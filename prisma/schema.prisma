@@ -1,0 +1,490 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String             @id @default(cuid())
+  name                 String?
+  email                String             @unique
+  emailVerified        DateTime? @map("emailverified")
+  image                String?
+  password             String?
+  role                 String             @default("user")
+  createdAt            DateTime           @default(now()) @map("createdat")
+  updatedAt            DateTime           @updatedAt @map("updatedat")
+  accounts             Account[]
+  auditLogs            AuditLog[]
+  favorites            Favorite[]
+  feedback             Feedback[]
+  links                LinkItem[]
+  memos                Memo[]
+  notifications        Notification[]
+  sessions             Session[]
+  shortLinks           ShortLink[]
+  preferences          UserPreference?
+  subscriptions        UserSubscription[]
+  webhooks             Webhook[]
+  workspaceMemberships WorkspaceMember[]
+  ownedWorkspaces      Workspace[]        @relation("WorkspaceOwner")
+
+  @@map("users")
+}
+
+model UserPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique @map("userid")
+  theme           String   @default("system")
+  language        String   @default("zh-CN")
+  emailNotif      Boolean  @default(true) @map("emailnotif")
+  compactMode     Boolean  @default(false) @map("compactmode")
+  itemsPerPage    Int      @default(20) @map("itemsperpage")
+  defaultCategory String? @map("defaultcategory")
+  createdAt       DateTime @default(now()) @map("createdat")
+  updatedAt       DateTime @updatedAt @map("updatedat")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String @map("userid")
+  type              String
+  provider          String
+  providerAccountId String @map("provideraccountid")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("sessiontoken")
+  userId       String @map("userid")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model LinkItem {
+  id           String     @id @default(cuid())
+  title        String
+  url          String
+  description  String?
+  icon         String?
+  categoryName String? @map("categoryname")
+  categoryId   String? @map("categoryid")
+  userId       String? @map("userid")
+  workspaceId  String? @map("workspaceid")
+  sortOrder    Int        @default(0) @map("sortorder")
+  isPinned     Boolean    @default(false) @map("ispinned")
+  isFeatured   Boolean    @default(false) @map("isfeatured")
+  clicks       Int        @default(0)
+  status       String     @default("active")
+  createdAt    DateTime   @default(now()) @map("createdat")
+  updatedAt    DateTime   @updatedAt @map("updatedat")
+  favorites    Favorite[]
+  tags         LinkTag[]
+  category     Category?  @relation(fields: [categoryId], references: [id])
+  user         User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("links")
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  icon      String?
+  color     String?
+  sortOrder Int        @default(0) @map("sortorder")
+  parentId  String? @map("parentid")
+  createdAt DateTime   @default(now()) @map("createdat")
+  updatedAt DateTime   @updatedAt @map("updatedat")
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  links     LinkItem[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("createdat")
+  links     LinkTag[]
+
+  @@map("tags")
+}
+
+model LinkTag {
+  id        String   @id @default(cuid())
+  linkId    String @map("linkid")
+  tagId     String @map("tagid")
+  createdAt DateTime @default(now()) @map("createdat")
+  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([linkId, tagId])
+  @@map("link_tags")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String @map("userid")
+  linkId    String @map("linkid")
+  createdAt DateTime @default(now()) @map("createdat")
+  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, linkId])
+  @@map("favorites")
+}
+
+model Memo {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  category  String?
+  userId    String @map("userid")
+  isPinned  Boolean  @default(false) @map("ispinned")
+  color     String?
+  createdAt DateTime @default(now()) @map("createdat")
+  updatedAt DateTime @updatedAt @map("updatedat")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("memos")
+}
+
+model Workspace {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  ownerId     String @map("ownerid")
+  isPublic    Boolean           @default(false) @map("ispublic")
+  slug        String            @unique
+  createdAt   DateTime          @default(now()) @map("createdat")
+  updatedAt   DateTime          @updatedAt @map("updatedat")
+  links       LinkItem[]
+  members     WorkspaceMember[]
+  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String @map("workspaceid")
+  userId      String @map("userid")
+  role        String    @default("member")
+  createdAt   DateTime  @default(now()) @map("createdat")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model ShortLink {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  url         String
+  userId      String? @map("userid")
+  title       String?
+  description String?
+  expiresAt   DateTime? @map("expiresat")
+  password    String?
+  clicks      Int       @default(0)
+  lastClickAt DateTime? @map("lastclickat")
+  isActive    Boolean   @default(true) @map("isactive")
+  createdAt   DateTime  @default(now()) @map("createdat")
+  updatedAt   DateTime  @updatedAt @map("updatedat")
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("short_links")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String? @map("userid")
+  action    String
+  entity    String?
+  entityId  String? @map("entityid")
+  details   String?
+  ip        String?
+  userAgent String? @map("useragent")
+  createdAt DateTime @default(now()) @map("createdat")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String? @map("userid")
+  type      String
+  subject   String
+  content   String
+  page      String?
+  email     String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now()) @map("createdat")
+  updatedAt DateTime @updatedAt @map("updatedat")
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("feedback")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String @map("userid")
+  title     String
+  message   String
+  type      String   @default("info")
+  link      String?
+  isRead    Boolean  @default(false) @map("isread")
+  createdAt DateTime @default(now()) @map("createdat")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model AdSlot {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  position    String
+  imageUrl    String @map("imageurl")
+  linkUrl     String @map("linkurl")
+  altText     String? @map("alttext")
+  startDate   DateTime @map("startdate")
+  endDate     DateTime? @map("enddate")
+  isActive    Boolean   @default(true) @map("isactive")
+  clicks      Int       @default(0)
+  impressions Int       @default(0)
+  createdAt   DateTime  @default(now()) @map("createdat")
+  updatedAt   DateTime  @updatedAt @map("updatedat")
+
+  @@map("ad_slots")
+}
+
+model Article {
+  id          String       @id @default(cuid())
+  title       String
+  slug        String       @unique
+  content     String
+  excerpt     String?
+  coverImage  String? @map("coverimage")
+  author      String?
+  status      String       @default("draft")
+  views       Int          @default(0)
+  publishedAt DateTime? @map("publishedat")
+  createdAt   DateTime     @default(now()) @map("createdat")
+  updatedAt   DateTime     @updatedAt @map("updatedat")
+  category    String?      // 文章分类：跨境寄送/海外生活/出海经营
+  seoTitle    String? @map("seotitle")       // SEO 标题
+  seoDescription String? @map("seodescription") // SEO 描述
+  relatedTools  String[] @default([]) @map("relatedtools") // 关联工具路由
+  tags        ArticleTag[]
+
+  @@index([status])
+  @@index([category])
+  @@map("articles")
+}
+
+model ArticleTag {
+  id        String   @id @default(cuid())
+  articleId String @map("articleid")
+  tag       String
+  createdAt DateTime @default(now()) @map("createdat")
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, tag])
+  @@map("article_tags")
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  description String?
+  category    String   // life/logistics/business/templates
+  tags        String[] @default([])
+  sourceType  String   @default("third-party") @map("sourcetype") // official/third-party/internal
+  usage       String?  // 适用场景/使用提示
+  disclaimer  String?  // 免责声明或使用提示
+  isActive    Boolean  @default(true) @map("isactive")
+  sortOrder   Int      @default(0) @map("sortorder")
+  createdAt   DateTime @default(now()) @map("createdat")
+  updatedAt   DateTime @updatedAt @map("updatedat")
+
+  @@index([category])
+  @@index([isActive])
+  @@map("resources")
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  name        String             @unique
+  slug        String             @unique
+  description String?
+  price       Float
+  interval    String
+  features    String?
+  isActive    Boolean            @default(true) @map("isactive")
+  sortOrder   Int                @default(0) @map("sortorder")
+  createdAt   DateTime           @default(now()) @map("createdat")
+  updatedAt   DateTime           @updatedAt @map("updatedat")
+  users       UserSubscription[]
+
+  @@map("subscriptions")
+}
+
+model UserSubscription {
+  id                String       @id @default(cuid())
+  userId            String @map("userid")
+  subscriptionId    String @map("subscriptionid")
+  status            String       @default("active")
+  startDate         DateTime     @default(now()) @map("startdate")
+  endDate           DateTime? @map("enddate")
+  cancelAtPeriodEnd Boolean      @default(false) @map("cancelatperiodend")
+  createdAt         DateTime     @default(now()) @map("createdat")
+  updatedAt         DateTime     @updatedAt @map("updatedat")
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subscriptionId])
+  @@map("user_subscriptions")
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  price       Float
+  interval    String
+  features    String?
+  isActive    Boolean  @default(true) @map("isactive")
+  createdAt   DateTime @default(now()) @map("createdat")
+  updatedAt   DateTime @updatedAt @map("updatedat")
+
+  @@map("subscription_plans")
+}
+
+model Webhook {
+  id            String    @id @default(cuid())
+  userId        String? @map("userid")
+  url           String
+  events        String
+  secret        String?
+  isActive      Boolean   @default(true) @map("isactive")
+  lastTriggered DateTime? @map("lasttriggered")
+  createdAt     DateTime  @default(now()) @map("createdat")
+  updatedAt     DateTime  @updatedAt @map("updatedat")
+  user          User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("webhooks")
+}
+
+model EmailSubscription {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  token       String?
+  confirmed   Boolean   @default(false)
+  isActive    Boolean   @default(true) @map("isactive")
+  confirmedAt DateTime? @map("confirmedat")
+  expiresAt   DateTime? @map("expiresat")
+  createdAt   DateTime  @default(now()) @map("createdat")
+  updatedAt   DateTime  @updatedAt @map("updatedat")
+
+  @@map("email_subscriptions")
+}
+
+model NewsletterBroadcast {
+  id        String   @id @default(cuid())
+  subject   String
+  content   String
+  status    String   @default("draft")
+  sentCount Int      @default(0) @map("sentcount")
+  createdAt DateTime @default(now()) @map("createdat")
+  updatedAt DateTime @updatedAt @map("updatedat")
+
+  @@map("newsletter_broadcasts")
+}
+
+model PostalCode {
+  id          String   @id @default(cuid())
+  country     String
+  countryCode String @map("countrycode")
+  province    String?
+  city        String
+  district    String?
+  postalCode  String @map("postalcode")
+  areaName    String? @map("areaname")
+  latitude    Float?
+  longitude   Float?
+  isActive    Boolean  @default(true) @map("isactive")
+  createdAt   DateTime @default(now()) @map("createdat")
+  updatedAt   DateTime @updatedAt @map("updatedat")
+
+  @@unique([country, postalCode])
+  @@index([country, city])
+  @@index([postalCode])
+  @@map("postal_codes")
+}
+
+model HSCode {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  level         Int
+  parentId      String? @map("parentid")
+  description   String
+  descriptionEn String? @map("descriptionen")
+  category      String?
+  taxRate       Float? @map("taxrate")
+  notes         String?
+  isActive      Boolean  @default(true) @map("isactive")
+  createdAt     DateTime @default(now()) @map("createdat")
+  updatedAt     DateTime @updatedAt @map("updatedat")
+  parent        HSCode?  @relation("HSHierarchy", fields: [parentId], references: [id])
+  children      HSCode[] @relation("HSHierarchy")
+
+  @@index([category])
+  @@index([description])
+  @@map("hs_codes")
+}

@@ -1,0 +1,134 @@
+{
+  "Navigation": {
+    "home": "首页",
+    "myLinks": "我的链接",
+    "tools": "工具合集",
+    "blog": "文章博客",
+    "favorites": "我的收藏",
+    "analytics": "数据分析",
+    "export": "数据导出",
+    "pricing": "定价方案",
+    "help": "帮助中心",
+    "settings": "系统设置",
+    "profile": "个人中心",
+    "admin": "管理后台"
+  },
+  "Common": {
+    "search": "搜索",
+    "loading": "加载中...",
+    "error": "出错了",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一页",
+    "prev": "上一页",
+    "noData": "暂无数据",
+    "success": "成功",
+    "failed": "失败"
+  },
+  "HomePage": {
+    "hero": {
+      "title": "一站式跨境物流工具平台",
+      "subtitle": "快递查询、船期跟踪、关务工具、翻译支付——您需要的，这里都有",
+      "cta": "立即开始使用",
+      "ctaSecondary": "了解更多"
+    },
+    "stats": {
+      "links": "链接总数",
+      "categories": "分类数量",
+      "users": "活跃用户",
+      "tools": "实用工具"
+    },
+    "features": {
+      "title": "核心功能",
+      "navigation": {
+        "title": "智能导航",
+        "desc": "49+ 物流工具分类导航，快速直达"
+      },
+      "tools": {
+        "title": "实用工具",
+        "desc": "运费计算、报关单生成、汇率换算等"
+      },
+      "analytics": {
+        "title": "数据分析",
+        "desc": "点击统计、趋势分析、分类分布可视化"
+      },
+      "management": {
+        "title": "后台管理",
+        "desc": "完整的 CMS、用户管理、数据备份"
+      }
+    }
+  },
+  "Tools": {
+    "title": "工具合集",
+    "subtitle": "专业的跨境物流工具集，助力您的日常工作",
+    "categories": {
+      "calculator": "计算器",
+      "document": "文档生成",
+      "converter": "转换器",
+      "utility": "实用工具"
+    },
+    "shippingCalculator": {
+      "title": "运费计算器",
+      "desc": "比较多家物流商价格，找到最优运输方案"
+    },
+    "customsGenerator": {
+      "title": "报关单生成器",
+      "desc": "快速生成商业发票和报关单据"
+    },
+    "exchangeRate": {
+      "title": "汇率换算",
+      "desc": "实时汇率查询，支持多种货币"
+    },
+    "qrCode": {
+      "title": "二维码生成",
+      "desc": "快速生成链接二维码，方便分享"
+    },
+    "containerCalculator": {
+      "title": "装箱计算",
+      "desc": "计算集装箱最优装载方案"
+    }
+  },
+  "Analytics": {
+    "title": "数据分析中心",
+    "subtitle": "实时监控与深度洞察",
+    "totalClicks": "总点击量",
+    "activeLinks": "活跃链接",
+    "activeUsers": "活跃用户",
+    "avgCTR": "平均 CTR",
+    "clickTrend": "点击趋势",
+    "categoryDist": "分类分布",
+    "topLinks": "热门链接",
+    "deviceDist": "设备分布",
+    "hourlyTraffic": "24小时流量",
+    "conversionFunnel": "转化漏斗",
+    "weeklyComparison": "周对比分析",
+    "exportReport": "导出报告",
+    "vsLastPeriod": "vs 上期",
+    "bestPrice": "最优惠"
+  },
+  "Auth": {
+    "login": "登录",
+    "register": "注册",
+    "logout": "退出登录",
+    "email": "邮箱",
+    "password": "密码",
+    "forgotPassword": "忘记密码",
+    "resetPassword": "重置密码",
+    "confirmEmail": "确认邮箱",
+    "noAccount": "还没有账户？",
+    "hasAccount": "已有账户？",
+    "signUpNow": "立即注册"
+  },
+  "Footer": {
+    "about": "关于我们",
+    "contact": "联系我们",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "copyright": "© 2024 喜熊供应链. 保留所有权利."
+  }
+}

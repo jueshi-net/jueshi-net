@@ -1,0 +1,46 @@
+{
+  "Navigation": {
+    "home": "홈",
+    "myLinks": "내 링크",
+    "tools": "도구",
+    "blog": "블로그",
+    "favorites": "즐겨찾기",
+    "analytics": "분석",
+    "export": "내보내기",
+    "pricing": "요금",
+    "help": "도움말",
+    "settings": "설정",
+    "profile": "프로필",
+    "admin": "관리"
+  },
+  "Common": {
+    "search": "검색",
+    "loading": "로딩 중...",
+    "error": "오류",
+    "save": "저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "편집",
+    "create": "생성",
+    "confirm": "확인",
+    "back": "뒤로",
+    "next": "다음",
+    "prev": "이전",
+    "noData": "데이터가 없습니다",
+    "success": "성공",
+    "failed": "실패"
+  },
+  "Auth": {
+    "login": "로그인",
+    "register": "가입",
+    "logout": "로그아웃",
+    "email": "이메일",
+    "password": "비밀번호",
+    "forgotPassword": "비밀번호 찾기",
+    "resetPassword": "비밀번호 재설정",
+    "confirmEmail": "이메일 확인",
+    "noAccount": "계정이 없으신가요?",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "signUpNow": "지금 가입"
+  }
+}
