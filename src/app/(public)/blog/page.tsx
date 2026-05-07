@@ -1,1 +1,1 @@
-import { redirect } from "next/navigation"; export default function BlogRedirect() { redirect("/guides"); }
+import { permanentRedirect } from "next/navigation"; export default function BlogRedirect() { permanentRedirect("/guides"); }
