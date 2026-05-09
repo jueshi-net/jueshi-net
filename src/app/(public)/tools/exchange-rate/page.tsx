@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
 
@@ -35,6 +36,9 @@ export default function ExchangeRatePage() {
   const [rateData, setRateData] = useState<RateResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [historyData, setHistoryData] = useState<{ date: string; rate: number }[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [showChart, setShowChart] = useState(false);
 
   const fetchRates = async () => {
     setLoading(true);
@@ -59,6 +63,53 @@ export default function ExchangeRatePage() {
       setLoading(false);
     }
   };
+
+  // Fetch 30-day history from frankfurter.app (free, no key needed)
+  const fetchHistory = async (from: string, to: string) => {
+    setHistoryLoading(true);
+    try {
+      const end = new Date();
+      const start = new Date();
+      start.setDate(end.getDate() - 30);
+      const startStr = start.toISOString().slice(0, 10);
+      const endStr = end.toISOString().slice(0, 10);
+
+      // frankfurter uses EUR base, fetch both currencies against EUR
+      const res = await fetch(
+        `https://api.frankfurter.app/${startStr}..${endStr}?from=EUR&to=${from},${to}`
+      );
+      if (!res.ok) throw new Error("history unavailable");
+      const json = await res.json();
+
+      // Convert EUR-based rates to from->to cross rate
+      const chartData: { date: string; rate: number }[] = [];
+      for (const [date, rates] of Object.entries(json.rates as Record<string, Record<string, number>>)) {
+        const fromEur = rates[from];
+        const toEur = rates[to];
+        if (fromEur && toEur) {
+          // from->to rate = toEur / fromEur
+          chartData.push({ date, rate: toEur / fromEur });
+        }
+      }
+      setHistoryData(chartData);
+      setShowChart(true);
+      trackEvent.custom('exchange-rate', 'view_history');
+    } catch {
+      // Silent fail — chart is optional
+      setHistoryData([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  // Current rate for reference line on chart
+  const currentRate = useMemo(() => {
+    if (!rateData) return null;
+    const fromRate = rateData.rates[fromCurrency];
+    const toRate = rateData.rates[toCurrency];
+    if (!fromRate || !toRate) return null;
+    return toRate / fromRate;
+  }, [rateData, fromCurrency, toCurrency]);
 
   useEffect(() => {
     fetchRates();
@@ -254,6 +305,88 @@ export default function ExchangeRatePage() {
               </div>
             </div>
           )}
+
+          {/* 30-Day History Chart */}
+          {rateData && (
+            <div className="mt-6 border-t pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-blue-500" />
+                  30 天汇率走势
+                </h3>
+                <button
+                  onClick={() => {
+                    if (!showChart) {
+                      fetchHistory(fromCurrency, toCurrency);
+                    } else {
+                      setShowChart(false);
+                    }
+                  }}
+                  disabled={historyLoading}
+                  className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50"
+                >
+                  {historyLoading ? "加载中..." : showChart ? "收起" : "查看走势"}
+                </button>
+              </div>
+
+              {showChart && historyData.length > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <p className="text-xs text-gray-500 mb-3">
+                    1 {fromCurrency} = ? {toCurrency}（数据来源：欧洲央行，仅参考）
+                  </p>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <LineChart data={historyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 10 }}
+                        tickFormatter={(v: string) => v.slice(5)}
+                        stroke="#9ca3af"
+                      />
+                      <YAxis
+                        tick={{ fontSize: 10 }}
+                        domain={['auto', 'auto']}
+                        stroke="#9ca3af"
+                        tickFormatter={(v: number) => v.toFixed(4)}
+                      />
+                      <Tooltip
+                        formatter={(value: unknown) => typeof value === 'number' ? value.toFixed(4) : String(value)}
+                        labelFormatter={(label: unknown) => String(label)}
+                        contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                      />
+                      {currentRate && (
+                        <ReferenceLine
+                          y={currentRate}
+                          stroke="#3b82f6"
+                          strokeDasharray="4 4"
+                          label={{
+                            value: `当前 ${currentRate.toFixed(4)}`,
+                            position: 'right',
+                            fontSize: 10,
+                            fill: '#3b82f6',
+                          }}
+                        />
+                      )}
+                      <Line
+                        type="monotone"
+                        dataKey="rate"
+                        stroke="#3b82f6"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {showChart && historyData.length === 0 && !historyLoading && (
+                <div className="bg-gray-50 rounded-xl p-8 text-center">
+                  <p className="text-sm text-gray-500">近期无可用历史数据（周末和节假日无报价）</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Disclaimer */}
@@ -286,6 +419,10 @@ export default function ExchangeRatePage() {
           {
             question: "可以用这个汇率做跨境结算吗？",
             answer: "不建议。本站汇率仅供参考和学习使用，不构成任何金融建议或结算依据。跨境结算请使用银行、PayPal、Wise 等持牌金融机构提供的实时汇率。",
+          },
+          {
+            question: "能看到汇率的历史走势吗？",
+            answer: "可以。点击「查看走势」按钮即可查看最近 30 天的汇率走势图，数据来源于欧洲央行（ECB）公开汇率。当前汇率以蓝色虚线标注在图表上，方便你对比历史水平。",
           },
         ]} />
       </div>

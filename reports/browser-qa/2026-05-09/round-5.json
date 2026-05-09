@@ -1,0 +1,698 @@
+{
+  "round": 5,
+  "timestamp": "2026-05-09T15:26:59.738Z",
+  "baseUrl": "http://localhost:3000",
+  "headless": true,
+  "mobileViewport": "iPhone 13 (390x844)",
+  "pages": [
+    {
+      "name": "home",
+      "status": "passed",
+      "title": "海外华人的常用工具箱",
+      "popularToolsExist": true,
+      "coreCardsFound": 3,
+      "time": "2026-05-09T15:27:12.589Z"
+    },
+    {
+      "name": "tracking",
+      "status": "passed",
+      "hasResults": true,
+      "copyExists": true,
+      "link17Exists": true,
+      "analyticsSent": 0,
+      "time": "2026-05-09T15:27:14.517Z"
+    },
+    {
+      "name": "shipping-calculator",
+      "status": "passed",
+      "time": "2026-05-09T15:27:15.585Z"
+    },
+    {
+      "name": "hs-code",
+      "status": "passed",
+      "searchTerms": [
+        "手机壳",
+        "茶叶",
+        "沙发",
+        "剪刀",
+        "猫粮"
+      ],
+      "riskLabels": 1,
+      "analytics": 0,
+      "time": "2026-05-09T15:27:20.564Z"
+    },
+    {
+      "name": "postal-code",
+      "status": "passed",
+      "time": "2026-05-09T15:27:25.722Z"
+    },
+    {
+      "name": "exchange-rate",
+      "status": "passed",
+      "hasDisclaimer": true,
+      "analytics": 0,
+      "time": "2026-05-09T15:27:27.476Z"
+    },
+    {
+      "name": "memo",
+      "status": "passed",
+      "analytics": 0,
+      "time": "2026-05-09T15:27:40.011Z"
+    },
+    {
+      "name": "resources",
+      "status": "passed",
+      "categories": 4,
+      "analytics": 0,
+      "time": "2026-05-09T15:27:41.741Z"
+    },
+    {
+      "name": "guides",
+      "status": "passed",
+      "time": "2026-05-09T15:27:47.789Z"
+    },
+    {
+      "name": "api-stats",
+      "status": 404,
+      "time": "2026-05-09T15:27:47.864Z"
+    },
+    {
+      "name": "rate-limit",
+      "status": "passed",
+      "got429": true,
+      "time": "2026-05-09T15:27:54.388Z"
+    }
+  ],
+  "errors": [
+    {
+      "severity": 2,
+      "page": "tracking",
+      "message": "未检测到 tracking 埋点请求",
+      "time": "2026-05-09T15:27:14.514Z"
+    },
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/logistics 不存在",
+      "time": "2026-05-09T15:27:41.739Z"
+    },
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/business 不存在",
+      "time": "2026-05-09T15:27:41.740Z"
+    },
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/templates 不存在",
+      "time": "2026-05-09T15:27:41.741Z"
+    },
+    {
+      "severity": 2,
+      "page": "guides",
+      "message": "文章相关工具点击未触发埋点",
+      "time": "2026-05-09T15:27:47.789Z"
+    },
+    {
+      "severity": 2,
+      "page": "api-stats",
+      "message": "/api/events/stats returned status 404",
+      "time": "2026-05-09T15:27:47.864Z"
+    }
+  ],
+  "failedRequests": [
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:14.577Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:14.577Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:14.577Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:15.832Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:15.832Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:15.832Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:15.832Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:40.104Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=b88ia",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-09T15:27:41.221Z"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "guides",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-09T15:27:47.853Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    },
+    {
+      "page": "guides",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-09T15:27:54.388Z"
+    }
+  ],
+  "p0": [],
+  "p1": [
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/logistics 不存在",
+      "time": "2026-05-09T15:27:41.739Z"
+    },
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/business 不存在",
+      "time": "2026-05-09T15:27:41.740Z"
+    },
+    {
+      "severity": 1,
+      "page": "resources",
+      "message": "分类入口 /resources/templates 不存在",
+      "time": "2026-05-09T15:27:41.741Z"
+    }
+  ],
+  "p2": [
+    {
+      "severity": 2,
+      "page": "tracking",
+      "message": "未检测到 tracking 埋点请求",
+      "time": "2026-05-09T15:27:14.514Z"
+    },
+    {
+      "severity": 2,
+      "page": "guides",
+      "message": "文章相关工具点击未触发埋点",
+      "time": "2026-05-09T15:27:47.789Z"
+    },
+    {
+      "severity": 2,
+      "page": "api-stats",
+      "message": "/api/events/stats returned status 404",
+      "time": "2026-05-09T15:27:47.864Z"
+    }
+  ],
+  "p3": [],
+  "timings": {
+    "home-load": 1581,
+    "home-click-物流追踪": 1670,
+    "home-click-运费/CBM": 28,
+    "home-click-HS编码": 25,
+    "home-click-邮编地址": 27,
+    "home-click-汇率查询": 20,
+    "home-click-工作便签": 34,
+    "tracking-load": 147,
+    "tracking-parse": 1158,
+    "tracking-copy-one": 24,
+    "tracking-17track": 51,
+    "shipping-load": 150,
+    "shipping-calc": 743,
+    "hs-load": 526,
+    "postal-load": 171,
+    "postal-validate-CA": 1145,
+    "postal-validate-US": 37,
+    "postal-validate-GB": 41,
+    "postal-validate-AU": 51,
+    "postal-validate-NZ": 50,
+    "exchange-load": 127,
+    "exchange-convert": 752,
+    "memo-load": 10078,
+    "memo-add": 41,
+    "memo-export": 35,
+    "resources-load": 171,
+    "guides-load": 1944
+  },
+  "analyticsSample": [
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:47.871Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:48.142Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:48.376Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:48.635Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:49.323Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:49.600Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:49.888Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:50.163Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:50.427Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:50.714Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:50.965Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:51.199Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:51.467Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:51.754Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:52.035Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:52.300Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:52.989Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:53.268Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:53.553Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:53.828Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:54.099Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-09T15:27:54.382Z"
+    }
+  ],
+  "reportFile": "round-5.md"
+}

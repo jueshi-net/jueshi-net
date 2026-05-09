@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, AlertCircle, Download, ListOrdered, FileText } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
@@ -19,6 +19,42 @@ export default function HSCodePage() {
   const [search, setSearch] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filterRisk, setFilterRisk] = useState('all');
+  const [batchMode, setBatchMode] = useState(false);
+  const [batchInput, setBatchInput] = useState('');
+
+  // CSV export: download filtered results as CSV
+  const exportCSV = () => {
+    const headers = '中文品名,英文申报名,HS候选编码,风险等级,材质,用途,申报注意\n';
+    const rows = filtered.map(p =>
+      `"${p.name}","${p.nameEn}","${p.hsCandidates.join('; ')}","${labelMap[p.riskLevel]}","${p.material}","${p.usage}","${p.notes.replace(/"/g, '""')}"`
+    ).join('\n');
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + headers + rows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hs-codes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    trackEvent.custom('hs-code', 'export_csv');
+  };
+
+  // Batch query: split input by lines/newlines, find matches for each
+  const batchResults = useMemo(() => {
+    if (!batchMode || !batchInput.trim()) return [];
+    const queries = batchInput.split(/[\n,，;；]+/).map(s => s.trim()).filter(Boolean);
+    return queries.map(q => {
+      const ql = q.toLowerCase();
+      const matches = commonProducts.filter(p =>
+        p.name.toLowerCase().includes(ql) ||
+        p.nameEn.toLowerCase().includes(ql) ||
+        p.aliases.some(a => a.toLowerCase().includes(ql))
+      );
+      return { query: q, matches, count: matches.length };
+    });
+  }, [batchMode, batchInput]);
+
+  const batchTotal = batchResults.reduce((sum, r) => sum + r.count, 0);
 
   const filtered = commonProducts.filter(p => {
     const q = search.toLowerCase();
@@ -71,7 +107,7 @@ export default function HSCodePage() {
 
         {/* Search & Filter */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-5 mb-6">
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input className="w-full pl-10 pr-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -85,8 +121,59 @@ export default function HSCodePage() {
               <option value="high-risk">仅高风险合规</option>
               <option value="restricted">仅受限/禁止风险</option>
             </select>
+            <button onClick={() => { setBatchMode(!batchMode); trackEvent.custom('hs-code', 'toggle_batch'); }}
+              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 transition-colors ${batchMode ? 'bg-blue-600 text-white border-blue-600' : 'dark:bg-gray-700 dark:border-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
+              <ListOrdered className="w-4 h-4" /> 批量查询
+            </button>
+            <button onClick={exportCSV}
+              className="px-4 py-2.5 border rounded-lg flex items-center gap-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800 transition-colors">
+              <Download className="w-4 h-4" /> 导出 CSV
+            </button>
           </div>
-          <p className="text-xs text-gray-400 mt-2">共 {commonProducts.length} 个常用商品，当前显示 {filtered.length} 个</p>
+          <p className="text-xs text-gray-400">共 {commonProducts.length} 个常用商品，当前显示 {filtered.length} 个</p>
+
+          {/* Batch Query Area */}
+          {batchMode && (
+            <div className="mt-4 pt-4 border-t dark:border-gray-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                批量查询 — 每行输入一个品名（支持中文/英文），或逗号/分号分隔
+              </p>
+              <textarea
+                value={batchInput}
+                onChange={e => setBatchInput(e.target.value)}
+                placeholder={"示例：\n手机壳\n充电宝\n茶叶\n沙发"}
+                rows={5}
+                className="w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono text-sm resize-y"
+              />
+              {batchInput.trim() && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    共 {batchResults.length} 个查询，匹配 {batchTotal} 条结果
+                  </p>
+                  {batchResults.map((r, i) => (
+                    <div key={i} className={`p-3 rounded-lg border ${r.count > 0 ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800'}`}>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {r.count > 0 ? '✅' : '❌'} {r.query}
+                        <span className="text-xs text-gray-500 ml-2">({r.count} 条匹配)</span>
+                      </p>
+                      {r.matches.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {r.matches.slice(0, 3).map((m, j) => (
+                            <span key={j} className="px-2 py-0.5 bg-white dark:bg-gray-700 rounded text-xs font-mono border">
+                              {m.hsCandidates[0]} — {m.nameEn}
+                            </span>
+                          ))}
+                          {r.matches.length > 3 && (
+                            <span className="text-xs text-gray-500">+{r.matches.length - 3} more</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Results */}
@@ -241,6 +328,14 @@ export default function HSCodePage() {
           {
             question: "如何查询官方的 HS 编码？",
             answer: "可以通过页面下方各国官方查询入口（中国海关总署、美国 USITC、英国 Trade Tariff 等）进行查询。也可以使用第三方参考网站如 hscode.net 进行快速检索。最终归类请以海关或报关行的判断为准。",
+          },
+          {
+            question: "能批量查询多个品名吗？",
+            answer: "可以。点击「批量查询」按钮，在文本框中输入多个品名（每行一个，或逗号/分号分隔），系统会同时搜索所有品名并显示匹配结果。适合需要同时查询多种商品的场景。",
+          },
+          {
+            question: "能导出 HS 编码数据吗？",
+            answer: "可以。点击「导出 CSV」按钮，会将当前筛选结果导出为 CSV 文件，包含中文品名、英文申报名、HS 候选编码、风险等级、材质、用途、申报注意等字段。方便在 Excel 中查看或发给报关行。",
           },
         ]} />
       </div>

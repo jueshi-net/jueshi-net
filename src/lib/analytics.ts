@@ -26,18 +26,21 @@ export interface TrackEvent {
 export function track(event: TrackEvent) {
   if (typeof window === 'undefined') return;
   
-  // Fire-and-forget: use sendBeacon if available, fallback to fetch
   const payload = {
     ...event,
     path: event.path || window.location.pathname,
     sessionId: getSessionId(),
   };
 
-  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  // In dev mode, use fetch for better testability and debugging
+  // In production, use sendBeacon for reliability
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   
-  if (navigator.sendBeacon) {
+  if (!isDev && navigator.sendBeacon) {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
     navigator.sendBeacon('/api/events', blob);
   } else {
+    // Use fetch with keepalive for dev mode (allows Playwright interception)
     fetch('/api/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
