@@ -128,7 +128,7 @@ export default function ExchangeRatePage() {
                   <p className="text-amber-600 font-medium">⚠ 数据已过期（API 暂不可用，显示为缓存内容）</p>
                 )}
                 {!rateData.isStale && (
-                  <p>缓存策略: 每 30 分钟自动刷新</p>
+                  <p>本站缓存约 30 分钟，实际更新时间以数据源返回为准</p>
                 )}
               </div>
             </div>

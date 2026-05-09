@@ -114,7 +114,7 @@ export default async function LandingPage() {
     { name: '邮编/地址工具', href: '/tools/postal-code', emoji: '📮', desc: '全球邮编 / 地址格式化', tooltip: '支持加拿大/美国/英国/澳洲/新西兰邮编格式校验，附带城市参考数据' },
     { name: '报价/收据生成', href: '/tools/quote', emoji: '💵', desc: '快速生成报价单收据', tooltip: '输入金额和商品，自动生成报价单或收据，支持多语言格式' },
     { name: '敏感货参考', href: '/tools/sensitive-goods', emoji: '⚠️', desc: '食品 / 电池 / 液体分类参考', tooltip: '查询常见物品是否属于敏感货（食品/液体/电池/粉末等），仅供参考不构成承运建议' },
-    { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '参考汇率换算', tooltip: '接入 ExchangeRate-API 实时数据，支持 9 种主流货币换算，每 30 分钟自动刷新' },
+    { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '参考汇率换算', tooltip: '接入 ExchangeRate-API 数据，支持 9 种主流货币换算，本站缓存约 30 分钟' },
   ];
 
   return (
@@ -189,14 +189,19 @@ export default async function LandingPage() {
                 <div className="text-3xl mb-3">{tool.emoji}</div>
                 <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{tool.name}</h3>
                 <p className="text-xs text-gray-400 mt-1">{tool.desc}</p>
-                {/* Tooltip */}
+                {/* Tooltip: desktop hover + mobile always-visible short hint */}
                 {tool.tooltip && (
-                  <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none shadow-lg">
-                    {tool.tooltip}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
-                      <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <>
+                    {/* Mobile: visible hint below card */}
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed md:hidden">{tool.tooltip}</p>
+                    {/* Desktop: hover tooltip */}
+                    <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible md:group-hover:opacity-100 md:group-hover:visible transition-all duration-200 pointer-events-none shadow-lg hidden md:block">
+                      {tool.tooltip}
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+                        <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </Link>
             ))}

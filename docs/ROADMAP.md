@@ -7,7 +7,7 @@
 | # | 工具 | 任务 | 说明 |
 |---|------|------|------|
 | 1 | exchange-rate | 升级 ExchangeRate-API v6 | 更稳定数据、更多币种、更高 QPS |
-| 2 | postal-code | 扩充城市范围数据 | CA/US/UK/AU/NZ 五国扩展 |
+| 2 | postal-code | 扩充城市范围数据 | 140 个城市（CA 49/US 31/UK 26/AU 22/NZ 12），0 重复 |
 | 3 | tracking | 批量追踪 + 单号复制 | 支持多单号同时查 17TRACK，每个单号可单独复制 |
 | 4 | home-page | 核心工具 Tooltip | 首页核心工具卡片增加悬浮提示 |
 
