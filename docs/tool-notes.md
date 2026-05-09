@@ -30,6 +30,20 @@
 
 ## 邮编查询 /tools/postal-code
 
-- 5 国（加拿大、美国、英国、澳大利亚、新西兰）100 个城市参考数据。
+- 5 国（加拿大、美国、英国、澳大利亚、新西兰）140 个城市参考数据。
 - 提供格式正则校验，非投递验证。
 - 官方入口：各国邮政官网。
+
+## Seed 数据维护
+
+- 种子文件 `prisma/seed-phase2-3.ts` 当前约 1850 行，包含：
+  - **Articles**: 20 篇（原始 10 + Phase 2A 新增 10）
+  - **Resources**: 80 条（4 类各 20 条，总计 81 含 1 条 extra）
+  - **Categories**: 6 个分类
+  - **Categories 资源**: 各 20 条
+- **维护建议**：后续当文章超过 30 篇或资源超过 100 条时，建议拆分为独立 seed 文件：
+  - `prisma/seed-articles.ts` — 文章种子
+  - `prisma/seed-resources.ts` — 资源种子
+  - `prisma/seed-main.ts` — 分类/用户/链接等核心数据
+  - 主 `prisma/seed.ts` 按顺序导入
+- 这样便于多人协作编辑、减少合并冲突、提高加载性能。
