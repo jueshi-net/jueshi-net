@@ -10,17 +10,26 @@ let cache: {
   date: string;
   updatedAt: string;
   cachedAt: number;
+  sourceLabel: string;
 } | null = null;
 
 /**
- * 调用 ExchangeRate-API v4 免费端点获取汇率。
- * 注意：v4 端点返回 { result: "success", ... } 格式。
- * 生产环境如需更稳定数据，可升级到 v6 端点：
- *   https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/CNY
- *   v6 需要 API Key，注册见 https://www.exchangerate-api.com/
+ * 调用 ExchangeRate-API 获取汇率。
+ * 优先级：
+ * 1. v6 端点（需 EXCHANGE_RATE_API_KEY 环境变量）— 更稳定、更高 QPS
+ * 2. v4 免费端点（无需 API Key）— 开发和轻量使用
+ *
+ * v6 升级路径：
+ * - 注册地址: https://www.exchangerate-api.com/
+ * - 设置环境变量: EXCHANGE_RATE_API_KEY=your_key_here
  */
 async function fetchFromProvider() {
-  const response = await fetch('https://api.exchangerate-api.com/v4/latest/CNY', {
+  const apiKey = process.env.EXCHANGE_RATE_API_KEY;
+  const url = apiKey
+    ? `https://v6.exchangerate-api.com/v6/${apiKey}/latest/CNY`
+    : 'https://api.exchangerate-api.com/v4/latest/CNY';
+
+  const response = await fetch(url, {
     next: { revalidate: 1800 }, // Next.js 数据缓存 30 分钟
   });
 
@@ -38,16 +47,24 @@ async function fetchFromProvider() {
     }
   }
 
-  // v4 返回 time_last_updated (Unix 秒)
-  const apiDate = data.time_last_updated
-    ? new Date(data.time_last_updated * 1000).toISOString().split('T')[0]
-    : new Date().toISOString().split('T')[0];
+  // v4 返回 time_last_updated (Unix 秒), v6 返回 time_last_update_utc (ISO string)
+  let apiDate: string;
+  if (data.time_last_updated) {
+    apiDate = new Date(data.time_last_updated * 1000).toISOString().split('T')[0];
+  } else if (data.time_last_update_utc) {
+    apiDate = new Date(data.time_last_update_utc).toISOString().split('T')[0];
+  } else {
+    apiDate = new Date().toISOString().split('T')[0];
+  }
+
+  const sourceLabel = apiKey ? 'ExchangeRate-API v6' : 'ExchangeRate-API v4';
 
   return {
     rates,
     base: 'CNY',
     date: apiDate,
     updatedAt: new Date().toISOString(),
+    sourceLabel,
   };
 }
 
@@ -58,7 +75,7 @@ export async function GET() {
   // 缓存有效，直接返回
   if (isFresh) {
     return NextResponse.json({
-      source: 'ExchangeRate-API v4',
+      source: cache!.sourceLabel,
       base: cache!.base,
       date: cache!.date,
       updatedAt: cache!.updatedAt,
@@ -73,7 +90,7 @@ export async function GET() {
     cache = { ...fresh, cachedAt: now };
 
     return NextResponse.json({
-      source: 'ExchangeRate-API v4',
+      source: fresh.sourceLabel,
       base: fresh.base,
       date: fresh.date,
       updatedAt: fresh.updatedAt,
@@ -86,7 +103,7 @@ export async function GET() {
     // 有新缓存但已过期，返回过时数据并标记 stale
     if (cache) {
       return NextResponse.json({
-        source: 'ExchangeRate-API v4',
+        source: cache.sourceLabel,
         base: cache.base,
         date: cache.date,
         updatedAt: cache.updatedAt,

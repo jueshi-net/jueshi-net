@@ -107,13 +107,14 @@ export default async function LandingPage() {
 
   // 8 Core tools
   const coreTools = [
-    { name: '物流追踪', href: '/tracking', emoji: '📦', desc: '单号查询 / 批量整理' },
-    { name: '体积/CBM/运费计算', href: '/tools/shipping-calculator', emoji: '📐', desc: '体积重 / CBM / 计费重 / 费用参考' },
-    { name: '发票/装箱单', href: '/tools/invoice', emoji: '🧾', desc: '商业发票 / 装箱单生成' },
-    { name: 'HS编码助手', href: '/tools/hs-code', emoji: '🔍', desc: '海关商品编码查询' },
-    { name: '邮编/地址工具', href: '/tools/postal-code', emoji: '📮', desc: '全球邮编 / 地址格式化' },
-    { name: '报价/收据生成', href: '/tools/quote', emoji: '💵', desc: '快速生成报价单收据' },
-    { name: '敏感货参考', href: '/tools/sensitive-goods', emoji: '⚠️', desc: '食品 / 电池 / 液体分类参考' },
+    { name: '物流追踪', href: '/tracking', emoji: '📦', desc: '单号查询 / 批量整理', tooltip: '支持粘贴多个单号，自动去重分行，每个单号可一键跳转 17TRACK 或承运商官网查询' },
+    { name: '体积/CBM/运费计算', href: '/tools/shipping-calculator', emoji: '📐', desc: '体积重 / CBM / 计费重 / 费用参考', tooltip: '输入长宽高和重量，自动计算体积重、计费重和 CBM，支持快递/空运/海运三种渠道' },
+    { name: '发票/装箱单', href: '/tools/invoice', emoji: '🧾', desc: '商业发票 / 装箱单生成', tooltip: '快速生成商业发票和装箱单，支持多币种、多商品，可导出 PDF 打印' },
+    { name: 'HS编码助手', href: '/tools/hs-code', emoji: '🔍', desc: '海关商品编码查询', tooltip: '收录 500+ 常见跨境商品 HS 编码候选，支持中/英/别名搜索，标注风险等级仅供参考' },
+    { name: '邮编/地址工具', href: '/tools/postal-code', emoji: '📮', desc: '全球邮编 / 地址格式化', tooltip: '支持加拿大/美国/英国/澳洲/新西兰邮编格式校验，附带城市参考数据' },
+    { name: '报价/收据生成', href: '/tools/quote', emoji: '💵', desc: '快速生成报价单收据', tooltip: '输入金额和商品，自动生成报价单或收据，支持多语言格式' },
+    { name: '敏感货参考', href: '/tools/sensitive-goods', emoji: '⚠️', desc: '食品 / 电池 / 液体分类参考', tooltip: '查询常见物品是否属于敏感货（食品/液体/电池/粉末等），仅供参考不构成承运建议' },
+    { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '参考汇率换算', tooltip: '接入 ExchangeRate-API 实时数据，支持 9 种主流货币换算，每 30 分钟自动刷新' },
   ];
 
   return (
@@ -183,11 +184,20 @@ export default async function LandingPage() {
               <Link
                 key={tool.href}
                 href={tool.href}
-                className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group"
+                className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group relative"
               >
                 <div className="text-3xl mb-3">{tool.emoji}</div>
                 <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{tool.name}</h3>
                 <p className="text-xs text-gray-400 mt-1">{tool.desc}</p>
+                {/* Tooltip */}
+                {tool.tooltip && (
+                  <div className="absolute z-10 bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none shadow-lg">
+                    {tool.tooltip}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+                      <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                    </div>
+                  </div>
+                )}
               </Link>
             ))}
           </div>
