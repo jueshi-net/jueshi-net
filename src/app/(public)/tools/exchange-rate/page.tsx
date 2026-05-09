@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info } from "lucide-react";
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 
 interface RateResponse {
   source: string;
@@ -197,7 +199,7 @@ export default function ExchangeRatePage() {
 
           <div className="flex gap-3 mb-6">
             <button
-              onClick={convert}
+              onClick={() => { convert(); trackEvent.exchangeConvert(); }}
               disabled={!rateData || loading}
               className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors"
             >
@@ -266,6 +268,26 @@ export default function ExchangeRatePage() {
             </div>
           </div>
         </div>
+
+        {/* FAQ */}
+        <FAQSection title="汇率查询常见问题" items={[
+          {
+            question: "汇率多久更新一次？",
+            answer: "本站接入 ExchangeRate-API 的每日更新汇率数据，本站缓存约 30 分钟。实际更新时间以数据源返回为准。如需更实时更新的汇率，建议使用银行或持牌金融机构的实时汇率接口。",
+          },
+          {
+            question: "为什么和银行的汇率不一样？",
+            answer: "本站使用的是国际市场中间汇率（mid-market rate），银行实际交易时会在这个基础上加点差（spread）。例如中间汇率是 1 USD = 7.2 CNY，银行卖出价可能是 7.25，买入价可能是 7.15。本站汇率仅作为参考，实际交易请以银行报价为准。",
+          },
+          {
+            question: "支持哪些货币？",
+            answer: "当前支持 9 种主流货币：美元 (USD)、人民币 (CNY)、加元 (CAD)、欧元 (EUR)、英镑 (GBP)、澳元 (AUD)、新西兰元 (NZD)、日元 (JPY)、港币 (HKD)。覆盖海外华人最常用的币种。",
+          },
+          {
+            question: "可以用这个汇率做跨境结算吗？",
+            answer: "不建议。本站汇率仅供参考和学习使用，不构成任何金融建议或结算依据。跨境结算请使用银行、PayPal、Wise 等持牌金融机构提供的实时汇率。",
+          },
+        ]} />
       </div>
     </div>
   );

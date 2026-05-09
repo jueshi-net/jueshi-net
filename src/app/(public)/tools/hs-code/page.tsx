@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 import { commonProducts } from '@/lib/data/product-declarations';
 import type { ProductDecl } from '@/lib/data/product-declarations';
 
@@ -117,10 +119,16 @@ export default function HSCodePage() {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">别名</p>
                         <p className="text-sm text-gray-700 dark:text-gray-300">{p.aliases.join(' / ')}</p>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">英文申报名</p>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">英文申报名</p>
+                      <div className="flex items-center gap-2">
                         <p className="text-sm font-mono text-blue-600 dark:text-blue-400">{p.nameEn}</p>
+                        <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(p.nameEn); trackEvent.hsCopyName(); }}
+                          className="text-xs text-blue-500 hover:text-blue-700 transition-colors" title="复制">
+                          📋
+                        </button>
                       </div>
+                    </div>
                       <div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">材质</p>
                         <p className="text-sm text-gray-700 dark:text-gray-300">{p.material}</p>
@@ -144,11 +152,13 @@ export default function HSCodePage() {
                     </div>
                     <div className="flex flex-wrap gap-3 text-xs">
                       <a href={p.officialUrl} target="_blank" rel="noopener noreferrer"
+                        onClick={() => trackEvent.hsClickVerify()}
                         className="inline-flex items-center gap-1 text-green-600 dark:text-green-400 hover:text-green-700">
                         <ExternalLink className="w-3 h-3" /> 前往官方税则核验
                       </a>
                       {p.thirdPartyUrl && (
                         <a href={p.thirdPartyUrl} target="_blank" rel="noopener noreferrer"
+                          onClick={() => trackEvent.custom('hs-code', 'click_third_party')}
                           className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-gray-600">
                           <ExternalLink className="w-3 h-3" /> 第三方参考入口
                         </a>
@@ -209,6 +219,30 @@ export default function HSCodePage() {
         </div>
 
         <RelatedGuidesSection slugs={["hs-code-beginner-guide", "commercial-invoice-how-to-fill"]} />
+
+        {/* FAQ */}
+        <FAQSection title="HS编码常见问题" items={[
+          {
+            question: "HS编码是什么？为什么需要它？",
+            answer: "HS编码（Harmonized System Code）是国际通用的商品分类编码体系，由世界海关组织（WCO）制定。国际贸易中，海关用 HS 编码来确定商品的关税税率、监管条件和统计数据。寄国际快递或做商业发票时，都需要填写商品 HS 编码。",
+          },
+          {
+            question: "本工具列出的 HS 编码能直接用吗？",
+            answer: "本工具列出的是候选编码，基于常见商品申报经验汇总。实际归类需要结合商品的具体材质、用途、加工工艺等因素综合判断。对于高价值货物或特殊商品，建议咨询报关行或查阅目的国官方税则。",
+          },
+          {
+            question: "为什么同一个商品有多个 HS 编码？",
+            answer: "HS 编码前 6 位是全球统一的，但各国可以在此基础上扩展至 8-10 位。同一商品因材质、规格不同可能归入不同编码。例如 T恤 按棉制和化纤制分别对应不同编码。本工具列出的是常见候选，具体适用需根据实际情况判断。",
+          },
+          {
+            question: "'需确认属性'和'高风险'是什么意思？",
+            answer: "风险等级仅供跨境寄送参考。普通货参考表示一般可作为普通货物寄送；需确认属性表示该商品可能涉及特殊材质（如木制、电池、液体）需要额外确认；高风险合规确认表示该商品受严格监管（如含锂电池、易燃品），运输前务必与承运商确认。",
+          },
+          {
+            question: "如何查询官方的 HS 编码？",
+            answer: "可以通过页面下方各国官方查询入口（中国海关总署、美国 USITC、英国 Trade Tariff 等）进行查询。也可以使用第三方参考网站如 hscode.net 进行快速检索。最终归类请以海关或报关行的判断为准。",
+          },
+        ]} />
       </div>
     </div>
   );

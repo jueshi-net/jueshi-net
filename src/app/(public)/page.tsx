@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { Package, Search, Calculator, FileText, MapPin, Globe, Briefcase, ArrowRight, Zap, Users, BookOpen, Calendar, Eye } from 'lucide-react';
+import { Package, Search, Calculator, FileText, MapPin, Globe, Briefcase, ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star } from 'lucide-react';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
+import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
 
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
@@ -174,6 +175,35 @@ export default async function LandingPage() {
         </div>
       </div>
 
+      {/* Popular Tools - Quick Access */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+          热门工具
+          <span className="text-sm font-normal text-gray-400 ml-2">快速入口</span>
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          {[
+            { name: '物流追踪', href: '/tracking', emoji: '📦' },
+            { name: '运费/CBM', href: '/tools/shipping-calculator', emoji: '📐' },
+            { name: 'HS编码', href: '/tools/hs-code', emoji: '🔍' },
+            { name: '邮编地址', href: '/tools/postal-code', emoji: '📮' },
+            { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱' },
+            { name: '工作便签', href: '/tools/memo', emoji: '📝' },
+          ].map((tool) => (
+            <TrackedHomeToolLink
+              key={tool.name}
+              href={tool.href}
+              toolName={tool.name}
+              className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all"
+            >
+              <span className="text-2xl">{tool.emoji}</span>
+              <span className="text-sm font-medium text-gray-700 text-center">{tool.name}</span>
+            </TrackedHomeToolLink>
+          ))}
+        </div>
+      </div>
+
       {/* Core Tools */}
       <div className="bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-16">
@@ -181,9 +211,10 @@ export default async function LandingPage() {
           <p className="text-gray-500 text-center mb-10">海外华人最常用的 8 大工具</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {coreTools.map((tool) => (
-              <Link
+              <TrackedHomeToolLink
                 key={tool.href}
                 href={tool.href}
+                toolName={tool.name}
                 className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group relative"
               >
                 <div className="text-3xl mb-3">{tool.emoji}</div>
@@ -203,7 +234,7 @@ export default async function LandingPage() {
                     </div>
                   </>
                 )}
-              </Link>
+              </TrackedHomeToolLink>
             ))}
           </div>
           <div className="text-center mt-8">

@@ -8,6 +8,8 @@ import {
   ArrowLeftRight, Scale, Box
 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 
 // ==================== Types ====================
 interface CalcRow {
@@ -193,6 +195,7 @@ export default function ShippingCalculatorPage() {
   const applyBatch = () => {
     if (parsedRows.length === 0) return;
     setRows(prev => [...prev, ...parsedRows]);
+    trackEvent.shippingCalculate();
     setShowBatch(false);
     setBatchText('');
     setParsedRows([]);
@@ -559,6 +562,30 @@ export default function ShippingCalculatorPage() {
 
         {/* Related Guides */}
         <RelatedGuidesSection slugs={['volumetric-weight-explained', 'cbm-shipping-volume-calculator']} />
+
+        {/* FAQ */}
+        <FAQSection title="运费计算常见问题" items={[
+          {
+            question: "什么是体积重？为什么要算体积重？",
+            answer: "体积重（Volumetric Weight / Dimensional Weight）是快递公司根据包裹体积折算的重量。因为轻但大的包裹（如泡沫、枕头）会占用更多运输空间，所以快递公司会按体积重和实际重量中较大的那个来计费。公式：长 × 宽 × 高 ÷ 除数。",
+          },
+          {
+            question: "快递、空运、海运的除数为什么不一样？",
+            answer: "不同运输方式的除数反映了各自的空间成本。快递（÷5000）最贵，因为时效快、空间紧张；空运（÷6000）次之；海运（÷7000）最宽松，因为船舱空间大。除数越大，算出来的体积重越小，费用越低。",
+          },
+          {
+            question: "什么是 CBM？",
+            answer: "CBM（Cubic Meter）是立方米，海运中常用的体积单位。1 CBM = 1 立方米。海运通常按 CBM 计费，不足 1 CBM 按 1 CBM 计算（LCL 拼箱）。输入长宽高时选择米作为单位，可直接得到 CBM 值。",
+          },
+          {
+            question: "计费重是什么？",
+            answer: "计费重（Chargeable Weight）是快递公司最终用来计算运费的重量，取实际重量和体积重中的较大者。如果体积重大于实重，说明是泡货，按体积重计费；如果实重大于体积重，说明是重货，按实重计费。",
+          },
+          {
+            question: "计算结果能作为实际运费报价吗？",
+            answer: "不能。本站只提供体积重和计费重的计算参考，不涉及具体运费报价。实际运费因承运商、渠道、目的地、燃油附加费等因素而异，请以承运商或集运商的实际报价为准。",
+          },
+        ]} />
       </div>
 
       {/* ==================== Batch Import Modal ==================== */}

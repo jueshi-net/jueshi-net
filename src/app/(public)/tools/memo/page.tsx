@@ -16,6 +16,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 
 const CATEGORIES = [
   "常用地址",
@@ -114,6 +116,7 @@ export default function MemoPage() {
         updatedAt: now,
       };
       persist([newNote, ...notes]);
+      trackEvent.memoAdd();
       flashMessage("success", "便签已创建");
     }
     resetForm();
@@ -140,6 +143,7 @@ export default function MemoPage() {
   const handleCopy = async (note: Note) => {
     try {
       await navigator.clipboard.writeText(note.content);
+      trackEvent.memoCopy();
       setCopiedId(note.id);
       setTimeout(() => setCopiedId(null), 1500);
     } catch {
@@ -148,6 +152,7 @@ export default function MemoPage() {
   };
 
   const handleExport = () => {
+    trackEvent.memoExport();
     const blob = new Blob([JSON.stringify(notes, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -458,6 +463,28 @@ export default function MemoPage() {
             {searchQuery || filterCategory ? "没有找到匹配的便签" : "还没有便签，点击上方按钮创建"}
           </div>
         )}
+      </div>
+
+      {/* FAQ */}
+      <div className="max-w-5xl mx-auto px-4 pb-16">
+        <FAQSection title="跨境工作便签常见问题" items={[
+          {
+            question: "便签数据存在哪里？会同步到云端吗？",
+            answer: "便签数据仅保存在您浏览器的本地存储（localStorage）中，不会上传到任何服务器。清除浏览器数据会导致便签丢失，建议定期使用导出功能备份。",
+          },
+          {
+            question: "如何备份和恢复便签？",
+            answer: "点击顶部的\"导出 JSON\"按钮可以下载所有便签的备份文件。需要恢复时，点击\"导入 JSON\"选择之前导出的文件即可。建议定期备份，防止浏览器数据被清理。",
+          },
+          {
+            question: "便签有什么用途？",
+            answer: "适合记录跨境工作中常用的信息：收件人地址、商品品名和 HS 编码候选、运单号整理、发票备注、客服话术模板等。7 个预设分类覆盖常见场景，也可以自定义分类。",
+          },
+          {
+            question: "数据安全吗？别人能看到我的便签吗？",
+            answer: "便签仅保存在您的浏览器本地，其他人无法通过网络访问。但如果您使用公共电脑，请记得退出时清除浏览器数据。建议不要在便签中存储密码、银行卡号等高敏感信息。",
+          },
+        ]} />
       </div>
     </div>
   );

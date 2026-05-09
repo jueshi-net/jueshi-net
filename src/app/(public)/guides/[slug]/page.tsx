@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { CalendarDays, Eye, Clock, ArrowLeft, Share2, Wrench, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
   "tracking": { name: "运单号整理工具", route: "/tracking", icon: "📦", desc: "批量整理运单号，自动识别承运商" },
@@ -97,20 +98,22 @@ export default async function ArticlePage({ params }: Props) {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {getRelatedTools(article.relatedTools).map((tool) => (
-                <Link
+                <TrackedArticleToolLink
                   key={tool.route}
                   href={tool.route}
-                  className="group flex flex-col gap-3 p-5 rounded-lg border bg-gray-50 hover:bg-white hover:shadow-md hover:border-blue-200 transition-all duration-200"
+                  toolName={tool.name}
                 >
-                  <span className="text-3xl">{tool.icon}</span>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{tool.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{tool.desc}</p>
+                  <div className="group flex flex-col gap-3 p-5 rounded-lg border bg-gray-50 hover:bg-white hover:shadow-md hover:border-blue-200 transition-all duration-200">
+                    <span className="text-3xl">{tool.icon}</span>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{tool.name}</h3>
+                      <p className="text-sm text-gray-500 mt-1">{tool.desc}</p>
+                    </div>
+                    <div className="mt-auto pt-2 flex items-center gap-1 text-sm text-blue-600 font-medium">
+                      使用工具 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
-                  <div className="mt-auto pt-2 flex items-center gap-1 text-sm text-blue-600 font-medium">
-                    使用工具 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
+                </TrackedArticleToolLink>
               ))}
             </div>
           </section>

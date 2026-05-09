@@ -11,6 +11,7 @@ import {
   Globe,
 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { TrackedResourceLink } from "@/components/tracked-resource-link";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -204,10 +205,11 @@ export default async function ResourceCategoryPage({ params }: Props) {
                     )}
 
                     {/* Action button */}
-                    <Link
+                    <TrackedResourceLink
                       href={href}
-                      target={isExternal ? "_blank" : undefined}
-                      rel={isExternal ? "noopener noreferrer" : undefined}
+                      isExternal={isExternal}
+                      isTemplate={isTemplate}
+                      category={slug}
                       className={`inline-flex items-center gap-2 text-sm font-medium transition-colors ${
                         isTemplate
                           ? "text-orange-600 hover:text-orange-700"
@@ -223,7 +225,7 @@ export default async function ResourceCategoryPage({ params }: Props) {
                           查看详情 <ArrowRight className="w-4 h-4" />
                         </>
                       )}
-                    </Link>
+                    </TrackedResourceLink>
                   </div>
                 </div>
               );

@@ -488,3 +488,20 @@ model HSCode {
   @@index([description])
   @@map("hs_codes")
 }
+
+// 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
+model EventLog {
+  id          String   @id @default(cuid())
+  eventType   String   @map("eventtype")       // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+  toolName    String?  @map("toolname")         // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
+  action      String?  // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
+  path        String?  // 页面路径，如 /tools/tracking
+  sessionId   String?  @map("sessionid")        // 匿名 sessionId（localStorage 生成，不关联用户身份）
+  createdAt   DateTime @default(now()) @map("createdat")
+
+  @@index([eventType])
+  @@index([toolName])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("event_logs")
+}

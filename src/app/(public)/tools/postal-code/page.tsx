@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 
 const STORAGE_KEY = 'postal-code-tool-state';
@@ -227,8 +229,8 @@ export default function PostalCodePage() {
                   onChange={e => setInputCode(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && validate()}
                 />
-                <button onClick={validate}
-                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm whitespace-nowrap">
+                <button onClick={() => { validate(); trackEvent.postalQuery(); }}
+                  className="px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
                   校验
                 </button>
               </div>
@@ -392,6 +394,26 @@ export default function PostalCodePage() {
         </div>
 
         <RelatedGuidesSection slugs={["canada-postal-code-format"]} />
+
+        {/* FAQ */}
+        <FAQSection title="邮编查询常见问题" items={[
+          {
+            question: "邮编校验通过就一定能收到包裹吗？",
+            answer: "不一定。本站只做格式校验和参考数据匹配，不验证地址是否真实存在。邮编正确只是投递成功的一个条件，还需要街道地址、门牌号、收件人姓名电话等信息完整准确。偏远地区即使邮编正确也可能需要额外派送时间或费用。",
+          },
+          {
+            question: "各国邮编格式是什么样的？",
+            answer: "加拿大：A1A 1A1（字母+数字+字母+空格+数字+字母+数字）；美国：12345 或 12345-6789（ZIP+4）；英国：SW1A 1AA（格式较灵活）；澳大利亚：1234（4位数字）；新西兰：1234（4位数字）。",
+          },
+          {
+            question: "美国 ZIP+4 是什么？必须填吗？",
+            answer: "ZIP+4 是在 5 位 ZIP Code 基础上增加的 4 位扩展码，用于更精确地定位到街道段或建筑群。普通邮寄写 5 位即可，但使用 ZIP+4 可以提高分拣效率和投递准确性。",
+          },
+          {
+            question: "加拿大邮编的字母 O 和数字 0 怎么区分？",
+            answer: "加拿大邮编不使用字母 O、D、F、I、Q、U（避免与数字混淆）。所以如果你看到类似字母 O，它实际上是数字 0。邮编的第一位字母表示省份，如 V 开头是 BC 省，M 开头是安大略省多伦多。",
+          },
+        ]} />
       </div>
     </div>
   );

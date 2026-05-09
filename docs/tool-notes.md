@@ -60,3 +60,24 @@
   - 主 `prisma/seed.ts` 按顺序导入
 - 这样便于多人协作编辑、减少合并冲突、提高加载性能。
 - **HS 数据**：`src/lib/data/product-declarations.ts` — 693 条，使用 `batch()` 函数按风险等级批量生成。新增条目必须置于对应风险等级的 `batch()` 数组内。部分条目通过 `riskLevel` 覆盖默认等级。
+
+## 匿名统计埋点 /api/events
+
+- **数据库**：当前 `DATABASE_URL` 指向 Neon 默认库 `neondb`（开发环境），非独立生产库。EventLog 仅用于开发/测试统计。
+- **环境标识**：`.env` 中 `DATABASE_URL` 包含 `ep-morning-sun-amgb7w40-pooler.c-5.us-east-1.aws.neon.tech`。
+- **白名单 eventType**：仅允许 `tool_click` / `tool_copy` / `tool_calculate` / `tool_query` / `article_click` / `resource_click` / `memo_action`，不在白名单的请求返回 400。
+- **字段长度限制**：eventType≤50, toolName≤80, action≤100, path≤300, sessionId≤100。
+- **防刷**：内存级限流，每 IP+UA 每 10 秒最多 20 次请求，超限返回 429。生产环境建议接 Redis / Vercel KV。
+- **不保存用户输入**：不采集单号、地址、邮编查询词、HS 搜索词、便签内容、发票内容等。仅记录事件元数据。
+- **前端埋点安全**：使用 `sendBeacon`（fire-and-forget），失败不阻塞跳转、复制、计算等操作；`fetch` fallback 有 `.catch(() => {})` 静吞错误。
+- **EventLog 保留策略**：仅保留 180 天内数据。后续可做定期清理脚本（`DELETE FROM event_logs WHERE createdat < NOW() - INTERVAL '180 days'`）。不存个人身份信息（PII）。
+- **/api/events/stats 访问控制**：
+  - 开发环境（NODE_ENV=development）：可公开访问。
+  - 生产环境：需设置 `ADMIN_SECRET` 环境变量并通过 `Authorization: Bearer <secret>` 验证；未设置则返回 403。
+  - 上线前必须设置 `ADMIN_SECRET` 或接入后台鉴权。
+- **上线前 TODO**：
+  - 使用 `npx prisma migrate dev` 管理 EventLog 表结构，而非仅 `db push`。
+  - 确认 DATABASE_URL 指向正确的生产库。
+  - 设置 ADMIN_SECRET 环境变量。
+  - 接入 Redis / KV 做分布式防刷限流。
+  - 配置 EventLog 定期清理任务。

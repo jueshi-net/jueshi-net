@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+import { FAQSection } from '@/components/faq-section';
+import { trackEvent } from '@/lib/analytics';
 
 interface Carrier {
   id: string;
@@ -60,6 +62,7 @@ export default function TrackingPage() {
     if (numbers.length === 0) return;
     navigator.clipboard.writeText(numbers.join('\n')).then(() => {
       setCopiedAll(true);
+      trackEvent.trackingCopy();
       setTimeout(() => setCopiedAll(false), 2000);
     });
   };
@@ -67,17 +70,20 @@ export default function TrackingPage() {
   const copyOne = (num: string) => {
     navigator.clipboard.writeText(num).then(() => {
       setCopiedSingle(num);
+      trackEvent.trackingCopy();
       setTimeout(() => setCopiedSingle(null), 1500);
     });
   };
 
   const jump17track = (num: string) => {
+    trackEvent.trackingClick17track();
     window.open(carrier17track(num), '_blank');
   };
 
   const jumpCarrier = (carrierId: string, num?: string) => {
     const c = carriers.find(x => x.id === carrierId);
     if (!c) return;
+    trackEvent.custom('tracking', 'jump_carrier');
     window.open(num ? c.trackingUrl : c.官网Url, '_blank');
   };
 
@@ -180,6 +186,7 @@ export default function TrackingPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">批量操作：</p>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={() => {
+                      trackEvent.trackingClick17track();
                       const url = carrier17track(numbers.join(','));
                       window.open(url, '_blank');
                     }} className="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded text-xs hover:bg-indigo-200 dark:hover:bg-indigo-900/50">
@@ -187,6 +194,7 @@ export default function TrackingPage() {
                     </button>
                     {currentCarrier && (
                       <button onClick={() => {
+                        trackEvent.custom('tracking', 'jump_carrier');
                         window.open(currentCarrier.trackingUrl, '_blank');
                       }} className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs hover:bg-blue-200 dark:hover:bg-blue-900/50">
                         前往 {currentCarrier.name} 官网
@@ -262,13 +270,37 @@ export default function TrackingPage() {
                 17TRACK 是全球知名的物流追踪平台，支持自动识别 1500+ 承运商。
                 如果您不确定单号属于哪家公司，可以直接在 17TRACK 查询。
               </p>
-              <button onClick={() => window.open('https://t.17track.net/en', '_blank')}
+              <button onClick={() => { trackEvent.trackingClick17track(); window.open('https://t.17track.net/en', '_blank'); }}
                 className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
                 <ExternalLink className="w-4 h-4" /> 打开 17TRACK
               </button>
             </div>
           </div>
         </div>
+
+        {/* FAQ */}
+        <FAQSection title="物流追踪常见问题" items={[
+          {
+            question: "为什么单号在官网查不到？",
+            answer: "刚生成的单号可能需要 1-6 小时才能在承运商系统中查到。如果商家只是打印了面单但快递员还没揽收，也不会显示轨迹。建议拿到单号后等 24-48 小时再查。",
+          },
+          {
+            question: "17TRACK 和承运商官网查的结果不一样？",
+            answer: "17TRACK 是第三方聚合平台，数据来自各承运商 API 同步，可能有几小时延迟。最准确的轨迹请以承运商官网为准。如果 17TRACK 能查到而官网查不到，可能是单号已转为目的国本地邮政的新单号。",
+          },
+          {
+            question: "邮政渠道的单号到国外后怎么查？",
+            answer: "通过 EMS/e邮宝等邮政渠道寄出的包裹，到达目的国后通常会转为当地邮政的新单号（如中国 EMS 到美国后转为 USPS 单号）。建议使用 17TRACK 查询，它能自动关联新旧单号。",
+          },
+          {
+            question: "什么是转运单号和末端派送单号？",
+            answer: "使用集运/转运服务时会收到多个单号：国内段单号（商家→转运仓）、国际段单号（转运仓→目的国）、末端派送单号（目的国本地快递派送）。每个阶段单号不同，需要分别追踪。",
+          },
+          {
+            question: "本站会保存我的物流信息吗？",
+            answer: "不会。本站只提供单号整理和跳转查询入口，不保存任何物流轨迹或包裹信息。所有查询都在承运商官网或 17TRACK 进行。",
+          },
+        ]} />
 
         <RelatedGuidesSection slugs={["package-tracking-sites-guide", "restricted-items-shipping-guide"]} />
       </div>
