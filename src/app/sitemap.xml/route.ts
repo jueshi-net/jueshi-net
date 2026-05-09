@@ -22,8 +22,8 @@ export async function GET() {
     '/resources', '/favorites', '/help', '/privacy', '/terms', '/changelog',
     '/tools/calculator', '/tools/qrcode', '/tools/exchange-rate',
     '/tools/container', '/tools/receipt', '/tools/invoice',
-    '/tools/memo', '/tools/quote', '/tools/inbound', '/tools/zip', '/tools/postal-code',
-    '/tools/hs-code', '/tools/shipping-estimator', '/tools/sensitive-goods', '/tools/address-formatter',
+    '/tools/qrcode', '/tools/exchange-rate',
+    '/tools/hs-code', '/tools/sensitive-goods', '/tools/address-formatter',
     '/tools/customs-generator', '/tools/shipping-calculator',
   ];
 

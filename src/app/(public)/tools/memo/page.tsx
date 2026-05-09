@@ -1,165 +1,300 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Trash2, Pin, PinOff, Save, Loader2, AlertCircle, CheckCircle, Search } from "lucide-react";
+import { useState } from "react";
+import {
+  Plus,
+  Trash2,
+  Pin,
+  PinOff,
+  Search,
+  Copy,
+  Download,
+  Upload,
+  Edit2,
+  Check,
+  X,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
-interface Memo {
+const CATEGORIES = [
+  "常用地址",
+  "常用品名",
+  "HS/申报",
+  "单号",
+  "单据备注",
+  "常用网站",
+  "客服话术",
+];
+
+const STORAGE_KEY = "cross_border_notes";
+
+interface Note {
   id: string;
   title: string;
   content: string;
+  category: string;
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
+function loadNotes(): Note[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Note[];
+  } catch {
+    console.error("Failed to load notes from localStorage");
+  }
+  return [];
+}
+
+function saveNotes(notes: Note[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  } catch {
+    console.error("Failed to save notes to localStorage");
+  }
+}
+
 export default function MemoPage() {
-  const [memos, setMemos] = useState<Memo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Memo | null>(null);
+  const [notes, setNotes] = useState<Note[]>(() => loadNotes());
+  const [editing, setEditing] = useState<Note | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const [filterCategory, setFilterCategory] = useState("");
+  const [message, setMessage] = useState({ type: "" as "success" | "error" | "", text: "" });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [formData, setFormData] = useState({ title: "", content: "", category: CATEGORIES[0], isPinned: false });
 
-  const [formData, setFormData] = useState({ title: "", content: "", isPinned: false });
-
-  useEffect(() => {
-    fetchMemos();
-  }, []);
-
-  const fetchMemos = async () => {
-    try {
-      const res = await fetch("/api/memos");
-      const data = await res.json();
-      if (data.success) setMemos(data.data || []);
-    } catch {
-      console.error("Failed to fetch memos");
-    } finally {
-      setLoading(false);
-    }
+  const flashMessage = (type: "success" | "error", text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: "", text: "" }), 2500);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.title.trim() && !formData.content.trim()) {
-      setMessage({ type: "error", text: "请输入标题或内容" });
-      return;
-    }
-
-    setSaving(true);
-    setMessage({ type: "", text: "" });
-
-    try {
-      if (editing) {
-        const res = await fetch(`/api/memos/${editing.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
-        if (data.success) {
-          setMessage({ type: "success", text: "备忘录已更新" });
-          fetchMemos();
-          resetForm();
-        }
-      } else {
-        const res = await fetch("/api/memos", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
-        if (data.success) {
-          setMessage({ type: "success", text: "备忘录已创建" });
-          fetchMemos();
-          resetForm();
-        }
-      }
-    } catch {
-      setMessage({ type: "error", text: "保存失败" });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("确定删除此备忘录？")) return;
-    try {
-      const res = await fetch(`/api/memos/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setMessage({ type: "success", text: "备忘录已删除" });
-        fetchMemos();
-      }
-    } catch {
-      setMessage({ type: "error", text: "删除失败" });
-    }
-  };
-
-  const togglePin = async (memo: Memo) => {
-    try {
-      const res = await fetch(`/api/memos/${memo.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...memo, isPinned: !memo.isPinned }),
-      });
-      if (res.ok) fetchMemos();
-    } catch {
-      console.error("Failed to toggle pin");
-    }
-  };
-
-  const startEdit = (memo: Memo) => {
-    setEditing(memo);
-    setFormData({ title: memo.title, content: memo.content, isPinned: memo.isPinned });
-    setShowForm(true);
+  const persist = (updated: Note[]) => {
+    setNotes(updated);
+    saveNotes(updated);
   };
 
   const resetForm = () => {
     setEditing(null);
     setShowForm(false);
-    setFormData({ title: "", content: "", isPinned: false });
+    setFormData({ title: "", content: "", category: CATEGORIES[0], isPinned: false });
   };
 
-  const filteredMemos = memos.filter(
-    (m) =>
-      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.content.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSubmit = () => {
+    if (!formData.title.trim() && !formData.content.trim()) {
+      flashMessage("error", "请输入标题或内容");
+      return;
+    }
 
-  if (loading) return <div className="max-w-4xl mx-auto px-4 py-8 text-center text-gray-500">加载中...</div>;
+    const now = new Date().toISOString();
+    if (editing) {
+      const updated = notes.map((n) =>
+        n.id === editing.id
+          ? { ...n, title: formData.title.trim(), content: formData.content, category: formData.category, isPinned: formData.isPinned, updatedAt: now }
+          : n
+      );
+      persist(updated);
+      flashMessage("success", "便签已更新");
+    } else {
+      const newNote: Note = {
+        id: generateId(),
+        title: formData.title.trim(),
+        content: formData.content,
+        category: formData.category,
+        isPinned: formData.isPinned,
+        createdAt: now,
+        updatedAt: now,
+      };
+      persist([newNote, ...notes]);
+      flashMessage("success", "便签已创建");
+    }
+    resetForm();
+  };
+
+  const handleDelete = (id: string) => {
+    persist(notes.filter((n) => n.id !== id));
+    flashMessage("success", "便签已删除");
+  };
+
+  const togglePin = (note: Note) => {
+    const updated = notes.map((n) =>
+      n.id === note.id ? { ...n, isPinned: !n.isPinned, updatedAt: new Date().toISOString() } : n
+    );
+    persist(updated);
+  };
+
+  const startEdit = (note: Note) => {
+    setEditing(note);
+    setFormData({ title: note.title, content: note.content, category: note.category, isPinned: note.isPinned });
+    setShowForm(true);
+  };
+
+  const handleCopy = async (note: Note) => {
+    try {
+      await navigator.clipboard.writeText(note.content);
+      setCopiedId(note.id);
+      setTimeout(() => setCopiedId(null), 1500);
+    } catch {
+      flashMessage("error", "复制失败");
+    }
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `跨境便签备份_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    flashMessage("success", "导出成功");
+  };
+
+  const handleImport = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target?.result as string) as Note[];
+          if (!Array.isArray(imported)) throw new Error("Invalid format");
+          const existingIds = new Set(notes.map((n) => n.id));
+          const newNotes = imported.filter((n) => !existingIds.has(n.id));
+          if (newNotes.length === 0) {
+            flashMessage("error", "没有新的便签可导入");
+            return;
+          }
+          persist([...newNotes, ...notes]);
+          flashMessage("success", `成功导入 ${newNotes.length} 条便签`);
+        } catch {
+          flashMessage("error", "导入失败，文件格式不正确");
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
+  const handleClearAll = () => {
+    persist([]);
+    setShowClearConfirm(false);
+    flashMessage("success", "所有便签已清空");
+  };
+
+  // Filtering & sorting
+  const filteredNotes = notes
+    .filter((n) => {
+      const matchesSearch =
+        !searchQuery ||
+        n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        n.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        n.category.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = !filterCategory || n.category === filterCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">云备忘录</h1>
-          <p className="text-sm text-gray-500 mt-1">你的个人私密笔记，安全存储</p>
+          <h1 className="text-2xl font-bold text-gray-900">跨境工作便签</h1>
+          <p className="text-sm text-gray-500 mt-1">数据保存在当前浏览器，安全私密</p>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> 新建备忘
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleImport}
+            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5"
+          >
+            <Upload className="w-4 h-4" /> 导入
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={notes.length === 0}
+            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" /> 导出
+          </button>
+          <button
+            onClick={() => setShowClearConfirm(true)}
+            disabled={notes.length === 0}
+            className="px-3 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="w-4 h-4" /> 清空
+          </button>
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" /> 新建便签
+          </button>
+        </div>
       </div>
 
+      {/* Disclaimers */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800 space-y-1">
+        <p>• 数据默认保存在当前浏览器</p>
+        <p>• 本站不会主动上传便签内容</p>
+        <p>• 更换设备或清理浏览器数据可能导致丢失</p>
+        <p>• 如需长期保存，请导出 JSON 备份</p>
+      </div>
+
+      {/* Message Toast */}
       {message.text && (
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm mb-4 ${
-          message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-        }`}>
-          {message.type === "success" ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+        <div
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm mb-4 ${
+            message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+          }`}
+        >
+          {message.type === "success" ? (
+            <CheckCircle className="w-4 h-4" />
+          ) : (
+            <AlertCircle className="w-4 h-4" />
+          )}
           <span>{message.text}</span>
         </div>
       )}
 
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="搜索备忘录..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+      {/* Search & Filter */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索便签..."
+            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm min-w-[140px]"
+        >
+          <option value="">全部分类</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Form Modal */}
@@ -167,8 +302,10 @@ export default function MemoPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">{editing ? "编辑备忘录" : "新建备忘录"}</h2>
-              <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">✕</button>
+              <h2 className="text-lg font-semibold">{editing ? "编辑便签" : "新建便签"}</h2>
+              <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
             </div>
             <div className="space-y-4">
               <input
@@ -184,12 +321,27 @@ export default function MemoPage() {
                 rows={10}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-6">
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="text-gray-500">分类</span>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <label className="flex items-center gap-2 text-sm text-gray-600">
                   <input
                     type="checkbox"
                     checked={formData.isPinned}
                     onChange={(e) => setFormData({ ...formData, isPinned: e.target.checked })}
+                    className="rounded"
                   />
                   置顶
                 </label>
@@ -197,54 +349,113 @@ export default function MemoPage() {
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleSubmit}
-                  disabled={saving}
-                  className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
                 >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  <Check className="w-4 h-4" />
                   保存
                 </button>
-                <button onClick={resetForm} className="px-6 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">取消</button>
+                <button
+                  onClick={resetForm}
+                  className="px-6 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
+                >
+                  取消
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Memo List */}
+      {/* Clear Confirmation Modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <AlertCircle className="w-6 h-6 text-red-500" />
+              <h2 className="text-lg font-semibold">确认清空</h2>
+            </div>
+            <p className="text-gray-600 text-sm mb-6">
+              确定要删除所有便签吗？此操作不可撤销。
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleClearAll}
+                className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+              >
+                确认清空
+              </button>
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className="flex-1 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
+              >
+                取消
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notes List */}
       <div className="space-y-4">
-        {filteredMemos.map((memo) => (
+        {filteredNotes.map((note) => (
           <div
-            key={memo.id}
+            key={note.id}
             className={`bg-white rounded-xl border p-5 hover:shadow-md transition-all ${
-              memo.isPinned ? "border-yellow-200 bg-yellow-50/30" : "border-gray-100"
+              note.isPinned ? "border-yellow-200 bg-yellow-50/30" : "border-gray-100"
             }`}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-gray-900">{memo.title}</h3>
-                {memo.isPinned && <Pin className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">
+                  {note.category}
+                </span>
+                <h3 className="text-lg font-semibold text-gray-900">{note.title}</h3>
+                {note.isPinned && <Pin className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
               </div>
-              <div className="flex gap-1">
-                <button onClick={() => togglePin(memo)} className="p-1 text-gray-400 hover:text-yellow-500">
-                  {memo.isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+              <div className="flex gap-1 shrink-0 ml-2">
+                <button
+                  onClick={() => handleCopy(note)}
+                  className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
+                  title="复制内容"
+                >
+                  {copiedId === note.id ? (
+                    <Check className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
                 </button>
-                <button onClick={() => startEdit(memo)} className="p-1 text-gray-400 hover:text-blue-600">
-                  <Save className="w-4 h-4" />
+                <button
+                  onClick={() => togglePin(note)}
+                  className="p-1.5 text-gray-400 hover:text-yellow-500 rounded transition-colors"
+                  title={note.isPinned ? "取消置顶" : "置顶"}
+                >
+                  {note.isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                 </button>
-                <button onClick={() => handleDelete(memo.id)} className="p-1 text-gray-400 hover:text-red-600">
+                <button
+                  onClick={() => startEdit(note)}
+                  className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
+                  title="编辑"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(note.id)}
+                  className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                  title="删除"
+                >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
-            <p className="text-gray-600 whitespace-pre-wrap line-clamp-4">{memo.content}</p>
+            <p className="text-gray-600 whitespace-pre-wrap line-clamp-6">{note.content}</p>
             <p className="text-xs text-gray-400 mt-3">
-              更新于 {new Date(memo.updatedAt).toLocaleString("zh-CN")}
+              更新于 {new Date(note.updatedAt).toLocaleString("zh-CN")}
             </p>
           </div>
         ))}
-        {filteredMemos.length === 0 && (
+        {filteredNotes.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-            {searchQuery ? "没有找到匹配的备忘录" : "还没有备忘录，点击上方按钮创建"}
+            {searchQuery || filterCategory ? "没有找到匹配的便签" : "还没有便签，点击上方按钮创建"}
           </div>
         )}
       </div>
