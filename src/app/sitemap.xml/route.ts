@@ -20,7 +20,7 @@ export async function GET() {
   const staticPages = [
     '', '/search', '/tools', '/shipping', '/business', '/guides', '/nav', '/tracking',
     '/resources', '/favorites', '/help', '/privacy', '/terms', '/changelog',
-    '/tools/calculator', '/tools/qrcode', '/tools/exchange-rate',
+    '/tools/qrcode', '/tools/exchange-rate',
     '/tools/container', '/tools/receipt', '/tools/invoice',
     '/tools/qrcode', '/tools/exchange-rate',
     '/tools/hs-code', '/tools/sensitive-goods', '/tools/address-formatter',

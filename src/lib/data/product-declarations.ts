@@ -20,7 +20,7 @@ const labelMap: Record<string, string> = {
   'normal': '普通货参考',
   'needs-confirm': '需确认属性',
   'high-risk': '高风险合规确认',
-  'restricted': '明显受限或禁止风险',
+  'restricted': '明显受限 / 高管制风险',
 };
 
 const mk = (name: string, aliases: string[], nameEn: string, material: string, usage: string, hsCandidates: string[], notes: string, riskLevel: ProductDecl['riskLevel'] = 'normal'): ProductDecl => ({

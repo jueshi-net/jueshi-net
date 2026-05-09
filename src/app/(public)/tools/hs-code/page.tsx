@@ -10,7 +10,7 @@ const labelMap: Record<string, string> = {
   'normal': '普通货参考',
   'needs-confirm': '需确认属性',
   'high-risk': '高风险合规确认',
-  'restricted': '明显受限或禁止风险',
+  'restricted': '明显受限 / 高管制风险',
 };
 
 export default function HSCodePage() {
@@ -63,7 +63,7 @@ export default function HSCodePage() {
         {/* Risk level disclaimer */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-4">
           <p className="text-xs text-blue-700 dark:text-blue-400">
-            风险等级仅供跨境寄送和申报准备参考，不代表任何物流服务商的接货规则。
+            风险等级仅供跨境寄送和申报准备参考，不代表任何物流服务商、海关或报关行的最终判断。
           </p>
         </div>
 
