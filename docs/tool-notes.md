@@ -2,11 +2,17 @@
 
 ## 汇率工具 /tools/exchange-rate
 
-- **数据源**: ExchangeRate-API (api.exchangerate-api.com/v4/latest/CNY)
-- **缓存策略**: 当前为 Node.js 内存缓存（单实例，约 30 分钟 TTL）+ Next.js revalidate 30 分钟。
+- **数据源**: ExchangeRate-API v4 免费端点 (api.exchangerate-api.com/v4/latest/CNY)
+- **v6 升级路径**: 生产环境如需更稳定数据、更多币种、更高 QPS，可升级至 v6 端点：
+  - URL 格式: `https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/CNY`
+  - 需注册获取 API Key: https://www.exchangerate-api.com/
+  - 升级时需修改 `src/app/api/exchange-rate/route.ts` 中的 fetch URL
+  - 将 `API_KEY` 作为环境变量 `EXCHANGE_RATE_API_KEY` 注入
+- **缓存策略**: Node.js 进程内内存缓存（单实例有效，TTL 30 分钟）+ Next.js 数据缓存 30 分钟。
 - **生产环境建议**: 如需跨实例稳定缓存、避免冷启动重复请求，后续可接入 Redis / Vercel KV / 数据库缓存。当前内存缓存适合开发和轻量使用场景。
-- **页面口径**: "参考汇率"（非"实时汇率"），明确标注数据来源、最后更新时间、缓存状态及"仅供参考"声明。
-- **失败策略**: API 失败时返回缓存数据（标注 stale）；无缓存时显示错误信息，不显示假数据。
+- **API 响应字段**: source, base(CNY), date, updatedAt, rates(仅 9 种货币), isStale。不返回第三方原始完整 JSON。
+- **页面口径**: "参考汇率"（非"实时汇率"），明确标注数据来源、数据基准、汇率日期、本站更新时间、缓存状态及"仅供参考"声明。
+- **失败策略**: API 失败时返回缓存数据（标记 isStale=true）；无缓存时显示错误，不显示假数据。
 - **支持币种**: CNY, USD, CAD, EUR, GBP, AUD, NZD, JPY, HKD。
 
 ## 运费计算器 /tools/shipping-calculator

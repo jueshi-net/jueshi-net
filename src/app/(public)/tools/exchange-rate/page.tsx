@@ -3,15 +3,13 @@
 import { useState, useEffect } from "react";
 import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info } from "lucide-react";
 
-interface ExchangeRateData {
-  success: boolean;
-  rates: Record<string, number>;
+interface RateResponse {
   source: string;
-  lastUpdate: string;
-  cachedAt: string;
-  cacheDurationMin: number;
-  fromCache: boolean;
-  stale?: boolean;
+  base: string;
+  date: string;
+  updatedAt: string;
+  rates: Record<string, number>;
+  isStale: boolean;
   error?: string;
 }
 
@@ -32,7 +30,7 @@ export default function ExchangeRatePage() {
   const [fromCurrency, setFromCurrency] = useState("USD");
   const [toCurrency, setToCurrency] = useState("CNY");
   const [result, setResult] = useState<{ amount: number; rate: number } | null>(null);
-  const [rateData, setRateData] = useState<ExchangeRateData | null>(null);
+  const [rateData, setRateData] = useState<RateResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,9 +45,8 @@ export default function ExchangeRatePage() {
         setRateData(null);
         return;
       }
-      const data = await res.json();
+      const data: RateResponse = await res.json();
       setRateData(data);
-      // Auto-convert if we already have a result
       if (amount && fromCurrency && toCurrency) {
         doConvert(data.rates);
       }
@@ -69,21 +66,17 @@ export default function ExchangeRatePage() {
     const amt = parseFloat(amount) || 0;
     const fromRate = rates[fromCurrency];
     const toRate = rates[toCurrency];
-
     if (fromRate === undefined || toRate === undefined) return;
 
-    // Convert via CNY (all rates are relative to CNY)
-    const inCNY = amt / fromRate; // amount in CNY
-    const converted = inCNY * toRate; // convert to target
+    // 通过 CNY 中转换算
+    const inCNY = amt / fromRate;
+    const converted = inCNY * toRate;
     const rate = toRate / fromRate;
-
     setResult({ amount: converted, rate });
   };
 
   const convert = () => {
-    if (rateData) {
-      doConvert(rateData.rates);
-    }
+    if (rateData) doConvert(rateData.rates);
   };
 
   const swap = () => {
@@ -98,20 +91,23 @@ export default function ExchangeRatePage() {
     setResult(null);
   };
 
-  const formatUpdateTime = (iso: string) => {
-    const d = new Date(iso);
-    return d.toLocaleString("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+  const formatDateTime = (iso: string) => {
+    return new Date(iso).toLocaleString("zh-CN", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit",
+    });
+  };
+
+  const formatDate = (iso: string) => {
+    return new Date(iso).toLocaleDateString("zh-CN", {
+      year: "numeric", month: "2-digit", day: "2-digit",
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <DollarSign className="w-8 h-8 text-green-600" />
@@ -121,18 +117,24 @@ export default function ExchangeRatePage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          {/* Data source info */}
+          {/* Data source bar */}
           {rateData && (
             <div className="mb-4 bg-blue-50 rounded-xl p-3 flex items-start gap-2">
               <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
               <div className="text-xs text-blue-700 space-y-0.5">
-                <p>数据来源: {rateData.source} | 更新: {formatUpdateTime(rateData.lastUpdate)}</p>
-                <p>缓存时间: {rateData.cacheDurationMin} 分钟 {rateData.stale && "(数据已过时)"} {rateData.fromCache && !rateData.stale && "(使用缓存)"}</p>
+                <p>数据来源: {rateData.source} | 数据基准: {rateData.base}</p>
+                <p>汇率日期: {formatDate(rateData.date)} | 本站更新: {formatDateTime(rateData.updatedAt)}</p>
+                {rateData.isStale && (
+                  <p className="text-amber-600 font-medium">⚠ 数据已过期（API 暂不可用，显示为缓存内容）</p>
+                )}
+                {!rateData.isStale && (
+                  <p>缓存策略: 每 30 分钟自动刷新</p>
+                )}
               </div>
             </div>
           )}
 
-          {/* Loading state */}
+          {/* Loading */}
           {loading && !rateData && (
             <div className="mb-4 bg-gray-50 rounded-xl p-4 text-center">
               <RefreshCw className="w-5 h-5 text-gray-400 animate-spin mx-auto mb-2" />
@@ -140,22 +142,20 @@ export default function ExchangeRatePage() {
             </div>
           )}
 
-          {/* Error state */}
+          {/* Error */}
           {error && !rateData && (
             <div className="mb-4 bg-red-50 rounded-xl p-4 flex items-start gap-2">
               <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm text-red-700">{error}</p>
-                <button
-                  onClick={fetchRates}
-                  className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-                >
+                <button onClick={fetchRates} className="mt-2 text-sm text-red-600 hover:text-red-800 underline">
                   重新尝试
                 </button>
               </div>
             </div>
           )}
 
+          {/* Conversion form */}
           <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">持有货币</label>
@@ -177,10 +177,7 @@ export default function ExchangeRatePage() {
               />
             </div>
 
-            <button
-              onClick={swap}
-              className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-            >
+            <button onClick={swap} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
               <ArrowLeftRight className="w-5 h-5 text-gray-600" />
             </button>
 
@@ -215,6 +212,7 @@ export default function ExchangeRatePage() {
             </button>
           </div>
 
+          {/* Result */}
           {result && (
             <div className="bg-green-50 rounded-xl p-6">
               <div className="flex items-center justify-between">
@@ -225,7 +223,7 @@ export default function ExchangeRatePage() {
                     {result.amount.toFixed(2)}
                   </p>
                   <p className="text-xs text-green-500 mt-2">
-                    汇率: 1 {fromCurrency} = {result.rate.toFixed(4)} {toCurrency}
+                    参考汇率: 1 {fromCurrency} = {result.rate.toFixed(4)} {toCurrency}
                   </p>
                 </div>
                 <div className="text-right text-sm text-green-600">
@@ -239,7 +237,7 @@ export default function ExchangeRatePage() {
           {/* Quick Rates Table */}
           {rateData && (
             <div className="mt-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">常用参考汇率 (对CNY)</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">常用参考汇率 (1 CNY = ?)</h3>
               <div className="grid grid-cols-3 gap-2">
                 {CURRENCIES.filter((c) => c.code !== "CNY").map((c) => {
                   const rate = rateData.rates[c.code];
@@ -263,7 +261,7 @@ export default function ExchangeRatePage() {
             <div className="text-sm text-yellow-800">
               <p className="font-medium">免责声明</p>
               <p className="mt-1">
-                以上汇率数据仅供参考，不构成任何投资或交易建议。实际交易汇率请以银行或金融机构提供的实时汇率为准。汇率数据来源于第三方 API，可能存在延迟或误差，本站不对汇率数据的准确性、及时性作任何保证。
+                本站汇率数据由 ExchangeRate-API 提供，仅供参考，不构成任何金融建议或结算承诺。实际交易汇率请以银行或持牌金融机构提供的汇率为准。本站不对汇率数据的准确性、及时性或完整性作任何保证。
               </p>
             </div>
           </div>
