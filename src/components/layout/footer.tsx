@@ -15,7 +15,7 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">常用工具</h3>
             <ul className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
-              <li><Link href="/tools/shipping-estimator" className="hover:text-blue-600 dark:hover:text-blue-400">运费估算</Link></li>
+              <li><Link href="/tools/shipping-calculator" className="hover:text-blue-600 dark:hover:text-blue-400">运费估算</Link></li>
               <li><Link href="/tools/invoice" className="hover:text-blue-600 dark:hover:text-blue-400">发票生成</Link></li>
               <li><Link href="/tools/sensitive-goods" className="hover:text-blue-600 dark:hover:text-blue-400">敏感货参考</Link></li>
               <li><Link href="/tools/postal-code" className="hover:text-blue-600 dark:hover:text-blue-400">邮编查询</Link></li>

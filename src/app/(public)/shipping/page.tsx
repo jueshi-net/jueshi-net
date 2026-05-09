@@ -16,10 +16,10 @@ const shippingTools = [
     color: "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300",
   },
   {
-    title: "体积重与运费估算",
-    description: "体积重计算、计费重估算、费用构成理解",
+    title: "体积/CBM/运费计算",
+    description: "体积重计算、计费重估算、CBM、费用构成参考",
     icon: Calculator,
-    href: "/tools/shipping-estimator",
+    href: "/tools/shipping-calculator",
     color: "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300",
   },
   {
@@ -37,10 +37,10 @@ const shippingTools = [
     color: "bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300",
   },
   {
-    title: "体积/CBM计算",
-    description: "快速计算包裹体积重量和立方数",
+    title: "体积/CBM/运费计算",
+    description: "快速计算包裹体积重量、CBM立方数和计费重",
     icon: Calculator,
-    href: "/tools/calculator",
+    href: "/tools/shipping-calculator",
     color: "bg-cyan-100 text-cyan-600 dark:bg-cyan-900 dark:text-cyan-300",
   },
   {

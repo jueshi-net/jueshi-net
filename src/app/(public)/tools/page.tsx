@@ -13,8 +13,7 @@ export default function ToolsCenterPage() {
       name: "跨境寄送工具", 
       tools: [
         { name: "物流追踪", href: "/tracking", icon: Package, desc: "单号查询 / 批量整理" },
-        { name: "体积重与运费估算", href: "/tools/shipping-estimator", icon: Calculator, desc: "体积重 / 计费重 / 费用构成" },
-        { name: "体积重 / CBM 计算", href: "/tools/calculator", icon: Calculator, desc: "体积重 / CBM 计算" },
+        { name: "体积/CBM/运费计算", href: "/tools/shipping-calculator", icon: Calculator, desc: "体积重 / CBM / 计费重 / 费用参考" },
         { name: "敏感货参考查询", href: "/tools/sensitive-goods", icon: AlertTriangle, desc: "食品 / 电池 / 液体分类参考" },
       ]
     },

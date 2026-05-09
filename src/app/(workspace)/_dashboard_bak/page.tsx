@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   ]);
 
   const quickTools = [
-    { name: "体积计算", desc: "材积重", icon: Calculator, href: "/tools/calculator", color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" },
+    { name: "体积计算", desc: "材积重", icon: Calculator, href: "/tools/shipping-calculator", color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400" },
     { name: "汇率查询", desc: "实时汇率", icon: DollarSign, href: "/tools/exchange-rate", color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" },
     { name: "收据", desc: "收款凭证", icon: Receipt, href: "/tools/receipt", color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" },
     { name: "发票", desc: "形式发票", icon: FileText, href: "/tools/invoice", color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400" },

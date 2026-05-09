@@ -17,7 +17,7 @@ export default async function DashboardPage() {
 
   const tools = [
     { name: "物流追踪", href: "/tracking", icon: PackageSearch, color: "bg-blue-100 text-blue-600" },
-    { name: "体积计算", href: "/tools/calculator", icon: Calculator, color: "bg-green-100 text-green-600" },
+    { name: "体积计算", href: "/tools/shipping-calculator", icon: Calculator, color: "bg-green-100 text-green-600" },
     { name: "发票生成", href: "/tools/invoice", icon: FileTextIcon, color: "bg-purple-100 text-purple-600" },
     { name: "邮编查询", href: "/tools/postal-code", icon: MapPin, color: "bg-orange-100 text-orange-600" },
   ];

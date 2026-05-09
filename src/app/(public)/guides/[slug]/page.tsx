@@ -5,14 +5,14 @@ import Link from "next/link";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
   "tracking": { name: "运单号整理工具", route: "/tracking", icon: "📦", desc: "批量整理运单号，自动识别承运商" },
-  "shipping-estimator": { name: "运费估算器", route: "/tools/shipping-estimator", icon: "🧮", desc: "计算体积重和费用参考" },
+  "shipping-estimator": { name: "运费估算器", route: "/tools/shipping-calculator", icon: "🧮", desc: "计算体积重和费用参考" },
   "hs-code": { name: "HS编码查询", route: "/tools/hs-code", icon: "📋", desc: "100个常用商品HS编码参考" },
   "sensitive-goods": { name: "敏感物品参考", route: "/tools/sensitive-goods", icon: "⚠️", desc: "特殊物品寄送参考和合规话术" },
   "postal-code": { name: "邮编格式校验", route: "/tools/postal-code", icon: "📮", desc: "5国邮编格式验证" },
   "address-formatter": { name: "地址格式化", route: "/tools/address-formatter", icon: "📝", desc: "5国地址格式一键生成" },
   "invoice": { name: "发票生成器", route: "/tools/invoice", icon: "📄", desc: "在线生成商业发票和装箱单" },
   "quote": { name: "报价单生成器", route: "/tools/quote", icon: "💰", desc: "外贸报价单模板" },
-  "calculator": { name: "计算器", route: "/tools/calculator", icon: "🔢", desc: "在线计算工具" },
+  "calculator": { name: "计算器", route: "/tools/shipping-calculator", icon: "🔢", desc: "在线计算工具" },
   "customs-generator": { name: "报关单生成", route: "/tools/customs-generator", icon: "📦", desc: "报关单据生成工具" },
 };
 

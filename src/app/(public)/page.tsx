@@ -98,7 +98,7 @@ export default async function LandingPage() {
   // Scene entries
   const scenes = [
     { title: "我要查包裹", href: "/tracking", icon: Package, color: "bg-blue-50 text-blue-600 border-blue-100", desc: "物流追踪 / 批量查询 / 异常解释" },
-    { title: "我要算运费", href: "/tools/shipping-estimator", icon: Calculator, color: "bg-green-50 text-green-600 border-green-100", desc: "体积重计算 / 集运估算 / 汇率换算" },
+    { title: "我要算运费", href: "/tools/shipping-calculator", icon: Calculator, color: "bg-green-50 text-green-600 border-green-100", desc: "体积重计算 / 集运估算 / CBM" },
     { title: "我要做单据", href: "/tools/invoice", icon: FileText, color: "bg-purple-50 text-purple-600 border-purple-100", desc: "发票 / 装箱单 / 报价单 / 收据" },
     { title: "我要查邮编地址", href: "/tools/postal-code", icon: MapPin, color: "bg-orange-50 text-orange-600 border-orange-100", desc: "全球邮编 / 地址格式 / 偏远地区" },
     { title: "我要找海外资源", href: "/resources", icon: BookOpen, color: "bg-teal-50 text-teal-600 border-teal-100", desc: "生活办事 / 银行学校 / 网盘资料" },
@@ -108,8 +108,7 @@ export default async function LandingPage() {
   // 8 Core tools
   const coreTools = [
     { name: '物流追踪', href: '/tracking', emoji: '📦', desc: '单号查询 / 批量整理' },
-    { name: '体积/CBM计算', href: '/tools/calculator', emoji: '📐', desc: '体积重 / CBM 计算' },
-    { name: '体积重与运费估算', href: '/tools/shipping-estimator', emoji: '💰', desc: '体积重 / 计费重 / 费用构成' },
+    { name: '体积/CBM/运费计算', href: '/tools/shipping-calculator', emoji: '📐', desc: '体积重 / CBM / 计费重 / 费用参考' },
     { name: '发票/装箱单', href: '/tools/invoice', emoji: '🧾', desc: '商业发票 / 装箱单生成' },
     { name: 'HS编码助手', href: '/tools/hs-code', emoji: '🔍', desc: '海关商品编码查询' },
     { name: '邮编/地址工具', href: '/tools/postal-code', emoji: '📮', desc: '全球邮编 / 地址格式化' },

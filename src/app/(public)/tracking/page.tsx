@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle, Link as LinkIcon } from 'lucide-react';
+import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 
 interface Carrier {
@@ -148,26 +148,28 @@ export default function TrackingPage() {
                     {copiedAll ? <><Check className="w-3 h-3" /> 已复制全部</> : <><Copy className="w-3 h-3" /> 复制全部</>}
                   </button>
                 </div>
-                <div className="space-y-2 max-h-80 overflow-y-auto">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
                   {numbers.map((num, i) => (
                     <div key={`${num}-${i}`}
-                      className="flex items-center justify-between gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-gray-400 w-6 text-right">{i + 1}</span>
-                        <span className="font-mono text-sm text-gray-900 dark:text-white truncate">{num}</span>
+                      className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs text-gray-400 w-6 text-right shrink-0">{i + 1}</span>
+                          <span className="font-mono text-sm text-gray-900 dark:text-white truncate">{num}</span>
+                        </div>
+                        <button onClick={() => removeOne(num)}
+                          className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0" title="移除">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex gap-2 pl-8">
                         <button onClick={() => copyOne(num)}
-                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="复制">
-                          {copiedSingle === num ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 rounded text-xs text-gray-700 dark:text-gray-200 hover:border-blue-400 hover:text-blue-600 transition-colors">
+                          {copiedSingle === num ? <><Check className="w-3 h-3 text-green-500" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制单号</>}
                         </button>
                         <button onClick={() => jump17track(num)}
-                          className="p-1 text-gray-400 hover:text-indigo-600 transition-colors" title="17TRACK">
-                          <LinkIcon className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => removeOne(num)}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors" title="移除">
-                          <Trash2 className="w-4 h-4" />
+                          className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded text-xs text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
+                          <ExternalLink className="w-3 h-3" /> 在17TRACK查询
                         </button>
                       </div>
                     </div>
@@ -246,9 +248,9 @@ export default function TrackingPage() {
               <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">💡 使用提示</h3>
               <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
                 <li>• 粘贴单号后点击"解析单号"，自动去空格、分行、去重复</li>
-                <li>• 点击单号旁的 <LinkIcon className="w-3 h-3 inline" /> 图标，跳转 17TRACK 查询</li>
+                <li>• 每个单号下方有"复制单号"和"在17TRACK查询"按钮，一键操作</li>
                 <li>• 点击"复制全部"，可复制整理后的单号列表</li>
-                <li>• 单号前的序号方便与朋友核对，点击 <Trash2 className="w-3 h-3 inline" /> 可移除单个</li>
+                <li>• 也可使用底部"全部跳转 17TRACK"批量打开查询</li>
                 <li>• 17TRACK 支持全球 1500+ 承运商自动识别</li>
               </ul>
             </div>
