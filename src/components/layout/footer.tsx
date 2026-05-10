@@ -47,6 +47,9 @@ export default function Footer() {
             海外百宝箱是独立工具与资源平台，不直接承运、不代收包裹、不代表任何物流服务商。
             相关价格、时效和规则请以实际服务商为准。
           </p>
+          <p className="mt-2">
+            部分链接可能为推广或赞助内容，海外百宝箱不对第三方服务结果作出承诺，请用户自行判断。
+          </p>
         </div>
         <div className="mt-4 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-sm text-gray-400 dark:text-gray-500">
           © {new Date().getFullYear()} 海外百宝箱. All rights reserved.

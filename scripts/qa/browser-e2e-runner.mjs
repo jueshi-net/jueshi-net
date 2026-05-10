@@ -634,6 +634,65 @@ async function testExchangeRate(page) {
 }
 
 // ============================================================
+// TEST 6.5: Starter Resources (/starter)
+// ============================================================
+async function testStarter(page) {
+  const name = 'starter';
+  log(`[${name}] Starting test...`);
+  setupCapture(page, name);
+  
+  const t0 = Date.now();
+  await page.goto(BASE_URL + '/starter', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForSelector('h1', { timeout: 10000 }).catch(() => {});
+  results.timings['starter-load'] = Date.now() - t0;
+  
+  // Check title
+  const h1Text = await page.locator('h1').first().innerText().catch(() => '');
+  const hasTitle = h1Text.includes('外网新手资源清单');
+  if (!hasTitle) {
+    addError(0, name, '页面标题应为「外网新手资源清单」');
+  }
+  
+  // Check 5 categories exist
+  const categories = ['新手必装软件', 'AI 工具', '视频与学习平台', '账号安全', '浏览器插件'];
+  for (const cat of categories) {
+    const exists = await page.locator(`text=${cat}`).count().then(c => c > 0).catch(() => false);
+    if (!exists) addError(1, name, `分类「${cat}」未出现`);
+  }
+  
+  // Check forbidden content (only in main content, not in disclaimer)
+  const forbidden = ['VPN下载', '翻墙工具推荐'];
+  for (const term of forbidden) {
+    const found = await page.locator(`text=${term}`).count().then(c => c > 0).catch(() => false);
+    if (found) addError(1, name, `页面不应出现「${term}」`);
+  }
+  // Check for YouTube playlist ID (should not be on page)
+  const pageContent = await page.content();
+  if (pageContent.includes('PLToFqcThng7rCz')) {
+    addError(1, name, '页面不应包含 YouTube 播放列表 ID');
+  }
+  
+  // Check external links have target="_blank" and rel="noopener"
+  const externalLinks = page.locator('a[target="_blank"]');
+  const count = await externalLinks.count();
+  let hasOpener = false;
+  for (let i = 0; i < count; i++) {
+    const rel = await externalLinks.nth(i).getAttribute('rel').catch(() => '');
+    if (rel && !rel.includes('noopener')) {
+      hasOpener = true;
+      break;
+    }
+  }
+  if (count > 0 && hasOpener) {
+    addWarning(2, name, '部分外链缺少 rel="noopener"');
+  }
+  
+  saveScreenshot(page, 'starter');
+  recordPage(name, 'passed', { title: h1Text, externalLinks: count });
+  log(`[${name}] Completed: title="${h1Text}", links=${count}`);
+}
+
+// ============================================================
 // TEST 7: Memo
 // ============================================================
 async function testMemo(page) {
@@ -946,6 +1005,7 @@ async function main() {
     await testHSCode(page);
     await testPostalCode(page);
     await testExchangeRate(page);
+    await testStarter(page);
     await testMemo(page);
     await testResources(page);
     await testGuides(page);

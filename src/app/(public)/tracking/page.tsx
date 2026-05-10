@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
+import { AdSlot } from '@/components/ad-slot';
 import { trackEvent } from '@/lib/analytics';
 
 interface Carrier {
@@ -301,6 +302,8 @@ export default function TrackingPage() {
             answer: "不会。本站只提供单号整理和跳转查询入口，不保存任何物流轨迹或包裹信息。所有查询都在承运商官网或 17TRACK 进行。",
           },
         ]} />
+
+        <AdSlot placement="tool-bottom" className="mb-8" />
 
         <RelatedGuidesSection slugs={["package-tracking-sites-guide", "restricted-items-shipping-guide"]} />
       </div>

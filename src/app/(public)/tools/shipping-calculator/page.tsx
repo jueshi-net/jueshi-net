@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
+import { AdSlot } from '@/components/ad-slot';
 import { trackEvent } from '@/lib/analytics';
 
 // ==================== Types ====================
@@ -678,6 +679,8 @@ export default function ShippingCalculatorPage() {
           </div>
         </div>
       )}
+
+      <AdSlot placement="tool-bottom" className="mt-8 mb-8 max-w-4xl mx-auto" />
     </div>
   );
 }

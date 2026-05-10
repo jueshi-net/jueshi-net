@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, AlertCircle, Download, ListOrdered, FileText } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
+import { AdSlot } from '@/components/ad-slot';
 import { trackEvent } from '@/lib/analytics';
 import { commonProducts } from '@/lib/data/product-declarations';
 import type { ProductDecl } from '@/lib/data/product-declarations';
@@ -338,6 +339,8 @@ export default function HSCodePage() {
             answer: "可以。点击「导出 CSV」按钮，会将当前筛选结果导出为 CSV 文件，包含中文品名、英文申报名、HS 候选编码、风险等级、材质、用途、申报注意等字段。方便在 Excel 中查看或发给报关行。",
           },
         ]} />
+
+        <AdSlot placement="tool-bottom" className="mb-8" />
       </div>
     </div>
   );

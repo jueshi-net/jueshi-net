@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CalendarDays, Eye, Clock, ArrowLeft, Share2, Wrench, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
+import { AdSlot } from "@/components/ad-slot";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
   "tracking": { name: "运单号整理工具", route: "/tracking", icon: "📦", desc: "批量整理运单号，自动识别承运商" },
@@ -89,7 +90,11 @@ export default async function ArticlePage({ params }: Props) {
           {article.author && <p className="text-sm text-gray-500 mt-2">作者：{article.author}</p>}
         </header>
 
+        <AdSlot placement="article-top" className="mb-8" />
+
         <div className="prose prose-gray max-w-none dark:prose-invert" dangerouslySetInnerHTML={{ __html: article.content }} />
+
+        <AdSlot placement="article-bottom" className="mt-8 mb-8" />
 
         {getRelatedTools(article.relatedTools).length > 0 && (
           <section className="mt-12 pt-8 border-t">
