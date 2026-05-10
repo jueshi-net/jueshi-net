@@ -64,33 +64,16 @@ export default function ExchangeRatePage() {
     }
   };
 
-  // Fetch 30-day history from frankfurter.app (free, no key needed)
+  // Fetch 30-day history via our backend proxy (eliminates CORS noise)
   const fetchHistory = async (from: string, to: string) => {
     setHistoryLoading(true);
     try {
-      const end = new Date();
-      const start = new Date();
-      start.setDate(end.getDate() - 30);
-      const startStr = start.toISOString().slice(0, 10);
-      const endStr = end.toISOString().slice(0, 10);
-
-      // frankfurter uses EUR base, fetch both currencies against EUR
-      const res = await fetch(
-        `https://api.frankfurter.app/${startStr}..${endStr}?from=EUR&to=${from},${to}`
-      );
+      const res = await fetch(`/api/exchange-rate/history?from=${from}&to=${to}&days=30`);
       if (!res.ok) throw new Error("history unavailable");
       const json = await res.json();
 
-      // Convert EUR-based rates to from->to cross rate
-      const chartData: { date: string; rate: number }[] = [];
-      for (const [date, rates] of Object.entries(json.rates as Record<string, Record<string, number>>)) {
-        const fromEur = rates[from];
-        const toEur = rates[to];
-        if (fromEur && toEur) {
-          // from->to rate = toEur / fromEur
-          chartData.push({ date, rate: toEur / fromEur });
-        }
-      }
+      // API returns { points: [{ date, rate }] }
+      const chartData: { date: string; rate: number }[] = json.points || [];
       setHistoryData(chartData);
       setShowChart(true);
       trackEvent.custom('exchange-rate', 'view_history');

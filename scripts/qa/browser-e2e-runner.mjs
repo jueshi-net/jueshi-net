@@ -574,14 +574,29 @@ async function testExchangeRate(page) {
   }
   
   // === NEW: Test 30-day history chart ===
+  // Capture requests to verify proxy API is used
+  let historyApiCalled = false;
+  let frankfurterCorsFound = false;
+  const onRequest = req => {
+    if (req.url().includes('/api/exchange-rate/history')) historyApiCalled = true;
+  };
+  const onConsole = msg => {
+    if (msg.type() === 'error' && msg.text().includes('frankfurter.app')) {
+      frankfurterCorsFound = true;
+    }
+  };
+  page.on('request', onRequest);
+  page.on('console', onConsole);
+  
   const chartBtn = page.locator('button').filter({ hasText: /查看走势/ });
   if (await chartBtn.count().then(c => c > 0).catch(() => false)) {
     await chartBtn.click();
-    await page.waitForTimeout(2000); // Allow API fetch time
+    await page.waitForTimeout(2500); // Allow API fetch time
     
     // Check chart area or empty state
     const hasChart = await page.locator('text=走势').count().then(c => c > 0).catch(() => false);
-    const hasEmpty = await page.locator('text=无可用历史数据').count().then(c => c > 0).catch(() => false);
+    const hasEmpty = await page.locator('text=走势暂不可用').count().then(c => c > 0).catch(() => false) ||
+                     await page.locator('text=无可用历史数据').count().then(c => c > 0).catch(() => false);
     const hasError = await page.locator('text=加载失败').count().then(c => c > 0).catch(() => false);
     
     if (hasChart || hasEmpty) {
@@ -592,10 +607,26 @@ async function testExchangeRate(page) {
       addWarning(2, name, '汇率走势图状态不明确');
     }
     
-    // Collapse chart
-    await chartBtn.click();
-    await page.waitForTimeout(200);
+    // Verify proxy usage
+    if (historyApiCalled) {
+      log(`[${name}] Proxy API /api/exchange-rate/history called ✓`);
+    } else {
+      addWarning(2, name, '未检测到本站代理 API 请求');
+    }
+    if (frankfurterCorsFound) {
+      addError(1, name, '仍出现 frankfurter.app CORS 报错');
+    }
+    
+    // Collapse chart (button text changed to "收起")
+    const collapseBtn = page.locator('button').filter({ hasText: /收起/ });
+    if (await collapseBtn.count().then(c => c > 0).catch(() => false)) {
+      await collapseBtn.click();
+      await page.waitForTimeout(200);
+    }
   }
+  
+  page.off('request', onRequest);
+  page.off('console', onConsole);
   
   saveScreenshot(page, 'exchange-rate');
   recordPage(name, 'passed', { hasDisclaimer, analytics: analytics.length });
