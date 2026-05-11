@@ -423,6 +423,14 @@ export const starterCategories = [
 // 首页卡片配置
 export const starterHomeCards = [
   {
+    id: "popular-apps",
+    title: "热门软件与网站",
+    description: "Telegram、YouTube、X、Ins、Facebook 等，一键直达",
+    icon: "🌍",
+    href: "/starter/apps",
+    tags: ["热门必装"],
+  },
+  {
     id: "starter",
     title: "外网新手必装软件",
     description: "浏览器、翻译、密码管理器、云盘、笔记工具",

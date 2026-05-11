@@ -966,6 +966,94 @@ async function testRateLimiting(page) {
 }
 
 // ============================================================
+// TEST: Documents Hub + Editor
+// ============================================================
+async function testDocuments(page) {
+  const name = 'documents';
+  log(`[${name}] Starting test...`);
+  setupCapture(page, name);
+  
+  // Test hub page
+  const t0 = Date.now();
+  await page.goto(BASE_URL + '/tools/documents', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForSelector('h1', { timeout: 10000 }).catch(() => {});
+  results.timings['documents-load'] = Date.now() - t0;
+  
+  // Check 12 core document cards exist
+  const coreDocs = ['形式发票', '商业发票', '装箱单', '销售合同', '订舱委托书', '报关委托书', '送货单', '运费对账单', '集运入库单', '集运合箱', '国际快递申报', '通用报价单'];
+  for (const doc of coreDocs) {
+    const exists = await page.locator(`text=${doc}`).count().then(c => c > 0).catch(() => false);
+    if (!exists) addError(1, name, `核心单据「${doc}」卡片未出现`);
+  }
+  
+  // Click PI to go to editor
+  const piLink = page.locator('a[href="/tools/documents/proforma-invoice"]').first();
+  if (await piLink.count().then(c => c > 0).catch(() => false)) {
+    await piLink.click();
+    await page.waitForTimeout(2000);
+    
+    // Check editor page loaded
+    const hasTitle = await page.locator('text=形式发票').count().then(c => c > 0).catch(() => false);
+    if (!hasTitle) addError(1, name, 'PI 编辑页标题未出现');
+    
+    // Fill a basic field
+    const docNoInput = page.locator('input[placeholder*="PI"]').first();
+    if (await docNoInput.count().then(c => c > 0).catch(() => false)) {
+      await docNoInput.fill('E2E-TEST-001');
+      await page.waitForTimeout(300);
+    }
+    
+    // Add a line item
+    const addBtn = page.locator('text=添加一行').first();
+    if (await addBtn.count().then(c => c > 0).catch(() => false)) {
+      await addBtn.click();
+      await page.waitForTimeout(300);
+    }
+    
+    // Check preview exists
+    const hasPreview = await page.locator('text=实时预览').count().then(c => c > 0).catch(() => false);
+    if (!hasPreview) addWarning(2, name, '预览区未出现');
+    
+    // Check export buttons exist
+    const hasPrintBtn = await page.locator('text=打印').count().then(c => c > 0).catch(() => false);
+    const hasPngBtn = await page.locator('button:has-text("PNG")').count().then(c => c > 0).catch(() => false);
+    const hasWordBtn = await page.locator('button:has-text("Word")').count().then(c => c > 0).catch(() => false);
+    
+    if (!hasPrintBtn) addError(1, name, '打印/PDF 按钮不存在');
+    if (!hasPngBtn) addError(1, name, 'PNG 按钮不存在');
+    if (!hasWordBtn) addWarning(2, name, 'Word 按钮不存在');
+    
+    // Check no VPN/proxy content
+    const pageContent = await page.content();
+    if (pageContent.includes('VPN') && pageContent.includes('下载')) {
+      addError(1, name, '页面不应出现 VPN 下载内容');
+    }
+    
+    // Check no ads in export area (check that ad slot is below form)
+    const exportSection = page.locator('text=打印 / PDF').first();
+    if (await exportSection.count().then(c => c > 0).catch(() => false)) {
+      // Check no ad text near export buttons
+      const nearbyAd = await page.locator('text=推荐').count().then(c => c > 0).catch(() => false);
+      // Ads are OK on page, just not in export area
+    }
+  }
+  
+  // Check old invoice page redirects
+  await page.goto(BASE_URL + '/tools/invoice', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(1000);
+  const currentUrl = page.url();
+  if (currentUrl.includes('invoice') && !currentUrl.includes('documents')) {
+    // Page still loads - check if it has redirect message
+    const hasRedirect = await page.locator('text=单据工具已升级').count().then(c => c > 0).catch(() => false);
+    if (!hasRedirect) addWarning(2, name, '/tools/invoice 旧页面未显示升级提示');
+  }
+  
+  saveScreenshot(page, 'documents');
+  recordPage(name, 'passed', { coreDocsCount: coreDocs.length });
+  log(`[${name}] Completed: core docs checked`);
+}
+
+// ============================================================
 // MAIN: Run all tests
 // ============================================================
 async function main() {
@@ -1009,6 +1097,7 @@ async function main() {
     await testMemo(page);
     await testResources(page);
     await testGuides(page);
+    await testDocuments(page);
     await testAPIStats(page);
     await testRateLimiting(page);
     

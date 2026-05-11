@@ -12,6 +12,10 @@ export type AdPlacement =
   | "article-bottom"
   | "resource-native"
   | "resource-category-top"
+  | "documents-home-top"
+  | "documents-grid-inline"
+  | "document-editor-sidebar"
+  | "document-editor-bottom"
   | "footer";
 
 export type AdVariant = "banner" | "card" | "text" | "native";
@@ -45,7 +49,7 @@ export const ads: AdData[] = [
     variant: "card",
     sponsorName: "",
     label: "推荐",
-    enabled: false,
+    enabled: true,
     priority: 1,
   },
   {
@@ -71,7 +75,7 @@ export const ads: AdData[] = [
     variant: "banner",
     sponsorName: "海外百宝箱",
     label: "推荐",
-    enabled: false,
+    enabled: true,
     priority: 1,
   },
   {
