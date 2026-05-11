@@ -273,6 +273,10 @@ export default function DocumentEditorPage() {
             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs ${roleInfo.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
               {roleInfo.role === 'member' ? '会员' : roleInfo.role === 'user' ? '用户' : '游客'}
             </span>
+            {/* Dev: Role switcher */}
+            <Link href="/tools/documents/settings/role-switcher" className="text-xs text-gray-300 hover:text-blue-500" title="切换角色（测试）">
+              ⚙️
+            </Link>
           </div>
         </div>
       </div>

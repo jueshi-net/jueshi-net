@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock } from "lucide-react";
 import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
+import { getDrafts } from "@/lib/documents/storage";
 import { AdSlot } from "@/components/ad-slot";
 
 export const metadata: Metadata = {
