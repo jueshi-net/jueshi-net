@@ -979,12 +979,40 @@ async function testDocuments(page) {
   await page.waitForSelector('h1', { timeout: 10000 }).catch(() => {});
   results.timings['documents-load'] = Date.now() - t0;
   
-  // Check 12 core document cards exist
-  const coreDocs = ['形式发票', '商业发票', '装箱单', '销售合同', '订舱委托书', '报关委托书', '送货单', '运费对账单', '集运入库单', '集运合箱', '国际快递申报', '通用报价单'];
+  // Check 20 core document cards exist
+  const coreDocs = ['形式发票', '商业发票', '装箱单', '销售合同', '订舱委托书', '报关委托书', '送货单', '运费对账单', '集运入库单', '集运合箱', '国际快递申报', '通用报价单', '提单补料', '拖车派车', '唛头', '装柜明细', '退货装箱', '原产地证', '熏蒸证明', '信用证'];
   for (const doc of coreDocs) {
     const exists = await page.locator(`text=${doc}`).count().then(c => c > 0).catch(() => false);
     if (!exists) addError(1, name, `核心单据「${doc}」卡片未出现`);
   }
+  
+  // Check search input exists
+  const searchInput = page.locator('input[placeholder*="搜索单据"]').first();
+  const hasSearch = await searchInput.count().then(c => c > 0).catch(() => false);
+  if (!hasSearch) addWarning(2, name, '搜索框未出现');
+  
+  // Test search filters results
+  if (hasSearch) {
+    await searchInput.fill('发票');
+    await page.waitForTimeout(500);
+    // Should show 形式发票 and 商业发票 at minimum
+    const hasPI = await page.locator('text=形式发票').count().then(c => c > 0).catch(() => false);
+    if (!hasPI) addWarning(2, name, '搜索「发票」未显示形式发票');
+    
+    // Clear search
+    await searchInput.fill('');
+    await page.waitForTimeout(300);
+  }
+  
+  // Test drafts page
+  await page.goto(BASE_URL + '/tools/documents/drafts', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
+  const draftsTitle = await page.locator('text=我的草稿').count().then(c => c > 0).catch(() => false);
+  if (!draftsTitle) addError(1, name, '草稿页标题未出现');
+  
+  // Navigate back to center for PI editor test
+  await page.goto(BASE_URL + '/tools/documents', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(500);
   
   // Click PI to go to editor
   const piLink = page.locator('a[href="/tools/documents/proforma-invoice"]').first();
