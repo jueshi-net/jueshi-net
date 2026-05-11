@@ -125,6 +125,19 @@ export default function DocumentsHubPage() {
         </div>
       </div>
 
+      {/* Label-maker CTA */}
+      <div className="max-w-6xl mx-auto px-4 pb-8">
+        <Link href="/tools/label-maker" className="block bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold mb-1">📦 需要生成箱唛/面单？</h3>
+              <p className="text-blue-100">外箱唛头、仓库标签、集运入库贴、合箱标签、寄件信息贴纸，一站式生成</p>
+            </div>
+            <div className="text-3xl">→</div>
+          </div>
+        </Link>
+      </div>
+
       {/* Disclaimer */}
       <div className="max-w-6xl mx-auto px-4 pb-12">
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">

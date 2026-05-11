@@ -16,6 +16,8 @@ export type AdPlacement =
   | "documents-grid-inline"
   | "document-editor-sidebar"
   | "document-editor-bottom"
+  | "label-maker-top"
+  | "label-maker-bottom"
   | "footer";
 
 export type AdVariant = "banner" | "card" | "text" | "native";

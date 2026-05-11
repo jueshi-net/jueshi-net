@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Package, Search, Calculator, FileText, MapPin, Globe, Briefcase, ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star } from 'lucide-react';
+import { Package, Search, Calculator, FileText, MapPin, Globe, Briefcase, ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star, Tags } from 'lucide-react';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
@@ -102,6 +102,7 @@ export default async function LandingPage() {
     { title: "我要查包裹", href: "/tracking", icon: Package, color: "bg-blue-50 text-blue-600 border-blue-100", desc: "物流追踪 / 批量查询 / 异常解释" },
     { title: "我要算运费", href: "/tools/shipping-calculator", icon: Calculator, color: "bg-green-50 text-green-600 border-green-100", desc: "体积重计算 / 集运估算 / CBM" },
     { title: "我要做单据", href: "/tools/documents", icon: FileText, color: "bg-purple-50 text-purple-600 border-purple-100", desc: "发票 / 装箱单 / 报价单 / 收据" },
+    { title: "我要做唛头面单", href: "/tools/label-maker", icon: Tags, color: "bg-indigo-50 text-indigo-600 border-indigo-100", desc: "外箱唛头 / 仓库标签 / 集运标签" },
     { title: "我要查邮编地址", href: "/tools/postal-code", icon: MapPin, color: "bg-orange-50 text-orange-600 border-orange-100", desc: "全球邮编 / 地址格式 / 偏远地区" },
     { title: "我要找海外资源", href: "/resources", icon: BookOpen, color: "bg-teal-50 text-teal-600 border-teal-100", desc: "生活办事 / 银行学校 / 网盘资料" },
     { title: "我要了解跨境寄送", href: "/shipping", icon: Package, color: "bg-red-50 text-red-600 border-red-100", desc: "运费估算 / 敏感货参考 / 寄送指南" },

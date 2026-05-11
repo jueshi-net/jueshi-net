@@ -136,6 +136,43 @@ export function canSaveTermTemplates(): boolean {
   return getRoleInfo().canSaveTermTemplates;
 }
 
+// 标签面单权限
+export function canUploadLabelLogo(): boolean {
+  return getRoleInfo().canUploadLogo;
+}
+
+export function canUseCustomLabelSize(): boolean {
+  return getRoleInfo().maxDrafts > 50; // member/admin
+}
+
+export function canUseLabelStyles(): boolean {
+  return getRoleInfo().canUseCustomStyle;
+}
+
+export function canBatchGenerateLabels(): boolean {
+  const info = getRoleInfo();
+  return info.maxDrafts > 50;
+}
+
+export function getLabelBatchLimit(): number {
+  const role = getRoleInfo().role;
+  if (role === 'member' || role === 'admin') return 100;
+  if (role === 'user') return 10;
+  return 3;
+}
+
+export function canRemoveLabelBranding(): boolean {
+  return getRoleInfo().canRemoveBranding;
+}
+
+export function canSaveLabelTemplates(): boolean {
+  return getRoleInfo().maxDrafts > 50;
+}
+
+export function getLabelStyleLimit(): 'default' | 'all' {
+  return getRoleInfo().canUseCustomStyle ? 'all' : 'default';
+}
+
 // 权限提示文案
 export const permissionMessages = {
   uploadLogo: "上传 Logo 为会员专属功能，升级会员后可使用",

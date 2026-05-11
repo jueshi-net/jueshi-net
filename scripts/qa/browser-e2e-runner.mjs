@@ -1082,6 +1082,96 @@ async function testDocuments(page) {
 }
 
 // ============================================================
+async function testLabelMaker(page) {
+  const name = 'label-maker';
+  log(`[${name}] Starting test...`);
+  setupCapture(page, name);
+  
+  const t0 = Date.now();
+  await page.goto(BASE_URL + '/tools/label-maker', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForTimeout(2000);
+  results.timings['label-maker-load'] = Date.now() - t0;
+  
+  // Check page title
+  const hasTitle = await page.locator('text=唛头面单生成器').count().then(c => c > 0).catch(() => false);
+  if (!hasTitle) addError(1, name, '页面标题「唛头面单生成器」未出现');
+  
+  // Check 8 template types exist
+  const templates = ['通用外箱唛头', '集运入库标签', '集运合箱标签', '仓库库位标签', '国际包裹信息面单', 'FBA 外箱信息贴', '托盘标签', '提示标签'];
+  for (const t of templates) {
+    const exists = await page.locator(`text=${t}`).count().then(c => c > 0).catch(() => false);
+    if (!exists) addError(1, name, `模板「${t}」未出现`);
+  }
+  
+  // Check default type is shipping-mark
+  const defaultSelected = await page.locator('text=Shipping Mark').count().then(c => c > 0).catch(() => false);
+  if (!defaultSelected) addWarning(2, name, '默认未选择通用外箱唛头');
+  
+  // Fill main mark field
+  const mainMark = page.locator('textarea[placeholder*="主唛"]').first();
+  if (await mainMark.count().then(c => c > 0).catch(() => false)) {
+    await mainMark.fill('E2E-TEST-MARK');
+    await page.waitForTimeout(300);
+  }
+  
+  // Fill destination
+  const dest = page.locator('input[placeholder*="目的港"]').first();
+  if (await dest.count().then(c => c > 0).catch(() => false)) {
+    await dest.fill('NEW YORK');
+    await page.waitForTimeout(300);
+  }
+  
+  // Check preview shows content
+  const previewContent = await page.locator('text=E2E-TEST-MARK').count().then(c => c > 0).catch(() => false);
+  if (!previewContent) addWarning(2, name, '预览区未显示填写的内容');
+  
+  // Switch to consolidation inbound
+  const inboundBtn = page.locator('text=集运入库标签').first();
+  if (await inboundBtn.count().then(c => c > 0).catch(() => false)) {
+    await inboundBtn.click();
+    await page.waitForTimeout(500);
+  }
+  
+  // Fill tracking no
+  const trackingInput = page.locator('input[placeholder*="快递单号"]').first();
+  if (await trackingInput.count().then(c => c > 0).catch(() => false)) {
+    await trackingInput.fill('E2E-TRACK-123');
+    await page.waitForTimeout(300);
+  }
+  
+  // Check print/PNG buttons exist
+  const hasPrint = await page.locator('text=打印').count().then(c => c > 0).catch(() => false);
+  const hasPng = await page.locator('button:has-text("PNG")').count().then(c => c > 0).catch(() => false);
+  if (!hasPrint) addError(1, name, '打印按钮不存在');
+  if (!hasPng) addError(1, name, 'PNG 按钮不存在');
+  
+  // Check disclaimer
+  const hasDisclaimer = await page.locator('text=本工具生成的是通用唛头').count().then(c => c > 0).catch(() => false);
+  if (!hasDisclaimer) addWarning(2, name, '免责声明未显示');
+  
+  // Check no carrier logos
+  const pageContent = await page.content();
+  for (const carrier of ['DHL', 'UPS', 'FedEx', 'Canada Post']) {
+    if (pageContent.includes(`生成${carrier}`) || pageContent.includes(`${carrier}官方面单`)) {
+      addError(1, name, `页面不应出现「${carrier}官方面单」`);
+    }
+  }
+  
+  // Save draft
+  const saveBtn = page.locator('text=保存草稿').first();
+  if (await saveBtn.count().then(c => c > 0).catch(() => false)) {
+    saveBtn.click();
+    await page.waitForTimeout(1000);
+    // Check alert was shown (accept it)
+    page.on('dialog', dialog => dialog.accept());
+  }
+  
+  saveScreenshot(page, name);
+  recordPage(name, 'passed', { templates: templates.length });
+  log(`[${name}] Completed: templates checked`);
+}
+
+// ============================================================
 // MAIN: Run all tests
 // ============================================================
 async function main() {
@@ -1126,6 +1216,7 @@ async function main() {
     await testResources(page);
     await testGuides(page);
     await testDocuments(page);
+    await testLabelMaker(page);
     await testAPIStats(page);
     await testRateLimiting(page);
     
