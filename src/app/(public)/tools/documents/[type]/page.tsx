@@ -278,6 +278,20 @@ export default function DocumentEditorPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Mobile preview toggle */}
+        <div className="lg:hidden mb-4 print:hidden">
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${showPreview ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-gray-200 text-gray-600'}`}
+          >
+            <span className="flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              {showPreview ? '收起预览' : '打开实时预览'}
+            </span>
+            <ChevronDown className={`w-4 h-4 transition-transform ${showPreview ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+
         <div className="flex gap-6 print:block">
           {/* Form panel */}
           <div className="w-full lg:w-1/2 print:hidden">
@@ -561,8 +575,8 @@ export default function DocumentEditorPage() {
           </div>
 
           {/* Preview panel */}
-          <div className="w-full lg:w-1/2 print:w-full">
-            <div className="sticky top-20">
+          <div className={`w-full lg:w-1/2 print:w-full ${showPreview ? 'block' : 'hidden lg:block'}`}>
+            <div className="lg:sticky lg:top-20">
               <div className="flex items-center justify-between mb-3 print:hidden">
                 <h2 className="font-semibold text-gray-700 flex items-center gap-2">
                   <Eye className="w-4 h-4" />
