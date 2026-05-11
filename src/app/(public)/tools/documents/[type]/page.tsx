@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   ArrowLeft, Save, Printer, Download, FileText, Image, Crown,
   Plus, Trash2, ChevronDown, Building2, AlertTriangle, Eye,
-  Palette, Settings, Info, ExternalLink, Bold, FileSpreadsheet
+  Palette, Settings, Info, ExternalLink, Bold, FileSpreadsheet, Clock
 } from 'lucide-react';
 import { getDocumentType, documentStyles } from '@/lib/documents/document-types';
 import { getTemplate } from '@/lib/documents/document-fields';
@@ -205,6 +205,9 @@ export default function DocumentEditorPage() {
           <div className="flex items-center gap-4">
             <Link href="/tools/documents" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">
               <ArrowLeft className="w-4 h-4" /> 返回
+            </Link>
+            <Link href="/tools/documents/drafts" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1" title="我的草稿">
+              <Clock className="w-4 h-4" />
             </Link>
             <div>
               <h1 className="font-bold text-gray-900">{docType.titleZh}</h1>

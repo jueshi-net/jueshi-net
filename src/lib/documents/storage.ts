@@ -34,7 +34,7 @@ const COMPANIES_KEY = "bxb_company_profiles";
 
 // ========== 草稿管理 ==========
 
-function getDrafts(): DocumentDraft[] {
+export function getDrafts(): DocumentDraft[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(DRAFTS_KEY);
@@ -44,7 +44,7 @@ function getDrafts(): DocumentDraft[] {
   }
 }
 
-function saveDrafts(drafts: DocumentDraft[]) {
+export function saveDrafts(drafts: DocumentDraft[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock } from "lucide-react";
 import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
 import { AdSlot } from "@/components/ad-slot";
@@ -61,6 +61,13 @@ export default function DocumentsHubPage() {
             >
               查看全部模板
             </a>
+            <Link
+              href="/tools/documents/drafts"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
+            >
+              <Clock className="w-5 h-5" />
+              我的草稿
+            </Link>
           </div>
         </div>
       </div>
@@ -73,7 +80,7 @@ export default function DocumentsHubPage() {
       {/* A. 核心基础单据 */}
       <div id="core-docs" className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">核心基础单据</h2>
-        <p className="text-gray-500 mb-8">12 套常用单据模板，在线填写，即时导出</p>
+        <p className="text-gray-500 mb-8">15 套常用单据模板，在线填写，即时导出</p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {coreDocs.map((doc, idx) => (

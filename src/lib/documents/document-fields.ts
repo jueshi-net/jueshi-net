@@ -436,6 +436,112 @@ export const quotation: DocumentTemplate = {
   totals: ["totalAmount"],
 };
 
+// ========== 13. 提单补料 SI ==========
+export const shippingInstruction: DocumentTemplate = {
+  type: "shipping-instruction",
+  sections: [
+    { id: "header", title: "补料信息", fields: [
+      ...docHeaderFields("SI"),
+      { key: "bookingNo", label: "订舱号", labelEn: "Booking No.", type: "text", required: true },
+      { key: "containerNo", label: "柜号", labelEn: "Container No.", type: "text" },
+      { key: "sealNo", label: "封号", labelEn: "Seal No.", type: "text" },
+    ]},
+    { id: "parties", title: "收发方", fields: [
+      { key: "shipper", label: "发货人", labelEn: "Shipper", type: "textarea", required: true, colspan: 2 },
+      { key: "consignee", label: "收货人", labelEn: "Consignee", type: "select", options: ["凭指示 To Order", "记名 Consignee", "凭托运人指示 To Order of Shipper"], required: true, colspan: 2 },
+      { key: "consigneeDetails", label: "收货人详情", labelEn: "Consignee Details", type: "textarea", placeholder: "公司全称、地址、联系方式", colspan: 2 },
+      { key: "notifyParty", label: "通知方", labelEn: "Notify Party", type: "textarea", colspan: 2 },
+    ]},
+    { id: "vessel", title: "船期信息", fields: [
+      { key: "vesselName", label: "船名", labelEn: "Vessel", type: "text" },
+      { key: "voyageNo", label: "航次", labelEn: "Voyage", type: "text" },
+      { key: "portOfLoading", label: "起运港", labelEn: "POL", type: "text" },
+      { key: "portOfDischarge", label: "卸货港", labelEn: "POD", type: "text" },
+      { key: "placeOfDelivery", label: "交货地", labelEn: "Place of Delivery", type: "text" },
+      { key: "etd", label: "预计离港日期", labelEn: "ETD", type: "date" },
+      { key: "eta", label: "预计到港日期", labelEn: "ETA", type: "date" },
+    ]},
+    { id: "freight", title: "运费条款", fields: [
+      { key: "freightType", label: "运费条款", labelEn: "Freight", type: "select", options: ["预付 Freight Prepaid", "到付 Freight Collect"] },
+      { key: "cargoReadyDate", label: "货好日期", labelEn: "Cargo Ready Date", type: "date" },
+      { key: "cutOffDate", label: "截关日期", labelEn: "Cut-off Date", type: "date" },
+    ]},
+  ],
+  lineItems: [
+    { key: "containerType", label: "柜型", width: "12%" },
+    { key: "quantity", label: "柜量", width: "8%" },
+    { key: "description", label: "品名", width: "30%" },
+    { key: "packages", label: "件数", width: "10%" },
+    { key: "grossWeight", label: "毛重(KGS)", width: "12%" },
+    { key: "volume", label: "体积(CBM)", width: "12%" },
+    { key: "hsCode", label: "HS编码", width: "16%" },
+  ],
+  totals: ["totalPackages", "totalGrossWeight", "totalVolume"],
+};
+
+// ========== 14. 拖车派车单 ==========
+export const truckingDispatchOrder: DocumentTemplate = {
+  type: "trucking-dispatch-order",
+  sections: [
+    { id: "header", title: "派车信息", fields: [
+      ...docHeaderFields("派车"),
+      { key: "driverName", label: "司机姓名", labelEn: "Driver", type: "text" },
+      { key: "driverPhone", label: "司机电话", labelEn: "Driver Phone", type: "text" },
+      { key: "vehiclePlate", label: "车牌号", labelEn: "Plate No.", type: "text" },
+    ]},
+    { id: "pickup", title: "提柜信息", fields: [
+      { key: "depotName", label: "提柜堆场", labelEn: "Depot", type: "textarea", required: true, colspan: 2 },
+      { key: "depotContact", label: "堆场联系人", labelEn: "Depot Contact", type: "text" },
+      { key: "containerType", label: "柜型", labelEn: "Container Type", type: "select", options: ["20GP", "40GP", "40HQ", "45HQ", "20RF", "40RF"] },
+      { key: "containerQty", label: "柜量", labelEn: "Quantity", type: "number" },
+    ]},
+    { id: "delivery", title: "装柜/还柜信息", fields: [
+      { key: "factoryName", label: "工厂/装柜地址", labelEn: "Factory", type: "textarea", required: true, colspan: 2 },
+      { key: "factoryContact", label: "工厂联系人", labelEn: "Factory Contact", type: "text" },
+      { key: "loadingDate", label: "装柜日期", labelEn: "Loading Date", type: "date" },
+      { key: "loadingTime", label: "装柜时间", labelEn: "Loading Time", type: "text" },
+      { key: "returnPort", label: "还柜码头", labelEn: "Return Port", type: "text" },
+      { key: "cutOffDate", label: "截关日期", labelEn: "Cut-off Date", type: "date" },
+    ]},
+    { id: "notes", title: "备注", fields: [
+      { key: "notes", label: "特殊要求", labelEn: "Notes", type: "textarea", placeholder: "如：需尾板车、需穿雨衣、不可叠放等", colspan: 2 },
+    ]},
+  ],
+  lineItems: [],
+  totals: [],
+};
+
+// ========== 15. 唛头通用模板 ==========
+export const shippingMark: DocumentTemplate = {
+  type: "shipping-mark",
+  sections: [
+    { id: "header", title: "唛头信息", fields: [
+      ...docHeaderFields("唛头"),
+      { key: "orderNo", label: "订单号", labelEn: "Order No.", type: "text" },
+      { key: "destinationPort", label: "目的港", labelEn: "Destination Port", type: "text" },
+    ]},
+    { id: "mark", title: "唛头内容", fields: [
+      { key: "companyAbbreviation", label: "公司简称/收货人简称", labelEn: "Consignee Abbrev.", type: "text", required: true, placeholder: "如 ABC" },
+      { key: "cartonRange", label: "箱号范围", labelEn: "Carton No.", type: "text", required: true, placeholder: "如 1-100 或 C/No.1-100" },
+      { key: "destination", label: "目的港/目的地", labelEn: "Destination", type: "text", required: true },
+      { key: "countryOfOrigin", label: "原产地", labelEn: "Country of Origin", type: "text", placeholder: "MADE IN CHINA" },
+      { key: "description", label: "货物描述", labelEn: "Description", type: "textarea", placeholder: "品名、规格、型号", colspan: 2 },
+    ]},
+    { id: "preview", title: "唛头预览", fields: [
+      { key: "markPreview", label: "唛头样式", labelEn: "Mark Preview", type: "textarea", placeholder: "系统自动生成的唛头文本：\n\nABC\nC/No.1-100\nNEW YORK\nMADE IN CHINA", colspan: 2 },
+    ]},
+  ],
+  lineItems: [
+    { key: "cartonNo", label: "箱号", width: "15%" },
+    { key: "description", label: "品名", width: "30%" },
+    { key: "specification", label: "规格", width: "20%" },
+    { key: "quantity", label: "数量", width: "12%" },
+    { key: "grossWeight", label: "毛重(KGS)", width: "12%" },
+    { key: "dimension", label: "尺寸(CM)", width: "11%" },
+  ],
+  totals: ["totalQuantity", "totalGrossWeight"],
+};
+
 // ========== 单据模板注册表 ==========
 export const documentTemplates: Record<string, DocumentTemplate> = {
   "proforma-invoice": proformaInvoice,
@@ -450,6 +556,9 @@ export const documentTemplates: Record<string, DocumentTemplate> = {
   "consolidation-packing-list": consolidationPackingList,
   "express-declaration": expressDeclaration,
   "quotation": quotation,
+  "shipping-instruction": shippingInstruction,
+  "trucking-dispatch-order": truckingDispatchOrder,
+  "shipping-mark": shippingMark,
 };
 
 export function getTemplate(type: string): DocumentTemplate | undefined {
