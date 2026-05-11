@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock } from "lucide-react";
 import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
-import { getDrafts } from "@/lib/documents/storage";
 import { AdSlot } from "@/components/ad-slot";
+import RecentlyUsedWidget from "@/components/recently-used-docs";
 
 export const metadata: Metadata = {
   title: "外贸/国际物流通用单据生成器 — 海外百宝箱",
@@ -77,6 +77,9 @@ export default function DocumentsHubPage() {
       <div className="max-w-6xl mx-auto px-4 -mt-4 mb-8">
         <AdSlot placement="documents-home-top" variant="banner" />
       </div>
+
+      {/* Recently used widget */}
+      <RecentlyUsedWidget />
 
       {/* A. 核心基础单据 */}
       <div id="core-docs" className="max-w-6xl mx-auto px-4 py-12">

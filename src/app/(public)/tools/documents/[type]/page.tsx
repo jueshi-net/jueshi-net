@@ -22,8 +22,11 @@ function getTotalLabel(key: string): string {
     totalGrossWeight: '总毛重',
     totalNetWeight: '总净重',
     totalVolume: '总体积',
+    totalWeight: '总重量',
     paidAmount: '已付金额',
     unpaidAmount: '未付金额',
+    totalValue: '总价值',
+    totalPackages: '总件数',
   };
   return labels[key] || key;
 }
