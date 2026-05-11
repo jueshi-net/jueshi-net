@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
 import { AdSlot } from "@/components/ad-slot";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
+import DocumentGrid from "@/components/document-grid";
 
 export const metadata: Metadata = {
   title: "外贸/国际物流通用单据生成器 — 海外百宝箱",
@@ -81,57 +82,9 @@ export default function DocumentsHubPage() {
       {/* Recently used widget */}
       <RecentlyUsedWidget />
 
-      {/* A. 核心基础单据 */}
-      <div id="core-docs" className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">核心基础单据</h2>
-        <p className="text-gray-500 mb-8">20 套常用单据模板，在线填写，即时导出</p>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {coreDocs.map((doc, idx) => (
-            <Link
-              key={doc.type}
-              href={`/tools/documents/${doc.type}`}
-              className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-blue-200 transition-all relative"
-            >
-              <div className="text-3xl mb-3">{doc.icon}</div>
-              <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
-                {doc.titleZh}
-              </h3>
-              <p className="text-xs text-gray-400 mb-2">{doc.titleEn}</p>
-              <p className="text-xs text-gray-500 line-clamp-2 mb-3">{doc.description}</p>
-              <div className="flex items-center justify-between">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs ${doc.isFree ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
-                  {doc.isFree ? "免费" : "会员"}
-                </span>
-                <span className="text-xs text-blue-600 group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                  生成 <ArrowRight className="w-3 h-3" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* B. 第二梯队 */}
-      <div className="max-w-6xl mx-auto px-4 pb-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">即将上线</h2>
-        <p className="text-gray-500 mb-8">更多单据模板正在准备中</p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {secondTierDocs.map((doc) => (
-            <div
-              key={doc.type}
-              className="bg-gray-50 rounded-xl border border-gray-100 p-5 opacity-60"
-            >
-              <div className="text-3xl mb-3">{doc.icon}</div>
-              <h3 className="font-semibold text-gray-700 mb-1">{doc.titleZh}</h3>
-              <p className="text-xs text-gray-400 mb-2">{doc.titleEn}</p>
-              <span className="inline-flex items-center px-2 py-0.5 bg-gray-200 text-gray-500 rounded text-xs">
-                模板准备中
-              </span>
-            </div>
-          ))}
-        </div>
+      {/* Document Grid with Search & Filter */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <DocumentGrid coreDocs={coreDocs} secondTierDocs={secondTierDocs} />
       </div>
 
       {/* C. 会员能力说明 */}
