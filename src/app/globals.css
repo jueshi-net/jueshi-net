@@ -61,3 +61,81 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #6b7280;
 }
+
+/* Print styles for document generator */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+  }
+
+  /* Hide non-printable elements */
+  .print\\:hidden,
+  nav,
+  banner,
+  footer,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Make printable elements full width */
+  .print\\:w-full {
+    width: 100% !important;
+  }
+
+  .print\\:block {
+    display: block !important;
+  }
+
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\\:border-none {
+    border: none !important;
+  }
+
+  .print\\:p-0 {
+    padding: 0 !important;
+  }
+
+  /* Document preview styles for print */
+  [ref] {
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Ensure borders print clearly */
+  .border, td, th {
+    border-color: #000 !important;
+  }
+
+  /* Remove shadows and backgrounds */
+  .shadow-sm, .shadow, .shadow-lg, .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  .bg-gray-50, .bg-blue-50, .bg-green-50, .bg-amber-50, .bg-yellow-50, .bg-orange-50, .bg-red-50 {
+    background-color: white !important;
+  }
+
+  /* Link URLs visible in print */
+  a[href]::after {
+    content: none;
+  }
+}

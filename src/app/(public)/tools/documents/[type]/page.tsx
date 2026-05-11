@@ -321,7 +321,22 @@ export default function DocumentEditorPage() {
                   ))}
                   <button
                     onClick={() => {
-                      if (companyProfile) saveCompanyProfile(companyProfile);
+                      const profile: CompanyProfile = {
+                        id: 'default',
+                        companyName: formData.companyName || '',
+                        companyNameEn: formData.companyNameEn || '',
+                        address: formData.companyAddress || '',
+                        addressEn: '',
+                        phone: formData.companyPhone || '',
+                        email: formData.companyEmail || '',
+                        website: formData.companyWebsite || '',
+                        taxId: '',
+                        contactPerson: '',
+                        defaultCurrency: formData.currency || 'USD',
+                        defaultTerms: formData.terms || '',
+                      };
+                      saveCompanyProfile(profile);
+                      setCompanyProfile(profile);
                       setShowCompanyForm(false);
                     }}
                     className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
@@ -502,11 +517,27 @@ export default function DocumentEditorPage() {
                 </Link>
               </div>
             )}
+            {(type === 'proforma-invoice' || type === 'quotation' || type === 'freight-statement') && formData.currency && (
+              <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-4">
+                <p className="text-sm text-indigo-700 mb-2">需要参考汇率？</p>
+                <Link href="/tools/exchange-rate" className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700">
+                  前往汇率查询 <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
             {(type === 'packing-list' || type === 'booking-instruction' || type === 'consolidation-packing-list') && (
               <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-4">
                 <p className="text-sm text-green-700 mb-2">需要计算体积/CBM？</p>
                 <Link href="/tools/shipping-calculator" className="inline-flex items-center gap-1 text-sm text-green-600 hover:text-green-700">
                   前往体积计算器 <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
+            {(type === 'express-declaration' || type === 'consolidation-inbound-receipt' || type === 'consolidation-packing-list') && (
+              <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 mb-4">
+                <p className="text-sm text-orange-700 mb-2">不确定是否属于敏感货？</p>
+                <Link href="/tools/sensitive-goods" className="inline-flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700">
+                  查看敏感货参考 <ExternalLink className="w-3.5 h-3.5" />
                 </Link>
               </div>
             )}
