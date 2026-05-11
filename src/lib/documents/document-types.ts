@@ -196,20 +196,32 @@ export const documentTypes: DocumentTypeMeta[] = [
     icon: "🏷️",
     exportFileNamePrefix: "SM",
   },
-
-  // ===== 第二梯队（即将上线） =====
   {
     type: "container-loading-list",
     titleZh: "装柜明细单",
     titleEn: "Container Loading List",
-    category: "second-tier",
-    description: "记录装柜货物详细信息的单据",
-    scenario: "装柜安排、仓库装货、客户确认",
+    category: "core",
+    description: "记录装柜货物详细信息，监装签收",
+    scenario: "装柜安排、仓库装货、客户确认、监装报告",
     isFree: true,
-    isOnline: false,
+    isOnline: true,
     icon: "📦",
     exportFileNamePrefix: "CLL",
   },
+  {
+    type: "return-packing-list",
+    titleZh: "退货装箱清单",
+    titleEn: "Return Packing List",
+    category: "core",
+    description: "跨境电商退货、退运清关时的装箱明细",
+    scenario: "退货处理、退运清关、仓库验收、RMA 管理",
+    isFree: true,
+    isOnline: true,
+    icon: "↩️",
+    exportFileNamePrefix: "RPL",
+  },
+
+  // ===== 第二梯队（即将上线） =====
   {
     type: "certificate-of-origin-template",
     titleZh: "通用原产地证 CO 模板",
@@ -233,18 +245,6 @@ export const documentTypes: DocumentTypeMeta[] = [
     isOnline: false,
     icon: "🪵",
     exportFileNamePrefix: "FC",
-  },
-  {
-    type: "return-packing-list",
-    titleZh: "退货装箱清单",
-    titleEn: "Return Packing List",
-    category: "second-tier",
-    description: "退货时使用的装箱明细单",
-    scenario: "跨境电商退货、退运清关",
-    isFree: true,
-    isOnline: false,
-    icon: "↩️",
-    exportFileNamePrefix: "RPL",
   },
   {
     type: "letter-of-credit-info-sheet",

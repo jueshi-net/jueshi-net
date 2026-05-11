@@ -542,6 +542,80 @@ export const shippingMark: DocumentTemplate = {
   totals: ["totalQuantity", "totalGrossWeight"],
 };
 
+// ========== 16. 装柜明细单 ==========
+export const containerLoadingList: DocumentTemplate = {
+  type: "container-loading-list",
+  sections: [
+    { id: "header", title: "装柜信息", fields: [
+      ...docHeaderFields("装柜"),
+      { key: "containerNo", label: "柜号", labelEn: "Container No.", type: "text", required: true, placeholder: "如 MSKU1234567" },
+      { key: "sealNo", label: "封条号", labelEn: "Seal No.", type: "text" },
+      { key: "containerType", label: "柜型", labelEn: "Container Type", type: "select", options: ["20GP", "40GP", "40HQ", "45HQ", "20RF", "40RF", "20OT", "40OT", "20FR", "40FR"] },
+    ]},
+    { id: "location", title: "装柜地点", fields: [
+      { key: "loadingAddress", label: "装柜地址", labelEn: "Loading Address", type: "textarea", required: true, colspan: 2 },
+      { key: "loadingDate", label: "装柜日期", labelEn: "Loading Date", type: "date" },
+      { key: "loadingSupervisor", label: "监装人", labelEn: "Supervisor", type: "text" },
+    ]},
+    { id: "cargo", title: "货物明细", fields: [] },
+    { id: "summary", title: "装柜汇总", fields: [
+      { key: "totalCartons", label: "总箱数", labelEn: "Total Cartons", type: "text" },
+      { key: "totalGrossWeight", label: "总毛重(KGS)", labelEn: "Total GW", type: "text" },
+      { key: "totalVolume", label: "总体积(CBM)", labelEn: "Total CBM", type: "text" },
+      { key: "loadingNotes", label: "装柜备注", labelEn: "Loading Notes", type: "textarea", placeholder: "如：重不压轻、防潮、不可倒置等", colspan: 2 },
+    ]},
+    { id: "signature", title: "签字确认", fields: [
+      { key: "loaderSignature", label: "装柜人签字", labelEn: "Loader Signature", type: "textarea", colspan: 2 },
+      { key: "supervisorSignature", label: "监装人签字", labelEn: "Supervisor Signature", type: "textarea", colspan: 2 },
+    ]},
+  ],
+  lineItems: [
+    { key: "cartonNo", label: "箱号", width: "12%" },
+    { key: "description", label: "品名", width: "25%" },
+    { key: "specification", label: "规格", width: "15%" },
+    { key: "quantity", label: "数量", width: "10%" },
+    { key: "grossWeight", label: "毛重(KGS)", width: "12%" },
+    { key: "netWeight", label: "净重(KGS)", width: "12%" },
+    { key: "volume", label: "体积(CBM)", width: "14%" },
+  ],
+  totals: ["totalQuantity", "totalGrossWeight", "totalNetWeight", "totalVolume"],
+};
+
+// ========== 17. 退货装箱清单 ==========
+export const returnPackingList: DocumentTemplate = {
+  type: "return-packing-list",
+  sections: [
+    { id: "header", title: "退货信息", fields: [
+      ...docHeaderFields("退货"),
+      { key: "originalOrderNo", label: "原订单号", labelEn: "Original Order No.", type: "text", required: true },
+      { key: "returnReason", label: "退货原因", labelEn: "Return Reason", type: "select", options: ["质量问题", "尺寸不符", "发错货", "客户取消", "破损", "其他"] },
+      { key: "rmaNo", label: "RMA编号", labelEn: "RMA No.", type: "text" },
+    ]},
+    { id: "parties", title: "收发方", fields: [
+      { key: "returnFrom", label: "退货方", labelEn: "Return From", type: "textarea", required: true, placeholder: "退货客户名称、地址、联系方式", colspan: 2 },
+      { key: "returnTo", label: "收货方", labelEn: "Return To", type: "textarea", required: true, placeholder: "退货仓库/供应商地址", colspan: 2 },
+      { key: "carrier", label: "物流承运商", labelEn: "Carrier", type: "text" },
+      { key: "trackingNo", label: "运单号", labelEn: "Tracking No.", type: "text" },
+    ]},
+    { id: "inspection", title: "检验信息", fields: [
+      { key: "inspectionResult", label: "检验结果", labelEn: "Inspection", type: "select", options: ["未检验", "完好可再售", "需返修", "报废处理", "退回供应商"] },
+      { key: "inspector", label: "检验人", labelEn: "Inspector", type: "text" },
+      { key: "inspectionDate", label: "检验日期", labelEn: "Inspection Date", type: "date" },
+      { key: "notes", label: "备注", labelEn: "Notes", type: "textarea", colspan: 2 },
+    ]},
+  ],
+  lineItems: [
+    { key: "sku", label: "SKU/货号", width: "15%" },
+    { key: "description", label: "品名", width: "25%" },
+    { key: "quantity", label: "退货数量", width: "12%" },
+    { key: "unit", label: "单位", width: "8%" },
+    { key: "condition", label: "货物状态", width: "15%" },
+    { key: "originalPrice", label: "原价", width: "12%" },
+    { key: "remark", label: "备注", width: "13%" },
+  ],
+  totals: ["totalQuantity"],
+};
+
 // ========== 单据模板注册表 ==========
 export const documentTemplates: Record<string, DocumentTemplate> = {
   "proforma-invoice": proformaInvoice,
@@ -559,6 +633,8 @@ export const documentTemplates: Record<string, DocumentTemplate> = {
   "shipping-instruction": shippingInstruction,
   "trucking-dispatch-order": truckingDispatchOrder,
   "shipping-mark": shippingMark,
+  "container-loading-list": containerLoadingList,
+  "return-packing-list": returnPackingList,
 };
 
 export function getTemplate(type: string): DocumentTemplate | undefined {
