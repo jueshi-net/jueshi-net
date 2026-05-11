@@ -616,6 +616,126 @@ export const returnPackingList: DocumentTemplate = {
   totals: ["totalQuantity"],
 };
 
+// ========== 18. 通用原产地证 CO 资料模板 ==========
+export const certificateOfOrigin: DocumentTemplate = {
+  type: "certificate-of-origin-template",
+  sections: [
+    { id: "header", title: "证书信息", fields: [
+      ...docHeaderFields("CO"),
+      { key: "invoiceNo", label: "发票号", labelEn: "Invoice No.", type: "text", required: true },
+      { key: "lCNo", label: "信用证号", labelEn: "L/C No.", type: "text" },
+    ]},
+    { id: "exporter", title: "出口方", fields: [
+      { key: "exporterName", label: "出口商名称", labelEn: "Exporter", type: "textarea", required: true, placeholder: "出口公司全称及地址", colspan: 2 },
+    ]},
+    { id: "consignee", title: "收货方", fields: [
+      { key: "consigneeName", label: "收货人名称", labelEn: "Consignee", type: "textarea", required: true, placeholder: "收货公司全称及地址", colspan: 2 },
+      { key: "notifyParty", label: "通知方", labelEn: "Notify Party", type: "textarea", colspan: 2 },
+    ]},
+    { id: "transport", title: "运输信息", fields: [
+      { key: "portOfLoading", label: "装运港", labelEn: "Port of Loading", type: "text" },
+      { key: "portOfDischarge", label: "卸货港", labelEn: "Port of Discharge", type: "text" },
+      { key: "transportMode", label: "运输方式", labelEn: "Transport", type: "select", options: ["海运", "空运", "陆运", "多式联运"] },
+      { key: "vesselName", label: "船名/航班号", labelEn: "Vessel/Flight", type: "text" },
+    ]},
+    { id: "goods", title: "货物描述", fields: [] },
+    { id: "origin", title: "原产地声明", fields: [
+      { key: "countryOfOrigin", label: "原产国", labelEn: "Country of Origin", type: "text", required: true, placeholder: "CHINA" },
+      { key: "originDeclaration", label: "原产地声明", labelEn: "Origin Declaration", type: "textarea", placeholder: "We hereby declare that the goods described above are wholly of Chinese origin.", colspan: 2 },
+    ]},
+    { id: "signature", title: "签字盖章", fields: [
+      { key: "applicantSignature", label: "申请人签字", labelEn: "Applicant Signature", type: "textarea", colspan: 2 },
+      { key: "chamberStamp", label: "商会/签证机构盖章", labelEn: "Chamber Stamp", type: "textarea", colspan: 2 },
+    ]},
+  ],
+  lineItems: [
+    { key: "marks", label: "唛头", width: "12%" },
+    { key: "description", label: "品名及包装", width: "30%" },
+    { key: "quantity", label: "数量", width: "12%" },
+    { key: "unit", label: "单位", width: "8%" },
+    { key: "grossWeight", label: "毛重(KGS)", width: "12%" },
+    { key: "volume", label: "体积(CBM)", width: "12%" },
+    { key: "invoiceValue", label: "发票金额", width: "14%" },
+  ],
+  totals: ["totalQuantity", "totalGrossWeight", "totalAmount"],
+  defaultTerms: ["⚠️ 本工具仅提供资料整理模板，不签发官方原产地证。正式原产地证请向贸促会(CCPIT)或海关申请。"],
+};
+
+// ========== 19. 熏蒸证明通用模板 ==========
+export const fumigationCertificate: DocumentTemplate = {
+  type: "fumigation-certificate-template",
+  sections: [
+    { id: "header", title: "证书信息", fields: [
+      ...docHeaderFields("熏蒸"),
+      { key: "invoiceNo", label: "发票号", labelEn: "Invoice No.", type: "text" },
+      { key: "billOfLadingNo", label: "提单号", labelEn: "B/L No.", type: "text" },
+    ]},
+    { id: "consignor", title: "发货方", fields: [
+      { key: "consignorName", label: "发货人", labelEn: "Consignor", type: "textarea", required: true, colspan: 2 },
+      { key: "consigneeName", label: "收货人", labelEn: "Consignee", type: "textarea", required: true, colspan: 2 },
+    ]},
+    { id: "treatment", title: "熏蒸处理信息", fields: [
+      { key: "treatmentType", label: "处理方式", labelEn: "Treatment", type: "select", options: ["甲基溴熏蒸", "硫酰氟熏蒸", "热处理", "其他"] },
+      { key: "treatmentDuration", label: "处理时长", labelEn: "Duration", type: "text", placeholder: "如 24 小时" },
+      { key: "temperature", label: "处理温度", labelEn: "Temperature", type: "text", placeholder: "如 21°C" },
+      { key: "chemicalDosage", label: "药剂用量", labelEn: "Dosage", type: "text" },
+      { key: "treatmentDate", label: "处理日期", labelEn: "Treatment Date", type: "date" },
+      { key: "treatmentLocation", label: "处理地点", labelEn: "Location", type: "text" },
+      { key: "fumigator", label: "熏蒸公司/操作人", labelEn: "Fumigator", type: "text" },
+    ]},
+    { id: "goods", title: "货物描述", fields: [] },
+    { id: "declaration", title: "声明", fields: [
+      { key: "declaration", label: "声明", labelEn: "Declaration", type: "textarea", placeholder: "The above consignment has been fumigated and is free from live pests.", colspan: 2 },
+    ]},
+    { id: "signature", title: "签字盖章", fields: [
+      { key: "fumigatorSignature", label: "熏蒸操作人签字", labelEn: "Fumigator Signature", type: "textarea", colspan: 2 },
+      { key: "authorityStamp", label: "检疫机构盖章", labelEn: "Authority Stamp", type: "textarea", colspan: 2 },
+    ]},
+  ],
+  lineItems: [
+    { key: "description", label: "品名及包装", width: "30%" },
+    { key: "quantity", label: "数量", width: "12%" },
+    { key: "unit", label: "单位", width: "8%" },
+    { key: "grossWeight", label: "毛重(KGS)", width: "15%" },
+    { key: "woodPackaging", label: "木质包装说明", width: "35%" },
+  ],
+  totals: ["totalQuantity", "totalGrossWeight"],
+  defaultTerms: ["⚠️ 本工具仅提供资料整理模板，不签发检疫或熏蒸证书。正式熏蒸证明请向有资质的熏蒸公司或检疫机构申请。"],
+};
+
+// ========== 20. 信用证简易资料单 ==========
+export const letterOfCreditInfo: DocumentTemplate = {
+  type: "letter-of-credit-info-sheet",
+  sections: [
+    { id: "header", title: "信用证信息", fields: [
+      ...docHeaderFields("L/C"),
+      { key: "lcNo", label: "信用证号", labelEn: "L/C No.", type: "text", required: true },
+      { key: "issuingBank", label: "开证行", labelEn: "Issuing Bank", type: "text", required: true },
+      { key: "lcType", label: "信用证类型", labelEn: "L/C Type", type: "select", options: ["即期 Sight", "远期 Usance", "可转让 Transferable", "备用 Standby"] },
+    ]},
+    { id: "parties", title: "相关方", fields: [
+      { key: "applicant", label: "开证申请人(买方)", labelEn: "Applicant", type: "textarea", required: true, colspan: 2 },
+      { key: "beneficiary", label: "受益人(卖方)", labelEn: "Beneficiary", type: "textarea", required: true, colspan: 2 },
+      { key: "advisingBank", label: "通知行", labelEn: "Advising Bank", type: "text", colspan: 2 },
+    ]},
+    { id: "terms", title: "条款", fields: [
+      { key: "amount", label: "信用证金额", labelEn: "Amount", type: "text" },
+      { key: "expiryDate", label: "有效期", labelEn: "Expiry Date", type: "date" },
+      { key: "expiryPlace", label: "到期地点", labelEn: "Expiry Place", type: "text" },
+      { key: "latestShipment", label: "最迟装运日", labelEn: "Latest Shipment", type: "date" },
+      { key: "portOfLoading", label: "装运港", labelEn: "Port of Loading", type: "text" },
+      { key: "portOfDischarge", label: "卸货港", labelEn: "Port of Discharge", type: "text" },
+      { key: "partialShipment", label: "分批装运", labelEn: "Partial Shipment", type: "select", options: ["允许 Allowed", "不允许 Not Allowed"] },
+      { key: "transshipment", label: "转运", labelEn: "Transshipment", type: "select", options: ["允许 Allowed", "不允许 Not Allowed"] },
+    ]},
+    { id: "documents", title: "所需单据清单", fields: [
+      { key: "requiredDocs", label: "所需单据", labelEn: "Required Documents", type: "textarea", placeholder: "1. Commercial Invoice\n2. Packing List\n3. Bill of Lading\n4. Certificate of Origin\n5. Insurance Policy\n6. Inspection Certificate", colspan: 2 },
+    ]},
+  ],
+  lineItems: [],
+  totals: [],
+};
+
 // ========== 单据模板注册表 ==========
 export const documentTemplates: Record<string, DocumentTemplate> = {
   "proforma-invoice": proformaInvoice,
@@ -635,6 +755,9 @@ export const documentTemplates: Record<string, DocumentTemplate> = {
   "shipping-mark": shippingMark,
   "container-loading-list": containerLoadingList,
   "return-packing-list": returnPackingList,
+  "certificate-of-origin-template": certificateOfOrigin,
+  "fumigation-certificate-template": fumigationCertificate,
+  "letter-of-credit-info-sheet": letterOfCreditInfo,
 };
 
 export function getTemplate(type: string): DocumentTemplate | undefined {

@@ -445,6 +445,13 @@ export default function DocumentEditorPage() {
                     </p>
                   </div>
                 )}
+                {(type === 'certificate-of-origin-template' || type === 'fumigation-certificate-template') && (
+                  <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-3">
+                    <p className="text-xs text-orange-700">
+                      ⚠️ 本工具仅提供资料整理模板，不签发官方证书。正式证书请向相关机构申请。
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
 
