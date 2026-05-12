@@ -5,6 +5,7 @@ import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle 
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
+import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { trackEvent } from '@/lib/analytics';
 
 interface Carrier {
@@ -302,6 +303,9 @@ export default function TrackingPage() {
             answer: "不会。本站只提供单号整理和跳转查询入口，不保存任何物流轨迹或包裹信息。所有查询都在承运商官网或 17TRACK 进行。",
           },
         ]} />
+
+        {/* Related Tools Widget */}
+        <RelatedToolsWidget currentTool="tracking" />
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-tracking-after-results" className="mb-6" />

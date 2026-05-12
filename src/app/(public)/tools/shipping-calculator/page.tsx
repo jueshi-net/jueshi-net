@@ -10,6 +10,7 @@ import {
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
+import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { trackEvent } from '@/lib/analytics';
 
 // ==================== Types ====================
@@ -679,6 +680,11 @@ export default function ShippingCalculatorPage() {
           </div>
         </div>
       )}
+
+      {/* Related Tools Widget */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <RelatedToolsWidget currentTool="shipping-calculator" />
+      </div>
 
       {/* Tool-specific ads */}
       <AdSlot placement="tool-shipping-calculator-bottom" className="mt-8 mb-4 max-w-4xl mx-auto" />
