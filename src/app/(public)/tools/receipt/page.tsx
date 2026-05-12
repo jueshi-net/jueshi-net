@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { Receipt, Download, Plus, Trash2 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { AdSlot } from "@/components/ad-slot";
+import { FAQSection } from "@/components/faq-section";
 
 interface ReceiptItem {
   id: string;
@@ -170,6 +172,16 @@ export default function ReceiptPage() {
             导出 PDF 收据
           </button>
         </div>
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* FAQ */}
+        <FAQSection title="收据生成常见问题" items={[
+          { question: "收据和发票有什么区别？", answer: "收据是收到款项的凭证，主要用于记录交易；发票是税务凭证，用于报税和抵扣。跨境贸易中通常需要商业发票，收据可作为补充凭证。" },
+          { question: "收据可以作为报销凭证吗？", answer: "取决于公司财务政策。部分公司接受收据作为小额报销凭证，但大额支出通常需要正式发票。" },
+          { question: "可以修改已生成的收据吗？", answer: "收据生成后可以重新编辑并导出新的 PDF。建议保留所有版本的记录，避免重复编号。" },
+        ]} />
       </div>
     </div>
   );

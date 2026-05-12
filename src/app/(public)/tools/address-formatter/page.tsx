@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+import { FAQSection } from '@/components/faq-section';
+import { AdSlot } from '@/components/ad-slot';
 
 interface AddressForm {
   country: string;
@@ -320,6 +322,16 @@ export default function AddressFormatterPage() {
             </div>
           </div>
         </div>
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* FAQ */}
+        <FAQSection title="地址格式化常见问题" items={[
+          { question: "为什么要格式化国际地址？", answer: "不同国家有不同的地址格式规范。格式错误的地址可能导致包裹延误、退回或无法投递。使用正确的格式可以提高投递成功率。" },
+          { question: "中文地址需要翻译成英文吗？", answer: "国际包裹建议同时提供中文和英文地址。英文地址用于国际运输段，中文地址用于目的国末端派送。" },
+          { question: "日本地址怎么写？", answer: "日本地址通常按从大到小顺序：邮编 → 都道府县 → 市区町村 → 町名 → 番地 → 建物名。建议同时提供日文和罗马字拼写。" },
+        ]} />
 
         <RelatedGuidesSection slugs={["canada-postal-code-format", "what-is-consolidation-shipping"]} />
       </div>

@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Container, Info } from "lucide-react";
+import { AdSlot } from "@/components/ad-slot";
+import { FAQSection } from "@/components/faq-section";
 
 const containerTypes = [
   { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770 },
@@ -128,6 +130,16 @@ export default function ContainerCalculatorPage() {
             </div>
           </div>
         ))}
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* FAQ */}
+        <FAQSection title="集装箱计算常见问题" items={[
+          { question: "什么是 CBM？", answer: "CBM（Cubic Meter）是立方米，国际物流中常用的体积单位。1 CBM = 1 立方米。集装箱的载货容积通常以 CBM 表示。" },
+          { question: "20GP、40GP、40HQ 有什么区别？", answer: "20GP 是 20 英尺标准柜（约 33 CBM），40GP 是 40 英尺标准柜（约 67 CBM），40HQ 是 40 英尺高柜（约 76 CBM）。" },
+          { question: "为什么实际装货量通常低于理论容积？", answer: "因为货物包装不规则、间隙、托盘占用空间等原因，实际装货量通常为理论容积的 80-90%。建议预留 10-15% 的空间余量。" },
+        ]} />
       </div>
     </div>
   );

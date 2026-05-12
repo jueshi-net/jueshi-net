@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
+import { AdSlot } from "@/components/ad-slot";
+import { FAQSection } from "@/components/faq-section";
 
 export default function QRCodePage() {
   const [url, setUrl] = useState("");
@@ -126,6 +128,16 @@ export default function QRCodePage() {
             </div>
           )}
         </div>
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* FAQ */}
+        <FAQSection title="二维码生成常见问题" items={[
+          { question: "二维码最多能存储多少内容？", answer: "标准二维码最多可存储约 3000 个字符（数字模式）。中文内容通常可存储约 500-800 个汉字。" },
+          { question: "二维码和条形码有什么区别？", answer: "二维码（QR Code）是二维矩阵，可存储更多数据且支持中文；条形码是一维线条，主要用于商品编号。" },
+          { question: "生成的二维码可以商用吗？", answer: "QR Code 是公开标准，可以自由使用。但请确保链接内容合法合规。" },
+        ]} />
       </div>
     </div>
   );

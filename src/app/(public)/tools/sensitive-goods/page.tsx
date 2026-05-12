@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { AlertTriangle, Info, CheckCircle, Shield, ClipboardList, MessageSquare } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
-
+import { FAQSection } from '@/components/faq-section';
+import { AdSlot } from '@/components/ad-slot';
+import { trackEvent } from '@/lib/analytics';
 interface SensitiveItem {
   name: string;
   type: string;
@@ -261,6 +263,16 @@ export default function SensitiveGoodsPage() {
             </div>
           </div>
         </div>
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* FAQ */}
+        <FAQSection title="敏感货邮寄常见问题" items={[
+          { question: "什么是敏感货？", answer: "敏感货是指在国际运输中受特殊监管或限制的物品，包括食品、液体、粉末、电池、化妆品、药品、品牌仿品等。不同承运商对敏感货的定义和接受程度不同。" },
+          { question: "食品可以邮寄吗？", answer: "部分集运渠道可以邮寄包装完好的预包装食品，但生鲜、肉类、乳制品通常被禁止。建议邮寄前与承运商确认。" },
+          { question: "带电池的电子产品怎么寄？", answer: "含锂电池的电子产品（如手机、笔记本）通常需要通过特殊渠道运输，且电池容量和数量有严格限制。建议走专门的带电渠道。" },
+        ]} />
 
         <RelatedGuidesSection slugs={["restricted-items-shipping-guide"]} />
       </div>
