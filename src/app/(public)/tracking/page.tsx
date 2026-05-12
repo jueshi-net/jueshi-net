@@ -281,6 +281,11 @@ export default function TrackingPage() {
         </div>
 
         {/* FAQ */}
+        {/* Related Tools Widget */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <RelatedToolsWidget currentTool="tracking" />
+        </div>
+
         <FAQSection title="物流追踪常见问题" items={[
           {
             question: "为什么单号在官网查不到？",
