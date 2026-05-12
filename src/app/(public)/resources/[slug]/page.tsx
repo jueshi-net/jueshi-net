@@ -21,6 +21,50 @@ const CATEGORY_MAP: Record<
   string,
   { name: string; desc: string; icon: string; gradient: string }
 > = {
+  // 新手资源 7 大分类
+  starter: {
+    name: "外网新手必装",
+    desc: "刚能访问外网必看的基础软件、浏览器、密码管理、翻译工具",
+    icon: "🛠️",
+    gradient: "from-red-500 via-red-600 to-orange-700",
+  },
+  "ai-tools": {
+    name: "AI 工具合集",
+    desc: "ChatGPT、Claude、Gemini、Midjourney 等主流 AI 平台",
+    icon: "🤖",
+    gradient: "from-violet-500 via-violet-600 to-purple-700",
+  },
+  "video-learning": {
+    name: "视频学习平台",
+    desc: "YouTube、Coursera、Khan Academy、edX 在线课程",
+    icon: "🎬",
+    gradient: "from-pink-500 via-pink-600 to-rose-700",
+  },
+  "overseas-life": {
+    name: "海外生活服务",
+    desc: "银行、汇款、购物、社交、生活办事一站整理",
+    icon: "🌐",
+    gradient: "from-cyan-500 via-cyan-600 to-blue-700",
+  },
+  "business-tools": {
+    name: "出海经营工具",
+    desc: "建站、收款、CDN、数据分析，从 0 到 1 出海",
+    icon: "💼",
+    gradient: "from-amber-500 via-amber-600 to-orange-700",
+  },
+  security: {
+    name: "账号安全隐私",
+    desc: "密码管理、两步验证、加密邮箱、隐私保护工具",
+    icon: "🔒",
+    gradient: "from-slate-500 via-slate-600 to-gray-700",
+  },
+  "browser-extensions": {
+    name: "浏览器插件",
+    desc: "翻译、暗色模式、比价、笔记等效率提升扩展",
+    icon: "🧩",
+    gradient: "from-emerald-500 via-emerald-600 to-teal-700",
+  },
+  // 原有分类
   life: {
     name: "海外生活资源",
     desc: "政府、银行、医疗、教育、生活服务常用网站与指南",

@@ -1,14 +1,23 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { FileText, LifeBuoy, Truck, Briefcase, ArrowRight } from 'lucide-react';
+import { FileText, LifeBuoy, Truck, Briefcase, ArrowRight, Wrench, Brain, GraduationCap, Globe, Shield, Puzzle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: '资源库 - 海外百宝箱',
-  description: '海外华人常用生活资源、跨境寄送资料、出海经营模板下载',
+  description: '海外华人常用生活资源、跨境寄送资料、出海经营模板、新手工具、AI 资源',
 };
 
 export default function ResourcesPage() {
   const categories = [
+    // 新增：新手资源 7 大分类
+    { name: "外网新手必装", slug: "starter", icon: Wrench, desc: "刚能访问外网必看的基础软件、浏览器、密码管理、翻译工具", color: "bg-red-100 text-red-600" },
+    { name: "AI 工具合集", slug: "ai-tools", icon: Brain, desc: "ChatGPT、Claude、Gemini、Midjourney 等主流 AI 平台", color: "bg-violet-100 text-violet-600" },
+    { name: "视频学习平台", slug: "video-learning", icon: GraduationCap, desc: "YouTube、Coursera、Khan Academy、edX 在线课程", color: "bg-pink-100 text-pink-600" },
+    { name: "海外生活服务", slug: "overseas-life", icon: Globe, desc: "银行、汇款、购物、社交、生活办事一站整理", color: "bg-cyan-100 text-cyan-600" },
+    { name: "出海经营工具", slug: "business-tools", icon: Briefcase, desc: "建站、收款、CDN、数据分析，从 0 到 1 出海", color: "bg-amber-100 text-amber-600" },
+    { name: "账号安全隐私", slug: "security", icon: Shield, desc: "密码管理、两步验证、加密邮箱、隐私保护工具", color: "bg-slate-100 text-slate-600" },
+    { name: "浏览器插件", slug: "browser-extensions", icon: Puzzle, desc: "翻译、暗色模式、比价、笔记等效率提升扩展", color: "bg-emerald-100 text-emerald-600" },
+    // 原有分类
     { name: "海外生活资源", slug: "life", icon: LifeBuoy, desc: "政府、银行、医疗、教育、生活服务常用网站与指南", color: "bg-green-100 text-green-600" },
     { name: "集运物流参考", slug: "logistics", icon: Truck, desc: "承运商查询、集运渠道介绍、敏感货邮寄指南", color: "bg-blue-100 text-blue-600" },
     { name: "出海经营资源", slug: "business", icon: Briefcase, desc: "跨境平台、收款工具、广告投放、AI工具导航", color: "bg-purple-100 text-purple-600" },
@@ -25,7 +34,7 @@ export default function ResourcesPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
