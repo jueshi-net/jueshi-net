@@ -22,6 +22,7 @@ const ROUTE_NAMES: Record<string, string> = {
   quote: '报价单',
   calculator: '计算器',
   'sensitive-goods': '敏感货',
+  'customs-generator': '报关单生成',
   'address-formatter': '地址格式化',
   container: '集装箱',
   inbound: '入库管理',

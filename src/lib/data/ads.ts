@@ -25,6 +25,7 @@ export type AdPlacement =
   | "document-editor-bottom"
   | "label-maker-top"
   | "label-maker-bottom"
+  | "tool-customs-generator-bottom"
   | "footer";
 
 export type AdVariant = "banner" | "card" | "text" | "native";

@@ -7,6 +7,9 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { Breadcrumb } from '@/components/breadcrumb';
+import { AdSlot } from '@/components/ad-slot';
+import { FAQSection } from '@/components/faq-section';
 
 interface CustomsItem {
   id: string;
@@ -151,6 +154,9 @@ export default function CustomsGenerator() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumb */}
+        <Breadcrumb />
+
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -483,6 +489,34 @@ export default function CustomsGenerator() {
             </div>
           </div>
         </div>
+
+        {/* FAQ */}
+        <FAQSection title="报关单生成常见问题" items={[
+          {
+            question: "商业发票 (Commercial Invoice) 和形式发票 (Proforma Invoice) 有什么区别？",
+            answer: "商业发票是货物实际出运后的正式交易凭证，用于报关和结算；形式发票是成交前给买方参考的预估单据。本工具生成的是商业发票，适用于实际报关场景。",
+          },
+          {
+            question: "HS 编码填错了怎么办？",
+            answer: "HS 编码错误可能导致清关延误或罚款。建议在提交前通过海关官网或专业报关行核实 HS 编码。不同国家对同一商品的 HS 编码可能略有差异（前6位国际通用，后几位各国自定）。",
+          },
+          {
+            question: "报关单上的申报价值需要和实际交易金额一致吗？",
+            answer: "是的，申报价值必须真实反映交易金额。低报可能导致目的国海关查验、补税甚至罚款；高报可能导致进口方多缴关税。建议按照实际成交发票金额如实申报。",
+          },
+          {
+            question: "FOB、CIF、EXW 这些贸易条款是什么意思？",
+            answer: "FOB（船上交货）：卖方负责到装运港上船前的费用和风险。CIF（成本+保险+运费）：卖方还需承担海运费和保险费到目的港。EXW（工厂交货）：买方自行到卖方工厂提货。不同条款决定了费用和风险的分担点。",
+          },
+          {
+            question: "这个工具生成的 PDF 可以直接用于报关吗？",
+            answer: "本工具生成的商业发票可作为参考模板，但各国海关对单据格式有特定要求。正式报关建议咨询专业报关行或使用海关指定的申报系统。本工具适合快速制作初步单据和内部参考。",
+          },
+        ]} />
+
+        {/* Ads */}
+        <AdSlot placement="tool-customs-generator-bottom" className="mb-6" />
+        <AdSlot placement="tool-bottom" className="mb-8" />
       </div>
     </div>
   );
