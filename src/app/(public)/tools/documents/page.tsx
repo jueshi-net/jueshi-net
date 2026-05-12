@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock } from "lu
 import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
 import { AdSlot } from "@/components/ad-slot";
+import { Breadcrumb } from "@/components/breadcrumb";
+import { FAQSection } from "@/components/faq-section";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
 import DocumentGrid from "@/components/document-grid";
 
@@ -72,6 +74,11 @@ export default function DocumentsHubPage() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* Breadcrumb */}
+      <div className="max-w-6xl mx-auto px-4 pt-6">
+        <Breadcrumb />
       </div>
 
       {/* Ad Slot: documents-home-top */}
@@ -154,6 +161,24 @@ export default function DocumentsHubPage() {
           </div>
         </div>
       </div>
+
+      {/* FAQ */}
+      <FAQSection title="单据中心常见问题" items={[
+        {
+          question: "这些单据模板可以用于正式报关/银行议付吗？",
+          answer: "本工具提供的是通用参考模板，适合资料整理、内部流转和业务沟通。正式报关、银行信用证议付等场景对单据格式有严格要求，请以相关机构的具体要求为准，或咨询专业报关行/银行。",
+        },
+        {
+          question: "草稿会保存多久？",
+          answer: "游客可保存3份草稿，注册用户10份，会员不限。草稿保存在浏览器本地存储（localStorage），清除浏览器数据会丢失。建议重要单据及时导出。",
+        },
+        {
+          question: "可以导出什么格式？",
+          answer: "支持导出 PDF、PNG 图片格式。会员还可上传公司 Logo，多套公司信息模板，导出带品牌标识的专业单据。",
+        },
+        { question: "商业发票和形式发票有什么区别？", answer: "商业发票（Commercial Invoice）是实际交易后出具的正式单据，用于报关结算；形式发票（Proforma Invoice）是成交前出具的预估单据，供买方参考或申请进口许可。" },
+        { question: "装箱单（Packing List）需要包含哪些信息？", answer: "装箱单应包含：货物名称、规格型号、数量、毛重、净重、包装方式、箱号、唛头等。注意与商业发票的品名和数量保持一致。" },
+      ]} />
     </div>
   );
 }

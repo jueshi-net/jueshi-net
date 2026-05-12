@@ -7,6 +7,8 @@ import { getLabelType, getLabelTemplate, labelTypes, labelSizes, labelStyles } f
 import { getRoleInfo, canUseCustomLabelSize, canUseLabelStyles, canUploadLabelLogo, canRemoveLabelBranding, canBatchGenerateLabels, getLabelBatchLimit, permissionMessages } from '@/lib/membership/permissions';
 import { saveLabelDraft, getLabelDraft, getAllLabelDrafts, deleteLabelDraft } from '@/lib/labels/label-storage';
 import { AdSlot } from '@/components/ad-slot';
+import { Breadcrumb } from '@/components/breadcrumb';
+import { FAQSection } from '@/components/faq-section';
 
 const DISCLAIMER = "本工具生成的是通用唛头、箱贴、仓库标签和信息面单，不是任何承运商或平台的官方运单。正式快递面单、平台标签、FBA 标签等，请以承运商、平台、仓库或服务商系统生成为准。";
 
@@ -125,6 +127,11 @@ export default function LabelMakerPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-4">
+        {/* Breadcrumb */}
+        <div className="mb-3 print:hidden">
+          <Breadcrumb />
+        </div>
+
         {/* Disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 print:hidden">
           <div className="flex items-start gap-2">
@@ -429,6 +436,27 @@ export default function LabelMakerPage() {
             </div>
           </div>
         </div>
+
+        {/* Tool ads */}
+        <AdSlot placement="tool-bottom" className="mb-6 print:hidden" />
+
+        {/* FAQ */}
+        <FAQSection title="唛头面单常见问题" items={[
+          {
+            question: "这个工具可以生成快递面单吗？",
+            answer: "本工具生成的是通用箱唛、仓库标签和寄件信息贴纸，不是任何承运商（DHL/FedEx/UPS/顺丰等）的官方运单。正式快递面单请在对应承运商官网或其系统中生成。",
+          },
+          {
+            question: "唛头（Shipping Mark）是什么？",
+            answer: "唛头是外箱上印刷或粘贴的标识信息，通常包括：收货人简称、目的港、箱号（如 1/50 表示共50箱中的第1箱）、产品名、重量尺寸等。用于仓库和物流环节快速识别货物。",
+          },
+          {
+            question: "FBA 标签可以用这个工具生成吗？",
+            answer: "不可以。Amazon FBA 标签（FNSKU、外箱标签、托盘标签等）必须在 Seller Central 后台生成，有严格的格式和条码要求。建议使用 Amazon 系统出具的官方标签。",
+          },
+          { question: "批量生成是什么意思？", answer: "批量生成指一次性生成多张相同或不同的标签。游客默认只能单次生成，会员可批量生成多张（如不同箱号的连续标签），提高仓库贴标效率。" },
+          { question: "生成的标签可以直接打印吗？", answer: "可以。点击「打印 / PDF」会调用浏览器打印功能，支持 A4 纸打印或导出 PDF。建议打印前预览，确保尺寸和边距正确。" },
+        ]} />
       </div>
     </div>
   );

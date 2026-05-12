@@ -5,6 +5,7 @@ import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check } from 'lucide-reac
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
+import { Breadcrumb } from '@/components/breadcrumb';
 
 interface AddressForm {
   country: string;
@@ -177,6 +178,11 @@ export default function AddressFormatterPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb />
+        </div>
+
         {/* Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
           <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
