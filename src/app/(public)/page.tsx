@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
 import { AdSlot } from '@/components/ad-slot';
-import { starterHomeCards } from '@/lib/data/starter-resources';
+import { StarterResourcesSection } from '@/components/home/starter-resources';
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
   title: {
@@ -253,30 +253,7 @@ export default async function LandingPage() {
       </div>
 
       {/* Starter Resources Module */}
-      <div className="bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-3">刚能访问外网？先看这个</h2>
-          <p className="text-gray-500 text-center mb-10">常用软件、AI 工具、学习平台、账号安全和海外资源，一次整理清楚。</p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {starterHomeCards.map((card) => (
-              <Link
-                key={card.id}
-                href={card.href}
-                className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group"
-              >
-                <div className="text-3xl mb-3">{card.icon}</div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">{card.title}</h3>
-                <p className="text-xs text-gray-400 mb-3">{card.description}</p>
-                <div className="flex flex-wrap gap-1">
-                  {card.tags.map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded">{tag}</span>
-                  ))}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
+      <StarterResourcesSection />
 
       {/* Ad Slot: before footer */}
       <div className="max-w-6xl mx-auto px-4 -mt-8 mb-8">

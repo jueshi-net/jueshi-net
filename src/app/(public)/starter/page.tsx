@@ -124,15 +124,21 @@ export default function StarterPage() {
 
                   {/* Meta info */}
                   <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-                    <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                      {platformLabels[r.platform] || r.platform}
-                    </span>
-                    <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                      {langLabels[r.language] || r.language}
-                    </span>
-                    <span className="px-1.5 py-0.5 bg-gray-100 rounded">
-                      {r.sourceType === "official" ? "官网" : "第三方"}
-                    </span>
+                    {r.platform && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 rounded">
+                        {platformLabels[r.platform] || r.platform}
+                      </span>
+                    )}
+                    {r.language && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 rounded">
+                        {langLabels[r.language] || r.language}
+                      </span>
+                    )}
+                    {r.sourceType && (
+                      <span className="px-1.5 py-0.5 bg-gray-100 rounded">
+                        {r.sourceType === "official" ? "官网" : "第三方"}
+                      </span>
+                    )}
                   </div>
 
                   {/* Link */}
