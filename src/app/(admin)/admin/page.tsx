@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, TrendingUp, Star, Download, Plus, Settings, Upload } from "lucide-react";
+import { LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, TrendingUp, Star, Download, Plus, Settings, Upload, BookOpen } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
 const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#6366F1"];
@@ -103,6 +103,7 @@ export default function AdminPage() {
           <a href="/admin/links" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-2"><Plus className="w-4 h-4" />管理链接</a>
           <a href="/admin/categories" className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-2"><FolderOpen className="w-4 h-4" />管理分类</a>
           <a href="/admin/cms" className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 flex items-center gap-2"><FileText className="w-4 h-4" />发布文章</a>
+          <a href="/admin/resources" className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700 flex items-center gap-2"><BookOpen className="w-4 h-4" />管理资源</a>
           <a href="/admin/ads" className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 flex items-center gap-2"><Megaphone className="w-4 h-4" />配置广告</a>
           <a href="/admin/users" className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 flex items-center gap-2"><Users className="w-4 h-4" />用户管理</a>
           <a href="/admin/settings" className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700 flex items-center gap-2"><Settings className="w-4 h-4" />系统设置</a>
