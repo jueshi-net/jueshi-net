@@ -7,6 +7,13 @@ export type AdPlacement =
   | "home-after-tools"
   | "home-starter-native"
   | "home-before-footer"
+  | "tool-tracking-after-results"
+  | "tool-tracking-bottom"
+  | "tool-shipping-calculator-bottom"
+  | "tool-hs-code-bottom"
+  | "tool-postal-code-bottom"
+  | "tool-exchange-rate-bottom"
+  | "tool-memo-bottom"
   | "tool-bottom"
   | "article-top"
   | "article-bottom"
@@ -101,6 +108,85 @@ export const ads: AdData[] = [
     targetUrl: "/guides",
     placement: ["article-top"],
     variant: "text",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  // 工具页专用广告
+  {
+    id: "ad-tracking-1",
+    title: "需要计算包裹运费？",
+    description: "输入长宽高和重量，自动计算体积重和计费重，支持快递/空运/海运",
+    imageUrl: "",
+    targetUrl: "/tools/shipping-calculator",
+    placement: ["tool-tracking-after-results", "tool-tracking-bottom"],
+    variant: "card",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  {
+    id: "ad-shipping-calc-1",
+    title: "需要查询 HS 编码？",
+    description: "收录 500+ 常见跨境商品海关编码候选，支持中/英/别名搜索",
+    imageUrl: "",
+    targetUrl: "/tools/hs-code",
+    placement: ["tool-shipping-calculator-bottom"],
+    variant: "card",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  {
+    id: "ad-hs-code-1",
+    title: "需要做商业发票？",
+    description: "快速生成商业发票和装箱单，支持多币种、多商品，可导出 PDF",
+    imageUrl: "",
+    targetUrl: "/tools/invoice",
+    placement: ["tool-hs-code-bottom"],
+    variant: "card",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  {
+    id: "ad-postal-1",
+    title: "需要查询国际汇率？",
+    description: "接入实时汇率数据，支持 9 种主流货币换算",
+    imageUrl: "",
+    targetUrl: "/tools/exchange-rate",
+    placement: ["tool-postal-code-bottom"],
+    variant: "card",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  {
+    id: "ad-exchange-1",
+    title: "需要生成唛头面单？",
+    description: "8 种标签模板，支持 A4/100x150mm 等尺寸，可导出 PNG/PDF",
+    imageUrl: "",
+    targetUrl: "/tools/label-maker",
+    placement: ["tool-exchange-rate-bottom"],
+    variant: "card",
+    sponsorName: "",
+    label: "推荐",
+    enabled: false,
+    priority: 1,
+  },
+  {
+    id: "ad-memo-1",
+    title: "需要整理跨境资源？",
+    description: "48 个新手必备工具，涵盖 AI、学习、生活、安全、浏览器插件",
+    imageUrl: "",
+    targetUrl: "/starter",
+    placement: ["tool-memo-bottom"],
+    variant: "card",
     sponsorName: "",
     label: "推荐",
     enabled: false,

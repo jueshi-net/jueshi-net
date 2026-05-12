@@ -340,6 +340,8 @@ export default function HSCodePage() {
           },
         ]} />
 
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-hs-code-bottom" className="mb-4" />
         <AdSlot placement="tool-bottom" className="mb-8" />
       </div>
     </div>

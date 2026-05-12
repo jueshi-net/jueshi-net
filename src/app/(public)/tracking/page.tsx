@@ -303,6 +303,9 @@ export default function TrackingPage() {
           },
         ]} />
 
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-tracking-after-results" className="mb-6" />
+        <AdSlot placement="tool-tracking-bottom" className="mb-8" />
         <AdSlot placement="tool-bottom" className="mb-8" />
 
         <RelatedGuidesSection slugs={["package-tracking-sites-guide", "restricted-items-shipping-guide"]} />

@@ -1,4 +1,5 @@
 "use client";
+import { AdSlot } from '@/components/ad-slot';
 
 import { useState, useEffect, useMemo } from "react";
 import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp } from "lucide-react";
@@ -408,6 +409,9 @@ export default function ExchangeRatePage() {
             answer: "可以。点击「查看走势」按钮即可查看最近 30 天的汇率走势图，数据来源于欧洲央行（ECB）公开汇率。当前汇率以蓝色虚线标注在图表上，方便你对比历史水平。",
           },
         ]} />
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-exchange-rate-bottom" className="mt-8 mb-8" />
       </div>
     </div>
   );

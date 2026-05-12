@@ -1,4 +1,5 @@
 "use client";
+import { AdSlot } from '@/components/ad-slot';
 
 import { useState } from "react";
 import {
@@ -485,6 +486,9 @@ export default function MemoPage() {
             answer: "便签仅保存在您的浏览器本地，其他人无法通过网络访问。但如果您使用公共电脑，请记得退出时清除浏览器数据。建议不要在便签中存储密码、银行卡号等高敏感信息。",
           },
         ]} />
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-memo-bottom" className="mt-8 mb-8" />
       </div>
     </div>
   );

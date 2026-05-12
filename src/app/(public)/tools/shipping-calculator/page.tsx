@@ -680,7 +680,9 @@ export default function ShippingCalculatorPage() {
         </div>
       )}
 
-      <AdSlot placement="tool-bottom" className="mt-8 mb-8 max-w-4xl mx-auto" />
+      {/* Tool-specific ads */}
+      <AdSlot placement="tool-shipping-calculator-bottom" className="mt-8 mb-4 max-w-4xl mx-auto" />
+      <AdSlot placement="tool-bottom" className="mt-4 mb-8 max-w-4xl mx-auto" />
     </div>
   );
 }

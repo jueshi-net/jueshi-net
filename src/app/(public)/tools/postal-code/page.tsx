@@ -1,4 +1,5 @@
 'use client';
+import { AdSlot } from '@/components/ad-slot';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search } from 'lucide-react';
@@ -414,6 +415,9 @@ export default function PostalCodePage() {
             answer: "加拿大邮编不使用字母 O、D、F、I、Q、U（避免与数字混淆）。所以如果你看到类似字母 O，它实际上是数字 0。邮编的第一位字母表示省份，如 V 开头是 BC 省，M 开头是安大略省多伦多。",
           },
         ]} />
+
+        {/* Tool-specific ads */}
+        <AdSlot placement="tool-postal-code-bottom" className="mt-8 mb-8" />
       </div>
     </div>
   );
