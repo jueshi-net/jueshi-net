@@ -1,323 +1,572 @@
 'use client';
 
-import { useState } from 'react';
-import { Package, ExternalLink, Copy, Check, Trash2, ClipboardList, AlertCircle } from 'lucide-react';
-import { RelatedGuidesSection } from '@/components/related-guides-section';
-import { FAQSection } from '@/components/faq-section';
+import { useState, useEffect, useCallback } from 'react';
 import { AdSlot } from '@/components/ad-slot';
-import { RelatedToolsWidget } from '@/components/related-tools-widget';
+import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
+import {
+  Package,
+  Search,
+  Copy,
+  Check,
+  Plus,
+  Trash2,
+  ExternalLink,
+  Clock,
+  Truck,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  HelpCircle,
+  Download,
+  Upload,
+} from 'lucide-react';
 
-interface Carrier {
+const STORAGE_KEY = 'tracking_numbers';
+
+type TrackingStatus = 'pending' | 'in-transit' | 'delivered' | 'exception' | 'unknown';
+
+interface TrackingEntry {
   id: string;
-  name: string;
-  trackingUrl: string;
- 官网Url: string;
-  category: '中国' | '国际' | '邮政';
+  number: string;
+  carrier: string;
+  status: TrackingStatus;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-const carriers: Carrier[] = [
-  { id: 'sf', name: '顺丰速运', trackingUrl: 'https://www.sf-express.com/weChat/func/movePage?code=QUERY_EXPRESS', 官网Url: 'https://www.sf-express.com', category: '中国' },
-  { id: 'yto', name: '圆通速递', trackingUrl: 'https://www.yto.net.cn/', 官网Url: 'https://www.yto.net.cn', category: '中国' },
-  { id: 'sto', name: '申通快递', trackingUrl: 'https://www.sto.cn/', 官网Url: 'https://www.sto.cn', category: '中国' },
-  { id: 'zto', name: '中通快递', trackingUrl: 'https://www.zto.com/', 官网Url: 'https://www.zto.com', category: '中国' },
-  { id: 'yunda', name: '韵达快递', trackingUrl: 'https://www.yundaex.com/', 官网Url: 'https://www.yundaex.com', category: '中国' },
-  { id: 'jt', name: '极兔速递', trackingUrl: 'https://www.jtexpress.cn/', 官网Url: 'https://www.jtexpress.cn', category: '中国' },
-  { id: 'ems', name: 'EMS中国邮政', trackingUrl: 'https://www.ems.com.cn/', 官网Url: 'https://www.ems.com.cn', category: '邮政' },
-  { id: 'jd', name: '京东物流', trackingUrl: 'https://www.jdl.cn/', 官网Url: 'https://www.jdl.cn', category: '中国' },
-  { id: 'dhl', name: 'DHL', trackingUrl: 'https://www.dhl.com/cn-zh/home/tracking.html', 官网Url: 'https://www.dhl.com', category: '国际' },
-  { id: 'fedex', name: 'FedEx', trackingUrl: 'https://www.fedex.com/zh-cn/tracking.html', 官网Url: 'https://www.fedex.com', category: '国际' },
-  { id: 'ups', name: 'UPS', trackingUrl: 'https://www.ups.com/track', 官网Url: 'https://www.ups.com', category: '国际' },
-  { id: 'tnt', name: 'TNT', trackingUrl: 'https://www.tnt.com/express/zh_cn/site/home.html', 官网Url: 'https://www.tnt.com', category: '国际' },
-  { id: 'usps', name: 'USPS', trackingUrl: 'https://tools.usps.com/go/TrackConfirmAction', 官网Url: 'https://www.usps.com', category: '邮政' },
-  { id: 'canadapost', name: 'Canada Post', trackingUrl: 'https://www.canadapost-postescanada.ca/track-reperage/en#/search', 官网Url: 'https://www.canadapost.ca', category: '邮政' },
-  { id: 'auspost', name: 'Australia Post', trackingUrl: 'https://auspost.com.au/mypost/track/#/search', 官网Url: 'https://auspost.com.au', category: '邮政' },
+const CARRIER_OPTIONS = [
+  '未选择',
+  '17TRACK',
+  '中通快递',
+  '圆通速递',
+  '韵达快递',
+  '申通快递',
+  '顺丰速运',
+  '京东物流',
+  'EMS中国邮政',
+  '极兔速递',
+  'DHL',
+  'FedEx',
+  'UPS',
+  'USPS',
+  'Canada Post',
 ];
 
-const carrier17track = (trackingNo: string) =>
-  `https://t.17track.net/en#tracknos=${encodeURIComponent(trackingNo)}`;
+const STATUS_CONFIG: Record<TrackingStatus, { label: string; color: string; icon: typeof Package }> = {
+  'pending': { label: '待查询', color: 'bg-gray-100 text-gray-600', icon: Clock },
+  'in-transit': { label: '运输中', color: 'bg-blue-100 text-blue-700', icon: Truck },
+  'delivered': { label: '已签收', color: 'bg-green-100 text-green-700', icon: CheckCircle },
+  'exception': { label: '异常', color: 'bg-red-100 text-red-700', icon: AlertCircle },
+  'unknown': { label: '未知', color: 'bg-yellow-100 text-yellow-700', icon: HelpCircle },
+};
+
+function generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
+function loadTracking(): TrackingEntry[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as TrackingEntry[];
+  } catch {
+    console.error('Failed to load tracking data');
+  }
+  return [];
+}
+
+function saveTracking(entries: TrackingEntry[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  } catch {
+    console.error('Failed to save tracking data');
+  }
+}
 
 export default function TrackingPage() {
-  const [input, setInput] = useState('');
-  const [numbers, setNumbers] = useState<string[]>([]);
-  const [copiedAll, setCopiedAll] = useState(false);
-  const [copiedSingle, setCopiedSingle] = useState<string | null>(null);
-  const [selectedCarrier, setSelectedCarrier] = useState('sf');
+  const [entries, setEntries] = useState<TrackingEntry[]>(() => loadTracking());
+  const [inputValue, setInputValue] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<TrackingStatus | 'all'>('all');
+  const [message, setMessage] = useState({ type: '' as 'success' | 'error' | '', text: '' });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showBatchInput, setShowBatchInput] = useState(false);
+  const [batchInput, setBatchInput] = useState('');
 
-  // Parse input into clean tracking numbers
-  const parseInput = () => {
-    const raw = input
-      .replace(/[，,、；;\s\n\r]+/g, '\n') // Replace common separators with newlines
-      .split('\n')
-      .map(s => s.trim())
-      .filter(s => s.length > 3 && !s.match(/^[^\u4e00-\u9fa5a-zA-Z0-9]*$/)); // Remove empty / pure symbol lines
-
-    const unique = [...new Set(raw)];
-    setNumbers(unique);
+  const flashMessage = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 2500);
   };
 
-  const clearAll = () => { setInput(''); setNumbers([]); };
-
-  const removeOne = (num: string) => setNumbers(prev => prev.filter(n => n !== num));
-
-  const copyAll = () => {
-    if (numbers.length === 0) return;
-    navigator.clipboard.writeText(numbers.join('\n')).then(() => {
-      setCopiedAll(true);
-      trackEvent.trackingCopy();
-      setTimeout(() => setCopiedAll(false), 2000);
-    });
+  const persist = (updated: TrackingEntry[]) => {
+    setEntries(updated);
+    saveTracking(updated);
   };
 
-  const copyOne = (num: string) => {
-    navigator.clipboard.writeText(num).then(() => {
-      setCopiedSingle(num);
-      trackEvent.trackingCopy();
-      setTimeout(() => setCopiedSingle(null), 1500);
-    });
-  };
+  const addTracking = useCallback(() => {
+    const trimmed = inputValue.trim();
+    if (!trimmed) {
+      flashMessage('error', '请输入快递单号');
+      return;
+    }
 
-  const jump17track = (num: string) => {
+    // Check duplicate
+    if (entries.some(e => e.number === trimmed)) {
+      flashMessage('error', '该单号已存在');
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const newEntry: TrackingEntry = {
+      id: generateId(),
+      number: trimmed,
+      carrier: '未选择',
+      status: 'pending',
+      note: '',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    persist([newEntry, ...entries]);
     trackEvent.trackingClick17track();
-    window.open(carrier17track(num), '_blank');
+    setInputValue('');
+    flashMessage('success', '已添加追踪单号');
+  }, [inputValue, entries]);
+
+  const addBatchTracking = useCallback(() => {
+    const lines = batchInput.split(/[\n,;，；]+/).map(s => s.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      flashMessage('error', '请输入至少一个单号');
+      return;
+    }
+
+    const existingNumbers = new Set(entries.map(e => e.number));
+    const now = new Date().toISOString();
+    const newEntries: TrackingEntry[] = [];
+
+    for (const num of lines) {
+      if (!existingNumbers.has(num)) {
+        newEntries.push({
+          id: generateId(),
+          number: num,
+          carrier: '未选择',
+          status: 'pending',
+          note: '',
+          createdAt: now,
+          updatedAt: now,
+        });
+        existingNumbers.add(num);
+      }
+    }
+
+    if (newEntries.length === 0) {
+      flashMessage('error', '所有单号均已存在');
+      return;
+    }
+
+    persist([...newEntries, ...entries]);
+    setBatchInput('');
+    setShowBatchInput(false);
+    flashMessage('success', `成功添加 ${newEntries.length} 个单号`);
+  }, [batchInput, entries]);
+
+  const removeEntry = useCallback((id: string) => {
+    persist(entries.filter(e => e.id !== id));
+    flashMessage('success', '已删除');
+  }, [entries]);
+
+  const updateEntry = useCallback((id: string, updates: Partial<TrackingEntry>) => {
+    const updated = entries.map(e =>
+      e.id === id ? { ...e, ...updates, updatedAt: new Date().toISOString() } : e
+    );
+    persist(updated);
+  }, [entries]);
+
+  const copyNumber = useCallback(async (number: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(number);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1500);
+      trackEvent.trackingCopy();
+    } catch {
+      flashMessage('error', '复制失败');
+    }
+  }, []);
+
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `快递追踪备份_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    flashMessage('success', '导出成功');
   };
 
-  const jumpCarrier = (carrierId: string, num?: string) => {
-    const c = carriers.find(x => x.id === carrierId);
-    if (!c) return;
-    trackEvent.custom('tracking', 'jump_carrier');
-    window.open(num ? c.trackingUrl : c.官网Url, '_blank');
+  const handleImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target?.result as string) as TrackingEntry[];
+          if (!Array.isArray(imported)) throw new Error('Invalid format');
+          const existingIds = new Set(entries.map(e => e.number));
+          const newEntries = imported.filter(e => !existingIds.has(e.number));
+          if (newEntries.length === 0) {
+            flashMessage('error', '没有新的单号可导入');
+            return;
+          }
+          persist([...newEntries, ...entries]);
+          flashMessage('success', `成功导入 ${newEntries.length} 个单号`);
+        } catch {
+          flashMessage('error', '导入失败，文件格式不正确');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   };
 
-  const currentCarrier = carriers.find(c => c.id === selectedCarrier);
+  // Filtering & sorting
+  const filteredEntries = entries
+    .filter(e => {
+      const matchesSearch = !searchQuery ||
+        e.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.carrier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        e.note.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = filterStatus === 'all' || e.status === filterStatus;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Pending and exception first, then in-transit, then delivered
+      const statusOrder: Record<string, number> = {
+        'exception': 0,
+        'pending': 1,
+        'in-transit': 2,
+        'unknown': 3,
+        'delivered': 4,
+      };
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[a.status] - statusOrder[b.status];
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+  // Stats
+  const stats = {
+    total: entries.length,
+    pending: entries.filter(e => e.status === 'pending').length,
+    inTransit: entries.filter(e => e.status === 'in-transit').length,
+    delivered: entries.filter(e => e.status === 'delivered').length,
+    exception: entries.filter(e => e.status === 'exception').length,
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">物流追踪入口</h1>
-          <p className="text-lg text-blue-100">批量单号整理 + 一键跳转承运商官网查询</p>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">物流追踪</h1>
+          <p className="text-sm text-gray-500 mt-1">管理你的快递单号，一键查询物流状态</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleImport}
+            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5"
+          >
+            <Upload className="w-4 h-4" /> 导入
+          </button>
+          <button
+            onClick={handleExport}
+            disabled={entries.length === 0}
+            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" /> 导出
+          </button>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        {/* Disclaimer */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-300">
-            <p>
-              <strong>本站不保存物流轨迹，不提供承运服务。</strong>
-              实际物流轨迹请以承运商官网或 17TRACK 等第三方平台为准。
-              本工具仅用于整理单号和提供查询入口。
-            </p>
+      {/* Stats */}
+      {entries.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="bg-white rounded-xl border p-3 text-center">
+            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+            <div className="text-xs text-gray-500">全部单号</div>
+          </div>
+          <div className="bg-white rounded-xl border p-3 text-center">
+            <div className="text-2xl font-bold text-gray-600">{stats.pending}</div>
+            <div className="text-xs text-gray-500">待查询</div>
+          </div>
+          <div className="bg-white rounded-xl border p-3 text-center">
+            <div className="text-2xl font-bold text-blue-600">{stats.inTransit}</div>
+            <div className="text-xs text-gray-500">运输中</div>
+          </div>
+          <div className="bg-white rounded-xl border p-3 text-center">
+            <div className="text-2xl font-bold text-green-600">{stats.delivered}</div>
+            <div className="text-xs text-gray-500">已签收</div>
+          </div>
+          <div className="bg-white rounded-xl border p-3 text-center">
+            <div className="text-2xl font-bold text-red-600">{stats.exception}</div>
+            <div className="text-xs text-gray-500">异常</div>
           </div>
         </div>
+      )}
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Left: Input & Parsed Numbers */}
-          <div className="space-y-5">
-            {/* Input */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <ClipboardList className="w-5 h-5 text-blue-600" />
-                粘贴单号
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                支持粘贴多个单号，空格、逗号、分号、换行均会自动识别。
-              </p>
-              <textarea
-                className="w-full h-36 px-4 py-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono text-sm"
-                placeholder={"例：\nSF1234567890\nYT9876543210 ZTO123456\nJD0012345678"}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-              />
-              <div className="flex gap-3 mt-3">
-                <button onClick={parseInput}
-                  className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm">
-                  解析单号
-                </button>
-                <button onClick={clearAll}
-                  className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm flex items-center gap-1">
-                  <Trash2 className="w-4 h-4" /> 清空
-                </button>
-              </div>
-            </div>
-
-            {/* Parsed Numbers */}
-            {numbers.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                    整理结果（{numbers.length} 个单号）
-                  </h2>
-                  <button onClick={copyAll}
-                    className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700">
-                    {copiedAll ? <><Check className="w-3 h-3" /> 已复制全部</> : <><Copy className="w-3 h-3" /> 复制全部</>}
-                  </button>
-                </div>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {numbers.map((num, i) => (
-                    <div key={`${num}-${i}`}
-                      className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-3 space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xs text-gray-400 w-6 text-right shrink-0">{i + 1}</span>
-                          <span className="font-mono text-sm text-gray-900 dark:text-white truncate">{num}</span>
-                        </div>
-                        <button onClick={() => removeOne(num)}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0" title="移除">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex gap-2 pl-8">
-                        <button onClick={() => copyOne(num)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 bg-white dark:bg-gray-600 border border-gray-200 dark:border-gray-500 rounded text-xs text-gray-700 dark:text-gray-200 hover:border-blue-400 hover:text-blue-600 transition-colors">
-                          {copiedSingle === num ? <><Check className="w-3 h-3 text-green-500" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制单号</>}
-                        </button>
-                        <button onClick={() => jump17track(num)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded text-xs text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">
-                          <ExternalLink className="w-3 h-3" /> 在17TRACK查询
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* Batch actions */}
-                <div className="mt-4 pt-3 border-t dark:border-gray-700">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">批量操作：</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={() => {
-                      trackEvent.trackingClick17track();
-                      const url = carrier17track(numbers.join(','));
-                      window.open(url, '_blank');
-                    }} className="px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded text-xs hover:bg-indigo-200 dark:hover:bg-indigo-900/50">
-                      全部跳转 17TRACK
-                    </button>
-                    {currentCarrier && (
-                      <button onClick={() => {
-                        trackEvent.custom('tracking', 'jump_carrier');
-                        window.open(currentCarrier.trackingUrl, '_blank');
-                      }} className="px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs hover:bg-blue-200 dark:hover:bg-blue-900/50">
-                        前往 {currentCarrier.name} 官网
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+      {/* Add single tracking number */}
+      <div className="bg-white rounded-xl border p-4 mb-6">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') addTracking(); }}
+              placeholder="输入快递单号，回车添加"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
+          <button
+            onClick={addTracking}
+            className="px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" /> 添加
+          </button>
+          <button
+            onClick={() => setShowBatchInput(!showBatchInput)}
+            className="px-3 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 text-sm"
+          >
+            批量添加
+          </button>
+        </div>
 
-          {/* Right: Carrier Shortcuts */}
-          <div className="space-y-5">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <ExternalLink className="w-5 h-5 text-green-600" />
-                承运商快捷入口
-              </h2>
-
-              {/* Carrier selector for quick jump */}
-              <div className="mb-4">
-                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">选择承运商</label>
-                <div className="flex gap-2">
-                  <select value={selectedCarrier} onChange={e => setSelectedCarrier(e.target.value)}
-                    className="flex-1 px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white text-sm">
-                    {carriers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                  <button onClick={() => jumpCarrier(selectedCarrier)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors">
-                    前往官网
-                  </button>
-                </div>
-              </div>
-
-              {/* Carrier list by category */}
-              {(['中国', '国际', '邮政'] as const).map(cat => (
-                <div key={cat} className="mb-4 last:mb-0">
-                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">{cat}</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {carriers.filter(c => c.category === cat).map(c => (
-                      <div key={c.id} className="flex gap-1">
-                        <button onClick={() => { setSelectedCarrier(c.id); jumpCarrier(c.id); }}
-                          className="flex-1 text-left px-3 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 transition-colors">
-                          {c.name}
-                        </button>
-                        <button onClick={() => window.open(c.trackingUrl, '_blank')}
-                          className="px-2 py-2 text-gray-400 hover:text-blue-600 transition-colors" title="查询">
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick reference */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-3">💡 使用提示</h3>
-              <ul className="space-y-2 text-sm text-blue-700 dark:text-blue-400">
-                <li>• 粘贴单号后点击"解析单号"，自动去空格、分行、去重复</li>
-                <li>• 每个单号下方有"复制单号"和"在17TRACK查询"按钮，一键操作</li>
-                <li>• 点击"复制全部"，可复制整理后的单号列表</li>
-                <li>• 也可使用底部"全部跳转 17TRACK"批量打开查询</li>
-                <li>• 17TRACK 支持全球 1500+ 承运商自动识别</li>
-              </ul>
-            </div>
-
-            {/* About 17TRACK */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">📦 关于 17TRACK</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                17TRACK 是全球知名的物流追踪平台，支持自动识别 1500+ 承运商。
-                如果您不确定单号属于哪家公司，可以直接在 17TRACK 查询。
-              </p>
-              <button onClick={() => { trackEvent.trackingClick17track(); window.open('https://t.17track.net/en', '_blank'); }}
-                className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
-                <ExternalLink className="w-4 h-4" /> 打开 17TRACK
+        {/* Batch input */}
+        {showBatchInput && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <textarea
+              value={batchInput}
+              onChange={(e) => setBatchInput(e.target.value)}
+              placeholder="每行一个单号，或用逗号、分号分隔&#10;例如：&#10;SF1234567890&#10;YT1234567890&#10;ZTO1234567890"
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={addBatchTracking}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+              >
+                批量添加
+              </button>
+              <button
+                onClick={() => { setShowBatchInput(false); setBatchInput(''); }}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+              >
+                取消
               </button>
             </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* FAQ */}
-        {/* Related Tools Widget */}
-        <div className="max-w-4xl mx-auto mb-8">
-          <RelatedToolsWidget currentTool="tracking" />
+      {/* Quick 17Track link */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center justify-between">
+        <div>
+          <h3 className="font-medium text-blue-900">查询物流状态</h3>
+          <p className="text-sm text-blue-700 mt-1">点击下方按钮前往 17TRACK 查询具体物流信息</p>
         </div>
+        <a
+          href="https://t.17track.net/zh-cn"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackEvent.trackingClick17track()}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 text-sm"
+        >
+          <ExternalLink className="w-4 h-4" /> 前往 17TRACK
+        </a>
+      </div>
 
+      {/* Message Toast */}
+      {message.text && (
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm mb-4 ${
+          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+        }`}>
+          {message.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+          <span>{message.text}</span>
+        </div>
+      )}
+
+      {/* Search & Filter */}
+      {entries.length > 0 && (
+        <div className="flex flex-wrap gap-3 mb-6">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="搜索单号、快递公司或备注..."
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as any)}
+            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm min-w-[120px]"
+          >
+            <option value="all">全部状态</option>
+            <option value="pending">待查询</option>
+            <option value="in-transit">运输中</option>
+            <option value="delivered">已签收</option>
+            <option value="exception">异常</option>
+            <option value="unknown">未知</option>
+          </select>
+        </div>
+      )}
+
+      {/* Tracking list */}
+      <div className="space-y-3">
+        {filteredEntries.map((entry) => {
+          const statusConfig = STATUS_CONFIG[entry.status];
+          const StatusIcon = statusConfig.icon;
+          return (
+            <div
+              key={entry.id}
+              className="bg-white rounded-xl border p-4 hover:shadow-md transition-all"
+            >
+              <div className="flex items-start gap-3">
+                {/* Copy button + number */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <button
+                      onClick={() => copyNumber(entry.number, entry.id)}
+                      className="font-mono text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5"
+                      title="点击复制"
+                    >
+                      {copiedId === entry.id ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-400" />
+                      )}
+                      {entry.number}
+                    </button>
+                    <span className={`px-2 py-0.5 text-xs rounded-md font-medium ${statusConfig.color}`}>
+                      <StatusIcon className="w-3 h-3 inline mr-0.5" />
+                      {statusConfig.label}
+                    </span>
+                  </div>
+
+                  {/* Carrier + Note */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <select
+                      value={entry.carrier}
+                      onChange={(e) => updateEntry(entry.id, { carrier: e.target.value })}
+                      className="px-2 py-1 border border-gray-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {CARRIER_OPTIONS.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                    <input
+                      value={entry.note}
+                      onChange={(e) => updateEntry(entry.id, { note: e.target.value })}
+                      placeholder="添加备注..."
+                      className="px-2 py-1 border border-gray-200 rounded text-xs flex-1 min-w-[150px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <p className="text-xs text-gray-400 mt-2">
+                    添加于 {new Date(entry.createdAt).toLocaleString('zh-CN')}
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  <a
+                    href={`https://t.17track.net/zh-cn#nums=${entry.number}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
+                    title="查询物流"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                  <button
+                    onClick={() => copyNumber(entry.number, entry.id)}
+                    className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
+                    title="复制单号"
+                  >
+                    {copiedId === entry.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => removeEntry(entry.id)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                    title="删除"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Status update buttons */}
+              <div className="flex gap-1 mt-3 pt-3 border-t border-gray-50">
+                {(['pending', 'in-transit', 'delivered', 'exception'] as TrackingStatus[]).map(s => (
+                  <button
+                    key={s}
+                    onClick={() => updateEntry(entry.id, { status: s })}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      entry.status === s
+                        ? `${STATUS_CONFIG[s].color} font-medium`
+                        : 'text-gray-400 hover:bg-gray-100'
+                    }`}
+                  >
+                    {STATUS_CONFIG[s].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+        {filteredEntries.length === 0 && entries.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+            没有找到匹配的追踪记录
+          </div>
+        )}
+        {entries.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+            <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-400">还没有追踪单号，输入单号开始追踪</p>
+          </div>
+        )}
+      </div>
+
+      {/* FAQ */}
+      <div className="max-w-5xl mx-auto px-4 pb-16">
         <FAQSection title="物流追踪常见问题" items={[
           {
-            question: "为什么单号在官网查不到？",
-            answer: "刚生成的单号可能需要 1-6 小时才能在承运商系统中查到。如果商家只是打印了面单但快递员还没揽收，也不会显示轨迹。建议拿到单号后等 24-48 小时再查。",
+            question: '如何查询快递物流信息？',
+            answer: '添加快递单号后，点击单号右侧的「查询物流」按钮，即可跳转至 17TRACK 网站查询详细物流信息。17TRACK 支持全球 1500+ 快递公司的包裹追踪。',
           },
           {
-            question: "17TRACK 和承运商官网查的结果不一样？",
-            answer: "17TRACK 是第三方聚合平台，数据来自各承运商 API 同步，可能有几小时延迟。最准确的轨迹请以承运商官网为准。如果 17TRACK 能查到而官网查不到，可能是单号已转为目的国本地邮政的新单号。",
+            question: '支持哪些快递公司？',
+            answer: '本工具支持管理任意快递公司的单号。实际查询通过 17TRACK 平台进行，该平台支持中国大陆（顺丰、中通、圆通、韵达等）、国际快递（DHL、FedEx、UPS）等 1500+ 承运商。',
           },
           {
-            question: "邮政渠道的单号到国外后怎么查？",
-            answer: "通过 EMS/e邮宝等邮政渠道寄出的包裹，到达目的国后通常会转为当地邮政的新单号（如中国 EMS 到美国后转为 USPS 单号）。建议使用 17TRACK 查询，它能自动关联新旧单号。",
+            question: '单号数据保存在哪里？',
+            answer: '单号和备注信息保存在您浏览器的本地存储（localStorage）中，不会上传到任何服务器。清除浏览器数据会导致单号列表丢失，建议定期使用导出功能备份。',
           },
           {
-            question: "什么是转运单号和末端派送单号？",
-            answer: "使用集运/转运服务时会收到多个单号：国内段单号（商家→转运仓）、国际段单号（转运仓→目的国）、末端派送单号（目的国本地快递派送）。每个阶段单号不同，需要分别追踪。",
-          },
-          {
-            question: "本站会保存我的物流信息吗？",
-            answer: "不会。本站只提供单号整理和跳转查询入口，不保存任何物流轨迹或包裹信息。所有查询都在承运商官网或 17TRACK 进行。",
+            question: '如何批量添加单号？',
+            answer: '点击「批量添加」按钮，在文本框中输入多个单号，每行一个或用逗号、分号分隔。点击「批量添加」即可一次性导入。',
           },
         ]} />
 
-        {/* Related Tools Widget */}
-        <RelatedToolsWidget currentTool="tracking" />
-
         {/* Tool-specific ads */}
-        <AdSlot placement="tool-tracking-after-results" className="mb-6" />
-        <AdSlot placement="tool-tracking-bottom" className="mb-8" />
-        <AdSlot placement="tool-bottom" className="mb-8" />
-
-        <RelatedGuidesSection slugs={["package-tracking-sites-guide", "restricted-items-shipping-guide"]} />
+        <AdSlot placement="tool-tracking-bottom" className="mt-8 mb-8" />
       </div>
     </div>
   );
