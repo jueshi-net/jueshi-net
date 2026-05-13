@@ -3,6 +3,7 @@ import { useState } from "react";
 import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
+import { Breadcrumb } from "@/components/breadcrumb";
 
 export default function QRCodePage() {
   const [url, setUrl] = useState("");
@@ -30,6 +31,10 @@ export default function QRCodePage() {
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb />
+      </div>
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
           <QrCode className="w-6 h-6 text-purple-600" />

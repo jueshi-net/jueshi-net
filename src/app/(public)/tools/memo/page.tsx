@@ -1,7 +1,7 @@
 "use client";
 import { AdSlot } from '@/components/ad-slot';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus,
   Trash2,
@@ -16,8 +16,13 @@ import {
   X,
   CheckCircle,
   AlertCircle,
+  Cloud,
+  CloudOff,
+  Clock,
+  Calendar,
 } from "lucide-react";
 import { FAQSection } from '@/components/faq-section';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 
 const CATEGORIES = [
@@ -40,6 +45,7 @@ interface Note {
   isPinned: boolean;
   createdAt: string;
   updatedAt: string;
+  dueDate?: string | null;
 }
 
 function generateId(): string {
@@ -64,16 +70,89 @@ function saveNotes(notes: Note[]) {
   }
 }
 
+// --- Due date helpers ---
+function getDueDateStatus(dueDate?: string | null): 'overdue' | 'today' | 'upcoming' | 'none' {
+  if (!dueDate) return 'none';
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const due = new Date(dueDate);
+  due.setHours(0, 0, 0, 0);
+  const diff = due.getTime() - now.getTime();
+  const dayMs = 86400000;
+  if (diff < 0) return 'overdue';
+  if (diff < dayMs) return 'today';
+  return 'upcoming';
+}
+
+function formatDueDate(dueDate: string): string {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const due = new Date(dueDate);
+  due.setHours(0, 0, 0, 0);
+  const diff = due.getTime() - now.getTime();
+  const dayMs = 86400000;
+  if (diff < 0) {
+    const days = Math.floor(Math.abs(diff) / dayMs);
+    return `已过期${days}天`;
+  }
+  if (diff < dayMs) return '今天到期';
+  const days = Math.ceil(diff / dayMs);
+  if (days === 1) return '明天到期';
+  return `${days}天后到期`;
+}
+
 export default function MemoPage() {
   const [notes, setNotes] = useState<Note[]>(() => loadNotes());
   const [editing, setEditing] = useState<Note | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
+  const [filterDueStatus, setFilterDueStatus] = useState<'all' | 'overdue' | 'today' | 'upcoming' | 'none'>('all');
   const [message, setMessage] = useState({ type: "" as "success" | "error" | "", text: "" });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [formData, setFormData] = useState({ title: "", content: "", category: CATEGORIES[0], isPinned: false });
+  const [formData, setFormData] = useState({ title: "", content: "", category: CATEGORIES[0], isPinned: false, dueDate: "" });
+
+  // Cloud sync state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<string | null>(null);
+
+  // Check auth status on mount
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user) {
+          setIsLoggedIn(true);
+          loadCloudMemos();
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const loadCloudMemos = async () => {
+    try {
+      const res = await fetch("/api/memos");
+      if (res.ok) {
+        const data = await res.json();
+        const cloudNotes: Note[] = (data.memos || []).map((m: any) => ({
+          id: m.id,
+          title: m.title,
+          content: m.content || "",
+          category: m.category || "",
+          isPinned: m.isPinned,
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt,
+          dueDate: m.dueDate ? new Date(m.dueDate).toISOString().slice(0, 16) : null,
+        }));
+        setNotes(cloudNotes);
+        setLastSynced(new Date().toLocaleTimeString("zh-CN"));
+      }
+    } catch (e) {
+      console.error("Failed to load cloud memos", e);
+    }
+  };
 
   const flashMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -88,10 +167,10 @@ export default function MemoPage() {
   const resetForm = () => {
     setEditing(null);
     setShowForm(false);
-    setFormData({ title: "", content: "", category: CATEGORIES[0], isPinned: false });
+    setFormData({ title: "", content: "", category: CATEGORIES[0], isPinned: false, dueDate: "" });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.title.trim() && !formData.content.trim()) {
       flashMessage("error", "请输入标题或内容");
       return;
@@ -101,10 +180,28 @@ export default function MemoPage() {
     if (editing) {
       const updated = notes.map((n) =>
         n.id === editing.id
-          ? { ...n, title: formData.title.trim(), content: formData.content, category: formData.category, isPinned: formData.isPinned, updatedAt: now }
+          ? { ...n, title: formData.title.trim(), content: formData.content, category: formData.category, isPinned: formData.isPinned, dueDate: formData.dueDate || null, updatedAt: now }
           : n
       );
       persist(updated);
+
+      // Sync to cloud if logged in
+      if (isLoggedIn) {
+        try {
+          await fetch(`/api/memos?id=${editing.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: formData.title.trim(),
+              content: formData.content,
+              category: formData.category,
+              isPinned: formData.isPinned,
+              dueDate: formData.dueDate || null,
+            }),
+          });
+        } catch {}
+      }
+
       flashMessage("success", "便签已更新");
     } else {
       const newNote: Note = {
@@ -113,31 +210,70 @@ export default function MemoPage() {
         content: formData.content,
         category: formData.category,
         isPinned: formData.isPinned,
+        dueDate: formData.dueDate || null,
         createdAt: now,
         updatedAt: now,
       };
       persist([newNote, ...notes]);
       trackEvent.memoAdd();
+
+      // Sync to cloud if logged in
+      if (isLoggedIn) {
+        try {
+          await fetch("/api/memos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title: formData.title.trim(),
+              content: formData.content,
+              category: formData.category,
+              isPinned: formData.isPinned,
+              dueDate: formData.dueDate || null,
+            }),
+          });
+        } catch {}
+      }
+
       flashMessage("success", "便签已创建");
     }
     resetForm();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     persist(notes.filter((n) => n.id !== id));
+    if (isLoggedIn) {
+      try {
+        await fetch(`/api/memos?id=${id}`, { method: "DELETE" });
+      } catch {}
+    }
     flashMessage("success", "便签已删除");
   };
 
-  const togglePin = (note: Note) => {
+  const togglePin = async (note: Note) => {
     const updated = notes.map((n) =>
       n.id === note.id ? { ...n, isPinned: !n.isPinned, updatedAt: new Date().toISOString() } : n
     );
     persist(updated);
+    if (isLoggedIn) {
+      try {
+        await fetch(`/api/memos?id=${note.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isPinned: !note.isPinned }),
+        });
+      } catch {}
+    }
   };
 
   const startEdit = (note: Note) => {
     setEditing(note);
-    setFormData({ title: note.title, content: note.content, category: note.category, isPinned: note.isPinned });
+    setFormData({
+      title: note.title,
+      content: note.content,
+      category: note.category,
+      isPinned: note.isPinned,
+      dueDate: note.dueDate ? note.dueDate.slice(0, 16) : "",
+    });
     setShowForm(true);
   };
 
@@ -199,6 +335,10 @@ export default function MemoPage() {
     flashMessage("success", "所有便签已清空");
   };
 
+  // Count due-date memos for reminder badge
+  const overdueCount = notes.filter(n => getDueDateStatus(n.dueDate) === 'overdue').length;
+  const todayCount = notes.filter(n => getDueDateStatus(n.dueDate) === 'today').length;
+
   // Filtering & sorting
   const filteredNotes = notes
     .filter((n) => {
@@ -208,7 +348,8 @@ export default function MemoPage() {
         n.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
         n.category.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = !filterCategory || n.category === filterCategory;
-      return matchesSearch && matchesCategory;
+      const matchesDueStatus = filterDueStatus === 'all' || getDueDateStatus(n.dueDate) === filterDueStatus;
+      return matchesSearch && matchesCategory && matchesDueStatus;
     })
     .sort((a, b) => {
       if (a.isPinned && !b.isPinned) return -1;
@@ -218,13 +359,38 @@ export default function MemoPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb />
+      </div>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">跨境工作便签</h1>
-          <p className="text-sm text-gray-500 mt-1">数据保存在当前浏览器，安全私密</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {isLoggedIn
+              ? `已登录 \u00b7 数据同步到云端${lastSynced ? `，上次同步 ${lastSynced}` : ""}`
+              : "数据保存在当前浏览器，安全私密"}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {isLoggedIn && (
+            <button
+              onClick={loadCloudMemos}
+              disabled={isSyncing}
+              className="px-3 py-2 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm hover:bg-green-100 flex items-center gap-1.5"
+            >
+              <Cloud className="w-4 h-4" /> {isSyncing ? "同步中..." : "从云端加载"}
+            </button>
+          )}
+          {!isLoggedIn && (
+            <a
+              href="/login?redirect=/tools/memo"
+              className="px-3 py-2 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-sm hover:bg-blue-100 flex items-center gap-1.5"
+            >
+              <CloudOff className="w-4 h-4" /> 登录开启云同步
+            </a>
+          )}
           <button
             onClick={handleImport}
             className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5"
@@ -257,10 +423,24 @@ export default function MemoPage() {
       {/* Disclaimers */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800 space-y-1">
         <p>• 数据默认保存在当前浏览器</p>
-        <p>• 本站不会主动上传便签内容</p>
-        <p>• 更换设备或清理浏览器数据可能导致丢失</p>
+        <p>• 登录后可开启云端同步，更换设备不丢失</p>
         <p>• 如需长期保存，请导出 JSON 备份</p>
       </div>
+
+      {/* Due date reminders */}
+      {(overdueCount > 0 || todayCount > 0) && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6 text-sm space-y-1">
+          <div className="flex items-center gap-2 text-red-700 font-medium">
+            <Clock className="w-4 h-4" /> 到期提醒
+          </div>
+          {overdueCount > 0 && (
+            <p className="text-red-600">⚠️ {overdueCount} 条便签已过期，请及时处理</p>
+          )}
+          {todayCount > 0 && (
+            <p className="text-orange-600">🔔 {todayCount} 条便签今天到期</p>
+          )}
+        </div>
+      )}
 
       {/* Message Toast */}
       {message.text && (
@@ -300,6 +480,17 @@ export default function MemoPage() {
               {cat}
             </option>
           ))}
+        </select>
+        <select
+          value={filterDueStatus}
+          onChange={(e) => setFilterDueStatus(e.target.value as any)}
+          className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm min-w-[140px]"
+        >
+          <option value="all">全部日期</option>
+          <option value="overdue">已过期</option>
+          <option value="today">今天到期</option>
+          <option value="upcoming">即将到期</option>
+          <option value="none">无到期日</option>
         </select>
       </div>
 
@@ -350,6 +541,15 @@ export default function MemoPage() {
                     className="rounded"
                   />
                   置顶
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <input
+                    type="datetime-local"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </label>
               </div>
               <div className="flex gap-3 pt-2">
@@ -403,65 +603,78 @@ export default function MemoPage() {
 
       {/* Notes List */}
       <div className="space-y-4">
-        {filteredNotes.map((note) => (
-          <div
-            key={note.id}
-            className={`bg-white rounded-xl border p-5 hover:shadow-md transition-all ${
-              note.isPinned ? "border-yellow-200 bg-yellow-50/30" : "border-gray-100"
-            }`}
-          >
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">
-                  {note.category}
-                </span>
-                <h3 className="text-lg font-semibold text-gray-900">{note.title}</h3>
-                {note.isPinned && <Pin className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
-              </div>
-              <div className="flex gap-1 shrink-0 ml-2">
-                <button
-                  onClick={() => handleCopy(note)}
-                  className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
-                  title="复制内容"
-                >
-                  {copiedId === note.id ? (
-                    <Check className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
+        {filteredNotes.map((note) => {
+          const dueStatus = getDueDateStatus(note.dueDate);
+          return (
+            <div
+              key={note.id}
+              className={`bg-white rounded-xl border p-5 hover:shadow-md transition-all ${
+                note.isPinned ? "border-yellow-200 bg-yellow-50/30" : "border-gray-100"
+              }`}
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-md font-medium">
+                    {note.category}
+                  </span>
+                  <h3 className="text-lg font-semibold text-gray-900">{note.title}</h3>
+                  {note.isPinned && <Pin className="w-4 h-4 text-yellow-500 fill-yellow-500" />}
+                  {note.dueDate && (
+                    <span className={`inline-block px-2 py-0.5 text-xs rounded-md font-medium ${
+                      dueStatus === 'overdue' ? "bg-red-100 text-red-600" :
+                      dueStatus === 'today' ? "bg-orange-100 text-orange-600" :
+                      "bg-gray-100 text-gray-600"
+                    }`}>
+                      <Clock className="w-3 h-3 inline mr-1" />
+                      {formatDueDate(note.dueDate)}
+                    </span>
                   )}
-                </button>
-                <button
-                  onClick={() => togglePin(note)}
-                  className="p-1.5 text-gray-400 hover:text-yellow-500 rounded transition-colors"
-                  title={note.isPinned ? "取消置顶" : "置顶"}
-                >
-                  {note.isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={() => startEdit(note)}
-                  className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
-                  title="编辑"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(note.id)}
-                  className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
-                  title="删除"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                </div>
+                <div className="flex gap-1 shrink-0 ml-2">
+                  <button
+                    onClick={() => handleCopy(note)}
+                    className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
+                    title="复制内容"
+                  >
+                    {copiedId === note.id ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => togglePin(note)}
+                    className="p-1.5 text-gray-400 hover:text-yellow-500 rounded transition-colors"
+                    title={note.isPinned ? "取消置顶" : "置顶"}
+                  >
+                    {note.isPinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => startEdit(note)}
+                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
+                    title="编辑"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(note.id)}
+                    className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                    title="删除"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
+              <p className="text-gray-600 whitespace-pre-wrap line-clamp-6">{note.content}</p>
+              <p className="text-xs text-gray-400 mt-3">
+                更新于 {new Date(note.updatedAt).toLocaleString("zh-CN")}
+              </p>
             </div>
-            <p className="text-gray-600 whitespace-pre-wrap line-clamp-6">{note.content}</p>
-            <p className="text-xs text-gray-400 mt-3">
-              更新于 {new Date(note.updatedAt).toLocaleString("zh-CN")}
-            </p>
-          </div>
-        ))}
+          );
+        })}
         {filteredNotes.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-            {searchQuery || filterCategory ? "没有找到匹配的便签" : "还没有便签，点击上方按钮创建"}
+            {searchQuery || filterCategory || filterDueStatus !== 'all' ? "没有找到匹配的便签" : "还没有便签，点击上方按钮创建"}
           </div>
         )}
       </div>
@@ -471,7 +684,7 @@ export default function MemoPage() {
         <FAQSection title="跨境工作便签常见问题" items={[
           {
             question: "便签数据存在哪里？会同步到云端吗？",
-            answer: "便签数据仅保存在您浏览器的本地存储（localStorage）中，不会上传到任何服务器。清除浏览器数据会导致便签丢失，建议定期使用导出功能备份。",
+            answer: "便签数据默认保存在您浏览器的本地存储（localStorage）中。登录后可以点击「登录开启云同步」，将便签同步到云端数据库，实现跨设备访问。建议定期使用导出功能备份。",
           },
           {
             question: "如何备份和恢复便签？",
@@ -479,11 +692,11 @@ export default function MemoPage() {
           },
           {
             question: "便签有什么用途？",
-            answer: "适合记录跨境工作中常用的信息：收件人地址、商品品名和 HS 编码候选、运单号整理、发票备注、客服话术模板等。7 个预设分类覆盖常见场景，也可以自定义分类。",
+            answer: "适合记录跨境工作中常用的信息：收件人地址、商品品名和 HS 编码候选、运单号整理、发票备注、客服话术模板等。7 个预设分类覆盖常见场景。还可以设置到期提醒，方便跟进待办事项。",
           },
           {
             question: "数据安全吗？别人能看到我的便签吗？",
-            answer: "便签仅保存在您的浏览器本地，其他人无法通过网络访问。但如果您使用公共电脑，请记得退出时清除浏览器数据。建议不要在便签中存储密码、银行卡号等高敏感信息。",
+            answer: "便签仅保存在您的浏览器本地（或您自己的云账户中），其他人无法通过网络访问。但如果您使用公共电脑，请记得退出时清除浏览器数据。建议不要在便签中存储密码、银行卡号等高敏感信息。",
           },
         ]} />
 

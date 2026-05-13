@@ -20,6 +20,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
         title: body.title,
         content: body.content,
         isPinned: body.isPinned,
+        ...(body.dueDate !== undefined && { dueDate: body.dueDate ? new Date(body.dueDate) : null }),
       },
     });
 

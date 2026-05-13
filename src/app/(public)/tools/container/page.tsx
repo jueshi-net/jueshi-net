@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Container, Info } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
+import { Breadcrumb } from "@/components/breadcrumb";
 
 const containerTypes = [
   { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770 },
@@ -38,6 +39,10 @@ export default function ContainerCalculatorPage() {
 
   return (
     <div className="max-w-5xl mx-auto py-8 px-4">
+      {/* Breadcrumb */}
+      <div className="mb-4">
+        <Breadcrumb />
+      </div>
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
           <Container className="w-6 h-6 text-blue-600" />

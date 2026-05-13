@@ -33,8 +33,7 @@ export default function LoginPage() {
         if (result?.error) {
           setError("邮箱或密码错误");
         } else {
-          router.push("/tools");
-          router.refresh();
+          window.location.href = "/tools";
         }
       } else {
         // Register via API first
@@ -59,8 +58,7 @@ export default function LoginPage() {
           setError("注册失败，请重试");
         } else {
           setSuccess("注册成功，正在登录...");
-          router.push("/tools");
-          router.refresh();
+          window.location.href = "/tools";
         }
       }
     } catch {

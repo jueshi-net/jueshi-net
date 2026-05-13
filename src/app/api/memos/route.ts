@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '未登录' }, { status: 401 });
   }
 
-  const { title, content, category, color } = await req.json();
+  const { title, content, category, color, dueDate } = await req.json();
 
   if (!title) {
     return NextResponse.json({ error: '缺少标题' }, { status: 400 });
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
       content: content || '',
       category: category || '',
       color: color || '',
+      dueDate: dueDate ? new Date(dueDate) : null,
     },
   });
 
@@ -67,6 +68,7 @@ export async function PATCH(req: Request) {
       ...(body.category !== undefined && { category: body.category }),
       ...(body.color !== undefined && { color: body.color }),
       ...(body.isPinned !== undefined && { isPinned: body.isPinned }),
+      ...(body.dueDate !== undefined && { dueDate: body.dueDate ? new Date(body.dueDate) : null }),
     },
   });
 

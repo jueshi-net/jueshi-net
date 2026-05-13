@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 
@@ -15,6 +16,7 @@ interface ValidationDetail {
   message: string;
   matchedRegion?: string;
   matchedCity?: string;
+  deliverability: 'confirmed' | 'likely' | 'unknown' | 'invalid';
 }
 
 function usePersistedState<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
@@ -144,13 +146,20 @@ export default function PostalCodePage() {
 
     if (formatOk) {
       let msg = '✅ 邮编格式正确';
-      if (matchedCity) msg += ` — 可能属于：${matchedCity}, ${matchedRegion}`;
-      else if (matchedRegion) msg += ` — 区域：${matchedRegion}`;
-      setValidationResult({ valid: true, message: msg, matchedRegion, matchedCity });
+      let deliverability: 'confirmed' | 'likely' | 'unknown' = 'unknown';
+      if (matchedCity) {
+        msg += ` — 可能属于：${matchedCity}, ${matchedRegion}`;
+        deliverability = 'confirmed';
+      } else if (matchedRegion) {
+        msg += ` — 区域：${matchedRegion}`;
+        deliverability = 'likely';
+      }
+      setValidationResult({ valid: true, message: msg, matchedRegion, matchedCity, deliverability });
     } else {
       setValidationResult({
         valid: false,
         message: `❌ 格式不正确，应为 ${country.format}`,
+        deliverability: 'invalid',
       });
     }
   }, [inputCode, country]);
@@ -185,6 +194,10 @@ export default function PostalCodePage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb />
+        </div>
         {/* Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -236,12 +249,32 @@ export default function PostalCodePage() {
                 </button>
               </div>
               {validationResult && (
-                <div className={`mt-3 p-3 rounded-lg text-sm font-medium ${
-                  validationResult.valid
+                <div className={`mt-3 p-3 rounded-lg text-sm ${
+                  validationResult.deliverability === 'confirmed'
                     ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
-                    : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
+                    : validationResult.deliverability === 'likely'
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                    : validationResult.deliverability === 'invalid'
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
+                    : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
                 }`}>
-                  {validationResult.message}
+                  <div className="flex items-start gap-2">
+                    {validationResult.deliverability === 'confirmed' && <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                    {validationResult.deliverability === 'likely' && <Info className="w-4 h-4 shrink-0 mt-0.5" />}
+                    {validationResult.deliverability === 'invalid' && <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                    <div>
+                      <div className="font-medium">{validationResult.message}</div>
+                      {validationResult.deliverability === 'confirmed' && (
+                        <div className="text-xs mt-1 opacity-80">🟢 可投递性：已确认 — 该邮编在数据库中匹配到具体城市</div>
+                      )}
+                      {validationResult.deliverability === 'likely' && (
+                        <div className="text-xs mt-1 opacity-80">🔵 可投递性：可能 — 该邮编格式正确且匹配到地区，但未找到具体城市</div>
+                      )}
+                      {validationResult.deliverability === 'unknown' && (
+                        <div className="text-xs mt-1 opacity-80">⚪ 可投递性：未知 — 格式正确但不在数据库中，请以官方查询为准</div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
               <p className="text-xs text-gray-400 mt-2">{country.hint}</p>

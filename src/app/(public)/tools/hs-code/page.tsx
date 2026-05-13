@@ -5,6 +5,7 @@ import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, Al
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { commonProducts } from '@/lib/data/product-declarations';
 import type { ProductDecl } from '@/lib/data/product-declarations';
@@ -89,11 +90,13 @@ export default function HSCodePage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb />
+        </div>
         {/* Disclaimer */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4">
           <p className="text-sm text-amber-800 dark:text-amber-300">
-            <strong>HS编码仅供辅助查询，最终以海关、报关行或官方税则为准。</strong>
             本工具列出的编码为常见候选，实际归类需结合商品材质、用途、加工工艺等综合判断。
             各国可在6位HS编码基础上扩展至8-10位。
           </p>

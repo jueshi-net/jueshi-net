@@ -5,6 +5,7 @@ import { AlertTriangle, Info, CheckCircle, Shield, ClipboardList, MessageSquare 
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
+import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 interface SensitiveItem {
   name: string;
@@ -153,6 +154,10 @@ export default function SensitiveGoodsPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
+        {/* Breadcrumb */}
+        <div className="mb-4">
+          <Breadcrumb />
+        </div>
         {/* Disclaimer */}
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
