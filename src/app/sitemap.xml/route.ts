@@ -2,19 +2,24 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // GET /sitemap.xml - 动态生成站点地图
+// 降级策略：DB不可用时只输出静态核心路由
 export async function GET() {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-  // 获取所有文章
-  const articles = await prisma.article.findMany({
-    where: { status: 'published' },
-    select: { slug: true, updatedAt: true },
-  });
+  let articles: { slug: string; updatedAt: Date }[] = [];
+  let categories: { slug: string; updatedAt: Date }[] = [];
 
-  // 获取所有分类
-  const categories = await prisma.category.findMany({
-    select: { slug: true, updatedAt: true },
-  });
+  try {
+    articles = await prisma.article.findMany({
+      where: { status: 'published' },
+      select: { slug: true, updatedAt: true },
+    });
+    categories = await prisma.category.findMany({
+      select: { slug: true, updatedAt: true },
+    });
+  } catch (e) {
+    console.warn('sitemap.xml: DB unavailable, outputting static routes only:', e);
+  }
 
   // 静态页面
   const staticPages = [
@@ -22,9 +27,13 @@ export async function GET() {
     '/resources', '/favorites', '/help', '/privacy', '/terms', '/changelog',
     '/tools/qrcode', '/tools/exchange-rate',
     '/tools/container', '/tools/receipt', '/tools/invoice',
-    '/tools/qrcode', '/tools/exchange-rate',
     '/tools/hs-code', '/tools/sensitive-goods', '/tools/address-formatter',
     '/tools/customs-generator', '/tools/shipping-calculator',
+    '/tools/postal-code', '/tools/memo', '/tools/documents',
+    '/tools/label-maker', '/tools/quote', '/tools/shipping-mark',
+    '/tools/calculator', '/tools/shipping-estimator', '/tools/zip',
+    '/tools/inbound',
+    '/starter', '/starter/apps',
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

@@ -35,12 +35,21 @@ const baseMetadata: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { getSiteStats } = await import("@/lib/stats-cache");
-  const stats = await getSiteStats();
+  let linkCount = 50, articleCount = 10, postalCount = 1080000, userCount = 5;
+  try {
+    const { getSiteStats } = await import("@/lib/stats-cache");
+    const data = await getSiteStats();
+    linkCount = data.linkCount ?? linkCount;
+    articleCount = data.articleCount ?? articleCount;
+    postalCount = data.postalCount ?? postalCount;
+    userCount = data.userCount ?? userCount;
+  } catch (e) {
+    console.warn("Homepage generateMetadata: DB unavailable, using defaults:", e);
+  }
   return {
     ...baseMetadata,
     title: `海外百宝箱 - 查包裹、算运费、做单据、查邮编、找资源`,
-    description: `海外华人的常用工具与资源平台。收录${stats.linkCount}+实用网站，提供体积计算、汇率查询、发票生成等工具。`,
+    description: `海外华人的常用工具与资源平台。收录${linkCount}+实用网站，提供体积计算、汇率查询、发票生成等工具。`,
     openGraph: {
       ...baseMetadata.openGraph,
       title: `海外百宝箱 - 海外华人的常用工具与资源平台`,
