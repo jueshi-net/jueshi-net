@@ -131,7 +131,7 @@ export default function TrackingPage() {
     persist([newEntry, ...entries]);
     trackEvent.trackingClick17track();
     setInputValue('');
-    flashMessage('success', '已添加追踪单号');
+    flashMessage('success', '已添加单号');
   }, [inputValue, entries]);
 
   const addBatchTracking = useCallback(() => {
@@ -199,7 +199,7 @@ export default function TrackingPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `快递追踪备份_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `快递单号备份_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     flashMessage('success', '导出成功');
@@ -274,7 +274,7 @@ export default function TrackingPage() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">物流追踪</h1>
-          <p className="text-sm text-gray-500 mt-1">管理你的快递单号，一键查询物流状态</p>
+          <p className="text-sm text-gray-500 mt-1">单号整理 · 状态备注 · 跳转第三方查询 · 实际物流轨迹以承运商为准</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
@@ -291,6 +291,14 @@ export default function TrackingPage() {
             <Download className="w-4 h-4" /> 导出
           </button>
         </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <p className="text-sm text-amber-800">
+          <strong>本站为单号整理工具，不提供物流轨迹查询服务。</strong>实际物流信息请以承运商官网或 17TRACK 等第三方平台为准。
+        </p>
       </div>
 
       {/* Stats */}
@@ -377,8 +385,8 @@ export default function TrackingPage() {
       {/* Quick 17Track link */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center justify-between">
         <div>
-          <h3 className="font-medium text-blue-900">查询物流状态</h3>
-          <p className="text-sm text-blue-700 mt-1">点击下方按钮前往 17TRACK 查询具体物流信息</p>
+          <h3 className="font-medium text-blue-900">前往第三方平台查询物流</h3>
+          <p className="text-sm text-blue-700 mt-1">本站不保存真实物流轨迹，点击下方按钮前往 17TRACK 查询</p>
         </div>
         <a
           href="https://t.17track.net/zh-cn"
@@ -491,7 +499,7 @@ export default function TrackingPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
-                    title="查询物流"
+                    title="跳转第三方查询"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
@@ -533,27 +541,27 @@ export default function TrackingPage() {
         })}
         {filteredEntries.length === 0 && entries.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-            没有找到匹配的追踪记录
+            没有找到匹配的单号
           </div>
         )}
         {entries.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-400">还没有追踪单号，输入单号开始追踪</p>
+            <p className="text-gray-400">还没有单号，输入单号开始整理</p>
           </div>
         )}
       </div>
 
       {/* FAQ */}
       <div className="max-w-5xl mx-auto px-4 pb-16">
-        <FAQSection title="物流追踪常见问题" items={[
+        <FAQSection title="物流单号管理常见问题" items={[
           {
-            question: '如何查询快递物流信息？',
-            answer: '添加快递单号后，点击单号右侧的「查询物流」按钮，即可跳转至 17TRACK 网站查询详细物流信息。17TRACK 支持全球 1500+ 快递公司的包裹追踪。',
+            question: '本站可以查询物流轨迹吗？',
+            answer: '本站为单号整理和状态备注工具，不提供物流轨迹查询服务。每条单号旁边都有「跳转查询」按钮，点击后会前往 17TRACK 等第三方平台查看真实物流信息。',
           },
           {
             question: '支持哪些快递公司？',
-            answer: '本工具支持管理任意快递公司的单号。实际查询通过 17TRACK 平台进行，该平台支持中国大陆（顺丰、中通、圆通、韵达等）、国际快递（DHL、FedEx、UPS）等 1500+ 承运商。',
+            answer: '本工具支持管理任意快递公司的单号。实际物流查询通过 17TRACK 平台进行，该平台支持中国大陆（顺丰、中通、圆通、韵达等）、国际快递（DHL、FedEx、UPS）等 1500+ 承运商。',
           },
           {
             question: '单号数据保存在哪里？',
