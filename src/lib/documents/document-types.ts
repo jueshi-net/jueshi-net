@@ -261,11 +261,72 @@ export const documentTypes: DocumentTypeMeta[] = [
 ];
 
 export const documentStyles = [
-  { id: "default", name: "黑白商务版", primaryColor: "#000000", borderColor: "#d1d5db", headingBgColor: "#f3f4f6", textColor: "#111827", isDefault: true },
-  { id: "blue", name: "蓝色外贸版", primaryColor: "#2563eb", borderColor: "#bfdbfe", headingBgColor: "#eff6ff", textColor: "#1e3a5f", isDefault: false, memberOnly: true },
-  { id: "dark-gray", name: "深灰专业版", primaryColor: "#374151", borderColor: "#d1d5db", headingBgColor: "#f9fafb", textColor: "#111827", isDefault: false, memberOnly: true },
-  { id: "minimal", name: "简洁无边框版", primaryColor: "#000000", borderColor: "transparent", headingBgColor: "#ffffff", textColor: "#111827", isDefault: false, memberOnly: true },
-  { id: "warehouse", name: "物流仓储版", primaryColor: "#059669", borderColor: "#a7f3d0", headingBgColor: "#ecfdf5", textColor: "#064e3b", isDefault: false, memberOnly: true },
+  // === 免费用户可用 ===
+  {
+    id: "default",
+    name: "标准商务版",
+    primaryColor: "#000000",
+    borderColor: "#000000",
+    headingBgColor: "#f3f4f6",
+    textColor: "#111827",
+    isDefault: true,
+    description: "黑白商务风格，适合正式打印",
+    headerStyle: "classic", // classic banner
+    tableStyle: "grid", // full grid borders
+  },
+  // === 会员专属 ===
+  {
+    id: "blue",
+    name: "蓝色外贸版",
+    primaryColor: "#1d4ed8",
+    borderColor: "#bfdbfe",
+    headingBgColor: "#dbeafe",
+    textColor: "#1e3a5f",
+    isDefault: false,
+    memberOnly: true,
+    description: "蓝色专业风格，外贸报价/发票首选",
+    headerStyle: "banner", // full-width banner
+    tableStyle: "zebra", // alternating rows
+  },
+  {
+    id: "warehouse",
+    name: "物流仓储版",
+    primaryColor: "#059669",
+    borderColor: "#6ee7b7",
+    headingBgColor: "#d1fae5",
+    textColor: "#064e3b",
+    isDefault: false,
+    memberOnly: true,
+    description: "绿色仓储风格，适合唛头/装箱单/送货单",
+    headerStyle: "compact", // compact header with logo area
+    tableStyle: "grid",
+  },
+  {
+    id: "dark-gray",
+    name: "深灰专业版",
+    primaryColor: "#374151",
+    borderColor: "#d1d5db",
+    headingBgColor: "#f3f4f6",
+    textColor: "#111827",
+    isDefault: false,
+    memberOnly: true,
+    description: "深灰沉稳风格，适合合同/委托书",
+    headerStyle: "classic",
+    tableStyle: "minimal", // minimal borders
+  },
+  {
+    id: "minimal",
+    name: "简洁无边框版",
+    primaryColor: "#000000",
+    borderColor: "transparent",
+    headingBgColor: "#ffffff",
+    textColor: "#111827",
+    isDefault: false,
+    memberOnly: true,
+    description: "极简无边框，适合电子传输",
+    headerStyle: "minimal",
+    tableStyle: "minimal",
+  },
 ];
 
 export function getDocumentType(type: string): DocumentTypeMeta | undefined {
