@@ -20,6 +20,8 @@ import {
   HelpCircle,
   Download,
   Upload,
+  ArrowRight,
+  Truck as TruckIcon,
 } from 'lucide-react';
 
 const STORAGE_KEY = 'tracking_numbers';
@@ -84,7 +86,16 @@ function saveTracking(entries: TrackingEntry[]) {
   }
 }
 
+/** Parse input text into an array of trimmed, non-empty tracking numbers */
+function parseTrackingNumbers(text: string): string[] {
+  return text.split(/[\n,，;；\s]+/).map(s => s.trim()).filter(Boolean);
+}
+
 export default function TrackingPage() {
+  // Hero query state
+  const [heroQuery, setHeroQuery] = useState('');
+
+  // Management section state
   const [entries, setEntries] = useState<TrackingEntry[]>(() => loadTracking());
   const [inputValue, setInputValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -104,6 +115,19 @@ export default function TrackingPage() {
     saveTracking(updated);
   };
 
+  // ---- HERO: direct query (jump to 17TRACK) ----
+  const handleHeroQuery = useCallback(() => {
+    const nums = parseTrackingNumbers(heroQuery);
+    if (nums.length === 0) {
+      flashMessage('error', '请输入至少一个快递单号');
+      return;
+    }
+    const url = `https://www.17track.net/zh-cn#nums=${nums.join(',')}`;
+    trackEvent.trackingClick17track();
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }, [heroQuery]);
+
+  // ---- Management: add single ----
   const addTracking = useCallback(() => {
     const trimmed = inputValue.trim();
     if (!trimmed) {
@@ -111,7 +135,6 @@ export default function TrackingPage() {
       return;
     }
 
-    // Check duplicate
     if (entries.some(e => e.number === trimmed)) {
       flashMessage('error', '该单号已存在');
       return;
@@ -134,6 +157,7 @@ export default function TrackingPage() {
     flashMessage('success', '已添加单号');
   }, [inputValue, entries]);
 
+  // ---- Management: add batch ----
   const addBatchTracking = useCallback(() => {
     const lines = batchInput.split(/[\n,;，；]+/).map(s => s.trim()).filter(Boolean);
     if (lines.length === 0) {
@@ -245,7 +269,6 @@ export default function TrackingPage() {
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
-      // Pending and exception first, then in-transit, then delivered
       const statusOrder: Record<string, number> = {
         'exception': 0,
         'pending': 1,
@@ -270,294 +293,335 @@ export default function TrackingPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">物流追踪</h1>
-          <p className="text-sm text-gray-500 mt-1">单号整理 · 状态备注 · 跳转第三方查询 · 实际物流轨迹以承运商为准</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleImport}
-            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5"
-          >
-            <Upload className="w-4 h-4" /> 导入
-          </button>
-          <button
-            onClick={handleExport}
-            disabled={entries.length === 0}
-            className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" /> 导出
-          </button>
-        </div>
-      </div>
 
-      {/* Disclaimer */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
-        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-sm text-amber-800">
-          <strong>本站为单号整理工具，不提供物流轨迹查询服务。</strong>实际物流信息请以承运商官网或 17TRACK 等第三方平台为准。
-        </p>
-      </div>
-
-      {/* Stats */}
-      {entries.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-          <div className="bg-white rounded-xl border p-3 text-center">
-            <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-            <div className="text-xs text-gray-500">全部单号</div>
-          </div>
-          <div className="bg-white rounded-xl border p-3 text-center">
-            <div className="text-2xl font-bold text-gray-600">{stats.pending}</div>
-            <div className="text-xs text-gray-500">待查询</div>
-          </div>
-          <div className="bg-white rounded-xl border p-3 text-center">
-            <div className="text-2xl font-bold text-blue-600">{stats.inTransit}</div>
-            <div className="text-xs text-gray-500">运输中</div>
-          </div>
-          <div className="bg-white rounded-xl border p-3 text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.delivered}</div>
-            <div className="text-xs text-gray-500">已签收</div>
-          </div>
-          <div className="bg-white rounded-xl border p-3 text-center">
-            <div className="text-2xl font-bold text-red-600">{stats.exception}</div>
-            <div className="text-xs text-gray-500">异常</div>
-          </div>
-        </div>
-      )}
-
-      {/* Add single tracking number */}
-      <div className="bg-white rounded-xl border p-4 mb-6">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') addTracking(); }}
-              placeholder="输入快递单号，回车添加"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <button
-            onClick={addTracking}
-            className="px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4" /> 添加
-          </button>
-          <button
-            onClick={() => setShowBatchInput(!showBatchInput)}
-            className="px-3 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 text-sm"
-          >
-            批量添加
-          </button>
-        </div>
-
-        {/* Batch input */}
-        {showBatchInput && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <textarea
-              value={batchInput}
-              onChange={(e) => setBatchInput(e.target.value)}
-              placeholder="每行一个单号，或用逗号、分号分隔&#10;例如：&#10;SF1234567890&#10;YT1234567890&#10;ZTO1234567890"
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
-            />
-            <div className="flex gap-2 mt-2">
-              <button
-                onClick={addBatchTracking}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-              >
-                批量添加
-              </button>
-              <button
-                onClick={() => { setShowBatchInput(false); setBatchInput(''); }}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
-              >
-                取消
-              </button>
+      {/* ===== HERO: Quick Query ===== */}
+      <section className="mb-10">
+        <div className="bg-gradient-to-br from-emerald-50 via-blue-50 to-cyan-50 border border-emerald-200 rounded-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <TruckIcon className="w-7 h-7 text-emerald-600" />
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">快递物流一键查询</h1>
+              <p className="text-sm text-gray-500 mt-0.5">输入单号，立即跳转查询结果页</p>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Quick 17Track link */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center justify-between">
-        <div>
-          <h3 className="font-medium text-blue-900">前往第三方平台查询物流</h3>
-          <p className="text-sm text-blue-700 mt-1">本站仅整理单号，实际轨迹以承运商或第三方平台为准</p>
+          {/* Hero input + button */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <textarea
+                value={heroQuery}
+                onChange={(e) => setHeroQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleHeroQuery();
+                  }
+                }}
+                placeholder="输入快递单号，一键查询物流轨迹&#10;支持多个单号，用换行、逗号或空格分隔"
+                rows={2}
+                className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none bg-white"
+              />
+            </div>
+            <button
+              onClick={handleHeroQuery}
+              className="sm:self-stretch px-8 py-4 bg-emerald-600 text-white rounded-xl font-semibold text-lg hover:bg-emerald-700 active:bg-emerald-800 flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all whitespace-nowrap"
+            >
+              <ArrowRight className="w-5 h-5" />
+              立即查询物流
+            </button>
+          </div>
+
+          <p className="text-xs text-gray-400 mt-3">
+            输入单号，一键跳转 17TRACK 查询结果页。本站不提供物流轨迹查询，实际物流信息请以承运商官网或 17TRACK 等第三方平台为准。
+          </p>
         </div>
-        <a
-          href="https://www.17track.net/zh-cn"
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => trackEvent.trackingClick17track()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 text-sm"
-        >
-          <ExternalLink className="w-4 h-4" /> 前往 17TRACK 查询
-        </a>
-      </div>
+      </section>
 
-      {/* Message Toast */}
+      {/* ===== Message Toast ===== */}
       {message.text && (
         <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm mb-4 ${
-          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
         }`}>
           {message.type === 'success' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
           <span>{message.text}</span>
         </div>
       )}
 
-      {/* Search & Filter */}
-      {entries.length > 0 && (
-        <div className="flex flex-wrap gap-3 mb-6">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索单号、快递公司或备注..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      {/* ===== 我的单号整理 ===== */}
+      <section className="mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">我的单号整理</h2>
+            <p className="text-sm text-gray-500 mt-0.5">保存、备注、管理你的快递单号</p>
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm min-w-[120px]"
-          >
-            <option value="all">全部状态</option>
-            <option value="pending">待查询</option>
-            <option value="in-transit">运输中</option>
-            <option value="delivered">已签收</option>
-            <option value="exception">异常</option>
-            <option value="unknown">未知</option>
-          </select>
-        </div>
-      )}
-
-      {/* Tracking list */}
-      <div className="space-y-3">
-        {filteredEntries.map((entry) => {
-          const statusConfig = STATUS_CONFIG[entry.status];
-          const StatusIcon = statusConfig.icon;
-          return (
-            <div
-              key={entry.id}
-              className="bg-white rounded-xl border p-4 hover:shadow-md transition-all"
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleImport}
+              className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5"
             >
-              <div className="flex items-start gap-3">
-                {/* Copy button + number */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <button
-                      onClick={() => copyNumber(entry.number, entry.id)}
-                      className="font-mono text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5"
-                      title="点击复制"
-                    >
-                      {copiedId === entry.id ? (
-                        <Check className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-gray-400" />
-                      )}
-                      {entry.number}
-                    </button>
-                    <span className={`px-2 py-0.5 text-xs rounded-md font-medium ${statusConfig.color}`}>
-                      <StatusIcon className="w-3 h-3 inline mr-0.5" />
-                      {statusConfig.label}
-                    </span>
-                  </div>
+              <Upload className="w-4 h-4" /> 导入
+            </button>
+            <button
+              onClick={handleExport}
+              disabled={entries.length === 0}
+              className="px-3 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-50 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" /> 导出
+            </button>
+          </div>
+        </div>
 
-                  {/* Carrier + Note */}
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <select
-                      value={entry.carrier}
-                      onChange={(e) => updateEntry(entry.id, { carrier: e.target.value })}
-                      className="px-2 py-1 border border-gray-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                      {CARRIER_OPTIONS.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </select>
-                    <input
-                      value={entry.note}
-                      onChange={(e) => updateEntry(entry.id, { note: e.target.value })}
-                      placeholder="添加备注..."
-                      className="px-2 py-1 border border-gray-200 rounded text-xs flex-1 min-w-[150px] focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
+        {/* Add single tracking number */}
+        <div className="bg-white rounded-xl border p-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') addTracking(); }}
+                placeholder="输入快递单号，回车添加"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={addTracking}
+                className="px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 flex items-center gap-1.5"
+              >
+                <Plus className="w-4 h-4" /> 添加
+              </button>
+              <button
+                onClick={() => setShowBatchInput(!showBatchInput)}
+                className="px-3 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 text-sm"
+              >
+                批量添加
+              </button>
+            </div>
+          </div>
 
-                  <p className="text-xs text-gray-400 mt-2">
-                    添加于 {new Date(entry.createdAt).toLocaleString('zh-CN')}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-1 shrink-0">
-                  <a
-                    href={`https://www.17track.net/zh-cn#nums=${entry.number}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
-                    title="跳转第三方查询"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
-                  <button
-                    onClick={() => copyNumber(entry.number, entry.id)}
-                    className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
-                    title="复制单号"
-                  >
-                    {copiedId === entry.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                  </button>
-                  <button
-                    onClick={() => removeEntry(entry.id)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
-                    title="删除"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Status update buttons */}
-              <div className="flex gap-1 mt-3 pt-3 border-t border-gray-50">
-                {(['pending', 'in-transit', 'delivered', 'exception'] as TrackingStatus[]).map(s => (
-                  <button
-                    key={s}
-                    onClick={() => updateEntry(entry.id, { status: s })}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${
-                      entry.status === s
-                        ? `${STATUS_CONFIG[s].color} font-medium`
-                        : 'text-gray-400 hover:bg-gray-100'
-                    }`}
-                  >
-                    {STATUS_CONFIG[s].label}
-                  </button>
-                ))}
+          {/* Batch input */}
+          {showBatchInput && (
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <textarea
+                value={batchInput}
+                onChange={(e) => setBatchInput(e.target.value)}
+                placeholder="每行一个单号，或用逗号、分号分隔&#10;例如：&#10;SF1234567890&#10;YT1234567890&#10;ZTO1234567890"
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
+              />
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={addBatchTracking}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                >
+                  批量添加
+                </button>
+                <button
+                  onClick={() => { setShowBatchInput(false); setBatchInput(''); }}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+                >
+                  取消
+                </button>
               </div>
             </div>
-          );
-        })}
-        {filteredEntries.length === 0 && entries.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
-            没有找到匹配的单号
-          </div>
-        )}
-        {entries.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-            <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-400">还没有单号，输入单号开始整理</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* FAQ */}
+        {/* 17TRACK quick link */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="font-medium text-blue-900">输入你的单号，直接跳转到 17TRACK 查询结果页</h3>
+            <p className="text-sm text-blue-700 mt-0.5">使用上方查询框输入单号后点击「立即查询物流」即可</p>
+          </div>
+          <a
+            href="https://www.17track.net/zh-cn"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent.trackingClick17track()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 text-sm shrink-0"
+          >
+            <ExternalLink className="w-4 h-4" /> 打开 17TRACK
+          </a>
+        </div>
+
+        {/* Search & Filter */}
+        {entries.length > 0 && (
+          <div className="flex flex-wrap gap-3 mb-4">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索单号、快递公司或备注..."
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-sm min-w-[120px]"
+            >
+              <option value="all">全部状态</option>
+              <option value="pending">待查询</option>
+              <option value="in-transit">运输中</option>
+              <option value="delivered">已签收</option>
+              <option value="exception">异常</option>
+              <option value="unknown">未知</option>
+            </select>
+          </div>
+        )}
+
+        {/* Stats */}
+        {entries.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
+            <div className="bg-white rounded-xl border p-3 text-center">
+              <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
+              <div className="text-xs text-gray-500">全部单号</div>
+            </div>
+            <div className="bg-white rounded-xl border p-3 text-center">
+              <div className="text-2xl font-bold text-gray-600">{stats.pending}</div>
+              <div className="text-xs text-gray-500">待查询</div>
+            </div>
+            <div className="bg-white rounded-xl border p-3 text-center">
+              <div className="text-2xl font-bold text-blue-600">{stats.inTransit}</div>
+              <div className="text-xs text-gray-500">运输中</div>
+            </div>
+            <div className="bg-white rounded-xl border p-3 text-center">
+              <div className="text-2xl font-bold text-green-600">{stats.delivered}</div>
+              <div className="text-xs text-gray-500">已签收</div>
+            </div>
+            <div className="bg-white rounded-xl border p-3 text-center">
+              <div className="text-2xl font-bold text-red-600">{stats.exception}</div>
+              <div className="text-xs text-gray-500">异常</div>
+            </div>
+          </div>
+        )}
+
+        {/* Tracking list */}
+        <div className="space-y-3">
+          {filteredEntries.map((entry) => {
+            const statusConfig = STATUS_CONFIG[entry.status];
+            const StatusIcon = statusConfig.icon;
+            return (
+              <div
+                key={entry.id}
+                className="bg-white rounded-xl border p-4 hover:shadow-md transition-all"
+              >
+                <div className="flex items-start gap-3">
+                  {/* Copy button + number */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <button
+                        onClick={() => copyNumber(entry.number, entry.id)}
+                        className="font-mono text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5"
+                        title="点击复制"
+                      >
+                        {copiedId === entry.id ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-gray-400" />
+                        )}
+                        {entry.number}
+                      </button>
+                      <span className={`px-2 py-0.5 text-xs rounded-md font-medium ${statusConfig.color}`}>
+                        <StatusIcon className="w-3 h-3 inline mr-0.5" />
+                        {statusConfig.label}
+                      </span>
+                    </div>
+
+                    {/* Carrier + Note */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <select
+                        value={entry.carrier}
+                        onChange={(e) => updateEntry(entry.id, { carrier: e.target.value })}
+                        className="px-2 py-1 border border-gray-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      >
+                        {CARRIER_OPTIONS.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                      <input
+                        value={entry.note}
+                        onChange={(e) => updateEntry(entry.id, { note: e.target.value })}
+                        placeholder="添加备注..."
+                        className="px-2 py-1 border border-gray-200 rounded text-xs flex-1 min-w-[150px] focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <p className="text-xs text-gray-400 mt-2">
+                      添加于 {new Date(entry.createdAt).toLocaleString('zh-CN')}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <a
+                      href={`https://www.17track.net/zh-cn#nums=${entry.number}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"
+                      title="跳转第三方查询"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                    <button
+                      onClick={() => copyNumber(entry.number, entry.id)}
+                      className="p-1.5 text-gray-400 hover:text-green-600 rounded transition-colors"
+                      title="复制单号"
+                    >
+                      {copiedId === entry.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => removeEntry(entry.id)}
+                      className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors"
+                      title="删除"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Status update buttons */}
+                <div className="flex gap-1 mt-3 pt-3 border-t border-gray-50">
+                  {(['pending', 'in-transit', 'delivered', 'exception'] as TrackingStatus[]).map(s => (
+                    <button
+                      key={s}
+                      onClick={() => updateEntry(entry.id, { status: s })}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        entry.status === s
+                          ? `${STATUS_CONFIG[s].color} font-medium`
+                          : 'text-gray-400 hover:bg-gray-100'
+                      }`}
+                    >
+                      {STATUS_CONFIG[s].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+          {filteredEntries.length === 0 && entries.length > 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center text-gray-400">
+              没有找到匹配的单号
+            </div>
+          )}
+          {entries.length === 0 && (
+            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+              <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-400">还没有单号，输入单号开始整理</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== FAQ ===== */}
       <div className="max-w-5xl mx-auto px-4 pb-16">
         <FAQSection title="物流单号管理常见问题" items={[
           {
             question: '本站可以查询物流轨迹吗？',
-            answer: '本站为单号整理和状态备注工具，不提供物流轨迹查询服务。每条单号旁边都有「跳转查询」按钮，点击后会前往 17TRACK 等第三方平台查看真实物流信息。',
+            answer: '本站为单号整理和状态备注工具，不提供物流轨迹查询服务。在顶部查询框输入单号后点击「立即查询物流」，即可跳转至 17TRACK 等第三方平台查看真实物流信息。',
           },
           {
             question: '支持哪些快递公司？',
@@ -568,8 +632,12 @@ export default function TrackingPage() {
             answer: '单号和备注信息保存在您浏览器的本地存储（localStorage）中，不会上传到任何服务器。清除浏览器数据会导致单号列表丢失，建议定期使用导出功能备份。',
           },
           {
+            question: '如何快速查询物流？',
+            answer: '在页面顶部的查询框中直接输入单号（支持多个单号，用换行、逗号或空格分隔），然后点击「立即查询物流」按钮，即可自动跳转至 17TRACK 查询结果页。',
+          },
+          {
             question: '如何批量添加单号？',
-            answer: '点击「批量添加」按钮，在文本框中输入多个单号，每行一个或用逗号、分号分隔。点击「批量添加」即可一次性导入。',
+            answer: '在「我的单号整理」区域点击「批量添加」按钮，在文本框中输入多个单号，每行一个或用逗号、分号分隔。点击「批量添加」即可一次性导入。',
           },
         ]} />
 

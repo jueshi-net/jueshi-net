@@ -1,10 +1,16 @@
 import Link from 'next/link';
-import { Package, Search, Calculator, FileText, MapPin, Globe, Briefcase, ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star, Tags } from 'lucide-react';
+import {
+  Package, Calculator, FileText, MapPin, Globe, Briefcase,
+  ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star,
+  Tag, Receipt, ClipboardList, FileBadge, FileSignature, Shield,
+  Layers, Palette, PenTool,
+} from 'lucide-react';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
 import { AdSlot } from '@/components/ad-slot';
 import { StarterResourcesSection } from '@/components/home/starter-resources';
+
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
   title: {
@@ -106,36 +112,50 @@ export default async function LandingPage() {
     },
   };
 
-  // Scene entries
+  // ====== SCENE ENTRIES (merged documents +唛头面单) ======
   const scenes = [
-    { title: "我要查包裹", href: "/tracking", icon: Package, color: "bg-blue-50 text-blue-600 border-blue-100", desc: "物流追踪 / 批量查询 / 异常解释" },
-    { title: "我要算运费", href: "/tools/shipping-calculator", icon: Calculator, color: "bg-green-50 text-green-600 border-green-100", desc: "体积重计算 / 集运估算 / CBM" },
-    { title: "我要做单据", href: "/tools/documents", icon: FileText, color: "bg-purple-50 text-purple-600 border-purple-100", desc: "发票 / 装箱单 / 报价单 / 收据" },
-    { title: "我要做唛头面单", href: "/tools/label-maker", icon: Tags, color: "bg-indigo-50 text-indigo-600 border-indigo-100", desc: "外箱唛头 / 仓库标签 / 集运标签" },
-    { title: "我要查邮编地址", href: "/tools/postal-code", icon: MapPin, color: "bg-orange-50 text-orange-600 border-orange-100", desc: "全球邮编 / 地址格式 / 偏远地区" },
-    { title: "我要找海外资源", href: "/resources", icon: BookOpen, color: "bg-teal-50 text-teal-600 border-teal-100", desc: "生活办事 / 银行学校 / 网盘资料" },
-    { title: "我要了解跨境寄送", href: "/shipping", icon: Package, color: "bg-red-50 text-red-600 border-red-100", desc: "运费估算 / 敏感货参考 / 寄送指南" },
+    { title: "我要查包裹", href: "/tracking", icon: Package, gradient: "from-blue-500 to-blue-700", desc: "物流追踪 / 批量查询 / 异常解释" },
+    { title: "我要做单据 / 面单", href: "/tools/documents", icon: FileText, gradient: "from-purple-500 to-indigo-700", desc: "发票、报价单、装箱单、唛头、快递面单，一站生成", isPortal: true },
+    { title: "我要算运费", href: "/tools/shipping-calculator", icon: Calculator, gradient: "from-emerald-500 to-green-700", desc: "体积重计算 / 集运估算 / CBM" },
+    { title: "我要查邮编地址", href: "/tools/postal-code", icon: MapPin, gradient: "from-orange-500 to-amber-700", desc: "全球邮编 / 地址格式 / 偏远地区" },
+    { title: "我要找海外资源", href: "/resources", icon: BookOpen, gradient: "from-teal-500 to-cyan-700", desc: "生活办事 / 银行学校 / 网盘资料" },
+    { title: "我要了解跨境寄送", href: "/shipping", icon: Globe, gradient: "from-red-500 to-rose-700", desc: "运费估算 / 敏感货参考 / 寄送指南" },
+  ];
+
+  // Sub-entries for the merged documents card
+  const documentSubEntries = [
+    { label: "唛头/面单生成器", icon: Tag },
+    { label: "商业发票", icon: Receipt },
+    { label: "装箱单", icon: Package },
+    { label: "报价单", icon: ClipboardList },
+    { label: "销售合同", icon: FileBadge },
+    { label: "报关/清关资料", icon: Shield },
   ];
 
   // 8 Core tools
   const coreTools = [
     { name: '物流追踪', href: '/tracking', emoji: '📦', desc: '单号查询 / 批量整理', tooltip: '支持粘贴多个单号，自动去重分行，每个单号可一键跳转 17TRACK 或承运商官网查询' },
     { name: '体积/CBM/运费计算', href: '/tools/shipping-calculator', emoji: '📐', desc: '体积重 / CBM / 计费重 / 费用参考', tooltip: '输入长宽高和重量，自动计算体积重、计费重和 CBM，支持快递/空运/海运三种渠道' },
-    { name: '发票/装箱单', href: '/tools/invoice', emoji: '🧾', desc: '商业发票 / 装箱单生成', tooltip: '快速生成商业发票和装箱单，支持多币种、多商品，可导出 PDF 打印' },
+    { name: '单据中心', href: '/tools/documents', emoji: '📋', desc: '发票 / 装箱单 / 合同 / 唛头', tooltip: '一站式生成商业发票、装箱单、报价单、销售合同、唛头面单、报关资料等全套外贸单据' },
     { name: 'HS编码助手', href: '/tools/hs-code', emoji: '🔍', desc: '海关商品编码查询', tooltip: '收录 500+ 常见跨境商品 HS 编码候选，支持中/英/别名搜索，标注风险等级仅供参考' },
     { name: '邮编/地址工具', href: '/tools/postal-code', emoji: '📮', desc: '全球邮编 / 地址格式化', tooltip: '支持加拿大/美国/英国/澳洲/新西兰邮编格式校验，附带城市参考数据' },
-    { name: '报价/收据生成', href: '/tools/quote', emoji: '💵', desc: '快速生成报价单收据', tooltip: '输入金额和商品，自动生成报价单或收据，支持多语言格式' },
     { name: '敏感货参考', href: '/tools/sensitive-goods', emoji: '⚠️', desc: '食品 / 电池 / 液体分类参考', tooltip: '查询常见物品是否属于敏感货（食品/液体/电池/粉末等），仅供参考不构成承运建议' },
     { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '参考汇率换算', tooltip: '接入 ExchangeRate-API 数据，支持 9 种主流货币换算，本站缓存约 30 分钟' },
+    { name: '工作便签', href: '/tools/memo', emoji: '📝', desc: '快捷笔记 / 备忘', tooltip: '在线便签工具，随时记录重要信息' },
   ];
 
   return (
     <div className="min-h-screen bg-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-20 text-center">
+      {/* ===== HERO ===== */}
+      <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950 text-white relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400 rounded-full blur-3xl"></div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 py-16 md:py-20 text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm mb-6">
             <Globe className="w-4 h-4" />
             海外华人的常用工具与资源平台
@@ -143,25 +163,58 @@ export default async function LandingPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
             海外华人的<span className="text-yellow-300">常用工具箱</span>
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-blue-200 max-w-2xl mx-auto mb-12">
             查包裹、算运费、做单据、查邮编、找资源，一个站搞定。
           </p>
           
-          {/* 6 Scene Entries */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+          {/* ===== 6 Large Scene Portal Cards ===== */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {scenes.map((s) => {
               const Icon = s.icon;
               return (
                 <Link 
                   key={s.title} 
                   href={s.href} 
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/20 transition-all group text-left"
+                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${s.gradient} p-6 text-left transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl`}
                 >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${s.color}`}>
-                    <Icon className="w-5 h-5" />
+                  {/* Glow effect */}
+                  <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
+                  
+                  <div className="relative z-10">
+                    {/* Icon + Title */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="font-bold text-xl">{s.title}</h3>
+                    </div>
+                    
+                    <p className="text-sm text-white/80 mb-4">{s.desc}</p>
+                    
+                    {/* Sub-entries for Documents card */}
+                    {s.isPortal && (
+                      <div className="grid grid-cols-2 gap-2 mt-3">
+                        {documentSubEntries.map((sub) => {
+                          const SubIcon = sub.icon;
+                          return (
+                            <div
+                              key={sub.label}
+                              className="flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-white/90 group-hover:bg-white/25 transition-colors"
+                            >
+                              <SubIcon className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{sub.label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
+                    {/* Arrow button */}
+                    <div className="flex items-center gap-2 mt-4 text-sm font-medium text-white/70 group-hover:text-white transition-colors">
+                      立即使用
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
-                  <h3 className="font-bold text-lg mb-1">{s.title}</h3>
-                  <p className="text-xs text-blue-100">{s.desc}</p>
                 </Link>
               );
             })}
@@ -169,8 +222,8 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="max-w-6xl mx-auto px-4 -mt-8">
+      {/* ===== STATS ===== */}
+      <div className="max-w-6xl mx-auto px-4 -mt-8 relative z-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: '收录网站', value: `${linkCount}+` },
@@ -178,7 +231,7 @@ export default async function LandingPage() {
             { label: '邮编数据', value: `${(postalCount / 10000).toFixed(0)}万+` },
             { label: '活跃用户', value: `${userCount}+` },
           ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-lg border p-5 text-center">
+            <div key={i} className="bg-white rounded-xl shadow-lg border border-gray-100 p-5 text-center">
               <p className="text-3xl font-bold text-blue-600">{stat.value}</p>
               <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
             </div>
@@ -186,7 +239,10 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      {/* Popular Tools - Quick Access */}
+      {/* ===== STARTER RESOURCES — moved higher ===== */}
+      <StarterResourcesSection />
+
+      {/* ===== QUICK ACCESS TOOLS ===== */}
       <div className="max-w-6xl mx-auto px-4 py-12">
         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
@@ -197,10 +253,10 @@ export default async function LandingPage() {
           {[
             { name: '物流追踪', href: '/tracking', emoji: '📦' },
             { name: '运费/CBM', href: '/tools/shipping-calculator', emoji: '📐' },
+            { name: '单据中心', href: '/tools/documents', emoji: '📋' },
             { name: 'HS编码', href: '/tools/hs-code', emoji: '🔍' },
             { name: '邮编地址', href: '/tools/postal-code', emoji: '📮' },
             { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱' },
-            { name: '工作便签', href: '/tools/memo', emoji: '📝' },
           ].map((tool) => (
             <TrackedHomeToolLink
               key={tool.name}
@@ -215,11 +271,11 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      {/* Core Tools */}
-      <div className="bg-gray-50">
+      {/* ===== CORE TOOLS ===== */}
+      <div className="bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto px-4 py-16">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-3">核心工具箱</h2>
-          <p className="text-gray-500 text-center mb-10">海外华人最常用的 8 大工具</p>
+          <p className="text-gray-500 text-center mb-10">海外华人最常用的工具，开箱即用</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {coreTools.map((tool) => (
               <TrackedHomeToolLink
@@ -261,15 +317,12 @@ export default async function LandingPage() {
         <AdSlot placement="home-after-tools" variant="card" />
       </div>
 
-      {/* Starter Resources Module */}
-      <StarterResourcesSection />
-
       {/* Ad Slot: before footer */}
       <div className="max-w-6xl mx-auto px-4 -mt-8 mb-8">
         <AdSlot placement="home-before-footer" variant="banner" />
       </div>
 
-      {/* Featured Links */}
+      {/* ===== FEATURED LINKS ===== */}
       <div className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-3">热门导航</h2>
         <p className="text-gray-500 text-center mb-10">精选最实用的跨境物流与海外生活网站</p>
@@ -297,7 +350,7 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      {/* Latest Articles */}
+      {/* ===== LATEST ARTICLES ===== */}
       {latestArticles.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 py-16">
           <div className="flex items-center justify-between mb-8">
@@ -346,7 +399,7 @@ export default async function LandingPage() {
         </div>
       )}
 
-      {/* CTA */}
+      {/* ===== CTA ===== */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
         <div className="max-w-4xl mx-auto px-4 py-16 text-center">
           <h2 className="text-3xl font-bold mb-3">开始使用海外百宝箱</h2>

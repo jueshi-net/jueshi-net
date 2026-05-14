@@ -13,6 +13,7 @@ import { getTemplate } from '@/lib/documents/document-fields';
 import { getRoleInfo, canRemoveBranding, canUseCustomStyle, canUploadLogo, canExportWord, permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
 import { AdSlot } from '@/components/ad-slot';
+import '@/styles/document-export-safe.css';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -164,6 +165,10 @@ export default function DocumentEditorPage() {
     }
     try {
       const html2canvas = (await import('html2canvas')).default;
+      // Add safe-mode class to override lab/oklch colors with hex values
+      previewRef.current.classList.add('export-safe-mode');
+      // Wait for browser to apply the class styles
+      await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
       const canvas = await html2canvas(previewRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -171,11 +176,15 @@ export default function DocumentEditorPage() {
         logging: false,
         allowTaint: true,
       });
+      // Remove safe-mode class after export
+      previewRef.current.classList.remove('export-safe-mode');
       const link = document.createElement('a');
       link.download = `${docType?.exportFileNamePrefix || type}_${formData.documentNo || 'draft'}_${new Date().toISOString().slice(0, 10)}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (error) {
+      // Ensure class is removed even on error
+      previewRef.current?.classList.remove('export-safe-mode');
       console.error('PNG export failed:', error);
       alert('导出图片失败：' + (error instanceof Error ? error.message : '未知错误') + '。请尝试使用浏览器打印功能导出 PDF。');
     }
@@ -219,10 +228,35 @@ export default function DocumentEditorPage() {
       {/* Print styles: ensure clean output */}
       <style jsx global>{`
         @media print {
+          /* Hide everything by default */
+          body > *, html > * {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          /* Only show the print container */
+          .print-only, .document-preview-container, [data-preview="true"] {
+            display: block !important;
+            visibility: visible !important;
+          }
+          /* Reset margins/padding for print */
           body, html {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          /* Ensure tables don't break across pages */
+          table, tr, td, th {
+            page-break-inside: avoid !important;
+          }
+          /* A4 centering */
+          .document-preview-container {
+            max-width: 210mm;
+            margin: 0 auto !important;
+            padding: 10mm !important;
+            box-shadow: none !important;
+            border: none !important;
           }
         }
       `}</style>
@@ -628,7 +662,8 @@ export default function DocumentEditorPage() {
               {showPreview && (
                 <div
                   ref={previewRef}
-                  className="bg-white rounded-xl border shadow-sm p-8 print:shadow-none print:border-none print:p-0"
+                  data-preview="true"
+                  className="document-preview-container bg-white rounded-xl border shadow-sm p-8 print:shadow-none print:border-none print:p-0"
                   style={{ fontFamily: 'SimSun, serif', fontSize: '11pt' }}
                 >
                   {/* Document header with company info */}

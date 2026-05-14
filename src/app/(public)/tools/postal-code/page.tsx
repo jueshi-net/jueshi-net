@@ -9,6 +9,15 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 
+function normalizePostal(input: string): string {
+  return input.trim().toUpperCase().replace(/[\s\-]+/g, '');
+}
+
+function looksLikePostalCode(q: string): boolean {
+  const normalized = normalizePostal(q);
+  return /^[A-Z0-9]{2,10}$/.test(normalized);
+}
+
 const STORAGE_KEY = 'postal-code-tool-state';
 
 interface ValidationDetail {
@@ -282,11 +291,7 @@ export default function PostalCodePage() {
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-800 dark:text-amber-300">
             <strong>免责声明：</strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。
-            实际邮编请以各国邮政官网为准。
-            <span className="block mt-1">
-              本数据来源于 <a href="https://download.geonames.org/export/zip/" className="underline" target="_blank" rel="noopener noreferrer">GeoNames</a>，
-              数据不构成官方投递地址验证，最终以当地邮政系统为准。
-            </span>
+            部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
           </div>
         </div>
 
@@ -371,7 +376,7 @@ export default function PostalCodePage() {
                 数据库邮编查询
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                从 GeoNames 数据库查询具体邮编或城市对应的邮编（支持 CA、US、GB、AU、NZ）
+                从数据库查询具体邮编或城市对应的邮编（支持 CA、US、GB、AU、NZ）
               </p>
 
               <div className="flex flex-wrap gap-2 mb-3">
@@ -416,43 +421,78 @@ export default function PostalCodePage() {
               {!dbLoading && dbResults.length > 0 && (
                 <>
                   <p className="text-xs text-gray-400 mb-2">找到 {dbTotal.toLocaleString()} 条记录</p>
-                  <div className="grid sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
-                    {dbResults.map((r) => (
-                      <div key={r.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2.5 flex flex-col gap-1">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">{r.postalCode}</span>
-                            {r.normalizedPostalCode && r.normalizedPostalCode !== r.postalCode.replace(/[\s-]/g, '').toUpperCase() && (
-                              <span className="font-mono text-xs text-gray-400" title="规范化邮编">{r.normalizedPostalCode}</span>
-                            )}
-                          </div>
-                          {r.accuracy != null && (
-                            <span className="text-xs text-gray-400" title={`精度等级: ${r.accuracy}`}>
-                              {'⭐'.repeat(Math.min(r.accuracy, 5))}
+                  <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto">
+                    {dbResults.map((r) => {
+                      // Compute match type
+                      const normalizedQuery = dbQuery.trim().toUpperCase().replace(/[\s-]+/g, '');
+                      const normalizedCode = (r.normalizedPostalCode || r.postalCode.replace(/[\s-]/g, '').toUpperCase());
+                      const queryIsPostal = looksLikePostalCode(dbQuery);
+
+                      let matchLabel = '城市匹配';
+                      let matchColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
+
+                      if (queryIsPostal) {
+                        if (normalizedCode === normalizedQuery) {
+                          matchLabel = '精确匹配';
+                          matchColor = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
+                        } else if (normalizedCode.startsWith(normalizedQuery)) {
+                          matchLabel = '前缀匹配';
+                          matchColor = 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+                        }
+                      }
+
+                      // Deliverability
+                      const formatOk = country.formatRegex.test(r.postalCode);
+
+                      return (
+                        <div key={r.id} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col gap-2 border border-gray-100 dark:border-gray-600">
+                          {/* Postal code - big & prominent */}
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400 tracking-wide">
+                              {r.postalCode}
                             </span>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${matchColor}`}>
+                              {matchLabel}
+                            </span>
+                          </div>
+
+                          {/* City */}
+                          <div className="text-base font-semibold text-gray-900 dark:text-white">
+                            {r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}
+                          </div>
+
+                          {/* Province + admin code */}
+                          {r.adminName1 && (
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                              {r.adminName1}{r.adminCode1 ? ` (${r.adminCode1})` : ''}
+                              {r.adminName2 ? ` · ${r.adminName2}` : ''}
+                            </div>
                           )}
-                        </div>
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}
-                        </div>
-                        {r.adminName1 && (
+
+                          {/* Country */}
                           <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {r.adminName1}{r.adminCode1 ? ` (${r.adminCode1})` : ''}
-                            {r.adminName2 ? ` · ${r.adminName2}` : ''}
+                            🌍 {r.country}
                           </div>
-                        )}
-                        {r.latitude != null && r.longitude != null && (
-                          <div className="text-xs text-gray-400">
-                            📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+
+                          {/* Coordinates */}
+                          {r.latitude != null && r.longitude != null && (
+                            <div className="text-xs text-gray-400 dark:text-gray-500">
+                              📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+                              {r.accuracy != null && (
+                                <span className="ml-2" title={`精度等级: ${r.accuracy}`}>
+                                  {'⭐'.repeat(Math.min(r.accuracy, 5))}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Deliverability */}
+                          <div className="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-600 pt-2 mt-1">
+                            {formatOk ? '✅ 格式有效' : '📋 数据库存在'} · 仍需以当地邮政官方为准
                           </div>
-                        )}
-                        {r.source && (
-                          <div className="text-xs text-gray-400">
-                            📦 {r.source}{r.sourceVersion ? ` (${r.sourceVersion})` : ''}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                   {dbTotal > 50 && (
                     <div className="flex items-center justify-center gap-2 mt-3">
@@ -467,16 +507,20 @@ export default function PostalCodePage() {
               )}
 
               {!dbLoading && dbQuery && dbResults.length === 0 && (
-                <div className="text-center py-6">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    未找到匹配 "{dbQuery}" 的记录
+                <div className="text-center py-8">
+                  <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    没有找到完全匹配
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    可能原因：邮编不存在、格式不同、数据库未覆盖该区域。
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                    可以尝试输入邮编前缀、城市名或省州名
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    建议尝试只输入前半段，例如 <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">V6B</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">10001</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">SW1A</code>，或切换国家后重试。
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+                    例如：<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">V6B</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">Vancouver</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">BC</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">10001</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">London</code>
                   </p>
+                  <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                    <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
+                  </a>
                 </div>
               )}
             </div>
@@ -620,7 +664,7 @@ export default function PostalCodePage() {
               </h3>
               <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-400">
                 <li>• 本工具提供格式校验和城市邮编范围参考</li>
-                <li>• 数据库收录 GeoNames 邮编数据（CA/US/GB/AU/NZ）</li>
+                <li>• 数据库收录邮编数据（CA/US/GB/AU/NZ）</li>
                 <li>• 邮编覆盖范围仅为主要城市，非完整数据库</li>
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
                 <li>• 填写快递面单时，邮编格式必须严格符合各国邮政要求</li>
@@ -653,6 +697,11 @@ export default function PostalCodePage() {
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-postal-code-bottom" className="mt-8 mb-8" />
+
+        {/* Footer attribution */}
+        <div className="text-center py-4 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-700 mt-8">
+          部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
+        </div>
       </div>
     </div>
   );

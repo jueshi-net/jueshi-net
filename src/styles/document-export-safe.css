@@ -1,0 +1,36 @@
+/**
+ * Safe export styles for PNG export via html2canvas.
+ * html2canvas cannot parse lab/oklch/color-mix color functions
+ * used by Tailwind v4, so we override all colors to hex/rgb when
+ * the .export-safe-mode class is present on the preview container.
+ */
+.export-safe-mode,
+.export-safe-mode * {
+  /* Override all text colors to safe dark gray */
+  color: #111827 !important;
+  /* Override all borders to safe light gray */
+  border-color: #d1d5db !important;
+  /* Override all backgrounds to white */
+  background-color: #ffffff !important;
+}
+
+/* Keep specific text hierarchy readable */
+.export-safe-mode .text-gray-300,
+.export-safe-mode .text-gray-400,
+.export-safe-mode .text-gray-500,
+.export-safe-mode .text-gray-600 {
+  color: #374151 !important;
+}
+
+/* Table header rows need slightly different bg for readability */
+.export-safe-mode thead tr,
+.export-safe-mode tfoot tr {
+  background-color: #f3f4f6 !important;
+}
+
+/* Ensure borders are visible on tables */
+.export-safe-mode table,
+.export-safe-mode th,
+.export-safe-mode td {
+  border-color: #000000 !important;
+}
