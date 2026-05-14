@@ -27,6 +27,7 @@ interface DbResult {
   city: string;
   district: string | null;
   postalCode: string;
+  normalizedPostalCode: string | null;
   areaName: string | null;
   adminName1: string | null;
   adminCode1: string | null;
@@ -205,20 +206,14 @@ export default function PostalCodePage() {
     }
     setDbLoading(true);
     try {
-      const params = new URLSearchParams({
-        q,
-        country: cc,
-        type: t,
-        page: '1',
-        limit: '50',
-      });
+      const params = new URLSearchParams({ q, country: cc });
       const res = await fetch(`/api/postal-codes?${params}`);
       const json = await res.json();
-      if (json.success) {
-        setDbResults(json.data);
-        setDbTotal(json.pagination.total);
-        setDbPage(1);
-      }
+      // API returns { results, total }
+      const results = json.results || json.data || [];
+      setDbResults(results);
+      setDbTotal(json.total || results.length);
+      setDbPage(1);
     } catch (e) {
       console.error('DB query failed:', e);
     } finally {
@@ -229,25 +224,18 @@ export default function PostalCodePage() {
   const loadDbPage = useCallback(async (page: number) => {
     setDbLoading(true);
     try {
-      const params = new URLSearchParams({
-        q: dbQuery,
-        country: selectedCountryCode,
-        type: dbTab,
-        page: String(page),
-        limit: '50',
-      });
+      const params = new URLSearchParams({ q: dbQuery, country: selectedCountryCode });
       const res = await fetch(`/api/postal-codes?${params}`);
       const json = await res.json();
-      if (json.success) {
-        setDbResults(json.data);
-        setDbPage(page);
-      }
+      const results = json.results || json.data || [];
+      setDbResults(results);
+      setDbPage(page);
     } catch (e) {
       console.error('DB query failed:', e);
     } finally {
       setDbLoading(false);
     }
-  }, [dbQuery, selectedCountryCode, dbTab]);
+  }, [dbQuery, selectedCountryCode]);
 
   const handleDbSearch = useCallback(() => {
     queryDb(dbQuery, selectedCountryCode, dbTab);
@@ -432,7 +420,12 @@ export default function PostalCodePage() {
                     {dbResults.map((r) => (
                       <div key={r.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2.5 flex flex-col gap-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">{r.postalCode}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">{r.postalCode}</span>
+                            {r.normalizedPostalCode && r.normalizedPostalCode !== r.postalCode.replace(/[\s-]/g, '').toUpperCase() && (
+                              <span className="font-mono text-xs text-gray-400" title="规范化邮编">{r.normalizedPostalCode}</span>
+                            )}
+                          </div>
                           {r.accuracy != null && (
                             <span className="text-xs text-gray-400" title={`精度等级: ${r.accuracy}`}>
                               {'⭐'.repeat(Math.min(r.accuracy, 5))}
@@ -453,6 +446,11 @@ export default function PostalCodePage() {
                             📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
                           </div>
                         )}
+                        {r.source && (
+                          <div className="text-xs text-gray-400">
+                            📦 {r.source}{r.sourceVersion ? ` (${r.sourceVersion})` : ''}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -469,9 +467,17 @@ export default function PostalCodePage() {
               )}
 
               {!dbLoading && dbQuery && dbResults.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                  未找到匹配 "{dbQuery}" 的记录
-                </p>
+                <div className="text-center py-6">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    未找到匹配 "{dbQuery}" 的记录
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    可能原因：邮编不存在、格式不同、数据库未覆盖该区域。
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    建议尝试只输入前半段，例如 <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">V6B</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">10001</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">SW1A</code>，或切换国家后重试。
+                  </p>
+                </div>
               )}
             </div>
 

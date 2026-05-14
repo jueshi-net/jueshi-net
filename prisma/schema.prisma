@@ -456,6 +456,7 @@ model PostalCode {
   city          String
   district      String?
   postalCode    String
+  normalizedPostalCode String?  // 去空格/横线的大写版本，如 V6B0A1, SW1A1AA
   areaName      String?
   adminName1    String?  // 省/州名
   adminCode1    String?  // 省/州缩写
@@ -473,6 +474,8 @@ model PostalCode {
 
   @@unique([countryCode, postalCode])
   @@index([postalCode])
+  @@index([normalizedPostalCode])
+  @@index([countryCode, normalizedPostalCode])
   @@index([country, city])
   @@index([countryCode, postalCode])
   @@index([countryCode, city])
