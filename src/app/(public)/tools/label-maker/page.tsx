@@ -63,12 +63,17 @@ export default function LabelMakerPage() {
     if (!previewRef.current) return;
     try {
       const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(previewRef.current, { scale: 2, backgroundColor: '#fff', useCORS: true });
+      const canvas = await html2canvas(previewRef.current, { scale: 2, backgroundColor: '#ffffff', useCORS: true, allowTaint: true });
       const link = document.createElement('a');
-      link.download = `${labelType?.titleEn || 'label'}-${Date.now()}.png`;
+      const now = new Date();
+      const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+      link.download = `label-${labelType?.titleEn || 'label'}_${ts}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-    } catch { alert('导出失败，请使用浏览器截图'); }
+    } catch (error: any) {
+      console.error('Label PNG export failed:', error);
+      alert(`导出失败：${error?.message || '未知错误'}，请使用浏览器截图`);
+    }
   }, [previewRef, labelType]);
 
   const addBatchItem = () => {
@@ -96,6 +101,17 @@ export default function LabelMakerPage() {
   const styleOptions = canUseLabelStyles() ? labelStyles : [labelStyles[0]];
 
   return (
+    <>
+      <style>{`
+        @media print {
+          .no-print, .print\\:hidden, .no-print-section { display: none !important; }
+          .print\\:w-full { width: 100% !important; flex: none !important; }
+          .print\\:p-0 { padding: 0 !important; }
+          .print\\:border-0 { border: none !important; }
+          .print\\:shadow-none { box-shadow: none !important; }
+          .print\\:block { display: block !important; }
+        }
+      `}</style>
     <div className="min-h-screen bg-gray-50">
       {/* Top bar */}
       <div className="bg-white border-b sticky top-0 z-40 print:hidden">
@@ -282,7 +298,7 @@ export default function LabelMakerPage() {
             )}
 
             {/* Ad */}
-            <AdSlot placement="label-maker-bottom" variant="card" />
+            <AdSlot placement="label-maker-bottom" variant="card" className="print:hidden" />
 
             {/* Save reminder */}
             <div className="text-center text-xs text-gray-400">
@@ -441,6 +457,7 @@ export default function LabelMakerPage() {
         <AdSlot placement="tool-bottom" className="mb-6 print:hidden" />
 
         {/* FAQ */}
+        <div className="print:hidden">
         <FAQSection title="唛头面单常见问题" items={[
           {
             question: "这个工具可以生成快递面单吗？",
@@ -457,7 +474,9 @@ export default function LabelMakerPage() {
           { question: "批量生成是什么意思？", answer: "批量生成指一次性生成多张相同或不同的标签。游客默认只能单次生成，会员可批量生成多张（如不同箱号的连续标签），提高仓库贴标效率。" },
           { question: "生成的标签可以直接打印吗？", answer: "可以。点击「打印 / PDF」会调用浏览器打印功能，支持 A4 纸打印或导出 PDF。建议打印前预览，确保尺寸和边距正确。" },
         ]} />
+        </div>
       </div>
     </div>
+    </>
   );
 }

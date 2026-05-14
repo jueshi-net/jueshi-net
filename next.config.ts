@@ -9,6 +9,40 @@ const nextConfig: NextConfig = {
   env: {
     DATABASE_URL: process.env.DATABASE_URL || "",
   },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
+        ],
+        has: [
+          {
+            type: "host",
+            value: "jueshi.net",
+          },
+        ],
+      },
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
+        ],
+        has: [
+          {
+            type: "host",
+            value: "www.jueshi.net",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

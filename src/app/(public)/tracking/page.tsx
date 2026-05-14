@@ -386,16 +386,16 @@ export default function TrackingPage() {
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center justify-between">
         <div>
           <h3 className="font-medium text-blue-900">前往第三方平台查询物流</h3>
-          <p className="text-sm text-blue-700 mt-1">本站不保存真实物流轨迹，点击下方按钮前往 17TRACK 查询</p>
+          <p className="text-sm text-blue-700 mt-1">本站仅整理单号，实际轨迹以承运商或第三方平台为准</p>
         </div>
         <a
-          href="https://t.17track.net/zh-cn"
+          href="https://www.17track.net/zh-cn"
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => trackEvent.trackingClick17track()}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 text-sm"
         >
-          <ExternalLink className="w-4 h-4" /> 前往 17TRACK
+          <ExternalLink className="w-4 h-4" /> 前往 17TRACK 查询
         </a>
       </div>
 
@@ -495,7 +495,7 @@ export default function TrackingPage() {
                 {/* Actions */}
                 <div className="flex flex-col gap-1 shrink-0">
                   <a
-                    href={`https://t.17track.net/zh-cn#nums=${entry.number}`}
+                    href={`https://www.17track.net/zh-cn#nums=${entry.number}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-1.5 text-gray-400 hover:text-blue-600 rounded transition-colors"

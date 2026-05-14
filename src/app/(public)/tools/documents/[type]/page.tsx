@@ -150,20 +150,34 @@ export default function DocumentEditorPage() {
   }, []);
 
   const handleExportPNG = useCallback(async () => {
-    if (!previewRef.current) return;
+    if (!previewRef.current) {
+      console.error('PNG export failed: previewRef is null');
+      alert('预览尚未加载，请稍后再试。如果问题持续，请使用浏览器打印功能导出 PDF。');
+      return;
+    }
+    // Check if preview is visible (not hidden via CSS)
+    const rect = previewRef.current.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      console.error('PNG export failed: preview area is not visible');
+      alert('预览区域不可见，请展开预览后再试，或使用浏览器打印功能导出 PDF。');
+      return;
+    }
     try {
       const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(previewRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
+        logging: false,
+        allowTaint: true,
       });
       const link = document.createElement('a');
-      link.download = `${docType?.exportFileNamePrefix || type}-${formData.documentNo || 'draft'}-${new Date().toISOString().slice(0, 10)}.png`;
+      link.download = `${docType?.exportFileNamePrefix || type}_${formData.documentNo || 'draft'}_${new Date().toISOString().slice(0, 10)}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
-    } catch {
-      alert('导出图片失败，请使用浏览器截图功能');
+    } catch (error) {
+      console.error('PNG export failed:', error);
+      alert('导出图片失败：' + (error instanceof Error ? error.message : '未知错误') + '。请尝试使用浏览器打印功能导出 PDF。');
     }
   }, [previewRef, docType, formData.documentNo, type]);
 
@@ -202,6 +216,16 @@ export default function DocumentEditorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Print styles: ensure clean output */}
+      <style jsx global>{`
+        @media print {
+          body, html {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+      `}</style>
       {/* Top bar */}
       <div className="bg-white border-b sticky top-0 z-40 print:hidden">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -574,10 +598,10 @@ export default function DocumentEditorPage() {
             )}
 
             {/* Ad Slot: document-editor-bottom */}
-            <AdSlot placement="document-editor-bottom" variant="card" />
+            <div className="print:hidden"><AdSlot placement="document-editor-bottom" variant="card" /></div>
 
             {/* Disclaimer */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 print:hidden">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <div className="text-xs text-yellow-800">

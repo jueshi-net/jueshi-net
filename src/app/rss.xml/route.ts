@@ -1,65 +1,73 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET /rss.xml - RSS 订阅源
+// GET /rss.xml - 生成 RSS 2.0 feed
 export async function GET() {
-  const [articles, links] = await Promise.all([
-    prisma.article.findMany({
+  const baseUrl = 'https://300zy.com';
+
+  let articles: {
+    title: string;
+    slug: string;
+    content: string;
+    publishedAt: Date | null;
+    createdAt: Date;
+  }[] = [];
+
+  try {
+    articles = await prisma.article.findMany({
       where: { status: 'published' },
-      orderBy: { publishedAt: 'desc' },
-      take: 20,
       select: {
-        id: true,
         title: true,
         slug: true,
-        excerpt: true,
+        content: true,
         publishedAt: true,
-      },
-    }),
-    prisma.linkItem.findMany({
-      where: { status: 'active' },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-      select: {
-        id: true,
-        title: true,
-        url: true,
-        description: true,
         createdAt: true,
       },
-    }),
-  ]);
+      orderBy: { publishedAt: 'desc' },
+      take: 50,
+    });
+  } catch (e) {
+    console.warn('rss.xml: DB unavailable, returning empty feed:', e);
+  }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  const buildDate = new Date().toUTCString();
+  function escapeXml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>海外百宝箱 - 最新更新</title>
-    <link>${siteUrl}</link>
-    <description>海外华人的常用工具与资源平台 - 导航、查询、工具、CMS</description>
-    <language>zh-CN</language>
-    <lastBuildDate>${buildDate}</lastBuildDate>
-    <atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml" />
-    
-    ${articles.map(a => `
+  function toRfc822(date: Date): string {
+    return date.toUTCString();
+  }
+
+  const itemsXml = articles
+    .map((a) => {
+      const link = `${baseUrl}/guides/${a.slug}`;
+      const description = escapeXml(a.content.slice(0, 200));
+      const pubDate = a.publishedAt ? toRfc822(a.publishedAt) : toRfc822(a.createdAt);
+      const guid = `${baseUrl}/guides/${a.slug}`;
+
+      return `
     <item>
       <title>${escapeXml(a.title)}</title>
-      <link>${siteUrl}/blog/${a.slug}</link>
-      <guid>${siteUrl}/blog/${a.slug}</guid>
-      <description>${escapeXml(a.excerpt || '')}</description>
-      <pubDate>${a.publishedAt ? new Date(a.publishedAt).toUTCString() : buildDate}</pubDate>
-    </item>`).join('')}
-    
-    ${links.map(l => `
-    <item>
-      <title>新链接: ${escapeXml(l.title)}</title>
-      <link>${l.url}</link>
-      <description>${escapeXml(l.description || '')}</description>
-      <pubDate>${new Date(l.createdAt).toUTCString()}</pubDate>
-    </item>`).join('')}
-    
+      <link>${escapeXml(link)}</link>
+      <description>${description}</description>
+      <pubDate>${pubDate}</pubDate>
+      <guid isPermaLink="true">${escapeXml(guid)}</guid>
+    </item>`;
+    })
+    .join('');
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>海外百宝箱</title>
+    <link>${baseUrl}</link>
+    <description>海外华人工具与资源平台</description>
+    <language>zh-CN</language>${itemsXml}
   </channel>
 </rss>`;
 
@@ -69,13 +77,4 @@ export async function GET() {
       'Cache-Control': 'public, max-age=3600',
     },
   });
-}
-
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
 }

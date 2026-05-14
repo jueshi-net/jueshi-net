@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { CalendarDays, Eye, Clock, ArrowLeft, Share2, Wrench, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
@@ -55,17 +56,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = await prisma.article.findUnique({ where: { slug } });
+
+  let article: Awaited<ReturnType<typeof prisma.article.findUnique>>;
+  try {
+    article = await prisma.article.findUnique({ where: { slug } });
+  } catch {
+    notFound();
+  }
 
   if (!article) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">文章未找到</h1>
-        <Link href="/guides" className="text-blue-600 hover:text-blue-700 flex items-center justify-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> 返回指南列表
-        </Link>
-      </div>
-    );
+    notFound();
   }
 
   return (

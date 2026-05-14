@@ -1,8 +1,8 @@
 'use client';
 import { AdSlot } from '@/components/ad-slot';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
@@ -17,6 +17,26 @@ interface ValidationDetail {
   matchedRegion?: string;
   matchedCity?: string;
   deliverability: 'confirmed' | 'likely' | 'unknown' | 'invalid';
+}
+
+interface DbResult {
+  id: string;
+  country: string;
+  countryCode: string;
+  province: string | null;
+  city: string;
+  district: string | null;
+  postalCode: string;
+  areaName: string | null;
+  adminName1: string | null;
+  adminCode1: string | null;
+  adminName2: string | null;
+  adminCode2: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+  source: string;
+  sourceVersion: string | null;
 }
 
 function usePersistedState<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
@@ -44,6 +64,15 @@ export default function PostalCodePage() {
   const [validationResult, setValidationResult] = useState<ValidationDetail | null>(null);
   const [citySearch, setCitySearch] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  // DB search state
+  const [dbQuery, setDbQuery] = useState('');
+  const [dbResults, setDbResults] = useState<DbResult[]>([]);
+  const [dbLoading, setDbLoading] = useState(false);
+  const [dbTotal, setDbTotal] = useState(0);
+  const [dbPage, setDbPage] = useState(1);
+  const [dbTab, setDbTab] = useState<'all' | 'code' | 'city'>('all');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const country = useMemo(
     () => allCountryData.find(c => c.code === selectedCountryCode) ?? allCountryData[0],
@@ -99,12 +128,10 @@ export default function PostalCodePage() {
         const parts = normalized.split(' ');
         if (parts.length >= 1) {
           const outward = parts[0].replace(/\d/g, '');
-          // Try exact match first
           const exactMatch = country.ranges.find(r =>
             r.prefix.split(',').map(p => p.trim()).includes(outward)
           );
           if (exactMatch) { matchedCity = exactMatch.city; matchedRegion = exactMatch.region; }
-          // Try first 1-2 letters
           else if (outward.length >= 1) {
             const shortMatch = country.ranges.find(r =>
               r.prefix.split(',').map(p => p.trim()).some(p => p.startsWith(outward) || outward.startsWith(p))
@@ -142,6 +169,11 @@ export default function PostalCodePage() {
         const match = country.ranges.find(r => r.prefix.split('/').includes(prefix2));
         if (match) { matchedCity = match.city; matchedRegion = match.region; }
       }
+
+      // Also query DB for this postal code
+      if (formatOk) {
+        queryDb(trimmed, selectedCountryCode, 'code');
+      }
     }
 
     if (formatOk) {
@@ -162,9 +194,67 @@ export default function PostalCodePage() {
         deliverability: 'invalid',
       });
     }
-  }, [inputCode, country]);
+  }, [inputCode, country, selectedCountryCode]);
 
-  // Filtered ranges based on city search
+  // DB search with debounce
+  const queryDb = useCallback(async (q: string, cc: string, t: 'all' | 'code' | 'city') => {
+    if (!q.trim()) {
+      setDbResults([]);
+      setDbTotal(0);
+      return;
+    }
+    setDbLoading(true);
+    try {
+      const params = new URLSearchParams({
+        q,
+        country: cc,
+        type: t,
+        page: '1',
+        limit: '50',
+      });
+      const res = await fetch(`/api/postal-codes?${params}`);
+      const json = await res.json();
+      if (json.success) {
+        setDbResults(json.data);
+        setDbTotal(json.pagination.total);
+        setDbPage(1);
+      }
+    } catch (e) {
+      console.error('DB query failed:', e);
+    } finally {
+      setDbLoading(false);
+    }
+  }, []);
+
+  const loadDbPage = useCallback(async (page: number) => {
+    setDbLoading(true);
+    try {
+      const params = new URLSearchParams({
+        q: dbQuery,
+        country: selectedCountryCode,
+        type: dbTab,
+        page: String(page),
+        limit: '50',
+      });
+      const res = await fetch(`/api/postal-codes?${params}`);
+      const json = await res.json();
+      if (json.success) {
+        setDbResults(json.data);
+        setDbPage(page);
+      }
+    } catch (e) {
+      console.error('DB query failed:', e);
+    } finally {
+      setDbLoading(false);
+    }
+  }, [dbQuery, selectedCountryCode, dbTab]);
+
+  const handleDbSearch = useCallback(() => {
+    queryDb(dbQuery, selectedCountryCode, dbTab);
+    trackEvent.postalQuery();
+  }, [dbQuery, selectedCountryCode, dbTab, queryDb]);
+
+  // Filtered ranges based on city search (legacy)
   const filteredRanges = useMemo(() => {
     if (!citySearch.trim()) return country.ranges;
     const q = citySearch.toLowerCase();
@@ -198,12 +288,18 @@ export default function PostalCodePage() {
         <div className="mb-4">
           <Breadcrumb />
         </div>
+
         {/* Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800 dark:text-amber-300">
-            <strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。实际邮编请以各国邮政官网为准。</strong>
-          </p>
+          <div className="text-sm text-amber-800 dark:text-amber-300">
+            <strong>免责声明：</strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。
+            实际邮编请以各国邮政官网为准。
+            <span className="block mt-1">
+              本数据来源于 <a href="https://download.geonames.org/export/zip/" className="underline" target="_blank" rel="noopener noreferrer">GeoNames</a>，
+              数据不构成官方投递地址验证，最终以当地邮政系统为准。
+            </span>
+          </div>
         </div>
 
         {/* Country Tab Selector */}
@@ -280,11 +376,110 @@ export default function PostalCodePage() {
               <p className="text-xs text-gray-400 mt-2">{country.hint}</p>
             </div>
 
-            {/* City / Region Search */}
+            {/* DB-Powered Search */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <Database className="w-5 h-5 text-purple-600" />
+                数据库邮编查询
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                从 GeoNames 数据库查询具体邮编或城市对应的邮编（支持 CA、US、GB、AU、NZ）
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-3">
+                <button
+                  onClick={() => setDbTab('all')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    dbTab === 'all' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  }`}>全部</button>
+                <button
+                  onClick={() => setDbTab('code')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    dbTab === 'code' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  }`}>按邮编</button>
+                <button
+                  onClick={() => setDbTab('city')}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    dbTab === 'city' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  }`}>按城市</button>
+              </div>
+
+              <div className="flex gap-2 mb-3">
+                <input
+                  className="flex-1 px-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  placeholder={dbTab === 'code' ? '输入邮编（如 M5V 2T6）...' : dbTab === 'city' ? '输入城市名（如 Toronto）...' : '输入邮编或城市名...'}
+                  value={dbQuery}
+                  onChange={e => setDbQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleDbSearch()}
+                />
+                <button onClick={handleDbSearch} disabled={dbLoading}
+                  className="px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+                  {dbLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  查询
+                </button>
+              </div>
+
+              {dbLoading && (
+                <div className="flex items-center justify-center py-8 text-gray-500">
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" /> 查询中...
+                </div>
+              )}
+
+              {!dbLoading && dbResults.length > 0 && (
+                <>
+                  <p className="text-xs text-gray-400 mb-2">找到 {dbTotal.toLocaleString()} 条记录</p>
+                  <div className="grid sm:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+                    {dbResults.map((r) => (
+                      <div key={r.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2.5 flex flex-col gap-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">{r.postalCode}</span>
+                          {r.accuracy != null && (
+                            <span className="text-xs text-gray-400" title={`精度等级: ${r.accuracy}`}>
+                              {'⭐'.repeat(Math.min(r.accuracy, 5))}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-900 dark:text-white">
+                          {r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}
+                        </div>
+                        {r.adminName1 && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {r.adminName1}{r.adminCode1 ? ` (${r.adminCode1})` : ''}
+                            {r.adminName2 ? ` · ${r.adminName2}` : ''}
+                          </div>
+                        )}
+                        {r.latitude != null && r.longitude != null && (
+                          <div className="text-xs text-gray-400">
+                            📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {dbTotal > 50 && (
+                    <div className="flex items-center justify-center gap-2 mt-3">
+                      <button onClick={() => loadDbPage(dbPage - 1)} disabled={dbPage <= 1}
+                        className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 disabled:opacity-40">上一页</button>
+                      <span className="text-xs text-gray-500">第 {dbPage} 页</span>
+                      <button onClick={() => loadDbPage(dbPage + 1)} disabled={dbPage * 50 >= dbTotal}
+                        className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 disabled:opacity-40">下一页</button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {!dbLoading && dbQuery && dbResults.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                  未找到匹配 "{dbQuery}" 的记录
+                </p>
+              )}
+            </div>
+
+            {/* City / Region Search (legacy) */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <Search className="w-5 h-5 text-indigo-600" />
-                按城市/地区查询邮编范围
+                按城市/地区查询邮编范围（参考）
               </h2>
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -419,6 +614,7 @@ export default function PostalCodePage() {
               </h3>
               <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-400">
                 <li>• 本工具提供格式校验和城市邮编范围参考</li>
+                <li>• 数据库收录 GeoNames 邮编数据（CA/US/GB/AU/NZ）</li>
                 <li>• 邮编覆盖范围仅为主要城市，非完整数据库</li>
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
                 <li>• 填写快递面单时，邮编格式必须严格符合各国邮政要求</li>

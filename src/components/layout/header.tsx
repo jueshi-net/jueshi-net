@@ -6,7 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import ThemeToggle from "@/components/theme-toggle";
 import NotificationBell from "@/components/notification-bell";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Header() {
   const { data: session, status } = useSession();
@@ -36,10 +35,9 @@ export default function Header() {
             <Link href="/dashboard" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">我的工作台</Link>
           </nav>
 
-          {/* Theme Toggle + Language + User */}
+          {/* Theme Toggle + User */}
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <LanguageSwitcher />
             {status === "authenticated" && <NotificationBell />}
             <div className="relative">
               {status === "authenticated" && session.user ? (

@@ -45,7 +45,7 @@ const modeDivisor = (mode: ShippingMode, custom: string): number => {
   switch (mode) {
     case 'express': return 5000;
     case 'air': return 6000;
-    case 'sea': return 7000;
+    case 'sea': return 6000;
     case 'custom': return parseInt(custom) || 5000;
   }
 };
@@ -54,7 +54,7 @@ const modeLabel = (mode: ShippingMode): string => {
   switch (mode) {
     case 'express': return '📦 快递体积重 ÷5000';
     case 'air': return '✈️ 空运体积重 ÷6000';
-    case 'sea': return '🚢 海运体积重 ÷7000';
+    case 'sea': return '🚢 海运体积重 ÷6000';
     case 'custom': return '⚙️ 自定义除数';
   }
 };
@@ -250,7 +250,7 @@ export default function ShippingCalculatorPage() {
           {([
             { key: 'express' as ShippingMode, icon: Package, label: '快递 ÷5000', color: 'blue' },
             { key: 'air' as ShippingMode, icon: Plane, label: '空运 ÷6000', color: 'green' },
-            { key: 'sea' as ShippingMode, icon: Ship, label: '海运 ÷7000', color: 'teal' },
+            { key: 'sea' as ShippingMode, icon: Ship, label: '海运 ÷6000', color: 'teal' },
             { key: 'custom' as ShippingMode, icon: Calculator, label: '自定义', color: 'purple' },
           ]).map(({ key, icon: Icon, label, color }) => {
             const active = mode === key;
@@ -302,7 +302,7 @@ export default function ShippingCalculatorPage() {
                 {[
                   { name: '国际快递', d: '5000', detail: 'DHL, UPS, FedEx' },
                   { name: '空运/专线', d: '6000', detail: '包税空派' },
-                  { name: '海运', d: '7000', detail: '部分渠道参考' },
+                  { name: '海运', d: '6000', detail: '部分渠道参考' },
                   { name: '中欧班列', d: '7000', detail: '铁路专线' },
                 ].map(item => (
                   <div key={item.name} className="flex items-center justify-between py-1.5 px-2 bg-white rounded border">
@@ -314,6 +314,7 @@ export default function ShippingCalculatorPage() {
                   </div>
                 ))}
               </div>
+              <p className="text-amber-600 mt-2">⚠️ 以上除数值仅供参考，不同承运商和渠道可能采用不同的除数标准（如海运可能使用 6000、7000 或其他值），请以实际承运商规定为准。</p>
             </div>
           )}
 
@@ -506,7 +507,7 @@ export default function ShippingCalculatorPage() {
               {
                 icon: '🚢', title: '海运/拼箱',
                 formula: `CBM 单价 × CBM 数 + 目的港费用`,
-                notes: ['通常按 CBM 计费，部分渠道有体积重参考（÷7000）', '起运量一般 1 CBM 起', '时效 30-50 工作日，适合大件重货'],
+                notes: ['通常按 CBM 计费，部分渠道有体积重参考（÷6000）', '起运量一般 1 CBM 起', '时效 30-50 工作日，适合大件重货'],
                 color: 'border-l-purple-500',
               },
             ].map((m, i) => (
@@ -578,7 +579,7 @@ export default function ShippingCalculatorPage() {
           },
           {
             question: "快递、空运、海运的除数为什么不一样？",
-            answer: "不同运输方式的除数反映了各自的空间成本。快递（÷5000）最贵，因为时效快、空间紧张；空运（÷6000）次之；海运（÷7000）最宽松，因为船舱空间大。除数越大，算出来的体积重越小，费用越低。",
+            answer: "不同运输方式的除数反映了各自的空间成本。快递（÷5000）最贵，因为时效快、空间紧张；空运（÷6000）次之；海运（÷6000）最宽松，因为船舱空间大。除数越大，算出来的体积重越小，费用越低。",
           },
           {
             question: "什么是 CBM？",

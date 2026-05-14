@@ -10,12 +10,12 @@ model User {
   id                   String             @id @default(cuid())
   name                 String?
   email                String             @unique
-  emailVerified        DateTime? @map("emailverified")
+  emailVerified        DateTime?
   image                String?
   password             String?
   role                 String             @default("user")
-  createdAt            DateTime           @default(now()) @map("createdat")
-  updatedAt            DateTime           @updatedAt @map("updatedat")
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
   accounts             Account[]
   auditLogs            AuditLog[]
   favorites            Favorite[]
@@ -36,15 +36,15 @@ model User {
 
 model UserPreference {
   id              String   @id @default(cuid())
-  userId          String   @unique @map("userid")
+  userId          String   @unique
   theme           String   @default("system")
   language        String   @default("zh-CN")
-  emailNotif      Boolean  @default(true) @map("emailnotif")
-  compactMode     Boolean  @default(false) @map("compactmode")
-  itemsPerPage    Int      @default(20) @map("itemsperpage")
-  defaultCategory String? @map("defaultcategory")
-  createdAt       DateTime @default(now()) @map("createdat")
-  updatedAt       DateTime @updatedAt @map("updatedat")
+  emailNotif      Boolean  @default(true)
+  compactMode     Boolean  @default(false)
+  itemsPerPage    Int      @default(20)
+  defaultCategory String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_preferences")
@@ -52,10 +52,10 @@ model UserPreference {
 
 model Account {
   id                String  @id @default(cuid())
-  userId            String @map("userid")
+  userId            String
   type              String
   provider          String
-  providerAccountId String @map("provideraccountid")
+  providerAccountId String
   refresh_token     String?
   access_token      String?
   expires_at        Int?
@@ -71,8 +71,8 @@ model Account {
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique @map("sessiontoken")
-  userId       String @map("userid")
+  sessionToken String   @unique
+  userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -94,17 +94,17 @@ model LinkItem {
   url          String
   description  String?
   icon         String?
-  categoryName String? @map("categoryname")
-  categoryId   String? @map("categoryid")
-  userId       String? @map("userid")
-  workspaceId  String? @map("workspaceid")
-  sortOrder    Int        @default(0) @map("sortorder")
-  isPinned     Boolean    @default(false) @map("ispinned")
-  isFeatured   Boolean    @default(false) @map("isfeatured")
+  categoryName String?
+  categoryId   String?
+  userId       String?
+  workspaceId  String?
+  sortOrder    Int        @default(0)
+  isPinned     Boolean    @default(false)
+  isFeatured   Boolean    @default(false)
   clicks       Int        @default(0)
   status       String     @default("active")
-  createdAt    DateTime   @default(now()) @map("createdat")
-  updatedAt    DateTime   @updatedAt @map("updatedat")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   favorites    Favorite[]
   tags         LinkTag[]
   category     Category?  @relation(fields: [categoryId], references: [id])
@@ -122,10 +122,10 @@ model Category {
   slug      String     @unique
   icon      String?
   color     String?
-  sortOrder Int        @default(0) @map("sortorder")
-  parentId  String? @map("parentid")
-  createdAt DateTime   @default(now()) @map("createdat")
-  updatedAt DateTime   @updatedAt @map("updatedat")
+  sortOrder Int        @default(0)
+  parentId  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children  Category[] @relation("CategoryHierarchy")
   links     LinkItem[]
@@ -136,7 +136,7 @@ model Category {
 model Tag {
   id        String    @id @default(cuid())
   name      String    @unique
-  createdAt DateTime  @default(now()) @map("createdat")
+  createdAt DateTime  @default(now())
   links     LinkTag[]
 
   @@map("tags")
@@ -144,9 +144,9 @@ model Tag {
 
 model LinkTag {
   id        String   @id @default(cuid())
-  linkId    String @map("linkid")
-  tagId     String @map("tagid")
-  createdAt DateTime @default(now()) @map("createdat")
+  linkId    String
+  tagId     String
+  createdAt DateTime @default(now())
   link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
   tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
@@ -156,9 +156,9 @@ model LinkTag {
 
 model Favorite {
   id        String   @id @default(cuid())
-  userId    String @map("userid")
-  linkId    String @map("linkid")
-  createdAt DateTime @default(now()) @map("createdat")
+  userId    String
+  linkId    String
+  createdAt DateTime @default(now())
   link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -171,12 +171,12 @@ model Memo {
   title     String
   content   String?
   category  String?
-  userId    String @map("userid")
-  isPinned  Boolean  @default(false) @map("ispinned")
+  userId    String
+  isPinned  Boolean  @default(false)
   color     String?
-  dueDate   DateTime? @map("duedate")
-  createdAt DateTime @default(now()) @map("createdat")
-  updatedAt DateTime @updatedAt @map("updatedat")
+  dueDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -188,11 +188,11 @@ model Workspace {
   name        String
   description String?
   icon        String?
-  ownerId     String @map("ownerid")
-  isPublic    Boolean           @default(false) @map("ispublic")
+  ownerId     String
+  isPublic    Boolean           @default(false)
   slug        String            @unique
-  createdAt   DateTime          @default(now()) @map("createdat")
-  updatedAt   DateTime          @updatedAt @map("updatedat")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   links       LinkItem[]
   members     WorkspaceMember[]
   owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -202,10 +202,10 @@ model Workspace {
 
 model WorkspaceMember {
   id          String    @id @default(cuid())
-  workspaceId String @map("workspaceid")
-  userId      String @map("userid")
+  workspaceId String
+  userId      String
   role        String    @default("member")
-  createdAt   DateTime  @default(now()) @map("createdat")
+  createdAt   DateTime  @default(now())
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
@@ -217,16 +217,16 @@ model ShortLink {
   id          String    @id @default(cuid())
   code        String    @unique
   url         String
-  userId      String? @map("userid")
+  userId      String?
   title       String?
   description String?
-  expiresAt   DateTime? @map("expiresat")
+  expiresAt   DateTime?
   password    String?
   clicks      Int       @default(0)
-  lastClickAt DateTime? @map("lastclickat")
-  isActive    Boolean   @default(true) @map("isactive")
-  createdAt   DateTime  @default(now()) @map("createdat")
-  updatedAt   DateTime  @updatedAt @map("updatedat")
+  lastClickAt DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   user        User?     @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -235,14 +235,14 @@ model ShortLink {
 
 model AuditLog {
   id        String   @id @default(cuid())
-  userId    String? @map("userid")
+  userId    String?
   action    String
   entity    String?
-  entityId  String? @map("entityid")
+  entityId  String?
   details   String?
   ip        String?
-  userAgent String? @map("useragent")
-  createdAt DateTime @default(now()) @map("createdat")
+  userAgent String?
+  createdAt DateTime @default(now())
   user      User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -253,15 +253,15 @@ model AuditLog {
 
 model Feedback {
   id        String   @id @default(cuid())
-  userId    String? @map("userid")
+  userId    String?
   type      String
   subject   String
   content   String
   page      String?
   email     String?
   status    String   @default("pending")
-  createdAt DateTime @default(now()) @map("createdat")
-  updatedAt DateTime @updatedAt @map("updatedat")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user      User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -271,13 +271,13 @@ model Feedback {
 
 model Notification {
   id        String   @id @default(cuid())
-  userId    String @map("userid")
+  userId    String
   title     String
   message   String
   type      String   @default("info")
   link      String?
-  isRead    Boolean  @default(false) @map("isread")
-  createdAt DateTime @default(now()) @map("createdat")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -289,16 +289,16 @@ model AdSlot {
   id          String    @id @default(cuid())
   name        String    @unique
   position    String
-  imageUrl    String @map("imageurl")
-  linkUrl     String @map("linkurl")
-  altText     String? @map("alttext")
-  startDate   DateTime @map("startdate")
-  endDate     DateTime? @map("enddate")
-  isActive    Boolean   @default(true) @map("isactive")
+  imageUrl    String
+  linkUrl     String
+  altText     String?
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
   clicks      Int       @default(0)
   impressions Int       @default(0)
-  createdAt   DateTime  @default(now()) @map("createdat")
-  updatedAt   DateTime  @updatedAt @map("updatedat")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("ad_slots")
 }
@@ -309,17 +309,17 @@ model Article {
   slug        String       @unique
   content     String
   excerpt     String?
-  coverImage  String? @map("coverimage")
+  coverImage  String?
   author      String?
   status      String       @default("draft")
   views       Int          @default(0)
-  publishedAt DateTime? @map("publishedat")
-  createdAt   DateTime     @default(now()) @map("createdat")
-  updatedAt   DateTime     @updatedAt @map("updatedat")
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   category    String?      // 文章分类：跨境寄送/海外生活/出海经营
-  seoTitle    String? @map("seotitle")       // SEO 标题
-  seoDescription String? @map("seodescription") // SEO 描述
-  relatedTools  String[] @default([]) @map("relatedtools") // 关联工具路由
+  seoTitle    String?       // SEO 标题
+  seoDescription String?   // SEO 描述
+  relatedTools  String[] @default([]) // 关联工具路由
   tags        ArticleTag[]
 
   @@index([status])
@@ -329,9 +329,9 @@ model Article {
 
 model ArticleTag {
   id        String   @id @default(cuid())
-  articleId String @map("articleid")
+  articleId String
   tag       String
-  createdAt DateTime @default(now()) @map("createdat")
+  createdAt DateTime @default(now())
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, tag])
@@ -345,13 +345,13 @@ model Resource {
   description String?
   category    String   // life/logistics/business/templates
   tags        String[] @default([])
-  sourceType  String   @default("third-party") @map("sourcetype") // official/third-party/internal
+  sourceType  String   @default("third-party") // official/third-party/internal
   usage       String?  // 适用场景/使用提示
   disclaimer  String?  // 免责声明或使用提示
-  isActive    Boolean  @default(true) @map("isactive")
-  sortOrder   Int      @default(0) @map("sortorder")
-  createdAt   DateTime @default(now()) @map("createdat")
-  updatedAt   DateTime @updatedAt @map("updatedat")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([category])
   @@index([isActive])
@@ -366,10 +366,10 @@ model Subscription {
   price       Float
   interval    String
   features    String?
-  isActive    Boolean            @default(true) @map("isactive")
-  sortOrder   Int                @default(0) @map("sortorder")
-  createdAt   DateTime           @default(now()) @map("createdat")
-  updatedAt   DateTime           @updatedAt @map("updatedat")
+  isActive    Boolean            @default(true)
+  sortOrder   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   users       UserSubscription[]
 
   @@map("subscriptions")
@@ -377,14 +377,14 @@ model Subscription {
 
 model UserSubscription {
   id                String       @id @default(cuid())
-  userId            String @map("userid")
-  subscriptionId    String @map("subscriptionid")
+  userId            String
+  subscriptionId    String
   status            String       @default("active")
-  startDate         DateTime     @default(now()) @map("startdate")
-  endDate           DateTime? @map("enddate")
-  cancelAtPeriodEnd Boolean      @default(false) @map("cancelatperiodend")
-  createdAt         DateTime     @default(now()) @map("createdat")
-  updatedAt         DateTime     @updatedAt @map("updatedat")
+  startDate         DateTime     @default(now())
+  endDate           DateTime?
+  cancelAtPeriodEnd Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
   subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -399,23 +399,23 @@ model SubscriptionPlan {
   price       Float
   interval    String
   features    String?
-  isActive    Boolean  @default(true) @map("isactive")
-  createdAt   DateTime @default(now()) @map("createdat")
-  updatedAt   DateTime @updatedAt @map("updatedat")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("subscription_plans")
 }
 
 model Webhook {
   id            String    @id @default(cuid())
-  userId        String? @map("userid")
+  userId        String?
   url           String
   events        String
   secret        String?
-  isActive      Boolean   @default(true) @map("isactive")
-  lastTriggered DateTime? @map("lasttriggered")
-  createdAt     DateTime  @default(now()) @map("createdat")
-  updatedAt     DateTime  @updatedAt @map("updatedat")
+  isActive      Boolean   @default(true)
+  lastTriggered DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   user          User?     @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -427,11 +427,11 @@ model EmailSubscription {
   email       String    @unique
   token       String?
   confirmed   Boolean   @default(false)
-  isActive    Boolean   @default(true) @map("isactive")
-  confirmedAt DateTime? @map("confirmedat")
-  expiresAt   DateTime? @map("expiresat")
-  createdAt   DateTime  @default(now()) @map("createdat")
-  updatedAt   DateTime  @updatedAt @map("updatedat")
+  isActive    Boolean   @default(true)
+  confirmedAt DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("email_subscriptions")
 }
@@ -441,31 +441,42 @@ model NewsletterBroadcast {
   subject   String
   content   String
   status    String   @default("draft")
-  sentCount Int      @default(0) @map("sentcount")
-  createdAt DateTime @default(now()) @map("createdat")
-  updatedAt DateTime @updatedAt @map("updatedat")
+  sentCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("newsletter_broadcasts")
 }
 
 model PostalCode {
-  id          String   @id @default(cuid())
-  country     String
-  countryCode String @map("countrycode")
-  province    String?
-  city        String
-  district    String?
-  postalCode  String @map("postalcode")
-  areaName    String? @map("areaname")
-  latitude    Float?
-  longitude   Float?
-  isActive    Boolean  @default(true) @map("isactive")
-  createdAt   DateTime @default(now()) @map("createdat")
-  updatedAt   DateTime @updatedAt @map("updatedat")
+  id            String   @id @default(cuid())
+  country       String
+  countryCode   String
+  province      String?
+  city          String
+  district      String?
+  postalCode    String
+  areaName      String?
+  adminName1    String?  // 省/州名
+  adminCode1    String?  // 省/州缩写
+  adminName2    String?
+  adminCode2    String?
+  latitude      Float?
+  longitude     Float?
+  accuracy      Int?     // 精度等级 1-6
+  isActive      Boolean  @default(true)
+  source        String   @default("GeoNames")
+  sourceUrl     String   @default("https://download.geonames.org/export/zip/")
+  sourceVersion String?  // import date
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  @@unique([country, postalCode])
-  @@index([country, city])
+  @@unique([countryCode, postalCode])
   @@index([postalCode])
+  @@index([country, city])
+  @@index([countryCode, postalCode])
+  @@index([countryCode, city])
+  @@index([adminCode1])
   @@map("postal_codes")
 }
 
@@ -473,15 +484,15 @@ model HSCode {
   id            String   @id @default(cuid())
   code          String   @unique
   level         Int
-  parentId      String? @map("parentid")
+  parentId      String?
   description   String
-  descriptionEn String? @map("descriptionen")
+  descriptionEn String?
   category      String?
-  taxRate       Float? @map("taxrate")
+  taxRate       Float?
   notes         String?
-  isActive      Boolean  @default(true) @map("isactive")
-  createdAt     DateTime @default(now()) @map("createdat")
-  updatedAt     DateTime @updatedAt @map("updatedat")
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   parent        HSCode?  @relation("HSHierarchy", fields: [parentId], references: [id])
   children      HSCode[] @relation("HSHierarchy")
 
@@ -493,12 +504,12 @@ model HSCode {
 // 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
 model EventLog {
   id          String   @id @default(cuid())
-  eventType   String   @map("eventtype")       // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
-  toolName    String?  @map("toolname")         // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
+  eventType   String         // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+  toolName    String?          // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
   action      String?  // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
   path        String?  // 页面路径，如 /tools/tracking
-  sessionId   String?  @map("sessionid")        // 匿名 sessionId（localStorage 生成，不关联用户身份）
-  createdAt   DateTime @default(now()) @map("createdat")
+  sessionId   String?         // 匿名 sessionId（localStorage 生成，不关联用户身份）
+  createdAt   DateTime @default(now())
 
   @@index([eventType])
   @@index([toolName])
