@@ -1,104 +1,95 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+function normalizePostal(input: string): string {
+  return input.trim().toUpperCase().replace(/[\s\-]+/g, '');
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action');
-  const country = searchParams.get('country') || 'CA';
+  const country = searchParams.get('country') || '';
   const query = searchParams.get('q') || '';
 
   if (!query) {
-    return NextResponse.json({ error: 'Missing query parameter' }, { status: 400 });
+    return NextResponse.json({ error: '缺少搜索内容', results: [], total: 0 });
   }
 
   try {
+    const normalized = normalizePostal(query);
+    const originalQuery = query.trim();
+
+    const searchByPostal = async (q: string, norm: string, c: string | undefined) => {
+      let sql = `
+        SELECT id, country, "countryCode", city, "postalCode", province, district,
+               "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
+               latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
+               "isActive", "createdAt", "updatedAt"
+        FROM postal_codes
+        WHERE "isActive" = true
+        AND (
+          "postalCode" ILIKE $1
+          OR REPLACE("postalCode", ' ', '') ILIKE $2
+          OR REPLACE("postalCode", '-', '') ILIKE $3
+          OR city ILIKE $4
+          OR province ILIKE $5
+          OR "adminCode1" ILIKE $6
+        )
+      `;
+      const params = [
+        `%${q}%`,
+        `%${norm}%`,
+        `%${norm}%`,
+        `%${q}%`,
+        `%${q}%`,
+        norm,
+      ];
+
+      if (c) {
+        sql += ` AND "countryCode" = $${params.length + 1}`;
+        params.push(c);
+      }
+
+      sql += ` ORDER BY city ASC, "postalCode" ASC LIMIT 50`;
+
+      const results = await prisma.$queryRawUnsafe(sql, ...params);
+      return results as any[];
+    };
+
+    let results: any[];
+
     if (action === 'search-city') {
-      // Search by city name → return all postal codes for that city
-      const results = await prisma.postalCode.findMany({
-        where: {
-          countryCode: country,
-          city: { contains: query, mode: 'insensitive' },
-          isActive: true,
-        },
-        orderBy: [{ postalCode: 'asc' }],
-        take: 50,
-        select: {
-          id: true,
-          country: true,
-          countryCode: true,
-          city: true,
-          province: true,
-          adminCode1: true,
-          postalCode: true,
-          areaName: true,
-          latitude: true,
-          longitude: true,
-          accuracy: true,
-          source: true,
-        },
-      });
+      const params: any[] = [`%${originalQuery}%`];
+      let sql = `
+        SELECT id, country, "countryCode", city, "postalCode", province,
+               "areaName", "adminName1", "adminCode1",
+               latitude, longitude, accuracy, source
+        FROM postal_codes
+        WHERE "isActive" = true
+        AND city ILIKE $1
+      `;
+      if (country) {
+        params.push(country);
+        sql += ` AND "countryCode" = $${params.length}`;
+      }
+      sql += ` ORDER BY "postalCode" ASC LIMIT 50`;
 
-      return NextResponse.json({ results, total: results.length });
+      results = await prisma.$queryRawUnsafe(sql, ...params);
+    } else if (action === 'search-postal') {
+      results = await searchByPostal(originalQuery, normalized, country || undefined);
+    } else {
+      results = await searchByPostal(originalQuery, normalized, country || undefined);
     }
 
-    if (action === 'search-postal') {
-      // Search by postal code → return matching places
-      const results = await prisma.postalCode.findMany({
-        where: {
-          countryCode: country,
-          postalCode: { contains: query.replace(/\s+/g, ''), mode: 'insensitive' },
-          isActive: true,
-        },
-        orderBy: [{ city: 'asc' }],
-        take: 50,
-        select: {
-          id: true,
-          country: true,
-          countryCode: true,
-          city: true,
-          province: true,
-          adminCode1: true,
-          postalCode: true,
-          areaName: true,
-          latitude: true,
-          longitude: true,
-          accuracy: true,
-          source: true,
-        },
-      });
-
-      return NextResponse.json({ results, total: results.length });
-    }
-
-    // Default: try both postal code and city search
-    const postalResults = await prisma.postalCode.findMany({
-      where: {
-        countryCode: country,
-        OR: [
-          { postalCode: { contains: query.replace(/\s+/g, ''), mode: 'insensitive' } },
-          { city: { contains: query, mode: 'insensitive' } },
-        ],
-        isActive: true,
-      },
-      orderBy: [{ city: 'asc' }, { postalCode: 'asc' }],
-      take: 50,
-      select: {
-        id: true,
-        country: true,
-        countryCode: true,
-        city: true,
-        province: true,
-        adminCode1: true,
-        postalCode: true,
-        areaName: true,
-        latitude: true,
-        longitude: true,
-        accuracy: true,
-        source: true,
-      },
+    const seen = new Set<string>();
+    const deduped = results.filter((r: any) => {
+      const key = `${r.countryCode}-${(r as any).postalCode}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
     });
 
-    return NextResponse.json({ results: postalResults, total: postalResults.length });
+    return NextResponse.json({ results: deduped, total: deduped.length });
   } catch (error) {
     console.error('Postal code API error:', error);
     return NextResponse.json({ error: '查询失败' }, { status: 500 });
