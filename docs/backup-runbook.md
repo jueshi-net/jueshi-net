@@ -46,13 +46,13 @@ bash /home/deploy/xixiong-saas/scripts/ops/upload-backup-r2.sh
 
 ```cron
 # 每天凌晨 3:20 执行本地备份
-20 3 * * * /home/deploy/xixiong-saas/scripts/ops/backup-postgres.sh >> /var/log/xixiong-backup.log 2>&1
+20 3 * * * cd /home/deploy/xixiong-saas && /home/deploy/xixiong-saas/scripts/ops/backup-postgres.sh >> /home/deploy/logs/xixiong-backup/backup.log 2>&1
 
 # 每天凌晨 3:40 执行恢复验证（备份完成后 20 分钟）
-40 3 * * * /home/deploy/xixiong-saas/scripts/ops/verify-postgres-backup.sh >> /var/log/xixiong-backup-verify.log 2>&1
+40 3 * * * cd /home/deploy/xixiong-saas && /home/deploy/xixiong-saas/scripts/ops/verify-postgres-backup.sh >> /home/deploy/logs/xixiong-backup/verify.log 2>&1
 
 # 每天凌晨 4:00 执行 R2 上传（如果已配置）
-0 4 * * * /home/deploy/xixiong-saas/scripts/ops/upload-backup-r2.sh >> /var/log/xixiong-backup-r2.log 2>&1
+0 4 * * * cd /home/deploy/xixiong-saas && /home/deploy/xixiong-saas/scripts/ops/upload-backup-r2.sh >> /home/deploy/logs/xixiong-backup/r2.log 2>&1
 ```
 
 ### 安装 cron
@@ -72,13 +72,13 @@ crontab -l
 
 ```bash
 # 本地备份日志
-tail -20 /var/log/xixiong-backup.log
+tail -20 /home/deploy/logs/xixiong-backup/backup.log
 
 # 恢复验证日志
-tail -20 /var/log/xixiong-backup-verify.log
+tail -20 /home/deploy/logs/xixiong-backup/verify.log
 
 # R2 上传日志
-tail -20 /var/log/xixiong-backup-r2.log
+tail -20 /home/deploy/logs/xixiong-backup/r2.log
 ```
 
 ---
