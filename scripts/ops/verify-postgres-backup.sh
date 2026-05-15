@@ -104,7 +104,7 @@ echo "-- 表存在性检查 --"
 TABLES=$(run_sql "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;")
 
 # Check for expected tables (using actual Prisma @@map names)
-for table in users memos postal_codes event_logs accounts sessions; do
+for table in users memos postal_codes events accounts sessions; do
   if echo "$TABLES" | grep -q "^${table}$"; then
     echo "  ✅ 表存在: ${table}"
   else
@@ -129,9 +129,9 @@ check_min "memos 表行数" 0 "$MEMO_COUNT"
 POSTAL_COUNT=$(run_sql "SELECT count(*) FROM postal_codes;" 2>/dev/null || echo "0")
 check_min "postal_codes 表行数 (必须 >= 2,700,000)" 2700000 "$POSTAL_COUNT"
 
-# event_logs 表
-EVENT_COUNT=$(run_sql "SELECT count(*) FROM event_logs;" 2>/dev/null || echo "0")
-check_min "event_logs 表行数" 0 "$EVENT_COUNT"
+# events 表
+EVENT_COUNT=$(run_sql "SELECT count(*) FROM events;" 2>/dev/null || echo "0")
+check_min "events 表行数" 0 "$EVENT_COUNT"
 
 # ===== 7. 验证索引 =====
 echo ""

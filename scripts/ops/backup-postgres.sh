@@ -9,11 +9,26 @@ set -euo pipefail
 
 # ===== 配置 =====
 DB_NAME="bxb_prod"
-DB_USER="bxb_user"
 DB_HOST="127.0.0.1"
 DB_PORT="5432"
 BACKUP_DIR="/var/backups/xixiong-saas/postgres"
 RETENTION_DAYS=14
+
+# ===== 读取数据库密码 =====
+ENV_FILE="/home/deploy/xixiong-saas/.env.production"
+if [ ! -f "$ENV_FILE" ]; then
+  ENV_FILE="/var/www/xixiong-saas/.env.production"
+fi
+if [ ! -f "$ENV_FILE" ]; then
+  echo "ERROR: .env.production not found"
+  exit 1
+fi
+
+# Extract user and password from DATABASE_URL
+# Format: postgresql://user:password@host:port/db?schema=public
+DB_URL=$(grep "^DATABASE_URL=" "$ENV_FILE" | sed 's/DATABASE_URL="//' | sed 's/"$//')
+DB_USER=$(echo "$DB_URL" | sed 's|postgresql://\([^:]*\):.*|\1|')
+DB_PASS=$(echo "$DB_URL" | sed 's|postgresql://[^:]*:\(.*\)@.*|\1|')
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${DATE}.sql.gz"
 
@@ -23,7 +38,7 @@ mkdir -p "$BACKUP_DIR"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 开始备份 ${DB_NAME}..."
 
 # ===== pg_dump =====
-pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
+PGPASSWORD="$DB_PASS" pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
   --format=plain \
   --no-owner \
   --no-privileges \
