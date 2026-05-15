@@ -77,6 +77,40 @@ export default function DashboardPage() {
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
+  // Fetch dashboard data
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const res = await fetch("/api/dashboard/summary");
+      if (res.status === 401) {
+        setLoginRequired(true);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setDashboard(data);
+    } catch (e) {
+      console.error("Failed to fetch dashboard:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch tasks
+  const fetchTasks = useCallback(async (filter = "pending") => {
+    setTaskLoading(true);
+    try {
+      const res = await fetch(`/api/tasks?status=${filter}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTasks(data.tasks);
+      }
+    } catch (e) {
+      console.error("Failed to fetch tasks:", e);
+    } finally {
+      setTaskLoading(false);
+    }
+  }, []);
+
   // Fetch rewards
   const fetchRewards = useCallback(async () => {
     try {
@@ -123,7 +157,6 @@ export default function DashboardPage() {
         setUserPoints(data.remainingPoints);
         fetchRewards();
         fetchMyRewards();
-        // Refresh dashboard points
         fetchDashboard();
       } else {
         setToast({ message: data.error || "兑换失败", type: "error" });
@@ -142,40 +175,6 @@ export default function DashboardPage() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-
-  // Fetch dashboard data
-  const fetchDashboard = useCallback(async () => {
-    try {
-      const res = await fetch("/api/dashboard/summary");
-      if (res.status === 401) {
-        setLoginRequired(true);
-        setLoading(false);
-        return;
-      }
-      const data = await res.json();
-      setDashboard(data);
-    } catch (e) {
-      console.error("Failed to fetch dashboard:", e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch tasks
-  const fetchTasks = useCallback(async (filter = "pending") => {
-    setTaskLoading(true);
-    try {
-      const res = await fetch(`/api/tasks?status=${filter}`);
-      if (res.ok) {
-        const data = await res.json();
-        setTasks(data.tasks);
-      }
-    } catch (e) {
-      console.error("Failed to fetch tasks:", e);
-    } finally {
-      setTaskLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     fetchDashboard();
