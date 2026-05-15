@@ -66,6 +66,11 @@ export async function POST(req: NextRequest) {
       });
 
       // Create user reward
+      const now = new Date();
+      const expiresAt = rewardItem.rewardType === "member_trial"
+        ? new Date(now.getTime() + rewardItem.rewardValue * 24 * 60 * 60 * 1000)
+        : null;
+
       const userReward = await tx.userReward.create({
         data: {
           userId,
@@ -73,11 +78,30 @@ export async function POST(req: NextRequest) {
           rewardType: rewardItem.rewardType,
           rewardValue: rewardItem.rewardValue,
           status: "active",
-          expiresAt: rewardItem.rewardType === "member_trial"
-            ? new Date(Date.now() + rewardItem.rewardValue * 24 * 60 * 60 * 1000)
-            : null,
+          expiresAt,
         },
       });
+
+      // Auto-upgrade for member_trial: set role to member and update memberUntil
+      if (rewardItem.rewardType === "member_trial" && expiresAt) {
+        const currentUser = await tx.user.findUnique({
+          where: { id: userId },
+          select: { memberUntil: true, role: true },
+        });
+
+        // Calculate new memberUntil: extend from current expiry or now
+        const currentExpiry = currentUser?.memberUntil;
+        const baseDate = (currentExpiry && currentExpiry > now) ? currentExpiry : now;
+        const newMemberUntil = new Date(baseDate.getTime() + rewardItem.rewardValue * 24 * 60 * 60 * 1000);
+
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            role: "member",
+            memberUntil: newMemberUntil,
+          },
+        });
+      }
 
       // Write point ledger
       await tx.pointLedger.create({

@@ -1,50 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+// GET /api/admin/users - Admin: list users with search
+// PATCH /api/admin/users/[id] - Admin: adjust role/points
 
-// GET /api/admin/users - 获取用户列表
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+// GET - list users
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
-    return NextResponse.json({ error: '未授权' }, { status: 403 });
-  }
+  if (!session?.user?.id) return NextResponse.json({ error: "未登录" }, { status: 401 });
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
+  if (!user || user.role !== "admin") return NextResponse.json({ error: "无权限" }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '20');
-  const search = searchParams.get('search') || '';
-  const status = searchParams.get('status');
+  const search = searchParams.get("search") || "";
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("pageSize") || "20", 10)));
 
-  const skip = (page - 1) * limit;
-
-  const where: any = {};
+  const where: Record<string, unknown> = {};
   if (search) {
-    where.OR = [
-      { name: { contains: search } },
-      { email: { contains: search } },
-    ];
+    where.email = { contains: search, mode: "insensitive" as const };
   }
-  if (status === 'active') where.role = 'admin';
-  if (status === 'inactive') where.role = 'user';
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
-        name: true,
         email: true,
+        name: true,
         role: true,
+        points: true,
+        memberUntil: true,
         createdAt: true,
-        _count: {
-          select: {
-            links: true,
-            ownedWorkspaces: true,
-          },
-        },
+        updatedAt: true,
+        _count: { select: { userRewards: true, pointLedgers: true } },
       },
     }),
     prisma.user.count({ where }),
@@ -52,34 +46,6 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     users,
-    total,
-    page,
-    totalPages: Math.ceil(total / limit),
+    pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
   });
-}
-
-// PATCH /api/admin/users/[id] - 更新用户状态
-export async function PATCH(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
-    return NextResponse.json({ error: '未授权' }, { status: 403 });
-  }
-
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get('id');
-  if (!id) {
-    return NextResponse.json({ error: '缺少用户ID' }, { status: 400 });
-  }
-
-  const body = await req.json();
-  const { role } = body;
-
-  const user = await prisma.user.update({
-    where: { id },
-    data: {
-      ...(role && { role }),
-    },
-  });
-
-  return NextResponse.json({ success: true, user });
 }

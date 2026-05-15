@@ -17,6 +17,7 @@ model User {
   points               Int                @default(0)       // 积分缓存
   checkinStreak        Int                @default(0)       // 连续签到天数
   lastCheckinDate      String?            // 最后一次签到日期 YYYY-MM-DD
+  memberUntil          DateTime?          // 会员体验到期时间
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   accounts             Account[]
@@ -639,3 +640,5 @@ model UserReward {
   @@index([expiresAt])
   @@map("user_rewards")
 }
+
+// NOTE: Adding memberUntil field to User model

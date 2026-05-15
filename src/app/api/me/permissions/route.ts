@@ -19,10 +19,15 @@ export async function GET() {
     try {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { points: true },
+        select: { points: true, role: true, memberUntil: true },
       });
       if (user) {
-        pointsInfo = { points: user.points };
+        const isMember = user.role === "member" && user.memberUntil && user.memberUntil > new Date();
+        pointsInfo = {
+          points: user.points,
+          memberUntil: isMember ? user.memberUntil.toISOString() : null,
+          isMember,
+        };
       }
     } catch {
       // Ignore errors

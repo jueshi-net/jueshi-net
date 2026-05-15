@@ -82,3 +82,49 @@ function getTZOffsetString(timeZone: string): string {
   const absHours = Math.abs(hours);
   return `${sign}${absHours.toString().padStart(2, "0")}:00`;
 }
+
+/**
+ * Returns [start, end) Date range for the current week (Sunday-Saturday) in the configured timezone.
+ */
+export function getVancouverWeekRange(): { start: Date; end: Date } {
+  const today = getTodayVancouverDate();
+  const dayOfWeek = today.getDay(); // 0=Sunday
+  const start = new Date(today);
+  start.setDate(today.getDate() - dayOfWeek);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 7);
+  return { start: utcDate(start), end: utcDate(end) };
+}
+
+/**
+ * Returns [start, end) Date range for the current month in the configured timezone.
+ */
+export function getVancouverMonthRange(): { start: Date; end: Date } {
+  const today = getTodayVancouverDate();
+  const start = new Date(today.getFullYear(), today.getMonth(), 1);
+  const end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+  return { start: utcDate(start), end: utcDate(end) };
+}
+
+/**
+ * Alias for getTodayRange (backward compatible).
+ */
+export function getVancouverDateRange(): { start: Date; end: Date } {
+  return getTodayRange();
+}
+
+/**
+ * Get today's date as a Date object in Vancouver timezone (midnight local).
+ */
+function getTodayVancouverDate(): Date {
+  const dateKey = getTodayDateKey(); // YYYY-MM-DD
+  const [y, m, d] = dateKey.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/**
+ * Convert a local date to a UTC Date for DB comparison.
+ */
+function utcDate(d: Date): Date {
+  return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+}

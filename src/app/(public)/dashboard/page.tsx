@@ -77,6 +77,9 @@ export default function DashboardPage() {
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
+  // Member state
+  const [memberInfo, setMemberInfo] = useState<{ isMember: boolean; memberUntil: string | null } | null>(null);
+
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
     try {
@@ -88,6 +91,17 @@ export default function DashboardPage() {
       }
       const data = await res.json();
       setDashboard(data);
+
+      // Fetch member info
+      try {
+        const permRes = await fetch("/api/me/permissions");
+        if (permRes.ok) {
+          const permData = await permRes.json();
+          setMemberInfo({ isMember: permData.isMember || false, memberUntil: permData.memberUntil || null });
+        }
+      } catch {
+        // Ignore
+      }
     } catch (e) {
       console.error("Failed to fetch dashboard:", e);
     } finally {
@@ -354,6 +368,47 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Member Benefits Card */}
+      {memberInfo && (
+        <div className={`rounded-xl border p-4 ${memberInfo.isMember ? "bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200" : "bg-white"}`}>
+          <div className="flex items-start gap-3">
+            {memberInfo.isMember ? (
+              <>
+                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold text-amber-900">会员权益已激活</div>
+                  {memberInfo.memberUntil && (
+                    <div className="text-sm text-amber-700 mt-1">
+                      会员有效期至 {new Date(memberInfo.memberUntil).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
+                    </div>
+                  )}
+                  <div className="text-sm text-amber-600 mt-2">
+                    你已解锁：签到双倍积分、Logo 上传、会员模板、去品牌、更多导出权益
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-5 h-5 text-gray-400" />
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-900">开通会员，解锁更多权益</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    使用积分兑换会员体验券，享受签到双倍积分、Logo 上传、会员模板等权益
+                  </div>
+                  <div className="mt-2 text-sm">
+                    <span className="text-blue-600">可用积分兑换 →</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Tasks */}
       <div className="bg-white rounded-xl border p-4">
         <div className="flex items-center justify-between mb-3">
@@ -472,10 +527,15 @@ export default function DashboardPage() {
 
       {/* Recent Point Logs */}
       <div className="bg-white rounded-xl border p-4">
-        <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
-          <Star className="w-5 h-5 text-amber-500" />
-          积分记录
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Star className="w-5 h-5 text-amber-500" />
+            积分记录
+          </h2>
+          <Link href="/dashboard/points" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+            查看全部 →
+          </Link>
+        </div>
         {dashboard.recentLogs.length === 0 ? (
           <div className="text-center text-gray-400 py-4 text-sm">暂无积分记录</div>
         ) : (
