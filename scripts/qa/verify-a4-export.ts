@@ -1,5 +1,5 @@
 // Verify A4 export renderer produces correct HTML
-import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT } from '../../src/lib/documents/a4-export-renderer.js';
+import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT } from '../../src/lib/documents/a4-export-renderer';
 
 const html = buildA4ExportHTML({
   companyName: '深圳海外贸易有限公司',
@@ -87,7 +87,7 @@ for (const [label, pattern] of checks) {
 }
 
 console.log('\n=== Label Export Test ===');
-import { buildLabelA4ExportHTML } from '../../src/lib/labels/a4-export-renderer.js';
+import { buildLabelA4ExportHTML } from '../../src/lib/labels/a4-export-renderer';
 
 const labelHtml = buildLabelA4ExportHTML({
   type: 'shipping-mark',
