@@ -22,11 +22,11 @@ export async function GET() {
         select: { points: true, role: true, memberUntil: true },
       });
       if (user) {
-        const isMember = user.role === "member" && user.memberUntil && user.memberUntil > new Date();
+        const hasActiveMembership = user.role === "member" && user.memberUntil !== null && user.memberUntil > new Date();
         pointsInfo = {
           points: user.points,
-          memberUntil: isMember ? user.memberUntil.toISOString() : null,
-          isMember,
+          memberUntil: hasActiveMembership && user.memberUntil ? user.memberUntil.toISOString() : null,
+          isMember: hasActiveMembership,
         };
       }
     } catch {
