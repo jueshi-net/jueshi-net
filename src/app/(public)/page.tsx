@@ -118,8 +118,8 @@ export default async function LandingPage() {
     { title: "我要做单据 / 面单", href: "/tools/documents", icon: FileText, gradient: "from-purple-500 to-indigo-700", desc: "发票、报价单、装箱单、唛头、快递面单，一站生成", isPortal: true },
     { title: "我要算运费", href: "/tools/shipping-calculator", icon: Calculator, gradient: "from-emerald-500 to-green-700", desc: "体积重计算 / 集运估算 / CBM" },
     { title: "我要查邮编地址", href: "/tools/postal-code", icon: MapPin, gradient: "from-orange-500 to-amber-700", desc: "全球邮编 / 地址格式 / 偏远地区" },
-    { title: "我要找海外资源", href: "/resources", icon: BookOpen, gradient: "from-teal-500 to-cyan-700", desc: "生活办事 / 银行学校 / 网盘资料" },
-    { title: "我要了解跨境寄送", href: "/shipping", icon: Globe, gradient: "from-red-500 to-rose-700", desc: "运费估算 / 敏感货参考 / 寄送指南" },
+    { title: "我要出海做生意", href: "/business", icon: Briefcase, gradient: "from-cyan-500 to-blue-700", desc: "建站、收款、物流、获客、工具导航" },
+    { title: "我要学习 AI", href: "/ai-learning", icon: Zap, gradient: "from-violet-500 to-purple-700", desc: "AI工具、教程、资料库、实用导航" },
   ];
 
   // Sub-entries for the merged documents card
