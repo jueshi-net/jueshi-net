@@ -139,11 +139,11 @@ export default function DocumentEditorPage() {
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
-  // ---- PNG Export: Fixed A4 canvas engine v1.12.8 ----
+  // ---- PNG Export: Fixed A4 canvas engine v1.12.8 (div-based, Safari-compatible) ----
   const handleExportPNG = useCallback(async () => {
     setExporting(true);
     try {
-      // Build A4 HTML using the dedicated renderer (pure inline CSS, NO Tailwind)
+      // Build A4 HTML using the dedicated renderer
       const html = buildA4ExportHTML({
         companyName: companyProfile?.companyName || formData.companyName || '公司名称',
         companyNameEn: companyProfile?.companyNameEn || formData.companyNameEn || '',
@@ -179,53 +179,63 @@ export default function DocumentEditorPage() {
         },
       });
 
-      // Create hidden iframe with EXPLICIT fixed A4 width
-      const container = exportContainerRef.current;
-      if (!container) throw new Error('export container not found');
-      container.innerHTML = '';
-      const iframe = document.createElement('iframe');
-      // Must NOT be display:none / visibility:hidden / opacity:0
-      // Use position:absolute offscreen
-      iframe.style.cssText = `position:absolute; left:-10000px; top:0; width:${A4_WIDTH}px; height:${A4_HEIGHT + 200}px; border:0;`;
-      container.appendChild(iframe);
+      // Create a temporary DIV (not iframe) appended to document.body
+      // This avoids Safari's iframe rendering inconsistencies
+      const tempDiv = document.createElement('div');
+      // CRITICAL: Must NOT use display:none, visibility:hidden, or opacity:0
+      // Use offscreen positioning with EXPLICIT fixed width
+      tempDiv.style.cssText = `
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: ${A4_WIDTH}px !important;
+        min-width: ${A4_WIDTH}px !important;
+        max-width: ${A4_WIDTH}px !important;
+        z-index: -99999 !important;
+        pointer-events: none !important;
+      `;
+      // Move it offscreen by translating up (html2canvas still renders it)
+      tempDiv.style.transform = 'translateY(-10000px)';
+      document.body.appendChild(tempDiv);
 
-      // Load the A4 HTML into iframe
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('iframe load timeout')), 10000);
-        iframe.onload = () => { clearTimeout(timeout); resolve(); };
-        iframe.onerror = () => { clearTimeout(timeout); reject(new Error('iframe load error')); };
-        iframe.srcdoc = html;
-      });
+      // Load the A4 HTML
+      tempDiv.innerHTML = html;
 
-      // Wait for content to fully render
+      // Wait for content to render
       await new Promise(r => setTimeout(r, 500));
 
       const html2canvas = (await import('html2canvas')).default;
-      // Capture the .a4-page element INSIDE the iframe (NOT the body)
-      const a4Page = iframe.contentDocument?.querySelector('.a4-page');
-      if (!a4Page) throw new Error('A4 page element not found in iframe');
+      
+      // Find the .a4-page element
+      const a4Page = tempDiv.querySelector('.a4-page') as HTMLElement;
+      if (!a4Page) throw new Error('A4 page element not found in temp div');
 
-      const canvas = await html2canvas(a4Page as HTMLElement, {
+      // Verify the element has correct dimensions before capturing
+      const rect = a4Page.getBoundingClientRect();
+      console.log(`[PNG Export] .a4-page rect: ${rect.width}×${rect.height}`);
+
+      // Capture WITHOUT width/height params - let the element's natural size determine it
+      const canvas = await html2canvas(a4Page, {
         backgroundColor: '#ffffff',
         scale: A4_EXPORT_SCALE,
         useCORS: true,
         logging: false,
         allowTaint: true,
-        // CRITICAL: Fixed viewport dimensions — prevents mobile-width squishing
-        width: A4_WIDTH,
-        height: A4_HEIGHT,
-        windowWidth: A4_WIDTH,
-        windowHeight: A4_HEIGHT,
+        // NO width/height/windowWidth/windowHeight — let the div's CSS width control it
         foreignObjectRendering: false,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
       });
 
-      container.removeChild(iframe);
+      document.body.removeChild(tempDiv);
 
       // Verify dimensions
       const cw = canvas.width;
       const ch = canvas.height;
       const ratio = cw / ch;
-      console.log(`[PNG Export] Canvas size: ${cw}×${ch}, ratio: ${ratio.toFixed(3)} (expected ~0.707)`);
+      console.log(`[PNG Export] Canvas: ${cw}×${ch}, ratio: ${ratio.toFixed(3)} (target ~0.707)`);
 
       // Download
       const link = document.createElement('a');
@@ -234,7 +244,9 @@ export default function DocumentEditorPage() {
       link.click();
     } catch (error) {
       console.error('PNG export failed:', error);
-      if (exportContainerRef.current) exportContainerRef.current.innerHTML = '';
+      // Cleanup if something went wrong
+      const tempDiv = document.querySelector('[style*="translateY(-10000px)"]');
+      if (tempDiv && tempDiv.parentNode) document.body.removeChild(tempDiv);
       alert('导出图片失败：' + (error instanceof Error ? error.message : '未知错误') + '。请尝试使用浏览器打印功能导出 PDF。');
     } finally {
       setExporting(false);

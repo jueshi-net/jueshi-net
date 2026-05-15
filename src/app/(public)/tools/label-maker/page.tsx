@@ -62,7 +62,7 @@ export default function LabelMakerPage() {
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
-  // PNG export: Fixed A4 canvas engine v1.12.8
+  // PNG export: Fixed A4 canvas engine v1.12.8 (div-based, Safari-compatible)
   const handleExportPNG = useCallback(async () => {
     setExporting(true);
     try {
@@ -76,32 +76,38 @@ export default function LabelMakerPage() {
         showQrCode: template?.showQrCode,
         canRemoveBranding: canRemoveLabelBranding(),
       });
-      const container = exportContainerRef.current;
-      if (!container) throw new Error('export container not found');
-      container.innerHTML = '';
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = `position:absolute; left:-10000px; top:0; width:${A4_WIDTH}px; height:${A4_HEIGHT + 200}px; border:0;`;
-      container.appendChild(iframe);
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('iframe load timeout')), 10000);
-        iframe.onload = () => { clearTimeout(timeout); resolve(); };
-        iframe.onerror = () => { clearTimeout(timeout); reject(new Error('iframe load error')); };
-        iframe.srcdoc = html;
-      });
+
+      const tempDiv = document.createElement('div');
+      tempDiv.style.cssText = `
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: ${A4_WIDTH}px !important;
+        min-width: ${A4_WIDTH}px !important;
+        max-width: ${A4_WIDTH}px !important;
+        z-index: -99999 !important;
+        pointer-events: none !important;
+      `;
+      tempDiv.style.transform = 'translateY(-10000px)';
+      document.body.appendChild(tempDiv);
+      tempDiv.innerHTML = html;
       await new Promise(r => setTimeout(r, 500));
 
       const html2canvas = (await import('html2canvas')).default;
-      const a4Page = iframe.contentDocument?.querySelector('.a4-page');
-      if (!a4Page) throw new Error('A4 page element not found in iframe');
-      const canvas = await html2canvas(a4Page as HTMLElement, {
+      const a4Page = tempDiv.querySelector('.a4-page') as HTMLElement;
+      if (!a4Page) throw new Error('A4 page element not found in temp div');
+
+      const rect = a4Page.getBoundingClientRect();
+      console.log(`[Label PNG Export] .a4-page rect: ${rect.width}×${rect.height}`);
+
+      const canvas = await html2canvas(a4Page, {
         backgroundColor: '#ffffff', scale: A4_EXPORT_SCALE, useCORS: true, logging: false, allowTaint: true,
-        width: A4_WIDTH, height: A4_HEIGHT, windowWidth: A4_WIDTH, windowHeight: A4_HEIGHT,
-        foreignObjectRendering: false,
+        foreignObjectRendering: false, scrollX: 0, scrollY: 0, x: 0, y: 0,
       });
-      container.removeChild(iframe);
+      document.body.removeChild(tempDiv);
 
       const cw = canvas.width; const ch = canvas.height;
-      console.log(`[Label PNG Export] Canvas size: ${cw}×${ch}, ratio: ${(cw/ch).toFixed(3)}`);
+      console.log(`[Label PNG Export] Canvas: ${cw}×${ch}, ratio: ${(cw/ch).toFixed(3)}`);
 
       const now = new Date();
       const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
@@ -111,12 +117,13 @@ export default function LabelMakerPage() {
       link.click();
     } catch (error: any) {
       console.error('Label PNG export failed:', error);
-      if (exportContainerRef.current) exportContainerRef.current.innerHTML = '';
+      const tempDiv = document.querySelector('[style*="translateY(-10000px)"]');
+      if (tempDiv && tempDiv.parentNode) document.body.removeChild(tempDiv);
       alert(`导出失败：${error?.message || '未知错误'}，请尝试使用浏览器打印功能导出 PDF。`);
     } finally {
       setExporting(false);
     }
-  }, [exportContainerRef, selectedType, labelType, formData, style, template]);
+  }, [selectedType, labelType, formData, style, template]);
 
   const addBatchItem = () => {
     const limit = getLabelBatchLimit();
