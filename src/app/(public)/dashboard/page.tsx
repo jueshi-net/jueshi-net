@@ -1,103 +1,444 @@
-import { Metadata } from 'next';
-import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Star, Clock, FileText, Wrench, ArrowRight, PackageSearch, Calculator, FileText as FileTextIcon, MapPin } from 'lucide-react';
+"use client";
 
-export const metadata: Metadata = {
-  title: '我的工作台 - 海外百宝箱',
-  description: '查看我的收藏、最近使用工具和备忘录',
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
+import {
+  CalendarCheck, Star, CheckCircle, Plus, Trash2, Clock,
+  FileText, Tag, MapPin, Truck, StickyNote, ChevronDown,
+  ArrowUpCircle, ArrowDownCircle, MinusCircle,
+} from "lucide-react";
+
+// Types
+interface DashboardData {
+  role: string;
+  points: number;
+  checkinStreak: number;
+  checkedInToday: boolean;
+  todayEarned: number;
+  todayLogCount: number;
+  dailyPointCap: number;
+  taskStats: { pending: number; done: number; archived: number; total: number };
+  recentLogs: { id: string; type: string; points: number; reason: string | null; createdAt: string }[];
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  category: string | null;
+  dueDate: string | null;
+  pointsAwarded: boolean;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+const POINT_TYPE_LABELS: Record<string, string> = {
+  daily_checkin: "每日签到",
+  task_complete: "完成任务",
+  export_word: "导出 Word",
+  admin_adjust: "管理员调整",
+  reward_redeem: "权益兑换",
 };
 
-export default async function DashboardPage() {
-  const session = await auth();
-  if (!session?.user) {
-    redirect('/login?callbackUrl=/dashboard');
+const PRIORITY_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
+  high: { label: "高", color: "text-red-500", icon: <ArrowUpCircle className="w-3 h-3" /> },
+  normal: { label: "中", color: "text-yellow-500", icon: <MinusCircle className="w-3 h-3" /> },
+  low: { label: "低", color: "text-green-500", icon: <ArrowDownCircle className="w-3 h-3" /> },
+};
+
+const SHORTCUTS = [
+  { label: "单据生成", href: "/tools/documents", icon: <FileText className="w-5 h-5" /> },
+  { label: "唛头面单", href: "/tools/label-maker", icon: <Tag className="w-5 h-5" /> },
+  { label: "邮编查询", href: "/tools/postal-code", icon: <MapPin className="w-5 h-5" /> },
+  { label: "物流查询", href: "/tracking", icon: <Truck className="w-5 h-5" /> },
+  { label: "Memo", href: "/tools/memo", icon: <StickyNote className="w-5 h-5" /> },
+];
+
+export default function DashboardPage() {
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [taskLoading, setTaskLoading] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [taskFilter, setTaskFilter] = useState("pending");
+  const [checkingIn, setCheckingIn] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
+  const [taskCapReached, setTaskCapReached] = useState(false);
+  const [loginRequired, setLoginRequired] = useState(false);
+
+  // Fetch dashboard data
+  const fetchDashboard = useCallback(async () => {
+    try {
+      const res = await fetch("/api/dashboard/summary");
+      if (res.status === 401) {
+        setLoginRequired(true);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setDashboard(data);
+    } catch (e) {
+      console.error("Failed to fetch dashboard:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Fetch tasks
+  const fetchTasks = useCallback(async (filter = "pending") => {
+    setTaskLoading(true);
+    try {
+      const res = await fetch(`/api/tasks?status=${filter}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTasks(data.tasks);
+      }
+    } catch (e) {
+      console.error("Failed to fetch tasks:", e);
+    } finally {
+      setTaskLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchTasks(taskFilter);
+  }, [fetchDashboard, fetchTasks, taskFilter]);
+
+  // Check-in handler
+  const handleCheckIn = useCallback(async () => {
+    setCheckingIn(true);
+    try {
+      const res = await fetch("/api/checkin", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        // Refresh dashboard
+        fetchDashboard();
+      } else if (res.status === 409) {
+        // Already checked in
+        fetchDashboard();
+      }
+    } catch (e) {
+      console.error("Check-in failed:", e);
+    } finally {
+      setCheckingIn(false);
+    }
+  }, [fetchDashboard]);
+
+  // Create task
+  const handleCreateTask = useCallback(async () => {
+    if (!newTaskTitle.trim()) return;
+    try {
+      const res = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTaskTitle.trim() }),
+      });
+      if (res.ok) {
+        setNewTaskTitle("");
+        fetchTasks(taskFilter);
+      }
+    } catch (e) {
+      console.error("Create task failed:", e);
+    }
+  }, [newTaskTitle, taskFilter, fetchTasks]);
+
+  // Complete task
+  const handleCompleteTask = useCallback(async (id: string) => {
+    setCompletingId(id);
+    try {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "done" }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // Check daily cap
+        if (data.pointsEarned > 0) {
+          if (data.dailyTaskPointsRemaining <= 0) {
+            setTaskCapReached(true);
+          }
+          fetchDashboard();
+        }
+        fetchTasks(taskFilter);
+      }
+    } catch (e) {
+      console.error("Complete task failed:", e);
+    } finally {
+      setCompletingId(null);
+    }
+  }, [taskFilter, fetchTasks, fetchDashboard]);
+
+  // Delete/archive task
+  const handleDeleteTask = useCallback(async (id: string) => {
+    try {
+      const res = await fetch(`/api/tasks/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchTasks(taskFilter);
+      }
+    } catch (e) {
+      console.error("Delete task failed:", e);
+    }
+  }, [taskFilter, fetchTasks]);
+
+  // Format time
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 flex items-center justify-center min-h-[50vh]">
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
   }
 
-  const tools = [
-    { name: "物流追踪", href: "/tracking", icon: PackageSearch, color: "bg-blue-100 text-blue-600" },
-    { name: "体积计算", href: "/tools/shipping-calculator", icon: Calculator, color: "bg-green-100 text-green-600" },
-    { name: "发票生成", href: "/tools/invoice", icon: FileTextIcon, color: "bg-purple-100 text-purple-600" },
-    { name: "邮编查询", href: "/tools/postal-code", icon: MapPin, color: "bg-orange-100 text-orange-600" },
-  ];
+  // Login required
+  if (loginRequired) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <div className="text-6xl mb-6">🔐</div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-3">请先登录</h1>
+        <p className="text-gray-600 mb-6">工作台和积分功能需要登录后使用</p>
+        <Link href="/login" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
+          前往登录
+        </Link>
+      </div>
+    );
+  }
+
+  if (!dashboard) return null;
+
+  const roleLabels: Record<string, string> = { guest: "游客", user: "用户", member: "会员", admin: "管理员" };
+  const roleColors: Record<string, string> = { guest: "bg-gray-100 text-gray-600", user: "bg-blue-100 text-blue-700", member: "bg-amber-100 text-amber-700", admin: "bg-purple-100 text-purple-700" };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-slate-700 via-slate-800 to-gray-900 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">我的工作台</h1>
-          <p className="text-slate-300">欢迎回来，{session.user.name || '用户'}</p>
+    <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">我的工作台</h1>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium ${roleColors[dashboard.role] || "bg-gray-100 text-gray-600"}`}>
+          {roleLabels[dashboard.role] || dashboard.role}
+        </span>
+      </div>
+
+      {/* Top Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="bg-white rounded-xl border p-4 text-center">
+          <div className="text-3xl font-bold text-amber-500">{dashboard.points}</div>
+          <div className="text-xs text-gray-500 mt-1">当前积分</div>
+        </div>
+        <div className="bg-white rounded-xl border p-4 text-center">
+          <div className="text-3xl font-bold text-green-500">+{dashboard.todayEarned}</div>
+          <div className="text-xs text-gray-500 mt-1">今日获得</div>
+        </div>
+        <div className="bg-white rounded-xl border p-4 text-center">
+          <div className="text-3xl font-bold text-blue-500">{dashboard.dailyPointCap}</div>
+          <div className="text-xs text-gray-500 mt-1">每日上限</div>
+        </div>
+        <div className="bg-white rounded-xl border p-4 text-center">
+          <div className="text-3xl font-bold text-orange-500">{dashboard.checkinStreak}</div>
+          <div className="text-xs text-gray-500 mt-1">连续签到</div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Stats cards */}
-          <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Star className="w-6 h-6 text-amber-600" />
-            </div>
+      {/* Check-in Card */}
+      <div className="bg-white rounded-xl border p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CalendarCheck className={`w-6 h-6 ${dashboard.checkedInToday ? "text-green-500" : "text-gray-400"}`} />
             <div>
-              <p className="text-2xl font-bold text-gray-900">0</p>
-              <p className="text-sm text-gray-500">我的收藏</p>
+              <div className="font-medium text-gray-900">
+                {dashboard.checkedInToday ? "今日已签到" : "每日签到"}
+              </div>
+              <div className="text-sm text-gray-500">
+                {dashboard.checkedInToday
+                  ? "明天再来签到吧"
+                  : `${dashboard.role === "member" || dashboard.role === "admin" ? "+10" : "+5"} 积分`}
+              </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">4</p>
-              <p className="text-sm text-gray-500">最近使用</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm border p-5 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">0</p>
-              <p className="text-sm text-gray-500">备忘录</p>
-            </div>
+          {!dashboard.checkedInToday && (
+            <button
+              onClick={handleCheckIn}
+              disabled={checkingIn}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 text-sm font-medium"
+            >
+              {checkingIn ? "签到中..." : "签到"}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Tasks */}
+      <div className="bg-white rounded-xl border p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-blue-500" />
+            我的待办
+          </h2>
+          <div className="flex gap-1">
+            {(["pending", "done", "archived"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setTaskFilter(f)}
+                className={`px-2 py-1 text-xs rounded-md transition-colors ${taskFilter === f ? "bg-blue-100 text-blue-700" : "text-gray-500 hover:bg-gray-100"}`}
+              >
+                {f === "pending" ? `待办 (${dashboard.taskStats.pending})` : f === "done" ? "已完成" : "归档"}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Quick tools */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-900">常用工具</h2>
-            <Link href="/tools" className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1">
-              查看全部 <ArrowRight className="w-4 h-4" />
-            </Link>
+        {/* New task input */}
+        {taskFilter === "pending" && (
+          <div className="flex gap-2 mb-3">
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreateTask()}
+              placeholder="输入新任务，按回车添加..."
+              className="flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handleCreateTask}
+              disabled={!newTaskTitle.trim()}
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {tools.map((t) => {
-              const Icon = t.icon;
+        )}
+
+        {/* Daily cap warning */}
+        {taskFilter === "pending" && taskCapReached && (
+          <div className="mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+            今日任务积分已达上限（20/20），仍可继续完成任务但不再加分
+          </div>
+        )}
+
+        {/* Task list */}
+        {taskLoading ? (
+          <div className="text-center text-gray-500 py-4">加载中...</div>
+        ) : tasks.length === 0 ? (
+          <div className="text-center text-gray-400 py-6 text-sm">
+            {taskFilter === "pending" ? "暂无待办任务" : taskFilter === "done" ? "暂无已完成任务" : "暂无归档任务"}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {tasks.map((task) => {
+              const prio = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.normal;
               return (
-                <Link key={t.href} href={t.href} className="flex items-center gap-3 p-4 rounded-lg border hover:border-blue-300 hover:bg-blue-50 transition-all">
-                  <div className={`w-10 h-10 rounded-lg ${t.color} flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
+                <div
+                  key={task.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                    task.status === "done" ? "bg-gray-50" : "bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  {task.status === "pending" && (
+                    <button
+                      onClick={() => handleCompleteTask(task.id)}
+                      disabled={completingId === task.id}
+                      className="w-5 h-5 border-2 border-gray-300 rounded flex-shrink-0 hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50"
+                      title="标记完成"
+                    />
+                  )}
+                  {task.status === "done" && (
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                  )}
+                  {task.status === "archived" && (
+                    <Clock className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  )}
+
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-sm font-medium ${task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}`}>
+                      {task.title}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`text-xs ${prio.color} flex items-center gap-0.5`}>
+                        {prio.icon}{prio.label}
+                      </span>
+                      {task.pointsAwarded && task.status === "done" && (
+                        <span className="text-xs text-green-600 flex items-center gap-0.5">
+                          <Star className="w-3 h-3" />+2
+                        </span>
+                      )}
+                      {task.dueDate && (
+                        <span className="text-xs text-gray-400">截止 {new Date(task.dueDate).toLocaleDateString("zh-CN")}</span>
+                      )}
+                    </div>
                   </div>
-                  <span className="font-medium text-gray-900">{t.name}</span>
-                </Link>
+
+                  {task.status !== "archived" && (
+                    <button
+                      onClick={() => handleDeleteTask(task.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                      title={task.status === "done" ? "归档" : "删除"}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">最近活动</h2>
-          <div className="text-center py-8 text-gray-400">
-            <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>暂无活动记录</p>
-            <p className="text-sm mt-1">开始使用工具后，这里会显示您的最近记录</p>
+      {/* Recent Point Logs */}
+      <div className="bg-white rounded-xl border p-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+          <Star className="w-5 h-5 text-amber-500" />
+          积分记录
+        </h2>
+        {dashboard.recentLogs.length === 0 ? (
+          <div className="text-center text-gray-400 py-4 text-sm">暂无积分记录</div>
+        ) : (
+          <div className="space-y-2">
+            {dashboard.recentLogs.map((log) => (
+              <div key={log.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600">{POINT_TYPE_LABELS[log.type] || log.type}</span>
+                  {log.reason && log.reason !== POINT_TYPE_LABELS[log.type] && (
+                    <span className="text-xs text-gray-400">{log.reason}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-sm font-medium ${log.points > 0 ? "text-green-600" : "text-red-600"}`}>
+                    {log.points > 0 ? "+" : ""}{log.points}
+                  </span>
+                  <span className="text-xs text-gray-400">{formatTime(log.createdAt)}</span>
+                </div>
+              </div>
+            ))}
           </div>
+        )}
+      </div>
+
+      {/* Quick Shortcuts */}
+      <div className="bg-white rounded-xl border p-4">
+        <h2 className="font-semibold text-gray-900 mb-3">常用工具</h2>
+        <div className="grid grid-cols-5 gap-3">
+          {SHORTCUTS.map((s) => (
+            <Link
+              key={s.href}
+              href={s.href}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+            >
+              <span className="text-blue-600">{s.icon}</span>
+              <span className="text-xs text-gray-600">{s.label}</span>
+            </Link>
+          ))}
         </div>
       </div>
     </div>
   );
 }
-
-export const dynamic = 'force-dynamic';

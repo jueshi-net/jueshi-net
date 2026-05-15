@@ -6,11 +6,28 @@
 import { NextResponse } from "next/server";
 import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await auth();
   const role = await getCurrentUserRole();
   const limits = getUserLimits(role);
+
+  // Get points info (optional, don't break if fails)
+  let pointsInfo = {};
+  if (session?.user?.id) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { points: true },
+      });
+      if (user) {
+        pointsInfo = { points: user.points };
+      }
+    } catch {
+      // Ignore errors
+    }
+  }
 
   return NextResponse.json({
     authenticated: !!session?.user,
@@ -26,5 +43,6 @@ export async function GET() {
       canExportWord: limits.canExportWord,
       wordExportDailyLimit: limits.canExportWordDailyLimit,
     },
+    ...pointsInfo,
   });
 }
