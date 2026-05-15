@@ -1,5 +1,23 @@
-// 会员权限层
-// 控制各功能的会员/非会员访问权限
+// ⚠️ DEPRECATED — localStorage-based permissions (UI-only, NOT trusted)
+//
+// This module reads role from localStorage.bxb_role for UI display purposes only.
+// It is NOT used for any real permission checks in production.
+// Server-side permissions are in src/lib/auth/permissions.ts (DB-verified).
+// Client-side hooks are in src/lib/auth/client-permissions.ts (API-fetched).
+//
+// localStorage role is a dev/demo tool — any user can set it in the browser console.
+// All real permission checks must go through the server API.
+//
+// Files still using this module (UI-only, non-critical):
+// - tools/documents/drafts/page.tsx (draft count display)
+// - tools/documents/settings/role-switcher/page.tsx (dev role-switching tool)
+//
+// Migrated to usePermissions():
+// - tools/documents/[type]/page.tsx ✅
+// - tools/label-maker/page.tsx ✅
+
+// 会员权限层 — 仅用于前端 UI 展示，不可作为真实权限依据
+// 真实权限请查询服务端 /api/me/permissions
 
 export type UserRole = "guest" | "user" | "member" | "admin";
 

@@ -190,6 +190,7 @@ export function createPermissionHelpers(perms: ClientPermissions) {
     canExportWord: () => perms.limits.canExportWord,
     canUseCustomStyle: () => perms.limits.canUseCustomStyle,
     canSaveCloudDraft: () => perms.limits.canCloudDraft,
+    canBatchGenerateLabels: () => perms.limits.labelBatchMax > 3,
     getLabelBatchLimit: () => perms.limits.labelBatchMax,
     getMaxCompanyProfiles: () => perms.limits.companyProfilesMax,
     getWordExportDailyLimit: () => perms.limits.wordExportDailyLimit,

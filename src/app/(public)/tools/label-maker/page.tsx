@@ -322,7 +322,7 @@ export default function LabelMakerPage() {
               )}
 
               {/* Batch generation */}
-              {p.canRemoveBranding() && (
+              {p.canBatchGenerateLabels() && (
                 <div className="bg-white rounded-xl border p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-gray-900">批量生成</h3>
