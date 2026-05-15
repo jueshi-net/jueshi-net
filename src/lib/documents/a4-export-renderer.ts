@@ -1,14 +1,18 @@
 /**
- * DocumentA4ExportRenderer - Fixed A4 export engine v1.12.8
- * 
+ * DocumentA4ExportRenderer v1.12.8 (Layout Fixed)
+ *
  * Builds a complete A4 document using ONLY inline CSS (px units, hex colors).
  * NO Tailwind classes, NO responsive layout, NO lab/oklch.
- * Renders into a fixed-width hidden iframe, captured by html2canvas.
- * 
- * Output: 794px base × 1123px height @ scale 2 = 1588×2246px PNG
+ *
+ * Layout specs:
+ * - Page: 794px × 1123px
+ * - Inner padding: 56px top, 64px left/right, 44px bottom
+ * - Content width: 666px (794 - 128)
+ * - All content rendered inside .a4-inner container
+ *
+ * Output: 794px × 1123px @ scale 2 = 1588×2246px PNG
  */
 
-// ---- Color utilities ----
 function toHex(c: string): string {
   if (!c || c === 'transparent') return '#d1d5db';
   if (/^#[0-9a-fA-F]{6}$/.test(c)) return c;
@@ -24,7 +28,6 @@ function val(v: any): string {
   return v != null && v !== '' ? String(v) : '';
 }
 
-// ---- Section types ----
 export interface ExportSection {
   title: string;
   fields: { key: string; label: string; colspan?: number }[];
@@ -43,19 +46,16 @@ export interface ExportTotal {
 }
 
 export interface A4ExportData {
-  // Company
   companyName: string;
   companyNameEn: string;
   companyAddress: string;
   companyPhone: string;
   companyEmail: string;
   companyWebsite: string;
-  // Document
   documentNo: string;
   documentDate: string;
   titleZh: string;
   titleEn: string;
-  // Content
   sections: ExportSection[];
   lineItems: {
     columns: ExportColumn[];
@@ -64,7 +64,6 @@ export interface A4ExportData {
   };
   terms: string;
   canRemoveBranding: boolean;
-  // Style
   style: {
     primaryColor: string;
     borderColor: string;
@@ -72,131 +71,154 @@ export interface A4ExportData {
   };
 }
 
-// ---- Main builder ----
+// ---- Page layout constants ----
+const PAD_TOP = 56;
+const PAD_X = 64;
+const PAD_BOTTOM = 44;
+
 export function buildA4ExportHTML(data: A4ExportData): string {
   const pc = toHex(data.style.primaryColor);
   const bc = toHex(data.style.borderColor);
   const hbg = toHex(data.style.headingBgColor);
   const safeBg = (c: string) => { const h = toHex(c); return h === '#000000' ? '#f3f4f6' : h; };
 
-  let body = '';
+  let inner = '';
 
-  // === HEADER: Company info left, document info right ===
-  body += `<div style="border-bottom:2px solid ${bc}; padding-bottom:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:flex-start;">`;
+  // ===================== HEADER =====================
+  inner += `<div style="padding-bottom:14px; margin-bottom:20px; border-bottom:2px solid ${bc}; display:flex; justify-content:space-between; align-items:flex-start;">`;
   // Left: Company
-  body += `<div style="flex:1;">`;
-  body += `<div style="font-size:16px; font-weight:bold; color:${pc}; margin-bottom:3px;">${esc(data.companyName) || '<span style="color:#9ca3af;">公司名称</span>'}</div>`;
-  if (data.companyNameEn) body += `<div style="font-size:10px; color:#6b7280; margin-bottom:2px;">${esc(data.companyNameEn)}</div>`;
-  if (data.companyAddress) body += `<div style="font-size:10px; color:#6b7280; margin-bottom:2px;">${esc(data.companyAddress)}</div>`;
+  inner += `<div style="flex:1; min-width:0;">`;
+  inner += `<div style="font-size:18px; font-weight:bold; color:${pc}; margin-bottom:4px; line-height:1.3;">${esc(data.companyName) || '<span style="color:#cbd5e1;">公司名称</span>'}</div>`;
+  if (data.companyNameEn) inner += `<div style="font-size:10px; color:#64748b; margin-bottom:2px;">${esc(data.companyNameEn)}</div>`;
+  if (data.companyAddress) inner += `<div style="font-size:10px; color:#64748b; margin-bottom:2px;">${esc(data.companyAddress)}</div>`;
   if (data.companyPhone || data.companyEmail) {
-    body += `<div style="font-size:10px; color:#6b7280;">`;
-    if (data.companyPhone) body += `Tel: ${esc(data.companyPhone)}`;
-    if (data.companyPhone && data.companyEmail) body += ' | ';
-    if (data.companyEmail) body += `Email: ${esc(data.companyEmail)}`;
-    body += `</div>`;
+    inner += `<div style="font-size:10px; color:#64748b;">`;
+    if (data.companyPhone) inner += `Tel: ${esc(data.companyPhone)}`;
+    if (data.companyPhone && data.companyEmail) inner += ' | ';
+    if (data.companyEmail) inner += `Email: ${esc(data.companyEmail)}`;
+    inner += `</div>`;
   }
-  body += `</div>`;
-  // Right: Document title + info
-  body += `<div style="text-align:right; flex:0 0 auto; min-width:200px;">`;
-  body += `<div style="font-size:22px; font-weight:bold; color:${pc}; margin-bottom:2px;">${esc(data.titleZh)}</div>`;
-  body += `<div style="font-size:12px; color:#6b7280; margin-bottom:8px;">${esc(data.titleEn)}</div>`;
-  body += `<div style="font-size:11px; margin-bottom:3px;"><strong>No.:</strong> ${esc(data.documentNo) || '<span style="color:#d1d5db;">___________</span>'}</div>`;
-  body += `<div style="font-size:11px;"><strong>Date:</strong> ${esc(data.documentDate) || '<span style="color:#d1d5db;">____-__-__</span>'}</div>`;
-  body += `</div></div>`;
+  inner += `</div>`;
+  // Right: Document title
+  inner += `<div style="text-align:right; flex:0 0 auto; min-width:180px;">`;
+  inner += `<div style="font-size:24px; font-weight:bold; color:${pc}; margin-bottom:2px; line-height:1.2;">${esc(data.titleZh)}</div>`;
+  inner += `<div style="font-size:11px; color:#64748b; margin-bottom:10px;">${esc(data.titleEn)}</div>`;
+  inner += `<div style="font-size:11px; color:#334155; margin-bottom:3px;"><span style="color:#64748b;">No.:</span> <strong>${esc(data.documentNo) || '<span style="color:#cbd5e1;">—</span>'}</strong></div>`;
+  inner += `<div style="font-size:11px; color:#334155;"><span style="color:#64748b;">Date:</span> <strong>${esc(data.documentDate) || '<span style="color:#cbd5e1;">—</span>'}</strong></div>`;
+  inner += `</div></div>`;
 
-  // === SECTIONS ===
+  // ===================== SECTIONS =====================
   for (const section of data.sections) {
     const visibleFields = section.fields.filter(f => val(section.data[f.key]));
     if (visibleFields.length === 0) continue;
-    body += `<div style="margin-bottom:10px;">`;
-    body += `<div style="background-color:${safeBg(hbg)}; color:${pc}; font-size:12px; font-weight:bold; padding:4px 8px; margin-bottom:6px; border-left:3px solid ${pc};">${esc(section.title)}</div>`;
-    body += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:3px 16px; font-size:11px; padding:0 4px;">`;
+
+    inner += `<div style="margin-bottom:18px;">`;
+    inner += `<div style="font-size:12px; font-weight:bold; color:${pc}; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid ${safeBg(hbg)};">${esc(section.title)}</div>`;
+    inner += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:5px 20px; font-size:11px;">`;
     for (const field of section.fields) {
       const v = section.data[field.key];
       if (!v && v !== 0) continue;
       const span = field.colspan === 2 ? 'grid-column: span 2;' : '';
-      body += `<div style="${span}"><span style="color:#6b7280;">${esc(field.label)}: </span><span style="color:#111827;">${esc(String(v))}</span></div>`;
+      inner += `<div style="${span}"><span style="color:#64748b;">${esc(field.label)}:</span><br/><span style="color:#1e293b;">${esc(String(v))}</span></div>`;
     }
-    body += `</div></div>`;
+    inner += `</div></div>`;
   }
 
-  // === LINE ITEMS TABLE ===
+  // ===================== LINE ITEMS TABLE =====================
   if (data.lineItems.columns.length > 0 && data.lineItems.rows.length > 0) {
-    body += `<div style="margin-bottom:10px;">`;
-    body += `<div style="background-color:${safeBg(hbg)}; color:${pc}; font-size:12px; font-weight:bold; padding:4px 8px; margin-bottom:6px; border-left:3px solid ${pc};">货物/项目明细</div>`;
-    body += `<table style="width:100%; border-collapse:collapse; font-size:11px;">`;
-    body += `<thead><tr>`;
+    inner += `<div style="margin-bottom:18px;">`;
+    inner += `<div style="font-size:12px; font-weight:bold; color:${pc}; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid ${safeBg(hbg)};">货物/项目明细</div>`;
+    inner += `<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:auto;">`;
+    inner += `<thead><tr>`;
     for (const col of data.lineItems.columns) {
-      body += `<th style="border:1px solid ${bc}; padding:5px 6px; text-align:left; font-weight:bold; color:${pc}; background-color:${safeBg(hbg)}; white-space:nowrap;">${esc(col.label)}</th>`;
+      inner += `<th style="border-bottom:2px solid ${bc}; padding:8px 8px; text-align:left; font-weight:bold; color:${pc}; background-color:${safeBg(hbg)}; white-space:nowrap;">${esc(col.label)}</th>`;
     }
-    body += `</tr></thead><tbody>`;
+    inner += `</tr></thead><tbody>`;
+    let rowIdx = 0;
     for (const row of data.lineItems.rows) {
-      body += `<tr>`;
+      const bg = rowIdx % 2 === 0 ? '#ffffff' : safeBg(hbg);
+      inner += `<tr style="background-color:${bg};">`;
       for (const col of data.lineItems.columns) {
         const v = row[col.key] ?? '';
         const isNum = col.key === 'amount' || col.key === 'totalValue' || col.key === 'unitPrice' || col.key === 'quantity' || col.key === 'grossWeight' || col.key === 'netWeight' || col.key === 'volume';
-        body += `<td style="border:1px solid ${bc}; padding:4px 6px;${isNum ? ' text-align:right;' : ''}">${esc(String(v))}</td>`;
+        inner += `<td style="border-bottom:1px solid ${bc}; padding:6px 8px;${isNum ? ' text-align:right;' : ''}">${esc(String(v)) || '—'}</td>`;
       }
-      body += `</tr>`;
+      inner += `</tr>`;
+      rowIdx++;
     }
     if (data.lineItems.totals.length > 0) {
-      body += `<tfoot><tr style="background-color:${safeBg(hbg)}; font-weight:bold;">`;
-      body += `<td colspan="${data.lineItems.columns.length}" style="border:1px solid ${bc}; padding:5px 6px; text-align:right;">`;
+      inner += `<tfoot><tr style="background-color:${safeBg(hbg)}; font-weight:bold;">`;
+      inner += `<td colspan="${data.lineItems.columns.length}" style="border-top:2px solid ${bc}; padding:8px 8px; text-align:right; font-size:12px; color:#1e293b;">`;
       for (const t of data.lineItems.totals) {
-        body += `<span style="margin-left:20px; font-size:11px;">${esc(t.label)}: ${esc(t.value)}</span>`;
+        inner += `<span style="margin-left:24px;">${esc(t.label)}: ${esc(t.value)}</span>`;
       }
-      body += `</td></tr></tfoot>`;
+      inner += `</td></tr></tfoot>`;
     }
-    body += `</tbody></table></div>`;
+    inner += `</tbody></table></div>`;
   }
 
-  // === TERMS ===
+  // ===================== TERMS =====================
   if (data.terms) {
-    body += `<div style="margin-bottom:10px;">`;
-    body += `<div style="background-color:${safeBg(hbg)}; color:${pc}; font-size:12px; font-weight:bold; padding:4px 8px; margin-bottom:6px; border-left:3px solid ${pc};">备注条款</div>`;
-    body += `<div style="font-size:11px; color:#111827; white-space:pre-wrap; padding:0 4px;">${esc(data.terms)}</div></div>`;
+    inner += `<div style="margin-bottom:18px;">`;
+    inner += `<div style="font-size:12px; font-weight:bold; color:${pc}; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid ${safeBg(hbg)};">备注条款</div>`;
+    inner += `<div style="font-size:11px; color:#334155; white-space:pre-wrap; line-height:1.6;">${esc(data.terms)}</div></div>`;
   }
 
-  // === SIGNATURE AREA ===
-  body += `<div style="margin-top:40px; padding-top:12px; border-top:1px solid ${bc};">`;
-  body += `<div style="display:grid; grid-template-columns:1fr 1fr; gap:40px;">`;
-  body += `<div style="font-size:11px;">`;
-  body += `<div style="color:#6b7280; margin-bottom:50px;">卖方/制单人签字盖章：</div>`;
-  body += `<div>日期：____________</div></div>`;
-  body += `<div style="font-size:11px;">`;
-  body += `<div style="color:#6b7280; margin-bottom:50px;">买方/审核人签字盖章：</div>`;
-  body += `<div>日期：____________</div></div>`;
-  body += `</div></div>`;
+  // ===================== SIGNATURES =====================
+  inner += `<div style="margin-top:36px; padding-top:16px; border-top:1px solid ${bc};">`;
+  inner += `<div style="display:flex; justify-content:space-between; gap:32px;">`;
+  inner += `<div style="width:48%; font-size:11px;">`;
+  inner += `<div style="color:#475569; margin-bottom:48px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">卖方/制单人签字盖章</div>`;
+  inner += `<div style="color:#475569;">日期：<span style="display:inline-block; width:100px; border-bottom:1px solid #cbd5e1;">&nbsp;</span></div>`;
+  inner += `</div>`;
+  inner += `<div style="width:48%; font-size:11px;">`;
+  inner += `<div style="color:#475569; margin-bottom:48px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">买方/审核人签字盖章</div>`;
+  inner += `<div style="color:#475569;">日期：<span style="display:inline-block; width:100px; border-bottom:1px solid #cbd5e1;">&nbsp;</span></div>`;
+  inner += `</div>`;
+  inner += `</div></div>`;
 
-  // === FOOTER ===
+  // ===================== FOOTER =====================
   if (!data.canRemoveBranding) {
-    body += `<div style="margin-top:20px; padding-top:8px; border-top:1px solid #e5e7eb; text-align:center; font-size:8px; color:#d1d5db;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
+    inner += `<div style="margin-top:16px; padding-top:8px; border-top:1px solid #e2e8f0; text-align:center; font-size:8px; color:#94a3b8; line-height:1.4;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
   }
 
-  // Wrap in A4 page
+  // Wrap in A4 page with proper padding + inner container
   const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 794px; min-width: 794px; max-width: 794px; background: #ffffff; color: #111827; }
-body { font-family: "SimSun", "Noto Serif SC", "Songti SC", "Microsoft YaHei", serif; font-size: 12px; line-height: 1.5; padding: 32px 36px; }
-.a4-page { width: 794px; min-height: 1123px; background: #ffffff; }
+html, body {
+  width: 794px; min-width: 794px; max-width: 794px;
+  background: #ffffff; color: #111827;
+}
+body {
+  font-family: Arial, "Noto Sans SC", "Microsoft YaHei", "SimSun", sans-serif;
+  font-size: 12px; line-height: 1.5;
+}
+.a4-page {
+  width: 794px; min-height: 1123px; background: #ffffff;
+  padding: ${PAD_TOP}px ${PAD_X}px ${PAD_BOTTOM}px ${PAD_X}px;
+}
+.a4-inner {
+  width: 100%; height: 100%; position: relative;
+}
 table { page-break-inside: auto; }
 tr { page-break-inside: avoid; }
 @media print { @page { margin: 0; size: A4; } }
 </style>
 </head>
 <body>
-<div class="a4-page">${body}</div>
+<div class="a4-page">
+<div class="a4-inner">${inner}</div>
+</div>
 </body>
 </html>`;
 
   return html;
 }
 
-// ---- A4 dimensions ----
-export const A4_WIDTH = 794;   // px at 96dpi
-export const A4_HEIGHT = 1123; // px at 96dpi
-export const A4_EXPORT_SCALE = 2; // output: 1588×2246px
+export const A4_WIDTH = 794;
+export const A4_HEIGHT = 1123;
+export const A4_EXPORT_SCALE = 2;
