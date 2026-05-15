@@ -115,10 +115,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     updateData.completedAt = new Date();
   } else if (status !== "done") {
     updateData.completedAt = null;
-    // If re-opening a completed task, reset pointsAwarded
-    if (existingTask.pointsAwarded) {
-      updateData.pointsAwarded = false;
-    }
+    // If re-opening a completed task, DO NOT reset pointsAwarded.
+    // Same task can only earn points once, even if re-opened.
   }
 
   const task = await prisma.userTask.update({
