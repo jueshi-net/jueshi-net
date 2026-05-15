@@ -4,7 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Printer, Download, Image, Crown, Plus, Trash2, ChevronDown, Eye, Palette, AlertTriangle, Settings, QrCode, Barcode, Save, Package, FileText } from 'lucide-react';
 import { getLabelType, getLabelTemplate, labelTypes, labelSizes, labelStyles } from '@/lib/labels/label-types';
-import { getRoleInfo, canUseCustomLabelSize, canUseLabelStyles, canUploadLabelLogo, canRemoveLabelBranding, canBatchGenerateLabels, getLabelBatchLimit, permissionMessages } from '@/lib/membership/permissions';
+import { usePermissions, authorizeExportClient, createPermissionHelpers } from '@/lib/auth/client-permissions';
+import { permissionMessages } from '@/lib/membership/permissions';
 import { saveLabelDraft, getLabelDraft, getAllLabelDrafts, deleteLabelDraft } from '@/lib/labels/label-storage';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
@@ -17,7 +18,8 @@ const DISCLAIMER = "本工具生成的是通用唛头、箱贴、仓库标签和
 type MobileTab = 'edit' | 'preview' | 'export';
 
 export default function LabelMakerPage() {
-  const roleInfo = getRoleInfo();
+  const perms = usePermissions();
+  const p = createPermissionHelpers(perms);
   const [selectedType, setSelectedType] = useState('shipping-mark');
   const [selectedSize, setSelectedSize] = useState('a4-full');
   const [selectedStyle, setSelectedStyle] = useState('black-white');
@@ -55,10 +57,10 @@ export default function LabelMakerPage() {
     const saved = saveLabelDraft({
       type: selectedType, title: labelType?.titleZh || selectedType,
       labelSize: selectedSize, data: formData, style: selectedStyle,
-    }, roleInfo.maxDrafts);
+    }, perms.limits.maxDrafts);
     setDraftId(saved.id);
     alert('草稿已保存');
-  }, [selectedType, labelType, selectedSize, formData, selectedStyle, roleInfo.maxDrafts]);
+  }, [selectedType, labelType, selectedSize, formData, selectedStyle, perms.limits.maxDrafts]);
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
@@ -74,7 +76,7 @@ export default function LabelMakerPage() {
         style: { primaryColor: style.primaryColor, borderColor: style.borderColor },
         showBarcode: template?.showBarcode,
         showQrCode: template?.showQrCode,
-        canRemoveBranding: canRemoveLabelBranding(),
+        canRemoveBranding: p.canRemoveBranding(),
       });
 
       const tempDiv = document.createElement('div');
@@ -126,7 +128,7 @@ export default function LabelMakerPage() {
   }, [selectedType, labelType, formData, style, template]);
 
   const addBatchItem = () => {
-    const limit = getLabelBatchLimit();
+    const limit = p.getLabelBatchLimit();
     if (batchItems.length >= limit) { alert(`批量生成上限：${limit} 张`); return; }
     setBatchItems(prev => [...prev, { cartonNo: `${batchItems.length + 1}` }]);
   };
@@ -137,8 +139,8 @@ export default function LabelMakerPage() {
     setBatchItems(prev => prev.filter((_, i) => i !== idx).length > 0 ? prev.filter((_, i) => i !== idx) : []);
   };
 
-  const sizeOptions = labelSizes.filter(s => !s.memberOnly || canUseCustomLabelSize());
-  const styleOptions = canUseLabelStyles() ? labelStyles : [labelStyles[0]];
+  const sizeOptions = labelSizes.filter(s => !s.memberOnly || p.canUseCustomStyle());
+  const styleOptions = p.canUseCustomStyle() ? labelStyles : [labelStyles[0]];
 
   const tabs: { id: MobileTab; label: string; icon: React.ReactNode }[] = [
     { id: 'edit', label: '填写资料', icon: <Settings className="w-4 h-4" /> },
@@ -189,8 +191,8 @@ export default function LabelMakerPage() {
               <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded-lg disabled:opacity-50">
                 <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
               </button>
-              <span className={`px-2 py-0.5 rounded text-xs ${roleInfo.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
-                {roleInfo.role === 'member' ? '会员' : roleInfo.role === 'user' ? '用户' : '游客'}
+              <span className={`px-2 py-0.5 rounded text-xs ${perms.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+                {perms.role === 'member' ? '会员' : perms.role === 'user' ? '用户' : '游客'}
               </span>
             </div>
           </div>
@@ -250,7 +252,7 @@ export default function LabelMakerPage() {
                       {sizeOptions.map(s => <option key={s.id} value={s.id}>{s.label} ({s.width}×{s.height}mm)</option>)}
                     </select>
                   </div>
-                  {canUseLabelStyles() && (
+                  {p.canUseCustomStyle() && (
                     <div>
                       <label className="text-xs text-gray-500 mb-1 block">风格</label>
                       <select value={selectedStyle} onChange={e => setSelectedStyle(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm">
@@ -258,7 +260,7 @@ export default function LabelMakerPage() {
                       </select>
                     </div>
                   )}
-                  {canUploadLabelLogo() && (
+                  {p.canUploadLogo() && (
                     <div>
                       <label className="text-xs text-gray-500 mb-1 block">公司 Logo</label>
                       <input type="file" accept="image/*" className="w-full text-sm"
@@ -320,7 +322,7 @@ export default function LabelMakerPage() {
               )}
 
               {/* Batch generation */}
-              {canBatchGenerateLabels() && (
+              {p.canRemoveBranding() && (
                 <div className="bg-white rounded-xl border p-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold text-gray-900">批量生成</h3>
@@ -330,7 +332,7 @@ export default function LabelMakerPage() {
                     <div className="space-y-2">
                       <div className="flex gap-2">
                         <button onClick={addBatchItem} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg">
-                          <Plus className="w-3 h-3" /> 添加 ({batchItems.length}/{getLabelBatchLimit()})
+                          <Plus className="w-3 h-3" /> 添加 ({batchItems.length}/{p.getLabelBatchLimit()})
                         </button>
                       </div>
                       {batchItems.map((item, idx) => (
@@ -492,7 +494,7 @@ export default function LabelMakerPage() {
                       </div>
                     )}
 
-                    {!canRemoveLabelBranding() && (
+                    {!p.canRemoveBranding() && (
                       <div className="mt-2 pt-2 border-t text-center text-xs text-gray-300" style={{ borderColor: style.borderColor }}>
                         由海外百宝箱生成，仅供参考 | kjbxb.com
                       </div>

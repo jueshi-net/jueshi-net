@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { getDocumentType, documentStyles } from '@/lib/documents/document-types';
 import { getTemplate } from '@/lib/documents/document-fields';
-import { getRoleInfo, canRemoveBranding, canUseCustomStyle, canUploadLogo, canExportWord, permissionMessages } from '@/lib/membership/permissions';
+import { usePermissions, authorizeExportClient, createPermissionHelpers } from '@/lib/auth/client-permissions';
+import { permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
 import { AdSlot } from '@/components/ad-slot';
 import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
@@ -44,7 +45,8 @@ export default function DocumentEditorPage() {
   const previewRef = useRef<HTMLDivElement>(null);
   const exportContainerRef = useRef<HTMLDivElement>(null);
 
-  const roleInfo = getRoleInfo();
+  const perms = usePermissions();
+  const p = createPermissionHelpers(perms);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [lineItems, setLineItems] = useState<Record<string, any>[]>([{}]);
   const [selectedStyle, setSelectedStyle] = useState('default');
@@ -132,10 +134,10 @@ export default function DocumentEditorPage() {
     const saved = saveDraft({
       type, title: docType?.titleZh || type, documentNo: formData.documentNo || '',
       data: formData, lineItems, style: selectedStyle,
-    }, roleInfo.maxDrafts);
+    }, perms.limits.maxDrafts);
     setDraftId(saved.id);
-    alert(`草稿已保存（${roleInfo.maxDrafts === 999 ? '无限制' : `最多 ${roleInfo.maxDrafts} 份`}）`);
-  }, [type, docType, formData, lineItems, selectedStyle, roleInfo.maxDrafts]);
+    alert(`草稿已保存（${perms.limits.maxDrafts === 999 ? '无限制' : `最多 ${perms.limits.maxDrafts} 份`}）`);
+  }, [type, docType, formData, lineItems, selectedStyle, perms.limits.maxDrafts]);
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
@@ -171,7 +173,7 @@ export default function DocumentEditorPage() {
           })),
         },
         terms: formData.terms || '',
-        canRemoveBranding: canRemoveBranding(),
+        canRemoveBranding: p.canRemoveBranding(),
         style: {
           primaryColor: style.primaryColor,
           borderColor: style.borderColor,
@@ -253,10 +255,16 @@ export default function DocumentEditorPage() {
     }
   }, [exportContainerRef, docType, formData, companyProfile, lineItems, style, template, type, calculateTotal]);
 
-  const handleExportWord = useCallback(() => {
-    if (!canExportWord()) { alert(permissionMessages.exportWord); return; }
-    if (wordExportsToday >= roleInfo.canExportWordDailyLimit) {
-      alert(`今日 Word 导出次数已达上限（${roleInfo.canExportWordDailyLimit}次）`);
+  const handleExportWord = useCallback(async () => {
+    // Server-side authorization check
+    const authResult = await authorizeExportClient({
+      exportType: 'word',
+      documentType: type,
+      removeBranding: p.canRemoveBranding(),
+      templateStyle: selectedStyle,
+    });
+    if (!authResult.allowed) {
+      alert(authResult.error || permissionMessages.exportWord);
       return;
     }
     const content = previewRef.current?.innerHTML || '';
@@ -271,7 +279,7 @@ export default function DocumentEditorPage() {
     link.href = URL.createObjectURL(blob);
     link.click();
     setWordExportsToday(prev => prev + 1);
-  }, [canExportWord, wordExportsToday, roleInfo, previewRef, docType, formData.documentNo, type]);
+  }, [p, selectedStyle, previewRef, docType, formData.documentNo, type]);
 
   if (!docType || !template) {
     return (
@@ -326,7 +334,7 @@ export default function DocumentEditorPage() {
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-2">
-            {canUseCustomStyle() && (
+            {p.canUseCustomStyle() && (
               <div className="relative">
                 <button onClick={() => setShowStylePicker(!showStylePicker)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500" title="切换模板风格">
                   <Palette className="w-4 h-4" />
@@ -355,12 +363,12 @@ export default function DocumentEditorPage() {
               <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
             </button>
             <button onClick={handleExportWord}
-              className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-              title={!canExportWord() ? permissionMessages.exportWord : '导出 Word'}>
+              className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+              title={!p.canExportWord() ? permissionMessages.exportWord : '导出 Word'}>
               <FileSpreadsheet className="w-4 h-4" /> Word
             </button>
-            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs ${roleInfo.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
-              {roleInfo.role === 'member' ? '会员' : roleInfo.role === 'user' ? '用户' : '游客'}
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs ${perms.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+              {perms.role === 'member' ? '会员' : perms.role === 'user' ? '用户' : '游客'}
             </span>
           </div>
         </div>
@@ -614,19 +622,19 @@ export default function DocumentEditorPage() {
                     <Image className="w-4 h-4" /> {exporting ? '生成中...' : '导出 PNG'}
                   </button>
                   <button onClick={handleExportWord}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-xl font-medium ${canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-200 text-gray-400'}`}
-                    title={!canExportWord() ? permissionMessages.exportWord : ''}>
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-xl font-medium ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-200 text-gray-400'}`}
+                    title={!p.canExportWord() ? permissionMessages.exportWord : ''}>
                     <FileSpreadsheet className="w-4 h-4" /> Word
                   </button>
                 </div>
               )}
 
               {/* Style picker for mobile */}
-              {mobileTab === 'preview' && canUseCustomStyle() && (
+              {mobileTab === 'preview' && p.canUseCustomStyle() && (
                 <div className="flex items-center justify-between mb-3 print:hidden">
                   <div className="flex items-center gap-2">
                     {documentStyles.map(s => {
-                      if (s.memberOnly && !canUseCustomStyle()) return null;
+                      if (s.memberOnly && !p.canUseCustomStyle()) return null;
                       return (
                         <button key={s.id} onClick={() => setSelectedStyle(s.id)}
                           className={`w-6 h-6 rounded-full border-2 ${selectedStyle === s.id ? 'border-blue-500 scale-110' : 'border-gray-200'}`}
@@ -634,7 +642,7 @@ export default function DocumentEditorPage() {
                       );
                     })}
                   </div>
-                  {canUseCustomStyle() && (
+                  {p.canUseCustomStyle() && (
                     <span className="text-xs text-gray-400 flex items-center gap-1"><Palette className="w-3 h-3" />切换风格</span>
                   )}
                 </div>
@@ -757,7 +765,7 @@ export default function DocumentEditorPage() {
                 </div>
 
                 {/* Footer branding */}
-                {!canRemoveBranding() && (
+                {!p.canRemoveBranding() && (
                   <div className="mt-8 pt-3 border-t text-center text-xs text-gray-300" style={{ borderColor: style.borderColor }}>
                     由海外百宝箱生成，仅供参考 | kjbxb.com
                   </div>

@@ -504,6 +504,22 @@ model HSCode {
   @@map("hs_codes")
 }
 
+// 导出日志：用于追踪每日导出次数和权限审计
+model ExportLog {
+  id            String   @id @default(cuid())
+  userId        String?  // null for guest attempts
+  exportType    String   // word/png/pdf/document/label
+  documentType  String?  // commercial-invoice/quotation/packing-list/label-maker etc
+  ipHash        String?  // anonymized IP
+  userAgent     String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+  @@index([exportType])
+  @@index([createdAt])
+  @@map("export_logs")
+}
+
 // 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
 model EventLog {
   id          String   @id @default(cuid())
