@@ -4,6 +4,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { getTodayRange } from "@/lib/date-utils";
+
+const MAX_TITLE_LENGTH = 100;
+const MAX_DESCRIPTION_LENGTH = 1000;
+const MAX_TASKS_PER_DAY = 50;
 
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -44,11 +49,33 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
   }
 
+  const trimmedTitle = title.trim();
+  if (trimmedTitle.length > MAX_TITLE_LENGTH) {
+    return NextResponse.json({ error: `标题不能超过 ${MAX_TITLE_LENGTH} 字` }, { status: 400 });
+  }
+
+  const trimmedDesc = description?.trim();
+  if (trimmedDesc && trimmedDesc.length > MAX_DESCRIPTION_LENGTH) {
+    return NextResponse.json({ error: `说明不能超过 ${MAX_DESCRIPTION_LENGTH} 字` }, { status: 400 });
+  }
+
+  // Check daily task creation limit
+  const { start, end } = getTodayRange();
+  const todayTaskCount = await prisma.userTask.count({
+    where: {
+      userId: session.user.id,
+      createdAt: { gte: start, lt: end },
+    },
+  });
+  if (todayTaskCount >= MAX_TASKS_PER_DAY) {
+    return NextResponse.json({ error: "每日最多创建 50 个任务" }, { status: 429 });
+  }
+
   const task = await prisma.userTask.create({
     data: {
       userId: session.user.id,
-      title: title.trim(),
-      description: description?.trim() || null,
+      title: trimmedTitle,
+      description: trimmedDesc || null,
       priority: priority || "normal",
       category: category || null,
       dueDate: dueDate ? new Date(dueDate) : null,

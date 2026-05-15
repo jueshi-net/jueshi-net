@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   CalendarCheck, Star, CheckCircle, Plus, Trash2, Clock,
   FileText, Tag, MapPin, Truck, StickyNote, ChevronDown,
-  ArrowUpCircle, ArrowDownCircle, MinusCircle,
+  ArrowUpCircle, ArrowDownCircle, MinusCircle, Gift, BookOpen,
 } from "lucide-react";
 
 // Types
@@ -421,6 +421,70 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* ===== Points Rewards (Coming Soon) ===== */}
+      <div className="bg-white rounded-xl border p-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+          <Gift className="w-5 h-5 text-amber-500" />
+          积分权益兑换
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            { points: 50, label: "Word 导出次数券 ×1", desc: "额外 1 次 Word 导出额度" },
+            { points: 80, label: "会员模板体验券 ×1", desc: "使用会员专属单据模板" },
+            { points: 100, label: "去品牌导出体验券 ×1", desc: "单次导出去除品牌水印" },
+            { points: 200, label: "草稿容量扩展包", desc: "+10 草稿容量，持续 30 天" },
+          ].map((reward) => (
+            <div
+              key={reward.label}
+              className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50"
+            >
+              <div className="flex-shrink-0 w-14 h-14 bg-amber-50 rounded-lg flex flex-col items-center justify-center">
+                <span className="text-sm font-bold text-amber-600">{reward.points}</span>
+                <span className="text-[10px] text-amber-400">积分</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium text-gray-900">{reward.label}</div>
+                <div className="text-xs text-gray-500">{reward.desc}</div>
+              </div>
+              <span className="text-xs text-gray-400 flex-shrink-0 bg-gray-100 px-2 py-1 rounded-md">
+                即将开放
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ===== Points Rules ===== */}
+      <div className="bg-white rounded-xl border p-4">
+        <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+          <BookOpen className="w-5 h-5 text-blue-500" />
+          积分规则
+        </h2>
+        <div className="space-y-4 text-sm">
+          <div>
+            <div className="font-medium text-gray-900 mb-2">📋 普通用户</div>
+            <ul className="space-y-1 text-gray-600">
+              <li>• 每日签到 +5 积分</li>
+              <li>• 完成任务 +2 积分/个</li>
+              <li>• 任务积分每日最多 +20（10 个任务）</li>
+              <li>• 每日总积分上限 30</li>
+            </ul>
+          </div>
+          <div>
+            <div className="font-medium text-gray-900 mb-2">⭐ 会员</div>
+            <ul className="space-y-1 text-gray-600">
+              <li>• 每日签到 +10 积分</li>
+              <li>• 完成任务 +2 积分/个</li>
+              <li>• 任务积分每日最多 +20</li>
+              <li>• 每日总积分上限 60</li>
+            </ul>
+          </div>
+          <p className="text-xs text-gray-400 border-t pt-3">
+            积分通过签到和完成任务获取，用于兑换站内权益。保持使用工具、养成工作习惯，积分自然增长。
+          </p>
+        </div>
       </div>
 
       {/* Quick Shortcuts */}

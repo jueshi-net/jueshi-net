@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
+import { getTodayDateKey, getDateKey } from "@/lib/date-utils";
 
 export async function POST() {
   const session = await auth();
@@ -20,8 +21,9 @@ export async function POST() {
   // Determine points based on role
   const checkinPoints = role === "member" || role === "admin" ? 10 : 5;
 
-  const today = new Date();
-  const dateKey = today.toISOString().slice(0, 10); // YYYY-MM-DD
+  // Use timezone-aware date key (America/Vancouver)
+  const dateKey = getTodayDateKey();
+  const yesterdayKey = getDateKey(-1);
 
   try {
     // Check if already checked in today
@@ -35,11 +37,6 @@ export async function POST() {
         { status: 409 }
       );
     }
-
-    // Calculate new streak
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayKey = yesterday.toISOString().slice(0, 10);
 
     const yesterdayCheckin = await prisma.dailyCheckIn.findUnique({
       where: { userId_dateKey: { userId, dateKey: yesterdayKey } },

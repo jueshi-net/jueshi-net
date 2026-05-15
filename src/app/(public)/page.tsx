@@ -3,7 +3,7 @@ import {
   Package, Calculator, FileText, MapPin, Globe, Briefcase,
   ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star,
   Tag, Receipt, ClipboardList, FileBadge, FileSignature, Shield,
-  Layers, Palette, PenTool,
+  Layers, Palette, PenTool, LayoutDashboard,
 } from 'lucide-react';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
@@ -237,6 +237,24 @@ export default async function LandingPage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ===== MEMBER WORKSPACE CARD ===== */}
+      <div className="max-w-6xl mx-auto px-4 -mt-2 mb-8">
+        <Link href="/dashboard" className="block bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                <LayoutDashboard className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">我的工作台</h3>
+                <p className="text-sm text-gray-500">每日签到 · 积分任务 · 常用工具</p>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          </div>
+        </Link>
       </div>
 
       {/* ===== STARTER RESOURCES — moved higher ===== */}

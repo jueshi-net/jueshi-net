@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
+import { getTodayDateKey, getTodayRange } from "@/lib/date-utils";
 
 export async function GET() {
   const session = await auth();
@@ -15,11 +16,9 @@ export async function GET() {
   const userId = session.user.id;
   const role = await getCurrentUserRole();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const dateKey = today.toISOString().slice(0, 10);
+  // Use timezone-aware date key and range
+  const dateKey = getTodayDateKey();
+  const { start: today, end: tomorrow } = getTodayRange();
 
   // Get user data
   const user = await prisma.user.findUnique({

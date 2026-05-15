@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getCurrentUserRole } from "@/lib/auth/permissions";
+import { getTodayRange } from "@/lib/date-utils";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -33,14 +34,16 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   // Handle task completion with points
   if (status === "done" && existingTask.status !== "done" && !existingTask.pointsAwarded) {
+    // Block completing archived tasks
+    if (existingTask.status === "archived") {
+      return NextResponse.json({ error: "已归档的任务不能完成" }, { status: 400 });
+    }
+
     const role = await getCurrentUserRole();
     const taskPoints = 2;
 
-    // Check daily task points cap
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Use timezone-aware daily range
+    const { start: today, end: tomorrow } = getTodayRange();
 
     const dailyTaskPoints = await prisma.pointLedger.aggregate({
       _sum: { points: true },
