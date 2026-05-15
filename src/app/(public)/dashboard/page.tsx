@@ -6,6 +6,7 @@ import {
   CalendarCheck, Star, CheckCircle, Plus, Trash2, Clock,
   FileText, Tag, MapPin, Truck, StickyNote, ChevronDown,
   ArrowUpCircle, ArrowDownCircle, MinusCircle, Gift, BookOpen,
+  Ticket, Shield, Sparkles,
 } from "lucide-react";
 
 // Types
@@ -69,6 +70,79 @@ export default function DashboardPage() {
   const [taskCapReached, setTaskCapReached] = useState(false);
   const [loginRequired, setLoginRequired] = useState(false);
 
+  // Rewards state
+  const [rewards, setRewards] = useState<any[]>([]);
+  const [userPoints, setUserPoints] = useState(0);
+  const [myRewards, setMyRewards] = useState<any[]>([]);
+  const [redeemingId, setRedeemingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  // Fetch rewards
+  const fetchRewards = useCallback(async () => {
+    try {
+      const res = await fetch("/api/rewards");
+      if (res.ok) {
+        const data = await res.json();
+        setRewards(data.items || []);
+        setUserPoints(data.points || 0);
+      }
+    } catch (e) {
+      console.error("Failed to fetch rewards:", e);
+    }
+  }, []);
+
+  // Fetch my rewards
+  const fetchMyRewards = useCallback(async () => {
+    try {
+      const res = await fetch("/api/rewards/my");
+      if (res.ok) {
+        const data = await res.json();
+        setMyRewards(data.rewards || []);
+      }
+    } catch (e) {
+      console.error("Failed to fetch my rewards:", e);
+    }
+  }, []);
+
+  // Redeem
+  const handleRedeem = useCallback(async (rewardItemId: string, name: string, cost: number) => {
+    if (userPoints < cost) {
+      setToast({ message: "积分不足", type: "error" });
+      return;
+    }
+    setRedeemingId(rewardItemId);
+    try {
+      const res = await fetch("/api/rewards/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rewardItemId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setToast({ message: `兑换成功：${name}`, type: "success" });
+        setUserPoints(data.remainingPoints);
+        fetchRewards();
+        fetchMyRewards();
+        // Refresh dashboard points
+        fetchDashboard();
+      } else {
+        setToast({ message: data.error || "兑换失败", type: "error" });
+      }
+    } catch (e) {
+      setToast({ message: "兑换失败，请重试", type: "error" });
+    } finally {
+      setRedeemingId(null);
+    }
+  }, [userPoints, fetchRewards, fetchMyRewards, fetchDashboard]);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
     try {
@@ -106,7 +180,11 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchDashboard();
     fetchTasks(taskFilter);
-  }, [fetchDashboard, fetchTasks, taskFilter]);
+    if (!loginRequired) {
+      fetchRewards();
+      fetchMyRewards();
+    }
+  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards]);
 
   // Check-in handler
   const handleCheckIn = useCallback(async () => {
@@ -423,38 +501,83 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* ===== Points Rewards (Coming Soon) ===== */}
+      {/* ===== Points Rewards ===== */}
       <div className="bg-white rounded-xl border p-4">
         <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
           <Gift className="w-5 h-5 text-amber-500" />
           积分权益兑换
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            { points: 50, label: "Word 导出次数券 ×1", desc: "额外 1 次 Word 导出额度" },
-            { points: 80, label: "会员模板体验券 ×1", desc: "使用会员专属单据模板" },
-            { points: 100, label: "去品牌导出体验券 ×1", desc: "单次导出去除品牌水印" },
-            { points: 200, label: "草稿容量扩展包", desc: "+10 草稿容量，持续 30 天" },
-          ].map((reward) => (
-            <div
-              key={reward.label}
-              className="flex items-center gap-3 p-3 rounded-lg border bg-gray-50"
-            >
-              <div className="flex-shrink-0 w-14 h-14 bg-amber-50 rounded-lg flex flex-col items-center justify-center">
-                <span className="text-sm font-bold text-amber-600">{reward.points}</span>
-                <span className="text-[10px] text-amber-400">积分</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900">{reward.label}</div>
-                <div className="text-xs text-gray-500">{reward.desc}</div>
-              </div>
-              <span className="text-xs text-gray-400 flex-shrink-0 bg-gray-100 px-2 py-1 rounded-md">
-                即将开放
-              </span>
-            </div>
-          ))}
-        </div>
+        {rewards.length === 0 ? (
+          <div className="text-center text-gray-400 py-4 text-sm">暂无可兑换权益</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {rewards.map((r) => {
+              const canAfford = userPoints >= r.costPoints;
+              return (
+                <div
+                  key={r.id}
+                  className={`flex items-center gap-3 p-3 rounded-lg border ${canAfford ? 'bg-white' : 'bg-gray-50 opacity-70'}`}
+                >
+                  <div className="flex-shrink-0 w-14 h-14 bg-amber-50 rounded-lg flex flex-col items-center justify-center">
+                    <span className="text-sm font-bold text-amber-600">{r.costPoints}</span>
+                    <span className="text-[10px] text-amber-400">积分</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900">{r.name}</div>
+                    <div className="text-xs text-gray-500">{r.description}</div>
+                  </div>
+                  <button
+                    onClick={() => handleRedeem(r.id, r.name, r.costPoints)}
+                    disabled={!canAfford || redeemingId === r.id}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      canAfford
+                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {redeemingId === r.id ? '兑换中...' : canAfford ? '兑换' : '积分不足'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      {/* ===== My Rewards ===== */}
+      {myRewards.length > 0 && (
+        <div className="bg-white rounded-xl border p-4">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+            <Ticket className="w-5 h-5 text-green-500" />
+            我的权益
+          </h2>
+          <div className="space-y-2">
+            {myRewards.map((r) => {
+              const statusConfig: Record<string, { label: string; color: string }> = {
+                active: { label: '可用', color: 'text-green-600 bg-green-50' },
+                used: { label: '已使用', color: 'text-gray-400 bg-gray-50' },
+                expired: { label: '已过期', color: 'text-red-400 bg-red-50' },
+              };
+              const sc = statusConfig[r.status] || statusConfig.active;
+              return (
+                <div key={r.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div className="flex items-center gap-2">
+                    {r.rewardType === 'word_export_coupon' && <Ticket className="w-4 h-4 text-blue-500" />}
+                    {r.rewardType === 'member_trial' && <Shield className="w-4 h-4 text-amber-500" />}
+                    {r.rewardType === 'no_branding_coupon' && <Sparkles className="w-4 h-4 text-purple-500" />}
+                    <span className="text-sm text-gray-900">{r.rewardItem?.name || r.rewardType}</span>
+                    <span className="text-xs text-gray-400">×{r.rewardValue}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-0.5 rounded ${sc.color}`}>{sc.label}</span>
+                    <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString('zh-CN')}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ===== Points Rules ===== */}
       <div className="bg-white rounded-xl border p-4">
@@ -503,6 +626,15 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all ${
+          toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        }`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }

@@ -36,6 +36,7 @@ model User {
   pointLedgers         PointLedger[]
   dailyCheckIns        DailyCheckIn[]
   userTasks            UserTask[]
+  userRewards          UserReward[]
 
   @@map("users")
 }
@@ -596,4 +597,45 @@ model UserTask {
   @@index([status])
   @@index([dueDate])
   @@map("user_tasks")
+}
+
+// 积分兑换商品配置
+model RewardItem {
+  id            String   @id @default(cuid())
+  code          String   @unique   // word_export_1x, word_export_3x, member_1day, no_branding_1x
+  name          String              // 显示名称
+  description   String?             // 说明
+  costPoints    Int                 // 兑换所需积分
+  rewardType    String              // word_export_coupon / member_trial / no_branding_coupon
+  rewardValue   Int                 // 券数量或天数
+  enabled       Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  userRewards   UserReward[]
+
+  @@index([enabled])
+  @@index([sortOrder])
+  @@map("reward_items")
+}
+
+// 用户已兑换权益
+model UserReward {
+  id            String   @id @default(cuid())
+  userId        String
+  rewardItemId  String
+  rewardType    String              // 冗余字段，便于查询
+  rewardValue   Int                 // 券数量或天数
+  status        String   @default("active")  // active / used / expired
+  expiresAt     DateTime?
+  usedAt        DateTime?
+  createdAt     DateTime @default(now())
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardItem    RewardItem @relation(fields: [rewardItemId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([rewardType])
+  @@index([expiresAt])
+  @@map("user_rewards")
 }

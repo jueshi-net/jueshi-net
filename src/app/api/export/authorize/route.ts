@@ -39,6 +39,72 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // For Word exports: check if user has an active coupon before checking daily limit
+  let usedCoupon = false;
+  if (userId && exportType === "word" && role === "user") {
+    const { prisma } = await import("@/lib/prisma");
+    const coupon = await prisma.userReward.findFirst({
+      where: {
+        userId,
+        rewardType: "word_export_coupon",
+        status: "active",
+      },
+      orderBy: { createdAt: "asc" }, // Use oldest first
+    });
+
+    if (coupon) {
+      // Use coupon instead of daily limit
+      const result = await prisma.$transaction(async (tx) => {
+        // Re-check coupon is still active
+        const active = await tx.userReward.findUnique({
+          where: { id: coupon.id },
+        });
+        if (!active || active.status !== "active") {
+          return null;
+        }
+        // Mark as used
+        await tx.userReward.update({
+          where: { id: coupon.id },
+          data: { status: "used", usedAt: new Date() },
+        });
+        return { couponId: coupon.id };
+      });
+
+      if (result) {
+        usedCoupon = true;
+      }
+    }
+  }
+
+  // If coupon was used, allow without checking daily limit
+  if (usedCoupon) {
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "";
+    const ua = req.headers.get("user-agent") || "";
+    if (userId) {
+      await recordExport(userId, exportType, documentType, ip ? hashIP(ip) : undefined, ua);
+    }
+
+    const token = generateExportToken({
+      userId,
+      role,
+      exportType,
+      documentType,
+      removeBranding: false,
+      templateStyle: "standard" as const,
+    });
+
+    return NextResponse.json({
+      allowed: true,
+      role,
+      mustShowBranding: true,
+      allowedTemplateStyle: "standard" as const,
+      remainingToday: null,
+      usedCoupon: true,
+      token,
+    });
+  }
+
+  // Normal authorization flow (daily limit check)
   const result = await authorizeExport(
     role,
     exportType,
