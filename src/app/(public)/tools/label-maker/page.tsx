@@ -10,6 +10,8 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 
+import { buildLabelA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/labels/a4-export-renderer';
+
 const DISCLAIMER = "本工具生成的是通用唛头、箱贴、仓库标签和信息面单，不是任何承运商或平台的官方运单。正式快递面单、平台标签、FBA 标签等，请以承运商、平台、仓库或服务商系统生成为准。";
 
 type MobileTab = 'edit' | 'preview' | 'export';
@@ -60,31 +62,46 @@ export default function LabelMakerPage() {
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
-  // PNG export: isolated iframe approach
+  // PNG export: Fixed A4 canvas engine v1.12.8
   const handleExportPNG = useCallback(async () => {
-    if (!exportContainerRef.current) { alert('预览尚未加载，请稍后再试。'); return; }
     setExporting(true);
     try {
-      const html = buildLabelExportHTML({
-        type: selectedType, labelType, formData, style,
-        template, selectedSize, size,
+      const html = buildLabelA4ExportHTML({
+        type: selectedType,
+        titleZh: labelType?.titleZh || selectedType,
+        titleEn: labelType?.titleEn || '',
+        formData,
+        style: { primaryColor: style.primaryColor, borderColor: style.borderColor },
+        showBarcode: template?.showBarcode,
+        showQrCode: template?.showQrCode,
+        canRemoveBranding: canRemoveLabelBranding(),
       });
       const container = exportContainerRef.current;
+      if (!container) throw new Error('export container not found');
       container.innerHTML = '';
       const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'width:800px;height:1100px;border:0;position:absolute;left:-9999px;top:0;';
+      iframe.style.cssText = `position:absolute; left:-10000px; top:0; width:${A4_WIDTH}px; height:${A4_HEIGHT + 200}px; border:0;`;
       container.appendChild(iframe);
-      await new Promise<void>(resolve => { iframe.onload = () => resolve(); iframe.srcdoc = html; });
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('iframe load timeout')), 10000);
+        iframe.onload = () => { clearTimeout(timeout); resolve(); };
+        iframe.onerror = () => { clearTimeout(timeout); reject(new Error('iframe load error')); };
+        iframe.srcdoc = html;
+      });
+      await new Promise(r => setTimeout(r, 500));
 
       const html2canvas = (await import('html2canvas')).default;
-      const body = iframe.contentDocument?.body;
-      if (!body) throw new Error('iframe body not accessible');
-      const canvas = await html2canvas(body, {
-        scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false, allowTaint: true,
-        width: 800, height: body.scrollHeight,
+      const a4Page = iframe.contentDocument?.querySelector('.a4-page');
+      if (!a4Page) throw new Error('A4 page element not found in iframe');
+      const canvas = await html2canvas(a4Page as HTMLElement, {
+        backgroundColor: '#ffffff', scale: A4_EXPORT_SCALE, useCORS: true, logging: false, allowTaint: true,
+        width: A4_WIDTH, height: A4_HEIGHT, windowWidth: A4_WIDTH, windowHeight: A4_HEIGHT,
+        foreignObjectRendering: false,
       });
       container.removeChild(iframe);
+
+      const cw = canvas.width; const ch = canvas.height;
+      console.log(`[Label PNG Export] Canvas size: ${cw}×${ch}, ratio: ${(cw/ch).toFixed(3)}`);
 
       const now = new Date();
       const ts = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
@@ -94,12 +111,12 @@ export default function LabelMakerPage() {
       link.click();
     } catch (error: any) {
       console.error('Label PNG export failed:', error);
-      exportContainerRef.current && (exportContainerRef.current.innerHTML = '');
+      if (exportContainerRef.current) exportContainerRef.current.innerHTML = '';
       alert(`导出失败：${error?.message || '未知错误'}，请尝试使用浏览器打印功能导出 PDF。`);
     } finally {
       setExporting(false);
     }
-  }, [exportContainerRef, selectedType, labelType, formData, style, template, selectedSize, size]);
+  }, [exportContainerRef, selectedType, labelType, formData, style, template]);
 
   const addBatchItem = () => {
     const limit = getLabelBatchLimit();
@@ -513,83 +530,4 @@ export default function LabelMakerPage() {
       </div>
     </>
   );
-}
-
-// ---- Label export HTML builder (hex colors only) ----
-function buildLabelExportHTML(data: {
-  type: string; labelType: any; formData: Record<string, any>;
-  style: any; template: any; selectedSize: string; size: any;
-}): string {
-  const { formData, labelType, style } = data;
-  const pc = toHex(style.primaryColor);
-  const bc = toHex(style.borderColor);
-
-  let html = '';
-  html += `<div style="border:2px solid ${bc};padding:16px;font-family:sans-serif;font-size:10pt;">`;
-  // Header
-  html += `<div style="display:flex;justify-content:space-between;border-bottom:2px solid ${bc};padding-bottom:8px;margin-bottom:12px;">`;
-  html += `<div>`;
-  html += `<h2 style="color:${pc};font-size:14pt;font-weight:bold;margin:0;">${esc(labelType?.titleZh || '')}</h2>`;
-  html += `<p style="color:#6b7280;font-size:8pt;margin:0;">${esc(labelType?.titleEn || '')}</p>`;
-  html += `</div>`;
-  html += `<div style="text-align:right;font-size:9pt;">`;
-  if (formData.destination || formData.destCountry) html += `<p>${esc(formData.destination || formData.destCountry)}</p>`;
-  if (formData.cartonNo) html += `<p style="font-weight:bold;font-size:12pt;">C/No. ${esc(formData.cartonNo)}</p>`;
-  if (formData.combinedNo) html += `<p>合箱: ${esc(formData.combinedNo)}</p>`;
-  html += `</div></div>`;
-
-  // Type-specific content
-  if (data.type === 'shipping-mark') {
-    if (formData.mainMark) html += `<div style="border:1px solid ${bc};padding:8px;margin-bottom:8px;"><p style="font-size:8pt;color:#6b7280;">Main Mark</p><p style="font-weight:bold;">${esc(formData.mainMark)}</p></div>`;
-    if (formData.sideMark) html += `<div style="border:1px solid ${bc};padding:8px;margin-bottom:8px;"><p style="font-size:8pt;color:#6b7280;">Side Mark</p><p>${esc(formData.sideMark)}</p></div>`;
-    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:9pt;">`;
-    if (formData.grossWeight) html += `<div><span style="color:#6b7280;">G.W.: </span><span>${esc(formData.grossWeight)}</span></div>`;
-    if (formData.netWeight) html += `<div><span style="color:#6b7280;">N.W.: </span><span>${esc(formData.netWeight)}</span></div>`;
-    if (formData.measurement) html += `<div><span style="color:#6b7280;">MEAS: </span><span>${esc(formData.measurement)}</span></div>`;
-    if (formData.origin) html += `<div><span style="color:#6b7280;">Origin: </span><span>${esc(formData.origin)}</span></div>`;
-    html += `</div>`;
-  } else if (data.type === 'parcel-info-label') {
-    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:9pt;">`;
-    html += `<div><p style="color:#6b7280;font-size:8pt;">寄件人 Sender</p><p style="font-weight:bold;white-space:pre-wrap;">${esc(formData.senderName || '—')}</p>`;
-    if (formData.senderPhone) html += `<p style="color:#9ca3af;font-size:8pt;">${esc(formData.senderPhone)}</p>`;
-    html += `</div>`;
-    html += `<div><p style="color:#6b7280;font-size:8pt;">收件人 Receiver</p><p style="font-weight:bold;white-space:pre-wrap;">${esc(formData.receiverName || '—')}</p>`;
-    if (formData.receiverPhone) html += `<p style="color:#9ca3af;font-size:8pt;">${esc(formData.receiverPhone)}</p>`;
-    html += `</div></div>`;
-    if (formData.receiverAddress) html += `<div style="margin-top:8px;font-size:9pt;"><span style="color:#6b7280;">地址: </span>${esc(formData.receiverAddress)}</div>`;
-    html += `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;font-size:9pt;">`;
-    if (formData.country) html += `<div><span style="color:#6b7280;">国家: </span>${esc(formData.country)}</div>`;
-    if (formData.postalCode) html += `<div><span style="color:#6b7280;">邮编: </span>${esc(formData.postalCode)}</div>`;
-    if (formData.refNo) html += `<div><span style="color:#6b7280;">单号: </span>${esc(formData.refNo)}</div>`;
-    html += `</div>`;
-  } else {
-    // Generic: render all fields
-    if (data.template?.fields) {
-      html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:9pt;">`;
-      for (const f of data.template.fields) {
-        if (formData[f.key]) {
-          html += `<div><span style="color:#6b7280;">${esc(f.label)}: </span><span>${esc(String(formData[f.key]))}</span></div>`;
-        }
-      }
-      html += `</div>`;
-    }
-  }
-
-  html += `<div style="margin-top:16px;padding-top:8px;border-top:1px solid ${bc};text-align:center;font-size:7pt;color:#d1d5db;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
-  html += `</div>`;
-
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    *{box-sizing:border-box;}body{margin:0;padding:0;background:#fff;color:#111827;}@page{margin:0;}
-  </style></head><body style="padding:24px;">${html}</body></html>`;
-}
-
-function toHex(c: string): string {
-  if (!c || c === 'transparent') return '#d1d5db';
-  if (/^#[0-9a-fA-F]{6}$/.test(c)) return c;
-  if (/^#[0-9a-fA-F]{3}$/.test(c)) return `#${c[1]}${c[1]}${c[2]}${c[2]}${c[3]}${c[3]}`;
-  return '#000000';
-}
-
-function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

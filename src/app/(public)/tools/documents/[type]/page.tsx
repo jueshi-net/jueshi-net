@@ -14,6 +14,7 @@ import { getTemplate } from '@/lib/documents/document-fields';
 import { getRoleInfo, canRemoveBranding, canUseCustomStyle, canUploadLogo, canExportWord, permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
 import { AdSlot } from '@/components/ad-slot';
+import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -138,24 +139,20 @@ export default function DocumentEditorPage() {
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
-  // ---- PNG Export: isolated render approach ----
+  // ---- PNG Export: Fixed A4 canvas engine v1.12.8 ----
   const handleExportPNG = useCallback(async () => {
-    if (!exportContainerRef.current) {
-      alert('预览尚未加载，请稍后再试。');
-      return;
-    }
     setExporting(true);
     try {
-      // Build pure-hex HTML string for export
-      const html = buildExportHTML({
+      // Build A4 HTML using the dedicated renderer (pure inline CSS, NO Tailwind)
+      const html = buildA4ExportHTML({
         companyName: companyProfile?.companyName || formData.companyName || '公司名称',
         companyNameEn: companyProfile?.companyNameEn || formData.companyNameEn || '',
         companyAddress: companyProfile?.address || formData.companyAddress || '',
         companyPhone: companyProfile?.phone || formData.companyPhone || '',
         companyEmail: companyProfile?.email || formData.companyEmail || '',
         companyWebsite: companyProfile?.website || formData.companyWebsite || '',
-        documentNo: formData.documentNo || '___',
-        documentDate: formData.documentDate || '___',
+        documentNo: formData.documentNo || '',
+        documentDate: formData.documentDate || '',
         titleZh: docType?.titleZh || type,
         titleEn: docType?.titleEn || '',
         sections: (template?.sections || []).map(s => ({
@@ -167,7 +164,6 @@ export default function DocumentEditorPage() {
           columns: template?.lineItems || [],
           rows: lineItems,
           totals: (template?.totals || []).map(key => ({
-            key,
             label: getTotalLabel(key),
             value: key.includes('Amount') || key.includes('Value')
               ? formatCurrency(calculateTotal(key), formData.currency)
@@ -183,49 +179,67 @@ export default function DocumentEditorPage() {
         },
       });
 
-      // Render the pure-HTML into a hidden container, then screenshot it
+      // Create hidden iframe with EXPLICIT fixed A4 width
       const container = exportContainerRef.current;
+      if (!container) throw new Error('export container not found');
       container.innerHTML = '';
       const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'width:800px;height:1100px;border:0;position:absolute;left:-9999px;top:0;';
+      // Must NOT be display:none / visibility:hidden / opacity:0
+      // Use position:absolute offscreen
+      iframe.style.cssText = `position:absolute; left:-10000px; top:0; width:${A4_WIDTH}px; height:${A4_HEIGHT + 200}px; border:0;`;
       container.appendChild(iframe);
 
-      await new Promise<void>(resolve => {
-        iframe.onload = () => resolve();
+      // Load the A4 HTML into iframe
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('iframe load timeout')), 10000);
+        iframe.onload = () => { clearTimeout(timeout); resolve(); };
+        iframe.onerror = () => { clearTimeout(timeout); reject(new Error('iframe load error')); };
         iframe.srcdoc = html;
       });
-      // Wait for iframe content to render
-      await new Promise(r => setTimeout(r, 200));
+
+      // Wait for content to fully render
+      await new Promise(r => setTimeout(r, 500));
 
       const html2canvas = (await import('html2canvas')).default;
-      // Screenshot the iframe body
-      const body = iframe.contentDocument?.body;
-      if (!body) throw new Error('iframe body not accessible');
+      // Capture the .a4-page element INSIDE the iframe (NOT the body)
+      const a4Page = iframe.contentDocument?.querySelector('.a4-page');
+      if (!a4Page) throw new Error('A4 page element not found in iframe');
 
-      const canvas = await html2canvas(body, {
-        scale: 2,
+      const canvas = await html2canvas(a4Page as HTMLElement, {
         backgroundColor: '#ffffff',
+        scale: A4_EXPORT_SCALE,
         useCORS: true,
         logging: false,
         allowTaint: true,
-        width: 800,
-        height: body.scrollHeight,
+        // CRITICAL: Fixed viewport dimensions — prevents mobile-width squishing
+        width: A4_WIDTH,
+        height: A4_HEIGHT,
+        windowWidth: A4_WIDTH,
+        windowHeight: A4_HEIGHT,
+        foreignObjectRendering: false,
       });
 
       container.removeChild(iframe);
 
+      // Verify dimensions
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const ratio = cw / ch;
+      console.log(`[PNG Export] Canvas size: ${cw}×${ch}, ratio: ${ratio.toFixed(3)} (expected ~0.707)`);
+
+      // Download
       const link = document.createElement('a');
       link.download = `${docType?.exportFileNamePrefix || type}_${formData.documentNo || 'draft'}_${new Date().toISOString().slice(0, 10)}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (error) {
       console.error('PNG export failed:', error);
-      exportContainerRef.current && (exportContainerRef.current.innerHTML = '');
+      if (exportContainerRef.current) exportContainerRef.current.innerHTML = '';
       alert('导出图片失败：' + (error instanceof Error ? error.message : '未知错误') + '。请尝试使用浏览器打印功能导出 PDF。');
     } finally {
       setExporting(false);
     }
-  }, [previewRef, exportContainerRef, docType, formData, companyProfile, lineItems, style, template, type, calculateTotal]);
+  }, [exportContainerRef, docType, formData, companyProfile, lineItems, style, template, type, calculateTotal]);
 
   const handleExportWord = useCallback(() => {
     if (!canExportWord()) { alert(permissionMessages.exportWord); return; }
@@ -769,126 +783,4 @@ export default function DocumentEditorPage() {
       </div>
     </div>
   );
-}
-
-// ---- Pure HTML builder for PNG export (hex colors only, no Tailwind, no lab/oklch) ----
-function buildExportHTML(data: {
-  companyName: string; companyNameEn: string; companyAddress: string;
-  companyPhone: string; companyEmail: string; companyWebsite: string;
-  documentNo: string; documentDate: string; titleZh: string; titleEn: string;
-  sections: { title: string; fields: { key: string; label: string; colspan?: number }[]; data: Record<string, any> }[];
-  lineItems: { columns: { key: string; label: string; width?: string }[]; rows: Record<string, any>[]; totals: { key: string; label: string; value: string }[] };
-  terms: string; canRemoveBranding: boolean;
-  style: { primaryColor: string; borderColor: string; headingBgColor: string };
-}): string {
-  const { primaryColor, borderColor, headingBgColor } = data.style;
-  const pc = toHex(primaryColor);
-  const bc = toHex(borderColor);
-  const hbg = toHex(headingBgColor);
-  const safeBg = (c: string) => { const h = toHex(c); return h === '#000000' ? '#f3f4f6' : h; };
-
-  let html = '';
-
-  // Header
-  html += `<div style="border-bottom:2px solid ${bc};padding-bottom:16px;margin-bottom:16px;">`;
-  html += `<div style="display:flex;justify-content:space-between;">`;
-  html += `<div>`;
-  html += `<h2 style="color:${pc};font-size:14pt;font-weight:bold;margin:0 0 4px 0;">${esc(data.companyName || '公司名称')}</h2>`;
-  if (data.companyNameEn) html += `<p style="color:#6b7280;font-size:9pt;margin:0 0 2px 0;">${esc(data.companyNameEn)}</p>`;
-  if (data.companyAddress) html += `<p style="color:#6b7280;font-size:9pt;margin:0 0 2px 0;">${esc(data.companyAddress)}</p>`;
-  if (data.companyPhone || data.companyEmail) {
-    html += `<p style="color:#6b7280;font-size:9pt;margin:0;">`;
-    if (data.companyPhone) html += `Tel: ${esc(data.companyPhone)}`;
-    if (data.companyPhone && data.companyEmail) html += ` | `;
-    if (data.companyEmail) html += `Email: ${esc(data.companyEmail)}`;
-    html += `</p>`;
-  }
-  html += `</div>`;
-  html += `<div style="text-align:right;">`;
-  html += `<h1 style="color:${pc};font-size:18pt;font-weight:bold;margin:0 0 2px 0;">${esc(data.titleZh)}</h1>`;
-  html += `<p style="color:#6b7280;font-size:10pt;margin:0 0 8px 0;">${esc(data.titleEn)}</p>`;
-  html += `<p style="font-size:10pt;margin:0 0 2px 0;">No.: <strong>${esc(data.documentNo || '___')}</strong></p>`;
-  html += `<p style="font-size:10pt;margin:0;">Date: ${esc(data.documentDate || '___')}</p>`;
-  html += `</div></div></div>`;
-
-  // Sections
-  for (const section of data.sections) {
-    const hasData = section.fields.some(f => section.data[f.key]);
-    if (!hasData) continue;
-    html += `<div style="margin-bottom:12px;">`;
-    html += `<h3 style="background-color:${safeBg(hbg)};color:${pc};font-size:10pt;font-weight:bold;margin:0 0 6px 0;padding:4px 8px;">${esc(section.title)}</h3>`;
-    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:9pt;">`;
-    for (const field of section.fields) {
-      const val = section.data[field.key];
-      if (!val) continue;
-      const span = field.colspan === 2 ? 'grid-column:span 2;' : '';
-      html += `<div style="${span}"><span style="color:#6b7280;">${esc(field.label)}: </span><span style="color:#111827;">${esc(String(val))}</span></div>`;
-    }
-    html += `</div></div>`;
-  }
-
-  // Line items
-  if (data.lineItems.columns.length > 0 && data.lineItems.rows.length > 0) {
-    html += `<div style="margin-bottom:12px;">`;
-    html += `<h3 style="background-color:${safeBg(hbg)};color:${pc};font-size:10pt;font-weight:bold;margin:0 0 6px 0;padding:4px 8px;">货物/项目明细</h3>`;
-    html += `<table style="width:100%;border-collapse:collapse;font-size:9pt;">`;
-    html += `<thead><tr style="background-color:${safeBg(hbg)};">`;
-    for (const col of data.lineItems.columns) {
-      html += `<th style="border:1px solid ${bc};padding:4px 8px;text-align:left;color:${pc};font-weight:bold;">${esc(col.label)}</th>`;
-    }
-    html += `</tr></thead><tbody>`;
-    for (const row of data.lineItems.rows) {
-      html += `<tr>`;
-      for (const col of data.lineItems.columns) {
-        const val = row[col.key] ?? '';
-        const isAmt = col.key === 'amount' || col.key === 'totalValue' || col.key === 'unitPrice';
-        html += `<td style="border:1px solid ${bc};padding:4px 8px;${isAmt ? 'text-align:right;' : ''}">${esc(String(val))}</td>`;
-      }
-      html += `</tr>`;
-    }
-    if (data.lineItems.totals.length > 0) {
-      html += `<tfoot><tr style="background-color:${safeBg(hbg)};font-weight:bold;">`;
-      html += `<td colspan="${data.lineItems.columns.length}" style="border:1px solid ${bc};padding:4px 8px;text-align:right;">`;
-      for (const t of data.lineItems.totals) {
-        html += `<span style="margin-left:16px;">${esc(t.label)}: ${esc(t.value)}</span>`;
-      }
-      html += `</td></tr></tfoot>`;
-    }
-    html += `</tbody></table></div>`;
-  }
-
-  // Terms
-  if (data.terms) {
-    html += `<div style="margin-bottom:12px;">`;
-    html += `<h3 style="background-color:${safeBg(hbg)};color:${pc};font-size:10pt;font-weight:bold;margin:0 0 6px 0;padding:4px 8px;">备注条款</h3>`;
-    html += `<p style="font-size:9pt;white-space:pre-wrap;color:#111827;">${esc(data.terms)}</p></div>`;
-  }
-
-  // Signature
-  html += `<div style="margin-top:32px;padding-top:16px;border-top:1px solid ${bc};">`;
-  html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;font-size:9pt;">`;
-  html += `<div><p style="color:#6b7280;margin:0 0 48px 0;">卖方/制单人签字盖章：</p><p style="margin:0;">日期：____________</p></div>`;
-  html += `<div><p style="color:#6b7280;margin:0 0 48px 0;">买方/审核人签字盖章：</p><p style="margin:0;">日期：____________</p></div>`;
-  html += `</div></div>`;
-
-  if (!data.canRemoveBranding) {
-    html += `<div style="margin-top:24px;padding-top:12px;border-top:1px solid ${bc};text-align:center;font-size:8pt;color:#d1d5db;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
-  }
-
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    *{box-sizing:border-box;}
-    body{font-family:"SimSun","Noto Serif SC","Songti SC",serif;margin:0;padding:0;background:#fff;color:#111827;}
-    @page{margin:0;}
-  </style></head><body style="padding:24px;">${html}</body></html>`;
-}
-
-function toHex(c: string): string {
-  if (!c || c === 'transparent') return '#d1d5db';
-  if (/^#[0-9a-fA-F]{6}$/.test(c)) return c;
-  if (/^#[0-9a-fA-F]{3}$/.test(c)) return `#${c[1]}${c[1]}${c[2]}${c[2]}${c[3]}${c[3]}`;
-  return '#000000';
-}
-
-function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
