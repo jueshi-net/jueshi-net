@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/auth/permissions';
 
 export async function GET(req: NextRequest) {
+  const adminCheck = await requireAdmin();
+  if ('error' in adminCheck) return adminCheck.error;
+
   try {
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') || 'json';

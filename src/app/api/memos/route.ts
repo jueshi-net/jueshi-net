@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { requireLogin, getUserLimits } from '@/lib/auth/permissions';
 
 // GET /api/memos - 获取用户备忘录
 export async function GET() {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 });
-  }
+  const res = await requireLogin();
+  if ('error' in res) return res.error;
 
   const memos = await prisma.memo.findMany({
-    where: { userId: session.user.id },
+    where: { userId: res.session.user.id },
     orderBy: [{ isPinned: 'desc' }, { updatedAt: 'desc' }],
   });
 
@@ -19,10 +18,8 @@ export async function GET() {
 
 // POST /api/memos - 创建备忘录
 export async function POST(req: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 });
-  }
+  const res = await requireLogin();
+  if ('error' in res) return res.error;
 
   const { title, content, category, color, dueDate } = await req.json();
 
@@ -30,9 +27,18 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '缺少标题' }, { status: 400 });
   }
 
+  // Check memo limit
+  const limits = getUserLimits(res.role as any);
+  if (limits.maxMemos > 0) {
+    const count = await prisma.memo.count({ where: { userId: res.session.user.id } });
+    if (count >= limits.maxMemos) {
+      return NextResponse.json({ error: `备忘录数量已达上限 (${limits.maxMemos})` }, { status: 403 });
+    }
+  }
+
   const memo = await prisma.memo.create({
     data: {
-      userId: session.user.id,
+      userId: res.session.user.id,
       title,
       content: content || '',
       category: category || '',
