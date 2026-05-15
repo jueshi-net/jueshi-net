@@ -1,2 +1,2 @@
 -- Add memberUntil field to User
-ALTER TABLE "users" ADD COLUMN "member_until" TIMESTAMP(3);
+ALTER TABLE "users" ADD COLUMN "memberUntil" TIMESTAMP(3);
