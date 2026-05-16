@@ -3,7 +3,7 @@ import {
   Package, Calculator, FileText, MapPin, Globe, Briefcase,
   ArrowRight, Zap, Users, BookOpen, Calendar, Eye, Star,
   Tag, Receipt, ClipboardList, FileBadge, FileSignature, Shield,
-  Layers, Palette, PenTool, LayoutDashboard,
+  Layers, Palette, PenTool, LayoutDashboard, Sparkles,
 } from 'lucide-react';
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
@@ -12,6 +12,7 @@ import { AdSlot } from '@/components/ad-slot';
 import { StarterResourcesSection } from '@/components/home/starter-resources';
 import { ScenarioCardGrid } from '@/components/starter/scenario-card-grid';
 import PopularToolsSection from '@/components/home/popular-tools-section';
+import { AiToolsSection } from '@/components/home/ai-tools-section';
 
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
@@ -267,6 +268,9 @@ export default async function LandingPage() {
         title="按场景开始"
         subtitle="不用从一堆工具里慢慢找，直接选择你的身份和任务"
       />
+
+      {/* ===== 站内 AI 工具 ===== */}
+      <AiToolsSection />
 
       {/* ===== 本周热门工具 (Top 5 from rankings) ===== */}
       <PopularToolsSection />

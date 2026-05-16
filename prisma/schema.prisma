@@ -24,6 +24,7 @@ model User {
   workbenchLinks       WorkbenchLink[]
   toolFavorites        ToolFavorite[]
   toolReviews          ToolReview[]
+  aiUsageLogs          AIUsageLog[]
   accounts             Account[]
   auditLogs            AuditLog[]
   favorites            Favorite[]
@@ -702,4 +703,24 @@ model ToolReview {
   @@index([status])
   @@index([createdAt])
   @@map("tool_reviews")
+}
+
+// AI 工具使用记录
+model AIUsageLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  toolType    String         // product_copy / translate_polish / document_summary
+  inputHash   String?        // SHA256 hash of input, not raw text
+  outputTokens Int?
+  costPoints  Int      @default(0)
+  ipHash      String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([toolType])
+  @@index([createdAt])
+  @@map("ai_usage_logs")
 }
