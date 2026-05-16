@@ -9,6 +9,7 @@ interface ModuleCard {
   status: "online" | "partial" | "planned";
   statusLabel: string;
   description: string;
+  dataSource: string;
   color: string;
 }
 
@@ -20,6 +21,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "查看/编辑用户、角色、积分、会员到期时间",
+    dataSource: "DB: users, memberships, point_ledgers",
     color: "blue",
   },
   {
@@ -29,6 +31,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "审核用户提交的工具短评（通过/隐藏/拒绝）",
+    dataSource: "DB: tool_reviews",
     color: "yellow",
   },
   {
@@ -37,7 +40,8 @@ const modules: ModuleCard[] = [
     icon: FileText,
     status: "online",
     statusLabel: "已上线",
-    description: "管理网站文章/指南/教程。数据来自 DB articles 表，当前 20 篇",
+    description: "管理网站文章/指南/教程。前台展示：/guides 和 /guides/[slug]",
+    dataSource: "DB: articles",
     color: "orange",
   },
   {
@@ -47,6 +51,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "管理广告位。支持图片广告、文字广告、HTML/JS 代码广告",
+    dataSource: "DB: ad_slots",
     color: "green",
   },
   {
@@ -55,7 +60,8 @@ const modules: ModuleCard[] = [
     icon: FolderOpen,
     status: "partial",
     statusLabel: "已上线/待完善",
-    description: "DB 中 80 条数据（生活/物流/商业/模板）。后台入口：/admin/resources",
+    description: "管理资源库内容。前台展示：/resources 和 /resources/[slug]",
+    dataSource: "DB: resources",
     color: "purple",
   },
   {
@@ -65,6 +71,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "管理链接收藏、分类、标签",
+    dataSource: "DB: links, link_categories, link_tags",
     color: "teal",
   },
   {
@@ -74,6 +81,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "管理链接分类和标签",
+    dataSource: "DB: link_categories, link_tags",
     color: "indigo",
   },
   {
@@ -82,7 +90,8 @@ const modules: ModuleCard[] = [
     icon: Package,
     status: "partial",
     statusLabel: "代码级管理",
-    description: "8 种唛头/标签类型。目前通过代码配置，不是后台编辑。v1.20 计划 CMS 化",
+    description: "8 种唛头/标签类型 + 6 种视觉风格。目前通过代码配置，不是后台编辑",
+    dataSource: "代码: src/lib/documents / src/lib/labels",
     color: "gray",
   },
   {
@@ -92,6 +101,7 @@ const modules: ModuleCard[] = [
     status: "planned",
     statusLabel: "未实现",
     description: "计划在 v1.20/v1.21 实现，目前无 model/API/页面",
+    dataSource: "无",
     color: "sky",
   },
   {
@@ -101,6 +111,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "网站基础设置",
+    dataSource: "DB: site_settings",
     color: "slate",
   },
   {
@@ -110,6 +121,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "数据库备份管理",
+    dataSource: "系统: pg_dump + 脚本",
     color: "emerald",
   },
   {
@@ -119,6 +131,7 @@ const modules: ModuleCard[] = [
     status: "online",
     statusLabel: "已上线",
     description: "审计日志、安全设置",
+    dataSource: "DB: audit_logs",
     color: "red",
   },
 ];
@@ -172,7 +185,8 @@ export default function AdminPage() {
                 <Icon className={`w-5 h-5 ${c.icon}`} />
                 <h3 className="font-semibold text-gray-700">{m.name}</h3>
               </div>
-              <p className="text-xs text-gray-500 mb-2">{m.description}</p>
+              <p className="text-xs text-gray-500 mb-1">{m.description}</p>
+              <p className="text-xs text-gray-400 mb-2 font-mono">{m.dataSource}</p>
               <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
             </div>
           ) : (
@@ -188,7 +202,8 @@ export default function AdminPage() {
                 </div>
                 <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
               </div>
-              <p className="text-xs text-gray-500 mb-3">{m.description}</p>
+              <p className="text-xs text-gray-500 mb-1">{m.description}</p>
+              <p className="text-xs text-gray-400 mb-3 font-mono">{m.dataSource}</p>
               <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
             </Link>
           );

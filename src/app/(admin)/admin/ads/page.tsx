@@ -26,13 +26,14 @@ interface AdSlot {
 }
 
 const positionOptions = [
+  { value: "home-after-tools", label: "首页工具列表下方" },
+  { value: "home-before-footer", label: "首页底部之前" },
+  { value: "tool-bottom", label: "工具页底部" },
+  { value: "sidebar", label: "侧边栏" },
+  { value: "article-bottom", label: "文章详情页底部" },
   { value: "TOP_BANNER", label: "首页顶部横幅" },
-  { value: "SIDEBAR_LEFT", label: "侧边栏广告" },
-  { value: "SIDEBAR_RIGHT", label: "右侧栏广告" },
   { value: "INLINE", label: "文章内嵌广告" },
   { value: "FOOTER", label: "页脚广告" },
-  { value: "FLOATING", label: "悬浮广告" },
-  { value: "TOOL_PAGE", label: "工具页广告" },
 ];
 
 const typeOptions = [

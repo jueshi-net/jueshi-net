@@ -4,6 +4,15 @@ interface AdBannerProps {
   position: string;
 }
 
+/**
+ * AdBanner — 服务端组件，从 DB ad_slots 表读取并渲染广告。
+ *
+ * ⚠️ SECURITY NOTE: code 类型广告使用 dangerouslySetInnerHTML 渲染。
+ *   - code 类型广告只能由 admin 通过 /admin/ads 后台创建/编辑
+ *   - POST/PUT/PATCH /api/ads 全部 requireAdmin()，普通用户无法写入
+ *   - 这不是用户提交内容，仅渲染管理员信任的代码
+ *   - 如果未来需要支持用户提交的 HTML，必须引入 CSP/sanitize 机制
+ */
 export default async function AdBanner({ position }: AdBannerProps) {
   const ads = await prisma.adSlot.findMany({
     where: { position: position as any, isActive: true },
