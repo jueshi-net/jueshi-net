@@ -1,3 +1,7 @@
+// Fix: trust the request host to avoid UntrustedHost errors
+// when NEXTAUTH_URL domain doesn't match the actual domain (kjbxb.com vs jueshi.net)
+process.env.AUTH_TRUST_HOST = 'true';
+
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
