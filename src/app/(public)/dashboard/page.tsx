@@ -8,6 +8,10 @@ import {
   ArrowUpCircle, ArrowDownCircle, MinusCircle, Gift, BookOpen,
   Ticket, Shield, Sparkles,
 } from "lucide-react";
+import ProfileSelector from "@/components/dashboard/profile-selector";
+import MyTools from "@/components/dashboard/my-tools";
+import MyLinks from "@/components/dashboard/my-links";
+import RecommendedPackages from "@/components/dashboard/recommended-packages";
 
 // Types
 interface DashboardData {
@@ -79,6 +83,16 @@ export default function DashboardPage() {
 
   // Member state
   const [memberInfo, setMemberInfo] = useState<{ isMember: boolean; memberUntil: string | null } | null>(null);
+
+  // Workbench state
+  const [workbenchData, setWorkbenchData] = useState<{
+    profileType: string | null;
+    links: any[];
+    favorites: any[];
+    recommendedTools: any[];
+    recommendedPackages: any[];
+    limits: { maxLinks: number };
+  } | null>(null);
 
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
@@ -152,6 +166,19 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Fetch workbench data
+  const fetchWorkbench = useCallback(async () => {
+    try {
+      const res = await fetch("/api/workbench/summary");
+      if (res.ok) {
+        const data = await res.json();
+        setWorkbenchData(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch workbench:", e);
+    }
+  }, []);
+
   // Redeem
   const handleRedeem = useCallback(async (rewardItemId: string, name: string, cost: number) => {
     if (userPoints < cost) {
@@ -196,8 +223,9 @@ export default function DashboardPage() {
     if (!loginRequired) {
       fetchRewards();
       fetchMyRewards();
+      fetchWorkbench();
     }
-  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards]);
+  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench]);
 
   // Check-in handler
   const handleCheckIn = useCallback(async () => {
@@ -406,6 +434,27 @@ export default function DashboardPage() {
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* ===== Workbench Section ===== */}
+      {!loginRequired && workbenchData && (
+        <div className="space-y-4">
+          <ProfileSelector
+            currentProfileType={workbenchData.profileType}
+            onUpdate={(pt) => setWorkbenchData(prev => prev ? { ...prev, profileType: pt } : null)}
+          />
+          <MyTools
+            favorites={workbenchData.favorites}
+            recommendedTools={workbenchData.recommendedTools}
+            onRefresh={fetchWorkbench}
+          />
+          <MyLinks
+            links={workbenchData.links}
+            maxLinks={workbenchData.limits.maxLinks}
+            onRefresh={fetchWorkbench}
+          />
+          <RecommendedPackages packages={workbenchData.recommendedPackages} />
         </div>
       )}
 

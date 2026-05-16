@@ -18,8 +18,11 @@ model User {
   checkinStreak        Int                @default(0)       // 连续签到天数
   lastCheckinDate      String?            // 最后一次签到日期 YYYY-MM-DD
   memberUntil          DateTime?          // 会员体验到期时间
+  profileType          String?            @map("profile_type")  // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
+  workbenchLinks       WorkbenchLink[]
+  toolFavorites        ToolFavorite[]
   accounts             Account[]
   auditLogs            AuditLog[]
   favorites            Favorite[]
@@ -642,3 +645,37 @@ model UserReward {
 }
 
 // NOTE: Adding memberUntil field to User model
+
+// 工作台自定义网址收藏
+model WorkbenchLink {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String           // 标题，max 80
+  url         String           // 网址，http/https
+  description String?          // 描述，max 200
+  iconUrl     String?          // 图标 URL
+  category    String?          // 分类
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("workbench_links")
+}
+
+// 站内工具收藏
+model ToolFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  toolKey   String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolKey])
+  @@index([userId])
+  @@map("tool_favorites")
+}
