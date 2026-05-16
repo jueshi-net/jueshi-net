@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma';
 import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
 import { AdSlot } from '@/components/ad-slot';
 import { StarterResourcesSection } from '@/components/home/starter-resources';
+import { ScenarioCardGrid } from '@/components/starter/scenario-card-grid';
 
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
@@ -259,6 +260,12 @@ export default async function LandingPage() {
 
       {/* ===== STARTER RESOURCES — moved higher ===== */}
       <StarterResourcesSection />
+
+      {/* ===== 按场景开始 ===== */}
+      <ScenarioCardGrid
+        title="按场景开始"
+        subtitle="不用从一堆工具里慢慢找，直接选择你的身份和任务"
+      />
 
       {/* ===== QUICK ACCESS TOOLS ===== */}
       <div className="max-w-6xl mx-auto px-4 py-12">
