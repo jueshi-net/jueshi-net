@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Shield, AlertTriangle } from "lucide-react";
 import { Metadata } from "next";
 import { starterResources, starterCategories } from "@/lib/data/starter-resources";
+import { SCENARIO_PACKAGES } from "@/data/scenario-packages";
 
 export const metadata: Metadata = {
   title: "外网新手资源清单 — 海外百宝箱",
@@ -67,6 +68,46 @@ export default function StarterPage() {
             不提供 VPN、代理节点或网络访问服务。
           </p>
         </div>
+
+        {/* ===== 按场景开始 ===== */}
+        <section className="mb-12">
+          <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+            <span>🎯</span>
+            按场景开始
+          </h2>
+          <p className="text-sm text-gray-400 mb-6">
+            不知道从哪开始？选一个适合你的场景，一站式工具包马上可用
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {SCENARIO_PACKAGES.map((pkg) => {
+              // Count total tools
+              let toolCount = 0;
+              for (const g of pkg.toolGroups) toolCount += g.tools.length;
+
+              return (
+                <Link
+                  key={pkg.slug}
+                  href={`/starter/${pkg.slug}`}
+                  className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-blue-200 transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-3xl">{pkg.emoji}</span>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{pkg.title}</h3>
+                      <p className="text-xs text-gray-400">{pkg.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">{pkg.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-400">👥 {pkg.targetUsers.split("、")[0]}</span>
+                    <span className="text-xs text-blue-600 font-medium">{toolCount} 个工具 →</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
         {/* Category nav */}
         <div className="flex flex-wrap gap-2 justify-center mb-10">
