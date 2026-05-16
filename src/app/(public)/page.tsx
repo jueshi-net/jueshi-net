@@ -40,7 +40,7 @@ const baseMetadata: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  let linkCount = 50, articleCount = 10, postalCount = 1080000, userCount = 5;
+  let linkCount = 50, articleCount = 10, postalCount = 2760000, userCount = 5;
   try {
     const { getSiteStats } = await import("@/lib/stats-cache");
     const data = await getSiteStats();
@@ -64,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LandingPage() {
   // Get real stats from database (cached 30s)
-  let linkCount = 50, articleCount = 10, postalCount = 1080000, userCount = 5;
+  let linkCount = 50, articleCount = 10, postalCount = 2760000, userCount = 5;
   try {
     const { getSiteStats } = await import("@/lib/stats-cache");
     const data = await getSiteStats();
