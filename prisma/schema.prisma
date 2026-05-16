@@ -23,6 +23,7 @@ model User {
   updatedAt            DateTime           @updatedAt
   workbenchLinks       WorkbenchLink[]
   toolFavorites        ToolFavorite[]
+  toolReviews          ToolReview[]
   accounts             Account[]
   auditLogs            AuditLog[]
   favorites            Favorite[]
@@ -678,4 +679,27 @@ model ToolFavorite {
   @@unique([userId, toolKey])
   @@index([userId])
   @@map("tool_favorites")
+}
+
+// 工具短评
+model ToolReview {
+  id            String   @id @default(cuid())
+  userId        String
+  toolKey       String         // 工具标识
+  rating        Int            // 1-5 评分
+  content       String         // 10-140 字短评
+  status        String   @default("pending")  // pending / approved / rejected / hidden
+  pointsAwarded Boolean  @default(false)
+  ipHash        String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolKey])
+  @@index([toolKey])
+  @@index([status])
+  @@index([createdAt])
+  @@map("tool_reviews")
 }

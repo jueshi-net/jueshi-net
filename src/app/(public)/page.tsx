@@ -11,6 +11,7 @@ import { TrackedHomeToolLink } from '@/components/tracked-home-tool-link';
 import { AdSlot } from '@/components/ad-slot';
 import { StarterResourcesSection } from '@/components/home/starter-resources';
 import { ScenarioCardGrid } from '@/components/starter/scenario-card-grid';
+import PopularToolsSection from '@/components/home/popular-tools-section';
 
 // Base metadata (not exported — merged with generateMetadata)
 const baseMetadata: Metadata = {
@@ -266,6 +267,9 @@ export default async function LandingPage() {
         title="按场景开始"
         subtitle="不用从一堆工具里慢慢找，直接选择你的身份和任务"
       />
+
+      {/* ===== 本周热门工具 (Top 5 from rankings) ===== */}
+      <PopularToolsSection />
 
       {/* ===== QUICK ACCESS TOOLS ===== */}
       <div className="max-w-6xl mx-auto px-4 py-12">

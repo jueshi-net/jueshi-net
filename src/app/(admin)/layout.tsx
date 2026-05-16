@@ -23,6 +23,7 @@ const navItems = [
   { href: "/admin/audit", label: "审计日志", icon: ClipboardList },
   { href: "/admin/health", label: "系统健康", icon: Activity },
   { href: "/admin/settings", label: "系统设置", icon: Settings },
+  { href: "/admin/tool-reviews", label: "短评审核", icon: MessageSquare },
 ];
 
 export default async function AdminLayout({

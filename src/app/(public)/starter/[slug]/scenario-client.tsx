@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, ExternalLink, ArrowLeft, ChevronRight, AlertTriangle, Check, Lock } from "lucide-react";
+import ToolReviewPanel from "@/components/tools/tool-review-panel";
 
 interface ScenarioTool {
   name: string;
@@ -277,6 +278,13 @@ function ToolCard({
               {tag}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Review panel */}
+      {tool.toolKey && (
+        <div className="mt-3 pt-3 border-t">
+          <ToolReviewPanel toolKey={tool.toolKey} isLoggedIn={isLoggedIn} />
         </div>
       )}
 
