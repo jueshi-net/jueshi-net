@@ -1,13 +1,13 @@
 'use client';
 import { AdSlot } from '@/components/ad-slot';
-
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2 } from 'lucide-react';
+import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
+import Link from 'next/link';
 
 function normalizePostal(input: string): string {
   return input.trim().toUpperCase().replace(/[\s\-]+/g, '');
@@ -218,7 +218,6 @@ export default function PostalCodePage() {
       const params = new URLSearchParams({ q, country: cc });
       const res = await fetch(`/api/postal-codes?${params}`);
       const json = await res.json();
-      // API returns { results, total }
       const results = json.results || json.data || [];
       setDbResults(results);
       setDbTotal(json.total || results.length);
@@ -271,40 +270,71 @@ export default function PostalCodePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">邮编参考查询工具</h1>
-          <p className="text-lg text-blue-100">格式校验 + 城市邮编范围查询 + 官方查询入口 — 覆盖加拿大、美国、英国、澳大利亚、新西兰</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* ===== HERO ===== */}
+      <div className="bg-gradient-to-br from-teal-600 via-teal-700 to-blue-800 text-white relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-teal-300/10 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-sm text-teal-100 mb-6 min-h-[44px]">
+            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" /> 首页
+            </Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/tools" className="hover:text-white transition-colors">工具</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-white font-medium">邮编查询</span>
+          </nav>
+
+          <div className="max-w-3xl">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                <MapPin className="w-3.5 h-3.5" /> 加拿大邮编
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                🇺🇸 美国 ZIP
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                地址核对
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                集运工具
+              </span>
+            </div>
+
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
+              {country.flag} {country.name}邮编查询
+            </h1>
+            <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
+              输入邮编，快速识别城市、省份/州、国家信息。适合集运、清关、地址核对使用。
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
-
-        {/* Disclaimer */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
+      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
+        {/* ===== DISCLAIMER ===== */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-300">
-            <strong>免责声明：</strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。
-            部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
+          <div className="text-sm text-amber-800">
+            <strong>免责声明：</strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。实际投递以当地邮政官方为准。
           </div>
         </div>
 
-        {/* Country Tab Selector */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-5 mb-6">
-          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">选择国家</h2>
+        {/* ===== COUNTRY TABS ===== */}
+        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家</h2>
           <div className="flex flex-wrap gap-2">
             {allCountryData.map(c => (
               <button key={c.code} onClick={() => selectCountry(c.code)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 ${
                   selectedCountryCode === c.code
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
                 }`}>
                 {c.flag} {c.name}
               </button>
@@ -312,362 +342,427 @@ export default function PostalCodePage() {
           </div>
         </div>
 
+        {/* ===== MAIN GRID ===== */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column (2/3): Validation + Search + Ranges */}
-          <div className="lg:col-span-2 space-y-5">
+          {/* Left Column (2/3): Validation + DB Search + Ranges */}
+          <div className="lg:col-span-2 space-y-6">
             {/* Format Validation */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                邮编格式校验
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                {country.flag} {country.name}（{country.nameEn}）邮编格式：<code className="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded text-sm font-mono">{country.format}</code>
-              </p>
-              <div className="flex gap-2">
-                <input
-                  className="flex-1 px-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono text-base"
-                  placeholder={country.format}
-                  value={inputCode}
-                  onChange={e => setInputCode(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && validate()}
-                />
-                <button onClick={() => { validate(); trackEvent.postalQuery(); }}
-                  className="px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                  校验
-                </button>
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-teal-600" />
+                  邮编格式校验
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {country.flag} {country.name} — 格式：<code className="bg-gray-100 px-2 py-0.5 rounded text-sm font-mono text-teal-700">{country.format}</code>
+                </p>
               </div>
-              {validationResult && (
-                <div className={`mt-3 p-3 rounded-lg text-sm ${
-                  validationResult.deliverability === 'confirmed'
-                    ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
-                    : validationResult.deliverability === 'likely'
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                    : validationResult.deliverability === 'invalid'
-                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800'
-                    : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
-                }`}>
-                  <div className="flex items-start gap-2">
-                    {validationResult.deliverability === 'confirmed' && <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />}
-                    {validationResult.deliverability === 'likely' && <Info className="w-4 h-4 shrink-0 mt-0.5" />}
-                    {validationResult.deliverability === 'invalid' && <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
-                    <div>
-                      <div className="font-medium">{validationResult.message}</div>
-                      {validationResult.deliverability === 'confirmed' && (
-                        <div className="text-xs mt-1 opacity-80">🟢 可投递性：已确认 — 该邮编在数据库中匹配到具体城市</div>
-                      )}
-                      {validationResult.deliverability === 'likely' && (
-                        <div className="text-xs mt-1 opacity-80">🔵 可投递性：可能 — 该邮编格式正确且匹配到地区，但未找到具体城市</div>
-                      )}
-                      {validationResult.deliverability === 'unknown' && (
-                        <div className="text-xs mt-1 opacity-80">⚪ 可投递性：未知 — 格式正确但不在数据库中，请以官方查询为准</div>
-                      )}
+              <div className="p-5">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-base font-mono focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    placeholder={country.format}
+                    value={inputCode}
+                    onChange={e => setInputCode(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && validate()}
+                  />
+                  <button onClick={() => { validate(); trackEvent.postalQuery(); }}
+                    className="px-6 py-3 min-h-[48px] bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 active:bg-teal-800 transition-all duration-200 shadow-sm flex items-center justify-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    校验
+                  </button>
+                </div>
+
+                {/* Validation result */}
+                {validationResult && (
+                  <div className={`mt-4 p-4 rounded-lg text-sm border ${
+                    validationResult.deliverability === 'confirmed'
+                      ? 'bg-green-50 text-green-700 border-green-200'
+                      : validationResult.deliverability === 'likely'
+                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                      : validationResult.deliverability === 'invalid'
+                      ? 'bg-red-50 text-red-700 border-red-200'
+                      : 'bg-gray-50 text-gray-700 border-gray-200'
+                  }`}>
+                    <div className="flex items-start gap-2">
+                      {validationResult.deliverability === 'confirmed' && <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                      {validationResult.deliverability === 'likely' && <Info className="w-4 h-4 shrink-0 mt-0.5" />}
+                      {validationResult.deliverability === 'invalid' && <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                      <div>
+                        <div className="font-semibold">{validationResult.message}</div>
+                        {validationResult.deliverability === 'confirmed' && (
+                          <div className="text-xs mt-1 opacity-80">🟢 可投递性：已确认 — 该邮编在数据库中匹配到具体城市</div>
+                        )}
+                        {validationResult.deliverability === 'likely' && (
+                          <div className="text-xs mt-1 opacity-80">🔵 可投递性：可能 — 匹配到地区，但未找到具体城市</div>
+                        )}
+                        {validationResult.deliverability === 'unknown' && (
+                          <div className="text-xs mt-1 opacity-80">⚪ 可投递性：未知 — 格式正确但不在数据库中，请以官方查询为准</div>
+                        )}
+                        {validationResult.deliverability === 'invalid' && (
+                          <div className="text-xs mt-1 opacity-80">请检查输入是否符合 {country.name} 邮编格式</div>
+                        )}
+                      </div>
                     </div>
                   </div>
+                )}
+
+                {/* Quick examples */}
+                <div className="flex flex-wrap items-center gap-2 mt-4">
+                  <span className="text-xs text-gray-400">示例：</span>
+                  {selectedCountryCode === 'CA' && (
+                    <>
+                      <button onClick={() => { setInputCode('V6B0A1'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">V6B 0A1</button>
+                      <button onClick={() => { setInputCode('M5V3L9'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">M5V 3L9</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'US' && (
+                    <>
+                      <button onClick={() => { setInputCode('90210'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">90210</button>
+                      <button onClick={() => { setInputCode('10001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">10001</button>
+                    </>
+                  )}
                 </div>
-              )}
-              <p className="text-xs text-gray-400 mt-2">{country.hint}</p>
+
+                <p className="text-xs text-gray-400 mt-3">{country.hint}</p>
+              </div>
             </div>
 
             {/* DB-Powered Search */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <Database className="w-5 h-5 text-purple-600" />
-                数据库邮编查询
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                从数据库查询具体邮编或城市对应的邮编（支持 CA、US、GB、AU、NZ）
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-3">
-                <button
-                  onClick={() => setDbTab('all')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                    dbTab === 'all' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                  }`}>全部</button>
-                <button
-                  onClick={() => setDbTab('code')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                    dbTab === 'code' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                  }`}>按邮编</button>
-                <button
-                  onClick={() => setDbTab('city')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                    dbTab === 'city' ? 'bg-purple-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
-                  }`}>按城市</button>
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <Database className="w-5 h-5 text-blue-600" />
+                  数据库邮编查询
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  从数据库查询具体邮编或城市对应的地址信息
+                </p>
               </div>
-
-              <div className="flex gap-2 mb-3">
-                <input
-                  className="flex-1 px-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder={dbTab === 'code' ? '输入邮编（如 M5V 2T6）...' : dbTab === 'city' ? '输入城市名（如 Toronto）...' : '输入邮编或城市名...'}
-                  value={dbQuery}
-                  onChange={e => setDbQuery(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleDbSearch()}
-                />
-                <button onClick={handleDbSearch} disabled={dbLoading}
-                  className="px-4 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center gap-2">
-                  {dbLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                  查询
-                </button>
-              </div>
-
-              {dbLoading && (
-                <div className="flex items-center justify-center py-8 text-gray-500">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" /> 查询中...
+              <div className="p-5">
+                {/* Tabs */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {[
+                    { key: 'all' as const, label: '全部' },
+                    { key: 'code' as const, label: '按邮编' },
+                    { key: 'city' as const, label: '按城市' },
+                  ].map(tab => (
+                    <button key={tab.key} onClick={() => setDbTab(tab.key)}
+                      className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all ${
+                        dbTab === tab.key
+                          ? 'bg-teal-600 text-white'
+                          : 'bg-gray-100 text-gray-600 hover:bg-teal-50 hover:text-teal-700'
+                      }`}>{tab.label}</button>
+                  ))}
                 </div>
-              )}
 
-              {!dbLoading && dbResults.length > 0 && (
-                <>
-                  <p className="text-xs text-gray-400 mb-2">找到 {dbTotal.toLocaleString()} 条记录</p>
-                  <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto">
-                    {dbResults.map((r) => {
-                      // Compute match type
-                      const normalizedQuery = dbQuery.trim().toUpperCase().replace(/[\s-]+/g, '');
-                      const normalizedCode = (r.normalizedPostalCode || r.postalCode.replace(/[\s-]/g, '').toUpperCase());
-                      const queryIsPostal = looksLikePostalCode(dbQuery);
+                {/* Search input */}
+                <div className="flex gap-3 mb-4">
+                  <input
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    placeholder={dbTab === 'code' ? '输入邮编（如 M5V 2T6）...' : dbTab === 'city' ? '输入城市名（如 Toronto）...' : '输入邮编或城市名...'}
+                    value={dbQuery}
+                    onChange={e => setDbQuery(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleDbSearch()}
+                  />
+                  <button onClick={handleDbSearch} disabled={dbLoading}
+                    className="px-6 py-3 min-h-[48px] bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center gap-2">
+                    {dbLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                    {dbLoading ? '查询中…' : '查询'}
+                  </button>
+                </div>
 
-                      let matchLabel = '城市匹配';
-                      let matchColor = 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300';
-
-                      if (queryIsPostal) {
-                        if (normalizedCode === normalizedQuery) {
-                          matchLabel = '精确匹配';
-                          matchColor = 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300';
-                        } else if (normalizedCode.startsWith(normalizedQuery)) {
-                          matchLabel = '前缀匹配';
-                          matchColor = 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
-                        }
-                      }
-
-                      // Deliverability
-                      const formatOk = country.formatRegex.test(r.postalCode);
-
-                      return (
-                        <div key={r.id} className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 flex flex-col gap-2 border border-gray-100 dark:border-gray-600">
-                          {/* Postal code - big & prominent */}
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-mono text-xl font-bold text-blue-600 dark:text-blue-400 tracking-wide">
-                              {r.postalCode}
-                            </span>
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${matchColor}`}>
-                              {matchLabel}
-                            </span>
-                          </div>
-
-                          {/* City */}
-                          <div className="text-base font-semibold text-gray-900 dark:text-white">
-                            {r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}
-                          </div>
-
-                          {/* Province + admin code */}
-                          {r.adminName1 && (
-                            <div className="text-sm text-gray-600 dark:text-gray-300">
-                              {r.adminName1}{r.adminCode1 ? ` (${r.adminCode1})` : ''}
-                              {r.adminName2 ? ` · ${r.adminName2}` : ''}
-                            </div>
-                          )}
-
-                          {/* Country */}
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            🌍 {r.country}
-                          </div>
-
-                          {/* Coordinates */}
-                          {r.latitude != null && r.longitude != null && (
-                            <div className="text-xs text-gray-400 dark:text-gray-500">
-                              📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
-                              {r.accuracy != null && (
-                                <span className="ml-2" title={`精度等级: ${r.accuracy}`}>
-                                  {'⭐'.repeat(Math.min(r.accuracy, 5))}
-                                </span>
-                              )}
-                            </div>
-                          )}
-
-                          {/* Deliverability */}
-                          <div className="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-600 pt-2 mt-1">
-                            {formatOk ? '✅ 格式有效' : '📋 数据库存在'} · 仍需以当地邮政官方为准
-                          </div>
-                        </div>
-                      );
-                    })}
+                {/* Loading state */}
+                {dbLoading && (
+                  <div className="flex items-center justify-center py-12 text-gray-500 bg-gray-50 rounded-lg">
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" /> 正在查询…
                   </div>
-                  {dbTotal > 50 && (
-                    <div className="flex items-center justify-center gap-2 mt-3">
-                      <button onClick={() => loadDbPage(dbPage - 1)} disabled={dbPage <= 1}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 disabled:opacity-40">上一页</button>
-                      <span className="text-xs text-gray-500">第 {dbPage} 页</span>
-                      <button onClick={() => loadDbPage(dbPage + 1)} disabled={dbPage * 50 >= dbTotal}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-gray-100 dark:bg-gray-700 disabled:opacity-40">下一页</button>
-                    </div>
-                  )}
-                </>
-              )}
+                )}
 
-              {!dbLoading && dbQuery && dbResults.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    没有找到完全匹配
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                    可以尝试输入邮编前缀、城市名或省州名
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
-                    例如：<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">V6B</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">Vancouver</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">BC</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">10001</code>、<code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">London</code>
-                  </p>
-                  <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
-                    <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
-                  </a>
-                </div>
-              )}
+                {/* Results */}
+                {!dbLoading && dbResults.length > 0 && (
+                  <>
+                    <p className="text-xs text-gray-400 mb-3">找到 {dbTotal.toLocaleString()} 条记录</p>
+                    <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto">
+                      {dbResults.map((r) => {
+                        const normalizedQuery = dbQuery.trim().toUpperCase().replace(/[\s-]+/g, '');
+                        const normalizedCode = (r.normalizedPostalCode || r.postalCode.replace(/[\s-]/g, '').toUpperCase());
+                        const queryIsPostal = looksLikePostalCode(dbQuery);
+
+                        let matchLabel = '城市匹配';
+                        let matchColor = 'bg-amber-100 text-amber-700';
+
+                        if (queryIsPostal) {
+                          if (normalizedCode === normalizedQuery) {
+                            matchLabel = '精确匹配';
+                            matchColor = 'bg-green-100 text-green-700';
+                          } else if (normalizedCode.startsWith(normalizedQuery)) {
+                            matchLabel = '前缀匹配';
+                            matchColor = 'bg-blue-100 text-blue-700';
+                          }
+                        }
+
+                        const formatOk = country.formatRegex.test(r.postalCode);
+
+                        return (
+                          <div key={r.id} className="bg-gray-50 rounded-xl p-4 flex flex-col gap-2 border border-gray-100">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="font-mono text-xl font-bold text-teal-600 tracking-wide">
+                                {r.postalCode}
+                              </span>
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${matchColor}`}>
+                                {matchLabel}
+                              </span>
+                            </div>
+                            <div className="text-base font-semibold text-gray-900">
+                              {r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}
+                            </div>
+                            {r.adminName1 && (
+                              <div className="text-sm text-gray-600">
+                                {r.adminName1}{r.adminCode1 ? ` (${r.adminCode1})` : ''}
+                                {r.adminName2 ? ` · ${r.adminName2}` : ''}
+                              </div>
+                            )}
+                            <div className="text-xs text-gray-500">🌍 {r.country}</div>
+                            {r.latitude != null && r.longitude != null && (
+                              <div className="text-xs text-gray-400">
+                                📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}
+                                {r.accuracy != null && <span className="ml-2">{'⭐'.repeat(Math.min(r.accuracy, 5))}</span>}
+                              </div>
+                            )}
+                            <div className="text-xs text-gray-400 border-t border-gray-200 pt-2 mt-1">
+                              {formatOk ? '✅ 格式有效' : '📋 数据库存在'} · 以当地邮政官方为准
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {dbTotal > 50 && (
+                      <div className="flex items-center justify-center gap-2 mt-4">
+                        <button onClick={() => loadDbPage(dbPage - 1)} disabled={dbPage <= 1}
+                          className="px-3 py-2 min-h-[44px] text-sm rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 transition-colors">上一页</button>
+                        <span className="text-xs text-gray-500">第 {dbPage} 页</span>
+                        <button onClick={() => loadDbPage(dbPage + 1)} disabled={dbPage * 50 >= dbTotal}
+                          className="px-3 py-2 min-h-[44px] text-sm rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 transition-colors">下一页</button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Empty state */}
+                {!dbLoading && dbQuery && dbResults.length === 0 && (
+                  <div className="text-center py-10 bg-gray-50 rounded-lg">
+                    <Database className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-base font-medium text-gray-600 mb-1">没有找到完全匹配</p>
+                    <p className="text-sm text-gray-400 mb-4">可以尝试输入邮编前缀、城市名或省州名</p>
+                    <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                      <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
+                    </a>
+                  </div>
+                )}
+
+                {/* Initial empty state */}
+                {!dbLoading && !dbQuery && (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <Database className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400">输入邮编或城市名，查询具体地址信息</p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* City / Region Search (legacy) */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <Search className="w-5 h-5 text-indigo-600" />
-                按城市/地区查询邮编范围（参考）
-              </h2>
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  className="w-full pl-9 pr-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="输入城市名或地区缩写（如 Toronto、NSW、100）..."
-                  value={citySearch}
-                  onChange={e => setCitySearch(e.target.value)}
-                />
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-5 border-b border-gray-100">
+                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                  <Search className="w-5 h-5 text-indigo-600" />
+                  按城市/地区查询邮编范围（参考）
+                </h2>
               </div>
+              <div className="p-5">
+                <div className="relative mb-4">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    placeholder="输入城市名或地区缩写（如 Toronto、NSW、100）..."
+                    value={citySearch}
+                    onChange={e => setCitySearch(e.target.value)}
+                  />
+                </div>
 
-              {filteredRanges.length === 0 && citySearch && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                  未找到匹配 "{citySearch}" 的记录
-                </p>
-              )}
+                {filteredRanges.length === 0 && citySearch && (
+                  <p className="text-sm text-gray-500 text-center py-6">
+                    未找到匹配 "{citySearch}" 的记录
+                  </p>
+                )}
 
-              <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
-                {filteredRanges.map((r, i) => (
-                  <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2.5 flex items-center justify-between">
-                    <div>
-                      <span className="font-medium text-sm text-gray-900 dark:text-white">{r.city}</span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({r.region})</span>
+                <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+                  {filteredRanges.map((r, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg px-3 py-2.5 flex items-center justify-between">
+                      <div className="min-w-0">
+                        <span className="font-medium text-sm text-gray-900">{r.city}</span>
+                        <span className="text-xs text-gray-500 ml-1">({r.region})</span>
+                      </div>
+                      <span className="font-mono text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded shrink-0">{r.range}</span>
                     </div>
-                    <span className="font-mono text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded">{r.range}</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                {citySearch && (
+                  <p className="text-xs text-gray-400 mt-2">找到 {filteredRanges.length} 条记录</p>
+                )}
               </div>
-              {citySearch && (
-                <p className="text-xs text-gray-400 mt-2">找到 {filteredRanges.length} 条记录</p>
-              )}
             </div>
 
             {/* Common Errors */}
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
-              <h2 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-3 flex items-center gap-1">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4" /> 常见错误提醒
               </h2>
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {country.commonErrors.map((e, i) => (
-                  <li key={i} className="text-sm text-red-700 dark:text-red-400 flex items-start gap-1">
-                    <span className="shrink-0 mt-0.5">•</span> {e}
+                  <li key={i} className="text-sm text-red-700 flex items-start gap-2">
+                    <span className="shrink-0 mt-0.5 text-red-400">•</span> {e}
                   </li>
                 ))}
               </ul>
             </div>
-          </div>
 
-          {/* Right Column (1/3): States + Official Links */}
-          <div className="space-y-5">
-            {/* State/Region Abbreviations */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">
-                {country.code === 'GB' ? '地区速查' : country.code === 'NZ' ? '地区速查' : '省州缩写速查'}
-              </h2>
-              <div className="grid grid-cols-1 gap-1.5 max-h-96 overflow-y-auto">
-                {country.stateAbbrevs.map(s => (
-                  <div key={s.code} className="bg-gray-50 dark:bg-gray-700 rounded-lg px-3 py-2 flex items-center gap-2">
-                    <span className="font-mono font-bold text-blue-600 dark:text-blue-400 text-sm w-10 shrink-0">{s.code}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{s.name}</span>
+            {/* Usage scenarios */}
+            <div>
+              <h2 className="text-base font-bold text-gray-900 mb-4">使用场景</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center flex-shrink-0">
+                    <Truck className="w-5 h-5 text-teal-600" />
                   </div>
-                ))}
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900">集运收货地址核对</h3>
+                    <p className="text-xs text-gray-500 mt-1">确认收货地址邮编格式是否正确，避免包裹投递失败</p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                    <Calculator className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900">运费估算前置检查</h3>
+                    <p className="text-xs text-gray-500 mt-1">邮编决定配送区域和运费，先核实再估算更准确</p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900">清关/派送区域确认</h3>
+                    <p className="text-xs text-gray-500 mt-1">确认邮编对应的省份/州，了解是否属于偏远地区</p>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Official Lookup Links */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <ExternalLink className="w-5 h-5 text-green-600" />
-                官方查询入口
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                如需精确查询具体地址的邮编，请访问{country.name}邮政官网：
-              </p>
-
-              <div className="space-y-3">
-                <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
-                  <ExternalLink className="w-4 h-4" /> 查询邮编 — {country.officialName}
-                </a>
-                <a href={country.officialUrl} target="_blank" rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                  <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 首页
-                </a>
+          {/* Right Column (1/3): States + Official Links + Address Format */}
+          <div className="space-y-6">
+            {/* State/Region Abbreviations */}
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="text-sm font-bold text-gray-900">
+                  {country.code === 'GB' ? '地区速查' : country.code === 'NZ' ? '地区速查' : '省州缩写速查'}
+                </h2>
               </div>
-
-              {/* Quick links to all countries */}
-              <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">各国官方邮编查询</p>
-                <div className="space-y-1.5">
-                  {allCountryData.filter(c => c.code !== country.code).map(c => (
-                    <a key={c.code} href={c.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                      <span>{c.flag}</span>
-                      <span>{c.name} — {c.officialName}</span>
-                      <ExternalLink className="w-3 h-3 shrink-0" />
-                    </a>
+              <div className="p-3 max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-1">
+                  {country.stateAbbrevs.map(s => (
+                    <div key={s.code} className="bg-gray-50 rounded-lg px-3 py-2 flex items-center gap-2">
+                      <span className="font-mono font-bold text-teal-600 text-sm w-10 shrink-0">{s.code}</span>
+                      <span className="text-xs text-gray-500">{s.name}</span>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
 
+            {/* Official Lookup Links */}
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4 text-green-600" />
+                  官方查询入口
+                </h2>
+              </div>
+              <div className="p-4">
+                <p className="text-sm text-gray-500 mb-4">
+                  如需精确查询具体地址的邮编，请访问{country.name}邮政官网：
+                </p>
+                <div className="space-y-3">
+                  <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                    <ExternalLink className="w-4 h-4" /> 查询邮编 — {country.officialName}
+                  </a>
+                  <a href={country.officialUrl} target="_blank" rel="noopener noreferrer"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                    <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 首页
+                  </a>
+                </div>
+
+                {/* Quick links to all countries */}
+                <div className="mt-5 pt-4 border-t border-gray-200">
+                  <p className="text-xs font-semibold text-gray-400 mb-2">各国官方邮编查询</p>
+                  <div className="space-y-2">
+                    {allCountryData.filter(c => c.code !== country.code).map(c => (
+                      <a key={c.code} href={c.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-teal-600 transition-colors">
+                        <span>{c.flag}</span>
+                        <span className="truncate">{c.name}</span>
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Address Format Reference */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-6">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-blue-600" />
-                地址格式参考
-              </h2>
-              <div className="space-y-3">
-                {country.ranges.slice(0, 4).map((r, i) => {
-                  const addr = getSampleAddress(country.code, r.city, r.region, r.range);
-                  return (
-                    <div key={i} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{r.city}, {r.region}</span>
-                        <button onClick={() => copyText(addr, `addr-${i}`)}
-                          className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
-                          {copiedField === `addr-${i}` ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制</>}
-                        </button>
+            <div className="bg-white rounded-xl border shadow-sm">
+              <div className="p-4 border-b border-gray-100">
+                <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-blue-600" />
+                  地址格式参考
+                </h2>
+              </div>
+              <div className="p-4">
+                <div className="space-y-3">
+                  {country.ranges.slice(0, 4).map((r, i) => {
+                    const addr = getSampleAddress(country.code, r.city, r.region, r.range);
+                    return (
+                      <div key={i} className="bg-gray-50 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-gray-500">{r.city}, {r.region}</span>
+                          <button onClick={() => copyText(addr, `addr-${i}`)}
+                            className="flex items-center gap-1 text-xs text-teal-600 hover:underline">
+                            {copiedField === `addr-${i}` ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制</>}
+                          </button>
+                        </div>
+                        <pre className="text-sm text-gray-900 whitespace-pre-wrap font-sans leading-relaxed">{addr}</pre>
                       </div>
-                      <pre className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap font-sans leading-relaxed">{addr}</pre>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* About Data */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-1">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-1.5">
                 <Info className="w-4 h-4" /> 关于邮编数据
               </h3>
-              <ul className="space-y-1 text-sm text-blue-700 dark:text-blue-400">
+              <ul className="space-y-1 text-sm text-blue-700">
                 <li>• 本工具提供格式校验和城市邮编范围参考</li>
                 <li>• 数据库收录邮编数据（CA/US/GB/AU/NZ）</li>
                 <li>• 邮编覆盖范围仅为主要城市，非完整数据库</li>
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
-                <li>• 填写快递面单时，邮编格式必须严格符合各国邮政要求</li>
               </ul>
             </div>
           </div>
@@ -682,16 +777,12 @@ export default function PostalCodePage() {
             answer: "不一定。本站只做格式校验和参考数据匹配，不验证地址是否真实存在。邮编正确只是投递成功的一个条件，还需要街道地址、门牌号、收件人姓名电话等信息完整准确。偏远地区即使邮编正确也可能需要额外派送时间或费用。",
           },
           {
-            question: "各国邮编格式是什么样的？",
-            answer: "加拿大：A1A 1A1（字母+数字+字母+空格+数字+字母+数字）；美国：12345 或 12345-6789（ZIP+4）；英国：SW1A 1AA（格式较灵活）；澳大利亚：1234（4位数字）；新西兰：1234（4位数字）。",
+            question: "加拿大邮编是否需要空格？",
+            answer: "加拿大邮编标准格式为 A1A 1A1（中间有空格），但大多数系统也接受不带空格的写法 A1A1A1。填写快递面单时建议加空格，格式更规范。",
           },
           {
-            question: "美国 ZIP+4 是什么？必须填吗？",
-            answer: "ZIP+4 是在 5 位 ZIP Code 基础上增加的 4 位扩展码，用于更精确地定位到街道段或建筑群。普通邮寄写 5 位即可，但使用 ZIP+4 可以提高分拣效率和投递准确性。",
-          },
-          {
-            question: "加拿大邮编的字母 O 和数字 0 怎么区分？",
-            answer: "加拿大邮编不使用字母 O、D、F、I、Q、U（避免与数字混淆）。所以如果你看到类似字母 O，它实际上是数字 0。邮编的第一位字母表示省份，如 V 开头是 BC 省，M 开头是安大略省多伦多。",
+            question: "查询不到怎么办？",
+            answer: "可以尝试输入邮编前缀（如只输入前3位）、城市名或省州缩写。数据库仅覆盖主要城市，偏远地区数据可能不完整。建议同时使用上方官方查询入口进行交叉验证。",
           },
         ]} />
 
@@ -699,7 +790,7 @@ export default function PostalCodePage() {
         <AdSlot placement="tool-postal-code-bottom" className="mt-8 mb-8" />
 
         {/* Footer attribution */}
-        <div className="text-center py-4 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-700 mt-8">
+        <div className="text-center py-4 text-xs text-gray-400 border-t border-gray-200 mt-8">
           部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
         </div>
       </div>
