@@ -19,6 +19,7 @@ interface Article {
 export default function AdminCMSPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Article | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -35,15 +36,27 @@ export default function AdminCMSPage() {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const res = await fetch("/api/articles?status=all");
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
       const data = await res.json();
-      setArticles(data.data || []);
-    } catch (error) {
-      console.error("Failed to fetch articles:", error);
+      if (data.success) {
+        setArticles(data.data || []);
+      } else {
+        throw new Error(data.error || "获取文章失败");
+      }
+    } catch (err: any) {
+      setError(err.message || "加载文章失败");
+      setArticles([]);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => { fetchData(); }, []);
 
   const handleSubmit = async () => {
     try {
@@ -91,18 +104,35 @@ export default function AdminCMSPage() {
   const resetForm = () => {
     setEditing(null);
     setShowForm(false);
+    setShowPreview(false);
     setFormData({ title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "DRAFT", tags: "" });
   };
 
-  if (loading) return <div className="p-6 text-center text-gray-500">加载中...</div>;
+  if (loading) return <div className="p-6 text-center text-gray-500 flex items-center justify-center gap-2"><Loader2 className="w-5 h-5 animate-spin" /> 加载文章中...</div>;
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+          <p className="text-red-600 font-medium">{error}</p>
+          <p className="text-sm text-red-400 mt-1">请检查是否已登录管理账号</p>
+          <button onClick={fetchData} className="mt-3 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700">重新加载</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <FileText className="w-6 h-6" />
-          文章管理
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FileText className="w-6 h-6" />
+            文章管理
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">管理网站文章、指南、教程等内容。当前共 {articles.length} 篇文章。</p>
+        </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
           className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-2"
@@ -119,7 +149,7 @@ export default function AdminCMSPage() {
               <h2 className="text-lg font-semibold">{editing ? "编辑文章" : "新建文章"}</h2>
               <button onClick={resetForm} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
             </div>
-          <div className="space-y-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">标题 *</label>
                 <input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value, slug: formData.slug || e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") })} className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500" placeholder="如：国际物流工具推荐" />
@@ -223,7 +253,11 @@ export default function AdminCMSPage() {
           </tbody>
         </table>
         {articles.length === 0 && (
-          <div className="p-8 text-center text-gray-400">暂无文章，点击上方按钮创建</div>
+          <div className="p-8 text-center text-gray-400">
+            <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+            <p className="text-lg mb-1">暂无文章</p>
+            <p className="text-sm">点击上方按钮创建第一篇文章</p>
+          </div>
         )}
       </div>
     </div>
