@@ -13,6 +13,14 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
       where: { slug },
     });
     if (!article) return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
+
+    // Non-admin can only access published articles
+    const session = await auth();
+    const isAdmin = session?.user?.role === "admin" || session?.user?.role === "ADMIN";
+    if (!isAdmin && article.status !== "published") {
+      return NextResponse.json({ success: false, error: "Not found" }, { status: 404 });
+    }
+
     return NextResponse.json({ success: true, data: article });
   } catch {
     return NextResponse.json({ success: false, error: "Failed" }, { status: 500 });
@@ -36,8 +44,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     if (body.tags !== undefined) updateData.tags = body.tags;
     if (body.status !== undefined) {
       updateData.status = body.status;
-      if (body.status === "PUBLISHED") updateData.publishedAt = new Date();
-      if (body.status === "DRAFT") updateData.publishedAt = null;
+      if (body.status === "PUBLISHED" || body.status === "published") updateData.publishedAt = new Date();
+      if (body.status === "DRAFT" || body.status === "draft") updateData.publishedAt = null;
     }
 
     const article = await prisma.article.update({ where: { slug }, data: updateData });
@@ -63,6 +71,6 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 async function requireAdmin() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  if ((session.user as any).role !== "ADMIN") return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  if (session.user.role !== "admin" && session.user.role !== "ADMIN") return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   return { session };
 }
