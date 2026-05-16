@@ -168,28 +168,72 @@ export default function LabelMakerPage() {
       {/* Hidden export container */}
       <div ref={exportContainerRef} className="hidden" aria-hidden="true" />
 
-      <div className="min-h-screen bg-gray-50">
-        {/* Top bar */}
-        <div className="bg-white border-b sticky top-0 z-40 print:hidden">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/tools" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">
-                <ArrowLeft className="w-4 h-4" /> 返回
-              </Link>
-              <div>
-                <h1 className="font-bold text-gray-900">唛头面单生成器</h1>
-                <p className="text-xs text-gray-400">Shipping Mark & Label Generator</p>
+      {/* ===== HERO ===== */}
+      <div className="bg-gradient-to-br from-teal-700 via-blue-700 to-indigo-800 text-white relative overflow-hidden print:hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-teal-300/10 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 pt-8 pb-6 md:pt-12 md:pb-8">
+          {/* Breadcrumb */}
+          <Breadcrumb />
+
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex flex-wrap gap-2 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                  <Package className="w-3.5 h-3.5" /> 唛头生成
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                  外箱标签
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                  仓库贴标
+                </span>
               </div>
+              <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
+                唛头/标签生成器
+              </h1>
+              <p className="text-sm text-teal-100/90 mt-1 max-w-xl">
+                外箱唛头、仓库标签、集运入库贴、合箱标签、寄件信息贴纸，一站式生成。支持批量打印和 PNG 导出。
+              </p>
             </div>
             <div className="hidden lg:flex items-center gap-2">
-              <button onClick={handleSaveDraft} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg">
+              <button onClick={handleSaveDraft} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg hover:bg-white/20 transition-colors min-h-[44px]">
                 <Save className="w-4 h-4" /> 保存草稿
               </button>
-              <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg">
+              <button onClick={handlePrint} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-white text-blue-700 rounded-lg font-semibold hover:bg-blue-50 transition-colors min-h-[44px]">
                 <Printer className="w-4 h-4" /> 打印/PDF
               </button>
-              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded-lg disabled:opacity-50">
+              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 min-h-[44px]">
                 <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="min-h-screen bg-gray-50">
+        {/* Top bar (simplified now that hero has breadcrumb + title) */}
+        <div className="bg-white border-b sticky top-0 z-40 print:hidden lg:hidden">
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Link href="/tools" className="text-xs text-gray-500 hover:text-blue-600 flex items-center gap-1">
+                <ArrowLeft className="w-3.5 h-3.5" /> 工具
+              </Link>
+              <div>
+                <h1 className="font-bold text-gray-900 text-sm">唛头面单生成器</h1>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={handleSaveDraft} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded-lg min-h-[44px]">
+                <Save className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={handlePrint} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-blue-600 text-white rounded-lg min-h-[44px]">
+                <Printer className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded-lg disabled:opacity-50 min-h-[44px]">
+                <Image className="w-3.5 h-3.5" />
               </button>
               <span className={`px-2 py-0.5 rounded text-xs ${perms.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
                 {perms.role === 'member' ? '会员' : perms.role === 'user' ? '用户' : '游客'}
@@ -199,11 +243,11 @@ export default function LabelMakerPage() {
         </div>
 
         {/* Mobile Tab bar */}
-        <div className="lg:hidden sticky top-[57px] z-30 bg-white border-b print:hidden">
+        <div className="lg:hidden sticky top-[48px] z-30 bg-white border-b print:hidden">
           <div className="flex">
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setMobileTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 transition-colors ${mobileTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}>
+                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium border-b-2 transition-colors ${mobileTab === tab.id ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'} min-h-[44px]`}>
                 {tab.icon}{tab.label}
               </button>
             ))}
@@ -211,7 +255,6 @@ export default function LabelMakerPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="mb-3 print:hidden"><Breadcrumb /></div>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 print:hidden">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
@@ -505,18 +548,18 @@ export default function LabelMakerPage() {
                 {/* Mobile bottom action bar */}
                 <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 print:hidden">
                   {mobileTab === 'edit' && (
-                    <button onClick={() => setMobileTab('preview')} className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium text-sm">
+                    <button onClick={() => setMobileTab('preview')} className="w-full py-3 min-h-[48px] bg-blue-600 text-white rounded-xl font-medium text-sm">
                       预览 →
                     </button>
                   )}
                   {mobileTab === 'preview' && (
                     <div className="flex gap-2">
-                      <button onClick={() => setMobileTab('edit')} className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm">← 返回编辑</button>
-                      <button onClick={() => setMobileTab('export')} className="flex-1 py-3 bg-green-600 text-white rounded-xl font-medium text-sm">导出 ↓</button>
+                      <button onClick={() => setMobileTab('edit')} className="flex-1 py-3 min-h-[48px] bg-gray-100 text-gray-700 rounded-xl font-medium text-sm">← 返回编辑</button>
+                      <button onClick={() => setMobileTab('export')} className="flex-1 py-3 min-h-[48px] bg-green-600 text-white rounded-xl font-medium text-sm">导出 ↓</button>
                     </div>
                   )}
                   {mobileTab === 'export' && (
-                    <button onClick={() => setMobileTab('preview')} className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm">← 返回预览</button>
+                    <button onClick={() => setMobileTab('preview')} className="w-full py-3 min-h-[48px] bg-gray-100 text-gray-700 rounded-xl font-medium text-sm">← 返回预览</button>
                   )}
                 </div>
                 <div className="lg:hidden h-20 print:hidden" />

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock, Tag, Receipt, ClipboardList, FileBadge, Shield, Plane, Package, ExternalLink, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
 import { AdSlot } from "@/components/ad-slot";
@@ -26,83 +26,180 @@ const membershipFeatures = [
   { feature: "云端保存草稿", guest: false, user: false, member: true },
 ];
 
+const documentScenarios = [
+  { icon: Receipt, title: "出口报关", desc: "商业发票 + 装箱单 + 报关资料，一套搞定", href: "/tools/documents/commercial-invoice" },
+  { icon: Plane, title: "国际物流", desc: "订舱委托书、装运通知，货代对接更轻松", href: "/tools/documents/booking-form" },
+  { icon: Tag, title: "跨境电商", desc: "形式发票、销售合同，平台入驻必备", href: "/tools/documents/proforma-invoice" },
+  { icon: Shield, title: "银行议付", desc: "信用证要求的全套单据，格式规范", href: "/tools/documents/commercial-invoice" },
+];
+
+const docCards = [
+  { icon: Receipt, label: "商业发票", sub: "Commercial Invoice", href: "/tools/documents/commercial-invoice", desc: "实际交易正式单据，用于报关结算" },
+  { icon: Tag, label: "形式发票", sub: "Proforma Invoice", href: "/tools/documents/proforma-invoice", desc: "成交前预估单据，供买方参考" },
+  { icon: Package, label: "装箱单", sub: "Packing List", href: "/tools/documents/packing-list", desc: "货物清单，包含箱数、重量、体积" },
+  { icon: FileBadge, label: "销售合同", sub: "Sales Contract", href: "/tools/documents/sales-contract", desc: "买卖双方权利义务约定" },
+  { icon: ClipboardList, label: "订舱委托书", sub: "Booking Form", href: "/tools/documents/booking-form", desc: "委托货代订舱的正式单据" },
+  { icon: Shield, label: "报关资料", sub: "Customs Docs", href: "/tools/documents/customs-declaration", desc: "海关申报所需全套资料" },
+];
+
 export default function DocumentsHubPage() {
   const coreDocs = getCoreDocuments();
   const secondTierDocs = getSecondTierDocuments();
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Back link */}
-      <div className="max-w-6xl mx-auto px-4 pt-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          返回首页
-        </Link>
-      </div>
+      {/* ===== HERO ===== */}
+      <div className="bg-gradient-to-br from-purple-700 via-indigo-700 to-blue-800 text-white relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-indigo-300/10 rounded-full blur-3xl" />
+        </div>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-10 pb-12 md:pt-14 md:pb-16">
+          {/* Breadcrumb */}
+          <Breadcrumb />
 
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-16 text-center">
-          <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <FileText className="w-8 h-8" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">外贸/国际物流通用单据生成器</h1>
-          <p className="text-lg text-blue-100 max-w-3xl mx-auto mb-8">
-            形式发票、商业发票、装箱单、销售合同、订舱委托书等常用模板，<br />
-            在线填写，自动排版，支持 PDF / Word / 图片导出。
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/tools/documents/proforma-invoice"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-700 rounded-xl font-semibold hover:bg-blue-50 transition-colors"
-            >
-              开始生成单据
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <a
-              href="#core-docs"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
-            >
-              查看全部模板
-            </a>
-            <Link
-              href="/tools/documents/drafts"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
-            >
-              <Clock className="w-5 h-5" />
-              我的草稿
-            </Link>
+          <div className="mt-6 max-w-3xl">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                <FileText className="w-3.5 h-3.5" /> 外贸单据
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                国际物流
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                报关资料
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                PDF/Word 导出
+              </span>
+            </div>
+
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
+              外贸/国际物流通用单据生成器
+            </h1>
+            <p className="text-lg text-indigo-100/90 max-w-2xl leading-relaxed">
+              商业发票、装箱单、销售合同、订舱委托书等常用单据模板。<br className="hidden md:block" />
+              在线填写，自动排版，支持 PDF / Word / 图片导出。
+            </p>
+
+            <div className="flex flex-wrap gap-3 mt-6">
+              <Link
+                href="/tools/documents/proforma-invoice"
+                className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors shadow-lg"
+              >
+                <Sparkles className="w-5 h-5" />
+                开始生成单据
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/tools/documents/drafts"
+                className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
+              >
+                <Clock className="w-5 h-5" />
+                我的草稿
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Breadcrumb */}
-      <div className="max-w-6xl mx-auto px-4 pt-6">
-        <Breadcrumb />
+      {/* ===== SCENARIO CARDS ===== */}
+      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-8">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-5">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">适合谁使用</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {documentScenarios.map((s) => {
+              const Icon = s.icon;
+              return (
+                <Link
+                  key={s.title}
+                  href={s.href}
+                  className="group flex items-start gap-3 p-4 rounded-lg bg-gray-50 hover:bg-purple-50 hover:border-purple-200 border border-transparent transition-all duration-200 min-h-[44px]"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                    <Icon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900 group-hover:text-purple-700 transition-colors">{s.title}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">{s.desc}</p>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Ad Slot: documents-home-top */}
-      <div className="max-w-6xl mx-auto px-4 -mt-4 mb-8">
+      {/* Ad Slot */}
+      <div className="max-w-6xl mx-auto px-4 mb-8">
         <AdSlot placement="documents-home-top" variant="banner" />
       </div>
 
       {/* Recently used widget */}
       <RecentlyUsedWidget />
 
-      {/* Document Grid with Search & Filter */}
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      {/* ===== DOCUMENT TYPE CARDS ===== */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <FileText className="w-6 h-6 text-purple-600" />
+          常用单据模板
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {docCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.label}
+                href={card.href}
+                className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg hover:border-purple-200 transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors">
+                    <Icon className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{card.label}</h3>
+                    <p className="text-xs text-gray-400 font-mono mt-0.5">{card.sub}</p>
+                    <p className="text-sm text-gray-500 mt-2">{card.desc}</p>
+                    <div className="flex items-center gap-1 mt-3 text-sm font-medium text-purple-600 group-hover:text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                      立即生成 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Full document grid (core + second tier) */}
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <DocumentGrid coreDocs={coreDocs} secondTierDocs={secondTierDocs} />
       </div>
 
-      {/* C. 会员能力说明 */}
+      {/* Label-maker CTA */}
+      <div className="max-w-6xl mx-auto px-4 pb-8">
+        <Link href="/tools/label-maker" className="block bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold mb-1">📦 需要生成箱唛/面单？</h3>
+              <p className="text-indigo-100 text-sm">外箱唛头、仓库标签、集运入库贴、合箱标签、寄件信息贴纸，一站式生成</p>
+            </div>
+            <ArrowRight className="w-6 h-6 flex-shrink-0" />
+          </div>
+        </Link>
+      </div>
+
+      {/* ===== MEMBERSHIP ===== */}
       <div className="bg-white border-t">
-        <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-6xl mx-auto px-4 py-10">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm mb-4">
               <Crown className="w-4 h-4" />
               会员专属能力
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">升级会员，解锁更多功能</h2>
+            <h2 className="text-xl font-bold text-gray-900">升级会员，解锁更多功能</h2>
           </div>
 
           <div className="overflow-x-auto">
@@ -132,21 +229,8 @@ export default function DocumentsHubPage() {
         </div>
       </div>
 
-      {/* Label-maker CTA */}
-      <div className="max-w-6xl mx-auto px-4 pb-8">
-        <Link href="/tools/label-maker" className="block bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold mb-1">📦 需要生成箱唛/面单？</h3>
-              <p className="text-blue-100">外箱唛头、仓库标签、集运入库贴、合箱标签、寄件信息贴纸，一站式生成</p>
-            </div>
-            <div className="text-3xl">→</div>
-          </div>
-        </Link>
-      </div>
-
       {/* Disclaimer */}
-      <div className="max-w-6xl mx-auto px-4 pb-12">
+      <div className="max-w-6xl mx-auto px-4 pb-8">
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
@@ -179,6 +263,8 @@ export default function DocumentsHubPage() {
         { question: "商业发票和形式发票有什么区别？", answer: "商业发票（Commercial Invoice）是实际交易后出具的正式单据，用于报关结算；形式发票（Proforma Invoice）是成交前出具的预估单据，供买方参考或申请进口许可。" },
         { question: "装箱单（Packing List）需要包含哪些信息？", answer: "装箱单应包含：货物名称、规格型号、数量、毛重、净重、包装方式、箱号、唛头等。注意与商业发票的品名和数量保持一致。" },
       ]} />
+
+      <AdSlot placement="footer" variant="banner" className="mt-8 mb-8" />
     </div>
   );
 }
