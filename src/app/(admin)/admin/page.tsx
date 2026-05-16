@@ -1,112 +1,220 @@
 "use client";
-import { useEffect, useState } from "react";
-import { LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, TrendingUp, Star, Download, Plus, Settings, Upload, BookOpen } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import Link from "next/link";
+import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink } from "lucide-react";
 
-const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#6366F1"];
+interface ModuleCard {
+  name: string;
+  path: string;
+  icon: any;
+  status: "online" | "partial" | "planned";
+  statusLabel: string;
+  description: string;
+  color: string;
+}
+
+const modules: ModuleCard[] = [
+  {
+    name: "用户管理",
+    path: "/admin/users",
+    icon: Users,
+    status: "online",
+    statusLabel: "已上线",
+    description: "查看/编辑用户、角色、积分、会员到期时间",
+    color: "blue",
+  },
+  {
+    name: "短评审核",
+    path: "/admin/tool-reviews",
+    icon: Star,
+    status: "online",
+    statusLabel: "已上线",
+    description: "审核用户提交的工具短评（通过/隐藏/拒绝）",
+    color: "yellow",
+  },
+  {
+    name: "文章管理",
+    path: "/admin/cms",
+    icon: FileText,
+    status: "online",
+    statusLabel: "已上线",
+    description: "管理网站文章/指南/教程。数据来自 DB articles 表，当前 20 篇",
+    color: "orange",
+  },
+  {
+    name: "广告管理",
+    path: "/admin/ads",
+    icon: Megaphone,
+    status: "online",
+    statusLabel: "已上线",
+    description: "管理广告位。支持图片广告、文字广告、HTML/JS 代码广告",
+    color: "green",
+  },
+  {
+    name: "资源库",
+    path: "/admin/resources",
+    icon: FolderOpen,
+    status: "partial",
+    statusLabel: "已上线/待完善",
+    description: "DB 中 80 条数据（生活/物流/商业/模板）。后台入口：/admin/resources",
+    color: "purple",
+  },
+  {
+    name: "链接管理",
+    path: "/admin/links",
+    icon: Link2,
+    status: "online",
+    statusLabel: "已上线",
+    description: "管理链接收藏、分类、标签",
+    color: "teal",
+  },
+  {
+    name: "分类/标签",
+    path: "/admin/categories",
+    icon: BarChart3,
+    status: "online",
+    statusLabel: "已上线",
+    description: "管理链接分类和标签",
+    color: "indigo",
+  },
+  {
+    name: "单据/唛头模板",
+    path: "/tools/label-maker",
+    icon: Package,
+    status: "partial",
+    statusLabel: "代码级管理",
+    description: "8 种唛头/标签类型。目前通过代码配置，不是后台编辑。v1.20 计划 CMS 化",
+    color: "gray",
+  },
+  {
+    name: "网盘分享",
+    path: "#",
+    icon: Cloud,
+    status: "planned",
+    statusLabel: "未实现",
+    description: "计划在 v1.20/v1.21 实现，目前无 model/API/页面",
+    color: "sky",
+  },
+  {
+    name: "系统设置",
+    path: "/admin/settings",
+    icon: Settings,
+    status: "online",
+    statusLabel: "已上线",
+    description: "网站基础设置",
+    color: "slate",
+  },
+  {
+    name: "数据备份",
+    path: "/admin/backup",
+    icon: Database,
+    status: "online",
+    statusLabel: "已上线",
+    description: "数据库备份管理",
+    color: "emerald",
+  },
+  {
+    name: "权限/安全",
+    path: "/admin/audit",
+    icon: Shield,
+    status: "online",
+    statusLabel: "已上线",
+    description: "审计日志、安全设置",
+    color: "red",
+  },
+];
+
+const statusColors: Record<string, string> = {
+  online: "bg-green-100 text-green-700",
+  partial: "bg-yellow-100 text-yellow-700",
+  planned: "bg-gray-100 text-gray-500",
+};
 
 export default function AdminPage() {
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/stats")
-      .then(res => res.json())
-      .then(data => { setStats(data); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, []);
-
-  if (loading) return <div className="flex items-center justify-center h-64">加载中...</div>;
-  if (!stats || !stats.categories) return <div className="text-red-500 p-8 text-center">
-    <p className="text-xl mb-2">加载失败</p>
-    <p className="text-sm text-gray-500">{stats?.error || "可能是权限问题，请重新登录"}</p>
-    <a href="/login" className="text-blue-600 underline mt-2 inline-block">返回登录</a>
-  </div>;
-
-  const categoryData = stats.categories.map((c: any) => ({ name: c.name, 数量: c._count.links }));
-  const linkData = stats.topLinks.map((l: any) => ({ name: l.title.slice(0, 8), 点击: l.clicks }));
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <LayoutDashboard className="w-6 h-6" />
-          管理面板
-        </h1>
-        <div className="flex gap-2">
-          <a href="/api/export?type=links&format=csv" className="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            导出CSV
-          </a>
-          <a href="/admin/settings" className="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            设置
-          </a>
-          <a href="/admin/import-bookmarks" className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-2">
-            <Upload className="w-4 h-4" />
-            导入书签
-          </a>
-        </div>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">管理面板</h1>
+        <p className="text-sm text-gray-500 mt-1">选择要管理的模块，每个模块显示当前状态</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {[
-          { label: "链接总数", value: stats.totalLinks, icon: Link2, color: "text-blue-600" },
-          { label: "分类数", value: stats.categories.length, icon: FolderOpen, color: "text-green-600" },
-          { label: "用户数", value: stats.totalUsers, icon: Users, color: "text-purple-600" },
-          { label: "文章数", value: stats.totalArticles, icon: FileText, color: "text-orange-600" },
-          { label: "总点击", value: stats.totalClicks, icon: TrendingUp, color: "text-red-600" },
-          { label: "总阅读", value: stats.totalViews, icon: Star, color: "text-yellow-600" },
-          { label: "订阅数", value: stats.totalSubs || 0, icon: Megaphone, color: "text-teal-600" },
-        ].map((s) => (
-          <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <s.icon className={`w-6 h-6 ${s.color} mb-2`} />
-            <p className="text-sm text-gray-500 dark:text-gray-400">{s.label}</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{s.value}</p>
+      {/* Status Legend */}
+      <div className="flex gap-4 text-xs text-gray-500">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span> 已上线</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> 部分功能</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-400"></span> 未实现</span>
+      </div>
+
+      {/* Module Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {modules.map((m) => {
+          const Icon = m.icon;
+          const isPlanned = m.status === "planned";
+          const colorMap: Record<string, { bg: string; icon: string; border: string }> = {
+            blue: { bg: "bg-blue-50", icon: "text-blue-600", border: "border-blue-200" },
+            yellow: { bg: "bg-yellow-50", icon: "text-yellow-600", border: "border-yellow-200" },
+            orange: { bg: "bg-orange-50", icon: "text-orange-600", border: "border-orange-200" },
+            green: { bg: "bg-green-50", icon: "text-green-600", border: "border-green-200" },
+            purple: { bg: "bg-purple-50", icon: "text-purple-600", border: "border-purple-200" },
+            teal: { bg: "bg-teal-50", icon: "text-teal-600", border: "border-teal-200" },
+            indigo: { bg: "bg-indigo-50", icon: "text-indigo-600", border: "border-indigo-200" },
+            gray: { bg: "bg-gray-50", icon: "text-gray-600", border: "border-gray-200" },
+            sky: { bg: "bg-sky-50", icon: "text-sky-600", border: "border-sky-200" },
+            slate: { bg: "bg-slate-50", icon: "text-slate-600", border: "border-slate-200" },
+            emerald: { bg: "bg-emerald-50", icon: "text-emerald-600", border: "border-emerald-200" },
+            red: { bg: "bg-red-50", icon: "text-red-600", border: "border-red-200" },
+          };
+          const c = colorMap[m.color] || colorMap.gray;
+
+          return isPlanned ? (
+            <div key={m.name} className={`rounded-xl border ${c.border} ${c.bg} p-5 opacity-70`}>
+              <div className="flex items-center gap-2 mb-2">
+                <Icon className={`w-5 h-5 ${c.icon}`} />
+                <h3 className="font-semibold text-gray-700">{m.name}</h3>
+              </div>
+              <p className="text-xs text-gray-500 mb-2">{m.description}</p>
+              <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
+            </div>
+          ) : (
+            <Link
+              key={m.name}
+              href={m.path}
+              className={`rounded-xl border ${c.border} ${c.bg} p-5 hover:shadow-md transition-all block group`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Icon className={`w-5 h-5 ${c.icon}`} />
+                  <h3 className="font-semibold text-gray-900">{m.name}</h3>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+              </div>
+              <p className="text-xs text-gray-500 mb-3">{m.description}</p>
+              <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Quick Stats */}
+      <div className="bg-white rounded-xl border border-gray-100 p-5">
+        <h3 className="font-semibold text-gray-900 mb-3">快速信息</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <p className="text-gray-500">文章</p>
+            <p className="text-lg font-bold text-gray-900">20 篇</p>
           </div>
-        ))}
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">分类分布</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={categoryData} cx="50%" cy="50%" labelLine={false} label={({ name, percent }: any) => `${name} ${((percent || 0) * 100).toFixed(0)}%`} outerRadius={100} fill="#8884d8" dataKey="数量">
-                {categoryData.map((_: any, index: number) => (<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">热门链接 Top 10</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={linkData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="点击" fill="#3B82F6" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">快捷操作</h2>
-        <div className="flex gap-3 flex-wrap">
-          <a href="/admin/links" className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-2"><Plus className="w-4 h-4" />管理链接</a>
-          <a href="/admin/categories" className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-2"><FolderOpen className="w-4 h-4" />管理分类</a>
-          <a href="/admin/cms" className="px-4 py-2 bg-orange-600 text-white rounded-lg text-sm hover:bg-orange-700 flex items-center gap-2"><FileText className="w-4 h-4" />发布文章</a>
-          <a href="/admin/resources" className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700 flex items-center gap-2"><BookOpen className="w-4 h-4" />管理资源</a>
-          <a href="/admin/ads" className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 flex items-center gap-2"><Megaphone className="w-4 h-4" />配置广告</a>
-          <a href="/admin/users" className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 flex items-center gap-2"><Users className="w-4 h-4" />用户管理</a>
-          <a href="/admin/settings" className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700 flex items-center gap-2"><Settings className="w-4 h-4" />系统设置</a>
+          <div>
+            <p className="text-gray-500">资源</p>
+            <p className="text-lg font-bold text-gray-900">80 条</p>
+          </div>
+          <div>
+            <p className="text-gray-500">广告位</p>
+            <p className="text-lg font-bold text-gray-900">0 个</p>
+          </div>
+          <div>
+            <p className="text-gray-500">单据模板</p>
+            <p className="text-lg font-bold text-gray-900">8 种</p>
+          </div>
         </div>
       </div>
     </div>

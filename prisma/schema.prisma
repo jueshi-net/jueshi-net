@@ -303,14 +303,14 @@ model AdSlot {
   name        String    @unique
   position    String
   type        String    @default("image") // image / code / text
-  imageUrl    String?
-  linkUrl     String?
-  targetUrl   String?
-  altText     String?
+  imageUrl    String?   @map("imageUrl")
+  linkUrl     String?   @map("linkUrl")
+  targetUrl   String?   @map("target_url")
+  altText     String?   @map("altText")
   title       String?
   description String?
-  buttonText  String?
-  code        String?   // HTML/JS code for code-type ads
+  buttonText  String?   @map("button_text")
+  code        String?
   startDate   DateTime
   endDate     DateTime?
   isActive    Boolean   @default(true)
