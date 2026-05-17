@@ -1,4 +1,4 @@
-// GET /api/me/membership — get current user's level and badges
+// GET /api/me/membership — get current user's level and badges (auto-award welcome badge)
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -8,8 +8,31 @@ export async function GET() {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ success: false, error: "未登录" }, { status: 401 });
 
+    const userId = session.user.id;
+
+    // Auto-award "初来乍到" badge (key: first_login) on first access
+    const welcomeBadge = await prisma.userBadge.findFirst({
+      where: { key: "first_login", isActive: true },
+      select: { id: true, key: true, name: true },
+    });
+
+    if (welcomeBadge) {
+      const existing = await prisma.userBadgeAward.findUnique({
+        where: { userId_badgeId: { userId, badgeId: welcomeBadge.id } },
+      });
+      if (!existing) {
+        await prisma.userBadgeAward.create({
+          data: {
+            userId,
+            badgeId: welcomeBadge.id,
+            reason: "首次访问会员中心自动授予",
+          },
+        });
+      }
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: {
         growthValue: true,
         levelKey: true,

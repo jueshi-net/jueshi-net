@@ -52,19 +52,24 @@ export default function MembershipCard() {
       </div>
 
       {/* Badges */}
-      {data.badges.length > 0 && (
+      {data.badges.length > 0 ? (
         <div>
           <div className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
             <Award className="w-3 h-3" /> 已获得勋章 ({data.badges.length})
           </div>
           <div className="flex flex-wrap gap-2">
-            {data.badges.slice(0, 6).map(b => (
+            {data.badges.slice(0, 5).map(b => (
               <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg border shadow-sm" title={b.description || b.name}>
                 <span className="text-base">{b.iconText}</span>
                 <span className="text-xs text-gray-700 font-medium">{b.name}</span>
               </div>
             ))}
           </div>
+        </div>
+      ) : (
+        <div className="text-center py-3 text-xs text-gray-500">
+          <Award className="w-4 h-4 mx-auto mb-1 text-gray-300" />
+          <p>继续签到、点评、收藏可获得勋章</p>
         </div>
       )}
     </div>

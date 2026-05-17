@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Users, Search, ChevronLeft, ChevronRight, Edit, Ticket, Loader2, AlertTriangle } from "lucide-react";
+import { Users, Search, ChevronLeft, ChevronRight, Edit, Ticket, Loader2, AlertTriangle, Award, TrendingUp, X } from "lucide-react";
 
 interface AdminUser {
   id: string; email: string; name: string | null; role: string; points: number;
   memberUntil: string | null; createdAt: string; updatedAt: string;
-  _count: { userRewards: number; pointLedgers: number };
+  growthValue: number; levelKey: string;
+  _count: { userRewards: number; pointLedgers: number; badgeAwards: number };
 }
 
 interface AdminData {
@@ -17,6 +18,8 @@ interface AdminData {
 
 const ROLE_LABELS: Record<string, string> = { user: "用户", member: "会员", admin: "管理员" };
 const ROLE_COLORS: Record<string, string> = { user: "bg-blue-100 text-blue-700", member: "bg-amber-100 text-amber-700", admin: "bg-purple-100 text-purple-700" };
+const LEVEL_LABELS: Record<string, string> = { lv1: "Lv.1", lv2: "Lv.2", lv3: "Lv.3", lv4: "Lv.4", lv5: "Lv.5" };
+const GROWTH_TYPE_LABELS: Record<string, string> = { checkin: "签到", task: "任务", review: "点评", topic: "专题", admin_adjust: "后台调整", system: "系统" };
 
 export default function AdminUsersPage() {
   const [data, setData] = useState<AdminData | null>(null);
@@ -31,6 +34,18 @@ export default function AdminUsersPage() {
   const [showRewards, setShowRewards] = useState<string | null>(null);
   const [rewards, setRewards] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  // Growth/badges modal state
+  const [showGrowth, setShowGrowth] = useState<string | null>(null);
+  const [growthUser, setGrowthUser] = useState<AdminUser | null>(null);
+  const [growthAdjust, setGrowthAdjust] = useState("");
+  const [growthReason, setGrowthReason] = useState("");
+  const [badgeId, setBadgeId] = useState("");
+  const [badgeReason, setBadgeReason] = useState("");
+  const [userBadges, setUserBadges] = useState<any[]>([]);
+  const [allBadges, setAllBadges] = useState<any[]>([]);
+  const [growthLogs, setGrowthLogs] = useState<any[]>([]);
+  const [growthSaving, setGrowthSaving] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true); setError(null);
@@ -66,6 +81,83 @@ export default function AdminUsersPage() {
     } catch { setToast("加载兑换记录失败"); }
   };
 
+  // Growth & badge management
+  const openGrowthModal = async (user: AdminUser) => {
+    setShowGrowth(user.id);
+    setGrowthUser(user);
+    setGrowthAdjust("");
+    setGrowthReason("");
+    setBadgeId("");
+    setBadgeReason("");
+    try {
+      const [badgesRes, logsRes] = await Promise.all([
+        fetch(`/api/admin/users/${user.id}/badges`),
+        fetch(`/api/admin/users/${user.id}/growth-logs`),
+      ]);
+      if (badgesRes.ok) {
+        const d = await badgesRes.json();
+        setUserBadges(d.awards || []);
+        setAllBadges(d.allBadges || []);
+      }
+      if (logsRes.ok) { const d = await logsRes.json(); setGrowthLogs(d.logs || []); }
+    } catch { setToast("加载失败"); }
+  };
+
+  const handleGrowthAdjust = async () => {
+    if (!growthUser) return;
+    const val = parseInt(growthAdjust, 10);
+    if (isNaN(val)) { setToast("请输入有效数字"); return; }
+    setGrowthSaving(true);
+    try {
+      const res = await fetch(`/api/admin/users/${growthUser.id}/growth-badges`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ growthAdjust: val, reason: growthReason || "后台调整成长值" }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setToast(`调整成功：${val > 0 ? "+" : ""}${val} 成长值 → ${result.data.levelKey}`);
+        setGrowthAdjust("");
+        setGrowthReason("");
+        fetchData();
+        openGrowthModal({ ...growthUser, growthValue: result.data.growthValue, levelKey: result.data.levelKey });
+      } else { setToast(result.error || "调整失败"); }
+    } catch { setToast("调整失败"); }
+    finally { setGrowthSaving(false); }
+  };
+
+  const handleAwardBadge = async () => {
+    if (!growthUser || !badgeId) { setToast("请选择勋章"); return; }
+    setGrowthSaving(true);
+    try {
+      const res = await fetch(`/api/admin/users/${growthUser.id}/growth-badges`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ badgeId, reason: badgeReason || "后台手动授予" }),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setToast("勋章授予成功");
+        setBadgeId("");
+        setBadgeReason("");
+        openGrowthModal(growthUser);
+        fetchData();
+      } else { setToast(result.error || "授予失败"); }
+    } catch { setToast("授予失败"); }
+    finally { setGrowthSaving(false); }
+  };
+
+  const handleRemoveBadge = async (awardId: string) => {
+    if (!growthUser) return;
+    if (!confirm("确认移除该勋章？")) return;
+    try {
+      const res = await fetch(`/api/admin/users/${growthUser.id}/badges/${awardId}`, { method: "DELETE" });
+      const result = await res.json();
+      if (res.ok) { setToast("勋章已移除"); openGrowthModal(growthUser); fetchData(); }
+      else { setToast(result.error || "移除失败"); }
+    } catch { setToast("移除失败"); }
+  };
+
   if (loading) return <div className="text-center text-gray-500 flex items-center justify-center gap-2 min-h-[200px]"><Loader2 className="w-5 h-5 animate-spin" /> 加载中...</div>;
   if (error) return <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">{error}</div>;
   if (!data) return <div className="text-center text-red-500">加载失败</div>;
@@ -80,12 +172,12 @@ export default function AdminUsersPage() {
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-5 text-white">
         <div>
           <h1 className="text-xl font-extrabold flex items-center gap-2"><Users className="w-5 h-5" /> 用户管理</h1>
-          <p className="text-sm text-blue-100 mt-1">管理平台用户、角色、积分与会员。共 {data.pagination.total} 个用户。</p>
+          <p className="text-sm text-blue-100 mt-1">管理平台用户、角色、积分、成长值与会员。共 {data.pagination.total} 个用户。</p>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white border rounded-xl p-4 text-center">
           <div className="text-2xl font-extrabold text-gray-900">{data.pagination.total}</div>
           <div className="text-xs text-gray-500">总用户</div>
@@ -118,39 +210,57 @@ export default function AdminUsersPage() {
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">邮箱</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">角色</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">积分</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">等级</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">成长值</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">积分</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">勋章</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">会员到期</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">注册</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y">
-              {data.users.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div className="font-medium max-w-[180px] truncate">{u.email}</div>
-                    {u.name && <div className="text-xs text-gray-400">{u.name}</div>}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[u.role] || "bg-gray-100"}`}>{ROLE_LABELS[u.role] || u.role}</span>
-                  </td>
-                  <td className="px-4 py-3 font-medium text-amber-600">{u.points}</td>
-                  <td className="px-4 py-3 text-xs text-gray-500 hidden sm:table-cell">{u.memberUntil ? new Date(u.memberUntil).toLocaleDateString("zh-CN") : "—"}</td>
-                  <td className="px-4 py-3 text-xs text-gray-500 hidden md:table-cell">{new Date(u.createdAt).toLocaleDateString("zh-CN")}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1">
-                      <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditPoints(""); setEditReason(""); }} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]" title="编辑"><Edit className="w-4 h-4" /></button>
-                      <button onClick={() => handleViewRewards(u.id)} className="p-1.5 text-gray-400 hover:text-green-600 min-h-[36px]" title="兑换记录"><Ticket className="w-4 h-4" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {data.users.map((u) => {
+                const isMember = u.memberUntil && new Date(u.memberUntil) > new Date();
+                return (
+                  <tr key={u.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <div className="font-medium max-w-[180px] truncate">{u.email}</div>
+                      {u.name && <div className="text-xs text-gray-400">{u.name}</div>}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[u.role] || "bg-gray-100"}`}>{ROLE_LABELS[u.role] || u.role}</span>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        {LEVEL_LABELS[u.levelKey] || u.levelKey}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="font-medium text-emerald-600">{u.growthValue}</span>
+                    </td>
+                    <td className="px-4 py-3 hidden sm:table-cell font-medium text-amber-600">{u.points}</td>
+                    <td className="px-4 py-3 hidden lg:table-cell text-gray-600">{u._count.badgeAwards}</td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <span className="text-xs text-gray-500">
+                        {u.memberUntil ? (isMember ? new Date(u.memberUntil).toLocaleDateString("zh-CN") : "已过期") : "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1">
+                        <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditPoints(""); setEditReason(""); }} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]" title="编辑"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => openGrowthModal(u)} className="p-1.5 text-gray-400 hover:text-emerald-600 min-h-[36px]" title="成长值/勋章"><TrendingUp className="w-4 h-4" /></button>
+                        <button onClick={() => handleViewRewards(u.id)} className="p-1.5 text-gray-400 hover:text-green-600 min-h-[36px]" title="兑换记录"><Ticket className="w-4 h-4" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Edit Modal (role/points) */}
       {editingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setEditingId(null)}>
           <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
@@ -174,6 +284,112 @@ export default function AdminUsersPage() {
               <button onClick={() => setEditingId(null)} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 min-h-[44px]">取消</button>
               <button onClick={() => handleSave(editingId)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 min-h-[44px]">保存</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Growth & Badge Modal */}
+      {showGrowth && growthUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowGrowth(null)}>
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-5 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold flex items-center gap-2"><TrendingUp className="w-5 h-5" /> 成长值与勋章管理</h2>
+              <button onClick={() => setShowGrowth(null)} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
+            </div>
+
+            {/* Current status */}
+            <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-xs text-gray-500">当前等级</div>
+                <div className="text-lg font-bold text-green-600">{LEVEL_LABELS[growthUser.levelKey] || growthUser.levelKey}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">成长值</div>
+                <div className="text-lg font-bold text-emerald-600">{growthUser.growthValue}</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">勋章数</div>
+                <div className="text-lg font-bold text-purple-600">{userBadges.length}</div>
+              </div>
+            </div>
+
+            {/* Growth adjust */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">📈 调整成长值</h3>
+              <div className="flex gap-2">
+                <input type="number" value={growthAdjust} onChange={(e) => setGrowthAdjust(e.target.value)} placeholder="如：+120 或 -50" className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+                <button onClick={handleGrowthAdjust} disabled={growthSaving || !growthAdjust} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 disabled:opacity-50 min-h-[44px]">{growthSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "保存"}</button>
+              </div>
+              <input type="text" value={growthReason} onChange={(e) => setGrowthReason(e.target.value)} placeholder="调整原因（如：测试成长值调整）" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+            </div>
+
+            {/* Current badges */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1"><Award className="w-4 h-4" /> 已获得勋章</h3>
+              {userBadges.length === 0 ? (
+                <div className="text-center text-gray-400 py-4 text-sm">暂无勋章</div>
+              ) : (
+                <div className="space-y-2">
+                  {userBadges.map((a: any) => (
+                    <div key={a.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                      <div>
+                        <div className="text-sm font-medium">{a.badge?.iconText} {a.badge?.name}</div>
+                        <div className="text-xs text-gray-400">{a.reason || "后台授予"} · {new Date(a.awardedAt).toLocaleDateString("zh-CN")}</div>
+                      </div>
+                      <button onClick={() => handleRemoveBadge(a.id)} className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded min-h-[36px]">移除</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Award badge */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">🎖️ 授予勋章</h3>
+              <div className="flex gap-2">
+                <select value={badgeId} onChange={(e) => setBadgeId(e.target.value)} className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]">
+                  <option value="">选择勋章...</option>
+                  {allBadges.filter((b: any) => b.isActive).map((b: any) => (
+                    <option key={b.id} value={b.id}>{b.iconText} {b.name}</option>
+                  ))}
+                </select>
+                <button onClick={handleAwardBadge} disabled={growthSaving || !badgeId} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 disabled:opacity-50 min-h-[44px]">{growthSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "授予"}</button>
+              </div>
+              <input type="text" value={badgeReason} onChange={(e) => setBadgeReason(e.target.value)} placeholder="授予原因" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+            </div>
+
+            {/* Growth logs */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">📋 最近成长值流水</h3>
+              {growthLogs.length === 0 ? (
+                <div className="text-center text-gray-400 py-4 text-sm">暂无流水记录</div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="text-left px-3 py-2 font-medium text-gray-500">时间</th>
+                        <th className="text-left px-3 py-2 font-medium text-gray-500">类型</th>
+                        <th className="text-left px-3 py-2 font-medium text-gray-500">数值</th>
+                        <th className="text-left px-3 py-2 font-medium text-gray-500">原因</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {growthLogs.slice(0, 10).map((l: any) => (
+                        <tr key={l.id}>
+                          <td className="px-3 py-2 text-gray-500">{new Date(l.createdAt).toLocaleDateString("zh-CN")}</td>
+                          <td className="px-3 py-2">{GROWTH_TYPE_LABELS[l.type] || l.type}</td>
+                          <td className={`px-3 py-2 font-medium ${l.value >= 0 ? "text-green-600" : "text-red-600"}`}>{l.value >= 0 ? "+" : ""}{l.value}</td>
+                          <td className="px-3 py-2 text-gray-500 truncate max-w-[100px]">{l.reason || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end"><button onClick={() => setShowGrowth(null)} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 min-h-[44px]">关闭</button></div>
           </div>
         </div>
       )}
