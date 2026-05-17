@@ -57,7 +57,7 @@ export default function StarterPage() {
         </Link>
 
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-6">
           <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-blue-600" />
           </div>
@@ -67,6 +67,23 @@ export default function StarterPage() {
             <br />
             不提供 VPN、代理节点或网络访问服务。
           </p>
+        </div>
+
+        {/* 什么是场景包 */}
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-8">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">🎯</span>
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-900 mb-1">什么是场景包？</h2>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                场景包是按照真实使用场景整理的「工具套餐」。比如你是亚马逊卖家，不需要在一堆工具里逐个找，
+                打开「亚马逊新手工具包」就能看到选品、文案、利润计算、商标合规等一整套工具，
+                按照推荐顺序使用，少走弯路。
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* ===== 按场景开始 ===== */}

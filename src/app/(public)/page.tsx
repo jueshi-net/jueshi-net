@@ -176,9 +176,9 @@ export default async function LandingPage() {
     { name: '邮编查询', href: '/tools/postal-code', icon: MapPin, desc: '全球邮编地址格式化' },
     { name: '单据生成', href: '/tools/documents', icon: FileText, desc: '发票/装箱单/合同' },
     { name: '唛头标签', href: '/tools/documents?type=mark', icon: Tag, desc: '一键生成唛头面单' },
-    { name: 'AI商品文案', href: '/ai-learning', icon: Sparkles, desc: 'AI 撰写产品描述' },
-    { name: 'AI翻译润色', href: '/ai-learning', icon: Globe, desc: '多语言翻译优化' },
-    { name: '排行榜', href: '/tools/rankings', icon: TrendingUp, desc: '热门工具实时排行' },
+    { name: 'AI商品文案', href: '/ai-tools/product-copy', icon: Sparkles, desc: 'AI 撰写产品描述' },
+    { name: 'AI翻译润色', href: '/ai-tools/translate-polish', icon: Globe, desc: '多语言翻译优化' },
+    { name: '排行榜', href: '/rankings', icon: TrendingUp, desc: '热门工具实时排行' },
   ];
 
   return (
