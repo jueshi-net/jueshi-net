@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { SCENARIO_PACKAGES } from '@/data/scenario-packages';
 
+export const dynamic = 'force-dynamic';
+
 // GET /sitemap.xml - 动态生成站点地图
 // 降级策略：DB不可用时只输出静态核心路由
 
