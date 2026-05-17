@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, X, ArrowRight, Star, Zap, Shield, Crown, Loader2 } from 'lucide-react';
+import { Check, X, ArrowRight, Star, Zap, Shield, Crown } from 'lucide-react';
 
 const plans = [
   {
@@ -83,11 +83,16 @@ const faqs = [
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);
-  const [loading, setLoading] = useState<string | null>(null);
 
   const handleSubscribe = async (planId: string, priceId: string) => {
     if (planId === 'free') {
       window.location.href = '/login';
+      return;
+    }
+
+    if (planId === 'pro') {
+      // 会员购买功能待开放，当前可通过积分兑换或后台开通
+      alert('会员购买功能即将开放。当前可通过积分兑换体验，或联系客服咨询。');
       return;
     }
 
@@ -96,27 +101,8 @@ export default function PricingPage() {
       return;
     }
 
-    setLoading(planId);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId,
-          successUrl: `${window.location.origin}/payment/success`,
-          cancelUrl: `${window.location.origin}/pricing`,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-    } finally {
-      setLoading(null);
-    }
+    // Fallback: no active checkout yet
+    alert('该方案暂未开放在线购买，请关注后续更新。');
   };
 
   return (
@@ -213,24 +199,14 @@ export default function PricingPage() {
 
                 <button
                   onClick={() => handleSubscribe(plan.id, plan.priceId)}
-                  disabled={loading === plan.id}
-                  className={`mt-6 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 ${
+                  className={`mt-6 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors min-h-[44px] ${
                     isPopular
                       ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {loading === plan.id ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      处理中...
-                    </>
-                  ) : (
-                    <>
-                      {plan.cta}
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
+                  {plan.cta}
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             );

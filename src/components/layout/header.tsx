@@ -1,110 +1,336 @@
 "use client";
 
 import Link from "next/link";
-import { PackageSearch, User, LogIn, Settings, LayoutDashboard, LogOut, Bell, Search, SlidersHorizontal, Shield, Star, Briefcase, Wrench, LifeBuoy, Globe } from "lucide-react";
+import {
+  PackageSearch,
+  User,
+  LogIn,
+  Settings,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  X,
+  Shield,
+  Wrench,
+  Sparkles,
+  BookOpen,
+  Library,
+  Briefcase,
+  LifeBuoy,
+  Gem,
+  ChevronDown,
+} from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ThemeToggle from "@/components/theme-toggle";
 import NotificationBell from "@/components/notification-bell";
+
+const NAV_LINKS = [
+  { href: "/tools", label: "工具", icon: Wrench },
+  { href: "/ai-tools/product-copy", label: "AI", icon: Sparkles },
+  { href: "/starter", label: "场景包", icon: Briefcase },
+  { href: "/guides", label: "指南", icon: BookOpen },
+  { href: "/resources", label: "资源", icon: Library },
+  { href: "/pricing", label: "会员", icon: Gem },
+];
 
 export default function Header() {
   const { data: session, status } = useSession();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMobileMenuOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Close menus on route change (listen for popstate)
+  useEffect(() => {
+    const handlePop = () => {
+      setShowUserMenu(false);
+      setMobileMenuOpen(false);
+    };
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
               <PackageSearch className="w-5 h-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">
-              海外百宝箱 <span className="text-gray-400 font-normal text-sm hidden sm:inline">| 海外华人的常用工具与资源平台</span>
-            </span>
+            <div className="hidden sm:block">
+              <span className="text-base font-bold text-gray-900 dark:text-white">海外百宝箱</span>
+              <span className="text-[11px] text-gray-400 ml-1.5">工具 · AI · 资源</span>
+            </div>
           </Link>
 
-          {/* Nav */}
-          <nav className="hidden xl:flex items-center gap-5 text-sm text-gray-600 dark:text-gray-300">
-            <Link href="/tools" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">工具中心</Link>
-            <Link href="/shipping" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">跨境寄送</Link>
-            <Link href="/resources" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">生活资源</Link>
-            <Link href="/business" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">出海经营</Link>
-            <Link href="/nav" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">网址导航</Link>
-            <Link href="/dashboard" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">我的工作台</Link>
+          {/* Center: Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
+            {NAV_LINKS.map((link) => {
+              const Icon = link.icon;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                >
+                  <Icon className="w-4 h-4" />
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Theme Toggle + User */}
-          <div className="flex items-center gap-3">
+          {/* Right: Theme + User / Login */}
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             {status === "authenticated" && <NotificationBell />}
-            <div className="relative">
+
+            {/* Desktop: User or Login */}
+            <div className="hidden md:block">
               {status === "authenticated" && session.user ? (
-                <div className="flex items-center gap-3">
+                <div className="relative">
                   <button
                     onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px]"
                   >
-                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+                    <div className="w-7 h-7 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-teal-600 dark:text-teal-300" />
                     </div>
-                    <span className="hidden sm:inline">{session.user.name || "用户"}</span>
+                    <span className="hidden lg:inline max-w-20 truncate">{session.user.name || "用户"}</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
                   </button>
 
                   {showUserMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
-                    <Link
-                      href="/favorites"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <Star className="w-4 h-4 text-amber-500" />
-                      我的收藏
-                    </Link>
-                    <Link
-                      href="/dashboard"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        我的工作台
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        <Settings className="w-4 h-4" />
-                        设置
-                      </Link>
-                      {(session.user as any)?.role === "admin" && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
+                      <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50">
                         <Link
-                          href="/admin"
-                          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                          href="/dashboard"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
-                          <Shield className="w-4 h-4" />
-                          管理后台
+                          <LayoutDashboard className="w-4 h-4" />
+                          我的工作台
                         </Link>
-                      )}
-                      <hr className="my-1 dark:border-gray-700" />
-                      <button
-                        onClick={() => { signOut({ callbackUrl: "/" }); setShowUserMenu(false); }}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        退出登录
-                      </button>
-                    </div>
+                        <Link
+                          href="/favorites"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Sparkles className="w-4 h-4 text-amber-500" />
+                          我的收藏
+                        </Link>
+                        <Link
+                          href="/dashboard/points"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Gem className="w-4 h-4 text-amber-500" />
+                          积分与会员
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Settings className="w-4 h-4" />
+                          设置
+                        </Link>
+                        {(session.user as any)?.role === "admin" && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 min-h-[44px]"
+                            onClick={() => setShowUserMenu(false)}
+                          >
+                            <Shield className="w-4 h-4" />
+                            管理后台
+                          </Link>
+                        )}
+                        <hr className="my-1 dark:border-gray-700" />
+                        <button
+                          onClick={() => { signOut({ callbackUrl: "/" }); setShowUserMenu(false); }}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left min-h-[44px]"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          退出登录
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm rounded-lg hover:bg-teal-700 transition-colors min-h-[44px] font-medium"
                 >
                   <LogIn className="w-4 h-4" />
+                  登录
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile: Hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              aria-label="菜单"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Menu Panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl z-50 transform transition-transform duration-300 md:hidden ${
+          mobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
+              <PackageSearch className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold text-gray-900 dark:text-white">菜单</span>
+          </div>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto h-[calc(100%-57px)] py-4">
+          {/* Main Nav Links */}
+          <div className="px-4 mb-6">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">导航</div>
+            <div className="space-y-0.5">
+              {NAV_LINKS.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <Icon className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tools Quick Links */}
+          <div className="px-4 mb-6">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">常用工具</div>
+            <div className="space-y-0.5">
+              {[
+                { href: "/tools/postal-code", label: "邮编查询" },
+                { href: "/tools/documents", label: "单据中心" },
+                { href: "/tools/label-maker", label: "唛头标签" },
+                { href: "/ai-tools/translate-polish", label: "AI 翻译润色" },
+                { href: "/ai-tools/document-summary", label: "AI 文件摘要" },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* User Actions */}
+          <div className="px-4">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+              {status === "authenticated" ? "我的" : "账户"}
+            </div>
+            <div className="space-y-0.5">
+              {status === "authenticated" ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <LayoutDashboard className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">我的工作台</span>
+                  </Link>
+                  <Link
+                    href="/dashboard/points"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <Gem className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">积分与会员</span>
+                  </Link>
+                  <Link
+                    href="/favorites"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <Sparkles className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">我的收藏</span>
+                  </Link>
+                  <Link
+                    href="/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <Settings className="w-5 h-5 text-gray-400" />
+                    <span className="font-medium">设置</span>
+                  </Link>
+                  {(session?.user as any)?.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors min-h-[44px]"
+                    >
+                      <Shield className="w-5 h-5" />
+                      <span className="font-medium">管理后台</span>
+                    </Link>
+                  )}
+                  <hr className="my-2 dark:border-gray-700" />
+                  <button
+                    onClick={() => { signOut({ callbackUrl: "/" }); setMobileMenuOpen(false); }}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full text-left min-h-[44px]"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">退出登录</span>
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 transition-colors min-h-[48px]"
+                >
+                  <LogIn className="w-5 h-5" />
                   登录 / 注册
                 </Link>
               )}
