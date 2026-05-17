@@ -1,6 +1,16 @@
 "use client";
 import Link from "next/link";
-import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare, Loader2, AlertCircle } from "lucide-react";
+
+interface OverviewStats {
+  users: { total: number; normal: number; members: number; admins: number };
+  articles: { total: number; published: number; draft: number; archived: number };
+  resources: { total: number; active: number; inactive: number; categories: number };
+  ads: { total: number; active: number; inactive: number };
+  reviews: { total: number; pending: number; approved: number; rejected: number; hidden: number };
+  points: { totalIssued: number; totalSpent: number; ledgerCount: number };
+}
 
 interface QuickAction {
   label: string;
@@ -8,16 +18,6 @@ interface QuickAction {
   icon: any;
   color: string;
   desc: string;
-}
-
-interface StatCard {
-  label: string;
-  value: string;
-  icon: any;
-  color: string;
-  bg: string;
-  link?: string;
-  linkLabel?: string;
 }
 
 interface ModuleCard {
@@ -37,15 +37,6 @@ const quickActions: QuickAction[] = [
   { label: "添加广告", href: "/admin/ads", icon: Megaphone, color: "green", desc: "配置广告位" },
   { label: "审核短评", href: "/admin/tool-reviews", icon: Star, color: "yellow", desc: "审核用户评论" },
   { label: "管理用户", href: "/admin/users", icon: Users, color: "blue", desc: "用户与会员" },
-];
-
-const statCards: StatCard[] = [
-  { label: "用户总数", value: "—", icon: Users, color: "text-blue-600", bg: "bg-blue-50", link: "/admin/users", linkLabel: "查看详情 →" },
-  { label: "文章总数", value: "—", icon: FileText, color: "text-orange-600", bg: "bg-orange-50", link: "/admin/cms", linkLabel: "查看文章 →" },
-  { label: "资源总数", value: "—", icon: FolderOpen, color: "text-purple-600", bg: "bg-purple-50", link: "/admin/resources", linkLabel: "查看资源 →" },
-  { label: "广告位", value: "—", icon: Megaphone, color: "text-green-600", bg: "bg-green-50", link: "/admin/ads", linkLabel: "管理广告 →" },
-  { label: "待审核短评", value: "—", icon: Star, color: "text-amber-600", bg: "bg-amber-50", link: "/admin/tool-reviews", linkLabel: "前往审核 →" },
-  { label: "今日积分流水", value: "—", icon: BarChart3, color: "text-teal-600", bg: "bg-teal-50", link: "/admin/users", linkLabel: "查看用户 →" },
 ];
 
 const modules: ModuleCard[] = [
@@ -91,6 +82,23 @@ const colorMap: Record<string, { bg: string; icon: string; border: string; hover
 };
 
 export default function AdminPage() {
+  const [stats, setStats] = useState<OverviewStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/overview")
+      .then(r => {
+        if (!r.ok) throw new Error("Failed to fetch stats");
+        return r.json();
+      })
+      .then(d => setStats(d))
+      .catch(() => setError("统计加载失败"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const s = stats;
+
   return (
     <div className="space-y-8">
       {/* ===== A. HEADER ===== */}
@@ -111,27 +119,31 @@ export default function AdminPage() {
       {/* ===== B. STATS ===== */}
       <div>
         <h2 className="text-lg font-bold text-gray-900 mb-3">运营概览</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {statCards.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div key={stat.label} className="bg-white rounded-xl border p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center`}>
-                    <Icon className={`w-4 h-4 ${stat.color}`} />
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
-                <p className="text-xl font-extrabold text-gray-900">{stat.value}</p>
-                {stat.link && (
-                  <Link href={stat.link} className="text-xs text-teal-600 hover:text-teal-700 mt-1 inline-block">
-                    {stat.linkLabel}
-                  </Link>
-                )}
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-xl border p-4 animate-pulse">
+                <div className="w-8 h-8 rounded-lg bg-gray-200 mb-2" />
+                <div className="h-3 bg-gray-200 rounded w-16 mb-2" />
+                <div className="h-7 bg-gray-200 rounded w-10" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-sm text-red-600">{error}，但模块卡片仍可用</p>
+          </div>
+        ) : s ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <StatCard icon={Users} label="用户总数" value={s.users.total} sub={`${s.users.members} 会员 / ${s.users.admins} 管理员`} color="text-blue-600" bg="bg-blue-50" link="/admin/users" linkLabel="查看详情 →" />
+            <StatCard icon={FileText} label="文章" value={s.articles.total} sub={`${s.articles.published} 已发布 / ${s.articles.draft} 草稿`} color="text-orange-600" bg="bg-orange-50" link="/admin/cms" linkLabel="查看文章 →" />
+            <StatCard icon={FolderOpen} label="资源" value={s.resources.total} sub={`${s.resources.active} 启用 / ${s.resources.categories} 分类`} color="text-purple-600" bg="bg-purple-50" link="/admin/resources" linkLabel="查看资源 →" />
+            <StatCard icon={Megaphone} label="广告位" value={s.ads.total} sub={`${s.ads.active} 启用 / ${s.ads.inactive} 停用`} color="text-green-600" bg="bg-green-50" link="/admin/ads" linkLabel="管理广告 →" />
+            <StatCard icon={Star} label="短评待审" value={s.reviews.pending} sub={`共 ${s.reviews.total} / ${s.reviews.approved} 已通过`} color="text-amber-600" bg="bg-amber-50" link="/admin/tool-reviews" linkLabel="前往审核 →" />
+            <StatCard icon={BarChart3} label="积分流水" value={s.points.ledgerCount} sub={`发放 ${s.points.totalIssued} / 消耗 ${s.points.totalSpent}`} color="text-teal-600" bg="bg-teal-50" link="/admin/users" linkLabel="查看用户 →" />
+          </div>
+        ) : null}
       </div>
 
       {/* ===== C. QUICK ACTIONS ===== */}
@@ -217,6 +229,26 @@ export default function AdminPage() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ icon: Icon, label, value, sub, color, bg, link, linkLabel }: { icon: any; label: string; value: number; sub: string; color: string; bg: string; link: string; linkLabel: string }) {
+  return (
+    <div className="bg-white rounded-xl border p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
+          <Icon className={`w-4 h-4 ${color}`} />
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 mb-1">{label}</p>
+      <p className="text-xl font-extrabold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-400 mt-0.5">{sub}</p>
+      {link && (
+        <Link href={link} className="text-xs text-teal-600 hover:text-teal-700 mt-1 inline-block">
+          {linkLabel}
+        </Link>
+      )}
     </div>
   );
 }
