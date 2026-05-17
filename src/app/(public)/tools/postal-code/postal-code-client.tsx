@@ -3,12 +3,12 @@ import { AdSlot } from '@/components/ad-slot';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
-
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import Link from 'next/link';
+import ToolReviewPanel from '@/components/tools/tool-review-panel';
 
 function normalizePostal(input: string): string {
   return input.trim().toUpperCase().replace(/[\s\-]+/g, '');
@@ -766,6 +766,9 @@ export default function PostalCodePage() {
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
               </ul>
             </div>
+
+            {/* Tool Reviews */}
+            <ToolReviewPanel toolKey="postal-code" isLoggedIn={!!(typeof window !== 'undefined' && document.cookie.includes('next-auth'))} />
           </div>
         </div>
 

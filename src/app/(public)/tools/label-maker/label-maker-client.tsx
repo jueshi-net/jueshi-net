@@ -10,6 +10,7 @@ import { saveLabelDraft, getLabelDraft, getAllLabelDrafts, deleteLabelDraft } fr
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
+import ToolReviewPanel from '@/components/tools/tool-review-panel';
 
 import { buildLabelA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/labels/a4-export-renderer';
 
@@ -490,6 +491,9 @@ export default function LabelMakerPage() {
             { question: "批量生成是什么意思？", answer: "批量生成指一次性生成多张相同或不同的标签。游客默认只能单次生成，会员可批量生成多张（如不同箱号的连续标签），提高仓库贴标效率。" },
             { question: "生成的标签可以直接打印吗？", answer: "可以。点击「打印 / PDF」会调用浏览器打印功能，支持 A4 纸打印或导出 PDF。建议打印前预览，确保尺寸和边距正确。" },
           ]} />
+
+          {/* Tool Reviews */}
+          <ToolReviewPanel toolKey="label-maker" isLoggedIn={typeof window !== 'undefined' && document.cookie.includes('next-auth')} />
         </div>
       </div>
     </>

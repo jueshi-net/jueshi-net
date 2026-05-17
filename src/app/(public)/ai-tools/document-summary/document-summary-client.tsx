@@ -9,6 +9,7 @@ import {
   FileCheck, Eye,
 } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
+import ToolReviewPanel from "@/components/tools/tool-review-panel";
 
 const DOC_TYPES = ["租房合同", "工作邮件", "学校通知", "商务合同", "其他"];
 
@@ -350,6 +351,9 @@ export default function DocumentSummaryPage() {
             ))}
           </div>
         </div>
+
+        {/* Tool Reviews */}
+        <ToolReviewPanel toolKey="document-summary" isLoggedIn={typeof window !== 'undefined' && document.cookie.includes('next-auth')} />
 
         <AdSlot placement="tool-bottom" className="mt-8" variant="card" />
       </div>

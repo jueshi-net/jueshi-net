@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, AlertCircle, Copy, Check, Globe, Tag, TrendingUp, ExternalLink, ChevronRight, Home, Languages, PenTool, BookOpen } from "lucide-react";
 
 import { AdSlot } from "@/components/ad-slot";
+import ToolReviewPanel from "@/components/tools/tool-review-panel";
 
 const TARGET_LANGS = ["中文", "英文"];
 const STYLES = ["正式", "自然", "商务", "礼貌", "简洁"];
@@ -306,6 +307,9 @@ export default function TranslatePolishPage() {
             </div>
           </div>
         </div>
+
+        {/* Tool Reviews */}
+        <ToolReviewPanel toolKey="translate-polish" isLoggedIn={typeof window !== 'undefined' && document.cookie.includes('next-auth')} />
 
         <AdSlot placement="tool-bottom" className="mt-8" variant="card" />
       </div>

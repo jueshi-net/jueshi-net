@@ -699,9 +699,10 @@ model ToolReview {
   userId        String
   toolKey       String         // 工具标识
   rating        Int            // 1-5 评分
-  content       String         // 10-140 字短评
+  content       String         // 5-300 字短评
   status        String   @default("pending")  // pending / approved / rejected / hidden
   pointsAwarded Boolean  @default(false)
+  reviewedRewardedAt DateTime?  // v1.20.20: 成长值/勋章奖励发放时间（防重复）
   ipHash        String?
   userAgent     String?
   createdAt     DateTime @default(now())
@@ -709,7 +710,7 @@ model ToolReview {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, toolKey])
+  @@index([userId])
   @@index([toolKey])
   @@index([status])
   @@index([createdAt])

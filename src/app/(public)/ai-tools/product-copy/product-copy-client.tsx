@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, AlertCircle, Copy, Check, Globe, Tag, TrendingUp, ExternalLink, ChevronRight, Home } from "lucide-react";
 
 import { AdSlot } from "@/components/ad-slot";
+import ToolReviewPanel from "@/components/tools/tool-review-panel";
 
 const PLATFORMS = ["Amazon", "TikTok", "Shopify", "小红书", "通用"];
 const LANGUAGES = ["中文", "英文", "中英双语"];
@@ -334,6 +335,9 @@ export default function ProductCopyPage() {
             </div>
           </div>
         </div>
+
+        {/* Tool Reviews */}
+        <ToolReviewPanel toolKey="product-copy" isLoggedIn={typeof window !== 'undefined' && document.cookie.includes('next-auth')} />
 
         <AdSlot placement="tool-bottom" className="mt-8" variant="card" />
       </div>

@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const reviews = await prisma.toolReview.findMany({
       where: { toolKey, status: "approved" },
       orderBy: { createdAt: "desc" },
-      take: 20,
+      take: 10,
       select: {
         id: true,
         rating: true,
@@ -82,15 +82,24 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: contentResult.error }, { status: 400 });
     }
 
-    // Check if already reviewed this tool
-    const existing = await prisma.toolReview.findUnique({
-      where: { userId_toolKey: { userId, toolKey: toolKey.trim() } },
+    // Daily submission limit: max 3 per user per tool per day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayCount = await prisma.toolReview.count({
+      where: {
+        userId,
+        toolKey: toolKey.trim(),
+        createdAt: { gte: today, lt: tomorrow },
+      },
     });
 
-    if (existing) {
+    if (todayCount >= 3) {
       return NextResponse.json(
-        { error: "你已提交过此工具的短评，每人每个工具只能写一条" },
-        { status: 409 }
+        { error: "今日对该工具的短评已达上限（3条）" },
+        { status: 429 }
       );
     }
 
@@ -118,11 +127,6 @@ export async function POST(req: Request) {
     if (canEarn) {
       await prisma.$transaction(async (tx) => {
         // Double-check cap inside transaction
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
         const todayPoints = await tx.pointLedger.aggregate({
           where: {
             userId,

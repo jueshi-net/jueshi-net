@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Check, X, EyeOff, Star, Loader2 } from "lucide-react";
+import { Check, X, EyeOff, Eye, Star, Loader2, RefreshCw } from "lucide-react";
 
 interface Review {
   id: string; toolKey: string; rating: number; content: string; status: string;
@@ -22,6 +22,7 @@ export default function AdminToolReviewsPage() {
   const [statusFilter, setStatusFilter] = useState("pending");
   const [acting, setActing] = useState<string | null>(null);
   const [stats, setStats] = useState<Record<string, number>>({});
+  const [toast, setToast] = useState<string | null>(null);
 
   const fetchReviews = useCallback(async (status: string) => {
     setLoading(true);
@@ -41,21 +42,36 @@ export default function AdminToolReviewsPage() {
     fetch("/api/admin/tool-reviews?status=approved").then(r => r.json()).then(d => {
       setStats(prev => ({ ...prev, approved: (d.reviews || []).length }));
     }).catch(() => {});
-    fetch("/api/admin/tool-reviews").then(r => r.json()).then(d => {
-      setStats(prev => ({ ...prev, total: (d.reviews || []).length }));
-    }).catch(() => {});
   }, []);
 
   useEffect(() => { fetchReviews(statusFilter); }, [statusFilter, fetchReviews]);
 
-  const handleAction = async (id: string, status: string) => {
+  const handleAction = async (id: string, status: string, label: string) => {
     setActing(id);
     try {
       const res = await fetch(`/api/admin/tool-reviews/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
-      if (res.ok) { fetchReviews(statusFilter); }
-    } catch { alert("操作失败"); }
+      if (res.ok) {
+        setToast(`${label}成功`);
+        fetchReviews(statusFilter);
+        // Refresh pending count
+        fetch("/api/admin/tool-reviews?status=pending").then(r => r.json()).then(d => {
+          setStats(prev => ({ ...prev, pending: (d.reviews || []).length }));
+        }).catch(() => {});
+      } else {
+        const data = await res.json();
+        setToast(data.error || "操作失败");
+      }
+    } catch { setToast("操作失败"); }
     finally { setActing(null); }
   };
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   return (
     <div className="space-y-6">
@@ -63,12 +79,12 @@ export default function AdminToolReviewsPage() {
       <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl p-5 text-white">
         <div>
           <h1 className="text-xl font-extrabold flex items-center gap-2"><Star className="w-5 h-5" /> 短评审核</h1>
-          <p className="text-sm text-amber-100 mt-1">审核用户提交的工具短评（通过/拒绝/隐藏）。共 {stats.total || reviews.length} 条。</p>
+          <p className="text-sm text-amber-100 mt-1">审核用户提交的工具短评（通过/拒绝/隐藏/恢复）。共 {stats.total || reviews.length} 条。</p>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
           <div className="text-2xl font-extrabold text-amber-700">{stats.pending || reviews.filter(r => r.status === "pending").length}</div>
           <div className="text-xs text-amber-600">待审核</div>
@@ -135,23 +151,45 @@ export default function AdminToolReviewsPage() {
                 </div>
 
                 {/* Actions */}
-                {r.status === "pending" && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={() => handleAction(r.id, "approved")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="通过">
-                      {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> 通过</>}
-                    </button>
-                    <button onClick={() => handleAction(r.id, "rejected")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="拒绝">
-                      {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4" /> 拒绝</>}
-                    </button>
-                    <button onClick={() => handleAction(r.id, "hidden")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm min-h-[44px]" title="隐藏">
+                <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
+                  {r.status === "pending" && (
+                    <>
+                      <button onClick={() => handleAction(r.id, "approved", "通过")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="通过">
+                        {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> 通过</>}
+                      </button>
+                      <button onClick={() => handleAction(r.id, "rejected", "拒绝")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="拒绝">
+                        {acting === r.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <><X className="w-4 h-4" /> 拒绝</>}
+                      </button>
+                      <button onClick={() => handleAction(r.id, "hidden", "隐藏")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm min-h-[44px]" title="隐藏">
+                        <EyeOff className="w-4 h-4" /> 隐藏
+                      </button>
+                    </>
+                  )}
+                  {r.status === "approved" && (
+                    <button onClick={() => handleAction(r.id, "hidden", "隐藏")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 text-sm min-h-[44px]" title="隐藏">
                       <EyeOff className="w-4 h-4" /> 隐藏
                     </button>
-                  </div>
-                )}
+                  )}
+                  {r.status === "rejected" && (
+                    <button onClick={() => handleAction(r.id, "approved", "恢复通过")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="恢复通过">
+                      <RefreshCw className="w-4 h-4" /> 恢复通过
+                    </button>
+                  )}
+                  {r.status === "hidden" && (
+                    <button onClick={() => handleAction(r.id, "approved", "恢复通过")} disabled={acting === r.id} className="flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium min-h-[44px]" title="恢复通过">
+                      <Eye className="w-4 h-4" /> 恢复展示
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium bg-green-600 text-white">{toast}</div>
       )}
     </div>
   );

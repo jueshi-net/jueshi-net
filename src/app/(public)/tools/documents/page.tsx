@@ -7,6 +7,7 @@ import { Breadcrumb } from "@/components/breadcrumb";
 import { FAQSection } from "@/components/faq-section";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
 import DocumentGrid from "@/components/document-grid";
+import ToolReviewServer from "@/components/tools/tool-review-server";
 
 export const metadata: Metadata = {
   title: "外贸/国际物流通用单据生成器 — 海外百宝箱",
@@ -263,6 +264,9 @@ export default function DocumentsHubPage() {
         { question: "商业发票和形式发票有什么区别？", answer: "商业发票（Commercial Invoice）是实际交易后出具的正式单据，用于报关结算；形式发票（Proforma Invoice）是成交前出具的预估单据，供买方参考或申请进口许可。" },
         { question: "装箱单（Packing List）需要包含哪些信息？", answer: "装箱单应包含：货物名称、规格型号、数量、毛重、净重、包装方式、箱号、唛头等。注意与商业发票的品名和数量保持一致。" },
       ]} />
+
+      {/* Tool Reviews */}
+      <ToolReviewServer toolKey="documents" />
 
       <AdSlot placement="footer" variant="banner" className="mt-8 mb-8" />
     </div>
