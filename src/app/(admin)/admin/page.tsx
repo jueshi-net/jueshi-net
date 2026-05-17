@@ -1,6 +1,24 @@
 "use client";
 import Link from "next/link";
-import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink } from "lucide-react";
+import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare } from "lucide-react";
+
+interface QuickAction {
+  label: string;
+  href: string;
+  icon: any;
+  color: string;
+  desc: string;
+}
+
+interface StatCard {
+  label: string;
+  value: string;
+  icon: any;
+  color: string;
+  bg: string;
+  link?: string;
+  linkLabel?: string;
+}
 
 interface ModuleCard {
   name: string;
@@ -9,131 +27,43 @@ interface ModuleCard {
   status: "online" | "partial" | "planned";
   statusLabel: string;
   description: string;
-  dataSource: string;
+  frontendPath?: string;
   color: string;
 }
 
+const quickActions: QuickAction[] = [
+  { label: "写文章", href: "/admin/cms", icon: FileText, color: "orange", desc: "管理指南内容" },
+  { label: "添加资源", href: "/admin/resources", icon: FolderOpen, color: "purple", desc: "管理资源库" },
+  { label: "添加广告", href: "/admin/ads", icon: Megaphone, color: "green", desc: "配置广告位" },
+  { label: "审核短评", href: "/admin/tool-reviews", icon: Star, color: "yellow", desc: "审核用户评论" },
+  { label: "管理用户", href: "/admin/users", icon: Users, color: "blue", desc: "用户与会员" },
+];
+
+const statCards: StatCard[] = [
+  { label: "用户总数", value: "—", icon: Users, color: "text-blue-600", bg: "bg-blue-50", link: "/admin/users", linkLabel: "查看详情 →" },
+  { label: "文章总数", value: "—", icon: FileText, color: "text-orange-600", bg: "bg-orange-50", link: "/admin/cms", linkLabel: "查看文章 →" },
+  { label: "资源总数", value: "—", icon: FolderOpen, color: "text-purple-600", bg: "bg-purple-50", link: "/admin/resources", linkLabel: "查看资源 →" },
+  { label: "广告位", value: "—", icon: Megaphone, color: "text-green-600", bg: "bg-green-50", link: "/admin/ads", linkLabel: "管理广告 →" },
+  { label: "待审核短评", value: "—", icon: Star, color: "text-amber-600", bg: "bg-amber-50", link: "/admin/tool-reviews", linkLabel: "前往审核 →" },
+  { label: "今日积分流水", value: "—", icon: BarChart3, color: "text-teal-600", bg: "bg-teal-50", link: "/admin/users", linkLabel: "查看用户 →" },
+];
+
 const modules: ModuleCard[] = [
-  {
-    name: "用户管理",
-    path: "/admin/users",
-    icon: Users,
-    status: "online",
-    statusLabel: "已上线",
-    description: "查看/编辑用户、角色、积分、会员到期时间",
-    dataSource: "DB: users, memberships, point_ledgers",
-    color: "blue",
-  },
-  {
-    name: "短评审核",
-    path: "/admin/tool-reviews",
-    icon: Star,
-    status: "online",
-    statusLabel: "已上线",
-    description: "审核用户提交的工具短评（通过/隐藏/拒绝）",
-    dataSource: "DB: tool_reviews",
-    color: "yellow",
-  },
-  {
-    name: "文章管理",
-    path: "/admin/cms",
-    icon: FileText,
-    status: "online",
-    statusLabel: "已上线",
-    description: "管理网站文章/指南/教程。前台展示：/guides 和 /guides/[slug]",
-    dataSource: "DB: articles",
-    color: "orange",
-  },
-  {
-    name: "广告管理",
-    path: "/admin/ads",
-    icon: Megaphone,
-    status: "online",
-    statusLabel: "已上线",
-    description: "管理广告位。支持图片广告、文字广告、HTML/JS 代码广告",
-    dataSource: "DB: ad_slots",
-    color: "green",
-  },
-  {
-    name: "资源库",
-    path: "/admin/resources",
-    icon: FolderOpen,
-    status: "partial",
-    statusLabel: "已上线/待完善",
-    description: "管理资源库内容。前台展示：/resources 和 /resources/[slug]",
-    dataSource: "DB: resources",
-    color: "purple",
-  },
-  {
-    name: "链接管理",
-    path: "/admin/links",
-    icon: Link2,
-    status: "online",
-    statusLabel: "已上线",
-    description: "管理链接收藏、分类、标签",
-    dataSource: "DB: links, link_categories, link_tags",
-    color: "teal",
-  },
-  {
-    name: "分类/标签",
-    path: "/admin/categories",
-    icon: BarChart3,
-    status: "online",
-    statusLabel: "已上线",
-    description: "管理链接分类和标签",
-    dataSource: "DB: link_categories, link_tags",
-    color: "indigo",
-  },
-  {
-    name: "单据/唛头模板",
-    path: "/tools/label-maker",
-    icon: Package,
-    status: "partial",
-    statusLabel: "代码级管理",
-    description: "8 种唛头/标签类型 + 6 种视觉风格。目前通过代码配置，不是后台编辑",
-    dataSource: "代码: src/lib/documents / src/lib/labels",
-    color: "gray",
-  },
-  {
-    name: "网盘分享",
-    path: "#",
-    icon: Cloud,
-    status: "planned",
-    statusLabel: "未实现",
-    description: "计划在 v1.20/v1.21 实现，目前无 model/API/页面",
-    dataSource: "无",
-    color: "sky",
-  },
-  {
-    name: "系统设置",
-    path: "/admin/settings",
-    icon: Settings,
-    status: "online",
-    statusLabel: "已上线",
-    description: "网站基础设置",
-    dataSource: "DB: site_settings",
-    color: "slate",
-  },
-  {
-    name: "数据备份",
-    path: "/admin/backup",
-    icon: Database,
-    status: "online",
-    statusLabel: "已上线",
-    description: "数据库备份管理",
-    dataSource: "系统: pg_dump + 脚本",
-    color: "emerald",
-  },
-  {
-    name: "权限/安全",
-    path: "/admin/audit",
-    icon: Shield,
-    status: "online",
-    statusLabel: "已上线",
-    description: "审计日志、安全设置",
-    dataSource: "DB: audit_logs",
-    color: "red",
-  },
+  { name: "用户管理", path: "/admin/users", icon: Users, status: "online", statusLabel: "已上线", description: "查看/编辑用户、角色、积分、会员到期时间", frontendPath: "/dashboard", color: "blue" },
+  { name: "短评审核", path: "/admin/tool-reviews", icon: Star, status: "online", statusLabel: "已上线", description: "审核用户提交的工具短评（通过/隐藏/拒绝）", frontendPath: "/tools/[name] → 短评", color: "yellow" },
+  { name: "文章管理", path: "/admin/cms", icon: FileText, status: "online", statusLabel: "已上线", description: "管理网站文章/指南/教程", frontendPath: "/guides 和 /guides/[slug]", color: "orange" },
+  { name: "广告管理", path: "/admin/ads", icon: Megaphone, status: "online", statusLabel: "已上线", description: "管理广告位。支持图片、文字、HTML/JS 代码广告", frontendPath: "AdSlot 组件自动展示", color: "green" },
+  { name: "资源库", path: "/admin/resources", icon: FolderOpen, status: "online", statusLabel: "已上线", description: "管理资源库内容", frontendPath: "/resources 和 /resources/[slug]", color: "purple" },
+  { name: "链接管理", path: "/admin/links", icon: Link2, status: "online", statusLabel: "已上线", description: "管理链接收藏、分类、标签", frontendPath: "导航/首页", color: "teal" },
+  { name: "分类/标签", path: "/admin/categories", icon: BarChart3, status: "online", statusLabel: "已上线", description: "管理链接分类和标签", frontendPath: "导航/首页", color: "indigo" },
+  { name: "单据/唛头模板", path: "/tools/label-maker", icon: Package, status: "partial", statusLabel: "代码级管理", description: "8 种唛头/标签类型 + 6 种视觉风格", frontendPath: "/tools/label-maker", color: "gray" },
+  { name: "数据导入", path: "/admin/import", icon: BookOpen, status: "online", statusLabel: "已上线", description: "批量导入链接/书签", frontendPath: "无", color: "cyan" },
+  { name: "反馈管理", path: "/admin/feedback", icon: MessageSquare, status: "online", statusLabel: "已上线", description: "查看用户反馈", frontendPath: "/feedback", color: "pink" },
+  { name: "系统设置", path: "/admin/settings", icon: Settings, status: "online", statusLabel: "已上线", description: "网站基础设置", frontendPath: "无", color: "slate" },
+  { name: "数据备份", path: "/admin/backup", icon: Database, status: "online", statusLabel: "已上线", description: "数据库备份管理", frontendPath: "无", color: "emerald" },
+  { name: "审计日志", path: "/admin/audit", icon: Shield, status: "online", statusLabel: "已上线", description: "操作审计与安全日志", frontendPath: "无", color: "red" },
+  { name: "系统健康", path: "/admin/health", icon: Eye, status: "online", statusLabel: "已上线", description: "系统健康检查", frontendPath: "无", color: "lime" },
+  { name: "网盘分享", path: "#", icon: Cloud, status: "planned", statusLabel: "未实现", description: "计划在后续版本实现", frontendPath: "无", color: "sky" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -142,94 +72,149 @@ const statusColors: Record<string, string> = {
   planned: "bg-gray-100 text-gray-500",
 };
 
+const colorMap: Record<string, { bg: string; icon: string; border: string; hover: string }> = {
+  blue: { bg: "bg-blue-50", icon: "text-blue-600", border: "border-blue-200", hover: "hover:border-blue-400 hover:shadow-blue-100" },
+  yellow: { bg: "bg-yellow-50", icon: "text-yellow-600", border: "border-yellow-200", hover: "hover:border-yellow-400 hover:shadow-yellow-100" },
+  orange: { bg: "bg-orange-50", icon: "text-orange-600", border: "border-orange-200", hover: "hover:border-orange-400 hover:shadow-orange-100" },
+  green: { bg: "bg-green-50", icon: "text-green-600", border: "border-green-200", hover: "hover:border-green-400 hover:shadow-green-100" },
+  purple: { bg: "bg-purple-50", icon: "text-purple-600", border: "border-purple-200", hover: "hover:border-purple-400 hover:shadow-purple-100" },
+  teal: { bg: "bg-teal-50", icon: "text-teal-600", border: "border-teal-200", hover: "hover:border-teal-400 hover:shadow-teal-100" },
+  indigo: { bg: "bg-indigo-50", icon: "text-indigo-600", border: "border-indigo-200", hover: "hover:border-indigo-400 hover:shadow-indigo-100" },
+  gray: { bg: "bg-gray-50", icon: "text-gray-600", border: "border-gray-200", hover: "" },
+  sky: { bg: "bg-sky-50", icon: "text-sky-600", border: "border-sky-200", hover: "" },
+  slate: { bg: "bg-slate-50", icon: "text-slate-600", border: "border-slate-200", hover: "hover:border-slate-400 hover:shadow-slate-100" },
+  emerald: { bg: "bg-emerald-50", icon: "text-emerald-600", border: "border-emerald-200", hover: "hover:border-emerald-400 hover:shadow-emerald-100" },
+  red: { bg: "bg-red-50", icon: "text-red-600", border: "border-red-200", hover: "hover:border-red-400 hover:shadow-red-100" },
+  cyan: { bg: "bg-cyan-50", icon: "text-cyan-600", border: "border-cyan-200", hover: "hover:border-cyan-400 hover:shadow-cyan-100" },
+  pink: { bg: "bg-pink-50", icon: "text-pink-600", border: "border-pink-200", hover: "hover:border-pink-400 hover:shadow-pink-100" },
+  lime: { bg: "bg-lime-50", icon: "text-lime-600", border: "border-lime-200", hover: "hover:border-lime-400 hover:shadow-lime-100" },
+};
+
 export default function AdminPage() {
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">管理面板</h1>
-        <p className="text-sm text-gray-500 mt-1">选择要管理的模块，每个模块显示当前状态</p>
-      </div>
-
-      {/* Status Legend */}
-      <div className="flex gap-4 text-xs text-gray-500">
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span> 已上线</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> 部分功能</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-400"></span> 未实现</span>
-      </div>
-
-      {/* Module Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {modules.map((m) => {
-          const Icon = m.icon;
-          const isPlanned = m.status === "planned";
-          const colorMap: Record<string, { bg: string; icon: string; border: string }> = {
-            blue: { bg: "bg-blue-50", icon: "text-blue-600", border: "border-blue-200" },
-            yellow: { bg: "bg-yellow-50", icon: "text-yellow-600", border: "border-yellow-200" },
-            orange: { bg: "bg-orange-50", icon: "text-orange-600", border: "border-orange-200" },
-            green: { bg: "bg-green-50", icon: "text-green-600", border: "border-green-200" },
-            purple: { bg: "bg-purple-50", icon: "text-purple-600", border: "border-purple-200" },
-            teal: { bg: "bg-teal-50", icon: "text-teal-600", border: "border-teal-200" },
-            indigo: { bg: "bg-indigo-50", icon: "text-indigo-600", border: "border-indigo-200" },
-            gray: { bg: "bg-gray-50", icon: "text-gray-600", border: "border-gray-200" },
-            sky: { bg: "bg-sky-50", icon: "text-sky-600", border: "border-sky-200" },
-            slate: { bg: "bg-slate-50", icon: "text-slate-600", border: "border-slate-200" },
-            emerald: { bg: "bg-emerald-50", icon: "text-emerald-600", border: "border-emerald-200" },
-            red: { bg: "bg-red-50", icon: "text-red-600", border: "border-red-200" },
-          };
-          const c = colorMap[m.color] || colorMap.gray;
-
-          return isPlanned ? (
-            <div key={m.name} className={`rounded-xl border ${c.border} ${c.bg} p-5 opacity-70`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Icon className={`w-5 h-5 ${c.icon}`} />
-                <h3 className="font-semibold text-gray-700">{m.name}</h3>
-              </div>
-              <p className="text-xs text-gray-500 mb-1">{m.description}</p>
-              <p className="text-xs text-gray-400 mb-2 font-mono">{m.dataSource}</p>
-              <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
-            </div>
-          ) : (
-            <Link
-              key={m.name}
-              href={m.path}
-              className={`rounded-xl border ${c.border} ${c.bg} p-5 hover:shadow-md transition-all block group`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Icon className={`w-5 h-5 ${c.icon}`} />
-                  <h3 className="font-semibold text-gray-900">{m.name}</h3>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
-              </div>
-              <p className="text-xs text-gray-500 mb-1">{m.description}</p>
-              <p className="text-xs text-gray-400 mb-3 font-mono">{m.dataSource}</p>
-              <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
+    <div className="space-y-8">
+      {/* ===== A. HEADER ===== */}
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-6 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-extrabold">运营后台</h1>
+            <p className="text-sm text-slate-300 mt-1">管理文章、资源、广告、用户、审核与系统配置</p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/" className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors min-h-[44px]">
+              <ExternalLink className="w-4 h-4" /> 查看网站首页
             </Link>
-          );
-        })}
+          </div>
+        </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5">
-        <h3 className="font-semibold text-gray-900 mb-3">快速信息</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <p className="text-gray-500">文章</p>
-            <p className="text-lg font-bold text-gray-900">20 篇</p>
-          </div>
-          <div>
-            <p className="text-gray-500">资源</p>
-            <p className="text-lg font-bold text-gray-900">80 条</p>
-          </div>
-          <div>
-            <p className="text-gray-500">广告位</p>
-            <p className="text-lg font-bold text-gray-900">0 个</p>
-          </div>
-          <div>
-            <p className="text-gray-500">单据模板</p>
-            <p className="text-lg font-bold text-gray-900">8 种</p>
-          </div>
+      {/* ===== B. STATS ===== */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">运营概览</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {statCards.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div key={stat.label} className="bg-white rounded-xl border p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                    <Icon className={`w-4 h-4 ${stat.color}`} />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                <p className="text-xl font-extrabold text-gray-900">{stat.value}</p>
+                {stat.link && (
+                  <Link href={stat.link} className="text-xs text-teal-600 hover:text-teal-700 mt-1 inline-block">
+                    {stat.linkLabel}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ===== C. QUICK ACTIONS ===== */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">快捷操作</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            const c = colorMap[action.color] || colorMap.gray;
+            return (
+              <Link key={action.label} href={action.href} className={`${c.bg} border ${c.border} rounded-xl p-4 hover:shadow-md transition-all block group min-h-[100px]`}>
+                <div className={`w-10 h-10 rounded-xl bg-white flex items-center justify-center mb-2 ${c.icon} group-hover:scale-110 transition-transform`}>
+                  <Icon className="w-5 h-5" />
+                </div>
+                <div className="font-semibold text-gray-900 text-sm">{action.label}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{action.desc}</div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ===== D. MODULE CARDS ===== */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">全部模块</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {modules.map((m) => {
+            const Icon = m.icon;
+            const isPlanned = m.status === "planned";
+            const c = colorMap[m.color] || colorMap.gray;
+
+            if (isPlanned) {
+              return (
+                <div key={m.name} className={`rounded-xl border ${c.border} ${c.bg} p-4 opacity-60`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className={`w-5 h-5 ${c.icon}`} />
+                    <h3 className="font-semibold text-gray-700 text-sm">{m.name}</h3>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-2">{m.description}</p>
+                  <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
+                </div>
+              );
+            }
+
+            return (
+              <Link key={m.name} href={m.path} className={`rounded-xl border ${c.border} bg-white p-4 ${c.hover} hover:shadow-md transition-all block group`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Icon className={`w-5 h-5 ${c.icon}`} />
+                    <h3 className="font-semibold text-gray-900 text-sm">{m.name}</h3>
+                  </div>
+                  <ArrowUpRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
+                </div>
+                <p className="text-xs text-gray-500 mb-1">{m.description}</p>
+                {m.frontendPath && (
+                  <p className="text-xs text-gray-400 mb-2">前台: {m.frontendPath}</p>
+                )}
+                <span className={`px-2 py-0.5 rounded text-xs ${statusColors[m.status]}`}>{m.statusLabel}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ===== E. CONTENT MAP ===== */}
+      <div className="bg-white rounded-xl border p-5">
+        <h3 className="font-bold text-gray-900 mb-4">📍 内容从哪里来？</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          {[
+            { from: "/admin/cms", to: "/guides", desc: "后台写文章 → 前台展示指南内容" },
+            { from: "/admin/resources", to: "/resources", desc: "后台管理资源 → 前台展示资源库" },
+            { from: "/admin/ads", to: "AdSlot 组件", desc: "后台配广告 → 前台自动展示" },
+            { from: "用户前台提交", to: "/admin/tool-reviews", desc: "用户写短评 → 后台审核" },
+            { from: "注册/登录", to: "/admin/users", desc: "用户注册 → 后台管理角色与权限" },
+            { from: "代码配置", to: "/tools/label-maker", desc: "模板在代码里配置 → 前台生成单据" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="text-xs font-mono bg-gray-200 px-2 py-1 rounded text-gray-700 whitespace-nowrap">{item.from}</div>
+              <div className="text-gray-400">→</div>
+              <div className="text-xs font-mono bg-teal-100 px-2 py-1 rounded text-teal-700 whitespace-nowrap">{item.to}</div>
+              <div className="text-xs text-gray-500 mt-1">{item.desc}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
