@@ -20,6 +20,7 @@ const FOOTER_LINKS = {
       { href: "/topics", label: "专题合集" },
       { href: "/starter", label: "场景工具包" },
       { href: "/rankings", label: "工具排行榜" },
+      { href: "/bbs", label: "社区论坛" },
     ],
   },
   user: {

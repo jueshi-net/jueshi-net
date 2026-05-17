@@ -36,6 +36,7 @@ const ROUTE_NAMES: Record<string, string> = {
   'business-tools': '出海经营',
   security: '账号安全',
   'browser-extensions': '浏览器插件',
+  bbs: '社区',
 };
 
 export function Breadcrumb() {

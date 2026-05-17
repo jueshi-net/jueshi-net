@@ -20,6 +20,7 @@ import {
   Gem,
   ChevronDown,
   Target,
+  MessageSquare,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -237,6 +238,21 @@ export default function Header() {
                   </Link>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Community Forum */}
+          <div className="px-4 mb-6">
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">社区</div>
+            <div className="space-y-0.5">
+              <Link
+                href="/bbs"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+              >
+                <MessageSquare className="w-5 h-5 text-violet-400" />
+                <span className="font-medium">社区论坛</span>
+              </Link>
             </div>
           </div>
 

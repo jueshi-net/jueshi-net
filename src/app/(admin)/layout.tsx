@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowLeft, LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, Settings, Bell, Tags, ClipboardList, Link as LinkIcon, Activity, Import, MessageSquare, TrendingUp, HeartPulse, Mail, Database, Webhook, Star, Award } from "lucide-react";
+import { Shield, ArrowLeft, LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, Settings, Bell, Tags, ClipboardList, Link as LinkIcon, Activity, Import, MessageSquare, TrendingUp, HeartPulse, Mail, Database, Webhook, Star, Award, MessageCircle } from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -33,6 +33,7 @@ const navItems = [
   { href: "/admin/health", label: "系统健康", icon: Activity },
   { href: "/admin/settings", label: "系统设置", icon: Settings },
   { href: "/admin/tool-reviews", label: "短评审核", icon: MessageSquare },
+  { href: "/admin/forum", label: "论坛管理", icon: MessageCircle },
 ];
 
 export default async function AdminLayout({

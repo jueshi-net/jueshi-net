@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare, AlertCircle } from "lucide-react";
+import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare, AlertCircle, MessageCircle } from "lucide-react";
 import type { AdminStatsData } from "@/lib/admin-stats";
 
 interface QuickAction {
@@ -27,12 +27,14 @@ const quickActions: QuickAction[] = [
   { label: "添加资源", href: "/admin/resources", icon: FolderOpen, color: "purple", desc: "管理资源库" },
   { label: "添加广告", href: "/admin/ads", icon: Megaphone, color: "green", desc: "配置广告位" },
   { label: "审核短评", href: "/admin/tool-reviews", icon: Star, color: "yellow", desc: "审核用户评论" },
+  { label: "论坛管理", href: "/admin/forum", icon: MessageCircle, color: "violet", desc: "帖子/评论/分类" },
   { label: "管理用户", href: "/admin/users", icon: Users, color: "blue", desc: "用户与会员" },
 ];
 
 const modules: ModuleCard[] = [
   { name: "用户管理", path: "/admin/users", icon: Users, status: "online", statusLabel: "已上线", description: "查看/编辑用户、角色、积分、会员到期时间", frontendPath: "/dashboard", color: "blue" },
   { name: "短评审核", path: "/admin/tool-reviews", icon: Star, status: "online", statusLabel: "已上线", description: "审核用户提交的工具短评（通过/隐藏/拒绝）", frontendPath: "/tools/[name] → 短评", color: "yellow" },
+  { name: "论坛管理", path: "/admin/forum", icon: MessageCircle, status: "online", statusLabel: "已上线", description: "管理论坛帖子、评论、分类和社区规范", frontendPath: "/bbs", color: "violet" },
   { name: "文章管理", path: "/admin/cms", icon: FileText, status: "online", statusLabel: "已上线", description: "管理网站文章/指南/教程", frontendPath: "/guides 和 /guides/[slug]", color: "orange" },
   { name: "广告管理", path: "/admin/ads", icon: Megaphone, status: "online", statusLabel: "已上线", description: "管理广告位。支持图片、文字、HTML/JS 代码广告", frontendPath: "AdSlot 组件自动展示", color: "green" },
   { name: "资源库", path: "/admin/resources", icon: FolderOpen, status: "online", statusLabel: "已上线", description: "管理资源库内容", frontendPath: "/resources 和 /resources/[slug]", color: "purple" },
@@ -70,6 +72,7 @@ const colorMap: Record<string, { bg: string; icon: string; border: string; hover
   cyan: { bg: "bg-cyan-50", icon: "text-cyan-600", border: "border-cyan-200", hover: "hover:border-cyan-400 hover:shadow-cyan-100" },
   pink: { bg: "bg-pink-50", icon: "text-pink-600", border: "border-pink-200", hover: "hover:border-pink-400 hover:shadow-pink-100" },
   lime: { bg: "bg-lime-50", icon: "text-lime-600", border: "border-lime-200", hover: "hover:border-lime-400 hover:shadow-lime-100" },
+  violet: { bg: "bg-violet-50", icon: "text-violet-600", border: "border-violet-200", hover: "hover:border-violet-400 hover:shadow-violet-100" },
 };
 
 export default function AdminDashboardClient({ stats }: { stats: AdminStatsData | null }) {
@@ -186,6 +189,7 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             { from: "注册/登录", to: "/admin/users", desc: "用户注册 → 后台管理角色与权限" },
             { from: "代码配置", to: "/tools/label-maker", desc: "模板在代码里配置 → 前台生成单据" },
             { from: "/admin/topics", to: "/topics/[slug]", desc: "后台管理专题 → 前台展示 APP 评级清单" },
+            { from: "/admin/forum", to: "/bbs", desc: "后台管理帖子/评论/分类 → 前台展示社区论坛" },
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
               <div className="text-xs font-mono bg-gray-200 px-2 py-1 rounded text-gray-700 whitespace-nowrap">{item.from}</div>
