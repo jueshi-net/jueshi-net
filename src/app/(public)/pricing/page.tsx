@@ -15,13 +15,13 @@ const plans = [
     color: 'gray',
     description: '适合个人用户',
     features: [
-      { text: '最多 50 个导航链接', included: true },
-      { text: '1 个工作区', included: true },
-      { text: '基础工具箱', included: true },
-      { text: '短链接生成', included: true },
-      { text: '社区支持', included: true },
-      { text: 'API 访问', included: false },
-      { text: '自定义域名', included: false },
+      { text: '每日签到赚积分', included: true },
+      { text: 'AI 工具基础额度', included: true },
+      { text: '实用工具箱全访问', included: true },
+      { text: '工作台收藏网址', included: true },
+      { text: '资源库与指南', included: true },
+      { text: '会员专属权益', included: false },
+      { text: '高额度 AI 调用', included: false },
       { text: '优先支持', included: false },
     ],
     cta: '免费注册',
@@ -29,44 +29,44 @@ const plans = [
   {
     id: 'pro',
     priceId: 'price_pro_month',
-    name: '专业版',
+    name: '会员版',
     price: 29,
     period: '月',
     yearlyPrice: 290,
     icon: Zap,
     color: 'blue',
     popular: true,
-    description: '适合团队和中小企业',
+    description: '高频用户与专业需求',
     features: [
-      { text: '无限导航链接', included: true },
-      { text: '5 个工作区', included: true },
-      { text: '全部工具箱', included: true },
-      { text: '短链接 + 统计', included: true },
+      { text: '更高 AI 每日额度', included: true },
+      { text: '积分加成奖励', included: true },
+      { text: '全部工具箱 + 高级功能', included: true },
+      { text: '无限工作台收藏', included: true },
       { text: '优先邮件支持', included: true },
-      { text: 'API 访问', included: true },
+      { text: '会员专属工具', included: true },
       { text: '自定义域名', included: false },
-      { text: '团队协作', included: true },
+      { text: '优先新功能体验', included: true },
     ],
-    cta: '订阅专业版',
+    cta: '加入会员',
   },
   {
     id: 'enterprise',
     priceId: 'price_enterprise',
-    name: '企业版',
+    name: '团队版',
     price: 99,
     period: '月',
     yearlyPrice: 990,
     icon: Crown,
     color: 'purple',
-    description: '适合大型企业和机构',
+    description: '适合团队和企业用户',
     features: [
-      { text: '无限一切', included: true },
-      { text: '无限工作区', included: true },
-      { text: '全部功能 + 优先', included: true },
-      { text: '自定义域名', included: true },
+      { text: '无限 AI 调用额度', included: true },
+      { text: '团队协作与共享', included: true },
+      { text: '全部功能 + 最高优先级', included: true },
+      { text: '自定义需求对接', included: true },
       { text: '7×24 专属支持', included: true },
       { text: 'API + Webhook', included: true },
-      { text: 'SSO 单点登录', included: true },
+      { text: '私有化部署方案', included: true },
       { text: 'SLA 保障', included: true },
     ],
     cta: '联系销售',
@@ -74,11 +74,11 @@ const plans = [
 ];
 
 const faqs = [
+  { q: '免费版有什么限制？', a: '免费版可以使用所有基础工具箱、每日签到赚积分、AI 工具基础额度。适合日常使用。' },
+  { q: '积分有什么用？', a: '积分可以兑换 AI 调用次数、会员体验时长和资源权益。每日签到、完成任务均可获得积分。' },
+  { q: '会员版相比免费版有哪些额外权益？', a: '会员版拥有更高的 AI 每日额度、积分加成奖励、会员专属工具和优先新功能体验。' },
   { q: '可以随时升级或降级吗？', a: '是的，您可以随时升级或降级方案。升级后立即生效，降级将在当前计费周期结束后生效。' },
-  { q: '是否支持退款？', a: '专业版和企业版提供 14 天无理由退款保证。如果您不满意，可申请全额退款。' },
-  { q: '免费版的限制是什么？', a: '免费版最多支持 50 个链接和 1 个工作区，所有基础功能均可使用。' },
-  { q: '企业版是否支持私有部署？', a: '是的，企业版支持私有化部署方案，请联系销售团队获取详细信息。' },
-  { q: '支持哪些付款方式？', a: '支持信用卡/借记卡、支付宝、微信支付和银行转账。' },
+  { q: '团队版是否支持私有部署？', a: '是的，团队版支持私有化部署方案，请联系销售团队获取详细信息。' },
 ];
 
 export default function PricingPage() {
@@ -87,7 +87,7 @@ export default function PricingPage() {
 
   const handleSubscribe = async (planId: string, priceId: string) => {
     if (planId === 'free') {
-      window.location.href = '/register';
+      window.location.href = '/login';
       return;
     }
 
