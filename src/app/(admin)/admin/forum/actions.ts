@@ -3,13 +3,32 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { grantPostReward, grantCommentReward } from "@/lib/forum-rewards";
 
 export async function updatePostStatus(postId: string, newStatus: string) {
   try {
+    const existing = await prisma.forumPost.findUnique({
+      where: { id: postId },
+      select: { status: true },
+    });
+    if (!existing) return { success: false, error: "帖子不存在" };
+
     await prisma.forumPost.update({
       where: { id: postId },
       data: { status: newStatus },
     });
+
+    // 如果审核通过（pending → published），发放成长值奖励
+    if (newStatus === "published" && existing.status === "pending") {
+      const postWithUser = await prisma.forumPost.findUnique({
+        where: { id: postId },
+        select: { rewardGrantedAt: true, userId: true },
+      });
+      if (postWithUser && !postWithUser.rewardGrantedAt) {
+        await grantPostReward(postId, postWithUser.userId);
+      }
+    }
+
     revalidatePath("/admin/forum");
     return { success: true };
   } catch (err) {
@@ -48,10 +67,40 @@ export async function togglePostLock(postId: string, isLocked: boolean) {
 
 export async function updateCommentStatus(commentId: string, newStatus: string) {
   try {
+    const existing = await prisma.forumComment.findUnique({
+      where: { id: commentId },
+      select: { status: true, postId: true },
+    });
+    if (!existing) return { success: false, error: "评论不存在" };
+
     await prisma.forumComment.update({
       where: { id: commentId },
       data: { status: newStatus },
     });
+
+    // 更新帖子评论数
+    if (
+      (existing.status === "published" && (newStatus === "hidden" || newStatus === "deleted")) ||
+      (existing.status === "hidden" && newStatus === "published")
+    ) {
+      const delta = existing.status === "published" ? -1 : 1;
+      await prisma.forumPost.update({
+        where: { id: existing.postId },
+        data: { commentCount: { increment: delta } },
+      });
+    }
+
+    // 如果审核通过（pending → published），发放成长值奖励
+    if (newStatus === "published" && existing.status === "pending") {
+      const commentWithUser = await prisma.forumComment.findUnique({
+        where: { id: commentId },
+        select: { rewardGrantedAt: true, userId: true },
+      });
+      if (commentWithUser && !commentWithUser.rewardGrantedAt) {
+        await grantCommentReward(commentId, commentWithUser.userId);
+      }
+    }
+
     revalidatePath("/admin/forum");
     return { success: true };
   } catch (err) {

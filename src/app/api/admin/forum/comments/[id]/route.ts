@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth-guard";
 import { prisma } from "@/lib/prisma";
+import { grantCommentReward } from "@/lib/forum-rewards";
 
 export async function PATCH(
   req: Request,
@@ -61,6 +62,17 @@ export async function PATCH(
         where: { id: existing.postId },
         data: { commentCount: { increment: delta } },
       });
+    }
+
+    // 如果审核通过（pending → published），发放成长值奖励
+    if (status === "published" && oldStatus === "pending") {
+      const commentWithUser = await prisma.forumComment.findUnique({
+        where: { id },
+        select: { rewardGrantedAt: true, userId: true },
+      });
+      if (commentWithUser && !commentWithUser.rewardGrantedAt) {
+        await grantCommentReward(id, commentWithUser.userId);
+      }
     }
 
     return NextResponse.json({ success: true, comment });

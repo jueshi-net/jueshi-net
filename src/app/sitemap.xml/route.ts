@@ -23,6 +23,8 @@ export async function GET() {
   // 动态内容（DB查询失败时降级为空数组）
   let articles: { slug: string; updatedAt: Date }[] = [];
   let topics: { slug: string; updatedAt: Date }[] = [];
+  let forumPosts: { slug: string; updatedAt: Date }[] = [];
+  let forumCategories: { key: string }[] = [];
 
   try {
     articles = await prisma.article.findMany({
@@ -42,6 +44,26 @@ export async function GET() {
     });
   } catch (e) {
     console.warn('sitemap.xml: Topics DB unavailable:', e);
+  }
+
+  try {
+    forumPosts = await prisma.forumPost.findMany({
+      where: { status: 'published' },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 200,
+    });
+  } catch (e) {
+    console.warn('sitemap.xml: Forum posts DB unavailable:', e);
+  }
+
+  try {
+    forumCategories = await prisma.forumCategory.findMany({
+      where: { isActive: true },
+      select: { key: true },
+    });
+  } catch (e) {
+    console.warn('sitemap.xml: Forum categories DB unavailable:', e);
   }
 
   // 静态公开页面
@@ -66,6 +88,9 @@ export async function GET() {
     { path: '/terms', priority: '0.3', changeFreq: 'yearly' },
     { path: '/privacy', priority: '0.3', changeFreq: 'yearly' },
     { path: '/feedback', priority: '0.4', changeFreq: 'monthly' },
+    // BBS 论坛
+    { path: '/bbs', priority: '0.8', changeFreq: 'daily' },
+    ...forumCategories.map(c => ({ path: `/bbs/category/${c.key}`, priority: '0.7', changeFreq: 'weekly' as const })),
   ];
 
   const now = new Date().toISOString();
@@ -89,6 +114,12 @@ ${topics.map(t => `  <url>
     <lastmod>${new Date(t.updatedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>`).join('\n')}
+${forumPosts.map(p => `  <url>
+    <loc>${baseUrl}/bbs/${p.slug}</loc>
+    <lastmod>${new Date(p.updatedAt).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>`).join('\n')}
 </urlset>`;
 

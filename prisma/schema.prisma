@@ -930,6 +930,7 @@ model ForumPost {
   userAgent        String?          @map("user_agent")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
+  rewardGrantedAt  DateTime?        @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
 
   comments         ForumComment[]
 
@@ -954,6 +955,7 @@ model ForumComment {
   userAgent String?    @map("user_agent")
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
+  rewardGrantedAt DateTime? @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
 
   @@index([postId])
   @@index([userId])
