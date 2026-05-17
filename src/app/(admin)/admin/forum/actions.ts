@@ -78,15 +78,28 @@ export async function updateCommentStatus(commentId: string, newStatus: string) 
       data: { status: newStatus },
     });
 
-    // 更新帖子评论数
+    // Update post commentCount when status crosses the published boundary
     if (
-      (existing.status === "published" && (newStatus === "hidden" || newStatus === "deleted")) ||
-      (existing.status === "hidden" && newStatus === "published")
+      newStatus === "published" && existing.status === "pending"
     ) {
-      const delta = existing.status === "published" ? -1 : 1;
       await prisma.forumPost.update({
         where: { id: existing.postId },
-        data: { commentCount: { increment: delta } },
+        data: {
+          commentCount: { increment: 1 },
+          lastCommentAt: new Date(),
+        },
+      });
+    } else if (
+      existing.status === "published" && (newStatus === "hidden" || newStatus === "deleted")
+    ) {
+      await prisma.forumPost.update({
+        where: { id: existing.postId },
+        data: { commentCount: { increment: -1 } },
+      });
+    } else if (existing.status === "hidden" && newStatus === "published") {
+      await prisma.forumPost.update({
+        where: { id: existing.postId },
+        data: { commentCount: { increment: 1 } },
       });
     }
 

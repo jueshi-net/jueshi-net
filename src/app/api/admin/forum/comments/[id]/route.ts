@@ -51,16 +51,27 @@ export async function PATCH(
     });
 
     // Update post commentCount when status crosses the published boundary
+    // pending → published: increment
     // published → hidden/deleted: decrement
     // hidden → published: increment
-    if (
-      (oldStatus === "published" && (status === "hidden" || status === "deleted")) ||
-      (oldStatus === "hidden" && status === "published")
-    ) {
-      const delta = oldStatus === "published" ? -1 : 1;
+    if (status === "published" && oldStatus === "pending") {
       await prisma.forumPost.update({
         where: { id: existing.postId },
-        data: { commentCount: { increment: delta } },
+        data: {
+          commentCount: { increment: 1 },
+          lastCommentAt: new Date(),
+          lastCommentUserId: comment.userId,
+        },
+      });
+    } else if (oldStatus === "published" && (status === "hidden" || status === "deleted")) {
+      await prisma.forumPost.update({
+        where: { id: existing.postId },
+        data: { commentCount: { increment: -1 } },
+      });
+    } else if (oldStatus === "hidden" && status === "published") {
+      await prisma.forumPost.update({
+        where: { id: existing.postId },
+        data: { commentCount: { increment: 1 } },
       });
     }
 

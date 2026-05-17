@@ -104,26 +104,34 @@ export async function POST(
     const ipHash = crypto.createHash("sha256").update(ip).digest("hex").slice(0, 16);
     const userAgent = request.headers.get("user-agent") || null;
 
+    // Admin users bypass moderation; regular users start as pending
+    const userRole = (session.user as any).role?.toUpperCase();
+    const commentStatus = userRole === "ADMIN" ? "published" : "pending";
+
     const comment = await prisma.$transaction(async (tx) => {
       const c = await tx.forumComment.create({
         data: {
           postId: post.id,
           userId: session.user.id,
           content,
+          status: commentStatus,
           ipHash,
           userAgent,
         },
         include: { user: { select: { name: true, email: true } } },
       });
 
-      await tx.forumPost.update({
-        where: { id: post.id },
-        data: {
-          commentCount: { increment: 1 },
-          lastCommentAt: new Date(),
-          lastCommentUserId: session.user.id,
-        },
-      });
+      // Only increment commentCount for published comments (visible on frontend)
+      if (commentStatus === "published") {
+        await tx.forumPost.update({
+          where: { id: post.id },
+          data: {
+            commentCount: { increment: 1 },
+            lastCommentAt: new Date(),
+            lastCommentUserId: session.user.id,
+          },
+        });
+      }
 
       return c;
     });
