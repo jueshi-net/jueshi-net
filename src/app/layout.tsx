@@ -69,7 +69,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={cn(inter.className, "min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased flex flex-col")}>
+      <body className={cn(inter.className, "min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased flex flex-col overflow-x-hidden")}>
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
