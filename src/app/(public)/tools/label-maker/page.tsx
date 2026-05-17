@@ -12,6 +12,8 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 
 import { buildLabelA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/labels/a4-export-renderer';
+import { renderLabelPreview } from '@/lib/labels/template-preview-renderers';
+import { buildVisualStyle, LabelVisualStyle } from '@/lib/labels/template-renderers';
 
 const DISCLAIMER = "本工具生成的是通用唛头、箱贴、仓库标签和信息面单，不是任何承运商或平台的官方运单。正式快递面单、平台标签、FBA 标签等，请以承运商、平台、仓库或服务商系统生成为准。";
 
@@ -411,114 +413,23 @@ export default function LabelMakerPage() {
                   </div>
                 )}
 
-                {/* Label preview */}
+                {/* Label preview — v1.20.4 template renderers */}
                 <div ref={previewRef} data-label-preview="true"
-                  className="bg-white border rounded-xl p-6 print:p-0 print:border-0 print:shadow-none"
-                  style={{ fontFamily: style.showBorder ? 'sans-serif' : 'sans-serif' }}>
-                  <div className="border-2 p-4" style={{ borderColor: style.borderColor }}>
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-3" style={{ borderColor: style.borderColor, borderBottomWidth: 2, paddingBottom: 8 }}>
-                      <div>
-                        {formData.logoUrl && <img src={formData.logoUrl} alt="Logo" className="h-8 mb-1" />}
-                        <h2 className="text-lg font-bold" style={{ color: style.primaryColor }}>{labelType?.titleZh || ''}</h2>
-                        <p className="text-xs text-gray-500">{labelType?.titleEn || ''}</p>
-                      </div>
-                      <div className="text-right text-xs">
-                        <p>{formData.destination || formData.destCountry || ''}</p>
-                        {formData.cartonNo && <p className="font-bold text-base">C/No. {formData.cartonNo}</p>}
-                        {formData.combinedNo && <p className="font-bold">合箱: {formData.combinedNo}</p>}
-                      </div>
-                    </div>
-
-                    {/* Main content */}
-                    <div className="space-y-2 text-sm">
-                      {selectedType === 'shipping-mark' && (
-                        <>
-                          {formData.mainMark && <div className="p-2 border rounded"><p className="text-xs text-gray-500">Main Mark</p><p className="font-bold">{formData.mainMark}</p></div>}
-                          {formData.sideMark && <div className="p-2 border rounded"><p className="text-xs text-gray-500">Side Mark</p><p>{formData.sideMark}</p></div>}
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            {formData.grossWeight && <div><span className="text-gray-500">G.W.: </span><span className="font-medium">{formData.grossWeight}</span></div>}
-                            {formData.netWeight && <div><span className="text-gray-500">N.W.: </span><span className="font-medium">{formData.netWeight}</span></div>}
-                            {formData.measurement && <div><span className="text-gray-500">MEAS: </span><span className="font-medium">{formData.measurement}</span></div>}
-                            {formData.origin && <div><span className="text-gray-500">Origin: </span><span className="font-medium">{formData.origin}</span></div>}
-                          </div>
-                        </>
-                      )}
-                      {(selectedType === 'consolidation-inbound-label' || selectedType === 'consolidation-combined-label') && (
-                        <>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            {formData.customerAccount && <div><span className="text-gray-500">账号: </span><span className="font-medium">{formData.customerAccount}</span></div>}
-                            {formData.customerNickname && <div><span className="text-gray-500">昵称: </span><span>{formData.customerNickname}</span></div>}
-                            {formData.trackingNo && <div><span className="text-gray-500">单号: </span><span className="font-medium">{formData.trackingNo}</span></div>}
-                            {formData.itemType && <div><span className="text-gray-500">类型: </span><span>{formData.itemType}</span></div>}
-                            {formData.totalWeight && <div><span className="text-gray-500">重量: </span><span>{formData.totalWeight}</span></div>}
-                            {formData.totalVolume && <div><span className="text-gray-500">体积: </span><span>{formData.totalVolume}</span></div>}
-                          </div>
-                          {formData.handlingNote && <div className="p-2 bg-amber-50 rounded text-xs text-amber-700">⚠️ {formData.handlingNote}</div>}
-                        </>
-                      )}
-                      {selectedType === 'warehouse-location-label' && (
-                        <div className="text-center py-4">
-                          <p className="text-xs text-gray-500">仓库: {formData.warehouseCode || '—'}</p>
-                          <p className="text-4xl font-bold my-2" style={{ color: style.primaryColor }}>{formData.locationNo || '—'}</p>
-                          <p className="text-xs text-gray-400">{formData.zone || ''} {formData.rackNo || ''} {formData.level || ''}</p>
-                        </div>
-                      )}
-                      {selectedType === 'parcel-info-label' && (
-                        <>
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div><p className="text-gray-500">寄件人 Sender</p><p className="font-medium whitespace-pre-wrap">{formData.senderName || '—'}</p>{formData.senderPhone && <p className="text-gray-400">{formData.senderPhone}</p>}</div>
-                            <div><p className="text-gray-500">收件人 Receiver</p><p className="font-medium whitespace-pre-wrap">{formData.receiverName || '—'}</p>{formData.receiverPhone && <p className="text-gray-400">{formData.receiverPhone}</p>}</div>
-                          </div>
-                          {formData.receiverAddress && <div className="mt-2 text-xs"><span className="text-gray-500">地址: </span>{formData.receiverAddress}</div>}
-                          <div className="grid grid-cols-3 gap-2 text-xs mt-2">
-                            {formData.country && <div><span className="text-gray-500">国家: </span>{formData.country}</div>}
-                            {formData.postalCode && <div><span className="text-gray-500">邮编: </span>{formData.postalCode}</div>}
-                            {formData.refNo && <div><span className="text-gray-500">单号: </span>{formData.refNo}</div>}
-                          </div>
-                          <p className="text-xs text-red-500 mt-2">此标签非官方快递运单，仅供参考</p>
-                        </>
-                      )}
-                      {selectedType === 'fba-carton-info-label' && (
-                        <>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            {formData.shipmentId && <div><span className="text-gray-500">Shipment ID: </span><span className="font-medium">{formData.shipmentId}</span></div>}
-                            {formData.boxNo && <div><span className="text-gray-500">Box: </span><span className="font-bold">{formData.boxNo}</span></div>}
-                            {formData.sku && <div><span className="text-gray-500">SKU: </span>{formData.sku}</div>}
-                            {formData.quantity && <div><span className="text-gray-500">Qty: </span>{formData.quantity}</div>}
-                            {formData.grossWeight && <div><span className="text-gray-500">GW: </span>{formData.grossWeight}</div>}
-                            {formData.cartonSize && <div><span className="text-gray-500">Size: </span>{formData.cartonSize}</div>}
-                          </div>
-                          <p className="text-xs text-red-500 mt-2">此标签非 Amazon 官方 FBA 标签，仅供装箱信息整理参考</p>
-                        </>
-                      )}
-                      {selectedType === 'pallet-label' && (
-                        <>
-                          <div className="grid grid-cols-2 gap-2 text-xs">
-                            {formData.palletNo && <div><span className="text-gray-500">Pallet: </span><span className="font-bold">{formData.palletNo}</span></div>}
-                            {formData.totalPallets && <div><span className="text-gray-500">Total: </span>{formData.totalPallets}</div>}
-                            {formData.cartonsOnPallet && <div><span className="text-gray-500">Cartons: </span>{formData.cartonsOnPallet}</div>}
-                            {formData.grossWeight && <div><span className="text-gray-500">GW: </span>{formData.grossWeight}</div>}
-                            {formData.destination && <div><span className="text-gray-500">Dest: </span>{formData.destination}</div>}
-                            {formData.handlingInstruction && formData.handlingInstruction !== 'None' && <div className="text-red-600 font-bold">⚠️ {formData.handlingInstruction}</div>}
-                          </div>
-                          {formData.consignee && <div className="mt-2 text-xs"><span className="text-gray-500">Consignee: </span>{formData.consignee}</div>}
-                        </>
-                      )}
-                      {selectedType === 'handling-label' && (
-                        <div className="text-center py-4">
-                          <div className="text-6xl mb-2">{formData.iconStyle?.split(' ')[0] || '⚠️'}</div>
-                          {formData.chineseText && <p className="text-xl font-bold mb-1">{formData.chineseText}</p>}
-                          {formData.englishText && <p className="text-lg font-bold" style={{ color: style.primaryColor }}>{formData.englishText}</p>}
-                          {!formData.chineseText && !formData.englishText && (
-                            <>
-                              <p className="text-xl font-bold">{formData.labelType?.split(' ')[0] || '易碎'}</p>
-                              <p className="text-lg font-bold" style={{ color: style.primaryColor }}>{formData.labelType?.includes(' ') ? formData.labelType.split(' ').slice(1).join(' ') : 'FRAGILE'}</p>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                  className="bg-white border rounded-xl p-4 print:p-0 print:border-0 print:shadow-none overflow-x-hidden"
+                  style={{ fontFamily: 'sans-serif', maxWidth: '100%' }}>
+                  <div style={{
+                    border: `${style.showBorder ? '2px' : '0'} ${style.showBorder ? 'solid' : 'none'} ${style.borderColor}`,
+                    borderRadius: style.showBorder ? '6px' : '0',
+                    padding: '12px',
+                  }}>
+                    {formData.logoUrl && <img src={formData.logoUrl} alt="Logo" className="h-8 mb-2 block" />}
+                    {renderLabelPreview(
+                      selectedType,
+                      formData,
+                      style,
+                      labelType?.titleZh || '',
+                      labelType?.titleEn || '',
+                    )}
 
                     {/* Barcode / QR */}
                     {template && (template.showBarcode || template.showQrCode) && (
