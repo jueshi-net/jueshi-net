@@ -20,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 
+
 const POINT_TYPE_LABELS: Record<string, { label: string; icon: string }> = {
   daily_checkin: { label: "签到", icon: "📅" },
   task_complete: { label: "任务", icon: "✅" },

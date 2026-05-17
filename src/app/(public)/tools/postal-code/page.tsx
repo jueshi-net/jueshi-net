@@ -3,6 +3,7 @@ import { AdSlot } from '@/components/ad-slot';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
+
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';

@@ -4,8 +4,12 @@ import { auth } from '@/lib/auth';
 import FavoritesClient from './favorites-client';
 
 export const metadata: Metadata = {
-  title: '我的收藏 - 海外百宝箱',
+  title: '我的收藏',
   description: '管理您收藏的网址和工具',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function FavoritesPage() {

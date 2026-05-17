@@ -1,4 +1,12 @@
+import { Metadata } from "next";
 import { auth } from "@/lib/auth";
+
+
+export const metadata: Metadata = {
+  title: "账户设置",
+  description: "管理你的海外百宝箱账户设置。",
+  robots: { index: false, follow: false },
+};
 
 export default async function SettingsPage() {
   const session = await auth();

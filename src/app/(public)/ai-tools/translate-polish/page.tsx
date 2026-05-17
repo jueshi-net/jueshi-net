@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, AlertCircle, Copy, Check, Globe, Tag, TrendingUp, ExternalLink, ChevronRight, Home, Languages, PenTool, BookOpen } from "lucide-react";
+
 import { AdSlot } from "@/components/ad-slot";
 
 const TARGET_LANGS = ["中文", "英文"];

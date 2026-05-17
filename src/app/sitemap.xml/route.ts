@@ -1,66 +1,75 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { SCENARIO_PACKAGES } from '@/data/scenario-packages';
 
 // GET /sitemap.xml - 动态生成站点地图
 // 降级策略：DB不可用时只输出静态核心路由
-export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
+// 资源分类 slug（稳定，手动维护）
+const RESOURCE_SLUGS = [
+  'starter', 'ai-tools', 'video-learning', 'overseas-life',
+  'business-tools', 'security', 'browser-extensions',
+  'life', 'logistics', 'business', 'templates',
+];
+
+// Starter 场景 slug（从静态数据读取）
+const STARTER_SLUGS = SCENARIO_PACKAGES.map(p => `/starter/${p.slug}`);
+
+export async function GET() {
+  const baseUrl = 'https://jueshi.net';
+
+  // 动态内容（DB查询失败时降级为空数组）
   let articles: { slug: string; updatedAt: Date }[] = [];
-  let categories: { slug: string; updatedAt: Date }[] = [];
 
   try {
     articles = await prisma.article.findMany({
       where: { status: 'published' },
       select: { slug: true, updatedAt: true },
-    });
-    categories = await prisma.category.findMany({
-      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
     });
   } catch (e) {
-    console.warn('sitemap.xml: DB unavailable, outputting static routes only:', e);
+    console.warn('sitemap.xml: Article DB unavailable:', e);
   }
 
-  // 静态页面
+  // 静态公开页面
   const staticPages = [
-    '', '/search', '/tools', '/shipping', '/business', '/guides', '/nav', '/tracking',
-    '/resources', '/favorites', '/help', '/privacy', '/terms', '/changelog',
-    '/tools/qrcode', '/tools/exchange-rate',
-    '/tools/container', '/tools/receipt', '/tools/invoice',
-    '/tools/hs-code', '/tools/sensitive-goods', '/tools/address-formatter',
-    '/tools/customs-generator', '/tools/shipping-calculator',
-    '/tools/postal-code', '/tools/memo', '/tools/documents',
-    '/tools/label-maker', '/tools/quote', '/tools/shipping-mark',
-    '/tools/calculator', '/tools/shipping-estimator', '/tools/zip',
-    '/tools/inbound',
-    '/starter', '/starter/apps',
+    { path: '', priority: '1.0', changeFreq: 'daily' },
+    { path: '/tools', priority: '0.9', changeFreq: 'weekly' },
+    { path: '/tools/postal-code', priority: '0.9', changeFreq: 'monthly' },
+    { path: '/tools/documents', priority: '0.9', changeFreq: 'monthly' },
+    { path: '/tools/label-maker', priority: '0.9', changeFreq: 'monthly' },
+    { path: '/ai-tools/product-copy', priority: '0.8', changeFreq: 'monthly' },
+    { path: '/ai-tools/translate-polish', priority: '0.8', changeFreq: 'monthly' },
+    { path: '/ai-tools/document-summary', priority: '0.8', changeFreq: 'monthly' },
+    { path: '/starter', priority: '0.8', changeFreq: 'weekly' },
+    ...STARTER_SLUGS.map(s => ({ path: s, priority: '0.7', changeFreq: 'monthly' as const })),
+    { path: '/guides', priority: '0.8', changeFreq: 'weekly' },
+    { path: '/resources', priority: '0.8', changeFreq: 'weekly' },
+    ...RESOURCE_SLUGS.map(s => ({ path: `/resources/${s}`, priority: '0.7', changeFreq: 'weekly' as const })),
+    { path: '/rankings', priority: '0.7', changeFreq: 'weekly' },
+    { path: '/pricing', priority: '0.6', changeFreq: 'monthly' },
+    { path: '/help', priority: '0.5', changeFreq: 'monthly' },
+    { path: '/terms', priority: '0.3', changeFreq: 'yearly' },
+    { path: '/privacy', priority: '0.3', changeFreq: 'yearly' },
+    { path: '/feedback', priority: '0.4', changeFreq: 'monthly' },
   ];
+
+  const now = new Date().toISOString();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${staticPages.map(path => `
-  <url>
-    <loc>${baseUrl}${path}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>${path === '' ? 'daily' : 'weekly'}</changefreq>
-    <priority>${path === '' ? '1.0' : path.startsWith('/tools') ? '0.8' : '0.7'}</priority>
-  </url>`).join('')}
-  
-  ${articles.map(a => `
-  <url>
-    <loc>${baseUrl}/blog/${a.slug}</loc>
+${staticPages.map(p => `  <url>
+    <loc>${baseUrl}${p.path}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${p.changeFreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+${articles.map(a => `  <url>
+    <loc>${baseUrl}/guides/${a.slug}</loc>
     <lastmod>${new Date(a.updatedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>`).join('')}
-  
-  ${categories.map(c => `
-  <url>
-    <loc>${baseUrl}/search?category=${c.slug}</loc>
-    <lastmod>${new Date(c.updatedAt).toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>`).join('')}
+  </url>`).join('\n')}
 </urlset>`;
 
   return new NextResponse(xml, {

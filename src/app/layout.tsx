@@ -7,6 +7,7 @@ import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import CommandPalette from "@/components/command-palette";
 import PWARegister from "@/components/PWARegister";
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, defaultOpenGraph } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,24 +16,49 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#3B82F6" },
-    { media: "(prefers-color-scheme: dark)", color: "#1E40AF" },
+    { media: "(prefers-color-scheme: light)", color: "#0D9488" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F766E" },
   ],
 };
 
 export const metadata: Metadata = {
-  title: "海外百宝箱 | 海外华人的常用工具与资源平台",
-  description: "海外华人的常用工具与资源平台 - 导航、查询、工具、CMS",
-  keywords: ["海外生活", "跨境寄送", "跨境经营", "海外工具", "邮编查询"],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME}｜海外华人、留学生、出海商家的工具与资源平台`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  keywords: ["海外华人", "跨境物流", "邮编查询", "单据生成", "AI工具", "海外资源", "留学生", "出海商家"],
   manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "喜熊",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    ...defaultOpenGraph,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   icons: {
     icon: "/favicon.ico",
     apple: "/icons/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: SITE_NAME,
   },
 };
 

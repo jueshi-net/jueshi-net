@@ -42,6 +42,7 @@ interface Task {
   completedAt: string | null;
 }
 
+
 const POINT_TYPE_LABELS: Record<string, string> = {
   daily_checkin: "每日签到",
   task_complete: "完成任务",

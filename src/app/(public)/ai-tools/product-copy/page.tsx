@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Sparkles, Loader2, AlertCircle, Copy, Check, Globe, Tag, TrendingUp, ExternalLink, ChevronRight, Home } from "lucide-react";
+
 import { AdSlot } from "@/components/ad-slot";
 
 const PLATFORMS = ["Amazon", "TikTok", "Shopify", "小红书", "通用"];

@@ -1,7 +1,14 @@
+import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Shield, ArrowLeft, LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, Settings, Bell, Tags, ClipboardList, Link as LinkIcon, Activity, Import, MessageSquare, TrendingUp, HeartPulse, Mail, Database, Webhook } from "lucide-react";
+
+
+export const metadata: Metadata = {
+  title: "管理后台",
+  robots: { index: false, follow: false },
+};
 
 const navItems = [
   { href: "/admin", label: "管理面板", icon: LayoutDashboard },
