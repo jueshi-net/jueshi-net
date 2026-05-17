@@ -19,6 +19,9 @@ model User {
   lastCheckinDate      String?            // 最后一次签到日期 YYYY-MM-DD
   memberUntil          DateTime?          // 会员体验到期时间
   profileType          String?            @map("profile_type")  // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
+  growthValue          Int                @default(0)           // v1.20.19: 成长值（不可消费）
+  levelKey             String             @default("lv1")       // v1.20.19: 当前等级 key
+  userLevel            UserLevel?         @relation(fields: [levelKey], references: [key])
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   workbenchLinks       WorkbenchLink[]
@@ -43,6 +46,8 @@ model User {
   dailyCheckIns        DailyCheckIn[]
   userTasks            UserTask[]
   userRewards          UserReward[]
+  badgeAwards          UserBadgeAward[]
+  growthLogs           GrowthLog[]
 
   @@map("users")
 }
@@ -806,4 +811,76 @@ model TopicSection {
   @@index([topicId])
   @@index([sortOrder])
   @@map("topic_sections")
+}
+
+// ===== v1.20.19: Membership levels, growth value, badges =====
+
+model UserLevel {
+  id          String   @id @default(cuid())
+  key         String   @unique  // lv1, lv2, lv3, lv4, lv5
+  name        String   // Lv.1 新手
+  minGrowth   Int      // 0, 100, 500, 1500, 5000
+  maxGrowth   Int?     // 99, 499, 1499, 4999, null
+  description String?
+  benefits    Json?    // ["签到+2积分", "AI+5次/日"]
+  iconText    String   // 🌱
+  color       String   // green-500
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  @@map("user_levels")
+}
+
+model UserBadge {
+  id           String   @id @default(cuid())
+  key          String   @unique  // first_login, checkin_first, etc.
+  name         String   // 初来乍到
+  description  String?
+  iconText     String   // 🎉
+  color        String   // purple-500
+  category     String   // checkin/review/topic/forum/member/system
+  conditionText String? // "完成首次签到"
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  awards       UserBadgeAward[]
+  @@map("user_badges")
+}
+
+model UserBadgeAward {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     UserBadge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  reason    String?  // "自动授予"/"后台手动授予"
+  awardedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@map("user_badge_awards")
+}
+
+model GrowthLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // checkin/task/review/topic/admin_adjust/system
+  value     Int      // +5, +10, -10
+  reason    String?  // "每日签到"/"后台调整"
+  refType   String?  // "daily_check_in", "tool_review"
+  refId     String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("growth_logs")
 }

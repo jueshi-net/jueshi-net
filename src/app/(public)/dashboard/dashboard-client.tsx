@@ -12,6 +12,7 @@ import ProfileSelector from "@/components/dashboard/profile-selector";
 import MyTools from "@/components/dashboard/my-tools";
 import MyLinks from "@/components/dashboard/my-links";
 import RecommendedPackages from "@/components/dashboard/recommended-packages";
+import MembershipCard from "@/components/dashboard/membership-card";
 
 // ===== ALL EXISTING LOGIC PRESERVED =====
 
@@ -500,6 +501,9 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+
+        {/* ===== MEMBERSHIP / LEVEL & BADGES ===== */}
+        {!loginRequired && <MembershipCard />}
 
         {/* ===== WORKBENCH SECTION ===== */}
         {!loginRequired && workbenchData && (

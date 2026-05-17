@@ -248,6 +248,29 @@ export default function PointsPage() {
         </div>
       </div>
 
+      {/* Growth Value Explanation */}
+      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-200 p-5">
+        <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+          📈 成长值说明
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <div className="space-y-2">
+            <p className="font-medium text-gray-900">🔹 积分 vs 成长值</p>
+            <ul className="space-y-1 text-xs">
+              <li>• <strong>积分</strong>：可消费，用于兑换 AI 次数、会员体验等站内权益</li>
+              <li>• <strong>成长值</strong>：不可消费，用于升级会员等级，不会被消耗</li>
+            </ul>
+          </div>
+          <div className="space-y-2">
+            <p className="font-medium text-gray-900">🔹 等级与会员</p>
+            <ul className="space-y-1 text-xs">
+              <li>• 等级从 Lv.1 到 Lv.5，通过积累成长值升级</li>
+              <li>• 会员购买功能暂未开放，当前所有用户均可免费使用</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       {/* Membership Comparison */}
       <div>
         <div className="flex items-center gap-2 mb-4">

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowLeft, LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, Settings, Bell, Tags, ClipboardList, Link as LinkIcon, Activity, Import, MessageSquare, TrendingUp, HeartPulse, Mail, Database, Webhook } from "lucide-react";
+import { Shield, ArrowLeft, LayoutDashboard, Link2, FileText, Megaphone, Users, FolderOpen, Settings, Bell, Tags, ClipboardList, Link as LinkIcon, Activity, Import, MessageSquare, TrendingUp, HeartPulse, Mail, Database, Webhook, Star, Award } from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -21,6 +21,7 @@ const navItems = [
   { href: "/admin/cms", label: "文章管理", icon: FileText },
   { href: "/admin/ads", label: "广告管理", icon: Megaphone },
   { href: "/admin/topics", label: "专题管理", icon: FileText },
+  { href: "/admin/levels", label: "等级勋章", icon: Star },
   { href: "/admin/short-links", label: "短链管理", icon: LinkIcon },
   { href: "/admin/feedback", label: "反馈管理", icon: MessageSquare },
   { href: "/admin/newsletter", label: "邮件广播", icon: Mail },

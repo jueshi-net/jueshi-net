@@ -214,6 +214,33 @@ export default function PricingPage() {
         </div>
       </div>
 
+      {/* Level Benefits */}
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h2 className="text-xl font-bold text-center text-gray-900 mb-6 flex items-center justify-center gap-2">
+          📈 会员等级权益（成长值升级）
+        </h2>
+        <div className="bg-white rounded-xl border p-5">
+          <p className="text-sm text-gray-500 mb-4">
+            等级通过积累成长值自动升级，无需付费。当前会员购买功能暂未开放。
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
+            {[
+              { icon: '🌱', name: 'Lv.1 新手', growth: '0+', color: 'bg-green-50 border-green-200' },
+              { icon: '🌿', name: 'Lv.2 常用', growth: '100+', color: 'bg-teal-50 border-teal-200' },
+              { icon: '🌳', name: 'Lv.3 进阶', growth: '500+', color: 'bg-blue-50 border-blue-200' },
+              { icon: '⭐', name: 'Lv.4 高级', growth: '1500+', color: 'bg-amber-50 border-amber-200' },
+              { icon: '👑', name: 'Lv.5 核心', growth: '5000+', color: 'bg-purple-50 border-purple-200' },
+            ].map(l => (
+              <div key={l.name} className={`rounded-lg border p-3 ${l.color}`}>
+                <div className="text-2xl mb-1">{l.icon}</div>
+                <div className="text-sm font-medium text-gray-900">{l.name}</div>
+                <div className="text-xs text-gray-500 mt-1">成长值 {l.growth}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* FAQ */}
       <div className="max-w-3xl mx-auto px-4 py-16">
         <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">常见问题</h2>
