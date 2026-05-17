@@ -767,7 +767,7 @@ export default function DocumentEditorPage() {
                 {/* Footer branding */}
                 {!p.canRemoveBranding() && (
                   <div className="mt-8 pt-3 border-t text-center text-xs text-gray-300" style={{ borderColor: style.borderColor }}>
-                    由海外百宝箱生成，仅供参考 | kjbxb.com
+                    由海外百宝箱生成，仅供参考 | jueshi.net
                   </div>
                 )}
               </div>

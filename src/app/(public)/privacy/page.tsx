@@ -72,7 +72,7 @@ export default function PrivacyPage() {
         <div className="mt-8 bg-blue-50 rounded-xl p-5 border border-blue-100">
           <h3 className="font-semibold text-blue-900 mb-2">联系我们</h3>
           <p className="text-blue-700 text-sm">
-            如果您对本隐私政策有任何疑问，请通过 <a href="mailto:contact@kjbxb.com" className="underline">contact@kjbxb.com</a> 联系我们。
+            如果您对本隐私政策有任何疑问，请通过 <a href="mailto:contact@jueshi.net" className="underline">contact@jueshi.net</a> 联系我们。
           </p>
         </div>
 

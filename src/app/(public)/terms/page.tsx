@@ -68,7 +68,7 @@ export default function TermsPage() {
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>如有疑问，请联系 <a href="mailto:contact@kjbxb.com" className="text-blue-600 hover:underline">contact@kjbxb.com</a></p>
+          <p>如有疑问，请联系 <a href="mailto:contact@jueshi.net" className="text-blue-600 hover:underline">contact@jueshi.net</a></p>
           <p className="mt-2">
             <Link href="/privacy" className="text-blue-600 hover:underline mr-4">隐私政策</Link>
             <Link href="/" className="text-blue-600 hover:underline">返回首页</Link>

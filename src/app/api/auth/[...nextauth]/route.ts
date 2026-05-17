@@ -1,5 +1,5 @@
 // Fix: trust the request host to avoid UntrustedHost errors
-// when NEXTAUTH_URL domain doesn't match the actual domain
+// Fix auth host trust for production domain jueshi.net
 process.env.AUTH_TRUST_HOST = 'true';
 
 import { handlers } from "@/lib/auth";

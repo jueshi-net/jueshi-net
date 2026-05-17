@@ -179,7 +179,7 @@ export function buildA4ExportHTML(data: A4ExportData): string {
 
   // ===================== FOOTER =====================
   if (!data.canRemoveBranding) {
-    inner += `<div style="margin-top:16px; padding-top:8px; border-top:1px solid #e2e8f0; text-align:center; font-size:8px; color:#94a3b8; line-height:1.4;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
+    inner += `<div style="margin-top:16px; padding-top:8px; border-top:1px solid #e2e8f0; text-align:center; font-size:8px; color:#94a3b8; line-height:1.4;">由海外百宝箱生成，仅供参考 | jueshi.net</div>`;
   }
 
   // Wrap in A4 page with proper padding + inner container

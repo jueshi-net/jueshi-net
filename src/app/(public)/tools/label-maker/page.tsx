@@ -450,7 +450,7 @@ export default function LabelMakerPage() {
 
                     {!p.canRemoveBranding() && (
                       <div className="mt-2 pt-2 border-t text-center text-xs text-gray-300" style={{ borderColor: style.borderColor }}>
-                        由海外百宝箱生成，仅供参考 | kjbxb.com
+                        由海外百宝箱生成，仅供参考 | jueshi.net
                       </div>
                     )}
                   </div>

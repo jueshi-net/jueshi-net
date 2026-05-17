@@ -38,7 +38,7 @@ export default function Footer() {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">联系</h3>
             <ul className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
               <li>深圳市海外百宝箱有限公司</li>
-              <li>联系邮箱: contact@kjbxb.com</li>
+              <li>联系邮箱: contact@jueshi.net</li>
             </ul>
           </div>
         </div>

@@ -79,10 +79,10 @@ export default function HelpPage() {
             <h3 className="font-semibold text-gray-900 group-hover:text-green-600">意见反馈</h3>
             <p className="text-sm text-gray-500 mt-1">提交建议或报告问题</p>
           </Link>
-          <a href="mailto:contact@kjbxb.com" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group">
+          <a href="mailto:contact@jueshi.net" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group">
             <Mail className="w-8 h-8 text-purple-500 mb-3" />
             <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">联系我们</h3>
-            <p className="text-sm text-gray-500 mt-1">contact@kjbxb.com</p>
+            <p className="text-sm text-gray-500 mt-1">contact@jueshi.net</p>
           </a>
         </div>
 
@@ -122,7 +122,7 @@ export default function HelpPage() {
               提交反馈
             </Link>
             <a
-              href="mailto:contact@kjbxb.com"
+              href="mailto:contact@jueshi.net"
               className="inline-flex items-center gap-2 px-5 py-2 border border-gray-300 rounded-lg hover:bg-white"
             >
               <Mail className="w-4 h-4" />

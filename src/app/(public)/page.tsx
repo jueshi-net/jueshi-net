@@ -19,18 +19,18 @@ const baseMetadata: Metadata = {
   description: '查包裹、算运费、做单据、查邮编、找资源，一个站搞定。面向海外华人的常用工具与资源平台，涵盖跨境寄送、生活资源、出海经营。',
   keywords: ['海外华人', '集运物流', '包裹查询', '邮编地址', '翻译工具', 'HS编码', '发票生成', '跨境生意'],
   alternates: {
-    canonical: 'https://kjbxb.com/',
+    canonical: 'https://jueshi.net/',
   },
   openGraph: {
     title: '海外百宝箱 - 海外华人的常用工具与资源平台',
     description: '查包裹、算运费、做单据、查邮编、找资源，一个站搞定。',
     type: 'website',
-    url: 'https://kjbxb.com/',
+    url: 'https://jueshi.net/',
     locale: 'zh_CN',
     siteName: '海外百宝箱',
     images: [
       {
-        url: 'https://kjbxb.com/og-image.png',
+        url: 'https://jueshi.net/og-image.png',
         width: 1200,
         height: 630,
         alt: '海外百宝箱',
@@ -102,11 +102,11 @@ export default async function LandingPage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: '海外百宝箱',
-    url: 'https://kjbxb.com/',
+    url: 'https://jueshi.net/',
     description: '海外华人的常用工具与资源平台',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://kjbxb.com/search?q={search_term_string}',
+      target: 'https://jueshi.net/search?q={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   };

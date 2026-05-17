@@ -79,7 +79,7 @@ export function buildLabelA4ExportHTML(data: LabelExportData): string {
   // Branding footer
   let branding = '';
   if (!data.canRemoveBranding) {
-    branding = `<div style="margin-top: 16px; padding-top: 8px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 8px; color: #94a3b8;">由海外百宝箱生成，仅供参考 | kjbxb.com</div>`;
+    branding = `<div style="margin-top: 16px; padding-top: 8px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 8px; color: #94a3b8;">由海外百宝箱生成，仅供参考 | jueshi.net</div>`;
   }
 
   const inner = bordered + barcodeSection + branding;
