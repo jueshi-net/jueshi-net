@@ -14,6 +14,8 @@ import {
   AlertCircle,
   Home,
   ChevronRight,
+  Sparkles,
+  Download,
 } from "lucide-react";
 import {
   apps,
@@ -40,6 +42,9 @@ export const metadata: Metadata = {
 // Group apps by rating for ordered display
 const RATING_ORDER: AppRating[] = ["S", "A", "B", "C", "D"];
 
+// "先装清单" apps — only use data that exists
+const QUICK_START_APPS = apps.filter((a) => a.installPriority === "先装").slice(0, 5);
+
 export default function OverseasEssentialAppsPage() {
   const appsByRating = RATING_ORDER.map((rating) => ({
     rating,
@@ -63,6 +68,10 @@ export default function OverseasEssentialAppsPage() {
           <nav className="flex items-center gap-1.5 text-sm text-blue-200 mb-6 min-h-[44px]">
             <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
               <Home className="w-3.5 h-3.5" /> 首页
+            </Link>
+            <ChevronRight className="w-3 h-3" />
+            <Link href="/topics" className="hover:text-white transition-colors">
+              专题
             </Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-white font-medium">出海必装 APP</span>
@@ -111,7 +120,35 @@ export default function OverseasEssentialAppsPage() {
           </div>
         </div>
 
-        {/* ===== 评级规则说明 ===== */}
+        {/* ===== 先装清单 ===== */}
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 p-5 md:p-6 mb-8">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">如果你刚出海，先装这 {QUICK_START_APPS.length} 个</h2>
+              <p className="text-sm text-gray-500">不用纠结顺序，到了当地就装上下面的就行：</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {QUICK_START_APPS.map((app) => (
+              <div key={app.name} className="bg-white rounded-xl border border-emerald-100 p-3 text-center hover:shadow-md transition-shadow">
+                <div
+                  className="w-12 h-12 rounded-xl mx-auto mb-2 flex items-center justify-center text-lg font-bold"
+                  style={{ backgroundColor: app.iconBg, color: app.iconFg }}
+                >
+                  {app.iconText}
+                </div>
+                <h3 className="font-semibold text-sm text-gray-900">{app.name}</h3>
+                <p className="text-[10px] text-gray-400 mt-0.5">{app.alias}</p>
+                <p className="text-[10px] text-emerald-600 mt-1 font-medium">{app.beginnerAdvice.slice(0, 20)}…</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== 怎么读这份榜单 ===== */}
         <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-500" />
@@ -121,9 +158,12 @@ export default function OverseasEssentialAppsPage() {
             {RATING_ORDER.map((rating) => {
               const info = ratingInfo[rating];
               return (
-                <div key={rating} className={`flex items-center gap-2 p-3 rounded-lg ${info.bg}`}>
-                  <span className={`text-lg font-extrabold ${info.color}`}>{info.label}</span>
-                  <span className="text-sm text-gray-600">{info.desc}</span>
+                <div key={rating} className={`flex flex-col gap-1 p-3 rounded-lg ${info.bg}`}>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-lg font-extrabold ${info.color}`}>{info.label}</span>
+                    <span className="text-sm text-gray-600">{info.desc}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 leading-snug">{info.advice}</p>
                 </div>
               );
             })}
@@ -168,14 +208,17 @@ export default function OverseasEssentialAppsPage() {
         {appsByRating.map(({ rating, info, apps: ratingApps }) => (
           <section key={rating} id={`rating-${rating}`} className="mb-10">
             {/* Rating header */}
-            <div className={`flex items-center gap-3 mb-4 p-4 rounded-xl ${info.bg}`}>
-              <span className={`text-2xl font-extrabold ${info.color}`}>{info.label} 级</span>
-              <span className="text-gray-600 text-sm">{info.desc}</span>
-              <span className="text-gray-400 text-sm ml-auto">{ratingApps.length} 个</span>
+            <div className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-5 p-4 rounded-xl ${info.bg}`}>
+              <div className="flex items-center gap-3">
+                <span className={`text-2xl font-extrabold ${info.color}`}>{info.label} 级</span>
+                <span className="text-gray-600 text-sm">{info.desc}</span>
+              </div>
+              <p className="text-sm text-gray-500 sm:ml-auto">{info.advice}（{ratingApps.length} 个）</p>
             </div>
 
             {/* App cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id={`cat-${appsByRating.find(g => g.rating === rating)?.apps[0]?.category || ''}`}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {ratingApps.map((app) => (
                 <AppCard key={app.name} app={app} />
               ))}
@@ -228,8 +271,33 @@ export default function OverseasEssentialAppsPage() {
           </div>
         </section>
 
+        {/* ===== 下一篇预告 ===== */}
+        <section className="mb-8">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">📖</span>
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-gray-900">下一篇：《出海新人必备网站导航》</h3>
+                  <span className="inline-flex items-center px-2 py-0.5 bg-gray-200 text-gray-500 text-[10px] rounded-full font-medium">
+                    筹备中
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  按行业分类整理实用的出海工具和服务网站——建站、支付、物流、获客、法律合规，敬请期待。
+                </p>
+                <Link href="/topics" className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium min-h-[44px]">
+                  ← 返回专题列表
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ===== 相关入口 CTA ===== */}
-        <section className="mb-10">
+        <section className="mb-8">
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-100 p-6">
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0">
@@ -273,26 +341,6 @@ export default function OverseasEssentialAppsPage() {
           </div>
         </section>
 
-        {/* ===== 下一篇预告 ===== */}
-        <section className="mb-8">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-5">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">📖</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">下一篇做什么？</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  我们正在准备「出海新人必备网站导航」—— 按行业分类整理实用的出海工具和服务网站，敬请期待。
-                </p>
-                <Link href="/topics" className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium min-h-[44px]">
-                  ← 返回专题列表
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
           <div className="flex items-start gap-2">
@@ -314,39 +362,63 @@ export default function OverseasEssentialAppsPage() {
 function AppCard({ app }: { app: typeof apps[number] }) {
   const info = ratingInfo[app.rating];
   const cat = categories.find((c) => c.id === app.category);
+  const priorityColors: Record<string, string> = {
+    "先装": "bg-emerald-100 text-emerald-700",
+    "高频": "bg-green-100 text-green-700",
+    "按需": "bg-blue-100 text-blue-700",
+    "了解即可": "bg-gray-100 text-gray-500",
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
-      {/* Header */}
-      <div className="p-4 pb-3">
-        <div className="flex items-start justify-between gap-2">
+      {/* Header: Icon + Rating */}
+      <div className="p-4 pb-0">
+        <div className="flex items-start gap-3">
+          {/* App Icon */}
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-lg font-bold shadow-sm"
+            style={{ backgroundColor: app.iconBg, color: app.iconFg }}
+          >
+            {app.iconText}
+          </div>
+
+          {/* Name + Badges */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-1.5 flex-wrap">
               <h3 className="font-bold text-gray-900 text-base">{app.name}</h3>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${info.bg} ${info.color}`}>
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold ${info.bg} ${info.color}`}>
                 {info.label}
               </span>
             </div>
             <p className="text-xs text-gray-400">{app.alias}</p>
+            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+              {cat && (
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full">
+                  {cat.emoji} {cat.label}
+                </span>
+              )}
+              <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${priorityColors[app.installPriority] || "bg-gray-100 text-gray-500"}`}>
+                {app.installPriority}
+              </span>
+            </div>
           </div>
         </div>
-
-        {/* Category badge */}
-        {cat && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] rounded-full mt-2">
-            {cat.emoji} {cat.label}
-          </span>
-        )}
       </div>
 
       {/* Body */}
-      <div className="px-4 pb-3 space-y-3 flex-1">
+      <div className="px-4 pt-3 pb-3 space-y-3 flex-1">
+        {/* One-line analogy */}
+        <p className="text-xs text-gray-500 italic">{app.analogy}</p>
+
         {/* Description */}
         <p className="text-sm text-gray-600 leading-relaxed">{app.description}</p>
 
-        {/* Analogy */}
-        <div className="bg-blue-50 rounded-lg p-3">
-          <p className="text-xs text-blue-700">{app.analogy}</p>
+        {/* Beginner Advice */}
+        <div className="bg-teal-50 rounded-lg p-2.5 flex items-start gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-teal-500 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-teal-700">
+            <span className="font-medium">新手建议：</span>{app.beginnerAdvice}
+          </p>
         </div>
 
         {/* Suitable for */}
@@ -378,7 +450,7 @@ function AppCard({ app }: { app: typeof apps[number] }) {
           访问官网
         </a>
         {app.beginnerRecommended && (
-          <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+          <span className="text-xs text-emerald-600 font-medium flex items-center gap-1">
             <CheckCircle className="w-3.5 h-3.5" />
             新手推荐
           </span>

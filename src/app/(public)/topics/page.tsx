@@ -75,7 +75,23 @@ export default function TopicsPage() {
               {/* Header */}
               <div className="p-5 md:p-6">
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <span className="text-4xl">{topic.emoji}</span>
+                  {/* Icon stack */}
+                  <div className="flex -space-x-2">
+                    {[
+                      { letter: "G", bg: "#EA4335" },
+                      { letter: "X", bg: "#000000" },
+                      { letter: "▶", bg: "#FF0000" },
+                      { letter: "TG", bg: "#0088cc" },
+                    ].map((icon, i) => (
+                      <div
+                        key={i}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-white border-2 border-white shadow-sm"
+                        style={{ backgroundColor: icon.bg }}
+                      >
+                        {icon.letter}
+                      </div>
+                    ))}
+                  </div>
                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${topic.badgeColor}`}>
                     {topic.badge}
                   </span>
