@@ -25,9 +25,9 @@ export async function GET() {
     // Articles by status
     const [articleTotal, articlePublished, articleDraft, articleArchived] = await Promise.all([
       prisma.article.count(),
-      prisma.article.count({ where: { status: "PUBLISHED" } }),
-      prisma.article.count({ where: { status: "DRAFT" } }),
-      prisma.article.count({ where: { status: "ARCHIVED" } }),
+      prisma.article.count({ where: { status: "published" } }),
+      prisma.article.count({ where: { status: "draft" } }),
+      prisma.article.count({ where: { status: "archived" } }),
     ]);
 
     // Resources
