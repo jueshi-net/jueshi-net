@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Star, AlertTriangle, Users, Shield, Home, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Home, ChevronRight } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "专题推荐 — 海外百宝箱",
@@ -14,34 +15,41 @@ export const metadata: Metadata = {
   },
 };
 
-const topics = [
-  {
-    slug: "overseas-essential-apps",
-    title: "出海之后必装 APP 评级推荐",
-    subtitle: "S/A/B/C/D 评级，18 个海外生活必备 APP",
-    description:
-      "刚出国不知道装什么？从通讯、社交、学习到工作，每个 APP 都有国内类比和避坑提醒，少走弯路。",
-    emoji: "📱",
-    badge: "NEW",
-    badgeColor: "bg-green-100 text-green-700",
-    tags: ["18 个 APP", "避坑提醒", "国内类比"],
-    suitableFor: ["出海新人", "留学生", "海外华人", "跨境从业者"],
-    features: [
-      { icon: "🏆", text: "S/A/B/C/D 评级" },
-      { icon: "🇨🇳", text: "每个都有国内类比" },
-      { icon: "⚠️", text: "避坑提醒" },
-      { icon: "🆕", text: "新手推荐标识" },
-    ],
-  },
-];
+async function getTopics() {
+  try {
+    const topics = await prisma.topic.findMany({
+      where: { status: "published" },
+      orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        subtitle: true,
+        summary: true,
+        coverEmoji: true,
+        heroBadges: true,
+        suitableFor: true,
+        tags: true,
+        youtubeVideoId: true,
+        publishedAt: true,
+        updatedAt: true,
+        _count: { select: { items: true } },
+      },
+    });
+    return topics;
+  } catch {
+    return [];
+  }
+}
 
-export default function TopicsPage() {
+export default async function TopicsPage() {
+  const topics = await getTopics();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
       <div className="bg-gradient-to-br from-indigo-600 via-blue-700 to-teal-700 text-white py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4">
-          {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-sm text-blue-200 mb-6 min-h-[44px]">
             <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
               <Home className="w-3.5 h-3.5" /> 首页
@@ -65,94 +73,33 @@ export default function TopicsPage() {
 
       <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16 relative z-10">
         {/* Topic cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {topics.map((topic) => (
-            <Link
-              key={topic.slug}
-              href={`/topics/${topic.slug}`}
-              className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all flex flex-col"
-            >
-              {/* Header */}
-              <div className="p-5 md:p-6">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  {/* Icon stack */}
-                  <div className="flex -space-x-2">
-                    {[
-                      { letter: "G", bg: "#EA4335" },
-                      { letter: "X", bg: "#000000" },
-                      { letter: "▶", bg: "#FF0000" },
-                      { letter: "TG", bg: "#0088cc" },
-                    ].map((icon, i) => (
-                      <div
-                        key={i}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-white border-2 border-white shadow-sm"
-                        style={{ backgroundColor: icon.bg }}
-                      >
-                        {icon.letter}
-                      </div>
-                    ))}
-                  </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${topic.badgeColor}`}>
-                    {topic.badge}
-                  </span>
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
-                  {topic.title}
-                </h2>
-                <p className="text-sm text-gray-400 mb-3">{topic.subtitle}</p>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4">{topic.description}</p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {topic.tags.map((tag) => (
-                    <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* 适合谁看 */}
-                {topic.suitableFor && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
-                    <span>👤 适合：</span>
-                    <span className="text-gray-600">{topic.suitableFor.join(" / ")}</span>
-                  </div>
-                )}
-
-                {/* Features */}
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  {topic.features.map((f) => (
-                    <div key={f.text} className="flex items-center gap-1.5 text-sm text-gray-500">
-                      <span>{f.icon}</span>
-                      <span className="text-xs">{f.text}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="px-5 md:px-6 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50">
-                <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700 transition-colors inline-flex items-center gap-1">
-                  阅读专题
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </span>
-                <span className="text-xs text-gray-400">免费</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {topics.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {topics.map((topic) => (
+              <TopicCard key={topic.id} topic={topic} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <div className="text-4xl mb-4">📝</div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">暂无专题</h2>
+            <p className="text-sm text-gray-500">我们正在准备更多精彩内容，敬请期待。</p>
+          </div>
+        )}
 
         {/* More topics coming soon */}
-        <div className="mt-10 text-center">
-          <div className="bg-white rounded-xl border border-gray-200 p-8">
-            <div className="text-3xl mb-3">🔜</div>
-            <h3 className="font-bold text-gray-900 mb-2">更多专题即将上线</h3>
-            <p className="text-sm text-gray-500 max-w-md mx-auto">
-              我们还在准备更多实用专题，涵盖海外生活、求职、购物、交通等方面。
-              关注我们的更新，第一时间获取新内容。
-            </p>
+        {topics.length > 0 && (
+          <div className="mt-10 text-center">
+            <div className="bg-white rounded-xl border border-gray-200 p-8">
+              <div className="text-3xl mb-3">🔜</div>
+              <h3 className="font-bold text-gray-900 mb-2">更多专题即将上线</h3>
+              <p className="text-sm text-gray-500 max-w-md mx-auto">
+                我们还在准备更多实用专题，涵盖海外生活、求职、购物、交通等方面。
+                关注我们的更新，第一时间获取新内容。
+              </p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Related links */}
         <div className="mt-8 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-100 p-6">
@@ -171,5 +118,80 @@ export default function TopicsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function TopicCard({ topic }: { topic: Awaited<ReturnType<typeof getTopics>>[number] }) {
+  const suitableFor = (topic.suitableFor as string[] | null) || [];
+  const tags = (topic.tags as string[] | null) || [];
+  const itemCount = topic._count.items;
+
+  return (
+    <Link
+      href={`/topics/${topic.slug}`}
+      className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all flex flex-col"
+    >
+      <div className="p-5 md:p-6">
+        <div className="flex items-start justify-between gap-3 mb-3">
+          {/* Icon stack with emoji */}
+          <div className="flex -space-x-2">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-sm border-2 border-white shadow-sm bg-gradient-to-br from-indigo-500 to-teal-500"
+            >
+              {topic.coverEmoji || "📑"}
+            </div>
+          </div>
+          <div className="flex gap-1.5">
+            {topic.youtubeVideoId && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-600 border border-red-100">
+                ▶ 含视频
+              </span>
+            )}
+            {itemCount > 0 && (
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
+                {itemCount} 个条目
+              </span>
+            )}
+          </div>
+        </div>
+        <h2 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
+          {topic.title}
+        </h2>
+        {topic.subtitle && (
+          <p className="text-sm text-gray-400 mb-3">{topic.subtitle}</p>
+        )}
+        {topic.summary && (
+          <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">{topic.summary}</p>
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {tags.slice(0, 4).map((tag) => (
+              <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* 适合谁看 */}
+        {suitableFor.length > 0 && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+            <span>👤 适合：</span>
+            <span className="text-gray-600">{suitableFor.slice(0, 4).join(" / ")}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="px-5 md:px-6 py-3 border-t border-gray-100 flex items-center justify-between bg-gray-50">
+        <span className="text-sm text-blue-600 font-medium group-hover:text-blue-700 transition-colors inline-flex items-center gap-1">
+          阅读专题
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </span>
+        <span className="text-xs text-gray-400">免费</span>
+      </div>
+    </Link>
   );
 }

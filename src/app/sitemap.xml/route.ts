@@ -20,6 +20,7 @@ export async function GET() {
 
   // 动态内容（DB查询失败时降级为空数组）
   let articles: { slug: string; updatedAt: Date }[] = [];
+  let topics: { slug: string; updatedAt: Date }[] = [];
 
   try {
     articles = await prisma.article.findMany({
@@ -29,6 +30,16 @@ export async function GET() {
     });
   } catch (e) {
     console.warn('sitemap.xml: Article DB unavailable:', e);
+  }
+
+  try {
+    topics = await prisma.topic.findMany({
+      where: { status: 'published' },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+  } catch (e) {
+    console.warn('sitemap.xml: Topics DB unavailable:', e);
   }
 
   // 静态公开页面
@@ -48,7 +59,6 @@ export async function GET() {
     ...RESOURCE_SLUGS.map(s => ({ path: `/resources/${s}`, priority: '0.7', changeFreq: 'weekly' as const })),
     { path: '/rankings', priority: '0.7', changeFreq: 'weekly' },
     { path: '/topics', priority: '0.8', changeFreq: 'weekly' },
-    { path: '/topics/overseas-essential-apps', priority: '0.8', changeFreq: 'weekly' },
     { path: '/pricing', priority: '0.6', changeFreq: 'monthly' },
     { path: '/help', priority: '0.5', changeFreq: 'monthly' },
     { path: '/terms', priority: '0.3', changeFreq: 'yearly' },
@@ -69,6 +79,12 @@ ${staticPages.map(p => `  <url>
 ${articles.map(a => `  <url>
     <loc>${baseUrl}/guides/${a.slug}</loc>
     <lastmod>${new Date(a.updatedAt).toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('\n')}
+${topics.map(t => `  <url>
+    <loc>${baseUrl}/topics/${t.slug}</loc>
+    <lastmod>${new Date(t.updatedAt).toISOString()}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`).join('\n')}

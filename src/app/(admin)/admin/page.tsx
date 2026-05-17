@@ -54,7 +54,7 @@ const modules: ModuleCard[] = [
   { name: "数据备份", path: "/admin/backup", icon: Database, status: "online", statusLabel: "已上线", description: "数据库备份管理", frontendPath: "无", color: "emerald" },
   { name: "审计日志", path: "/admin/audit", icon: Shield, status: "online", statusLabel: "已上线", description: "操作审计与安全日志", frontendPath: "无", color: "red" },
   { name: "系统健康", path: "/admin/health", icon: Eye, status: "online", statusLabel: "已上线", description: "系统健康检查", frontendPath: "无", color: "lime" },
-  { name: "网盘分享", path: "#", icon: Cloud, status: "planned", statusLabel: "未实现", description: "计划在后续版本实现", frontendPath: "无", color: "sky" },
+  { name: "专题管理", path: "/admin/topics", icon: FileText, status: "online", statusLabel: "已上线", description: "管理专题内容、APP 条目、YouTube 视频。数据来源: topics, topic_items, topic_sections", frontendPath: "/topics", color: "purple" },
 ];
 
 const statusColors: Record<string, string> = {

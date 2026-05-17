@@ -730,3 +730,80 @@ model AIUsageLog {
   @@index([createdAt])
   @@map("ai_usage_logs")
 }
+
+// 专题系统
+model Topic {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  title             String
+  subtitle          String?
+  summary           String?
+  status            String    @default("draft") // draft / published / archived
+  templateType      String    @default("rating_list")
+  coverEmoji        String?
+  coverImage        String?
+  heroBadges        Json?     // [{label, color}]
+  suitableFor       Json?     // string[]
+  tags              Json?     // string[]
+  youtubeUrl        String?
+  youtubeVideoId    String?
+  youtubeTitle      String?
+  youtubeDescription String?
+  youtubeThumbnail  String?
+  seoTitle          String?
+  seoDescription    String?
+  publishedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  items    TopicItem[]
+  sections TopicSection[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("topics")
+}
+
+model TopicItem {
+  id               String   @id @default(cuid())
+  topicId          String
+  topic            Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  name             String
+  alias            String?
+  rating           String?  // S/A/B/C/D
+  category         String?
+  iconText         String?
+  iconBg           String?
+  iconFg           String?
+  installPriority  String?  // 先装 / 高频 / 按需 / 了解即可
+  description      String?
+  analogy          String?
+  suitableFor      String?
+  beginnerAdvice   String?
+  riskTip          String?
+  officialUrl      String?
+  isBeginnerFriendly Boolean @default(false)
+  sortOrder        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([sortOrder])
+  @@map("topic_items")
+}
+
+model TopicSection {
+  id        String   @id @default(cuid())
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  type      String   // intro / notice / faq / cta / custom_text
+  title     String?
+  content   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([sortOrder])
+  @@map("topic_sections")
+}
