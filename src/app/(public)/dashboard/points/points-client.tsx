@@ -71,9 +71,9 @@ const EARNING_METHODS = [
 ];
 
 const REDEEM_OPTIONS = [
-  { icon: "⚡", title: "兑换 AI 次数", desc: "用积分兑换 AI 工具的调用次数", status: "已开放" },
-  { icon: "👑", title: "兑换会员体验", desc: "体验会员专属功能和高额度", status: "已开放" },
-  { icon: "📚", title: "兑换资源权益", desc: "解锁高级资源库内容", status: "持续开放" },
+  { icon: "⚡", title: "兑换 AI 次数", desc: "用积分兑换 AI 工具的调用次数", status: "待开放" },
+  { icon: "👑", title: "兑换会员体验", desc: "体验会员专属功能和高额度", status: "待开放" },
+  { icon: "📚", title: "兑换资源权益", desc: "解锁高级资源库内容", status: "待开放" },
 ];
 
 const MEMBERSHIP_TIERS = [
