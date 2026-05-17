@@ -385,8 +385,8 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link href="/workbench/links" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">
-                <Plus className="w-4 h-4" /> 添加网址
+              <Link href="#my-links" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">
+                <Plus className="w-4 h-4" /> 前往添加网址
               </Link>
               <Link href="/dashboard/points" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white text-teal-700 rounded-xl text-sm font-semibold hover:bg-teal-50 transition-colors">
                 <TrendingUp className="w-4 h-4" /> 积分明细
@@ -502,7 +502,7 @@ export default function DashboardPage() {
 
         {/* ===== WORKBENCH SECTION ===== */}
         {!loginRequired && workbenchData && (
-          <div className="space-y-6 mb-6">
+          <div className="space-y-6 mb-6" id="my-links">
             <ProfileSelector
               currentProfileType={workbenchData.profileType}
               onUpdate={(pt) => setWorkbenchData(prev => prev ? { ...prev, profileType: pt } : null)}
