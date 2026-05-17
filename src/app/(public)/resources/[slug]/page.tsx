@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Tag,
   Globe,
+  BookOpen,
 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { TrackedResourceLink } from "@/components/tracked-resource-link";
@@ -91,6 +92,19 @@ const CATEGORY_MAP: Record<
   },
 };
 
+/** Get 3 related categories excluding the current one */
+function getRelatedCategories(currentSlug: string) {
+  const allSlugs = Object.keys(CATEGORY_MAP);
+  const others = allSlugs.filter((s) => s !== currentSlug);
+  // Simple deterministic selection: pick first 3 that aren't current
+  const picked: string[] = [];
+  for (const s of others) {
+    if (picked.length >= 3) break;
+    picked.push(s);
+  }
+  return picked.map((slug) => ({ slug, ...CATEGORY_MAP[slug] }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const category = CATEGORY_MAP[slug];
@@ -154,24 +168,48 @@ export default async function ResourceCategoryPage({ params }: Props) {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
   });
 
+  const relatedCategories = getRelatedCategories(slug);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className={`bg-gradient-to-r ${category.gradient} text-white py-16`}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-4xl mb-3">{category.icon}</div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">
-            {category.name}
-          </h1>
-          <p className="text-lg text-white/80">{category.desc}</p>
-          <div className="mt-4 flex items-center gap-2 text-sm text-white/70">
-            <span>
-              共 {resources.length} 个资源
-            </span>
-            <span className="mx-1">·</span>
+      {/* Breadcrumb */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <nav className="flex items-center gap-2 text-sm text-gray-500">
+            <Link href="/" className="hover:text-teal-600 transition-colors">
+              首页
+            </Link>
+            <span className="text-gray-300">/</span>
             <Link
               href="/resources"
-              className="hover:text-white underline underline-offset-2"
+              className="hover:text-teal-600 transition-colors"
+            >
+              资源库
+            </Link>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-900 font-medium">{category.name}</span>
+          </nav>
+        </div>
+      </div>
+
+      {/* Category Hero */}
+      <div className={`bg-gradient-to-r ${category.gradient} text-white`}>
+        <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-4xl">{category.icon}</span>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              {category.name}
+            </h1>
+          </div>
+          <p className="text-lg text-white/80 mb-6">{category.desc}</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
+              <BookOpen className="w-4 h-4" />
+              {resources.length} 个资源
+            </span>
+            <Link
+              href="/resources"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full text-sm font-medium transition-colors"
             >
               ← 返回资源库
             </Link>
@@ -180,13 +218,19 @@ export default async function ResourceCategoryPage({ params }: Props) {
       </div>
 
       {/* Resource Cards */}
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
+      <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16">
         {resources.length === 0 ? (
           <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-200">
             <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">
-              暂无资源，敬请期待
+            <p className="text-gray-500 text-lg mb-2">
+              该分类资源正在整理中
             </p>
+            <Link
+              href="/resources"
+              className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm transition-colors"
+            >
+              ← 返回资源库
+            </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
@@ -200,12 +244,12 @@ export default async function ResourceCategoryPage({ params }: Props) {
               return (
                 <div
                   key={resource.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md hover:border-teal-300 transition-all overflow-hidden"
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg hover:border-teal-300 transition-all duration-200 overflow-hidden group"
                 >
                   <div className="p-6">
                     {/* Header: name + badge */}
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <h3 className="text-lg font-bold text-gray-900 leading-snug">
+                      <h3 className="text-lg font-bold text-gray-900 leading-snug group-hover:text-teal-700 transition-colors">
                         {resource.name}
                       </h3>
                       <SourceTypeBadge sourceType={resource.sourceType} />
@@ -233,7 +277,7 @@ export default async function ResourceCategoryPage({ params }: Props) {
                         {resource.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                            className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs hover:bg-teal-50 hover:text-teal-600 transition-colors"
                           >
                             {tag}
                           </span>
@@ -277,6 +321,38 @@ export default async function ResourceCategoryPage({ params }: Props) {
           </div>
         )}
       </div>
+
+      {/* Related Categories */}
+      {relatedCategories.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 pb-16">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-teal-600" />
+              相关推荐
+            </h2>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {relatedCategories.map((rc) => (
+                <Link
+                  key={rc.slug}
+                  href={`/resources/${rc.slug}`}
+                  className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all group"
+                >
+                  <span className="text-2xl">{rc.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 group-hover:text-teal-700 transition-colors truncate">
+                      {rc.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 truncate">
+                      {rc.desc}
+                    </p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-teal-600 transition-colors shrink-0" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Disclaimer Section */}
       <div className="max-w-6xl mx-auto px-4 pb-16">
