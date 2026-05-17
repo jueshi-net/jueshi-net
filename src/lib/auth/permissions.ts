@@ -106,6 +106,16 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
     const session = await auth();
     if (!session?.user) return "guest";
 
+    // Fast path: use role from JWT token if available
+    const tokenRole = (session.user as any).role;
+    if (tokenRole) {
+      const role = tokenRole.toLowerCase();
+      if (role === "admin") return "admin";
+      if (role === "member") return "member";
+      if (role === "user") return "user";
+    }
+
+    // Fallback: DB lookup
     const userId = (session.user as any).id;
     const email = (session.user as any).email;
 
@@ -131,7 +141,6 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
 
     return "guest";
   } catch {
-    // DB failure → degrade to guest, never allow access
     return "guest";
   }
 }
