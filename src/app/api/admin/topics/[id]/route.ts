@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma";
+import { parseYouTubeUrl } from "@/lib/youtube";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const res = await requireAdmin();
@@ -46,6 +47,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const now = new Date();
     const publishedAt = status === "published" && existing.status !== "published" ? now : (status === "draft" ? null : existing.publishedAt);
 
+    const youtubeVideoId = youtubeUrl ? parseYouTubeUrl(youtubeUrl) : null;
+
     const topic = await prisma.topic.update({
       where: { id },
       data: {
@@ -58,6 +61,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         seoTitle: seoTitle ?? undefined,
         seoDescription: seoDescription ?? undefined,
         youtubeUrl: youtubeUrl ?? undefined,
+        youtubeVideoId: youtubeVideoId ?? undefined,
         heroBadges: heroBadges ?? undefined,
         suitableFor: suitableFor ?? undefined,
         tags: tags ?? undefined,

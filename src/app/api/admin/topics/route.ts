@@ -4,6 +4,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma";
+import { parseYouTubeUrl } from "@/lib/youtube";
 
 export async function GET() {
   const res = await requireAdmin();
@@ -37,12 +38,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "slug 和 title 必填" }, { status: 400 });
     }
 
+    const youtubeVideoId = youtubeUrl ? parseYouTubeUrl(youtubeUrl) : null;
+
     const topic = await prisma.topic.create({
       data: {
         slug, title, subtitle: subtitle || null, summary: summary || null,
         status: status || "draft", templateType: templateType || "rating_list",
         coverEmoji: coverEmoji || null, seoTitle: seoTitle || null,
         seoDescription: seoDescription || null, youtubeUrl: youtubeUrl || null,
+        youtubeVideoId: youtubeVideoId || null,
         publishedAt: status === "published" ? new Date() : null,
       },
     });
