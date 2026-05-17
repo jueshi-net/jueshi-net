@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, Home, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "专题推荐 — 海外百宝箱",
   description: "精选专题内容：出海必装 APP 评级、实用工具指南、生活攻略。帮助你快速适应海外生活。",
