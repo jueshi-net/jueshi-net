@@ -47,6 +47,8 @@ export async function GET() {
     { path: '/resources', priority: '0.8', changeFreq: 'weekly' },
     ...RESOURCE_SLUGS.map(s => ({ path: `/resources/${s}`, priority: '0.7', changeFreq: 'weekly' as const })),
     { path: '/rankings', priority: '0.7', changeFreq: 'weekly' },
+    { path: '/topics', priority: '0.8', changeFreq: 'weekly' },
+    { path: '/topics/overseas-essential-apps', priority: '0.8', changeFreq: 'weekly' },
     { path: '/pricing', priority: '0.6', changeFreq: 'monthly' },
     { path: '/help', priority: '0.5', changeFreq: 'monthly' },
     { path: '/terms', priority: '0.3', changeFreq: 'yearly' },

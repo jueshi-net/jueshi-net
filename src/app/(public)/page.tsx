@@ -398,6 +398,26 @@ export default async function LandingPage() {
 
       {/* ===== CONTENT & RESOURCES GUIDE ===== */}
       <div className="max-w-6xl mx-auto px-4 py-10 md:py-14">
+        {/* ===== 出海新人专题 ===== */}
+        <div className="mb-10">
+          <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-teal-50 rounded-xl border border-indigo-100 p-5 md:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex-shrink-0">
+                <span className="text-4xl">📱</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-[10px] rounded-full font-bold mb-2">NEW</div>
+                <h2 className="font-bold text-gray-900 text-lg">出海新人专题：出海之后必装 APP 评级推荐</h2>
+                <p className="text-sm text-gray-500 mt-1">S/A/B/C/D 评级，18 个 APP 从通讯、社交到工作全覆盖。每个都有国内类比和避坑提醒。</p>
+              </div>
+              <Link href="/topics/overseas-essential-apps" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex-shrink-0 min-h-[48px]">
+                查看专题
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
         <div className="text-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">指南 & 资源</h2>
           <p className="text-gray-500 mt-2 max-w-lg mx-auto">集运攻略、清关指南、出海经验分享，帮你少走弯路</p>

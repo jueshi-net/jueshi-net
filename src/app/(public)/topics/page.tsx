@@ -25,6 +25,7 @@ const topics = [
     badge: "NEW",
     badgeColor: "bg-green-100 text-green-700",
     tags: ["18 个 APP", "避坑提醒", "国内类比"],
+    suitableFor: ["出海新人", "留学生", "海外华人", "跨境从业者"],
     features: [
       { icon: "🏆", text: "S/A/B/C/D 评级" },
       { icon: "🇨🇳", text: "每个都有国内类比" },
@@ -86,13 +87,21 @@ export default function TopicsPage() {
                 <p className="text-sm text-gray-600 leading-relaxed mb-4">{topic.description}</p>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1.5 mb-4">
+                <div className="flex flex-wrap gap-1.5 mb-3">
                   {topic.tags.map((tag) => (
                     <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded">
                       {tag}
                     </span>
                   ))}
                 </div>
+
+                {/* 适合谁看 */}
+                {topic.suitableFor && (
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+                    <span>👤 适合：</span>
+                    <span className="text-gray-600">{topic.suitableFor.join(" / ")}</span>
+                  </div>
+                )}
 
                 {/* Features */}
                 <div className="grid grid-cols-2 gap-2 mb-4">

@@ -17,6 +17,7 @@ const FOOTER_LINKS = {
     links: [
       { href: "/guides", label: "实用指南" },
       { href: "/resources", label: "资源库" },
+      { href: "/topics", label: "专题合集" },
       { href: "/starter", label: "场景工具包" },
       { href: "/rankings", label: "工具排行榜" },
     ],

@@ -234,6 +234,12 @@ export default function ToolsCenterPage() {
                   🎓 留学生论文
                 </Link>
                 <Link
+                  href="/topics/overseas-essential-apps"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors min-h-[44px]"
+                >
+                  📱 APP 评级清单
+                </Link>
+                <Link
                   href="/starter"
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-teal-700 rounded-lg text-sm font-medium border border-teal-200 hover:bg-teal-50 transition-colors min-h-[44px]"
                 >

@@ -19,6 +19,7 @@ import {
   LifeBuoy,
   Gem,
   ChevronDown,
+  Target,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -31,6 +32,7 @@ const NAV_LINKS = [
   { href: "/starter", label: "场景包", icon: Briefcase },
   { href: "/guides", label: "指南", icon: BookOpen },
   { href: "/resources", label: "资源", icon: Library },
+  { href: "/topics", label: "专题", icon: Target },
   { href: "/pricing", label: "会员", icon: Gem },
 ];
 

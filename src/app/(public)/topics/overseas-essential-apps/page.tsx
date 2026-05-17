@@ -95,11 +95,27 @@ export default function OverseasEssentialAppsPage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
+        {/* ===== 文章式开篇 ===== */}
+        <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
+          <div className="prose prose-sm max-w-none">
+            <p className="text-base text-gray-700 leading-relaxed mb-4">
+              刚出海最尴尬的不是不会英语，而是不知道该用哪些软件。
+              到了国外你会发现，国内常用的微信、支付宝、淘宝在很多场景下用不了，
+              而当地人都用什么、哪些是注册服务必须用的、哪些有替代方案，没人给你整理过。
+            </p>
+            <p className="text-base text-gray-700 leading-relaxed">
+              这份清单从 <strong>18 个 APP</strong> 中帮你筛选——按实用程度分 <strong>S / A / B / C / D</strong> 五个等级，
+              每个都标注了「国内类比」「适合谁」「避坑提醒」。
+              不用在一堆应用商店里逐个试，照着这份清单装就行。
+            </p>
+          </div>
+        </div>
+
         {/* ===== 评级规则说明 ===== */}
         <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-500" />
-            评级规则说明
+            怎么读这份榜单
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {RATING_ORDER.map((rating) => {
@@ -112,12 +128,16 @@ export default function OverseasEssentialAppsPage() {
               );
             })}
           </div>
-          <p className="text-xs text-gray-400 mt-3">
-            评级基于海外生活实用性和不可替代程度，主观判断，仅供参考。所有 APP 均可免费使用基础功能。
-          </p>
+          <div className="mt-4 bg-blue-50 rounded-lg p-3">
+            <p className="text-sm text-blue-700">
+              <strong>阅读建议：</strong>S 级到了海外就先装上，A 级日常高频使用，B 级按需安装，
+              C 和 D 级先了解即可，有需要再说。所有 APP 均可免费使用基础功能。
+              评级基于海外生活实用性和不可替代程度，主观判断，仅供参考。
+            </p>
+          </div>
         </div>
 
-        {/* ===== 分类筛选说明 ===== */}
+        {/* ===== 按用途分类 ===== */}
         <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
             <Target className="w-5 h-5 text-blue-500" />
@@ -248,6 +268,26 @@ export default function OverseasEssentialAppsPage() {
                     📖 实用指南
                   </Link>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 下一篇预告 ===== */}
+        <section className="mb-8">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-lg">📖</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1">下一篇做什么？</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  我们正在准备「出海新人必备网站导航」—— 按行业分类整理实用的出海工具和服务网站，敬请期待。
+                </p>
+                <Link href="/topics" className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium min-h-[44px]">
+                  ← 返回专题列表
+                </Link>
               </div>
             </div>
           </div>
