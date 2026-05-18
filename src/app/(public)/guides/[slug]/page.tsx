@@ -32,7 +32,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const article = await prisma.article.findUnique({ where: { slug } });
-  if (!article) return { title: "文章未找到" };
+  if (!article || article.status !== "published") return { title: "文章未找到" };
 
   return {
     title: `${article.title} | 海外百宝箱`,
@@ -70,7 +70,8 @@ export default async function ArticlePage({ params }: Props) {
     notFound();
   }
 
-  if (!article) {
+  // Only published articles are publicly accessible
+  if (!article || article.status !== "published") {
     notFound();
   }
 

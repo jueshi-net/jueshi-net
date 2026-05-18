@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Edit2, Trash2, X, Save, FileText, Eye, Code, Loader2, AlertCircle, Link as LinkIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, X, Save, FileText, Eye, Code, Loader2, AlertCircle, Link as LinkIcon, Search } from "lucide-react";
 import { marked } from "marked";
 
 interface Article {
@@ -14,6 +14,7 @@ interface Article {
   views: number;
   tags: string;
   createdAt: string;
+  updatedAt: string;
   publishedAt: string | null;
 }
 
@@ -24,14 +25,20 @@ export default function AdminCMSPage() {
   const [editing, setEditing] = useState<Article | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "DRAFT", tags: "",
+    title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "draft", tags: "",
   });
   const [showPreview, setShowPreview] = useState(false);
+  // Filters
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQ, setSearchQ] = useState("");
 
   const fetchData = async () => {
     try {
       setLoading(true); setError(null);
-      const res = await fetch("/api/articles?status=all");
+      const params = new URLSearchParams();
+      if (statusFilter !== "all") params.set("status", statusFilter);
+      if (searchQ) params.set("q", searchQ);
+      const res = await fetch(`/api/articles?${params}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       const data = await res.json();
       if (data.success) setArticles(data.data || []);
@@ -46,28 +53,58 @@ export default function AdminCMSPage() {
     try {
       const method = editing ? "PUT" : "POST";
       const url = editing ? `/api/articles/${editing.slug}` : "/api/articles";
-      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...formData, authorId: "admin" }) });
+      const payload = {
+        title: formData.title,
+        slug: formData.slug,
+        content: formData.content,
+        excerpt: formData.summary || null,
+        status: formData.status.toLowerCase(),
+        author: formData.authorId || null,
+      };
+      const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const result = await res.json();
       if (res.ok) { fetchData(); resetForm(); }
-    } catch (error) { console.error("Failed to save article:", error); }
+      else { alert(result.error || "保存失败"); }
+    } catch (error) { console.error("Failed to save article:", error); alert("保存失败"); }
   };
 
   const handleDelete = async (slug: string) => {
-    if (!confirm("确定删除此文章？此操作不可恢复。")) return;
+    if (!confirm("确定归档此文章？归档后前台不再展示。")) return;
     try { const res = await fetch(`/api/articles/${slug}`, { method: "DELETE" }); if (res.ok) fetchData(); }
-    catch (error) { console.error("Failed to delete article:", error); }
+    catch (error) { console.error("Failed to archive article:", error); }
   };
 
-  const startEdit = (article: Article) => {
+  const startEdit = async (article: Article) => {
     setEditing(article);
-    setFormData({ title: article.title, slug: article.slug, content: "", summary: article.summary || "", cover: "", authorId: "", status: article.status, tags: article.tags });
+    // Fetch full article content
+    try {
+      const res = await fetch(`/api/articles/${article.slug}`);
+      const data = await res.json();
+      const full = data.data;
+      setFormData({
+        title: full.title || article.title,
+        slug: full.slug || article.slug,
+        content: full.content || "",
+        summary: full.excerpt || article.summary || "",
+        cover: full.coverImage || "",
+        authorId: full.author || "",
+        status: full.status || article.status,
+        tags: article.tags,
+      });
+    } catch {
+      setFormData({
+        title: article.title, slug: article.slug, content: "", summary: article.summary || "",
+        cover: "", authorId: "", status: article.status, tags: article.tags,
+      });
+    }
     setShowForm(true);
   };
 
-  const resetForm = () => { setEditing(null); setShowForm(false); setShowPreview(false); setFormData({ title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "DRAFT", tags: "" }); };
+  const resetForm = () => { setEditing(null); setShowForm(false); setShowPreview(false); setFormData({ title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "draft", tags: "" }); };
 
-  const publishedCount = articles.filter(a => a.status === "PUBLISHED").length;
-  const draftCount = articles.filter(a => a.status === "DRAFT").length;
-  const archivedCount = articles.filter(a => a.status === "ARCHIVED").length;
+  const publishedCount = articles.filter(a => a.status === "published").length;
+  const draftCount = articles.filter(a => a.status === "draft").length;
+  const archivedCount = articles.filter(a => a.status === "archived").length;
 
   if (loading) return (
     <div className="p-6 text-center text-gray-500 flex items-center justify-center gap-2 min-h-[200px]">
@@ -117,6 +154,35 @@ export default function AdminCMSPage() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            value={searchQ}
+            onChange={(e) => setSearchQ(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && fetchData()}
+            placeholder="搜索标题..."
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[44px]"
+          />
+        </div>
+        <div className="flex gap-2">
+          {["all", "published", "draft", "archived"].map((s) => (
+            <button
+              key={s}
+              onClick={() => { setStatusFilter(s); setTimeout(fetchData, 0); }}
+              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors min-h-[44px] ${
+                statusFilter === s
+                  ? "bg-orange-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {s === "all" ? "全部" : s === "published" ? "已发布" : s === "draft" ? "草稿" : "已归档"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -146,9 +212,9 @@ export default function AdminCMSPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">状态</label>
                   <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2 border rounded-lg text-sm">
-                    <option value="DRAFT">草稿</option>
-                    <option value="PUBLISHED">发布</option>
-                    <option value="ARCHIVED">归档</option>
+                    <option value="draft">草稿</option>
+                    <option value="published">发布</option>
+                    <option value="archived">归档</option>
                   </select>
                 </div>
               </div>
@@ -188,7 +254,8 @@ export default function AdminCMSPage() {
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Slug</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500">状态</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">标签</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">日期</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">发布</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden xl:table-cell">更新</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">操作</th>
               </tr>
             </thead>
@@ -198,12 +265,13 @@ export default function AdminCMSPage() {
                   <td className="px-4 py-3 font-medium text-gray-900 max-w-[200px] truncate">{a.title}</td>
                   <td className="px-4 py-3 text-gray-500 font-mono text-xs hidden sm:table-cell">{a.slug}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded text-xs ${a.status === "PUBLISHED" ? "bg-green-50 text-green-600" : a.status === "DRAFT" ? "bg-yellow-50 text-yellow-600" : "bg-gray-100 text-gray-400"}`}>
-                      {a.status === "PUBLISHED" ? "已发布" : a.status === "DRAFT" ? "草稿" : "已归档"}
+                    <span className={`px-2 py-0.5 rounded text-xs ${a.status === "published" ? "bg-green-50 text-green-600" : a.status === "draft" ? "bg-yellow-50 text-yellow-600" : a.status === "archived" ? "bg-gray-100 text-gray-500" : "bg-gray-100 text-gray-400"}`}>
+                      {a.status === "published" ? "已发布" : a.status === "draft" ? "草稿" : a.status === "archived" ? "已归档" : a.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">{a.tags}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("zh-CN") : new Date(a.createdAt).toLocaleDateString("zh-CN")}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs hidden xl:table-cell">{new Date(a.updatedAt).toLocaleDateString("zh-CN")}</td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <Link href={`/guides/${a.slug}`} target="_blank" className="text-teal-600 hover:text-teal-700 mr-3 inline-flex items-center gap-1 min-h-[44px]"><LinkIcon className="w-3 h-3" /> 预览</Link>
                     <button onClick={() => startEdit(a)} className="text-blue-600 hover:text-blue-700 mr-3 inline-flex items-center gap-1 min-h-[44px]"><Edit2 className="w-3 h-3" /> 编辑</button>
