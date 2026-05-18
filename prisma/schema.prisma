@@ -50,6 +50,8 @@ model User {
   growthLogs           GrowthLog[]
   forumPosts           ForumPost[]
   forumComments        ForumComment[]
+  companyProfiles      UserCompanyProfile[]
+  toolDocumentDrafts   ToolDocumentDraft[]
 
   @@map("users")
 }
@@ -965,4 +967,86 @@ model ForumComment {
   @@index([status])
   @@index([createdAt(sort: Desc)])
   @@map("forum_comments")
+}
+
+// ─── v1.20.32: Document Tools Foundation ───
+
+model UserCompanyProfile {
+  id               String                   @id @default(cuid())
+  userId           String                   @map("user_id")
+  user             User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileName      String                   @map("profile_name")           // "西雄供应链默认资料"
+  companyName      String                   @map("company_name")
+  companyNameEn    String?                  @map("company_name_en")
+  contactName      String?                  @map("contact_name")
+  phone            String?
+  email            String?
+  website          String?
+  address          String?
+  cityPostal       String?                  @map("city_postal")
+  taxId            String?                  @map("tax_id")
+  bankCnyInfo      String?                  @map("bank_cny_info")
+  bankUsdInfo      String?                  @map("bank_usd_info")
+  defaultCurrency  String                   @default("USD")               @map("default_currency")
+  logoDataUrl      String?                  @map("logo_data_url")         // base64 data URL, max ~500KB
+  logoText         String?                  @map("logo_text")             // fallback text logo
+  isDefault        Boolean                  @default(false)               @map("is_default")
+  createdAt        DateTime                 @default(now())               @map("created_at")
+  updatedAt        DateTime                 @updatedAt                    @map("updated_at")
+
+  drafts           ToolDocumentDraft[]
+  history          UserCompanyProfileHistory[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("user_company_profiles")
+}
+
+model UserCompanyProfileHistory {
+  id          String            @id @default(cuid())
+  userId      String            @map("user_id")
+  profileId   String            @map("profile_id")
+  profile     UserCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  snapshotJson String           @map("snapshot_json")
+  action      String            // create/update/restore/logo_update
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  @@index([profileId])
+  @@index([userId])
+  @@map("user_company_profile_history")
+}
+
+model ToolDocumentDraft {
+  id               String                  @id @default(cuid())
+  userId           String                  @map("user_id")
+  user             User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyProfileId String?                 @map("company_profile_id")
+  companyProfile   UserCompanyProfile?     @relation(fields: [companyProfileId], references: [id], onDelete: SetNull)
+  toolKey          String                  @map("tool_key")  // quote_sheet/inbound_receipt/handover_note/commercial_invoice/shipping_label/debit_note/video_script_sop
+  title            String
+  dataJson         String                  @map("data_json")       // current form data as JSON
+  previewJson      String?                 @map("preview_json")    // optional preview config
+  createdAt        DateTime                @default(now())         @map("created_at")
+  updatedAt        DateTime                @updatedAt              @map("updated_at")
+
+  history          ToolDocumentHistory[]
+
+  @@index([userId])
+  @@index([toolKey])
+  @@index([companyProfileId])
+  @@map("tool_document_drafts")
+}
+
+model ToolDocumentHistory {
+  id         String             @id @default(cuid())
+  userId     String             @map("user_id")
+  documentId String             @map("document_id")
+  document   ToolDocumentDraft  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  snapshotJson String           @map("snapshot_json")
+  action     String             // create/update/restore/export
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  @@index([documentId])
+  @@index([userId])
+  @@map("tool_document_history")
 }
