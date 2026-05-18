@@ -1,6 +1,7 @@
 // POST /api/checkin
 // Daily check-in with anti-duplicate.
 // user: +5 points, member/admin: +10 points
+// Also grants +2 growth_value (all roles) and writes growth_logs
 // Each user can only check in once per day.
 
 import { NextResponse } from "next/server";
@@ -8,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
 import { getTodayDateKey, getDateKey } from "@/lib/date-utils";
+import { addGrowthValue } from "@/lib/growth-helpers";
 
 export async function POST() {
   const session = await auth();
@@ -82,6 +84,9 @@ export async function POST() {
           lastCheckinDate: dateKey,
         },
       });
+
+      // Grant +2 growth_value and write growth_logs
+      await addGrowthValue(userId, 2, "daily_checkin", "每日签到奖励", "daily_checkin", checkin.id, tx);
 
       return { checkin, updatedUser };
     });

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Target, ArrowRight, CheckCircle, CalendarCheck, MessageSquare, Gift, Loader2 } from "lucide-react";
+import { Target, ArrowRight, CheckCircle, CalendarCheck, MessageSquare, Gift } from "lucide-react";
 
 export default function GrowthTaskSummary() {
   const [tasks, setTasks] = useState<{ key: string; title: string; completed: boolean; url: string }[]>([]);
@@ -25,10 +25,10 @@ export default function GrowthTaskSummary() {
   if (loading) return <div className="animate-pulse bg-white rounded-xl border p-5 h-28" />;
 
   const pendingTasks = tasks.filter(t => !t.completed).slice(0, 3);
+  const allDone = pendingTasks.length === 0 && tasks.length > 0;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-teal-600" />
@@ -42,13 +42,14 @@ export default function GrowthTaskSummary() {
         </Link>
       </div>
 
-      {/* Task items */}
       <div className="p-5">
-        {pendingTasks.length === 0 ? (
+        {allDone ? (
           <div className="text-center py-3">
             <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-1" />
-            <p className="text-sm text-gray-500">今日任务全部完成！🎉</p>
+            <p className="text-sm text-gray-500">今天的成长任务已完成！🎉</p>
           </div>
+        ) : pendingTasks.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-3">暂无任务</p>
         ) : (
           <div className="space-y-2">
             {pendingTasks.map(task => (

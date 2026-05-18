@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Home, ChevronRight, CheckCircle, ArrowRight, Target, Gift,
   Sparkles, MessageSquare, CalendarCheck, Globe, Loader2,
@@ -47,8 +48,29 @@ const TASK_ACTION_ICONS: Record<string, typeof CalendarCheck> = {
 export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; levelInfo: LevelInfo | null }) {
   const completedCount = tasks.filter(t => t.completed).length;
   const totalCount = tasks.length;
+  const [signingIn, setSigningIn] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  // Group tasks by category
+  const handleCheckin = async () => {
+    setSigningIn("daily_checkin");
+    try {
+      const res = await fetch("/api/checkin", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        setToast({ message: `签到成功！+${data.points} 积分，+2 成长值`, type: "success" });
+      } else if (res.status === 409) {
+        setToast({ message: "今日已签到", type: "success" });
+      } else {
+        setToast({ message: data.error || "签到失败", type: "error" });
+      }
+    } catch {
+      setToast({ message: "签到失败，请重试", type: "error" });
+    } finally {
+      setSigningIn(null);
+      setTimeout(() => setToast(null), 3000);
+    }
+  };
+
   const grouped = Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => ({
     key: key as TaskData["category"],
     ...cfg,
@@ -121,6 +143,15 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
           </div>
         )}
 
+        {/* All completed */}
+        {completedCount === totalCount && totalCount > 0 && (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-5 mb-6 text-center">
+            <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-2" />
+            <h3 className="font-bold text-green-800 text-lg">全部任务已完成！🎉</h3>
+            <p className="text-sm text-green-600 mt-1">继续保持，明天再来获取新的成长值</p>
+          </div>
+        )}
+
         {/* Task groups by category */}
         {grouped.map((group) => {
           const Icon = group.icon;
@@ -180,6 +211,22 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
                           <span className="text-xs text-green-600 font-medium shrink-0 flex items-center gap-1 min-h-[44px]">
                             ✓ 已完成
                           </span>
+                        ) : task.key === "workspace_visit" ? (
+                          <span className="text-xs text-gray-400 font-medium shrink-0 flex items-center gap-1 min-h-[44px]">
+                            即将开放
+                          </span>
+                        ) : task.key === "daily_checkin" ? (
+                          <button
+                            onClick={handleCheckin}
+                            disabled={signingIn === "daily_checkin"}
+                            className="inline-flex items-center gap-1 px-4 py-2 bg-teal-600 text-white rounded-lg text-xs font-medium hover:bg-teal-700 transition-colors shrink-0 min-h-[44px] disabled:opacity-50"
+                          >
+                            {signingIn === "daily_checkin" ? (
+                              <><Loader2 className="w-3 h-3 animate-spin" /> 签到中...</>
+                            ) : (
+                              <>去签到 <ArrowRight className="w-3 h-3" /></>
+                            )}
+                          </button>
                         ) : (
                           <Link
                             href={task.targetUrl}
@@ -231,6 +278,15 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
           </div>
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+        }`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 }
