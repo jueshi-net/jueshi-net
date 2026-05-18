@@ -278,6 +278,25 @@ export default function PointsPage() {
         </div>
       </div>
 
+      {/* Growth Task Entry */}
+      <Link
+        href="/dashboard/tasks"
+        className="block bg-gradient-to-br from-teal-50 to-emerald-50 rounded-xl border border-teal-200 p-5 hover:shadow-md transition-shadow"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center shrink-0">
+            <span className="text-2xl">🎯</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-gray-900 mb-1">成长任务中心</h3>
+            <p className="text-sm text-gray-500">
+              完成每日任务获取成长值和勋章，提升社区等级 →
+            </p>
+          </div>
+          <ArrowLeft className="w-5 h-5 text-teal-500 shrink-0 rotate-180" />
+        </div>
+      </Link>
+
       {/* Membership Comparison */}
       <div>
         <div className="flex items-center gap-2 mb-4">

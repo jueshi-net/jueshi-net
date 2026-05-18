@@ -6,13 +6,14 @@ import {
   CalendarCheck, Star, CheckCircle, Plus, Trash2, Clock,
   FileText, Tag, MapPin, Truck, StickyNote, ChevronDown,
   ArrowUpCircle, ArrowDownCircle, MinusCircle, Gift, BookOpen,
-  Ticket, Shield, Sparkles, TrendingUp, ExternalLink, ChevronRight, Home, Zap, Target, Crown, Package, Receipt, Globe, ArrowRight,
+  Ticket, Shield, Sparkles, TrendingUp, ExternalLink, ChevronRight, Home, Zap, Target, Crown, Package, Receipt, Globe, ArrowRight, MessageSquare,
 } from "lucide-react";
 import ProfileSelector from "@/components/dashboard/profile-selector";
 import MyTools from "@/components/dashboard/my-tools";
 import MyLinks from "@/components/dashboard/my-links";
 import RecommendedPackages from "@/components/dashboard/recommended-packages";
 import MembershipCard from "@/components/dashboard/membership-card";
+import GrowthTaskSummary from "@/components/dashboard/growth-task-summary";
 
 // ===== ALL EXISTING LOGIC PRESERVED =====
 
@@ -504,6 +505,9 @@ export default function DashboardPage() {
 
         {/* ===== MEMBERSHIP / LEVEL & BADGES ===== */}
         {!loginRequired && <MembershipCard />}
+
+        {/* ===== GROWTH TASK SUMMARY ===== */}
+        {!loginRequired && <GrowthTaskSummary />}
 
         {/* ===== WORKBENCH SECTION ===== */}
         {!loginRequired && workbenchData && (
