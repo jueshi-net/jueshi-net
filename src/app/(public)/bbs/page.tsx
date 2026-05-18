@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Search, Sparkles } from "lucide-react";
+import { Plus, Search, Sparkles, FileText, Tag, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical } from "@/lib/seo";
 import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
+import { formatDateTime } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,27 @@ async function getCategories() {
       orderBy: { sortOrder: "asc" },
     });
     return cats;
+  } catch {
+    return [];
+  }
+}
+
+async function getCategoriesWithCounts() {
+  try {
+    const cats = await prisma.forumCategory.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, key: true, name: true, description: true, iconText: true, color: true },
+    });
+    // Count posts per category
+    const postCounts = await prisma.forumPost.groupBy({
+      by: ["categoryId"],
+      _count: { id: true },
+      where: { status: "published" },
+    });
+    const countMap = new Map<string, number>();
+    for (const pc of postCounts) countMap.set(pc.categoryId, pc._count.id);
+    return cats.map(c => ({ ...c, postCount: countMap.get(c.id) || 0 }));
   } catch {
     return [];
   }
@@ -65,6 +87,23 @@ async function getPosts(params: { q?: string; category?: string; page?: number }
   }
 }
 
+async function getStats() {
+  try {
+    const [postCount, categoryCount, latestPost] = await Promise.all([
+      prisma.forumPost.count({ where: { status: "published" } }),
+      prisma.forumCategory.count({ where: { isActive: true } }),
+      prisma.forumPost.findFirst({
+        where: { status: "published" },
+        orderBy: { createdAt: "desc" },
+        select: { createdAt: true },
+      }),
+    ]);
+    return { postCount, categoryCount, latestPostAt: latestPost?.createdAt ?? null };
+  } catch {
+    return { postCount: 0, categoryCount: 0, latestPostAt: null };
+  }
+}
+
 export default async function BBSPage({
   searchParams,
 }: {
@@ -75,9 +114,11 @@ export default async function BBSPage({
   const category = params.category || "";
   const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
 
-  const [categories, { posts, total, pageSize }] = await Promise.all([
+  const [categories, { posts, total, pageSize }, stats, categoriesWithCounts] = await Promise.all([
     getCategories(),
     getPosts({ q, category, page }),
+    getStats(),
+    getCategoriesWithCounts(),
   ]);
   const session = await auth();
   const isLoggedIn = !!session?.user;
@@ -95,11 +136,23 @@ export default async function BBSPage({
               <span>海外百宝箱社区</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
-              海外百宝箱社区
+              社区论坛
             </h1>
-            <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
-              交流海外生活、工具经验、物流问题
+            <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed mb-4">
+              交流出海工具、海外生活、物流经验、AI 工具使用心得
             </p>
+            {/* Reminders */}
+            <div className="flex flex-wrap gap-2 text-sm text-teal-100/80">
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
+                新帖需审核后展示
+              </span>
+              <span className="hidden sm:inline text-teal-300">·</span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+                请勿发布广告、灰产、引战内容
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -180,6 +233,43 @@ export default async function BBSPage({
                 登录后发帖
               </Link>
             )}
+          </div>
+        </div>
+
+        {/* Stats area */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <FileText className="w-4 h-4 text-teal-500" />
+              <span className="text-2xl font-extrabold text-gray-900">{stats.postCount}</span>
+            </div>
+            <span className="text-xs text-gray-500">已发布帖子</span>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Tag className="w-4 h-4 text-teal-500" />
+              <span className="text-2xl font-extrabold text-gray-900">{stats.categoryCount}</span>
+            </div>
+            <span className="text-xs text-gray-500">分类数</span>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Clock className="w-4 h-4 text-teal-500" />
+              <span className="text-xs font-medium text-gray-700">
+                {stats.latestPostAt ? formatDateTime(stats.latestPostAt) : "暂无"}
+              </span>
+            </div>
+            <span className="text-xs text-gray-500">最新更新</span>
+          </div>
+        </div>
+
+        {/* Category cards */}
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">📂 论坛分类</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {categoriesWithCounts.map((cat) => (
+              <CategoryCard key={cat.id} category={cat} />
+            ))}
           </div>
         </div>
 
@@ -315,4 +405,21 @@ function buildPageUrl(
   if (params.q) sp.set("q", params.q);
   if (params.category) sp.set("category", params.category);
   return `${base}?${sp.toString()}`;
+}
+
+function CategoryCard({ category }: { category: { id: string; key: string; name: string; description: string | null; iconText: string | null; color: string | null; postCount: number } }) {
+  return (
+    <Link
+      href={`/bbs/category/${category.key}`}
+      className="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-teal-200 transition-all text-center group min-h-[100px] flex flex-col items-center justify-center"
+    >
+      {category.iconText && <span className="text-2xl mb-1.5 block">{category.iconText}</span>}
+      <span className="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors line-clamp-1 break-words">
+        {category.name}
+      </span>
+      <span className="text-xs text-gray-400 mt-1">
+        {category.postCount} 帖
+      </span>
+    </Link>
+  );
 }

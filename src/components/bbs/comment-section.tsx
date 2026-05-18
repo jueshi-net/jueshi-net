@@ -37,6 +37,7 @@ export default function CommentSection({
   const [comments, setComments] = useState(initialComments);
   const [newContent, setNewContent] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = useCallback(
@@ -73,8 +74,9 @@ export default function CommentSection({
             return;
           }
 
-          setComments((prev) => [...prev, data.comment]);
+          // 评论提交后进入待审核状态，不立即显示在列表中
           setNewContent("");
+          setSuccess(true);
         } catch {
           setError("网络错误，请重试");
         }
@@ -98,6 +100,15 @@ export default function CommentSection({
         <div className="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-5">
           <p className="text-sm text-gray-500">
             🔒 该帖已锁定，不能继续评论
+          </p>
+        </div>
+      )}
+
+      {/* Pending comment notice */}
+      {success && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-5">
+          <p className="text-sm text-amber-700">
+            ✅ 评论已提交，审核通过后展示。
           </p>
         </div>
       )}

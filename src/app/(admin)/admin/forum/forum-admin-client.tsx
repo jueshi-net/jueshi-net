@@ -15,12 +15,12 @@ import {
 interface PostData {
   id: string; title: string; slug: string; status: string;
   isPinned: boolean; isLocked: boolean; viewCount: number; commentCount: number;
-  createdAt: string; updatedAt: string;
+  createdAt: string; updatedAt: string; rewardGrantedAt: string | null;
   user: { name: string | null; email: string | null };
   category: { name: string; key: string; iconText: string | null; color: string | null };
 }
 interface CommentData {
-  id: string; content: string; status: string; createdAt: string;
+  id: string; content: string; status: string; createdAt: string; rewardGrantedAt: string | null;
   user: { name: string | null; email: string | null };
   post: { title: string; slug: string };
 }
@@ -209,8 +209,8 @@ export default function ForumAdminClient({ data }: { data: ForumData | null }) {
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2">
         {[
-          { id: "posts" as const, label: "帖子管理", count: posts.length, icon: MessageSquare },
-          { id: "comments" as const, label: "评论管理", count: comments.length, icon: ScrollText },
+          { id: "posts" as const, label: "帖子管理", count: posts.length, pendingCount: postStats.pending || 0, icon: MessageSquare },
+          { id: "comments" as const, label: "评论管理", count: comments.length, pendingCount: commentStats.pending || 0, icon: ScrollText },
           { id: "categories" as const, label: "分类管理", count: categories.length, icon: FolderOpen },
           { id: "rules" as const, label: "规则说明", icon: ScrollText },
         ].map((tab) => {
@@ -231,6 +231,11 @@ export default function ForumAdminClient({ data }: { data: ForumData | null }) {
               {"count" in tab && tab.count !== undefined && (
                 <span className={`text-xs px-1.5 py-0.5 rounded-full ${isActive ? "bg-violet-200 text-violet-800" : "bg-gray-100 text-gray-500"}`}>
                   {tab.count}
+                </span>
+              )}
+              {"pendingCount" in tab && tab.pendingCount !== undefined && tab.pendingCount > 0 && (
+                <span className="text-xs px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-800 font-semibold">
+                  {tab.pendingCount}
                 </span>
               )}
             </button>
@@ -335,6 +340,11 @@ export default function ForumAdminClient({ data }: { data: ForumData | null }) {
                         <span>👤 {p.user.name || p.user.email || "未知"}</span>
                         <span>👁 {p.viewCount}</span>
                         <span>💬 {p.commentCount}</span>
+                        {p.rewardGrantedAt ? (
+                          <span className="text-green-500" title={`已奖励: ${new Date(p.rewardGrantedAt).toLocaleString("zh-CN")}`}>🎁 已奖励</span>
+                        ) : (
+                          <span className="text-gray-300">🎁 未奖励</span>
+                        )}
                         <span>{new Date(p.createdAt).toLocaleString("zh-CN")}</span>
                       </div>
                     </div>
@@ -488,6 +498,11 @@ export default function ForumAdminClient({ data }: { data: ForumData | null }) {
                       <p className="text-sm text-gray-700 mb-2 break-words line-clamp-2">{c.content}</p>
                       <div className="flex items-center gap-3 text-xs text-gray-400 flex-wrap">
                         <span className="bg-gray-100 px-2 py-0.5 rounded">👤 {c.user.name || c.user.email || "未知"}</span>
+                        {c.rewardGrantedAt ? (
+                          <span className="text-green-500" title={`已奖励: ${new Date(c.rewardGrantedAt).toLocaleString("zh-CN")}`}>🎁 已奖励</span>
+                        ) : (
+                          <span className="text-gray-300">🎁 未奖励</span>
+                        )}
                         <span>{new Date(c.createdAt).toLocaleString("zh-CN")}</span>
                       </div>
                     </div>

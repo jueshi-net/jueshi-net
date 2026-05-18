@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Eye, MessageSquare, Calendar, Lock, Pin } from "lucide-react";
+import { ChevronLeft, Eye, MessageSquare, Calendar, Lock, Pin, Home, ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical, SITE_URL } from "@/lib/seo";
@@ -17,14 +17,15 @@ async function getPost(slug: string) {
     const post = await prisma.forumPost.findUnique({
       where: { slug },
       include: {
-        user: { select: { id: true, name: true, email: true } },
+        user: { select: { id: true, name: true, email: true, levelKey: true, growthValue: true } },
         category: true,
         _count: { select: { comments: { where: { status: "published" } } } },
       },
     });
 
     if (!post) return null;
-    if (post.status === "hidden" || post.status === "deleted") return null;
+    // Only published posts are publicly viewable
+    if (post.status !== "published") return null;
 
     return post;
   } catch {
@@ -123,13 +124,20 @@ export default async function PostDetailPage({
       {/* Hero */}
       <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <Link
-            href="/bbs"
-            className="inline-flex items-center gap-1.5 text-sm text-teal-100 hover:text-white transition-colors mb-4"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            返回论坛
-          </Link>
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-1.5 text-sm text-teal-100/80 mb-4 flex-wrap">
+            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
+              <Home className="w-3.5 h-3.5" /> 首页
+            </Link>
+            <span>/</span>
+            <Link href="/bbs" className="hover:text-white transition-colors">
+              社区论坛
+            </Link>
+            <span>/</span>
+            <Link href={`/bbs/category/${post.category.key}`} className="hover:text-white transition-colors">
+              {post.category.name}
+            </Link>
+          </nav>
 
           {/* Category + badges */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -148,7 +156,7 @@ export default async function PostDetailPage({
             )}
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight break-words">
             {post.title}
           </h1>
         </div>
@@ -191,6 +199,33 @@ export default async function PostDetailPage({
           <PostContent content={post.content} />
         </div>
 
+        {/* Author info card */}
+        <AuthorInfoCard post={post} />
+
+        {/* Related links */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mt-5">
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/bbs"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors min-h-[44px]"
+            >
+              <ArrowLeft className="w-4 h-4" /> 返回论坛首页
+            </Link>
+            <Link
+              href={`/bbs/category/${post.category.key}`}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors min-h-[44px]"
+            >
+              返回「{post.category.name}」
+            </Link>
+            <Link
+              href="/bbs/new"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]"
+            >
+              发布新帖
+            </Link>
+          </div>
+        </div>
+
         {/* Comments */}
         <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 shadow-sm mt-5">
           <CommentSection
@@ -211,4 +246,41 @@ function maskEmail(email: string): string {
   const [local, domain] = email.split("@");
   if (local.length <= 2) return `${local[0]}***@${domain}`;
   return `${local[0]}***${local[local.length - 1]}@${domain}`;
+}
+
+async function AuthorInfoCard({ post }: { post: any }) {
+  const displayName = post.user.name || maskEmail(post.user.email);
+  let levelInfo: { name: string; color: string; iconText: string } | null = null;
+  try {
+    const level = await prisma.userLevel.findUnique({
+      where: { key: post.user.levelKey },
+      select: { name: true, color: true, iconText: true },
+    });
+    if (level) levelInfo = level;
+  } catch {
+    // ignore
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mt-5">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-sm font-bold text-teal-700 shrink-0">
+          {displayName[0].toUpperCase()}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-gray-900">{displayName}</span>
+            {levelInfo && (
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-${levelInfo.color}/10 text-${levelInfo.color} border border-${levelInfo.color}/20`}>
+                {levelInfo.iconText} {levelInfo.name}
+              </span>
+            )}
+          </div>
+          <span className="text-xs text-gray-400">
+            成长值 {post.user.growthValue || 0}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 }

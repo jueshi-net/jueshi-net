@@ -96,7 +96,7 @@ export default async function NewPostPage() {
             <ul className="text-xs text-amber-700 space-y-1">
               <li>• 标题 5-80 字，内容 10-3000 字</li>
               <li>• 不支持 HTML 格式，纯文本即可</li>
-              <li>• 普通用户发帖需审核后显示</li>
+              <li>• 普通用户发帖后进入<strong>待审核</strong>状态，管理员审核后才公开展示</li>
               <li>• 每日最多发布 5 条帖子</li>
               <li>• 请勿发布违规、广告或侵权内容</li>
             </ul>

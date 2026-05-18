@@ -182,9 +182,12 @@ export default function PostForm({ categories }: PostFormProps) {
 
       {/* Success message */}
       {success && (
-        <div className="rounded-lg bg-green-50 border border-green-200 p-3">
-          <p className="text-sm text-green-600">
-            🎉 发布成功！正在跳转到论坛首页...
+        <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+          <p className="text-sm text-green-700 font-medium mb-1">
+            🎉 帖子已提交！
+          </p>
+          <p className="text-xs text-green-600">
+            帖子正在等待管理员审核，审核通过后会出现在论坛首页。
           </p>
         </div>
       )}
