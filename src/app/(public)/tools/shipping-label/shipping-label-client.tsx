@@ -89,7 +89,7 @@ export default function ShippingLabelClient() {
               <span className="truncate">唛头标签打印</span>
             </h1>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
               {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
             </button>
@@ -109,10 +109,10 @@ export default function ShippingLabelClient() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 overflow-x-hidden">
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
           {/* Form */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Settings */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
@@ -139,8 +139,8 @@ export default function ShippingLabelClient() {
               </div>
               <div className="space-y-3">
                 {labelItems.map((item) => (
-                  <div key={item.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div key={item.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50 overflow-x-auto">
+                    <div className="grid grid-cols-2 gap-2 min-w-0">
                       <input value={item.trackingNo} onChange={(e) => updateLabel(item.id, "trackingNo", e.target.value)} placeholder="追踪号" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                       <input value={item.channel} onChange={(e) => updateLabel(item.id, "channel", e.target.value)} placeholder="渠道" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                       <input value={item.productName} onChange={(e) => updateLabel(item.id, "productName", e.target.value)} placeholder="品名" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
@@ -163,7 +163,7 @@ export default function ShippingLabelClient() {
           {/* Preview */}
           {showPreview && (
             <div className="lg:sticky lg:top-20 self-start">
-              <div ref={previewRef} className="space-y-4">
+              <div ref={previewRef} className="space-y-4 overflow-x-auto">
                 {Array.from({ length: Math.min(printCopies, 5) }).map((_, copyIdx) => (
                   <div key={copyIdx}>
                     {printCopies > 1 && <p className="text-xs text-gray-400 mb-1">副本 {copyIdx + 1}/{printCopies}</p>}

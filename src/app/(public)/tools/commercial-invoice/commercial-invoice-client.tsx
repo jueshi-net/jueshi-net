@@ -100,7 +100,7 @@ export default function CommercialInvoiceClient() {
               <span className="truncate">外贸发票生成器</span>
             </h1>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
             <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
               {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
             </button>
@@ -122,10 +122,10 @@ export default function CommercialInvoiceClient() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 overflow-x-hidden">
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
           {/* Form */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {/* Company Info */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
@@ -156,14 +156,14 @@ export default function CommercialInvoiceClient() {
                   <Plus className="w-4 h-4" /> 添加
                 </button>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 overflow-x-auto">
                 {lineItems.map((item) => (
-                  <div key={item.id} className="flex gap-2 items-start">
-                    <input value={item.description} onChange={(e) => updateLine(item.id, "description", e.target.value)} placeholder="商品描述" className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-                    <input type="number" value={item.quantity} onChange={(e) => updateLine(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-20 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-                    <input type="number" step="0.01" value={item.unitPrice} onChange={(e) => updateLine(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-24 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-                    <span className="text-sm text-gray-500 py-2 min-w-[60px]">={(item.quantity * item.unitPrice).toFixed(2)}</span>
-                    <button onClick={() => removeLine(item.id)} className="p-2 text-red-400 hover:text-red-600 min-h-[44px] min-w-[44px] flex items-center justify-center">
+                  <div key={item.id} className="flex gap-1 items-start min-w-0">
+                    <input value={item.description} onChange={(e) => updateLine(item.id, "description", e.target.value)} placeholder="商品描述" className="min-w-[80px] flex-1 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
+                    <input type="number" value={item.quantity} onChange={(e) => updateLine(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-16 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
+                    <input type="number" step="0.01" value={item.unitPrice} onChange={(e) => updateLine(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-20 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
+                    <span className="text-xs text-gray-500 py-2 min-w-[40px] shrink-0">={(item.quantity * item.unitPrice).toFixed(2)}</span>
+                    <button onClick={() => removeLine(item.id)} className="p-1 text-red-400 hover:text-red-600 min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -187,7 +187,8 @@ export default function CommercialInvoiceClient() {
           {/* Preview */}
           {showPreview && (
             <div className="lg:sticky lg:top-20 self-start">
-              <div ref={previewRef} className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 min-h-[700px]" style={{ fontFamily: "Arial, sans-serif" }}>
+              <div ref={previewRef} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-8 min-h-[700px] overflow-x-auto" style={{ fontFamily: "Arial, sans-serif" }}>
+                <div className="min-w-[280px]">
                 <h1 className="text-2xl font-bold text-center text-teal-700 mb-6">COMMERCIAL INVOICE</h1>
 
                 <div className="grid grid-cols-2 gap-6 mb-6">
@@ -238,6 +239,7 @@ export default function CommercialInvoiceClient() {
 
                 {terms && <p className="text-xs text-gray-500 mt-6">Payment Terms: {terms}</p>}
                 {notes && <p className="text-xs text-gray-500 mt-2">Notes: {notes}</p>}
+                </div>
               </div>
             </div>
           )}
