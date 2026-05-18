@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Printer, Download, Building2, Plus, Trash2, FileText, Loader2, Eye, Code, History } from "lucide-react";
+import { ArrowLeft, Save, Printer, Building2, Plus, Trash2, FileText, Loader2, Eye, Code } from "lucide-react";
+import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
+import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
 
 interface LineItem {
   id: string;
@@ -27,7 +29,36 @@ export default function CommercialInvoiceClient() {
   const [showPreview, setShowPreview] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Load from URL params or localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("invoice-draft");
+    if (saved) {
+      try {
+        const d = JSON.parse(saved);
+        if (d.companyName) setCompanyName(d.companyName);
+        if (d.companyAddress) setCompanyAddress(d.companyAddress);
+        if (d.clientName) setClientName(d.clientName);
+        if (d.clientAddress) setClientAddress(d.clientAddress);
+        if (d.invoiceNo) setInvoiceNo(d.invoiceNo);
+        if (d.lineItems) setLineItems(d.lineItems);
+        if (d.freight) setFreight(d.freight);
+        if (d.insurance) setInsurance(d.insurance);
+        if (d.terms) setTerms(d.terms);
+        if (d.notes) setNotes(d.notes);
+      } catch { /* ignore */ }
+    }
+  }, []);
+
+  // Auto-fill company info from selected profile
+  const handleProfileSelect = useCallback((profile: CompanyProfile) => {
+    setSelectedProfile(profile);
+    setCompanyName(profile.companyName);
+    setCompanyAddress(profile.address || "");
+  }, []);
 
   const addLine = () => {
     setLineItems([...lineItems, { id: `${Date.now()}`, description: "", quantity: 1, unitPrice: 0, currency: "USD" }]);
@@ -50,19 +81,45 @@ export default function CommercialInvoiceClient() {
     setSaved(false);
     try {
       const data = { companyName, companyAddress, clientName, clientAddress, invoiceNo, invoiceDate, lineItems, freight, insurance, terms, notes };
-      const res = await fetch("/api/me/tool-documents", {
-        method: "POST",
+      const method = currentDocId ? "PUT" : "POST";
+      const url = currentDocId ? `/api/me/tool-documents/${currentDocId}` : "/api/me/tool-documents";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           toolKey: "commercial_invoice",
           title: invoiceNo || `商业发票 ${invoiceDate}`,
           dataJson: JSON.stringify(data),
+          ...(selectedProfile?.id && { companyProfileId: selectedProfile.id }),
         }),
       });
-      if (res.ok) setSaved(true);
-      else alert("保存失败");
+      if (res.ok) {
+        setSaved(true);
+        const d = await res.json();
+        if (d.data?.id && !currentDocId) setCurrentDocId(d.data.id);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        if (res.status === 401) { window.location.href = "/login"; return; }
+        alert(d.error || "保存失败");
+      }
     } catch { alert("保存失败"); }
     setSaving(false);
+  };
+
+  const handleRestore = (dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      if (d.companyName) setCompanyName(d.companyName);
+      if (d.companyAddress) setCompanyAddress(d.clientAddress);
+      if (d.clientName) setClientName(d.clientName);
+      if (d.clientAddress) setClientAddress(d.clientAddress);
+      if (d.invoiceNo) setInvoiceNo(d.invoiceNo);
+      if (d.lineItems) setLineItems(d.lineItems);
+      if (d.freight) setFreight(d.freight);
+      if (d.insurance) setInsurance(d.insurance);
+      if (d.terms) setTerms(d.terms);
+      if (d.notes) setNotes(d.notes);
+    } catch { /* ignore */ }
   };
 
   const handlePrint = () => {
@@ -78,7 +135,6 @@ export default function CommercialInvoiceClient() {
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background: #f5f5f5; }
         h1 { text-align: center; color: #0d9488; }
-        .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
         .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
       </style></head><body>${printContent.innerHTML}</body></html>
     `);
@@ -101,6 +157,9 @@ export default function CommercialInvoiceClient() {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {currentDocId && (
+              <ToolHistoryPanel documentId={currentDocId} toolKey="commercial_invoice" onRestore={handleRestore} />
+            )}
             <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
               {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
             </button>
@@ -126,6 +185,14 @@ export default function CommercialInvoiceClient() {
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
           {/* Form */}
           <div className="space-y-4 min-w-0">
+            {/* Company Profile Picker */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-teal-600" /> 公司资料
+              </h2>
+              <CompanyProfilePicker onSelect={handleProfileSelect} selectedId={selectedProfile?.id} />
+            </div>
+
             {/* Company Info */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
@@ -162,7 +229,7 @@ export default function CommercialInvoiceClient() {
                     <input value={item.description} onChange={(e) => updateLine(item.id, "description", e.target.value)} placeholder="商品描述" className="min-w-[80px] flex-1 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
                     <input type="number" value={item.quantity} onChange={(e) => updateLine(item.id, "quantity", parseFloat(e.target.value) || 0)} className="w-16 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
                     <input type="number" step="0.01" value={item.unitPrice} onChange={(e) => updateLine(item.id, "unitPrice", parseFloat(e.target.value) || 0)} className="w-20 px-2 py-2 border rounded-lg text-sm min-h-[44px]" />
-                    <span className="text-xs text-gray-500 py-2 min-w-[40px] shrink-0">={(item.quantity * item.unitPrice).toFixed(2)}</span>
+                    <span className="text-xs text-gray-500 py-2 min-w-[40px] shrink-0">{(item.quantity * item.unitPrice).toFixed(2)}</span>
                     <button onClick={() => removeLine(item.id)} className="p-1 text-red-400 hover:text-red-600 min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0">
                       <Trash2 className="w-4 h-4" />
                     </button>

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Printer, Tag, Plus, Trash2, FileText, Loader2, Eye, Code } from "lucide-react";
+import { ArrowLeft, Save, Printer, Tag, Plus, Trash2, FileText, Loader2, Eye, Code, Building2 } from "lucide-react";
+import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
+import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
 
 interface LabelItem {
   id: string;
@@ -21,7 +23,15 @@ export default function ShippingLabelClient() {
   const [showPreview, setShowPreview] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Auto-fill company info from selected profile
+  const handleProfileSelect = useCallback((profile: CompanyProfile) => {
+    setSelectedProfile(profile);
+    setCompanyName(profile.companyName);
+  }, []);
 
   const addLabel = () => {
     setLabelItems([...labelItems, { id: `${Date.now()}`, trackingNo: "", channel: "", productName: "", qty: 1, weight: "" }]);
@@ -41,19 +51,39 @@ export default function ShippingLabelClient() {
     setSaved(false);
     try {
       const data = { companyName, paperSize, printCopies, labelItems };
-      const res = await fetch("/api/me/tool-documents", {
-        method: "POST",
+      const method = currentDocId ? "PUT" : "POST";
+      const url = currentDocId ? `/api/me/tool-documents/${currentDocId}` : "/api/me/tool-documents";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           toolKey: "shipping_label",
           title: `唛头标签 ${new Date().toLocaleDateString("zh-CN")}`,
           dataJson: JSON.stringify(data),
+          ...(selectedProfile?.id && { companyProfileId: selectedProfile.id }),
         }),
       });
-      if (res.ok) setSaved(true);
-      else alert("保存失败");
+      if (res.ok) {
+        setSaved(true);
+        const d = await res.json();
+        if (d.data?.id && !currentDocId) setCurrentDocId(d.data.id);
+      } else {
+        const d = await res.json().catch(() => ({}));
+        if (res.status === 401) { window.location.href = "/login"; return; }
+        alert(d.error || "保存失败");
+      }
     } catch { alert("保存失败"); }
     setSaving(false);
+  };
+
+  const handleRestore = (dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      if (d.companyName) setCompanyName(d.companyName);
+      if (d.paperSize) setPaperSize(d.paperSize);
+      if (d.printCopies) setPrintCopies(d.printCopies);
+      if (d.labelItems) setLabelItems(d.labelItems);
+    } catch { /* ignore */ }
   };
 
   const handlePrint = () => {
@@ -90,6 +120,9 @@ export default function ShippingLabelClient() {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {currentDocId && (
+              <ToolHistoryPanel documentId={currentDocId} toolKey="shipping_label" onRestore={handleRestore} />
+            )}
             <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
               {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
             </button>
@@ -113,6 +146,14 @@ export default function ShippingLabelClient() {
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>
           {/* Form */}
           <div className="space-y-4 min-w-0">
+            {/* Company Profile Picker */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-purple-600" /> 公司资料
+              </h2>
+              <CompanyProfilePicker onSelect={handleProfileSelect} selectedId={selectedProfile?.id} />
+            </div>
+
             {/* Settings */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h2 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
