@@ -211,10 +211,6 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
                           <span className="text-xs text-green-600 font-medium shrink-0 flex items-center gap-1 min-h-[44px]">
                             ✓ 已完成
                           </span>
-                        ) : task.key === "workspace_visit" ? (
-                          <span className="text-xs text-gray-400 font-medium shrink-0 flex items-center gap-1 min-h-[44px]">
-                            即将开放
-                          </span>
                         ) : task.key === "daily_checkin" ? (
                           <button
                             onClick={handleCheckin}

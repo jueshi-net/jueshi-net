@@ -222,6 +222,15 @@ export default function DashboardPage() {
     }
   }, [toast]);
 
+  // Record dashboard visit for growth task (fire-and-forget, once per day)
+  const recordDashboardVisit = useCallback(async () => {
+    try {
+      await fetch("/api/growth-tasks/dashboard-visit", { method: "POST" });
+    } catch {
+      // Ignore errors — this is a background reward task
+    }
+  }, []);
+
   useEffect(() => {
     fetchDashboard();
     fetchTasks(taskFilter);
@@ -229,8 +238,9 @@ export default function DashboardPage() {
       fetchRewards();
       fetchMyRewards();
       fetchWorkbench();
+      recordDashboardVisit();
     }
-  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench]);
+  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench, recordDashboardVisit]);
 
   // Check-in handler
   const handleCheckIn = useCallback(async () => {

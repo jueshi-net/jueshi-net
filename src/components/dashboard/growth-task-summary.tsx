@@ -76,5 +76,6 @@ function TaskIcon({ taskKey }: { taskKey: string }) {
   if (taskKey === "daily_checkin") return <CalendarCheck className="w-5 h-5 text-blue-500 shrink-0" />;
   if (taskKey === "tool_review_approved") return <Gift className="w-5 h-5 text-amber-500 shrink-0" />;
   if (taskKey === "forum_post_published" || taskKey === "forum_comment_published") return <MessageSquare className="w-5 h-5 text-teal-500 shrink-0" />;
+  if (taskKey === "workspace_visit") return <Target className="w-5 h-5 text-emerald-500 shrink-0" />;
   return <Target className="w-5 h-5 text-gray-400 shrink-0" />;
 }

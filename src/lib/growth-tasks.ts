@@ -127,8 +127,18 @@ export async function getUserTaskStatus(userId: string) {
   });
   results.set("forum_comment_published", { completed: commentCount > 0, count: commentCount });
 
-  // 5. workspace_visit: 本轮标记为"待接入"，暂不判断
-  results.set("workspace_visit", { completed: false, count: 0 });
+  // 5. workspace_visit: 通过 growth_logs 判断今天是否已访问工作台并获奖励
+  const visitDateKey = dateKey;
+  const todayVisit = await prisma.growthLog.findFirst({
+    where: {
+      userId,
+      type: "dashboard_visit",
+      createdAt: {
+        gte: new Date(visitDateKey + "T00:00:00-07:00"),
+      },
+    },
+  });
+  results.set("workspace_visit", { completed: !!todayVisit, count: todayVisit ? 1 : 0 });
 
   // 6. first_login_badge: 是否已获得 first_login 勋章
   const badgeAward = await prisma.userBadgeAward.findFirst({
