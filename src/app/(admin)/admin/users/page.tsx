@@ -16,10 +16,11 @@ interface AdminData {
   pagination: { page: number; pageSize: number; total: number; totalPages: number };
 }
 
+import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
+
 const ROLE_LABELS: Record<string, string> = { user: "用户", member: "会员", admin: "管理员" };
 const ROLE_COLORS: Record<string, string> = { user: "bg-blue-100 text-blue-700", member: "bg-amber-100 text-amber-700", admin: "bg-purple-100 text-purple-700" };
-const LEVEL_LABELS: Record<string, string> = { lv1: "Lv.1", lv2: "Lv.2", lv3: "Lv.3", lv4: "Lv.4", lv5: "Lv.5" };
-const GROWTH_TYPE_LABELS: Record<string, string> = { checkin: "签到", task: "任务", review: "点评", topic: "专题", admin_adjust: "后台调整", system: "系统" };
+const LEVEL_LABELS: Record<string, string> = { lv1: "Lv.1 新手", lv2: "Lv.2 进阶", lv3: "Lv.3 精英", lv4: "Lv.4 大师", lv5: "Lv.5 传奇" };
 
 export default function AdminUsersPage() {
   const [data, setData] = useState<AdminData | null>(null);

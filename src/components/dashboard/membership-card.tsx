@@ -1,6 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Star, Award, ArrowUpRight, Loader2, Crown } from "lucide-react";
+import { Star, Award, ArrowUpRight, Loader2, Crown, TrendingUp } from "lucide-react";
+import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
+
+interface GrowthLog {
+  id: string;
+  type: string;
+  value: number;
+  reason: string | null;
+  createdAt: string;
+}
 
 interface MembershipData {
   growthValue: number;
@@ -13,12 +22,21 @@ interface MembershipData {
 export default function MembershipCard() {
   const [data, setData] = useState<MembershipData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [growthLogs, setGrowthLogs] = useState<GrowthLog[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
 
   useEffect(() => {
     fetch("/api/me/membership")
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d?.success) setData(d.data); })
       .finally(() => setLoading(false));
+
+    // Fetch recent growth logs
+    setLogsLoading(true);
+    fetch("/api/me/growth-logs")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.success) setGrowthLogs(d.logs || []); })
+      .finally(() => setLogsLoading(false));
   }, []);
 
   if (loading) return <div className="animate-pulse bg-white rounded-xl border p-4 h-32" />;
@@ -72,6 +90,38 @@ export default function MembershipCard() {
           <p>继续签到、点评、收藏可获得勋章</p>
         </div>
       )}
+
+      {/* 最近成长记录 */}
+      <div className="mt-4 pt-4 border-t border-amber-200/50">
+        <div className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
+          <TrendingUp className="w-3 h-3" /> 最近成长记录
+        </div>
+        {logsLoading ? (
+          <div className="animate-pulse space-y-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-8 bg-white rounded-lg border" />
+            ))}
+          </div>
+        ) : growthLogs.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-2">暂无成长记录，快去签到吧</p>
+        ) : (
+          <div className="space-y-1.5">
+            {growthLogs.map(log => (
+              <div key={log.id} className="flex items-center justify-between py-1.5 px-2 bg-white rounded-lg border text-xs">
+                <span className="text-gray-700">{GROWTH_TYPE_LABELS[log.type] || log.type}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">
+                    {new Date(log.createdAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" })}
+                  </span>
+                  <span className={`font-semibold ${log.value >= 0 ? "text-green-600" : "text-red-600"}`}>
+                    {log.value >= 0 ? "+" : ""}{log.value}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

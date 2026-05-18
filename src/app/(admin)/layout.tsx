@@ -34,6 +34,7 @@ const navItems = [
   { href: "/admin/settings", label: "系统设置", icon: Settings },
   { href: "/admin/tool-reviews", label: "短评审核", icon: MessageSquare },
   { href: "/admin/forum", label: "论坛管理", icon: MessageCircle },
+  { href: "/admin/growth-logs", label: "成长日志", icon: TrendingUp },
 ];
 
 export default async function AdminLayout({
