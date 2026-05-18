@@ -23,7 +23,7 @@ export default async function NotificationsAdminPage(props: {
   if (!session?.user) redirect("/login");
 
   const adminError = await requireAdmin();
-  if (adminError) redirect("/dashboard");
+  if ("error" in adminError) redirect("/dashboard");
 
   const sp = await props.searchParams;
   const page = Math.max(1, parseInt(sp.page || "1", 10));

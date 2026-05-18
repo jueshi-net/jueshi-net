@@ -35,7 +35,7 @@ const NAV_LINKS = [
   { href: "/guides", label: "指南", icon: BookOpen },
   { href: "/resources", label: "资源", icon: Library },
   { href: "/topics", label: "专题", icon: Target },
-  { href: "/bbs", label: "社区", icon: MessageSquare },
+  { href: "/bbs", label: "论坛", icon: MessageSquare },
   { href: "/pricing", label: "会员", icon: Gem },
 ];
 
@@ -261,7 +261,7 @@ export default function Header() {
 
           {/* Community Forum */}
           <div className="px-4 mb-6">
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">社区</div>
+            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">论坛</div>
             <div className="space-y-0.5">
               <Link
                 href="/bbs"
@@ -269,7 +269,7 @@ export default function Header() {
                 className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
               >
                 <MessageSquare className="w-5 h-5 text-violet-400" />
-                <span className="font-medium">社区论坛</span>
+                <span className="font-medium">论坛</span>
               </Link>
             </div>
           </div>
