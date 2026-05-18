@@ -3,6 +3,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { createNotification } from "@/lib/notifications";
 import { grantPostReward, grantCommentReward } from "@/lib/forum-rewards";
 
 export async function updatePostStatus(postId: string, newStatus: string) {
@@ -18,14 +19,35 @@ export async function updatePostStatus(postId: string, newStatus: string) {
       data: { status: newStatus },
     });
 
-    // 如果审核通过（pending → published），发放成长值奖励
+    // 如果审核通过（pending → published），发放成长值奖励 + 通知
     if (newStatus === "published" && existing.status === "pending") {
       const postWithUser = await prisma.forumPost.findUnique({
         where: { id: postId },
-        select: { rewardGrantedAt: true, userId: true },
+        select: { rewardGrantedAt: true, userId: true, slug: true, title: true },
       });
       if (postWithUser && !postWithUser.rewardGrantedAt) {
         await grantPostReward(postId, postWithUser.userId);
+        createNotification({
+          userId: postWithUser.userId,
+          type: "forum_post_approved",
+          title: "帖子审核通过 ✓",
+          message: `你的帖子「${postWithUser.title}」已通过审核，现在可以在论坛查看。`,
+          link: `/bbs/${postWithUser.slug}`,
+        });
+      }
+    } else if (newStatus === "rejected" && existing.status === "pending") {
+      const postWithUser = await prisma.forumPost.findUnique({
+        where: { id: postId },
+        select: { userId: true, title: true },
+      });
+      if (postWithUser) {
+        createNotification({
+          userId: postWithUser.userId,
+          type: "forum_post_rejected",
+          title: "帖子审核未通过",
+          message: `你的帖子「${postWithUser.title}」未通过审核。请检查内容是否符合社区规范后重新提交。`,
+          link: "/bbs",
+        });
       }
     }
 
@@ -103,14 +125,26 @@ export async function updateCommentStatus(commentId: string, newStatus: string) 
       });
     }
 
-    // 如果审核通过（pending → published），发放成长值奖励
+    // 如果审核通过（pending → published），发放成长值奖励 + 通知
     if (newStatus === "published" && existing.status === "pending") {
       const commentWithUser = await prisma.forumComment.findUnique({
         where: { id: commentId },
-        select: { rewardGrantedAt: true, userId: true },
+        select: { rewardGrantedAt: true, userId: true, postId: true },
       });
       if (commentWithUser && !commentWithUser.rewardGrantedAt) {
         await grantCommentReward(commentId, commentWithUser.userId);
+        // Find post slug for link
+        const post = await prisma.forumPost.findUnique({
+          where: { id: commentWithUser.postId },
+          select: { slug: true },
+        });
+        createNotification({
+          userId: commentWithUser.userId,
+          type: "forum_comment_approved",
+          title: "评论审核通过 ✓",
+          message: "你的评论已通过审核，现在可以在帖子中查看。",
+          link: post ? `/bbs/${post.slug}` : "/bbs",
+        });
       }
     }
 

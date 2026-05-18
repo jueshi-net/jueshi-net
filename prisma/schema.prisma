@@ -297,11 +297,14 @@ model Notification {
   type      String   @default("info")
   link      String?
   isRead    Boolean  @default(false)
+  readAt    DateTime? @map("read_at")
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([isRead])
+  @@index([userId, isRead])
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type])
   @@map("notifications")
 }
 

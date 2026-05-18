@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addGrowthValue } from "@/lib/growth-helpers";
 import { requireAdmin } from "@/lib/auth/permissions";
+import { createNotification } from "@/lib/notifications";
 
 const VALID_STATUSES = ["approved", "rejected", "hidden"];
 
@@ -77,6 +78,25 @@ export async function PATCH(
           });
         }
       }
+    }
+
+    // Fire-and-forget notification based on status
+    if (status === "approved") {
+      createNotification({
+        userId: existing.userId,
+        type: "review_approved",
+        title: "点评审核通过 ✓",
+        message: "你的工具点评已通过审核，帮助了其他用户做出选择。",
+        link: "/tools",
+      });
+    } else if (status === "rejected") {
+      createNotification({
+        userId: existing.userId,
+        type: "review_rejected",
+        title: "点评审核未通过",
+        message: "你的点评未通过审核。你可以修改后重新提交，或继续体验其他工具。",
+        link: "/tools",
+      });
     }
 
     return NextResponse.json({ review: { id: review.id, status: review.status } });

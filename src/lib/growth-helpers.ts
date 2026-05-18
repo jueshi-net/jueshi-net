@@ -1,5 +1,6 @@
 // Shared growth/level helper — used by checkin, forum rewards, admin tools
 import { prisma } from "@/lib/prisma";
+import { createGrowthNotification, createLevelUpNotification } from "@/lib/notifications";
 
 /**
  * Calculate user level key based on growth value
@@ -33,12 +34,13 @@ export async function addGrowthValue(
 ): Promise<{ newGrowth: number; newLevel: string }> {
   const client = tx || prisma;
 
-  // Get current growth value
+  // Get current growth value and level
   const user = await client.user.findUnique({
     where: { id: userId },
-    select: { growthValue: true },
+    select: { growthValue: true, levelKey: true },
   });
 
+  const oldLevel = user?.levelKey || "lv1";
   const newGrowth = (user?.growthValue || 0) + value;
   const newLevel = await calculateLevelKey(newGrowth, client);
 
@@ -62,6 +64,12 @@ export async function addGrowthValue(
       refId: refId || null,
     },
   });
+
+  // Fire-and-forget notifications — never block main flow
+  createGrowthNotification(userId, type, value);
+  if (newLevel !== oldLevel) {
+    createLevelUpNotification(userId, newLevel);
+  }
 
   return { newGrowth, newLevel };
 }

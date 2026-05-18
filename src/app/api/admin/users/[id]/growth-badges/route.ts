@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma";
+import { createBadgeNotification } from "@/lib/notifications";
 
 async function recalculateLevel(growthValue: number): Promise<string> {
   const levels = await prisma.userLevel.findMany({
@@ -44,9 +45,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       where: { userId_badgeId: { userId: id, badgeId: body.badgeId } },
     });
     if (existing) return NextResponse.json({ success: false, error: "已授予过该勋章" }, { status: 409 });
+    const badge = await prisma.userBadge.findUnique({ where: { id: body.badgeId }, select: { name: true } });
     const award = await prisma.userBadgeAward.create({
       data: { userId: id, badgeId: body.badgeId, reason: body.reason || "后台手动授予" },
     });
+    // Fire-and-forget notification
+    if (badge) createBadgeNotification(id, badge.name);
     return NextResponse.json({ success: true, data: award }, { status: 201 });
   }
 

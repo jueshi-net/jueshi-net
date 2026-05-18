@@ -14,6 +14,7 @@ import MyLinks from "@/components/dashboard/my-links";
 import RecommendedPackages from "@/components/dashboard/recommended-packages";
 import MembershipCard from "@/components/dashboard/membership-card";
 import GrowthTaskSummary from "@/components/dashboard/growth-task-summary";
+import NotificationSummaryCard from "@/components/dashboard/notification-summary-card";
 
 // ===== ALL EXISTING LOGIC PRESERVED =====
 
@@ -518,6 +519,7 @@ export default function DashboardPage() {
 
         {/* ===== GROWTH TASK SUMMARY ===== */}
         {!loginRequired && <GrowthTaskSummary />}
+        {!loginRequired && <NotificationSummaryCard />}
 
         {/* ===== WORKBENCH SECTION ===== */}
         {!loginRequired && workbenchData && (
