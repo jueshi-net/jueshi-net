@@ -39,6 +39,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "内容最多 500 字" }, { status: 400 });
   }
 
+  // Validate linkUrl: must be empty, relative path, or https://jueshi.net/*
+  if (link && !link.startsWith("/") && !link.startsWith("https://jueshi.net/")) {
+    return NextResponse.json(
+      { error: "链接必须是站内路径或 https://jueshi.net/..." },
+      { status: 400 }
+    );
+  }
+
   const result = await broadcastNotification(type, title, message, link || null);
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: 500 });
