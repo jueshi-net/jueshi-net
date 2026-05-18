@@ -35,6 +35,7 @@ const NAV_LINKS = [
   { href: "/guides", label: "指南", icon: BookOpen },
   { href: "/resources", label: "资源", icon: Library },
   { href: "/topics", label: "专题", icon: Target },
+  { href: "/bbs", label: "社区", icon: MessageSquare },
   { href: "/pricing", label: "会员", icon: Gem },
 ];
 
@@ -63,7 +64,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm overflow-x-hidden">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Left: Logo */}
@@ -78,7 +79,7 @@ export default function Header() {
           </Link>
 
           {/* Center: Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
+          <nav className="hidden lg:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
               return (
@@ -100,7 +101,7 @@ export default function Header() {
             {status === "authenticated" && <NotificationBell />}
 
             {/* Desktop: User or Login */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               {status === "authenticated" && session.user ? (
                 <div className="relative">
                   <button
@@ -125,6 +126,22 @@ export default function Header() {
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           我的工作台
+                        </Link>
+                        <Link
+                          href="/dashboard/tasks"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Target className="w-4 h-4 text-teal-500" />
+                          成长任务
+                        </Link>
+                        <Link
+                          href="/dashboard/notifications"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <Bell className="w-4 h-4 text-amber-500" />
+                          通知中心
                         </Link>
                         <Link
                           href="/favorites"
@@ -186,7 +203,7 @@ export default function Header() {
             {/* Mobile: Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="菜单"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -199,11 +216,11 @@ export default function Header() {
       {mobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            className="fixed inset-0 bg-black/40 z-40 lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
           <div
-            className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl z-50 md:hidden"
+            className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl z-50 lg:hidden"
           >
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2">
@@ -295,6 +312,14 @@ export default function Header() {
                   >
                     <LayoutDashboard className="w-5 h-5 text-gray-400" />
                     <span className="font-medium">我的工作台</span>
+                  </Link>
+                  <Link
+                    href="/dashboard/tasks"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <Target className="w-5 h-5 text-teal-400" />
+                    <span className="font-medium">成长任务</span>
                   </Link>
                   <Link
                     href="/dashboard/notifications"
