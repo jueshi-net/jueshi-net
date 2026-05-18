@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare, AlertCircle, MessageCircle } from "lucide-react";
+import { Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud, BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight, BookOpen, Eye, MessageSquare, AlertCircle, MessageCircle, Bell } from "lucide-react";
 import type { AdminStatsData } from "@/lib/admin-stats";
 
 interface QuickAction {
@@ -48,6 +48,7 @@ const modules: ModuleCard[] = [
   { name: "审计日志", path: "/admin/audit", icon: Shield, status: "online", statusLabel: "已上线", description: "操作审计与安全日志", frontendPath: "无", color: "red" },
   { name: "系统健康", path: "/admin/health", icon: Eye, status: "online", statusLabel: "已上线", description: "系统健康检查", frontendPath: "无", color: "lime" },
   { name: "专题管理", path: "/admin/topics", icon: FileText, status: "online", statusLabel: "已上线", description: "管理专题内容、APP 条目、YouTube 视频。数据来源: topics, topic_items, topic_sections", frontendPath: "/topics", color: "purple" },
+  { name: "通知管理", path: "/admin/notifications", icon: Bell, status: "online", statusLabel: "已上线", description: "查看通知记录、发送通知给用户、群发系统通知", frontendPath: "/dashboard/notifications", color: "blue" },
 ];
 
 const statusColors: Record<string, string> = {

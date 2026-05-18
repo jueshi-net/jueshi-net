@@ -159,3 +159,151 @@ export async function markAllAsRead(userId: string): Promise<number> {
     return 0;
   }
 }
+
+/**
+ * Admin: list notifications with filters (for /admin/notifications)
+ */
+export interface AdminNotificationFilters {
+  page?: number;
+  pageSize?: number;
+  email?: string;
+  type?: string;
+  unreadOnly?: boolean;
+}
+
+export interface AdminNotificationListResult {
+  items: Array<{
+    id: string;
+    userId: string;
+    userEmail: string;
+    userNickname: string | null;
+    title: string;
+    message: string;
+    type: string;
+    isRead: boolean;
+    readAt: string | null;
+    link: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export async function listAdminNotifications(
+  filters: AdminNotificationFilters = {}
+): Promise<AdminNotificationListResult> {
+  const page = Math.max(1, filters.page || 1);
+  const pageSize = Math.min(100, Math.max(1, filters.pageSize || 20));
+
+  const where: Record<string, unknown> = {};
+  if (filters.email) {
+    where.user = { email: { contains: filters.email, mode: "insensitive" } };
+  }
+  if (filters.type) {
+    where.type = filters.type;
+  }
+  if (filters.unreadOnly) {
+    where.isRead = false;
+  }
+
+  const [notifications, total] = await Promise.all([
+    prisma.notification.findMany({
+      where,
+      include: { user: { select: { email: true, name: true } } },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.notification.count({ where }),
+  ]);
+
+  return {
+    items: notifications.map((n) => ({
+      id: n.id,
+      userId: n.userId,
+      userEmail: n.user.email,
+      userNickname: n.user.name,
+      title: n.title,
+      message: n.message,
+      type: n.type,
+      isRead: n.isRead,
+      readAt: n.readAt?.toISOString() || null,
+      link: n.link,
+      createdAt: n.createdAt.toISOString(),
+      updatedAt: n.createdAt.toISOString(),
+    })),
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+}
+
+/**
+ * Admin: send notification to a user by email
+ */
+export async function sendNotificationByEmail(
+  email: string,
+  type: string,
+  title: string,
+  message: string,
+  link?: string | null
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+      select: { id: true, role: true },
+    });
+    if (!user) return { success: false, error: `用户 ${email} 不存在` };
+
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type,
+        title,
+        message,
+        link: link || null,
+        isRead: false,
+      },
+    });
+    return { success: true };
+  } catch (err) {
+    console.error("[notifications] sendNotificationByEmail failed:", err);
+    return { success: false, error: "发送失败" };
+  }
+}
+
+/**
+ * Admin: broadcast notification to all enabled users
+ */
+export async function broadcastNotification(
+  type: string,
+  title: string,
+  message: string,
+  link?: string | null
+): Promise<{ createdCount: number; error?: string }> {
+  try {
+    const allUsers = await prisma.user.findMany({
+      select: { id: true },
+    });
+    if (allUsers.length === 0) return { createdCount: 0 };
+
+    await prisma.notification.createMany({
+      data: allUsers.map((u) => ({
+        userId: u.id,
+        type,
+        title,
+        message,
+        link: link || null,
+        isRead: false,
+      })),
+    });
+    return { createdCount: allUsers.length };
+  } catch (err) {
+    console.error("[notifications] broadcastNotification failed:", err);
+    return { createdCount: 0, error: "群发失败" };
+  }
+}

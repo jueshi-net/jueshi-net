@@ -35,6 +35,7 @@ const navItems = [
   { href: "/admin/tool-reviews", label: "短评审核", icon: MessageSquare },
   { href: "/admin/forum", label: "论坛管理", icon: MessageCircle },
   { href: "/admin/growth-logs", label: "成长日志", icon: TrendingUp },
+  { href: "/admin/notifications", label: "通知管理", icon: Bell },
 ];
 
 export default async function AdminLayout({
