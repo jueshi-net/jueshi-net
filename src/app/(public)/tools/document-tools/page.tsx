@@ -56,6 +56,14 @@ export default function DocumentToolsPage() {
         </div>
       </div>
 
+      {/* Draft Reminder */}
+      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700 flex items-center gap-2">
+          <FileText className="w-4 h-4 shrink-0" />
+          已保存的草稿可在 <Link href="/dashboard/documents" className="font-semibold underline">我的工作台 → 我的单据</Link> 中继续编辑
+        </div>
+      </div>
+
       {/* Tool Cards */}
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save, Printer, Tag, Plus, Trash2, FileText, Loader2, Eye, Code, Building2 } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import { useDraftLoader } from "@/lib/use-draft-loader";
 
 interface LabelItem {
   id: string;
@@ -15,7 +16,7 @@ interface LabelItem {
   weight: string;
 }
 
-export default function ShippingLabelClient() {
+export default function ShippingLabelClient({ draftId }: { draftId: string | null }) {
   const [companyName, setCompanyName] = useState("");
   const [paperSize, setPaperSize] = useState("100x150");
   const [printCopies, setPrintCopies] = useState(1);
@@ -27,6 +28,23 @@ export default function ShippingLabelClient() {
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Load draft from URL param
+  const loadDraftData = useCallback((dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      if (d.companyName) setCompanyName(d.companyName);
+      if (d.paperSize) setPaperSize(d.paperSize);
+      if (d.printCopies) setPrintCopies(d.printCopies);
+      if (d.labelItems) setLabelItems(d.labelItems);
+    } catch { /* ignore */ }
+  }, []);
+
+  const { loadingDraft, draftError, draftLoaded } = useDraftLoader(() => draftId, loadDraftData);
+
+  useEffect(() => {
+    if (draftLoaded && draftId) setCurrentDocId(draftId);
+  }, [draftLoaded, draftId]);
 
   // Auto-fill company info from selected profile
   const handleProfileSelect = useCallback((profile: CompanyProfile) => {
@@ -145,6 +163,20 @@ export default function ShippingLabelClient() {
           </div>
         </div>
       </header>
+
+      {loadingDraft && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
+          </div>
+        </div>
+      )}
+
+      {draftError && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm text-red-700">{draftError}</div>
+        </div>
+      )}
 
       {saved && (
         <div className="max-w-7xl mx-auto px-4 mt-3">

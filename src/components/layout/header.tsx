@@ -22,6 +22,7 @@ import {
   Target,
   MessageSquare,
   Bell,
+  FileText,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
@@ -150,6 +151,14 @@ export default function Header() {
                         >
                           <Sparkles className="w-4 h-4 text-amber-500" />
                           我的收藏
+                        </Link>
+                        <Link
+                          href="/dashboard/documents"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
+                          onClick={() => setShowUserMenu(false)}
+                        >
+                          <FileText className="w-4 h-4 text-blue-500" />
+                          我的单据
                         </Link>
                         <Link
                           href="/dashboard/points"
@@ -344,6 +353,14 @@ export default function Header() {
                   >
                     <Sparkles className="w-5 h-5 text-gray-400" />
                     <span className="font-medium">我的收藏</span>
+                  </Link>
+                  <Link
+                    href="/dashboard/documents"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  >
+                    <FileText className="w-5 h-5 text-blue-400" />
+                    <span className="font-medium">我的单据</span>
                   </Link>
                   <Link
                     href="/settings"

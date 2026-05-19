@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, Printer, Building2, Plus, Trash2, FileText, Loader2, Eye, Code } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import { useDraftLoader } from "@/lib/use-draft-loader";
 
 interface LineItem {
   id: string;
@@ -14,7 +15,7 @@ interface LineItem {
   currency: string;
 }
 
-export default function CommercialInvoiceClient() {
+export default function CommercialInvoiceClient({ draftId }: { draftId: string | null }) {
   const [companyName, setCompanyName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [clientName, setClientName] = useState("");
@@ -34,8 +35,35 @@ export default function CommercialInvoiceClient() {
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Load from URL params or localStorage
+  // Load draft from URL param
+  const loadDraftData = useCallback((dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      if (d.companyName) setCompanyName(d.companyName);
+      if (d.companyAddress) setCompanyAddress(d.companyAddress);
+      if (d.clientName) setClientName(d.clientName);
+      if (d.clientAddress) setClientAddress(d.clientAddress);
+      if (d.invoiceNo) setInvoiceNo(d.invoiceNo);
+      if (d.invoiceDate) setInvoiceDate(d.invoiceDate);
+      if (d.lineItems) setLineItems(d.lineItems);
+      if (d.freight) setFreight(d.freight);
+      if (d.insurance) setInsurance(d.insurance);
+      if (d.terms) setTerms(d.terms);
+      if (d.notes) setNotes(d.notes);
+      if (d._docId) setCurrentDocId(d._docId);
+    } catch { /* ignore */ }
+  }, []);
+
+  const { loadingDraft, draftError, draftLoaded } = useDraftLoader(() => draftId, loadDraftData);
+
+  // Set currentDocId after draft loads
   useEffect(() => {
+    if (draftLoaded && draftId) setCurrentDocId(draftId);
+  }, [draftLoaded, draftId]);
+
+  // Load from localStorage (only if no draftId)
+  useEffect(() => {
+    if (draftId) return; // skip localStorage if loading from draft
     const saved = localStorage.getItem("invoice-draft");
     if (saved) {
       try {
@@ -113,7 +141,7 @@ export default function CommercialInvoiceClient() {
     try {
       const d = JSON.parse(dataJson);
       if (d.companyName) setCompanyName(d.companyName);
-      if (d.companyAddress) setCompanyAddress(d.clientAddress);
+      if (d.companyAddress) setCompanyAddress(d.companyAddress);
       if (d.clientName) setClientName(d.clientName);
       if (d.clientAddress) setClientAddress(d.clientAddress);
       if (d.invoiceNo) setInvoiceNo(d.invoiceNo);
@@ -182,6 +210,20 @@ export default function CommercialInvoiceClient() {
           </div>
         </div>
       </header>
+
+      {loadingDraft && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
+          </div>
+        </div>
+      )}
+
+      {draftError && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm text-red-700">{draftError}</div>
+        </div>
+      )}
 
       {saved && saveMsg && (
         <div className="max-w-7xl mx-auto px-4 mt-3">

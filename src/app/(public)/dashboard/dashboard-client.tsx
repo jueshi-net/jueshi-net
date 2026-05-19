@@ -100,6 +100,10 @@ export default function DashboardPage() {
     limits: { maxLinks: number };
   } | null>(null);
 
+  // Recent drafts
+  const [recentDrafts, setRecentDrafts] = useState<any[]>([]);
+  const [totalDrafts, setTotalDrafts] = useState(0);
+
   // Fetch dashboard data
   const fetchDashboard = useCallback(async () => {
     try {
@@ -185,6 +189,20 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Fetch recent drafts
+  const fetchRecentDrafts = useCallback(async () => {
+    try {
+      const res = await fetch("/api/me/tool-documents");
+      if (res.ok) {
+        const data = await res.json();
+        setRecentDrafts((data.data || []).slice(0, 3));
+        setTotalDrafts((data.data || []).length);
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
   // Redeem
   const handleRedeem = useCallback(async (rewardItemId: string, name: string, cost: number) => {
     if (userPoints < cost) {
@@ -239,9 +257,10 @@ export default function DashboardPage() {
       fetchRewards();
       fetchMyRewards();
       fetchWorkbench();
+      fetchRecentDrafts();
       recordDashboardVisit();
     }
-  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench, recordDashboardVisit]);
+  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench, fetchRecentDrafts, recordDashboardVisit]);
 
   // Check-in handler
   const handleCheckIn = useCallback(async () => {
@@ -513,6 +532,36 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+
+        {/* ===== MY DRAFTS PREVIEW ===== */}
+        {totalDrafts > 0 && (
+          <div className="bg-white rounded-xl border shadow-sm mb-6">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-teal-600" />
+                我的单据草稿
+              </h2>
+              <Link href="/dashboard/documents" className="text-sm text-teal-600 hover:text-teal-700 font-medium min-h-[44px] inline-flex items-center px-2">
+                查看全部 ({totalDrafts}) <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </Link>
+            </div>
+            <div className="p-5">
+              <div className="space-y-2">
+                {recentDrafts.map((draft) => (
+                  <div key={draft.id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 truncate">{draft.title}</p>
+                      <p className="text-xs text-gray-400">{draft.toolKey} · {new Date(draft.updatedAt).toLocaleDateString("zh-CN")}</p>
+                    </div>
+                    <Link href={`/tools/${draft.toolKey.replace(/_/g, "-")}?draftId=${draft.id}`} className="text-sm text-teal-600 hover:text-teal-700 font-medium ml-3 shrink-0 min-h-[44px] flex items-center">
+                      打开 <ArrowRight className="w-3 h-3 ml-0.5" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ===== MEMBERSHIP / LEVEL & BADGES ===== */}
         {!loginRequired && <MembershipCard />}

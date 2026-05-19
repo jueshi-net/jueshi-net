@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Save, Printer, FileText, Plus, Trash2, Loader2, Building2, Eye, Code } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import { useDraftLoader } from "@/lib/use-draft-loader";
 
 interface CargoLine {
   id: string;
@@ -14,6 +16,8 @@ interface CargoLine {
 }
 
 export default function InboundReceiptPage() {
+  const searchParams = useSearchParams();
+  const draftId = searchParams?.get("draftId");
   const [companyName, setCompanyName] = useState("");
   const [companyPhone, setCompanyPhone] = useState("");
   const [companyEmail, setCompanyEmail] = useState("");
@@ -35,6 +39,33 @@ export default function InboundReceiptPage() {
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Load draft from URL param
+  const loadDraftData = useCallback((dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      if (d.companyName) setCompanyName(d.companyName);
+      if (d.companyPhone) setCompanyPhone(d.companyPhone);
+      if (d.companyEmail) setCompanyEmail(d.companyEmail);
+      if (d.companyAddress) setCompanyAddress(d.companyAddress);
+      if (d.receiptNo) setReceiptNo(d.receiptNo);
+      if (d.date) setDate(d.date);
+      if (d.customerName) setCustomerName(d.customerName);
+      if (d.warehouseName) setWarehouseName(d.warehouseName);
+      if (d.trackingNo) setTrackingNo(d.trackingNo);
+      if (d.packages) setPackages(d.packages);
+      if (d.weight) setWeight(d.weight);
+      if (d.volume) setVolume(d.volume);
+      if (d.items) setItems(d.items);
+      if (d.notes) setNotes(d.notes);
+    } catch { /* ignore */ }
+  }, []);
+
+  const { loadingDraft, draftError, draftLoaded } = useDraftLoader(() => draftId, loadDraftData);
+
+  useEffect(() => {
+    if (draftLoaded && draftId) setCurrentDocId(draftId);
+  }, [draftLoaded, draftId]);
 
   const handleProfileSelect = useCallback((profile: CompanyProfile) => {
     setSelectedProfile(profile);
@@ -132,6 +163,20 @@ export default function InboundReceiptPage() {
       </header>
 
       {saved && <div className="max-w-7xl mx-auto px-4 mt-3">{saveMsg && <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">{saveMsg}</div>}</div>}
+
+      {loadingDraft && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
+          </div>
+        </div>
+      )}
+
+      {draftError && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm text-red-700">{draftError}</div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 py-6 overflow-x-hidden">
         <div className={`grid gap-6 ${showPreview ? "lg:grid-cols-2" : "lg:grid-cols-1"}`}>

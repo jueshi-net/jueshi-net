@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description: "在线生成唛头/物流标签，支持纸张尺寸、公司名、单号、渠道、品名、打印数量、分页打印。",
 };
 
-export default function ShippingLabelPage() {
-  return <ShippingLabelClient />;
+export default async function ShippingLabelPage({ searchParams }: { searchParams: Promise<{ draftId?: string }> }) {
+  const params = await searchParams;
+  return <ShippingLabelClient draftId={params.draftId || null} />;
 }

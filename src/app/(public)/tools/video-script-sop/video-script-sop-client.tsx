@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, Printer, Building2, FileText, Loader2, Eye, Video, Download } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import { useDraftLoader } from "@/lib/use-draft-loader";
 
 const PLATFORMS = ["小红书", "TikTok", "Facebook", "Instagram", "YouTube Shorts", "其他"] as const;
 const VIDEO_TYPES = ["物流科普", "产品介绍", "客户案例", "仓库实拍", "报价解释", "避坑提醒", "教程类", "其他"] as const;
@@ -59,7 +60,7 @@ const emptyForm: FormData = {
   publishChecklist: "",
 };
 
-export default function VideoScriptSopClient() {
+export default function VideoScriptSopClient({ draftId }: { draftId: string | null }) {
   const [form, setForm] = useState<FormData>({ ...emptyForm });
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const [saving, setSaving] = useState(false);
@@ -69,8 +70,23 @@ export default function VideoScriptSopClient() {
   const [showPreview, setShowPreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Load draft from localStorage on mount
+  // Load draft from URL param
+  const loadDraftData = useCallback((dataJson: string) => {
+    try {
+      const d = JSON.parse(dataJson);
+      setForm((prev) => ({ ...prev, ...d }));
+    } catch { /* ignore */ }
+  }, []);
+
+  const { loadingDraft, draftError, draftLoaded } = useDraftLoader(() => draftId, loadDraftData);
+
   useEffect(() => {
+    if (draftLoaded && draftId) setCurrentDocId(draftId);
+  }, [draftLoaded, draftId]);
+
+  // Load draft from localStorage on mount (only if no draftId)
+  useEffect(() => {
+    if (draftId) return;
     try {
       const saved = localStorage.getItem("video-script-sop-draft");
       if (saved) {
@@ -390,6 +406,14 @@ export default function VideoScriptSopClient() {
                   <Download className="w-4 h-4 rotate-180" /> 清空
                 </button>
               </div>
+              {loadingDraft && (
+                <div className="text-sm px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
+                </div>
+              )}
+              {draftError && (
+                <div className="text-sm px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">{draftError}</div>
+              )}
               {saveMsg && (
                 <div className={`text-sm px-3 py-2 rounded-lg ${saved ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
                   {saveMsg}
