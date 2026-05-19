@@ -44,6 +44,7 @@ export default function ToolHistoryPanel({ documentId, toolKey, onRestore }: Too
   }, [open, documentId]);
 
   const handleRestore = async (entry: HistoryEntry) => {
+    if (!confirm("确定要恢复到此历史版本吗？当前未保存的修改将被覆盖。")) return;
     setRestoring(entry.id);
     setError("");
     try {

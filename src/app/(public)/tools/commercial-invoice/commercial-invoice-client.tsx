@@ -29,6 +29,7 @@ export default function CommercialInvoiceClient() {
   const [showPreview, setShowPreview] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,8 @@ export default function CommercialInvoiceClient() {
       });
       if (res.ok) {
         setSaved(true);
+        setSaveMsg(currentDocId ? "已更新草稿" : "已保存草稿");
+        setTimeout(() => setSaved(false), 3000);
         const d = await res.json();
         if (d.data?.id && !currentDocId) setCurrentDocId(d.data.id);
       } else {
@@ -120,6 +123,12 @@ export default function CommercialInvoiceClient() {
       if (d.terms) setTerms(d.terms);
       if (d.notes) setNotes(d.notes);
     } catch { /* ignore */ }
+  };
+
+  const handleReset = () => {
+    if (confirm("确定要清空所有内容吗？")) {
+      setCompanyName(""); setCompanyAddress(""); setClientName(""); setClientAddress(""); setInvoiceNo(""); setInvoiceDate(new Date().toISOString().split("T")[0]); setLineItems([{ id: "1", description: "", quantity: 1, unitPrice: 0, currency: "USD" }]); setFreight(0); setInsurance(0); setTerms("T/T"); setNotes(""); setCurrentDocId(null); setSelectedProfile(null); setSaved(false); setSaveMsg("");
+    }
   };
 
   const handlePrint = () => {
@@ -164,8 +173,9 @@ export default function CommercialInvoiceClient() {
               {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
             </button>
             <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 min-h-[44px]">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存草稿
             </button>
+            <button onClick={handleReset} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">🗑️ 清空</button>
             <button onClick={handlePrint} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 min-h-[44px]">
               <Printer className="w-4 h-4" /> 打印/PDF
             </button>
@@ -173,11 +183,9 @@ export default function CommercialInvoiceClient() {
         </div>
       </header>
 
-      {saved && (
+      {saved && saveMsg && (
         <div className="max-w-7xl mx-auto px-4 mt-3">
-          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">
-            ✅ 已保存
-          </div>
+          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2 text-sm text-green-700">{saveMsg}</div>
         </div>
       )}
 
