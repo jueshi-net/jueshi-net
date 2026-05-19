@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await req.json();
-  const { role, pointsAdjust, pointsAdjustReason } = body;
+  const { role, pointsAdjust, pointsAdjustReason, memberUntil } = body;
 
   try {
     const result = await prisma.$transaction(async (tx) => {
@@ -26,6 +26,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         updates.role = role;
         if (role !== "member") {
           updates.memberUntil = null;
+        }
+      }
+
+      // memberUntil adjustment: set, extend, or clear
+      if (memberUntil !== undefined) {
+        if (memberUntil === null || memberUntil === "") {
+          updates.memberUntil = null;
+        } else {
+          updates.memberUntil = new Date(memberUntil);
         }
       }
 

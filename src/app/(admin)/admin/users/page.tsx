@@ -29,6 +29,7 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editRole, setEditRole] = useState("");
+  const [editMemberUntil, setEditMemberUntil] = useState("");
   const [editPoints, setEditPoints] = useState("");
   const [editReason, setEditReason] = useState("");
   const [toast, setToast] = useState<string | null>(null);
@@ -66,10 +67,28 @@ export default function AdminUsersPage() {
     try {
       const body: Record<string, unknown> = {};
       if (editRole) body.role = editRole;
+      if (editMemberUntil !== undefined) body.memberUntil = editMemberUntil || null;
       if (editPoints) { body.pointsAdjust = parseInt(editPoints, 10); body.pointsAdjustReason = editReason || undefined; }
+
+      // Secondary confirmation for membership changes
+      if (editMemberUntil !== undefined || (editRole && editRole === "member")) {
+        const confirmMsg = editMemberUntil
+          ? `确认调整会员状态？\n${editMemberUntil ? "到期时间：" + editMemberUntil : "取消会员"}\n此操作将影响用户权益。`
+          : "确认修改用户角色？此操作将影响用户权限。";
+        if (!confirm(confirmMsg)) return;
+      }
+
       const res = await fetch(`/api/admin/users/${userId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const result = await res.json();
-      if (res.ok) { setToast("保存成功"); setEditingId(null); fetchData(); }
+      if (res.ok) {
+        const msgs: string[] = [];
+        if (editRole) msgs.push("角色已更新");
+        if (editMemberUntil !== undefined) msgs.push(editMemberUntil ? `会员至 ${editMemberUntil}` : "会员已取消");
+        if (editPoints) msgs.push(`积分调整 ${editPoints}`);
+        setToast(msgs.join("，") || "保存成功");
+        setEditingId(null);
+        fetchData();
+      }
       else { setToast(result.error || "保存失败"); }
     } catch { setToast("保存失败"); }
   };
@@ -200,7 +219,7 @@ export default function AdminUsersPage() {
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} onKeyDown={(e) => e.key === "Enter" && setPage(1)} placeholder="搜索邮箱..." className="w-full pl-9 pr-3 py-2.5 border rounded-lg text-sm min-h-[44px]" />
+        <input type="text" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} onKeyDown={(e) => e.key === "Enter" && setPage(1)} placeholder="搜索邮箱..." className="w-full pl-9 pr-3 py-2.5 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400 min-h-[44px]" />
       </div>
 
       {/* Table */}
@@ -248,7 +267,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
-                        <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditPoints(""); setEditReason(""); }} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]" title="编辑"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditMemberUntil(u.memberUntil ? new Date(u.memberUntil).toISOString().slice(0, 16) : ""); setEditPoints(""); setEditReason(""); }} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]" title="编辑"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => openGrowthModal(u)} className="p-1.5 text-gray-400 hover:text-emerald-600 min-h-[36px]" title="成长值/勋章"><TrendingUp className="w-4 h-4" /></button>
                         <button onClick={() => handleViewRewards(u.id)} className="p-1.5 text-gray-400 hover:text-green-600 min-h-[36px]" title="兑换记录"><Ticket className="w-4 h-4" /></button>
                       </div>
@@ -261,28 +280,33 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Edit Modal (role/points) */}
+      {/* Edit Modal (role/points/membership) */}
       {editingId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setEditingId(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold">编辑用户</h2>
-            <div><label className="text-sm text-gray-600">角色</label><select value={editRole} onChange={(e) => setEditRole(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"><option value="user">用户</option><option value="member">会员</option><option value="admin">管理员</option></select></div>
+          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-4 text-gray-900" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-gray-900">编辑用户</h2>
+            <div><label className="text-sm text-gray-700">角色</label><select value={editRole} onChange={(e) => setEditRole(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white"><option value="user">用户</option><option value="member">会员</option><option value="admin">管理员</option></select></div>
             <div>
-              <label className="text-sm text-gray-600">积分调整（正数=加，负数=减）</label>
-              <input type="number" value={editPoints} onChange={(e) => setEditPoints(e.target.value)} placeholder="如：+50 或 -20" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+              <label className="text-sm text-gray-700">会员到期时间（留空=非会员）</label>
+              <input type="datetime-local" value={editMemberUntil} onChange={(e) => setEditMemberUntil(e.target.value)} className="w-full mt-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white" />
+              <p className="text-xs text-gray-400 mt-1">设为未来时间=授予会员，清空=取消会员</p>
+            </div>
+            <div>
+              <label className="text-sm text-gray-700">积分调整（正数=加，负数=减）</label>
+              <input type="number" value={editPoints} onChange={(e) => setEditPoints(e.target.value)} placeholder="如：+50 或 -20" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400" />
             </div>
             {editPoints && (
               <div>
-                <label className="text-sm text-gray-600">调整原因</label>
-                <input type="text" value={editReason} onChange={(e) => setEditReason(e.target.value)} placeholder="如：补偿、奖励、违规扣除" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
+                <label className="text-sm text-gray-700">调整原因</label>
+                <input type="text" value={editReason} onChange={(e) => setEditReason(e.target.value)} placeholder="如：补偿、奖励、违规扣除" className="w-full mt-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400" />
               </div>
             )}
             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-              修改角色或积分将影响用户权限与积分账户
+              修改角色、会员状态或积分将影响用户权限
             </div>
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setEditingId(null)} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50 min-h-[44px]">取消</button>
+              <button onClick={() => setEditingId(null)} className="px-4 py-2 border rounded-lg text-sm text-gray-700 hover:bg-gray-50 min-h-[44px]">取消</button>
               <button onClick={() => handleSave(editingId)} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 min-h-[44px]">保存</button>
             </div>
           </div>
@@ -292,9 +316,9 @@ export default function AdminUsersPage() {
       {/* Growth & Badge Modal */}
       {showGrowth && growthUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowGrowth(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-5 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-5 text-gray-900 max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold flex items-center gap-2"><TrendingUp className="w-5 h-5" /> 成长值与勋章管理</h2>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2"><TrendingUp className="w-5 h-5" /> 成长值与勋章管理</h2>
               <button onClick={() => setShowGrowth(null)} className="p-1 hover:bg-gray-100 rounded"><X className="w-5 h-5" /></button>
             </div>
 
@@ -318,10 +342,10 @@ export default function AdminUsersPage() {
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">📈 调整成长值</h3>
               <div className="flex gap-2">
-                <input type="number" value={growthAdjust} onChange={(e) => setGrowthAdjust(e.target.value)} placeholder="如：+120 或 -50" className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+                <input type="number" value={growthAdjust} onChange={(e) => setGrowthAdjust(e.target.value)} placeholder="如：+120 或 -50" className="flex-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400 min-h-[44px]" />
                 <button onClick={handleGrowthAdjust} disabled={growthSaving || !growthAdjust} className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 disabled:opacity-50 min-h-[44px]">{growthSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "保存"}</button>
               </div>
-              <input type="text" value={growthReason} onChange={(e) => setGrowthReason(e.target.value)} placeholder="调整原因（如：测试成长值调整）" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+              <input type="text" value={growthReason} onChange={(e) => setGrowthReason(e.target.value)} placeholder="调整原因（如：测试成长值调整）" className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400 min-h-[44px]" />
             </div>
 
             {/* Current badges */}
@@ -348,7 +372,7 @@ export default function AdminUsersPage() {
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1">🎖️ 授予勋章</h3>
               <div className="flex gap-2">
-                <select value={badgeId} onChange={(e) => setBadgeId(e.target.value)} className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]">
+                <select value={badgeId} onChange={(e) => setBadgeId(e.target.value)} className="flex-1 px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white min-h-[44px]">
                   <option value="">选择勋章...</option>
                   {allBadges.filter((b: any) => b.isActive).map((b: any) => (
                     <option key={b.id} value={b.id}>{b.iconText} {b.name}</option>
@@ -356,7 +380,7 @@ export default function AdminUsersPage() {
                 </select>
                 <button onClick={handleAwardBadge} disabled={growthSaving || !badgeId} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 disabled:opacity-50 min-h-[44px]">{growthSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : "授予"}</button>
               </div>
-              <input type="text" value={badgeReason} onChange={(e) => setBadgeReason(e.target.value)} placeholder="授予原因" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+              <input type="text" value={badgeReason} onChange={(e) => setBadgeReason(e.target.value)} placeholder="授予原因" className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400 min-h-[44px]" />
             </div>
 
             {/* Growth logs */}
@@ -398,8 +422,8 @@ export default function AdminUsersPage() {
       {/* Rewards Drawer */}
       {showRewards && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowRewards(null)}>
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h2 className="text-lg font-bold">兑换记录</h2>
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg space-y-4 text-gray-900 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold text-gray-900">兑换记录</h2>
             {rewards.length === 0 ? <div className="text-center text-gray-400 py-8">暂无兑换记录</div> : (
               <div className="space-y-2">
                 {rewards.map((r) => (

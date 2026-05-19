@@ -37,6 +37,21 @@ body {
   background: var(--background);
 }
 
+/* Prevent form inputs from inheriting white text on white bg in dark mode */
+input, textarea, select {
+  color: inherit;
+}
+
+/* Ensure inputs inside light-colored containers always have visible text */
+.bg-white input,
+.bg-white textarea,
+.bg-white select,
+.bg-gray-50 input,
+.bg-gray-50 textarea,
+.bg-gray-50 select {
+  color: #111827;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

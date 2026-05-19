@@ -278,7 +278,7 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 text-gray-900">
             <h3 className="text-lg font-bold mb-4">{formId ? "编辑公司资料" : "新建公司资料"}</h3>
             {error && <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-red-700 mb-3">{error}</div>}
             <div className="space-y-3">
@@ -314,19 +314,19 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
                 )}
               </div>
 
-              <div><label className="text-xs text-gray-500">资料名称</label><input value={formName} onChange={e => setFormName(e.target.value)} placeholder="如：西雄供应链默认" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
-              <div><label className="text-xs text-gray-500">公司名称 *</label><input value={formCompany} onChange={e => setFormCompany(e.target.value)} placeholder="必填" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
-              <div><label className="text-xs text-gray-500">英文名</label><input value={formCompanyEn} onChange={e => setFormCompanyEn(e.target.value)} placeholder="Company Name EN" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
+              <div><label className="text-xs text-gray-500">资料名称</label><input value={formName} onChange={e => setFormName(e.target.value)} placeholder="如：西雄供应链默认" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
+              <div><label className="text-xs text-gray-500">公司名称 *</label><input value={formCompany} onChange={e => setFormCompany(e.target.value)} placeholder="必填" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
+              <div><label className="text-xs text-gray-500">英文名</label><input value={formCompanyEn} onChange={e => setFormCompanyEn(e.target.value)} placeholder="Company Name EN" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="text-xs text-gray-500">联系人</label><input value={formContact} onChange={e => setFormContact(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
-                <div><label className="text-xs text-gray-500">电话</label><input value={formPhone} onChange={e => setFormPhone(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
+                <div><label className="text-xs text-gray-500">联系人</label><input value={formContact} onChange={e => setFormContact(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
+                <div><label className="text-xs text-gray-500">电话</label><input value={formPhone} onChange={e => setFormPhone(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
               </div>
-              <div><label className="text-xs text-gray-500">邮箱</label><input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
-              <div><label className="text-xs text-gray-500">地址</label><textarea value={formAddress} onChange={e => setFormAddress(e.target.value)} rows={2} className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
-              <div><label className="text-xs text-gray-500">默认货币</label><select value={formCurrency} onChange={e => setFormCurrency(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]"><option value="USD">USD</option><option value="CNY">CNY</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select></div>
+              <div><label className="text-xs text-gray-500">邮箱</label><input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
+              <div><label className="text-xs text-gray-500">地址</label><textarea value={formAddress} onChange={e => setFormAddress(e.target.value)} rows={2} className="w-full px-3 py-2 border rounded-lg text-sm text-gray-900 bg-white placeholder:text-gray-400" /></div>
+              <div><label className="text-xs text-gray-500">默认货币</label><select value={formCurrency} onChange={e => setFormCurrency(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white"><option value="USD">USD</option><option value="CNY">CNY</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select></div>
             </div>
             <div className="flex gap-3 mt-5">
-              <button onClick={() => setShowForm(false)} className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-lg min-h-[44px]">取消</button>
+              <button onClick={() => setShowForm(false)} className="flex-1 px-4 py-2 text-sm text-gray-700 border border-gray-200 rounded-lg min-h-[44px] hover:bg-gray-50">取消</button>
               <button onClick={handleSaveForm} disabled={saving} className="flex-1 px-4 py-2 text-sm text-white bg-teal-600 rounded-lg min-h-[44px] disabled:opacity-50">{saving ? <Loader2 className="w-4 h-4 animate-spin inline mr-1" /> : null} 保存</button>
             </div>
           </div>
