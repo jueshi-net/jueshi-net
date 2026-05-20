@@ -23,11 +23,30 @@ import {
   MessageSquare,
   Bell,
   FileText,
+  Search,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import ThemeToggle from "@/components/theme-toggle";
 import NotificationBell from "@/components/notification-bell";
+import { useCommandMenu } from "@/components/command-palette";
+
+/** Search trigger button for header */
+function SearchTrigger() {
+  const { setOpen } = useCommandMenu();
+  return (
+    <button
+      onClick={() => setOpen(true)}
+      className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[180px] border border-gray-200 dark:border-gray-700"
+    >
+      <Search className="w-4 h-4" />
+      <span className="flex-1 text-left">搜索…</span>
+      <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-[10px] font-mono text-gray-400">
+        ⌘K
+      </kbd>
+    </button>
+  );
+}
 
 const NAV_LINKS = [
   { href: "/tools", label: "工具", icon: Wrench },
@@ -96,8 +115,10 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Right: Theme + User / Login */}
+          {/* Right: Search + Theme + User / Login */}
           <div className="flex items-center gap-2">
+            {/* Search trigger */}
+            <SearchTrigger />
             <ThemeToggle />
             {status === "authenticated" && <NotificationBell />}
 

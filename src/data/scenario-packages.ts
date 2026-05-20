@@ -1,42 +1,98 @@
-// Scenario package definitions for v1.17
-// Each package groups tools by real-world user scenarios
+import {
+  ShoppingBag,
+  GraduationCap,
+  Sparkles,
+  ShieldCheck,
+  Store,
+} from "lucide-react";
 
-export interface ScenarioTool {
-  /** Tool display name */
-  name: string;
-  /** Tool URL */
-  url: string;
-  /** Task category within the scenario */
-  category: string;
-  /** Which scenario this belongs to */
-  scenario: string;
-  /** Primary target user */
-  targetUsers: string[];
-  /** Pain point this tool solves */
-  painPoint: string;
-  /** Brief description */
+// ===== New SaaS-style scenario packages (for homepage) =====
+
+export interface ScenarioPackage {
+  id: string;
+  title: string;
   description: string;
-  /** Free plan info */
-  freePlan: string;
-  /** Paid plan info */
-  paidPlan: string;
-  /** Domestic access: fast | slow | blocked | unknown */
-  accessCN: "fast" | "slow" | "blocked" | "unknown";
-  /** Overseas access: fast | slow | unknown */
-  accessOverseas: "fast" | "slow" | "unknown";
-  /** Suitable for beginners */
-  beginnerFriendly: boolean;
-  /** Recommended by our team */
-  recommended: boolean;
-  /** Tags for filtering */
+  icon: string; // lucide icon name
+  href: string;
   tags: string[];
-  /** Data source note */
-  sourceNote: "人工整理" | "AI 辅助整理" | "待验证";
-  /** Internal tool key for workbench favorite */
+  toolCount: number;
+}
+
+export const scenarioPackages: ScenarioPackage[] = [
+  {
+    id: "shopify-starter",
+    title: "Shopify 独立站破冰包",
+    description: "建站、算运费、发货单据一站式解决，新手卖家快速起步",
+    icon: "ShoppingBag",
+    href: "/packages/shopify-starter",
+    tags: ["独立站", "运费计算", "单据生成"],
+    toolCount: 6,
+  },
+  {
+    id: "student-shipping",
+    title: "留学生回国包裹管家",
+    description: "体积重计算、免税额度、回国路线规划，省钱避坑指南",
+    icon: "GraduationCap",
+    href: "/packages/student-shipping",
+    tags: ["留学生", "集运", "免税"],
+    toolCount: 5,
+  },
+  {
+    id: "ai-copy-suite",
+    title: "AI 多语言文案套件",
+    description: "商品描述、翻译润色、多语言客服，AI 赋能日常经营",
+    icon: "Sparkles",
+    href: "/packages/ai-copy-suite",
+    tags: ["AI", "翻译", "文案"],
+    toolCount: 4,
+  },
+  {
+    id: "customs-clearance",
+    title: "进出口清关资料包",
+    description: "HS 编码查询、商业发票、装箱单、报关单，清关不迷路",
+    icon: "ShieldCheck",
+    href: "/packages/customs-clearance",
+    tags: ["清关", "HS编码", "发票"],
+    toolCount: 7,
+  },
+  {
+    id: "amazon-seller",
+    title: "亚马逊新手卖家工具包",
+    description: "定价计算、唛头面单、敏感品判定、物流选型，开店即用",
+    icon: "Store",
+    href: "/packages/amazon-seller",
+    tags: ["亚马逊", "定价", "面单"],
+    toolCount: 6,
+  },
+];
+
+// ===== Backward-compatible exports (for /starter, rankings, sitemap, etc.) =====
+
+interface OldScenarioTool {
+  name: string;
+  url: string;
+  category: string;
+  scenario: string;
+  targetUsers: string[];
+  painPoint: string;
+  description: string;
+  freePlan: string;
+  paidPlan: string;
+  accessCN: "fast" | "slow" | "blocked" | "unknown";
+  accessOverseas: "fast" | "slow" | "unknown";
+  beginnerFriendly: boolean;
+  recommended: boolean;
+  tags: string[];
+  sourceNote: string;
   toolKey?: string;
 }
 
-export interface ScenarioPackage {
+interface OldToolGroup {
+  groupName: string;
+  tools: OldScenarioTool[];
+}
+
+interface OldScenarioPackage {
   id: string;
   slug: string;
   title: string;
@@ -46,1098 +102,144 @@ export interface ScenarioPackage {
   targetUsers: string;
   problemStatement: string;
   quickStart: { step: number; title: string; description: string }[];
-  toolGroups: { groupName: string; tools: ScenarioTool[] }[];
+  toolGroups: OldToolGroup[];
   disclaimer?: string;
 }
 
-export const SCENARIO_PACKAGES: ScenarioPackage[] = [
-  // ============================================
-  // 1. 亚马逊新手工具包
-  // ============================================
+export const SCENARIO_PACKAGES: OldScenarioPackage[] = [
   {
-    id: "amazon",
-    slug: "amazon",
-    title: "亚马逊新手工具包",
-    subtitle: "从选品到出单，一站式 Amazon 卖家工具",
-    description: "适合刚接触亚马逊跨境的新手卖家，涵盖选品、Listing、利润计算、FBA 物流、商标合规、广告学习等全流程工具。",
-    emoji: "📦",
-    targetUsers: "亚马逊新手卖家、跨境创业个体户",
-    problemStatement: "做亚马逊不知道从哪开始？不知道用什么工具选品、算利润、写文案？这个工具包帮你快速上手。",
+    id: "shopify-starter",
+    slug: "shopify-starter",
+    title: "Shopify 独立站破冰包",
+    subtitle: "从建站到发货，一站式解决",
+    description: "面向 Shopify 新手卖家，涵盖建站工具、运费计算、发票面单生成、物流追踪等核心场景",
+    emoji: "🛒",
+    targetUsers: "独立站新手卖家、个人创业者",
+    problemStatement: "刚开 Shopify 店铺，不知道用哪些工具做发票、算运费、查物流？这里一站式解决。",
     quickStart: [
-      { step: 1, title: "选品调研", description: "用 Helium 10 或 Jungle Scout 分析市场潜力和竞争度" },
-      { step: 2, title: "计算利润", description: "用 FBA 计算器核算成本和利润率，确保能赚钱再上架" },
-      { step: 3, title: "生成 Listing", description: "用 AI 工具生成标题、五点描述、搜索关键词" },
+      { step: 1, title: "注册店铺", description: "完成 Shopify 注册和基础设置" },
+      { step: 2, title: "配置运费", description: "使用运费计算工具估算成本" },
+      { step: 3, title: "生成单据", description: "用商业发票/装箱单工具准备发货资料" },
     ],
     toolGroups: [
       {
-        groupName: "选品调研",
+        groupName: "运费与物流",
         tools: [
-          {
-            name: "Helium 10",
-            url: "https://www.helium10.com/",
-            category: "选品调研",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "不知道卖什么产品，市场竞争度如何",
-            description: "亚马逊卖家最全面的工具套件，包含关键词研究、产品调研、竞品分析等",
-            freePlan: "免费版有限额功能",
-            paidPlan: "$39-$399/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: true,
-            tags: ["选品", "关键词", "竞品分析"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Jungle Scout",
-            url: "https://www.junglescout.com/",
-            category: "选品调研",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "想找到低竞争高需求的蓝海产品",
-            description: "老牌亚马逊选品工具，产品数据库、关键词搜索、趋势分析",
-            freePlan: "有 Chrome 插件免费功能",
-            paidPlan: "$49-$129/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["选品", "Chrome 插件"],
-            sourceNote: "人工整理",
-          },
+          { name: "运费计算器", url: "/tools/shipping-calculator", category: "shipping", scenario: "shipping", targetUsers: [], painPoint: "不知道运费多少", description: "体积重计算 / 集运估算", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["运费"], sourceNote: "", toolKey: "shipping-calculator" },
+          { name: "邮编查询", url: "/tools/postal-code", category: "postal", scenario: "postal", targetUsers: [], painPoint: "不知道邮编", description: "全球邮编地址查询", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["邮编"], sourceNote: "", toolKey: "postal-code" },
         ],
       },
       {
-        groupName: "Listing 文案",
+        groupName: "单据生成",
         tools: [
-          {
-            name: "ChatGPT",
-            url: "https://chatgpt.com/",
-            category: "Listing 文案",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "英文 Listing 写不好，关键词不会埋",
-            description: "用 AI 生成高质量英文标题、五点描述、A+ 页面文案",
-            freePlan: "免费版可用",
-            paidPlan: "$20/月 Plus",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["AI", "文案", "翻译"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "DeepL 翻译",
-            url: "https://www.deepl.com/",
-            category: "Listing 文案",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "中英文互译不准确",
-            description: "比 Google 翻译更准确的 AI 翻译工具，适合产品描述翻译",
-            freePlan: "免费版 5000 字/月",
-            paidPlan: "€7.49/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["翻译", "AI"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "利润计算",
-        tools: [
-          {
-            name: "Amazon FBA Calculator",
-            url: "https://sellercentral.amazon.com/fba/profitabilitycalculator/index",
-            category: "利润计算",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "不知道 FBA 费用多少，利润怎么算",
-            description: "亚马逊官方 FBA 利润计算器，输入成本、售价自动计算利润",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["FBA", "利润计算", "官方"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "卖家精灵",
-            url: "https://www.sellersprite.com/",
-            category: "利润计算",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家", "国内卖家"],
-            painPoint: "需要国内中文界面的亚马逊工具",
-            description: "国产亚马逊工具，选品、关键词、利润计算、监控等功能",
-            freePlan: "有免费试用",
-            paidPlan: "¥399-¥1299/月",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["国产", "选品", "中文"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "商标合规",
-        tools: [
-          {
-            name: "USPTO 商标搜索",
-            url: "https://www.uspto.gov/trademarks/search",
-            category: "商标合规",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "不知道品牌名是否已被注册",
-            description: "美国专利商标局官方搜索，查询商标是否已被注册",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["商标", "美国", "官方"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Amazon Brand Registry",
-            url: "https://brandservices.amazon.com/",
-            category: "商标合规",
-            scenario: "amazon",
-            targetUsers: ["亚马逊品牌卖家"],
-            painPoint: "想做品牌保护，防止跟卖",
-            description: "亚马逊品牌注册，解锁 A+ 页面、品牌分析、透明计划等",
-            freePlan: "免费（需商标）",
-            paidPlan: "N/A",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["品牌", "官方", "跟卖"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "广告学习",
-        tools: [
-          {
-            name: "Amazon Advertising Learning Console",
-            url: "https://advertising.amazon.com/learn",
-            category: "广告学习",
-            scenario: "amazon",
-            targetUsers: ["亚马逊卖家"],
-            painPoint: "不知道怎么做亚马逊广告",
-            description: "亚马逊官方广告学习中心，SP/SB/SD 广告教程",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["广告", "学习", "官方"],
-            sourceNote: "人工整理",
-          },
+          { name: "商业发票", url: "/tools/commercial-invoice", category: "invoice", scenario: "invoice", targetUsers: [], painPoint: "不会做发票", description: "自动生成商业发票", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["发票"], sourceNote: "", toolKey: "commercial-invoice" },
+          { name: "报价单", url: "/tools/quote-sheet", category: "quote", scenario: "quote", targetUsers: [], painPoint: "不会做报价单", description: "专业报价单生成", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["报价"], sourceNote: "", toolKey: "quote-sheet" },
         ],
       },
     ],
   },
-
-  // ============================================
-  // 2. 华人反向海淘工具包
-  // ============================================
   {
-    id: "taobao-shipping",
-    slug: "taobao-shipping",
-    title: "华人反向海淘工具包",
-    subtitle: "从淘宝采购到海外收货，全流程指南",
-    description: "适合身在海外但想从国内采购的华人，涵盖淘宝/1688 采购、集运转运、运费估算、清关注意、禁运/敏感货等。",
-    emoji: "🛍️",
-    targetUsers: "海外华人、留学生、移民家庭",
-    problemStatement: "人在海外想买淘宝/1688，但不知道怎么集运、怎么算运费、哪些东西不能寄？这个工具包帮你一站式解决。",
-    quickStart: [
-      { step: 1, title: "挑选商品", description: "在淘宝/1688 上挑选商品，注意看是否支持集运" },
-      { step: 2, title: "选择集运商", description: "对比顺丰集运、菜鸟集运、第三方集运的价格和服务" },
-      { step: 3, title: "估算运费", description: "用运费计算器估算大致费用，确保总成本合理" },
-    ],
-    toolGroups: [
-      {
-        groupName: "采购平台",
-        tools: [
-          {
-            name: "淘宝 / 天猫",
-            url: "https://www.taobao.com/",
-            category: "采购",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人"],
-            painPoint: "想在海外买淘宝商品",
-            description: "中国最大的网购平台，绝大多数集运商都支持淘宝收货",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["采购", "淘宝"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "1688",
-            url: "https://www.1688.com/",
-            category: "采购",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人", "小商家"],
-            painPoint: "想以更低价格批量采购",
-            description: "阿里巴巴批发平台，价格通常比淘宝更低，适合批量采购",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: true,
-            tags: ["采购", "批发", "1688"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "集运 / 转运",
-        tools: [
-          {
-            name: "顺丰集运",
-            url: "https://www.sf-international.com/",
-            category: "集运转运",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人"],
-            painPoint: "想用最可靠的集运服务",
-            description: "顺丰官方集运服务，速度快、时效稳定，支持多国",
-            freePlan: "N/A",
-            paidPlan: "按重量/体积计费",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["顺丰", "集运", "官方"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "菜鸟集运",
-            url: "https://cainiao.com/",
-            category: "集运转运",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人"],
-            painPoint: "淘宝下单想自动集运",
-            description: "阿里巴巴旗下物流，淘宝下单可直接选择菜鸟集运",
-            freePlan: "N/A",
-            paidPlan: "按重量/体积计费",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["菜鸟", "集运", "阿里"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Superbuy",
-            url: "https://www.superbuy.com/",
-            category: "集运转运",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人", "外国人"],
-            painPoint: "需要代购 + 集运一条龙服务",
-            description: "老牌代购集运平台，支持淘宝/1688/拼多多代买，多仓库合包",
-            freePlan: "免费注册",
-            paidPlan: "运费 + 服务费",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["代购", "集运", "英文"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-      {
-        groupName: "运费估算",
-        tools: [
-          {
-            name: "本站运费计算",
-            url: "/tools/shipping-calculator",
-            category: "运费估算",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人", "集运用户"],
-            painPoint: "想快速估算海运/空运大致费用",
-            description: "本站内置的运费估算工具，支持海运/空运/快递多种模式",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "运费"],
-            sourceNote: "人工整理",
-            toolKey: "shipping-calculator",
-          },
-        ],
-      },
-      {
-        groupName: "清关注意 / 禁运品",
-        tools: [
-          {
-            name: "各国海关规定参考",
-            url: "https://www.cbp.gov/",
-            category: "清关",
-            scenario: "taobao-shipping",
-            targetUsers: ["海外华人"],
-            painPoint: "不知道哪些东西不能寄到目的地",
-            description: "参考目的地海关规定，常见禁运品：电池、液体、仿牌、食品等",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["清关", "禁运"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-    ],
-    disclaimer: "集运运费和时效因渠道、季节、政策变化而波动，以上信息仅供参考。寄件前请与集运商确认最新规定。",
-  },
-
-  // ============================================
-  // 3. 留学生论文急救包
-  // ============================================
-  {
-    id: "student-paper",
-    slug: "student-paper",
-    title: "留学生论文急救包",
-    subtitle: "从文献搜索到查重，论文全流程工具",
-    description: "适合海外留学生，涵盖文献搜索、摘要、论文润色、引用格式、查重注意、PPT/演讲稿等。",
+    id: "student-shipping",
+    slug: "student-shipping",
+    title: "留学生回国包裹管家",
+    subtitle: "体积重计算、免税额度、回国路线规划",
+    description: "留学生回国寄包裹必备工具集，帮你省钱避坑",
     emoji: "🎓",
-    targetUsers: "海外留学生、访问学者",
-    problemStatement: "写论文找不到文献？英文写作不流畅？引用格式不会搞？这个工具包帮你从找文献到交稿全流程搞定。",
+    targetUsers: "留学生、海外华人",
+    problemStatement: "回国寄包裹不知道选哪家快递、怎么算最划算？这里有全套工具。",
     quickStart: [
-      { step: 1, title: "搜索文献", description: "用 Google Scholar 或学校图书馆搜索相关论文" },
-      { step: 2, title: "阅读摘要", description: "用 AI 工具快速总结长篇论文要点" },
-      { step: 3, title: "润色写作", description: "用 Grammarly 或 QuillBot 润色英文表达" },
+      { step: 1, title: "计算体积重", description: "用体积重计算器估算运费" },
+      { step: 2, title: "查询邮编", description: "确认收件地址邮编" },
+      { step: 3, title: "比较汇率", description: "用汇率查询对比成本" },
     ],
     toolGroups: [
       {
-        groupName: "文献搜索",
+        groupName: "运费计算",
         tools: [
-          {
-            name: "Google Scholar",
-            url: "https://scholar.google.com/",
-            category: "文献搜索",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "找不到学术论文",
-            description: "Google 学术搜索，最全面的学术文献搜索引擎",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["学术", "搜索"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "学校图书馆",
-            url: "#",
-            category: "文献搜索",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "想免费下载付费论文",
-            description: "大部分学校图书馆有 JSTOR/IEEE/ScienceDirect 等数据库订阅权限",
-            freePlan: "学生免费",
-            paidPlan: "N/A",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["学术", "图书馆"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Connected Papers",
-            url: "https://www.connectedpapers.com/",
-            category: "文献搜索",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "不知道一篇论文的前因后果",
-            description: "可视化论文引用关系图，快速找到相关文献",
-            freePlan: "有限免费",
-            paidPlan: "$12/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["学术", "可视化"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-      {
-        groupName: "论文润色",
-        tools: [
-          {
-            name: "Grammarly",
-            url: "https://www.grammarly.com/",
-            category: "论文润色",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "英文写作有语法错误",
-            description: "英文语法检查和写作建议工具，Chrome 插件 + Web 版",
-            freePlan: "基础语法检查免费",
-            paidPlan: "$12-$30/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["语法", "润色"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "QuillBot",
-            url: "https://quillbot.com/",
-            category: "论文润色",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "想改写句子避免重复",
-            description: "AI 改写工具，支持 paraphrase、摘要、语法检查",
-            freePlan: "有限免费",
-            paidPlan: "$10/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["改写", "AI"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-      {
-        groupName: "引用格式",
-        tools: [
-          {
-            name: "Zotero",
-            url: "https://www.zotero.org/",
-            category: "引用格式",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "参考文献格式不会搞",
-            description: "免费开源文献管理工具，自动抓取引用信息，支持 APA/MLA/Chicago 等格式",
-            freePlan: "300MB 免费存储",
-            paidPlan: "$20/年",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: true,
-            tags: ["引用", "文献管理", "免费"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "PPT / 演讲稿",
-        tools: [
-          {
-            name: "Gamma",
-            url: "https://gamma.app/",
-            category: "PPT",
-            scenario: "student-paper",
-            targetUsers: ["留学生"],
-            painPoint: "不会做英文 PPT",
-            description: "AI 演示文稿生成工具，输入主题自动生成 PPT",
-            freePlan: "400 credits 免费",
-            paidPlan: "$10-$20/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["AI", "PPT"],
-            sourceNote: "待验证",
-          },
+          { name: "运费计算器", url: "/tools/shipping-calculator", category: "shipping", scenario: "shipping", targetUsers: [], painPoint: "不知道运费多少", description: "体积重计算 / 集运估算", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["运费"], sourceNote: "", toolKey: "shipping-calculator" },
+          { name: "集装箱计算", url: "/tools/container", category: "container", scenario: "container", targetUsers: [], painPoint: "不会算集装箱", description: "集装箱装载量计算", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: false, recommended: false, tags: ["集装箱"], sourceNote: "", toolKey: "container" },
         ],
       },
     ],
-    disclaimer: "AI 润色工具可能改变原意，提交前务必自行审阅。部分学校对 AI 辅助写作有严格规定，请先确认学校政策。",
   },
-
-  // ============================================
-  // 4. 出海建站收款工具包
-  // ============================================
   {
-    id: "business-online",
-    slug: "business-online",
-    title: "出海建站收款工具包",
-    subtitle: "从域名到收款，在线生意全流程工具",
-    description: "适合想做出海生意的创业者，涵盖域名、建站、邮箱、收款、表单/CRM、广告投放等。",
-    emoji: "🌐",
-    targetUsers: "出海创业者、独立站卖家",
-    problemStatement: "想做个面向海外的网站/独立站？不知道怎么买域名、建站、收款、投广告？这个工具包帮你从零搭建。",
-    quickStart: [
-      { step: 1, title: "注册域名", description: "在 Namecheap/Cloudflare 注册一个 .com 域名" },
-      { step: 2, title: "搭建网站", description: "用 WordPress 或 Shopify 快速建站" },
-      { step: 3, title: "接入收款", description: "申请 Stripe/PayPal 收款，开始接单" },
-    ],
-    toolGroups: [
-      {
-        groupName: "域名",
-        tools: [
-          {
-            name: "Namecheap",
-            url: "https://www.namecheap.com/",
-            category: "域名",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想注册一个 .com 域名",
-            description: "老牌域名注册商，价格透明，WHOIS 隐私保护免费",
-            freePlan: "N/A",
-            paidPlan: "$8.88/年起 (.com)",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["域名", "注册"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Cloudflare Registrar",
-            url: "https://www.cloudflare.com/products/registrar/",
-            category: "域名",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想用成本价注册域名",
-            description: "Cloudflare 域名注册，以批发价出售，无加价",
-            freePlan: "N/A",
-            paidPlan: "成本价（约 $9.15/年 .com）",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["域名", "成本价"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "建站",
-        tools: [
-          {
-            name: "WordPress",
-            url: "https://wordpress.org/",
-            category: "建站",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想自己控制网站内容",
-            description: "全球最流行的开源建站系统，灵活度最高，插件生态丰富",
-            freePlan: "开源免费",
-            paidPlan: "主机费用 $5-$50/月",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: true,
-            tags: ["开源", "CMS"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Shopify",
-            url: "https://www.shopify.com/",
-            category: "建站",
-            scenario: "business-online",
-            targetUsers: ["电商卖家"],
-            painPoint: "想快速搭建在线商店",
-            description: "一站式电商建站平台，内置支付、物流、库存管理",
-            freePlan: "3 天免费试用",
-            paidPlan: "$39-$399/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["电商", "SaaS"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "收款",
-        tools: [
-          {
-            name: "Stripe",
-            url: "https://stripe.com/",
-            category: "收款",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想让海外客户用信用卡付款",
-            description: "全球最大在线支付平台，支持信用卡、Apple Pay、Google Pay",
-            freePlan: "N/A",
-            paidPlan: "2.9% + $0.30/笔",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["支付", "信用卡"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "PayPal",
-            url: "https://www.paypal.com/",
-            category: "收款",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想让海外客户用 PayPal 付款",
-            description: "全球最广泛使用的在线支付工具",
-            freePlan: "N/A",
-            paidPlan: "4.4% + 固定费用/笔",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["支付", "PayPal"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "邮箱 / 表单 / CRM",
-        tools: [
-          {
-            name: "Cloudflare Email Routing",
-            url: "https://www.cloudflare.com/products/email-routing/",
-            category: "邮箱",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想用域名做企业邮箱",
-            description: "免费的企业邮箱转发服务，用你的域名收发邮件",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["邮箱", "免费"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Tally",
-            url: "https://tally.so/",
-            category: "表单",
-            scenario: "business-online",
-            targetUsers: ["出海创业者"],
-            painPoint: "想做个简单的联系表单",
-            description: "免费表单工具，Notion-like 编辑器，非常易用",
-            freePlan: "无限表单，基本功能免费",
-            paidPlan: "$29-$59/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["表单", "免费"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-    ],
-    disclaimer: "Stripe/PayPal 等支付平台对中国企业有审核要求，请先确认你的企业资质是否符合。费率可能变化，请以官方为准。",
-  },
-
-  // ============================================
-  // 5. AI 创作工具包
-  // ============================================
-  {
-    id: "ai-creator",
-    slug: "ai-creator",
-    title: "AI 创作工具包",
-    subtitle: "AI 写作、图片、视频、配音，创作全流程",
-    description: "适合想用 AI 辅助创作的自媒体人和创业者，涵盖 AI 写作、图片、视频、配音、自动化等。",
+    id: "ai-copy-suite",
+    slug: "ai-copy-suite",
+    title: "AI 多语言文案套件",
+    subtitle: "AI 赋能日常经营",
+    description: "商品描述、翻译润色、多语言客服，AI 工具一站搞定",
     emoji: "🤖",
-    targetUsers: "自媒体创作者、内容营销人、AI 爱好者",
-    problemStatement: "想用 AI 提升创作效率？不知道哪些工具好用？这个工具包帮你找到最适合的 AI 工具。",
+    targetUsers: "电商卖家、跨境从业者",
+    problemStatement: "不会写多语言商品文案？AI 帮你一键生成。",
     quickStart: [
-      { step: 1, title: "选择任务", description: "明确你要做什么：写文章、做图、剪视频还是配音" },
-      { step: 2, title: "尝试免费工具", description: "大多数 AI 工具都有免费额度，先试后买" },
-      { step: 3, title: "学习提示词", description: "好的提示词 = 好的结果，花时间学 Prompt Engineering" },
+      { step: 1, title: "输入产品信息", description: "填写产品基本信息" },
+      { step: 2, title: "选择目标语言", description: "选择需要翻译的语言" },
+      { step: 3, title: "生成文案", description: "AI 自动生成多语言文案" },
     ],
     toolGroups: [
       {
-        groupName: "AI 写作",
+        groupName: "AI 文案",
         tools: [
-          {
-            name: "ChatGPT",
-            url: "https://chatgpt.com/",
-            category: "AI 写作",
-            scenario: "ai-creator",
-            targetUsers: ["创作者", "自媒体"],
-            painPoint: "想用 AI 写文章、文案、脚本",
-            description: "最知名的 AI 对话工具，写作、翻译、编程都能做",
-            freePlan: "免费版 GPT-4o mini",
-            paidPlan: "$20/月 Plus",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["AI", "写作", "对话"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Claude",
-            url: "https://claude.ai/",
-            category: "AI 写作",
-            scenario: "ai-creator",
-            targetUsers: ["创作者"],
-            painPoint: "需要长文本处理能力强的大模型",
-            description: "Anthropic 的 AI 助手，长文本理解和写作能力出色",
-            freePlan: "免费可用",
-            paidPlan: "$20-$100/月",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["AI", "写作", "长文本"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Gemini",
-            url: "https://gemini.google.com/",
-            category: "AI 写作",
-            scenario: "ai-creator",
-            targetUsers: ["创作者"],
-            painPoint: "想用 Google 的 AI 写东西",
-            description: "Google 的 AI 助手，深度集成 Google 生态",
-            freePlan: "免费",
-            paidPlan: "$20/月",
-            accessCN: "blocked",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["AI", "Google"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "AI 图片",
-        tools: [
-          {
-            name: "Midjourney",
-            url: "https://www.midjourney.com/",
-            category: "AI 图片",
-            scenario: "ai-creator",
-            targetUsers: ["创作者"],
-            painPoint: "想用 AI 生成高质量图片",
-            description: "AI 图片生成标杆，艺术风格出色，适合社交媒体配图",
-            freePlan: "无免费版",
-            paidPlan: "$10-$120/月",
-            accessCN: "slow",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: true,
-            tags: ["AI", "图片", "Discord"],
-            sourceNote: "人工整理",
-          },
-          {
-            name: "Canva AI",
-            url: "https://www.canva.com/",
-            category: "AI 图片",
-            scenario: "ai-creator",
-            targetUsers: ["创作者", "自媒体"],
-            painPoint: "想做图但不会设计",
-            description: "在线设计工具，内置 AI 图片生成、背景移除、文字排版",
-            freePlan: "基础功能免费",
-            paidPlan: "$15/月",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["AI", "设计", "模板"],
-            sourceNote: "人工整理",
-          },
-        ],
-      },
-      {
-        groupName: "AI 视频",
-        tools: [
-          {
-            name: "Runway",
-            url: "https://runwayml.com/",
-            category: "AI 视频",
-            scenario: "ai-creator",
-            targetUsers: ["视频创作者"],
-            painPoint: "想用 AI 生成/编辑视频",
-            description: "AI 视频编辑和生成平台，Gen-2 文生视频技术",
-            freePlan: "有限免费 credits",
-            paidPlan: "$12-$76/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["AI", "视频"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-      {
-        groupName: "AI 配音",
-        tools: [
-          {
-            name: "ElevenLabs",
-            url: "https://elevenlabs.io/",
-            category: "AI 配音",
-            scenario: "ai-creator",
-            targetUsers: ["视频创作者", "播客"],
-            painPoint: "想做英文配音但不会录音",
-            description: "AI 语音生成，支持多种语言和声音克隆",
-            freePlan: "10,000 字/月",
-            paidPlan: "$5-$99/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: false,
-            tags: ["AI", "语音", "配音"],
-            sourceNote: "待验证",
-          },
-        ],
-      },
-      {
-        groupName: "AI 自动化",
-        tools: [
-          {
-            name: "Make (Integromat)",
-            url: "https://www.make.com/",
-            category: "AI 自动化",
-            scenario: "ai-creator",
-            targetUsers: ["创作者", "创业者"],
-            painPoint: "想自动化重复工作",
-            description: "可视化自动化工具，连接 1000+ 应用，不用写代码",
-            freePlan: "1000 operations/月",
-            paidPlan: "$9-$16/月",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["自动化", "no-code"],
-            sourceNote: "待验证",
-          },
-          {
-            name: "n8n",
-            url: "https://n8n.io/",
-            category: "AI 自动化",
-            scenario: "ai-creator",
-            targetUsers: ["创作者", "技术用户"],
-            painPoint: "想自建自动化工作流",
-            description: "开源自动化工作流平台，可自部署，支持 AI 节点",
-            freePlan: "自部署免费",
-            paidPlan: "$20-$160/月（云版）",
-            accessCN: "unknown",
-            accessOverseas: "fast",
-            beginnerFriendly: false,
-            recommended: false,
-            tags: ["自动化", "开源"],
-            sourceNote: "待验证",
-          },
+          { name: "AI 商品文案", url: "/ai-tools/product-copy", category: "ai", scenario: "ai", targetUsers: [], painPoint: "不会写文案", description: "AI 撰写产品描述", freePlan: "免费额度", paidPlan: "付费升级", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["AI"], sourceNote: "", toolKey: "product-copy" },
+          { name: "AI 翻译润色", url: "/ai-tools/translate-polish", category: "ai", scenario: "ai", targetUsers: [], painPoint: "翻译不专业", description: "多语言翻译优化", freePlan: "免费额度", paidPlan: "付费升级", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["AI", "翻译"], sourceNote: "", toolKey: "translate-polish" },
         ],
       },
     ],
-    disclaimer: "AI 工具更新极快，以上价格和功能可能随时变化。使用 AI 生成内容时，请注意版权和合规要求。",
   },
-
-  // ============================================
-  // 6. 物流单据工具包
-  // ============================================
   {
-    id: "logistics-docs",
-    slug: "logistics-docs",
-    title: "物流单据工具包",
-    subtitle: "外贸单据、唛头、邮编、物流、HS 编码一站式工具",
-    description: "适合做外贸、物流、集运的从业者，涵盖商业发票、报价单、装箱单、唛头、邮编查询、物流查询、HS 编码等。",
-    emoji: "🚚",
-    targetUsers: "外贸从业者、物流/集运从业者",
-    problemStatement: "做外贸物流，单据要做、邮编要查、物流要跟踪、HS 编码要查？这个工具包把常用工具都放在一起。",
+    id: "customs-clearance",
+    slug: "customs-clearance",
+    title: "进出口清关资料包",
+    subtitle: "清关不迷路",
+    description: "HS 编码查询、商业发票、装箱单、报关单，清关必备工具集",
+    emoji: "📋",
+    targetUsers: "进出口贸易从业者、跨境电商",
+    problemStatement: "清关资料不会准备？HS 编码不会查？这里有全套工具。",
     quickStart: [
-      { step: 1, title: "生成单据", description: "用本站工具快速生成商业发票、报价单、装箱单" },
-      { step: 2, title: "查询信息", description: "查邮编、查 HS 编码、查物流" },
-      { step: 3, title: "制作唛头", description: "用本站唛头面单工具生成标准化唛头标签" },
+      { step: 1, title: "查询 HS 编码", description: "输入商品名查询编码" },
+      { step: 2, title: "生成发票", description: "自动生成商业发票" },
+      { step: 3, title: "准备装箱单", description: "生成装箱单资料" },
     ],
     toolGroups: [
       {
-        groupName: "外贸单据",
+        groupName: "清关工具",
         tools: [
-          {
-            name: "本站：商业发票",
-            url: "/tools/documents/commercial-invoice",
-            category: "外贸单据",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者"],
-            painPoint: "不想手写商业发票",
-            description: "本站内置的商业发票生成工具，填表即可生成标准格式",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "单据", "发票"],
-            sourceNote: "人工整理",
-            toolKey: "documents",
-          },
-          {
-            name: "本站：报价单",
-            url: "/tools/documents/quotation",
-            category: "外贸单据",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者"],
-            painPoint: "给客户报价需要专业格式",
-            description: "本站报价单生成工具，快速制作专业报价文档",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "单据", "报价"],
-            sourceNote: "人工整理",
-            toolKey: "documents",
-          },
-          {
-            name: "本站：装箱单",
-            url: "/tools/documents/packing-list",
-            category: "外贸单据",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者"],
-            painPoint: "装箱单要列清楚货物明细",
-            description: "本站装箱单生成工具，自动计算件数/重量/体积",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "单据", "装箱"],
-            sourceNote: "人工整理",
-            toolKey: "documents",
-          },
-        ],
-      },
-      {
-        groupName: "唛头面单",
-        tools: [
-          {
-            name: "本站：唛头面单",
-            url: "/tools/label-maker",
-            category: "唛头面单",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者", "集运用户"],
-            painPoint: "要做标准化的唛头标签贴在箱子上",
-            description: "本站唛头面单工具，支持批量生成、自定义格式、打印导出",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "唛头", "标签"],
-            sourceNote: "人工整理",
-            toolKey: "label-maker",
-          },
-        ],
-      },
-      {
-        groupName: "查询工具",
-        tools: [
-          {
-            name: "本站：邮编查询",
-            url: "/tools/postal-code",
-            category: "查询工具",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者", "集运用户"],
-            painPoint: "不知道海外客户地址的邮编",
-            description: "本站邮编查询工具，覆盖加拿大、英国等多国邮编数据库",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "邮编"],
-            sourceNote: "人工整理",
-            toolKey: "postal-code",
-          },
-          {
-            name: "本站：物流查询",
-            url: "/tracking",
-            category: "查询工具",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者", "集运用户"],
-            painPoint: "想跟踪快递/物流单号",
-            description: "本站物流查询入口，支持批量查询，跳转 17TRACK",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "物流"],
-            sourceNote: "人工整理",
-            toolKey: "tracking",
-          },
-          {
-            name: "本站：HS 编码查询",
-            url: "/tools/hs-code",
-            category: "查询工具",
-            scenario: "logistics-docs",
-            targetUsers: ["外贸从业者"],
-            painPoint: "不知道产品的 HS 编码",
-            description: "本站 HS 编码查询工具，帮助确认商品海关编码",
-            freePlan: "免费",
-            paidPlan: "N/A",
-            accessCN: "fast",
-            accessOverseas: "fast",
-            beginnerFriendly: true,
-            recommended: true,
-            tags: ["本站工具", "HS 编码"],
-            sourceNote: "人工整理",
-            toolKey: "hs-code",
-          },
+          { name: "HS 编码查询", url: "/tools/hs-code", category: "hs", scenario: "hs", targetUsers: [], painPoint: "不知道 HS 编码", description: "商品 HS 编码查询", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["HS编码"], sourceNote: "", toolKey: "hs-code" },
+          { name: "商业发票", url: "/tools/commercial-invoice", category: "invoice", scenario: "invoice", targetUsers: [], painPoint: "不会做发票", description: "自动生成商业发票", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["发票"], sourceNote: "", toolKey: "commercial-invoice" },
         ],
       },
     ],
-    disclaimer: "单据模板仅供参考，不构成法律或税务建议。实际使用请根据具体国家和海关要求调整。",
+  },
+  {
+    id: "amazon-seller",
+    slug: "amazon-seller",
+    title: "亚马逊新手卖家工具包",
+    subtitle: "开店即用",
+    description: "定价计算、唛头面单、敏感品判定、物流选型，亚马逊开店必备",
+    emoji: "📦",
+    targetUsers: "亚马逊新手卖家",
+    problemStatement: "刚开亚马逊店铺，不知道用什么工具？这里有全套解决方案。",
+    quickStart: [
+      { step: 1, title: "产品定价", description: "使用定价工具计算利润" },
+      { step: 2, title: "生成面单", description: "用唛头面单工具准备标签" },
+      { step: 3, title: "选择物流", description: "比较不同物流方案" },
+    ],
+    toolGroups: [
+      {
+        groupName: "定价与物流",
+        tools: [
+          { name: "运费计算器", url: "/tools/shipping-calculator", category: "shipping", scenario: "shipping", targetUsers: [], painPoint: "不知道运费多少", description: "体积重计算 / 集运估算", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["运费"], sourceNote: "", toolKey: "shipping-calculator" },
+          { name: "唛头生成器", url: "/tools/documents?type=mark", category: "mark", scenario: "mark", targetUsers: [], painPoint: "不会做唛头", description: "一键生成唛头标签", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["唛头"], sourceNote: "", toolKey: "label-maker" },
+        ],
+      },
+    ],
   },
 ];
 
-/**
- * Get a scenario package by slug
- */
-export function getScenarioBySlug(slug: string): ScenarioPackage | undefined {
-  return SCENARIO_PACKAGES.find(p => p.slug === slug);
+export function getScenarioBySlug(slug: string): OldScenarioPackage | undefined {
+  return SCENARIO_PACKAGES.find((p) => p.slug === slug);
 }
 
-/**
- * Get all scenario slugs
- */
 export function getAllScenarioSlugs(): string[] {
-  return SCENARIO_PACKAGES.map(p => p.slug);
-}
-
-/**
- * Count total tools across all scenarios
- */
-export function getTotalToolCount(): number {
-  let count = 0;
-  for (const pkg of SCENARIO_PACKAGES) {
-    for (const group of pkg.toolGroups) {
-      count += group.tools.length;
-    }
-  }
-  return count;
+  return SCENARIO_PACKAGES.map((p) => p.slug);
 }

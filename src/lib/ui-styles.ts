@@ -62,3 +62,8 @@ export const tableStyles = {
   row: "hover:bg-gray-50 transition-colors",
   cell: "px-4 py-3",
 };
+
+export const sectionTitleStyles = {
+  base: "text-2xl md:text-3xl font-bold text-gray-900",
+  subtitle: "text-gray-500 mt-2 max-w-lg",
+};

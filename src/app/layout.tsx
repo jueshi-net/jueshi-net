@@ -4,7 +4,7 @@ import "@/app/globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
 import Header from "@/components/layout/header";
-import CommandPalette from "@/components/command-palette";
+import CommandPalette, { CommandMenuProvider } from "@/components/command-palette";
 import PWARegister from "@/components/PWARegister";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, defaultOpenGraph } from "@/lib/seo";
 
@@ -70,9 +70,11 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={cn(inter.className, "min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased flex flex-col overflow-x-hidden")}>
         <Providers>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <CommandPalette />
+          <CommandMenuProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <CommandPalette />
+          </CommandMenuProvider>
           <PWARegister />
         </Providers>
       </body>

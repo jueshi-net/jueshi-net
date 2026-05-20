@@ -1,148 +1,246 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { Search, X, Link2, FileText, Wrench, ArrowRight } from "lucide-react";
-import { useRouter } from "next/navigation";
 
-interface SearchResult {
-  title: string;
-  path: string;
-  icon: React.ReactNode;
-  category: string;
+import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import {
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+} from "cmdk";
+import {
+  Search,
+  Wrench,
+  FileText,
+  Globe,
+  MapPin,
+  Calculator,
+  Tag,
+  TrendingUp,
+  Shield,
+  Zap,
+  BookOpen,
+  Library,
+  Target,
+  MessageSquare,
+  LayoutDashboard,
+  Gem,
+  Briefcase,
+  Sparkles,
+  Package,
+  Star,
+} from "lucide-react";
+import { scenarioPackages } from "@/data/scenario-packages";
+
+// ===== Context for global open/close =====
+
+interface CommandMenuContextType {
+  open: boolean;
+  setOpen: (updater: boolean | ((prev: boolean) => boolean)) => void;
 }
 
-const staticResults: SearchResult[] = [
-  { title: "首页", path: "/", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "搜索链接", path: "/search", icon: <Search className="w-4 h-4" />, category: "页面" },
-  { title: "工具集合", path: "/tools", icon: <Wrench className="w-4 h-4" />, category: "页面" },
-  { title: "体积计算器", path: "/tools/shipping-calculator", icon: <Wrench className="w-4 h-4" />, category: "工具" },
-  { title: "收据生成器", path: "/tools/receipt", icon: <Wrench className="w-4 h-4" />, category: "工具" },
-  { title: "发票生成器", path: "/tools/invoice", icon: <Wrench className="w-4 h-4" />, category: "工具" },
-  { title: "报价单生成器", path: "/tools/quote", icon: <Wrench className="w-4 h-4" />, category: "工具" },
-  { title: "博客文章", path: "/blog", icon: <FileText className="w-4 h-4" />, category: "页面" },
-  { title: "定价方案", path: "/pricing", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "更新日志", path: "/changelog", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "帮助中心", path: "/help", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "API 文档", path: "/api-docs", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "通知中心", path: "/notifications", icon: <Link2 className="w-4 h-4" />, category: "页面" },
-  { title: "管理面板", path: "/admin", icon: <Link2 className="w-4 h-4" />, category: "后台" },
-  { title: "链接管理", path: "/admin/links", icon: <Link2 className="w-4 h-4" />, category: "后台" },
-  { title: "文章管理", path: "/admin/cms", icon: <FileText className="w-4 h-4" />, category: "后台" },
+const CommandMenuContext = createContext<CommandMenuContextType>({
+  open: false,
+  setOpen: () => {},
+});
+
+/** Hook to open/close the global CommandMenu from anywhere */
+export function useCommandMenu() {
+  return useContext(CommandMenuContext);
+}
+
+/** Provider wrapper — mount once at the root level */
+export function CommandMenuProvider({ children }: { children: ReactNode }) {
+  const [open, setOpenState] = useState(false);
+  const setOpen = useCallback(
+    (updater: boolean | ((prev: boolean) => boolean)) => {
+      setOpenState(typeof updater === "function" ? (updater as (prev: boolean) => boolean)(open) : updater);
+    },
+    [open]
+  );
+  return (
+    <CommandMenuContext.Provider value={{ open, setOpen }}>
+      {children}
+    </CommandMenuContext.Provider>
+  );
+}
+
+// ===== Data sources =====
+
+interface SearchItem {
+  id: string;
+  title: string;
+  subtitle?: string;
+  href: string;
+  icon: React.ReactNode;
+  keywords?: string[];
+}
+
+const navItems: SearchItem[] = [
+  { id: "nav-home", title: "首页", href: "/", icon: <Globe className="w-4 h-4" />, keywords: ["home", "首页"] },
+  { id: "nav-tools", title: "工具集合", href: "/tools", icon: <Wrench className="w-4 h-4" />, keywords: ["tools", "工具"] },
+  { id: "nav-ai", title: "AI 工具", href: "/ai-tools/product-copy", icon: <Sparkles className="w-4 h-4" />, keywords: ["ai", "人工智能", "文案", "翻译"] },
+  { id: "nav-ai-translate", title: "AI 翻译润色", href: "/ai-tools/translate-polish", icon: <Zap className="w-4 h-4" />, keywords: ["translate", "翻译", "润色"] },
+  { id: "nav-ai-summary", title: "AI 文件摘要", href: "/ai-tools/document-summary", icon: <Zap className="w-4 h-4" />, keywords: ["summary", "摘要", "总结"] },
+  { id: "nav-guides", title: "实用指南", href: "/guides", icon: <BookOpen className="w-4 h-4" />, keywords: ["guides", "指南", "攻略"] },
+  { id: "nav-resources", title: "资源导航", href: "/resources", icon: <Library className="w-4 h-4" />, keywords: ["resources", "资源", "导航"] },
+  { id: "nav-topics", title: "专题", href: "/topics", icon: <Target className="w-4 h-4" />, keywords: ["topics", "专题"] },
+  { id: "nav-bbs", title: "论坛", href: "/bbs", icon: <MessageSquare className="w-4 h-4" />, keywords: ["bbs", "论坛", "社区"] },
+  { id: "nav-pricing", title: "会员与定价", href: "/pricing", icon: <Gem className="w-4 h-4" />, keywords: ["pricing", "会员", "定价", "付费"] },
+  { id: "nav-dashboard", title: "我的工作台", href: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" />, keywords: ["dashboard", "工作台", "个人"] },
+  { id: "nav-rankings", title: "工具排行榜", href: "/rankings", icon: <TrendingUp className="w-4 h-4" />, keywords: ["rankings", "排行", "热门"] },
+  { id: "nav-tracking", title: "包裹追踪", href: "/tracking", icon: <Package className="w-4 h-4" />, keywords: ["tracking", "包裹", "物流"] },
+  { id: "nav-starter", title: "场景包列表", href: "/starter", icon: <Briefcase className="w-4 h-4" />, keywords: ["starter", "场景", "新手"] },
 ];
 
+const toolItems: SearchItem[] = [
+  { id: "tool-invoice", title: "商业发票", href: "/tools/commercial-invoice", icon: <FileText className="w-4 h-4" />, subtitle: "国际贸易必备", keywords: ["invoice", "发票", "商业"] },
+  { id: "tool-quote", title: "报价单", href: "/tools/quote-sheet", icon: <TrendingUp className="w-4 h-4" />, subtitle: "专业报价单生成", keywords: ["quote", "报价", "价格"] },
+  { id: "tool-mark", title: "唛头面单", href: "/tools/documents?type=mark", icon: <Tag className="w-4 h-4" />, subtitle: "一键生成唛头标签", keywords: ["mark", "唛头", "面单", "标签"] },
+  { id: "tool-hs", title: "HS 编码查询", href: "/tools/hs-code", icon: <Shield className="w-4 h-4" />, subtitle: "报关必备", keywords: ["hs", "编码", "海关", "报关"] },
+  { id: "tool-postal", title: "邮编查询", href: "/tools/postal-code", icon: <MapPin className="w-4 h-4" />, subtitle: "全球邮编地址", keywords: ["postal", "邮编", "地址"] },
+  { id: "tool-shipping", title: "运费计算器", href: "/tools/shipping-calculator", icon: <Calculator className="w-4 h-4" />, subtitle: "体积重计算", keywords: ["shipping", "运费", "体积", "重量"] },
+  { id: "tool-exchange", title: "汇率查询", href: "/tools/exchange-rate", icon: <TrendingUp className="w-4 h-4" />, subtitle: "实时汇率", keywords: ["exchange", "汇率", "货币"] },
+  { id: "tool-container", title: "集装箱计算", href: "/tools/container", icon: <Package className="w-4 h-4" />, subtitle: "装载量计算", keywords: ["container", "集装箱", "货柜"] },
+  { id: "tool-address", title: "地址格式化", href: "/tools/address-formatter", icon: <MapPin className="w-4 h-4" />, subtitle: "国际地址标准化", keywords: ["address", "地址", "格式化"] },
+  { id: "tool-qrcode", title: "二维码生成", href: "/tools/qrcode", icon: <Tag className="w-4 h-4" />, subtitle: "快速生成 QR Code", keywords: ["qrcode", "二维码", "QR"] },
+  { id: "tool-sensitive", title: "敏感品判定", href: "/tools/sensitive-goods", icon: <Shield className="w-4 h-4" />, subtitle: "判断是否敏感货品", keywords: ["sensitive", "敏感", "危险品"] },
+  { id: "tool-memo", title: "备忘录", href: "/tools/memo", icon: <FileText className="w-4 h-4" />, subtitle: "快速记录", keywords: ["memo", "备忘录", "笔记"] },
+  { id: "tool-documents", title: "单据中心", href: "/tools/documents", icon: <FileText className="w-4 h-4" />, subtitle: "发票 / 装箱单 / 合同", keywords: ["documents", "单据", "发票", "装箱"] },
+  { id: "tool-calculator", title: "工具箱", href: "/tools/calculator", icon: <Calculator className="w-4 h-4" />, subtitle: "各种计算器", keywords: ["calculator", "计算"] },
+  { id: "tool-receipt", title: "收据生成", href: "/tools/receipt", icon: <FileText className="w-4 h-4" />, subtitle: "快速生成收据", keywords: ["receipt", "收据"] },
+  { id: "tool-label", title: "唛头标签生成", href: "/tools/label-maker", icon: <Tag className="w-4 h-4" />, subtitle: "标签生成器", keywords: ["label", "标签", "唛头"] },
+  { id: "tool-customs", title: "报关资料生成", href: "/tools/customs-generator", icon: <Shield className="w-4 h-4" />, subtitle: "清关资料", keywords: ["customs", "报关", "清关"] },
+  { id: "tool-inbound", title: "入库单", href: "/tools/inbound", icon: <FileText className="w-4 h-4" />, subtitle: "入库单据生成", keywords: ["inbound", "入库"] },
+  { id: "tool-shipping-label", title: "快递面单", href: "/tools/shipping-label", icon: <Tag className="w-4 h-4" />, subtitle: "快递面单生成", keywords: ["shipping-label", "面单", "快递"] },
+  { id: "tool-video-script", title: "视频脚本 SOP", href: "/tools/video-script-sop", icon: <Sparkles className="w-4 h-4" />, subtitle: "短视频脚本生成", keywords: ["video", "脚本", "短视频"] },
+  { id: "tool-debit", title: "借记通知单", href: "/tools/debit-note", icon: <FileText className="w-4 h-4" />, subtitle: "借记单生成", keywords: ["debit", "借记", "通知"] },
+  { id: "tool-handover", title: "交接单", href: "/tools/handover-note", icon: <FileText className="w-4 h-4" />, subtitle: "交接单据", keywords: ["handover", "交接"] },
+  { id: "tool-shipping-mark", title: "运输唛头", href: "/tools/shipping-mark", icon: <Tag className="w-4 h-4" />, subtitle: "运输标记", keywords: ["mark", "唛头", "运输"] },
+  { id: "tool-quote-page", title: "报价工具", href: "/tools/quote", icon: <TrendingUp className="w-4 h-4" />, subtitle: "报价计算", keywords: ["quote", "报价"] },
+  { id: "tool-inbound-receipt", title: "入库签收", href: "/tools/inbound-receipt", icon: <FileText className="w-4 h-4" />, subtitle: "入库签收单", keywords: ["inbound", "入库", "签收"] },
+];
+
+const scenarioItems: SearchItem[] = scenarioPackages.map((pkg) => ({
+  id: `scenario-${pkg.id}`,
+  title: pkg.title,
+  href: pkg.href,
+  icon: <Briefcase className="w-4 h-4" />,
+  subtitle: `${pkg.toolCount} 个内置工具`,
+  keywords: pkg.tags,
+}));
+
+// ===== Main Component =====
+
 export default function CommandPalette() {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const { open, setOpen } = useCommandMenu();
   const router = useRouter();
 
-  const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = useCallback(() => {
-    setOpen(false);
-    setQuery("");
-    setSelectedIndex(0);
-  }, []);
-
+  // Global keyboard shortcut (already handled by cmdk, but we add Cmd+K toggle)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        setOpen(prev => !prev);
+        setOpen((prev) => !prev);
       }
-      if (e.key === "Escape") handleClose();
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [handleClose]);
+  }, [setOpen]);
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
-  const filtered = query
-    ? staticResults.filter(r =>
-        r.title.toLowerCase().includes(query.toLowerCase()) ||
-        r.path.toLowerCase().includes(query.toLowerCase()) ||
-        r.category.toLowerCase().includes(query.toLowerCase())
-      )
-    : staticResults;
-
-  const selectResult = (path: string) => {
-    router.push(path);
-    handleClose();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setSelectedIndex(prev => Math.min(prev + 1, filtered.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedIndex(prev => Math.max(prev - 1, 0));
-    } else if (e.key === "Enter" && filtered[selectedIndex]) {
-      selectResult(filtered[selectedIndex].path);
-    }
-  };
-
-  if (!open) return null;
+  const runCommand = useCallback(
+    (command: () => void) => {
+      setOpen(false);
+      command();
+    },
+    [setOpen]
+  );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-24 px-4">
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
+    <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="搜索工具、场景包、页面…" className="border-none focus:ring-0 text-base" />
+        <CommandList>
+          <CommandEmpty>
+            <div className="py-6 text-center text-sm text-gray-400">
+              未找到匹配结果
+            </div>
+          </CommandEmpty>
 
-      {/* Palette */}
-      <div className="relative w-full max-w-lg bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Search Input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-          <Search className="w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="搜索页面、工具、功能..."
-            className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 outline-none text-sm"
-            autoFocus
-          />
-          <kbd className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-400">ESC</kbd>
-          <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Results */}
-        <div className="max-h-80 overflow-y-auto p-2">
-          {filtered.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">无匹配结果</div>
-          ) : (
-            filtered.map((result, idx) => (
-              <button
-                key={result.path + idx}
-                onClick={() => selectResult(result.path)}
-                onMouseEnter={() => setSelectedIndex(idx)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                  idx === selectedIndex ? "bg-blue-50 dark:bg-blue-900/20" : "hover:bg-gray-50 dark:hover:bg-gray-700"
-                }`}
+          {/* Navigation */}
+          <CommandGroup heading="导航" className="[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-gray-400 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
+            {navItems.map((item) => (
+              <CommandItem
+                key={item.id}
+                value={`${item.title} ${item.keywords?.join(" ") || ""}`}
+                onSelect={() => runCommand(() => router.push(item.href))}
+                className="data-[selected=true]:bg-gray-100"
               >
-                <span className="text-gray-400">{result.icon}</span>
+                <span className="mr-2 text-gray-400">{item.icon}</span>
+                <span>{item.title}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Core Tools */}
+          <CommandGroup heading="工具" className="[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-gray-400 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
+            {toolItems.map((item) => (
+              <CommandItem
+                key={item.id}
+                value={`${item.title} ${item.subtitle || ""} ${item.keywords?.join(" ") || ""}`}
+                onSelect={() => runCommand(() => router.push(item.href))}
+                className="data-[selected=true]:bg-gray-100"
+              >
+                <span className="mr-2 text-gray-400">{item.icon}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{result.title}</p>
-                  <p className="text-xs text-gray-400 truncate">{result.path}</p>
+                  <span>{item.title}</span>
+                  {item.subtitle && (
+                    <span className="ml-2 text-xs text-gray-400">{item.subtitle}</span>
+                  )}
                 </div>
-                <span className="text-xs text-gray-400 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">{result.category}</span>
-                <ArrowRight className="w-4 h-4 text-gray-300" />
-              </button>
-            ))
-          )}
-        </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Scenario Packages */}
+          <CommandGroup heading="场景包" className="[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-gray-400 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
+            {scenarioItems.map((item) => (
+              <CommandItem
+                key={item.id}
+                value={`${item.title} ${item.subtitle || ""} ${item.keywords?.join(" ") || ""}`}
+                onSelect={() => runCommand(() => router.push(item.href))}
+                className="data-[selected=true]:bg-gray-100"
+              >
+                <span className="mr-2 text-blue-500">{item.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <span>{item.title}</span>
+                  {item.subtitle && (
+                    <span className="ml-2 text-xs text-gray-400">{item.subtitle}</span>
+                  )}
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-700 flex items-center gap-4 text-xs text-gray-400">
-          <span>↑↓ 导航</span>
-          <span>↵ 选择</span>
-          <span>ESC 关闭</span>
+        <div className="border-t border-gray-100 px-4 py-2.5 flex items-center gap-3 text-xs text-gray-400">
+          <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-mono">
+            <span>⌘</span>K
+          </kbd>
+          <span>打开</span>
+          <kbd className="inline-flex items-center px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-mono ml-2">
+            ESC
+          </kbd>
+          <span>关闭</span>
+          <span className="ml-auto">海外百宝箱 Command Palette</span>
         </div>
-      </div>
-    </div>
+      </CommandDialog>
   );
 }
