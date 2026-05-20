@@ -16,6 +16,8 @@ export interface ScenarioPackage {
   href: string;
   tags: string[];
   toolCount: number;
+  externalLinks?: { title: string; url: string; description: string; icon: string }[];
+  sopGuides?: { title: string; description: string; icon: string }[];
 }
 
 export const scenarioPackages: ScenarioPackage[] = [
@@ -27,6 +29,49 @@ export const scenarioPackages: ScenarioPackage[] = [
     href: "/packages/shopify-starter",
     tags: ["独立站", "运费计算", "单据生成"],
     toolCount: 6,
+    externalLinks: [
+      {
+        title: "17Track 全球物流查询",
+        url: "https://www.17track.net",
+        description: "支持全球 800+ 快递公司，一键追踪包裹状态",
+        icon: "Truck",
+      },
+      {
+        title: "Shopify 官方入口",
+        url: "https://www.shopify.com",
+        description: "全球最流行的独立站电商平台，14天免费试用",
+        icon: "ShoppingBag",
+      },
+      {
+        title: "Stripe 支付网关",
+        url: "https://stripe.com",
+        description: "支持 135+ 种货币的在线支付处理，独立站首选收款工具",
+        icon: "CreditCard",
+      },
+      {
+        title: "PayPal 费率计算器",
+        url: "https://www.paypal.com/merchantcalc",
+        description: "计算 PayPal 交易手续费，了解实际到账金额",
+        icon: "CreditCard",
+      },
+    ],
+    sopGuides: [
+      {
+        title: "Shopify 新手发货避坑指南",
+        description: "从选择物流商、计算体积重到打印面单，新手卖家最容易踩的 10 个坑",
+        icon: "ShieldAlert",
+      },
+      {
+        title: "客户发起 PayPal 争议(Dispute)如何应对",
+        description: "买家退款纠纷处理全流程：从收到通知到提交证据，保住你的货款",
+        icon: "FileText",
+      },
+      {
+        title: "如何用 AI 生成高转化商品描述",
+        description: "利用 AI 工具撰写 SEO 友好的多语言商品文案，提升转化率 30%+",
+        icon: "Zap",
+      },
+    ],
   },
   {
     id: "student-shipping",

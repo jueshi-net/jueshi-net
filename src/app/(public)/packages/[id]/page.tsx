@@ -15,6 +15,12 @@ import {
   Sparkles,
   ShieldCheck,
   Store,
+  ExternalLink,
+  BookOpen,
+  FileText,
+  CreditCard,
+  Truck,
+  ShieldAlert,
 } from "lucide-react";
 import { cardStyles, badgeStyles, buttonVariants } from "@/lib/ui-styles";
 import { scenarioPackages, type ScenarioPackage } from "@/data/scenario-packages";
@@ -26,6 +32,21 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Sparkles,
   ShieldCheck,
   Store,
+  ExternalLink,
+  BookOpen,
+  FileText,
+  CreditCard,
+  Truck,
+  ShieldAlert,
+  Zap,
+};
+
+const SOP_ICON_MAP: Record<string, React.ElementType> = {
+  ShieldAlert,
+  FileText,
+  Zap,
+  BookOpen,
+  Shield,
 };
 
 function findPackage(id: string): ScenarioPackage | undefined {
@@ -168,37 +189,112 @@ export default async function ScenarioPackagePage({
           </div>
         </div>
 
-        {/* SOP guide placeholder */}
-        <div className={`${cardStyles.base} mt-5`}>
-          <h2 className={cardStyles.header}>SOP 指南</h2>
-          <p className="text-sm text-gray-500">
-            该场景的标准操作流程和最佳实践指南将在后续版本中逐步完善。
-          </p>
-          <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
-            <div className="flex items-start gap-2">
-              <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <h3 className="font-semibold text-sm text-blue-800">
-                  即将上线
-                </h3>
-                <p className="text-sm text-blue-600 mt-1">
-                  我们会为每个场景包配置专属的 SOP 指南，包括步骤说明、注意事项和常见问题。
-                </p>
+        {/* SOP guide */}
+        {pkg.sopGuides && pkg.sopGuides.length > 0 ? (
+          <div className={`${cardStyles.base} mt-5`}>
+            <h2 className={cardStyles.header}>
+              <BookOpen className="w-5 h-5 text-emerald-600" />
+              实用指南
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              「{pkg.title}」相关的 SOP 操作流程和最佳实践：
+            </p>
+            <div className="space-y-3">
+              {pkg.sopGuides.map((guide, i) => {
+                const GuideIcon = SOP_ICON_MAP[guide.icon] || BookOpen;
+                return (
+                  <div
+                    key={i}
+                    className="group flex items-start gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-blue-200 hover:shadow-sm transition-all duration-200 cursor-pointer"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-200 transition-colors">
+                      <GuideIcon className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm text-gray-900 group-hover:text-blue-700 transition-colors">
+                        {guide.title}
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-1 leading-snug">
+                        {guide.description}
+                      </p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all shrink-0 mt-1" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className={`${cardStyles.base} mt-5`}>
+            <h2 className={cardStyles.header}>SOP 指南</h2>
+            <p className="text-sm text-gray-500">
+              该场景的标准操作流程和最佳实践指南将在后续版本中逐步完善。
+            </p>
+            <div className="mt-4 bg-blue-50 rounded-lg p-4 border border-blue-100">
+              <div className="flex items-start gap-2">
+                <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-sm text-blue-800">
+                    即将上线
+                  </h3>
+                  <p className="text-sm text-blue-600 mt-1">
+                    我们会为每个场景包配置专属的 SOP 指南，包括步骤说明、注意事项和常见问题。
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* External links placeholder */}
-        <div className={`${cardStyles.base} mt-5`}>
-          <h2 className={cardStyles.header}>精选外链</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            与「{pkg.title}」相关的外部优质资源：
-          </p>
-          <div className="text-sm text-gray-400 italic">
-            外链资源将在后续版本中添加。
+        {/* External links */}
+        {pkg.externalLinks && pkg.externalLinks.length > 0 ? (
+          <div className={`${cardStyles.base} mt-5`}>
+            <h2 className={cardStyles.header}>
+              <ExternalLink className="w-5 h-5 text-blue-600" />
+              精选外链
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              与「{pkg.title}」相关的外部优质资源：
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {pkg.externalLinks.map((link, i) => {
+                const LinkIcon = ICON_MAP[link.icon] || ExternalLink;
+                return (
+                  <a
+                    key={i}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-white hover:border-blue-200 hover:shadow-sm transition-all duration-200"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                      <LinkIcon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm text-gray-900 group-hover:text-blue-700 transition-colors flex items-center gap-1">
+                        {link.title}
+                        <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-blue-400 transition-colors" />
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-1 leading-snug">
+                        {link.description}
+                      </p>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className={`${cardStyles.base} mt-5`}>
+            <h2 className={cardStyles.header}>精选外链</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              与「{pkg.title}」相关的外部优质资源：
+            </p>
+            <div className="text-sm text-gray-400 italic">
+              外链资源将在后续版本中添加。
+            </div>
+          </div>
+        )}
 
         {/* Back to home */}
         <div className="mt-8 text-center">
