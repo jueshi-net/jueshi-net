@@ -1,4 +1,5 @@
 import { Breadcrumb } from '@/components/breadcrumb';
+import Footer from '@/components/layout/footer';
 
 export default function PublicLayout({
   children,
@@ -9,6 +10,7 @@ export default function PublicLayout({
     <>
       <Breadcrumb />
       {children}
+      <Footer />
     </>
   );
 }

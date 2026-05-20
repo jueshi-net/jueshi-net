@@ -17,9 +17,10 @@ interface AdminData {
 }
 
 import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
+import { tableStyles, badgeStyles, buttonVariants, cardStyles } from "@/lib/ui-styles";
 
 const ROLE_LABELS: Record<string, string> = { user: "用户", member: "会员", admin: "管理员" };
-const ROLE_COLORS: Record<string, string> = { user: "bg-blue-100 text-blue-700", member: "bg-amber-100 text-amber-700", admin: "bg-purple-100 text-purple-700" };
+const ROLE_BADGE: Record<string, string> = { user: badgeStyles.info, member: badgeStyles.warning, admin: badgeStyles.purple };
 const LEVEL_LABELS: Record<string, string> = { lv1: "Lv.1 新手", lv2: "Lv.2 进阶", lv3: "Lv.3 精英", lv4: "Lv.4 大师", lv5: "Lv.5 传奇" };
 
 export default function AdminUsersPage() {
@@ -198,19 +199,19 @@ export default function AdminUsersPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white border rounded-xl p-4 text-center">
+        <div className={`${cardStyles.base} p-4 text-center`}>
           <div className="text-2xl font-extrabold text-gray-900">{data.pagination.total}</div>
           <div className="text-xs text-gray-500">总用户</div>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+        <div className={`${cardStyles.base.replace("p-5", "p-4")} text-center bg-blue-50 border-blue-200`}>
           <div className="text-2xl font-extrabold text-blue-700">{userCount}</div>
           <div className="text-xs text-blue-600">普通用户</div>
         </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+        <div className={`${cardStyles.base.replace("p-5", "p-4")} text-center bg-amber-50 border-amber-200`}>
           <div className="text-2xl font-extrabold text-amber-700">{memberCount}</div>
           <div className="text-xs text-amber-600">会员</div>
         </div>
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
+        <div className={`${cardStyles.base.replace("p-5", "p-4")} text-center bg-purple-50 border-purple-200`}>
           <div className="text-2xl font-extrabold text-purple-700">{adminCount}</div>
           <div className="text-xs text-purple-600">管理员</div>
         </div>
@@ -223,53 +224,53 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
+      <div className={tableStyles.wrapper}>
+        <div className={tableStyles.scroll}>
+          <table className={tableStyles.base}>
+            <thead className={tableStyles.header}>
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">邮箱</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">角色</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">等级</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">成长值</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">积分</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden lg:table-cell">勋章</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">会员到期</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">操作</th>
+                <th className={tableStyles.headCell}>邮箱</th>
+                <th className={tableStyles.headCell}>角色</th>
+                <th className={`${tableStyles.headCell} hidden sm:table-cell`}>等级</th>
+                <th className={`${tableStyles.headCell} hidden md:table-cell`}>成长值</th>
+                <th className={`${tableStyles.headCell} hidden sm:table-cell`}>积分</th>
+                <th className={`${tableStyles.headCell} hidden lg:table-cell`}>勋章</th>
+                <th className={`${tableStyles.headCell} hidden sm:table-cell`}>会员到期</th>
+                <th className={tableStyles.headCell}>操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className={tableStyles.body}>
               {data.users.map((u) => {
                 const isMember = u.memberUntil && new Date(u.memberUntil) > new Date();
                 return (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
+                  <tr key={u.id} className={tableStyles.row}>
+                    <td className={tableStyles.cell}>
                       <div className="font-medium max-w-[180px] truncate">{u.email}</div>
                       {u.name && <div className="text-xs text-gray-400">{u.name}</div>}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_COLORS[u.role] || "bg-gray-100"}`}>{ROLE_LABELS[u.role] || u.role}</span>
+                    <td className={tableStyles.cell}>
+                      <span className={ROLE_BADGE[u.role] || badgeStyles.neutral}>{ROLE_LABELS[u.role] || u.role}</span>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    <td className={`${tableStyles.cell} hidden sm:table-cell`}>
+                      <span className={badgeStyles.success}>
                         {LEVEL_LABELS[u.levelKey] || u.levelKey}
                       </span>
                     </td>
-                    <td className="px-4 py-3 hidden md:table-cell">
+                    <td className={`${tableStyles.cell} hidden md:table-cell`}>
                       <span className="font-medium text-emerald-600">{u.growthValue}</span>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell font-medium text-amber-600">{u.points}</td>
-                    <td className="px-4 py-3 hidden lg:table-cell text-gray-600">{u._count.badgeAwards}</td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
+                    <td className={`${tableStyles.cell} hidden sm:table-cell font-medium text-amber-600`}>{u.points}</td>
+                    <td className={`${tableStyles.cell} hidden lg:table-cell text-gray-600`}>{u._count.badgeAwards}</td>
+                    <td className={`${tableStyles.cell} hidden sm:table-cell`}>
                       <span className="text-xs text-gray-500">
                         {u.memberUntil ? (isMember ? new Date(u.memberUntil).toLocaleDateString("zh-CN") : "已过期") : "—"}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={tableStyles.cell}>
                       <div className="flex gap-1">
-                        <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditMemberUntil(u.memberUntil ? new Date(u.memberUntil).toISOString().slice(0, 16) : ""); setEditPoints(""); setEditReason(""); }} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]" title="编辑"><Edit className="w-4 h-4" /></button>
-                        <button onClick={() => openGrowthModal(u)} className="p-1.5 text-gray-400 hover:text-emerald-600 min-h-[36px]" title="成长值/勋章"><TrendingUp className="w-4 h-4" /></button>
-                        <button onClick={() => handleViewRewards(u.id)} className="p-1.5 text-gray-400 hover:text-green-600 min-h-[36px]" title="兑换记录"><Ticket className="w-4 h-4" /></button>
+                        <button onClick={() => { setEditingId(u.id); setEditRole(u.role); setEditMemberUntil(u.memberUntil ? new Date(u.memberUntil).toISOString().slice(0, 16) : ""); setEditPoints(""); setEditReason(""); }} className={buttonVariants.ghost.replace("min-h-[44px]", "min-h-[36px]")} title="编辑"><Edit className="w-4 h-4" /></button>
+                        <button onClick={() => openGrowthModal(u)} className={buttonVariants.ghost.replace("min-h-[44px]", "min-h-[36px]")} title="成长值/勋章"><TrendingUp className="w-4 h-4" /></button>
+                        <button onClick={() => handleViewRewards(u.id)} className={buttonVariants.ghost.replace("min-h-[44px]", "min-h-[36px]")} title="兑换记录"><Ticket className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>

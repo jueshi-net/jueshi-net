@@ -15,6 +15,7 @@ import RecommendedPackages from "@/components/dashboard/recommended-packages";
 import MembershipCard from "@/components/dashboard/membership-card";
 import GrowthTaskSummary from "@/components/dashboard/growth-task-summary";
 import NotificationSummaryCard from "@/components/dashboard/notification-summary-card";
+import { buttonVariants, cardStyles, inputStyles } from "@/lib/ui-styles";
 
 // ===== ALL EXISTING LOGIC PRESERVED =====
 
@@ -54,10 +55,10 @@ const POINT_TYPE_LABELS: Record<string, string> = {
   reward_redeem: "权益兑换",
 };
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  high: { label: "高", color: "text-red-500", icon: <ArrowUpCircle className="w-3 h-3" /> },
-  normal: { label: "中", color: "text-yellow-500", icon: <MinusCircle className="w-3 h-3" /> },
-  low: { label: "低", color: "text-green-500", icon: <ArrowDownCircle className="w-3 h-3" /> },
+const PRIORITY_CONFIG: Record<string, { label: string; icon: React.ReactNode; badgeClass: string }> = {
+  high: { label: "高", icon: <ArrowUpCircle className="w-3 h-3" />, badgeClass: "bg-red-50 text-red-700" },
+  normal: { label: "中", icon: <MinusCircle className="w-3 h-3" />, badgeClass: "bg-yellow-50 text-yellow-700" },
+  low: { label: "低", icon: <ArrowDownCircle className="w-3 h-3" />, badgeClass: "bg-green-50 text-green-700" },
 };
 
 const SHORTCUTS = [
@@ -375,7 +376,6 @@ export default function DashboardPage() {
   if (!dashboard) return null;
 
   const roleLabels: Record<string, string> = { guest: "游客", user: "用户", member: "会员", admin: "管理员" };
-  const roleColors: Record<string, string> = { guest: "bg-gray-100 text-gray-600", user: "bg-blue-100 text-blue-700", member: "bg-amber-100 text-amber-700", admin: "bg-purple-100 text-purple-700" };
   const roleIcons: Record<string, React.ReactNode> = { guest: <Globe className="w-4 h-4" />, user: <Zap className="w-4 h-4" />, member: <Crown className="w-4 h-4" />, admin: <Shield className="w-4 h-4" /> };
 
   return (
@@ -405,7 +405,12 @@ export default function DashboardPage() {
                 管理你的工具、任务、积分、会员权益和常用资源
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${roleColors[dashboard.role] || "bg-gray-100 text-gray-600"}`}>
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                  dashboard.role === "admin" ? "bg-purple-100 text-purple-800" :
+                  dashboard.role === "member" ? "bg-amber-100 text-amber-800" :
+                  dashboard.role === "user" ? "bg-blue-100 text-blue-700" :
+                  "bg-gray-100 text-gray-600"
+                }`}>
                   {roleIcons[dashboard.role]}
                   {roleLabels[dashboard.role] || dashboard.role}
                 </span>
@@ -421,7 +426,7 @@ export default function DashboardPage() {
               <Link href="#my-links" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">
                 <Plus className="w-4 h-4" /> 前往添加网址
               </Link>
-              <Link href="/dashboard/points" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white text-teal-700 rounded-xl text-sm font-semibold hover:bg-teal-50 transition-colors">
+              <Link href="/dashboard/points" className={buttonVariants.primary + " bg-white text-teal-700 hover:bg-teal-50"}>
                 <TrendingUp className="w-4 h-4" /> 积分明细
               </Link>
             </div>
@@ -440,13 +445,13 @@ export default function DashboardPage() {
           ].map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <div key={i} className="bg-white rounded-xl border shadow-sm p-4 flex items-start gap-3">
+              <div key={i} className={`${cardStyles.base} p-4 flex items-start gap-3`}>
                 <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center flex-shrink-0`}>
                   <Icon className={`w-5 h-5 ${stat.color}`} />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-gray-500">{stat.label}</p>
-                  <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className={`text-2xl font-bold tracking-tight ${stat.color}`}>{stat.value}</p>
                   <p className="text-xs text-gray-400 mt-0.5 truncate">{stat.desc}</p>
                 </div>
               </div>
@@ -457,7 +462,7 @@ export default function DashboardPage() {
         {/* ===== CHECK-IN + REWARDS PREVIEW ===== */}
         <div className="grid lg:grid-cols-3 gap-4 mb-6">
           {/* Check-in card */}
-          <div className={`rounded-xl border shadow-sm p-5 ${dashboard.checkedInToday ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200" : "bg-white"}`}>
+          <div className={`${cardStyles.base} ${dashboard.checkedInToday ? "!bg-gradient-to-br from-green-50 to-emerald-50 !border-green-200" : ""}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${dashboard.checkedInToday ? "bg-green-100" : "bg-gray-100"}`}>
@@ -478,7 +483,7 @@ export default function DashboardPage() {
                 <button
                   onClick={handleCheckIn}
                   disabled={checkingIn}
-                  className="px-5 py-2.5 min-h-[48px] bg-teal-600 text-white rounded-xl text-sm font-semibold hover:bg-teal-700 active:bg-teal-800 transition-all disabled:opacity-50 shadow-sm"
+                  className={buttonVariants.primary}
                 >
                   {checkingIn ? "签到中..." : "签到"}
                 </button>
@@ -487,9 +492,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Rewards preview */}
-          <div className="lg:col-span-2 bg-white rounded-xl border shadow-sm p-5">
+          <div className={`lg:col-span-2 ${cardStyles.base}`}>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <h2 className={cardStyles.header}>
                 <Gift className="w-5 h-5 text-amber-500" />
                 积分权益兑换
               </h2>
@@ -519,7 +524,7 @@ export default function DashboardPage() {
                         disabled={!canAfford || redeemingId === r.id}
                         className={`w-full py-2 min-h-[44px] rounded-lg text-xs font-medium transition-colors ${
                           canAfford
-                            ? "bg-teal-600 text-white hover:bg-teal-700"
+                            ? buttonVariants.primary
                             : "bg-gray-200 text-gray-400 cursor-not-allowed"
                         }`}
                       >
@@ -535,20 +540,20 @@ export default function DashboardPage() {
 
         {/* ===== MY DRAFTS PREVIEW ===== */}
         {totalDrafts > 0 && (
-          <div className="bg-white rounded-xl border shadow-sm mb-6">
+          <div className={`${cardStyles.base} mb-6`}>
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <h2 className={cardStyles.header}>
                 <FileText className="w-5 h-5 text-teal-600" />
                 我的单据草稿
               </h2>
-              <Link href="/dashboard/documents" className="text-sm text-teal-600 hover:text-teal-700 font-medium min-h-[44px] inline-flex items-center px-2">
+              <Link href="/dashboard/documents" className={buttonVariants.ghost}>
                 查看全部 ({totalDrafts}) <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </Link>
             </div>
             <div className="p-5">
-              <div className="space-y-2">
+              <div className="divide-y divide-gray-100">
                 {recentDrafts.map((draft) => (
-                  <div key={draft.id} className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={draft.id} className="flex items-center justify-between py-3 px-2 hover:bg-gray-50 transition-colors rounded-lg">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-gray-900 truncate">{draft.title}</p>
                       <p className="text-xs text-gray-400">{draft.toolKey} · {new Date(draft.updatedAt).toLocaleDateString("zh-CN")}</p>
@@ -592,10 +597,10 @@ export default function DashboardPage() {
         )}
 
         {/* ===== TODAY'S TASKS ===== */}
-        <div className="bg-white rounded-xl border shadow-sm mb-6">
+        <div className={`${cardStyles.base} mb-6`}>
           <div className="p-5 border-b border-gray-100">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <h2 className={cardStyles.header}>
                 <Target className="w-5 h-5 text-teal-600" />
                 今日待办
               </h2>
@@ -604,7 +609,7 @@ export default function DashboardPage() {
                   <button
                     key={f}
                     onClick={() => setTaskFilter(f)}
-                    className={`px-3 py-2 min-h-[44px] text-xs rounded-lg font-medium transition-all ${taskFilter === f ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                    className={`px-3 py-2 min-h-[44px] text-xs rounded-lg font-medium transition-all ${taskFilter === f ? buttonVariants.primary : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
                   >
                     {f === "pending" ? `待办 (${dashboard.taskStats.pending})` : f === "done" ? `已完成 (${dashboard.taskStats.done})` : `归档 (${dashboard.taskStats.archived})`}
                   </button>
@@ -629,12 +634,12 @@ export default function DashboardPage() {
                   onChange={(e) => setNewTaskTitle(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleCreateTask()}
                   placeholder="添加今天要完成的事项，完成后可获得积分..."
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                  className={inputStyles}
                 />
                 <button
                   onClick={handleCreateTask}
                   disabled={!newTaskTitle.trim()}
-                  className="px-5 py-3 min-h-[48px] bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 active:bg-teal-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className={buttonVariants.primary}
                 >
                   <Plus className="w-4 h-4" /> 添加
                 </button>
@@ -658,14 +663,14 @@ export default function DashboardPage() {
                 )}
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="divide-y divide-gray-100">
                 {tasks.map((task) => {
                   const prio = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.normal;
                   return (
                     <div
                       key={task.id}
-                      className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
-                        task.status === "done" ? "bg-gray-50 border-gray-100" : "bg-white hover:bg-gray-50"
+                      className={`flex items-center gap-3 p-4 transition-all ${
+                        task.status === "done" ? "bg-gray-50" : "hover:bg-gray-50"
                       }`}
                     >
                       {task.status === "pending" && (
@@ -687,12 +692,12 @@ export default function DashboardPage() {
                         <div className={`text-sm font-medium ${task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}`}>
                           {task.title}
                         </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-xs ${prio.color} flex items-center gap-0.5`}>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${prio.badgeClass}`}>
                             {prio.icon}{prio.label}
                           </span>
                           {task.pointsAwarded && task.status === "done" && (
-                            <span className="text-xs text-green-600 flex items-center gap-0.5">
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700">
                               <Star className="w-3 h-3" />+2
                             </span>
                           )}
@@ -720,13 +725,13 @@ export default function DashboardPage() {
         </div>
 
         {/* ===== RECENT POINT LOGS ===== */}
-        <div className="bg-white rounded-xl border shadow-sm mb-6">
+        <div className={`${cardStyles.base} mb-6`}>
           <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+            <h2 className={cardStyles.header}>
               <Star className="w-5 h-5 text-amber-500" />
               最近积分记录
             </h2>
-            <Link href="/dashboard/points" className="text-sm text-teal-600 hover:text-teal-700 font-medium min-h-[44px] inline-flex items-center px-2">
+            <Link href="/dashboard/points" className={buttonVariants.ghost}>
               查看全部 <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </Link>
           </div>
@@ -737,9 +742,9 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-400">暂无积分记录</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="divide-y divide-gray-100">
                 {dashboard.recentLogs.slice(0, 5).map((log) => (
-                  <div key={log.id} className="flex items-center justify-between py-2">
+                  <div key={log.id} className="flex items-center justify-between py-3">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm text-gray-700 truncate">{POINT_TYPE_LABELS[log.type] || log.type}</span>
                       {log.reason && log.reason !== POINT_TYPE_LABELS[log.type] && (
@@ -761,9 +766,9 @@ export default function DashboardPage() {
 
         {/* ===== MY REWARDS ===== */}
         {myRewards.length > 0 && (
-          <div className="bg-white rounded-xl border shadow-sm mb-6">
+          <div className={`${cardStyles.base} mb-6`}>
             <div className="p-5 border-b border-gray-100">
-              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <h2 className={cardStyles.header}>
                 <Ticket className="w-5 h-5 text-green-500" />
                 我的权益
               </h2>
@@ -771,12 +776,6 @@ export default function DashboardPage() {
             <div className="p-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {myRewards.map((r) => {
-                  const statusConfig: Record<string, { label: string; color: string }> = {
-                    active: { label: "可用", color: "text-green-600 bg-green-50" },
-                    used: { label: "已使用", color: "text-gray-400 bg-gray-50" },
-                    expired: { label: "已过期", color: "text-red-400 bg-red-50" },
-                  };
-                  const sc = statusConfig[r.status] || statusConfig.active;
                   return (
                     <div key={r.id} className="flex items-center gap-3 p-4 rounded-lg border">
                       {r.rewardType === "word_export_coupon" && <Ticket className="w-5 h-5 text-blue-500 flex-shrink-0" />}
@@ -787,7 +786,13 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-400">×{r.rewardValue}</p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`text-xs px-2 py-0.5 rounded ${sc.color}`}>{sc.label}</span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          r.status === "active" ? "bg-green-100 text-green-800" :
+                          r.status === "used" ? "bg-gray-100 text-gray-600" :
+                          "bg-red-100 text-red-800"
+                        }`}>
+                          {r.status === "active" ? "可用" : r.status === "used" ? "已使用" : "已过期"}
+                        </span>
                         <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString("zh-CN")}</span>
                       </div>
                     </div>
@@ -799,9 +804,9 @@ export default function DashboardPage() {
         )}
 
         {/* ===== POINTS RULES ===== */}
-        <div className="bg-white rounded-xl border shadow-sm mb-6">
+        <div className={`${cardStyles.base} mb-6`}>
           <div className="p-5 border-b border-gray-100">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+            <h2 className={cardStyles.header}>
               <BookOpen className="w-5 h-5 text-blue-500" />
               积分规则
             </h2>
@@ -840,9 +845,9 @@ export default function DashboardPage() {
         </div>
 
         {/* ===== QUICK SHORTCUTS ===== */}
-        <div className="bg-white rounded-xl border shadow-sm">
+        <div className={cardStyles.base}>
           <div className="p-5 border-b border-gray-100">
-            <h2 className="font-bold text-gray-900">快速入口</h2>
+            <h2 className={cardStyles.header}>快速入口</h2>
           </div>
           <div className="p-5">
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">

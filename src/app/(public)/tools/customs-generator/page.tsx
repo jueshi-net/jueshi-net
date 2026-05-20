@@ -10,6 +10,7 @@ import 'jspdf-autotable';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { AdSlot } from '@/components/ad-slot';
 import { FAQSection } from '@/components/faq-section';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface CustomsItem {
   id: string;
@@ -168,7 +169,7 @@ export default function CustomsGenerator() {
           </div>
           <button
             onClick={generatePDF}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+            className={buttonVariants.primary}
           >
             <Download className="w-5 h-5" />
             生成 PDF
@@ -177,39 +178,39 @@ export default function CustomsGenerator() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Shipper Info */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className={cardStyles.base}>
+            <h2 className={cardStyles.header}>
               <Globe className="w-5 h-5 text-blue-500" />
               发货人信息 (Shipper)
             </h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">公司名称</label>
+                <label className={labelStyles.field}>公司名称</label>
                 <input
                   type="text"
                   value={form.shipperName}
                   onChange={(e) => setForm(prev => ({ ...prev, shipperName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={inputStyles}
                   placeholder="输入公司英文名称"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">地址</label>
+                <label className={labelStyles.field}>地址</label>
                 <textarea
                   value={form.shipperAddress}
                   onChange={(e) => setForm(prev => ({ ...prev, shipperAddress: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`${inputStyles} resize-none`}
                   rows={2}
                   placeholder="详细地址"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
+                <label className={labelStyles.field}>联系电话</label>
                 <input
                   type="text"
                   value={form.shipperPhone}
                   onChange={(e) => setForm(prev => ({ ...prev, shipperPhone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={inputStyles}
                   placeholder="+86"
                 />
               </div>
@@ -217,39 +218,39 @@ export default function CustomsGenerator() {
           </div>
 
           {/* Consignee Info */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className={cardStyles.base}>
+            <h2 className={cardStyles.header}>
               <Globe className="w-5 h-5 text-green-500" />
               收货人信息 (Consignee)
             </h2>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">公司名称</label>
+                <label className={labelStyles.field}>公司名称</label>
                 <input
                   type="text"
                   value={form.consigneeName}
                   onChange={(e) => setForm(prev => ({ ...prev, consigneeName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={inputStyles}
                   placeholder="输入公司英文名称"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">地址</label>
+                <label className={labelStyles.field}>地址</label>
                 <textarea
                   value={form.consigneeAddress}
                   onChange={(e) => setForm(prev => ({ ...prev, consigneeAddress: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={`${inputStyles} resize-none`}
                   rows={2}
                   placeholder="目的国详细地址"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
+                <label className={labelStyles.field}>联系电话</label>
                 <input
                   type="text"
                   value={form.consigneePhone}
                   onChange={(e) => setForm(prev => ({ ...prev, consigneePhone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className={inputStyles}
                   placeholder="+1"
                 />
               </div>
@@ -258,33 +259,33 @@ export default function CustomsGenerator() {
         </div>
 
         {/* Trade Info */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+        <div className={cardStyles.base}>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">贸易信息</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">发票号</label>
+              <label className={labelStyles.field}>发票号</label>
               <input
                 type="text"
                 value={form.invoiceNo}
                 onChange={(e) => setForm(prev => ({ ...prev, invoiceNo: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">日期</label>
+              <label className={labelStyles.field}>日期</label>
               <input
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm(prev => ({ ...prev, date: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">贸易条款</label>
+              <label className={labelStyles.field}>贸易条款</label>
               <select
                 value={form.tradeTerm}
                 onChange={(e) => setForm(prev => ({ ...prev, tradeTerm: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
               >
                 <option value="FOB">FOB</option>
                 <option value="CIF">CIF</option>
@@ -294,11 +295,11 @@ export default function CustomsGenerator() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">付款方式</label>
+              <label className={labelStyles.field}>付款方式</label>
               <select
                 value={form.paymentTerm}
                 onChange={(e) => setForm(prev => ({ ...prev, paymentTerm: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
               >
                 <option value="T/T">T/T</option>
                 <option value="L/C">L/C</option>
@@ -307,22 +308,22 @@ export default function CustomsGenerator() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">装货港</label>
+              <label className={labelStyles.field}>装货港</label>
               <input
                 type="text"
                 value={form.portOfLoading}
                 onChange={(e) => setForm(prev => ({ ...prev, portOfLoading: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
                 placeholder="上海"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">卸货港</label>
+              <label className={labelStyles.field}>卸货港</label>
               <input
                 type="text"
                 value={form.portOfDischarge}
                 onChange={(e) => setForm(prev => ({ ...prev, portOfDischarge: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className={inputStyles}
                 placeholder="Los Angeles"
               />
             </div>
@@ -330,24 +331,24 @@ export default function CustomsGenerator() {
         </div>
 
         {/* Items */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+        <div className={cardStyles.base}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <h2 className={cardStyles.header}>
               <Package className="w-5 h-5 text-blue-500" />
               货物清单
             </h2>
             <button
               onClick={addItem}
-              className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+              className={buttonVariants.secondary}
             >
               <Plus className="w-4 h-4" />
               添加项目
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 divide-y divide-gray-100">
             {items.map((item, index) => (
-              <div key={item.id} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div key={item.id} className={labelStyles.item}>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-medium text-gray-500">项目 {index + 1}</span>
                   {items.length > 1 && (
@@ -362,60 +363,60 @@ export default function CustomsGenerator() {
                 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">英文品名</label>
+                    <label className={labelStyles.field}>英文品名</label>
                     <input
                       type="text"
                       value={item.nameEn}
                       onChange={(e) => updateItem(item.id, 'nameEn', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       placeholder="Product Name"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">中文品名</label>
+                    <label className={labelStyles.field}>中文品名</label>
                     <input
                       type="text"
                       value={item.nameCn}
                       onChange={(e) => updateItem(item.id, 'nameCn', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       placeholder="产品名称"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">HS 编码</label>
+                    <label className={labelStyles.field}>HS 编码</label>
                     <input
                       type="text"
                       value={item.hsCode}
                       onChange={(e) => updateItem(item.id, 'hsCode', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       placeholder="1234567890"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">原产国</label>
+                    <label className={labelStyles.field}>原产国</label>
                     <input
                       type="text"
                       value={item.origin}
                       onChange={(e) => updateItem(item.id, 'origin', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">数量</label>
+                    <label className={labelStyles.field}>数量</label>
                     <input
                       type="number"
                       value={item.quantity}
                       onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       min="1"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">单位</label>
+                    <label className={labelStyles.field}>单位</label>
                     <select
                       value={item.unit}
                       onChange={(e) => updateItem(item.id, 'unit', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                     >
                       <option value="件">件</option>
                       <option value="箱">箱</option>
@@ -425,23 +426,23 @@ export default function CustomsGenerator() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">单价</label>
+                    <label className={labelStyles.field}>单价</label>
                     <input
                       type="number"
                       value={item.unitPrice}
                       onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       step="0.01"
                       min="0"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">单重 (kg)</label>
+                    <label className={labelStyles.field}>单重 (kg)</label>
                     <input
                       type="number"
                       value={item.weight}
                       onChange={(e) => updateItem(item.id, 'weight', parseFloat(e.target.value) || 0)}
-                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                      className={inputStyles}
                       step="0.01"
                       min="0"
                     />

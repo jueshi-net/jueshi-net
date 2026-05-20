@@ -6,6 +6,7 @@ import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
 import { commonProducts } from '@/lib/data/product-declarations';
 import type { ProductDecl } from '@/lib/data/product-declarations';
@@ -110,15 +111,15 @@ export default function HSCodePage() {
         </div>
 
         {/* Search & Filter */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-5 mb-6">
+        <div className={cardStyles.base + " mb-6"}>
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input className="w-full pl-10 pr-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              <input className={inputStyles + " pl-10"}
                 placeholder="搜索商品名称（中文/英文/别名）..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             <select value={filterRisk} onChange={e => setFilterRisk(e.target.value)}
-              className="px-4 py-2.5 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+              className={inputStyles}>
               <option value="all">全部商品</option>
               <option value="normal">仅普通货参考</option>
               <option value="needs-confirm">仅需要确认属性</option>
@@ -126,11 +127,11 @@ export default function HSCodePage() {
               <option value="restricted">仅受限/禁止风险</option>
             </select>
             <button onClick={() => { setBatchMode(!batchMode); trackEvent.custom('hs-code', 'toggle_batch'); }}
-              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 transition-colors ${batchMode ? 'bg-blue-600 text-white border-blue-600' : 'dark:bg-gray-700 dark:border-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600'}`}>
+              className={`flex items-center gap-2 transition-colors rounded-lg ${batchMode ? buttonVariants.primary : buttonVariants.secondary}`}>
               <ListOrdered className="w-4 h-4" /> 批量查询
             </button>
             <button onClick={exportCSV}
-              className="px-4 py-2.5 border rounded-lg flex items-center gap-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800 transition-colors">
+              className={buttonVariants.secondary}>
               <Download className="w-4 h-4" /> 导出 CSV
             </button>
           </div>
@@ -147,7 +148,7 @@ export default function HSCodePage() {
                 onChange={e => setBatchInput(e.target.value)}
                 placeholder={"示例：\n手机壳\n充电宝\n茶叶\n沙发"}
                 rows={5}
-                className="w-full px-4 py-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono text-sm resize-y"
+                className={inputStyles + " font-mono text-sm resize-y"}
               />
               {batchInput.trim() && (
                 <div className="mt-3 space-y-2">
@@ -186,7 +187,7 @@ export default function HSCodePage() {
             const id = `product-${i}`;
             const isExpanded = expandedId === id;
             return (
-              <div key={id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div key={id} className={`${cardStyles.base.replace("p-5", "")} overflow-hidden`}>
                 <div className="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750"
                   onClick={() => setExpandedId(isExpanded ? null : id)}>
                   <div className="flex items-center gap-3 min-w-0">
@@ -239,7 +240,7 @@ export default function HSCodePage() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">申报注意事项</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded-lg p-3">{p.notes}</p>
+                      <p className={`text-sm text-gray-600 dark:text-gray-300 ${labelStyles.item}`}>{p.notes}</p>
                     </div>
                     <div className="flex flex-wrap gap-3 text-xs">
                       <a href={p.officialUrl} target="_blank" rel="noopener noreferrer"
@@ -270,8 +271,8 @@ export default function HSCodePage() {
         )}
 
         {/* Government sources */}
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl border p-6">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <div className={`mt-8 ${cardStyles.base}`}>
+          <h3 className={cardStyles.header}>
             <ExternalLink className="w-4 h-4 text-green-600" />
             各国官方 HS 编码查询入口
           </h3>
@@ -297,8 +298,8 @@ export default function HSCodePage() {
         </div>
 
         {/* Source info */}
-        <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl border p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">📚 数据来源与说明</h3>
+        <div className={`mt-6 ${cardStyles.base}`}>
+          <h3 className={cardStyles.header}>📚 数据来源与说明</h3>
           <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div><p className="font-medium">来源</p><p>常用商品申报经验汇总</p></div>
             <div><p className="font-medium">版本</p><p>2026 年 HS 编码体系</p></div>

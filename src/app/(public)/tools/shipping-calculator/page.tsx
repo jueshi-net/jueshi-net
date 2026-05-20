@@ -13,6 +13,7 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { trackEvent } from '@/lib/analytics';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 // ==================== Types ====================
 interface CalcRow {
@@ -224,7 +225,7 @@ export default function ShippingCalculatorPage() {
               </div>
             </div>
             <button onClick={clearAll}
-              className="px-3 py-2 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 flex items-center gap-1.5">
+              className={buttonVariants.secondary}>
               <RotateCcw className="w-4 h-4" />重置
             </button>
           </div>
@@ -274,7 +275,7 @@ export default function ShippingCalculatorPage() {
           <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center gap-4">
             <label className="text-sm font-medium text-gray-700">自定义除数：</label>
             <input type="number" value={customDivisor} onChange={e => setCustomDivisor(e.target.value)}
-              className="px-3 py-1.5 border border-purple-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none w-28" />
+              className={`${inputStyles} w-28`} />
             <span className="text-xs text-gray-500">长×宽×高(cm) ÷ 除数 = 体积重(kg)</span>
           </div>
         )}
@@ -347,31 +348,31 @@ export default function ShippingCalculatorPage() {
                     <label className="md:hidden text-[10px] text-gray-400">长</label>
                     <input type="number" step={useMeters ? '0.01' : '1'} placeholder="长" value={row.length}
                       onChange={e => updateRow(row.id, 'length', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                      className={`${inputStyles} text-center`} />
                   </div>
                   <div className="md:col-span-2">
                     <label className="md:hidden text-[10px] text-gray-400">宽</label>
                     <input type="number" step={useMeters ? '0.01' : '1'} placeholder="宽" value={row.width}
                       onChange={e => updateRow(row.id, 'width', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                      className={`${inputStyles} text-center`} />
                   </div>
                   <div className="md:col-span-2">
                     <label className="md:hidden text-[10px] text-gray-400">高</label>
                     <input type="number" step={useMeters ? '0.01' : '1'} placeholder="高" value={row.height}
                       onChange={e => updateRow(row.id, 'height', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                      className={`${inputStyles} text-center`} />
                   </div>
                   <div className="md:col-span-1">
                     <label className="md:hidden text-[10px] text-gray-400">件数</label>
                     <input type="number" min="1" placeholder="件数" value={row.quantity}
                       onChange={e => updateRow(row.id, 'quantity', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                      className={`${inputStyles} text-center`} />
                   </div>
                   <div className="md:col-span-2">
                     <label className="md:hidden text-[10px] text-gray-400">实重</label>
                     <input type="number" step="0.1" placeholder="kg" value={row.actualWeight}
                       onChange={e => updateRow(row.id, 'actualWeight', e.target.value)}
-                      className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-center focus:ring-2 focus:ring-blue-400 focus:outline-none" />
+                      className={`${inputStyles} text-center`} />
                   </div>
                   <div className="md:col-span-1 flex items-center justify-center">
                     <button onClick={() => removeRow(row.id)} disabled={rows.length === 1}
@@ -390,11 +391,11 @@ export default function ShippingCalculatorPage() {
           {/* Action buttons */}
           <div className="px-4 pb-4 flex flex-wrap gap-2">
             <button onClick={addRow}
-              className="px-4 py-2 bg-green-50 text-green-600 rounded-lg text-sm hover:bg-green-100 flex items-center gap-1">
+              className={buttonVariants.secondary}>
               <Plus className="w-4 h-4" />增加规格
             </button>
             <button onClick={() => { setShowBatch(true); setBatchText(''); setParsedRows([]); setParseErrors([]); }}
-              className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 flex items-center gap-1">
+              className={buttonVariants.ghost}>
               <Clipboard className="w-4 h-4" />批量增加
             </button>
           </div>
@@ -485,12 +486,12 @@ export default function ShippingCalculatorPage() {
         {/* ==================== 费用构成参考 ==================== */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="px-4 py-3 bg-gray-50 border-b">
-            <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <h3 className={cardStyles.header}>
               <Truck className="w-4 h-4 text-green-600" />费用构成参考
             </h3>
             <p className="text-xs text-gray-500 mt-0.5">以下仅为费用构成说明，非实际报价</p>
           </div>
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-3 divide-y divide-gray-100">
             {[
               {
                 icon: '📦', title: '国际快递 (DHL/FedEx/UPS)',
@@ -542,7 +543,7 @@ export default function ShippingCalculatorPage() {
           {/* Measurement Guide */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-4 py-3 bg-gray-50 border-b">
-              <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className={cardStyles.header}>
                 <AlertTriangle className="w-4 h-4 text-orange-500" />尺寸测量指南
               </h3>
             </div>
@@ -556,7 +557,7 @@ export default function ShippingCalculatorPage() {
           {/* Packing Tips */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-4 py-3 bg-gray-50 border-b">
-              <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className={cardStyles.header}>
                 <Box className="w-4 h-4 text-green-500" />包装优化建议 💰
               </h3>
             </div>
@@ -629,7 +630,7 @@ export default function ShippingCalculatorPage() {
               <textarea value={batchText} onChange={e => handleBatchParse(e.target.value)}
                 placeholder={'粘贴数据，例如：\n50*40*30*5*10\n60×50×40×2×15kg\n70,45,35,3,8'}
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" />
+                className={`${inputStyles} resize-none font-mono`} />
 
               {parsedRows.length > 0 && (
                 <div className="mt-4">

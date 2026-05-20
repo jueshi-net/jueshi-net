@@ -8,6 +8,7 @@ import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
 import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import Link from 'next/link';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 function normalizePostal(input: string): string {
   return input.trim().toUpperCase().replace(/[\s\-]+/g, '');
@@ -326,7 +327,7 @@ export default function PostalCodePage() {
         </div>
 
         {/* ===== COUNTRY TABS ===== */}
-        <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+<div className={cardStyles.base}>
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家</h2>
           <div className="flex flex-wrap gap-2">
             {allCountryData.map(c => (
@@ -347,9 +348,9 @@ export default function PostalCodePage() {
           {/* Left Column (2/3): Validation + DB Search + Ranges */}
           <div className="lg:col-span-2 space-y-6">
             {/* Format Validation */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-5 border-b border-gray-100">
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <h2 className={cardStyles.header}>
                   <CheckCircle className="w-5 h-5 text-teal-600" />
                   邮编格式校验
                 </h2>
@@ -360,14 +361,14 @@ export default function PostalCodePage() {
               <div className="p-5">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <input
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-base font-mono focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className={`${inputStyles} font-mono`}
                     placeholder={country.format}
                     value={inputCode}
                     onChange={e => setInputCode(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && validate()}
                   />
                   <button onClick={() => { validate(); trackEvent.postalQuery(); }}
-                    className="px-6 py-3 min-h-[48px] bg-teal-600 text-white rounded-lg font-semibold hover:bg-teal-700 active:bg-teal-800 transition-all duration-200 shadow-sm flex items-center justify-center gap-2">
+                    className={`${buttonVariants.primary} shadow-sm`}>
                     <CheckCircle className="w-4 h-4" />
                     校验
                   </button>
@@ -429,9 +430,9 @@ export default function PostalCodePage() {
             </div>
 
             {/* DB-Powered Search */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-5 border-b border-gray-100">
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <h2 className={cardStyles.header}>
                   <Database className="w-5 h-5 text-blue-600" />
                   数据库邮编查询
                 </h2>
@@ -459,14 +460,14 @@ export default function PostalCodePage() {
                 {/* Search input */}
                 <div className="flex gap-3 mb-4">
                   <input
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className={`${inputStyles} flex-1`}
                     placeholder={dbTab === 'code' ? '输入邮编（如 M5V 2T6）...' : dbTab === 'city' ? '输入城市名（如 Toronto）...' : '输入邮编或城市名...'}
                     value={dbQuery}
                     onChange={e => setDbQuery(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleDbSearch()}
                   />
                   <button onClick={handleDbSearch} disabled={dbLoading}
-                    className="px-6 py-3 min-h-[48px] bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center gap-2">
+                    className={buttonVariants.primary}>
                     {dbLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                     {dbLoading ? '查询中…' : '查询'}
                   </button>
@@ -483,7 +484,7 @@ export default function PostalCodePage() {
                 {!dbLoading && dbResults.length > 0 && (
                   <>
                     <p className="text-xs text-gray-400 mb-3">找到 {dbTotal.toLocaleString()} 条记录</p>
-                    <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto">
+                    <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto divide-y divide-gray-100">
                       {dbResults.map((r) => {
                         const normalizedQuery = dbQuery.trim().toUpperCase().replace(/[\s-]+/g, '');
                         const normalizedCode = (r.normalizedPostalCode || r.postalCode.replace(/[\s-]/g, '').toUpperCase());
@@ -573,9 +574,9 @@ export default function PostalCodePage() {
             </div>
 
             {/* City / Region Search (legacy) */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-5 border-b border-gray-100">
-                <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <h2 className={cardStyles.header}>
                   <Search className="w-5 h-5 text-indigo-600" />
                   按城市/地区查询邮编范围（参考）
                 </h2>
@@ -584,7 +585,7 @@ export default function PostalCodePage() {
                 <div className="relative mb-4">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
-                    className="w-full pl-9 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    className={`${inputStyles} pl-9`}
                     placeholder="输入城市名或地区缩写（如 Toronto、NSW、100）..."
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
@@ -597,7 +598,7 @@ export default function PostalCodePage() {
                   </p>
                 )}
 
-                <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+                <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto divide-y divide-gray-100">
                   {filteredRanges.map((r, i) => (
                     <div key={i} className="bg-gray-50 rounded-lg px-3 py-2.5 flex items-center justify-between">
                       <div className="min-w-0">
@@ -666,14 +667,14 @@ export default function PostalCodePage() {
           {/* Right Column (1/3): States + Official Links + Address Format */}
           <div className="space-y-6">
             {/* State/Region Abbreviations */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-4 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-900">
+                <h2 className={cardStyles.header}>
                   {country.code === 'GB' ? '地区速查' : country.code === 'NZ' ? '地区速查' : '省州缩写速查'}
                 </h2>
               </div>
               <div className="p-3 max-h-96 overflow-y-auto">
-                <div className="grid grid-cols-1 gap-1">
+                <div className="grid grid-cols-1 gap-1 divide-y divide-gray-100">
                   {country.stateAbbrevs.map(s => (
                     <div key={s.code} className="bg-gray-50 rounded-lg px-3 py-2 flex items-center gap-2">
                       <span className="font-mono font-bold text-teal-600 text-sm w-10 shrink-0">{s.code}</span>
@@ -685,9 +686,9 @@ export default function PostalCodePage() {
             </div>
 
             {/* Official Lookup Links */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-4 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <h2 className={cardStyles.header}>
                   <ExternalLink className="w-4 h-4 text-green-600" />
                   官方查询入口
                 </h2>
@@ -698,11 +699,11 @@ export default function PostalCodePage() {
                 </p>
                 <div className="space-y-3">
                   <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                    className={`${buttonVariants.primary} w-full justify-center`}>
                     <ExternalLink className="w-4 h-4" /> 查询邮编 — {country.officialName}
                   </a>
                   <a href={country.officialUrl} target="_blank" rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                    className={`${buttonVariants.secondary} w-full justify-center`}>
                     <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 首页
                   </a>
                 </div>
@@ -725,15 +726,15 @@ export default function PostalCodePage() {
             </div>
 
             {/* Address Format Reference */}
-            <div className="bg-white rounded-xl border shadow-sm">
+            <div className={cardStyles.base}>
               <div className="p-4 border-b border-gray-100">
-                <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                <h2 className={cardStyles.header}>
                   <MapPin className="w-4 h-4 text-blue-600" />
                   地址格式参考
                 </h2>
               </div>
               <div className="p-4">
-                <div className="space-y-3">
+                <div className="space-y-3 divide-y divide-gray-100">
                   {country.ranges.slice(0, 4).map((r, i) => {
                     const addr = getSampleAddress(country.code, r.city, r.region, r.range);
                     return (

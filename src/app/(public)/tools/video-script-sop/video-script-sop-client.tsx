@@ -1,11 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Printer, Building2, FileText, Loader2, Eye, Video, Download } from "lucide-react";
+import { ArrowLeft, Save, Printer, Building2, FileText, Loader2, Eye, Video } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useDocumentToolBase } from "@/lib/use-document-tool-base";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
-import { useDraftLoader } from "@/lib/use-draft-loader";
+
+// ─── Style constants (UI Design System) ───
+
+const textareaStyles = {
+  base: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-y break-words whitespace-pre-wrap",
+  hint: "text-xs text-gray-400 mt-1",
+};
+
+const cardStyles = {
+  base: "bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-6",
+  section: "space-y-4",
+  sectionHeader: "text-base font-bold text-gray-900 mb-3 flex items-center gap-2",
+  sectionNumber: "w-6 h-6 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-xs font-bold",
+};
+
+const buttonVariants = {
+  primary: "inline-flex items-center gap-2 px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm font-medium min-h-[44px] disabled:opacity-50 transition-colors",
+  secondary: "inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm min-h-[44px] transition-colors",
+  chip: (active: boolean, color: "teal" | "pink") =>
+    cn(
+      "px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition-colors",
+      active
+        ? color === "teal"
+          ? "bg-teal-600 text-white border-teal-600"
+          : "bg-pink-600 text-white border-pink-600"
+        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+    ),
+  previewToggle: "inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 rounded hover:bg-gray-200 min-h-[36px] print:hidden transition-colors",
+};
+
+const inputStyles = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-[44px]";
+
+// ─── Constants ───
 
 const PLATFORMS = ["小红书", "TikTok", "Facebook", "Instagram", "YouTube Shorts", "其他"] as const;
 const VIDEO_TYPES = ["物流科普", "产品介绍", "客户案例", "仓库实拍", "报价解释", "避坑提醒", "教程类", "其他"] as const;
@@ -60,129 +94,102 @@ const emptyForm: FormData = {
   publishChecklist: "",
 };
 
+// ─── Sub-components ───
+
+function TextArea({
+  label,
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  hint,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  rows?: number;
+  hint?: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={rows}
+        className={textareaStyles.base}
+      />
+      {hint && <p className={textareaStyles.hint}>{hint}</p>}
+    </div>
+  );
+}
+
+function ChipSelector({
+  label,
+  options,
+  value,
+  onChange,
+  color = "teal",
+}: {
+  label: string;
+  options: readonly string[];
+  value: string;
+  onChange: (value: string) => void;
+  color?: "teal" | "pink";
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(value === opt ? "" : opt)}
+            className={buttonVariants.chip(value === opt, color)}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───
+
 export default function VideoScriptSopClient({ draftId }: { draftId: string | null }) {
-  const [form, setForm] = useState<FormData>({ ...emptyForm });
-  const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [saveMsg, setSaveMsg] = useState("");
-  const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Load draft from URL param
-  const loadDraftData = useCallback((dataJson: string) => {
-    try {
-      const d = JSON.parse(dataJson);
-      setForm((prev) => ({ ...prev, ...d }));
-    } catch { /* ignore */ }
-  }, []);
-
-  const { loadingDraft, draftError, draftLoaded } = useDraftLoader(() => draftId, loadDraftData);
-
-  useEffect(() => {
-    if (draftLoaded && draftId) setCurrentDocId(draftId);
-  }, [draftLoaded, draftId]);
-
-  // Load draft from localStorage on mount (only if no draftId)
-  useEffect(() => {
-    if (draftId) return;
-    try {
-      const saved = localStorage.getItem("video-script-sop-draft");
-      if (saved) {
-        const d = JSON.parse(saved);
-        setForm((prev) => ({ ...prev, ...d }));
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  // Auto-save to localStorage
-  useEffect(() => {
-    const t = setTimeout(() => {
-      localStorage.setItem("video-script-sop-draft", JSON.stringify(form));
-    }, 500);
-    return () => clearTimeout(t);
-  }, [form]);
-
-  const update = (field: keyof FormData, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleProfileSelect = useCallback((profile: CompanyProfile) => {
-    setSelectedProfile(profile);
-    if (!form.title) update("title", profile.companyName + " 短视频脚本");
-    if (!form.ctaText && (profile.phone || profile.email)) {
-      const parts: string[] = [];
-      if (profile.phone) parts.push("电话: " + profile.phone);
-      if (profile.email) parts.push("邮箱: " + profile.email);
-      if (profile.website) parts.push("网站: " + profile.website);
-      update("ctaText", parts.join(" | "));
-    }
-    if (!form.sellingPoint1 && profile.companyName) {
-      update("sellingPoint1", profile.companyName + " 专业提供跨境物流服务");
-    }
-  }, [form.title, form.ctaText, form.sellingPoint1]);
-
-  const handleSave = async () => {
-    setSaving(true);
-    setSaved(false);
-    setSaveMsg("");
-    try {
-      const method = currentDocId ? "PUT" : "POST";
-      const url = currentDocId
-        ? `/api/me/tool-documents/${currentDocId}`
-        : "/api/me/tool-documents";
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          toolKey: "video-script-sop",
-          title: form.title || "短视频 SOP 脚本草稿",
-          dataJson: JSON.stringify({ ...form, selectedCompanyId: selectedProfile?.id || null, selectedCompanyName: selectedProfile?.companyName || null }),
-          ...(selectedProfile?.id && { companyProfileId: selectedProfile.id }),
-        }),
-      });
-      if (res.ok) {
-        const d = await res.json();
-        if (d.data?.id && !currentDocId) setCurrentDocId(d.data.id);
-        setSaved(true);
-        setSaveMsg("已保存草稿");
-        setTimeout(() => setSaved(false), 3000);
-      } else {
-        const e = await res.json().catch(() => ({}));
-        setSaveMsg(e.error || "保存失败");
-      }
-    } catch {
-      setSaveMsg("网络错误");
-    }
-    setSaving(false);
-  };
-
-  const handleRestore = useCallback((snapshotJson: string) => {
-    try {
-      const d = JSON.parse(snapshotJson);
-      // Restore form fields (filter out metadata fields)
-      const { selectedCompanyId, selectedCompanyName, ...rest } = d as Record<string, unknown>;
-      setForm((prev) => ({ ...prev, ...rest }));
-      setSaveMsg("已恢复历史版本，点击「保存草稿」确认");
-    } catch {
-      setSaveMsg("恢复数据解析失败");
-    }
-  }, []);
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleReset = () => {
-    if (confirm("确定要清空所有填写内容吗？")) {
-      setForm({ ...emptyForm });
-      localStorage.removeItem("video-script-sop-draft");
-    }
-  };
+  const {
+    form,
+    setForm,
+    update,
+    selectedProfile,
+    handleProfileSelect,
+    currentDocId,
+    saving,
+    saved,
+    saveMsg,
+    loadingDraft,
+    draftError,
+    handleSave,
+    handleRestore,
+    handleReset,
+  } = useDocumentToolBase<FormData>({
+    toolKey: "video-script-sop",
+    emptyForm,
+    localStorageKey: "video-script-sop-draft",
+    getTitle: (f) => (f as FormData).title || "短视频 SOP 脚本草稿",
+    draftId,
+  });
 
   // Preview text generation
-  const generatePreview = () => {
+  const generatePreview = useCallback(() => {
+    const f = form as FormData;
     const lines: string[] = [];
     lines.push("═══════════════════════════════════════════");
     lines.push("       短视频 SOP 脚本文档");
@@ -190,64 +197,46 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
     lines.push("");
     lines.push("📋 基础信息");
     lines.push("───────────────────────────────────────────");
-    if (form.title) lines.push(`视频标题: ${form.title}`);
+    if (f.title) lines.push(`视频标题: ${f.title}`);
     if (selectedProfile) lines.push(`品牌/公司: ${selectedProfile.companyName}`);
-    if (form.platform) lines.push(`发布平台: ${form.platform}`);
-    if (form.videoType) lines.push(`视频类型: ${form.videoType}`);
-    if (form.targetAudience) lines.push(`目标受众: ${form.targetAudience}`);
-    if (form.coreSellingPoint) lines.push(`核心卖点: ${form.coreSellingPoint}`);
-    if (form.ctaText) lines.push(`CTA 引导: ${form.ctaText}`);
+    if (f.platform) lines.push(`发布平台: ${f.platform}`);
+    if (f.videoType) lines.push(`视频类型: ${f.videoType}`);
+    if (f.targetAudience) lines.push(`目标受众: ${f.targetAudience}`);
+    if (f.coreSellingPoint) lines.push(`核心卖点: ${f.coreSellingPoint}`);
+    if (f.ctaText) lines.push(`CTA 引导: ${f.ctaText}`);
     lines.push("");
     lines.push("🎬 脚本结构");
     lines.push("───────────────────────────────────────────");
-    if (form.hook) lines.push(`【开头 3 秒钩子】\n${form.hook}`);
-    if (form.painPoint) lines.push(`【痛点描述】\n${form.painPoint}`);
-    if (form.solution) lines.push(`【解决方案】\n${form.solution}`);
-    if (form.sellingPoint1) lines.push(`【关键卖点 1】\n${form.sellingPoint1}`);
-    if (form.sellingPoint2) lines.push(`【关键卖点 2】\n${form.sellingPoint2}`);
-    if (form.sellingPoint3) lines.push(`【关键卖点 3】\n${form.sellingPoint3}`);
-    if (form.visualSuggestion) lines.push(`【画面建议】\n${form.visualSuggestion}`);
-    if (form.voiceoverScript) lines.push(`【口播文案】\n${form.voiceoverScript}`);
-    if (form.subtitleScript) lines.push(`【字幕文案】\n${form.subtitleScript}`);
-    if (form.endingCta) lines.push(`【结尾 CTA】\n${form.endingCta}`);
+    if (f.hook) lines.push(`【开头 3 秒钩子】\n${f.hook}`);
+    if (f.painPoint) lines.push(`【痛点描述】\n${f.painPoint}`);
+    if (f.solution) lines.push(`【解决方案】\n${f.solution}`);
+    if (f.sellingPoint1) lines.push(`【关键卖点 1】\n${f.sellingPoint1}`);
+    if (f.sellingPoint2) lines.push(`【关键卖点 2】\n${f.sellingPoint2}`);
+    if (f.sellingPoint3) lines.push(`【关键卖点 3】\n${f.sellingPoint3}`);
+    if (f.visualSuggestion) lines.push(`【画面建议】\n${f.visualSuggestion}`);
+    if (f.voiceoverScript) lines.push(`【口播文案】\n${f.voiceoverScript}`);
+    if (f.subtitleScript) lines.push(`【字幕文案】\n${f.subtitleScript}`);
+    if (f.endingCta) lines.push(`【结尾 CTA】\n${f.endingCta}`);
     lines.push("");
     lines.push("📸 拍摄 SOP");
     lines.push("───────────────────────────────────────────");
-    if (form.scenePrep) lines.push(`【场景准备】\n${form.scenePrep}`);
-    if (form.propPrep) lines.push(`【道具准备】\n${form.propPrep}`);
-    if (form.shotList) lines.push(`【镜头清单】\n${form.shotList}`);
-    if (form.shootingNotes) lines.push(`【拍摄注意事项】\n${form.shootingNotes}`);
-    if (form.editingNotes) lines.push(`【剪辑注意事项】\n${form.editingNotes}`);
-    if (form.publishChecklist) lines.push(`【发布前检查清单】\n${form.publishChecklist}`);
+    if (f.scenePrep) lines.push(`【场景准备】\n${f.scenePrep}`);
+    if (f.propPrep) lines.push(`【道具准备】\n${f.propPrep}`);
+    if (f.shotList) lines.push(`【镜头清单】\n${f.shotList}`);
+    if (f.shootingNotes) lines.push(`【拍摄注意事项】\n${f.shootingNotes}`);
+    if (f.editingNotes) lines.push(`【剪辑注意事项】\n${f.editingNotes}`);
+    if (f.publishChecklist) lines.push(`【发布前检查清单】\n${f.publishChecklist}`);
     lines.push("");
     lines.push("═══════════════════════════════════════════");
     lines.push("生成时间: " + new Date().toLocaleString("zh-CN"));
     if (selectedProfile) lines.push("公司资料: " + selectedProfile.companyName);
     lines.push("");
     return lines.join("\n");
-  };
+  }, [form, selectedProfile]);
 
   const previewText = generatePreview();
 
-  const textArea = (
-    label: string,
-    field: keyof FormData,
-    placeholder: string,
-    rows = 3,
-    hint?: string
-  ) => (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <textarea
-        value={form[field]}
-        onChange={(e) => update(field, e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-y break-words whitespace-pre-wrap"
-      />
-      {hint && <p className="text-xs text-gray-400 mt-1">{hint}</p>}
-    </div>
-  );
+  const f = form as FormData;
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
@@ -276,21 +265,21 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Editor */}
           <div className="flex-1 min-w-0 print:hidden">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-6">
+            <div className={cardStyles.base}>
               {/* Section 1: Basic Info */}
               <div>
-                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <h2 className={cardStyles.sectionHeader}>
+                  <span className={cardStyles.sectionNumber}>1</span>
                   基础信息
                 </h2>
-                <div className="space-y-4">
+                <div className={cardStyles.section}>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">项目 / 视频标题</label>
                     <input
-                      value={form.title}
+                      value={f.title}
                       onChange={(e) => update("title", e.target.value)}
                       placeholder="如：XX 物流 30 秒带货脚本"
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-[44px]"
+                      className={inputStyles}
                     />
                   </div>
                   {selectedProfile && (
@@ -299,81 +288,160 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
                       <span>已选择：{selectedProfile.companyName}</span>
                     </div>
                   )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">发布平台</label>
-                    <div className="flex flex-wrap gap-2">
-                      {PLATFORMS.map((p) => (
-                        <button
-                          key={p}
-                          onClick={() => update("platform", form.platform === p ? "" : p)}
-                          className={`px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition ${
-                            form.platform === p
-                              ? "bg-teal-600 text-white border-teal-600"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          {p}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">视频类型</label>
-                    <div className="flex flex-wrap gap-2">
-                      {VIDEO_TYPES.map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => update("videoType", form.videoType === t ? "" : t)}
-                          className={`px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition ${
-                            form.videoType === t
-                              ? "bg-pink-600 text-white border-pink-600"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  {textArea("目标受众", "targetAudience", "如：25-40 岁跨境电商卖家、集运用户")}
-                  {textArea("核心卖点", "coreSellingPoint", "一句话说清楚你的产品或服务最大的优势是什么")}
-                  {textArea("CTA 联系方式 / 引导语", "ctaText", "如：私信我获取报价 / 点击下方链接")}
+                  <ChipSelector
+                    label="发布平台"
+                    options={PLATFORMS}
+                    value={f.platform}
+                    onChange={(v) => update("platform", v)}
+                    color="teal"
+                  />
+                  <ChipSelector
+                    label="视频类型"
+                    options={VIDEO_TYPES}
+                    value={f.videoType}
+                    onChange={(v) => update("videoType", v)}
+                    color="pink"
+                  />
+                  <TextArea
+                    label="目标受众"
+                    value={f.targetAudience}
+                    onChange={(v) => update("targetAudience", v)}
+                    placeholder="如：25-40 岁跨境电商卖家、集运用户"
+                  />
+                  <TextArea
+                    label="核心卖点"
+                    value={f.coreSellingPoint}
+                    onChange={(v) => update("coreSellingPoint", v)}
+                    placeholder="一句话说清楚你的产品或服务最大的优势是什么"
+                  />
+                  <TextArea
+                    label="CTA 联系方式 / 引导语"
+                    value={f.ctaText}
+                    onChange={(v) => update("ctaText", v)}
+                    placeholder="如：私信我获取报价 / 点击下方链接"
+                  />
                 </div>
               </div>
 
               {/* Section 2: Script Structure */}
               <div>
-                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <h2 className={cardStyles.sectionHeader}>
+                  <span className={cardStyles.sectionNumber}>2</span>
                   脚本结构
                 </h2>
-                <div className="space-y-4">
-                  {textArea("开头 3 秒钩子", "hook", "抓住观众注意力的第一句话，如：\"90% 的人不知道这个省钱方法\"", 2)}
-                  {textArea("痛点描述", "painPoint", "描述目标用户遇到的具体问题和困扰")}
-                  {textArea("解决方案", "solution", "你的产品/服务如何解决这个痛点")}
-                  {textArea("关键卖点 1", "sellingPoint1", "第一个核心卖点", 2)}
-                  {textArea("关键卖点 2", "sellingPoint2", "第二个核心卖点", 2)}
-                  {textArea("关键卖点 3", "sellingPoint3", "第三个核心卖点（可选）", 2)}
-                  {textArea("画面建议", "visualSuggestion", "每个段落建议拍什么画面、用什么镜头")}
-                  {textArea("口播文案", "voiceoverScript", "完整的口播逐字稿", 4)}
-                  {textArea("字幕文案", "subtitleScript", "视频字幕文字（可与口播一致或简化）", 4)}
-                  {textArea("结尾 CTA", "endingCta", "引导观众行动的话术，如关注、私信、点击链接")}
+                <div className={cardStyles.section}>
+                  <TextArea
+                    label="开头 3 秒钩子"
+                    value={f.hook}
+                    onChange={(v) => update("hook", v)}
+                    placeholder="抓住观众注意力的第一句话，如：90% 的人不知道这个省钱方法"
+                    rows={2}
+                  />
+                  <TextArea
+                    label="痛点描述"
+                    value={f.painPoint}
+                    onChange={(v) => update("painPoint", v)}
+                    placeholder="描述目标用户遇到的具体问题和困扰"
+                  />
+                  <TextArea
+                    label="解决方案"
+                    value={f.solution}
+                    onChange={(v) => update("solution", v)}
+                    placeholder="你的产品/服务如何解决这个痛点"
+                  />
+                  <TextArea
+                    label="关键卖点 1"
+                    value={f.sellingPoint1}
+                    onChange={(v) => update("sellingPoint1", v)}
+                    placeholder="第一个核心卖点"
+                    rows={2}
+                  />
+                  <TextArea
+                    label="关键卖点 2"
+                    value={f.sellingPoint2}
+                    onChange={(v) => update("sellingPoint2", v)}
+                    placeholder="第二个核心卖点"
+                    rows={2}
+                  />
+                  <TextArea
+                    label="关键卖点 3"
+                    value={f.sellingPoint3}
+                    onChange={(v) => update("sellingPoint3", v)}
+                    placeholder="第三个核心卖点（可选）"
+                    rows={2}
+                  />
+                  <TextArea
+                    label="画面建议"
+                    value={f.visualSuggestion}
+                    onChange={(v) => update("visualSuggestion", v)}
+                    placeholder="每个段落建议拍什么画面、用什么镜头"
+                  />
+                  <TextArea
+                    label="口播文案"
+                    value={f.voiceoverScript}
+                    onChange={(v) => update("voiceoverScript", v)}
+                    placeholder="完整的口播逐字稿"
+                    rows={4}
+                  />
+                  <TextArea
+                    label="字幕文案"
+                    value={f.subtitleScript}
+                    onChange={(v) => update("subtitleScript", v)}
+                    placeholder="视频字幕文字（可与口播一致或简化）"
+                    rows={4}
+                  />
+                  <TextArea
+                    label="结尾 CTA"
+                    value={f.endingCta}
+                    onChange={(v) => update("endingCta", v)}
+                    placeholder="引导观众行动的话术，如关注、私信、点击链接"
+                  />
                 </div>
               </div>
 
               {/* Section 3: Shooting SOP */}
               <div>
-                <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <h2 className={cardStyles.sectionHeader}>
+                  <span className={cardStyles.sectionNumber}>3</span>
                   拍摄 SOP
                 </h2>
-                <div className="space-y-4">
-                  {textArea("场景准备", "scenePrep", "需要准备的拍摄场地、背景布置、光线等")}
-                  {textArea("道具准备", "propPrep", "需要用到的产品、包装盒、标签、道具等")}
-                  {textArea("镜头清单", "shotList", "按顺序列出每个镜头的内容、角度、时长")}
-                  {textArea("拍摄注意事项", "shootingNotes", "拍摄时需要特别注意的事项")}
-                  {textArea("剪辑注意事项", "editingNotes", "剪辑时的要点、转场、配乐、字幕样式等")}
-                  {textArea("发布前检查清单", "publishChecklist", "标题、标签、封面、描述、发布时间等检查项")}
+                <div className={cardStyles.section}>
+                  <TextArea
+                    label="场景准备"
+                    value={f.scenePrep}
+                    onChange={(v) => update("scenePrep", v)}
+                    placeholder="需要准备的拍摄场地、背景布置、光线等"
+                  />
+                  <TextArea
+                    label="道具准备"
+                    value={f.propPrep}
+                    onChange={(v) => update("propPrep", v)}
+                    placeholder="需要用到的产品、包装盒、标签、道具等"
+                  />
+                  <TextArea
+                    label="镜头清单"
+                    value={f.shotList}
+                    onChange={(v) => update("shotList", v)}
+                    placeholder="按顺序列出每个镜头的内容、角度、时长"
+                  />
+                  <TextArea
+                    label="拍摄注意事项"
+                    value={f.shootingNotes}
+                    onChange={(v) => update("shootingNotes", v)}
+                    placeholder="拍摄时需要特别注意的事项"
+                  />
+                  <TextArea
+                    label="剪辑注意事项"
+                    value={f.editingNotes}
+                    onChange={(v) => update("editingNotes", v)}
+                    placeholder="剪辑时的要点、转场、配乐、字幕样式等"
+                  />
+                  <TextArea
+                    label="发布前检查清单"
+                    value={f.publishChecklist}
+                    onChange={(v) => update("publishChecklist", v)}
+                    placeholder="标题、标签、封面、描述、发布时间等检查项"
+                  />
                 </div>
               </div>
 
@@ -382,40 +450,51 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm font-medium min-h-[44px] disabled:opacity-50"
+                  className={buttonVariants.primary}
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   保存草稿
                 </button>
                 <button
                   onClick={() => setShowPreview(!showPreview)}
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm min-h-[44px]"
+                  className={buttonVariants.secondary}
                 >
                   <Eye className="w-4 h-4" /> {showPreview ? "隐藏预览" : "显示预览"}
                 </button>
                 <button
-                  onClick={handlePrint}
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm min-h-[44px]"
+                  onClick={() => window.print()}
+                  className={buttonVariants.secondary}
                 >
                   <Printer className="w-4 h-4" /> 打印
                 </button>
                 <button
                   onClick={handleReset}
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm min-h-[44px]"
+                  className={buttonVariants.secondary}
                 >
-                  <Download className="w-4 h-4 rotate-180" /> 清空
+                  <Printer className="w-4 h-4 rotate-180" /> 清空
                 </button>
               </div>
+
+              {/* Status messages */}
               {loadingDraft && (
                 <div className="text-sm px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
                 </div>
               )}
               {draftError && (
-                <div className="text-sm px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">{draftError}</div>
+                <div className="text-sm px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">
+                  {draftError}
+                </div>
               )}
               {saveMsg && (
-                <div className={`text-sm px-3 py-2 rounded-lg ${saved ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                <div
+                  className={cn(
+                    "text-sm px-3 py-2 rounded-lg border",
+                    saved
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : "bg-red-50 text-red-700 border-red-200"
+                  )}
+                >
                   {saveMsg}
                 </div>
               )}
@@ -430,7 +509,10 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
                   <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
                     <FileText className="w-4 h-4" /> 预览
                   </h3>
-                  <button onClick={handlePrint} className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 rounded hover:bg-gray-200 min-h-[36px] print:hidden">
+                  <button
+                    onClick={() => window.print()}
+                    className={buttonVariants.previewToggle}
+                  >
                     <Printer className="w-3.5 h-3.5" /> 打印
                   </button>
                 </div>
@@ -448,7 +530,9 @@ export default function VideoScriptSopClient({ draftId }: { draftId: string | nu
 
       {/* Print-only preview wrapper */}
       <div className="hidden print:block print:p-8">
-        <pre className="text-sm whitespace-pre-wrap break-words font-mono text-gray-800">{previewText}</pre>
+        <pre className="text-sm whitespace-pre-wrap break-words font-mono text-gray-800">
+          {previewText}
+        </pre>
       </div>
     </div>
   );

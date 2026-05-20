@@ -4,7 +4,6 @@ import "@/app/globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
 import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
 import CommandPalette from "@/components/command-palette";
 import PWARegister from "@/components/PWARegister";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, defaultOpenGraph } from "@/lib/seo";
@@ -73,7 +72,6 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>
-          <Footer />
           <CommandPalette />
           <PWARegister />
         </Providers>

@@ -7,6 +7,7 @@ import autoTable from "jspdf-autotable";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface ReceiptItem {
   id: string;
@@ -91,7 +92,7 @@ export default function ReceiptPage() {
           <p className="text-gray-500 mt-1">快速生成专业收款收据，支持PDF导出</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-6">
+        <div className={cardStyles.base + " space-y-6"}>
           {/* Basic Info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
@@ -108,7 +109,7 @@ export default function ReceiptPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">付款方式</label>
-              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className={inputStyles}>
                 <option>银行转账</option>
                 <option>支付宝</option>
                 <option>微信支付</option>

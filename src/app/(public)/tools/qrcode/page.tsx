@@ -4,6 +4,7 @@ import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 export default function QRCodePage() {
   const [url, setUrl] = useState("");
@@ -47,31 +48,31 @@ export default function QRCodePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 space-y-4">
+        <div className={`${cardStyles.base} space-y-4`}>
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">链接/文本</label>
+            <label className={labelStyles.field}>链接/文本</label>
             <input
               type="text"
               value={url}
               onChange={e => setUrl(e.target.value)}
               onKeyDown={e => e.key === "Enter" && generate()}
               placeholder="https://example.com"
-              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className={inputStyles}
             />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">尺寸 (px)</label>
+              <label className={labelStyles.field}>尺寸 (px)</label>
               <input
                 type="number"
                 value={size}
                 onChange={e => setSize(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                className={inputStyles}
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">前景色</label>
+              <label className={labelStyles.field}>前景色</label>
               <input
                 type="color"
                 value={fgColor}
@@ -80,7 +81,7 @@ export default function QRCodePage() {
               />
             </div>
             <div>
-              <label className="text-xs text-gray-500 mb-1 block">背景色</label>
+              <label className={labelStyles.field}>背景色</label>
               <input
                 type="color"
                 value={bgColor}
@@ -92,7 +93,7 @@ export default function QRCodePage() {
 
           <button
             onClick={generate}
-            className="w-full py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center justify-center gap-2"
+            className={`${buttonVariants.primary} w-full`}
           >
             <QrCode className="w-4 h-4" />
             生成二维码
@@ -100,7 +101,7 @@ export default function QRCodePage() {
         </div>
 
         {/* Preview */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 flex flex-col items-center justify-center">
+        <div className={`${cardStyles.base} flex flex-col items-center justify-center`}>
           {generated ? (
             <>
               <img
@@ -112,14 +113,14 @@ export default function QRCodePage() {
               <div className="flex gap-2">
                 <button
                   onClick={downloadQR}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm flex items-center gap-2"
+                  className={buttonVariants.secondary}
                 >
                   <Download className="w-4 h-4" />
                   下载 PNG
                 </button>
                 <button
                   onClick={() => { navigator.clipboard.writeText(url); }}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 text-sm flex items-center gap-2"
+                  className={buttonVariants.secondary}
                 >
                   <Copy className="w-4 h-4" />
                   复制链接

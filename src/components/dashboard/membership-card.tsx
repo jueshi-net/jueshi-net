@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Star, Award, ArrowUpRight, Loader2, Crown, TrendingUp } from "lucide-react";
 import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
+import { cardStyles } from "@/lib/ui-styles";
 
 interface GrowthLog {
   id: string;
@@ -77,7 +78,7 @@ export default function MembershipCard() {
           </div>
           <div className="flex flex-wrap gap-2">
             {data.badges.slice(0, 5).map(b => (
-              <div key={b.id} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white rounded-lg border shadow-sm" title={b.description || b.name}>
+              <div key={b.id} className={`flex items-center gap-1.5 px-2.5 py-1.5 ${cardStyles.base.replace("p-5", "")} shadow-sm`}>
                 <span className="text-base">{b.iconText}</span>
                 <span className="text-xs text-gray-700 font-medium">{b.name}</span>
               </div>
@@ -105,9 +106,9 @@ export default function MembershipCard() {
         ) : growthLogs.length === 0 ? (
           <p className="text-xs text-gray-400 text-center py-2">暂无成长记录，快去签到吧</p>
         ) : (
-          <div className="space-y-1.5">
+          <div className="divide-y divide-gray-100">
             {growthLogs.map(log => (
-              <div key={log.id} className="flex items-center justify-between py-1.5 px-2 bg-white rounded-lg border text-xs">
+              <div key={log.id} className="flex items-center justify-between py-2 px-2 bg-white rounded-lg border text-xs">
                 <span className="text-gray-700">{GROWTH_TYPE_LABELS[log.type] || log.type}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-400">

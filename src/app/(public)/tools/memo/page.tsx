@@ -24,6 +24,7 @@ import {
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 const CATEGORIES = [
   "常用地址",
@@ -586,7 +587,7 @@ export default function MemoPage() {
             <div className="flex gap-3">
               <button
                 onClick={handleClearAll}
-                className="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+className={buttonVariants.primary}
               >
                 确认清空
               </button>

@@ -7,7 +7,8 @@ import { getLabelType, getLabelTemplate, labelTypes, labelSizes, labelStyles } f
 import { usePermissions, authorizeExportClient, createPermissionHelpers } from '@/lib/auth/client-permissions';
 import { permissionMessages } from '@/lib/membership/permissions';
 import { saveLabelDraft, getLabelDraft, getAllLabelDrafts, deleteLabelDraft } from '@/lib/labels/label-storage';
-import { AdSlot } from '@/components/ad-slot';
+import { buttonVariants, inputStyles, cardStyles } from "@/lib/ui-styles";
+import { AdSlot } from "@/components/ad-slot";
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 import ToolReviewPanel from '@/components/tools/tool-review-panel';

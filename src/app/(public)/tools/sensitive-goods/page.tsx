@@ -6,7 +6,9 @@ import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
+
 interface SensitiveItem {
   name: string;
   type: string;
@@ -159,7 +161,7 @@ export default function SensitiveGoodsPage() {
           <Breadcrumb />
         </div>
         {/* Disclaimer */}
-        <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div className={cardStyles.base + " mb-6"}>
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
             <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
             <div className="text-sm text-amber-800 dark:text-amber-300">
@@ -174,9 +176,9 @@ export default function SensitiveGoodsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border overflow-hidden mb-6">
+        <div className={`${cardStyles.base.replace("p-5", "")} overflow-hidden mb-6`}>
           <div className="p-5 border-b bg-gray-50 dark:bg-gray-700">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">常见物品分类速查</h2>
+            <h2 className={cardStyles.header}>常见物品分类速查</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">

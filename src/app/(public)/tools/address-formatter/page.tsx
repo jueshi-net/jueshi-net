@@ -6,6 +6,7 @@ import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface AddressForm {
   country: string;
@@ -192,15 +193,15 @@ export default function AddressFormatterPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-4 md:p-8">
+        <div className={cardStyles.base + " p-4 md:p-8"}>
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
             {/* Form */}
             <div className="space-y-5">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">输入地址信息</h2>
+              <h2 className={cardStyles.header}>输入地址信息</h2>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">国家</label>
-                <select className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                <label className={labelStyles.field}>国家</label>
+                <select className={inputStyles}
                   value={form.country} onChange={e => update('country', e.target.value)}>
                   {Object.keys(countryConfig).map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -208,66 +209,66 @@ export default function AddressFormatterPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">姓名（拼音/英文）</label>
-                  <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  <label className={labelStyles.field}>姓名（拼音/英文）</label>
+                  <input className={inputStyles}
                     placeholder="如: Zhang San" value={form.name} onChange={e => update('name', e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">电话</label>
-                  <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  <label className={labelStyles.field}>电话</label>
+                  <input className={inputStyles}
                     placeholder={config.phoneFormat} value={form.phone} onChange={e => update('phone', e.target.value)} />
                   <p className="text-xs text-gray-400 mt-1">{config.phoneHint}</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">街道地址</label>
-                <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                <label className={labelStyles.field}>街道地址</label>
+                <input className={inputStyles}
                   placeholder="如: 123 Main Street" value={form.street} onChange={e => update('street', e.target.value)} />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">公寓/单元号（可选）</label>
-                <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                <label className={labelStyles.field}>公寓/单元号（可选）</label>
+                <input className={inputStyles}
                   placeholder="如: Apt 4B 或 Unit 12" value={form.apt} onChange={e => update('apt', e.target.value)} />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">城市</label>
-                  <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  <label className={labelStyles.field}>城市</label>
+                  <input className={inputStyles}
                     placeholder="如: Toronto" value={form.city} onChange={e => update('city', e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">省/州</label>
+                  <label className={labelStyles.field}>省/州</label>
                   {config.stateOptions.length > 0 ? (
-                    <select className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    <select className={inputStyles}
                       value={form.state} onChange={e => update('state', e.target.value)}>
                       <option value="">选择</option>
                       {config.stateOptions.map(s => <option key={s}>{s}</option>)}
                     </select>
                   ) : (
-                    <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    <input className={inputStyles}
                       placeholder="如: ON" value={form.state} onChange={e => update('state', e.target.value)} />
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">邮编</label>
-                  <input className="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  <label className={labelStyles.field}>邮编</label>
+                  <input className={inputStyles}
                     placeholder={config.postalFormat} value={form.postalCode} onChange={e => update('postalCode', e.target.value)} />
                   <p className="text-xs text-gray-400 mt-1">{config.postalHint}</p>
                 </div>
               </div>
 
               <button onClick={generate}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+                className={buttonVariants.primary + " w-full"}>
                 <MapPin className="w-5 h-5" /> 生成地址格式
               </button>
             </div>
 
             {/* Output */}
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">生成结果</h2>
+              <h2 className={cardStyles.header}>生成结果</h2>
 
               {!result ? (
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border-2 border-dashed border-gray-200 dark:border-gray-600 flex flex-col items-center justify-center text-center min-h-[200px]">
@@ -282,7 +283,7 @@ export default function AddressFormatterPage() {
                       <div className="flex items-center justify-between mb-2">
                         <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">英文标准格式（适合快递面单）</label>
                         <button onClick={copyResult}
-                          className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700">
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs text-indigo-600 hover:text-indigo-700 rounded">
                           {copied ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制</>}
                         </button>
                       </div>

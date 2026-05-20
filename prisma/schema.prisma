@@ -21,6 +21,11 @@ model User {
   profileType          String?            @map("profile_type")  // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
   growthValue          Int                @default(0)           @map("growth_value")  // v1.20.19: 成长值（不可消费）
   levelKey             String             @default("lv1")       @map("level_key")     // v1.20.19: 当前等级 key
+  // Stripe subscription fields
+  stripeCustomerId     String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  stripePriceId        String?            @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime?        @map("stripe_current_period_end")
   userLevel            UserLevel?         @relation(fields: [levelKey], references: [key])
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt

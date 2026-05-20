@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Target, ArrowRight, CheckCircle, CalendarCheck, MessageSquare, Gift } from "lucide-react";
+import { cardStyles } from "@/lib/ui-styles";
 
 export default function GrowthTaskSummary() {
   const [tasks, setTasks] = useState<{ key: string; title: string; completed: boolean; url: string }[]>([]);
@@ -28,16 +29,16 @@ export default function GrowthTaskSummary() {
   const allDone = pendingTasks.length === 0 && tasks.length > 0;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className={cardStyles.base}>
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Target className="w-5 h-5 text-teal-600" />
-          <h2 className="font-bold text-gray-900">今日成长任务</h2>
+          <h2 className="text-sm font-bold text-gray-700">今日成长任务</h2>
           <span className="text-xs text-gray-400">
             {completedCount}/{tasks.length} 已完成
           </span>
         </div>
-        <Link href="/dashboard/tasks" className="inline-flex items-center gap-1 text-sm text-teal-600 hover:text-teal-700 font-medium min-h-[44px] px-2">
+        <Link href="/dashboard/tasks" className="inline-flex items-center gap-1 px-3 py-2 text-sm text-teal-600 hover:text-teal-700 min-h-[44px]">
           查看全部 <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
@@ -51,12 +52,12 @@ export default function GrowthTaskSummary() {
         ) : pendingTasks.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-3">暂无任务</p>
         ) : (
-          <div className="space-y-2">
+          <div className="divide-y divide-gray-100">
             {pendingTasks.map(task => (
               <Link
                 key={task.key}
                 href={task.url}
-                className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-teal-50 hover:border-teal-200 transition-all min-h-[44px]"
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-teal-50 transition-all min-h-[44px]"
               >
                 <TaskIcon taskKey={task.key} />
                 <div className="flex-1 min-w-0">

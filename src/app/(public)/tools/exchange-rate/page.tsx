@@ -7,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface RateResponse {
   source: string;
@@ -158,7 +159,7 @@ export default function ExchangeRatePage() {
           <p className="text-gray-500 mt-1">参考汇率转换，支持主流货币对</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+        <div className={cardStyles.base}>
           {/* Data source bar */}
           {rateData && (
             <div className="mb-4 bg-blue-50 rounded-xl p-3 flex items-start gap-2">
@@ -200,11 +201,11 @@ export default function ExchangeRatePage() {
           {/* Conversion form */}
           <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">持有货币</label>
+              <label className={labelStyles.field}>持有货币</label>
               <select
                 value={fromCurrency}
                 onChange={(e) => setFromCurrency(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputStyles}
               >
                 {CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
@@ -214,7 +215,7 @@ export default function ExchangeRatePage() {
                 type="number"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full mt-2 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-2xl font-bold"
+                className={`${inputStyles} mt-2 text-2xl font-bold`}
                 placeholder="0.00"
               />
             </div>
@@ -224,11 +225,11 @@ export default function ExchangeRatePage() {
             </button>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">目标货币</label>
+              <label className={labelStyles.field}>目标货币</label>
               <select
                 value={toCurrency}
                 onChange={(e) => setToCurrency(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={inputStyles}
               >
                 {CURRENCIES.map((c) => (
                   <option key={c.code} value={c.code}>{c.code} - {c.name}</option>
@@ -241,13 +242,13 @@ export default function ExchangeRatePage() {
             <button
               onClick={() => { convert(); trackEvent.exchangeConvert(); }}
               disabled={!rateData || loading}
-              className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl font-medium transition-colors"
+              className={`${buttonVariants.primary} flex-1`}
             >
               转换
             </button>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors flex items-center gap-2"
+              className={buttonVariants.secondary}
             >
               <RotateCcw className="w-4 h-4" />
               重置
@@ -280,7 +281,7 @@ export default function ExchangeRatePage() {
           {rateData && (
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">常用参考汇率 (1 CNY = ?)</h3>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 divide-y divide-gray-100">
                 {CURRENCIES.filter((c) => c.code !== "CNY").map((c) => {
                   const rate = rateData.rates[c.code];
                   if (rate === undefined) return null;

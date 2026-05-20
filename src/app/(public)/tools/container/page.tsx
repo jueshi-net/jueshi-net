@@ -4,6 +4,7 @@ import { Container, Info } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 const containerTypes = [
   { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770 },
@@ -54,28 +55,28 @@ export default function ContainerCalculatorPage() {
       </div>
 
       {/* Input */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 mb-6">
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">货物尺寸 (cm)</h3>
+      <div className={cardStyles.base + " mb-6"}>
+        <h3 className={cardStyles.header}>货物尺寸 (cm)</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">长 (cm)</label>
-            <input type="number" value={cargoL || ""} onChange={e => setCargoL(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <label className={labelStyles.field}>长 (cm)</label>
+            <input type="number" value={cargoL || ""} onChange={e => setCargoL(Number(e.target.value))} className={inputStyles} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">宽 (cm)</label>
-            <input type="number" value={cargoW || ""} onChange={e => setCargoW(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <label className={labelStyles.field}>宽 (cm)</label>
+            <input type="number" value={cargoW || ""} onChange={e => setCargoW(Number(e.target.value))} className={inputStyles} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">高 (cm)</label>
-            <input type="number" value={cargoH || ""} onChange={e => setCargoH(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <label className={labelStyles.field}>高 (cm)</label>
+            <input type="number" value={cargoH || ""} onChange={e => setCargoH(Number(e.target.value))} className={inputStyles} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">单件重量 (kg)</label>
-            <input type="number" value={cargoWeight || ""} onChange={e => setCargoWeight(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <label className={labelStyles.field}>单件重量 (kg)</label>
+            <input type="number" value={cargoWeight || ""} onChange={e => setCargoWeight(Number(e.target.value))} className={inputStyles} />
           </div>
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">数量</label>
-            <input type="number" value={quantity || ""} onChange={e => setQuantity(Number(e.target.value))} className="w-full px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <label className={labelStyles.field}>数量</label>
+            <input type="number" value={quantity || ""} onChange={e => setQuantity(Number(e.target.value))} className={inputStyles} />
           </div>
         </div>
 
@@ -95,7 +96,7 @@ export default function ContainerCalculatorPage() {
         {results.map(ct => (
           <div
             key={ct.name}
-            className={`bg-white dark:bg-gray-800 rounded-xl border-2 p-5 transition-all ${
+            className={`${cardStyles.base.replace("p-5", "")} border-2 transition-all 
               ct.recommended ? "border-green-500 shadow-lg" : "border-gray-100 dark:border-gray-700"
             }`}
           >

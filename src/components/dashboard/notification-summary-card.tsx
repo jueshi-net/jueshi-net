@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Bell, ArrowRight, TrendingUp, Award, Star, Check, Mail } from "lucide-react";
+import { cardStyles } from "@/lib/ui-styles";
 
 const TYPE_ICON: Record<string, any> = {
   growth_reward: TrendingUp,
@@ -41,28 +42,42 @@ export default function NotificationSummaryCard() {
     }).finally(() => setLoading(false));
   }, []);
 
+  const handleMarkRead = async (id: string) => {
+    try {
+      const res = await fetch(`/api/me/notifications/${id}`, { method: "PATCH" });
+      if (res.ok) {
+        setNotifications(prev =>
+          prev.map(n => n.id === id ? { ...n, isRead: true } : n)
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch {
+      // fire-and-forget, don't block navigation
+    }
+  };
+
   if (loading) return <div className="animate-pulse bg-white rounded-xl border p-5 h-36" />;
   if (notifications.length === 0 && unreadCount === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className={cardStyles.base}>
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-blue-600" />
-          <h2 className="font-bold text-gray-900">通知</h2>
+          <h2 className="text-sm font-bold text-gray-700">通知</h2>
           {unreadCount > 0 && (
             <span className="inline-flex items-center justify-center min-w-[20px] h-5 bg-red-500 text-white text-xs font-bold rounded-full px-1.5">
               {unreadCount}
             </span>
           )}
         </div>
-        <Link href="/dashboard/notifications" className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium min-h-[44px] px-2">
+        <Link href="/dashboard/notifications" className="inline-flex items-center gap-1 px-3 py-2 text-sm text-blue-600 hover:text-blue-700 min-h-[44px]">
           查看全部 <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
 
       <div className="p-5">
-        <div className="space-y-2">
+        <div className="divide-y divide-gray-100">
           {notifications.slice(0, 3).map((n: any) => {
             const Icon = TYPE_ICON[n.type] || Bell;
             const color = TYPE_COLOR[n.type] || "text-gray-400";
@@ -70,6 +85,7 @@ export default function NotificationSummaryCard() {
               <Link
                 key={n.id}
                 href={n.link || "/dashboard/notifications"}
+                onClick={() => handleMarkRead(n.id)}
                 className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 transition-all min-h-[44px]"
               >
                 <Icon className={`w-4 h-4 shrink-0 ${color}`} />

@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import {
-  Users, Star, FileText, Megaphone, FolderOpen, Link2, Settings, Cloud,
-  BarChart3, Shield, Database, Package, ExternalLink, ArrowUpRight,
-  BookOpen, Eye, MessageSquare, AlertCircle, MessageCircle, Bell,
-  TrendingUp, CheckCircle, Clock, Award, ChevronRight, Activity,
+  Users, FileText, ExternalLink, ArrowUpRight,
+  MessageSquare, MessageCircle, Bell, TrendingUp, CheckCircle,
+  Activity, Award, ChevronRight, Clock, BarChart3, Shield,
+  Star, Database, Settings, HeartPulse, AlertCircle, FolderOpen,
 } from "lucide-react";
 import type { AdminStatsData } from "@/lib/admin-stats";
+import { cardStyles, badgeStyles } from "@/lib/ui-styles";
 
 const LEVEL_NAMES: Record<string, string> = {
   lv1: "Lv.1 新手", lv2: "Lv.2 进阶", lv3: "Lv.3 精英",
@@ -48,9 +49,9 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             <Clock className="w-5 h-5 text-amber-500" />
             今日待处理
             {totalPending > 0 ? (
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">{totalPending} 项</span>
+              <span className={badgeStyles.warning}>{totalPending} 项</span>
             ) : (
-              <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">全部已处理</span>
+              <span className={badgeStyles.success}>全部已处理</span>
             )}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -96,8 +97,8 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             {/* Level distribution */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <div className={cardStyles.base}>
+              <h3 className={cardStyles.header}>
                 <Award className="w-4 h-4 text-amber-500" /> 等级分布
               </h3>
               <div className="space-y-2">
@@ -111,8 +112,8 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             </div>
 
             {/* Recent growth logs */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 lg:col-span-2">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <div className={`${cardStyles.base} lg:col-span-2`}>
+              <h3 className={cardStyles.header}>
                 <Activity className="w-4 h-4 text-teal-500" /> 最近成长记录
               </h3>
               {s.growth.recentLogs.length === 0 ? (
@@ -205,9 +206,9 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
 
 function PendingCard({ label, count, href, icon: Icon, color }: { label: string; count: number; href: string; icon: any; color: string }) {
   const colors: Record<string, { bg: string; text: string; badge: string }> = {
-    amber: { bg: "bg-amber-50", text: "text-amber-600", badge: "bg-amber-100 text-amber-700" },
-    gray: { bg: "bg-gray-50", text: "text-gray-500", badge: "bg-gray-100 text-gray-600" },
-    blue: { bg: "bg-blue-50", text: "text-blue-600", badge: "bg-blue-100 text-blue-700" },
+    amber: { bg: "bg-amber-50", text: "text-amber-600", badge: badgeStyles.warning },
+    gray: { bg: "bg-gray-50", text: "text-gray-500", badge: badgeStyles.neutral },
+    blue: { bg: "bg-blue-50", text: "text-blue-600", badge: badgeStyles.info },
   };
   const c = colors[color] || colors.gray;
   return (
@@ -231,7 +232,7 @@ function StatMini({ label, value, sub, color }: { label: string; value: number; 
     green: "text-green-600", teal: "text-teal-600", indigo: "text-indigo-600", amber: "text-amber-600",
   };
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3">
+    <div className={`${cardStyles.base} p-3`}>
       <p className="text-xs text-gray-400 mb-0.5">{label}</p>
       <p className={`text-xl font-extrabold ${colors[color] || "text-gray-900"}`}>{value.toLocaleString()}</p>
       {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
@@ -241,7 +242,7 @@ function StatMini({ label, value, sub, color }: { label: string; value: number; 
 
 function ContentCard({ title, total, href, items }: { title: string; total: number; href: string; items: Array<{ label: string; value: number; color: string }> }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-sm transition-all">
+    <div className={`${cardStyles.base} hover:shadow-sm transition-all`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
         <Link href={href} className="inline-flex items-center gap-0.5 text-xs text-blue-600 hover:text-blue-700 min-h-[44px] px-1">
