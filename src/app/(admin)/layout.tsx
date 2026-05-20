@@ -55,7 +55,7 @@ export default async function AdminLayout({
             ))}
           </nav>
         </aside>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6 pb-8 pb-[env(safe-area-inset-bottom)]">{children}</main>
       </div>
     </div>
   );

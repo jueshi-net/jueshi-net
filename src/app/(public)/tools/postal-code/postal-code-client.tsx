@@ -6,7 +6,7 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
-import { allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
+import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
@@ -75,6 +75,7 @@ export default function PostalCodePage() {
   const [validationResult, setValidationResult] = useState<ValidationDetail | null>(null);
   const [citySearch, setCitySearch] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [countrySearch, setCountrySearch] = useState('');
 
   // DB search state
   const [dbQuery, setDbQuery] = useState('');
@@ -327,10 +328,10 @@ export default function PostalCodePage() {
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                <MapPin className="w-3.5 h-3.5" /> 加拿大邮编
+                <Database className="w-3.5 h-3.5" /> 全球邮编库
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                🇺🇸 美国 ZIP
+                {SUPPORTED_COUNTRIES.length}+ 国家
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
                 地址核对
@@ -359,20 +360,90 @@ export default function PostalCodePage() {
           </div>
         </div>
 
-        {/* ===== COUNTRY TABS ===== */}
-<div className={cardStyles.base}>
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家</h2>
+        {/* ===== COUNTRY SELECTOR ===== */}
+        <div className={cardStyles.base}>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家 / 地区</h2>
           <div className="flex flex-wrap gap-2">
-            {allCountryData.map(c => (
-              <button key={c.code} onClick={() => selectCountry(c.code)}
-                className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 ${
-                  selectedCountryCode === c.code
-                    ? 'bg-teal-600 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
-                }`}>
-                {c.flag} {c.name}
-              </button>
-            ))}
+            {/* Searchable select */}
+            <div className="relative w-full sm:w-72">
+              <input
+                list="country-list"
+                placeholder="搜索国家（如 Japan、德国、JP）…"
+                value={countrySearch}
+                onChange={e => {
+                  setCountrySearch(e.target.value);
+                  // Auto-select if exact match
+                  const match = SUPPORTED_COUNTRIES.find(c =>
+                    c.code.toLowerCase() === e.target.value.toLowerCase() ||
+                    c.name.includes(e.target.value) ||
+                    c.nameEn.toLowerCase().includes(e.target.value.toLowerCase())
+                  );
+                  if (match) selectCountry(match.code);
+                }}
+                className={`${inputStyles} pr-10`}
+              />
+              <datalist id="country-list">
+                {SUPPORTED_COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.nameEn})</option>
+                ))}
+              </datalist>
+              <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* Quick-pick: popular countries by region */}
+            <div className="flex flex-wrap gap-1.5">
+              {/* North America */}
+              {['CA', 'US'].map(code => {
+                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                return (
+                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                      selectedCountryCode === code
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                    }`}>
+                    {c.flag} {c.name}
+                  </button>
+                );
+              })}
+              {/* Europe */}
+              {['GB', 'DE', 'FR', 'IT', 'ES', 'NL'].map(code => {
+                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                return (
+                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                      selectedCountryCode === code
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                    }`}>
+                    {c.flag} {c.name}
+                  </button>
+                );
+              })}
+              {/* Asia Pacific */}
+              {['JP', 'KR', 'AU', 'NZ', 'SG', 'MY'].map(code => {
+                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                return (
+                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                      selectedCountryCode === code
+                        ? 'bg-teal-600 text-white shadow-sm'
+                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                    }`}>
+                    {c.flag} {c.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Current selection badge */}
+            <div className="w-full mt-2 flex items-center gap-2">
+              <span className="text-xs text-gray-400">当前：</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                {country.flag} {country.name} ({country.code})
+              </span>
+              <span className="text-xs text-gray-400 ml-auto">{SUPPORTED_COUNTRIES.length} 个国家可选</span>
+            </div>
           </div>
         </div>
 
@@ -455,6 +526,51 @@ export default function PostalCodePage() {
                       <button onClick={() => { setInputCode('90210'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">90210</button>
                       <button onClick={() => { setInputCode('10001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">10001</button>
                     </>
+                  )}
+                  {selectedCountryCode === 'JP' && (
+                    <>
+                      <button onClick={() => { setInputCode('100-0001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">100-0001</button>
+                      <button onClick={() => { setInputCode('530-0001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">530-0001</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'DE' && (
+                    <>
+                      <button onClick={() => { setInputCode('10115'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">10115</button>
+                      <button onClick={() => { setInputCode('80331'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">80331</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'GB' && (
+                    <>
+                      <button onClick={() => { setInputCode('SW1A 1AA'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">SW1A 1AA</button>
+                      <button onClick={() => { setInputCode('M1 1AE'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">M1 1AE</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'FR' && (
+                    <>
+                      <button onClick={() => { setInputCode('75001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">75001</button>
+                      <button onClick={() => { setInputCode('69001'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">69001</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'AU' && (
+                    <>
+                      <button onClick={() => { setInputCode('2000'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">2000</button>
+                      <button onClick={() => { setInputCode('3000'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">3000</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'SG' && (
+                    <>
+                      <button onClick={() => { setInputCode('018956'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">018956</button>
+                      <button onClick={() => { setInputCode('238884'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">238884</button>
+                    </>
+                  )}
+                  {selectedCountryCode === 'KR' && (
+                    <>
+                      <button onClick={() => { setInputCode('04524'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">04524</button>
+                      <button onClick={() => { setInputCode('06236'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">06236</button>
+                    </>
+                  )}
+                  {!['CA', 'US', 'JP', 'DE', 'GB', 'FR', 'AU', 'SG', 'KR'].includes(selectedCountryCode) && (
+                    <span className="text-xs text-gray-300">请在下方输入邮编进行校验</span>
                   )}
                 </div>
 
@@ -794,7 +910,7 @@ export default function PostalCodePage() {
               </h3>
               <ul className="space-y-1 text-sm text-blue-700">
                 <li>• 本工具提供格式校验和城市邮编范围参考</li>
-                <li>• 数据库收录邮编数据（CA/US/GB/AU/NZ）</li>
+                <li>• 数据库收录全球 50+ 国家邮编数据（GeoNames 全量数据）</li>
                 <li>• 邮编覆盖范围仅为主要城市，非完整数据库</li>
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
               </ul>

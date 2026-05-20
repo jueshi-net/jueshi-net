@@ -308,7 +308,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
                 <div className="min-w-[280px]">
                 <h1 className="text-2xl font-bold text-center text-teal-700 mb-6">COMMERCIAL INVOICE</h1>
 
-                <div className="grid grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                   <div>
                     <p className="text-xs text-gray-500 mb-1">FROM</p>
                     <p className="font-bold text-gray-900">{companyName || "— 公司名称 —"}</p>
@@ -321,7 +321,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-6 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6 text-sm">
                   <div><span className="text-gray-500">Invoice No: </span><span className="font-medium">{invoiceNo || "—"}</span></div>
                   <div><span className="text-gray-500">Date: </span><span className="font-medium">{invoiceDate}</span></div>
                 </div>

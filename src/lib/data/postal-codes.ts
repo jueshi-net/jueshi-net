@@ -337,8 +337,75 @@ export const nzFirstTwoDigitMap: Record<string, string> = {
   '98': 'Southland (Invercargill)', '99': 'Southland',
 };
 
-// ─── Combined Export ─────────────────────────────────────────────────────────
+// ─── Combined Export ───
 
+// Global supported countries (80+ countries for postal code lookup)
+export const SUPPORTED_COUNTRIES = [
+  // North America
+  { code: 'CA', name: '加拿大', nameEn: 'Canada', flag: '🇨🇦' },
+  { code: 'US', name: '美国', nameEn: 'United States', flag: '🇺🇸' },
+  { code: 'MX', name: '墨西哥', nameEn: 'Mexico', flag: '🇲🇽' },
+  // Europe
+  { code: 'GB', name: '英国', nameEn: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'DE', name: '德国', nameEn: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: '法国', nameEn: 'France', flag: '🇫🇷' },
+  { code: 'IT', name: '意大利', nameEn: 'Italy', flag: '🇮🇹' },
+  { code: 'ES', name: '西班牙', nameEn: 'Spain', flag: '🇪🇸' },
+  { code: 'NL', name: '荷兰', nameEn: 'Netherlands', flag: '🇳🇱' },
+  { code: 'BE', name: '比利时', nameEn: 'Belgium', flag: '🇧🇪' },
+  { code: 'AT', name: '奥地利', nameEn: 'Austria', flag: '🇦🇹' },
+  { code: 'CH', name: '瑞士', nameEn: 'Switzerland', flag: '🇨🇭' },
+  { code: 'SE', name: '瑞典', nameEn: 'Sweden', flag: '🇸🇪' },
+  { code: 'NO', name: '挪威', nameEn: 'Norway', flag: '🇳🇴' },
+  { code: 'DK', name: '丹麦', nameEn: 'Denmark', flag: '🇩🇰' },
+  { code: 'FI', name: '芬兰', nameEn: 'Finland', flag: '🇫🇮' },
+  { code: 'PL', name: '波兰', nameEn: 'Poland', flag: '🇵🇱' },
+  { code: 'CZ', name: '捷克', nameEn: 'Czech Republic', flag: '🇨🇿' },
+  { code: 'PT', name: '葡萄牙', nameEn: 'Portugal', flag: '🇵🇹' },
+  { code: 'IE', name: '爱尔兰', nameEn: 'Ireland', flag: '🇮🇪' },
+  { code: 'GR', name: '希腊', nameEn: 'Greece', flag: '🇬🇷' },
+  { code: 'RO', name: '罗马尼亚', nameEn: 'Romania', flag: '🇷🇴' },
+  { code: 'HU', name: '匈牙利', nameEn: 'Hungary', flag: '🇭🇺' },
+  { code: 'RU', name: '俄罗斯', nameEn: 'Russia', flag: '🇷🇺' },
+  { code: 'UA', name: '乌克兰', nameEn: 'Ukraine', flag: '🇺🇦' },
+  // Asia Pacific
+  { code: 'AU', name: '澳大利亚', nameEn: 'Australia', flag: '🇦🇺' },
+  { code: 'NZ', name: '新西兰', nameEn: 'New Zealand', flag: '🇳🇿' },
+  { code: 'JP', name: '日本', nameEn: 'Japan', flag: '🇯🇵' },
+  { code: 'KR', name: '韩国', nameEn: 'South Korea', flag: '🇰🇷' },
+  { code: 'CN', name: '中国', nameEn: 'China', flag: '🇨🇳' },
+  { code: 'SG', name: '新加坡', nameEn: 'Singapore', flag: '🇸🇬' },
+  { code: 'MY', name: '马来西亚', nameEn: 'Malaysia', flag: '🇲🇾' },
+  { code: 'TH', name: '泰国', nameEn: 'Thailand', flag: '🇹🇭' },
+  { code: 'VN', name: '越南', nameEn: 'Vietnam', flag: '🇻🇳' },
+  { code: 'PH', name: '菲律宾', nameEn: 'Philippines', flag: '🇵🇭' },
+  { code: 'ID', name: '印度尼西亚', nameEn: 'Indonesia', flag: '🇮🇩' },
+  { code: 'IN', name: '印度', nameEn: 'India', flag: '🇮🇳' },
+  { code: 'HK', name: '香港', nameEn: 'Hong Kong', flag: '🇭🇰' },
+  { code: 'TW', name: '台湾', nameEn: 'Taiwan', flag: '🇹🇼' },
+  // Middle East
+  { code: 'AE', name: '阿联酋', nameEn: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: 'SA', name: '沙特阿拉伯', nameEn: 'Saudi Arabia', flag: '🇸🇦' },
+  { code: 'IL', name: '以色列', nameEn: 'Israel', flag: '🇮🇱' },
+  { code: 'TR', name: '土耳其', nameEn: 'Turkey', flag: '🇹🇷' },
+  // South America
+  { code: 'BR', name: '巴西', nameEn: 'Brazil', flag: '🇧🇷' },
+  { code: 'AR', name: '阿根廷', nameEn: 'Argentina', flag: '🇦🇷' },
+  { code: 'CL', name: '智利', nameEn: 'Chile', flag: '🇨🇱' },
+  { code: 'CO', name: '哥伦比亚', nameEn: 'Colombia', flag: '🇨🇴' },
+  // Africa
+  { code: 'ZA', name: '南非', nameEn: 'South Africa', flag: '🇿🇦' },
+  { code: 'EG', name: '埃及', nameEn: 'Egypt', flag: '🇪🇬' },
+  { code: 'NG', name: '尼日利亚', nameEn: 'Nigeria', flag: '🇳🇬' },
+  { code: 'KE', name: '肯尼亚', nameEn: 'Kenya', flag: '🇰🇪' },
+];
+
+// Lookup maps for quick access
+export const countryByCode: Record<string, typeof SUPPORTED_COUNTRIES[0]> = {};
+for (const c of SUPPORTED_COUNTRIES) countryByCode[c.code] = c;
+
+// Legacy allCountryData format for backward compatibility with existing UI
+// Extended to include all supported countries with format info
 export const allCountryData: CountryPostalData[] = [
   {
     code: 'CA', name: '加拿大', nameEn: 'Canada', flag: '🇨🇦',
@@ -428,4 +495,20 @@ export const allCountryData: CountryPostalData[] = [
     officialName: 'NZ Post',
     officialLookupUrl: 'https://www.nzpost.co.nz/tools/find-a-postcode',
   },
+  // Add other countries with minimal format info (DB-powered, no ranges needed)
+  ...SUPPORTED_COUNTRIES.filter(c => !['CA', 'US', 'GB', 'AU', 'NZ'].includes(c.code)).map(c => ({
+    code: c.code,
+    name: c.name,
+    nameEn: c.nameEn,
+    flag: c.flag,
+    format: '查询数据库获取',
+    formatRegex: /.*/,  // Accept any input — validation is DB-driven
+    hint: `在下方数据库搜索中查询${c.name}具体邮编信息`,
+    ranges: [],
+    stateAbbrevs: [],
+    commonErrors: ['请直接使用数据库查询功能搜索具体邮编'],
+    officialUrl: '',
+    officialName: '',
+    officialLookupUrl: '',
+  })),
 ];

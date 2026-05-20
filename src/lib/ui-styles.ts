@@ -23,7 +23,7 @@ export const buttonVariants = {
 };
 
 export const inputStyles =
-  "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all";
+  "w-full px-3 py-2 border border-gray-300 rounded-lg text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all";
 
 export const cardStyles = {
   base: "bg-white rounded-xl border border-gray-200 p-5",
@@ -53,14 +53,14 @@ export const badgeStyles = {
 };
 
 export const tableStyles = {
-  wrapper: "bg-white rounded-xl border border-gray-200 overflow-hidden",
+  wrapper: "w-full bg-white rounded-xl border border-gray-200 overflow-x-auto overflow-y-hidden",
   scroll: "overflow-x-auto",
-  base: "w-full text-sm",
+  base: "w-full text-sm min-w-[640px]",
   header: "bg-gray-50 border-b border-gray-200",
-  headCell: "text-left px-4 py-3 font-medium text-gray-600 text-xs uppercase tracking-wider",
+  headCell: "text-left px-4 py-3 font-medium text-gray-600 text-xs uppercase tracking-wider whitespace-nowrap",
   body: "divide-y divide-gray-100",
   row: "hover:bg-gray-50 transition-colors",
-  cell: "px-4 py-3",
+  cell: "px-4 py-3 whitespace-nowrap",
 };
 
 export const sectionTitleStyles = {

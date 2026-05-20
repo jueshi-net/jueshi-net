@@ -241,11 +241,11 @@ export default function InboundReceiptPage() {
               <div ref={previewRef} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-8 min-h-[700px] overflow-x-auto" style={{ fontFamily: "Arial, sans-serif" }}>
                 <div className="min-w-[280px]">
                   <h1 className="text-2xl font-bold text-center text-teal-700 mb-6">入库单</h1>
-                  <div className="grid grid-cols-2 gap-6 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                     <div><p className="text-xs text-gray-500 mb-1">收货方</p><p className="font-bold">{companyName || "—"}</p><p className="text-sm text-gray-600">{companyPhone}{companyEmail ? ` · ${companyEmail}` : ""}</p><p className="text-sm text-gray-600">{companyAddress || ""}</p></div>
                     <div><p className="text-xs text-gray-500 mb-1">客户</p><p className="font-bold">{customerName || "—"}</p><p className="text-sm text-gray-600">{warehouseName || ""}</p></div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 mb-6 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-sm">
                     <div><span className="text-gray-500">入库单号: </span><span className="font-medium">{receiptNo}</span></div>
                     <div><span className="text-gray-500">日期: </span><span className="font-medium">{date}</span></div>
                     <div><span className="text-gray-500">快递单号: </span><span className="font-medium">{trackingNo || "—"}</span></div>

@@ -614,7 +614,7 @@ export default function ShippingCalculatorPage() {
             <div className="p-6">
               <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm font-medium text-blue-800 mb-1">📋 支持以下格式（自动识别）：</p>
-                <div className="grid grid-cols-2 gap-1 text-xs text-blue-700 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-blue-700 font-mono">
                   <p>• 50*40*30*5*10</p>
                   <p>• 50×40×30×5×10kg</p>
                   <p>• 50,40,30,5,10</p>

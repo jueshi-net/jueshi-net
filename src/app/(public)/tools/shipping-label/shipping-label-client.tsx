@@ -223,7 +223,7 @@ export default function ShippingLabelClient({ draftId }: { draftId: string | nul
               <div className="space-y-3">
                 {labelItems.map((item) => (
                   <div key={item.id} className="border border-gray-100 rounded-lg p-3 bg-gray-50 overflow-x-auto">
-                    <div className="grid grid-cols-2 gap-2 min-w-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 min-w-0">
                       <input value={item.trackingNo} onChange={(e) => updateLabel(item.id, "trackingNo", e.target.value)} placeholder="追踪号" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                       <input value={item.channel} onChange={(e) => updateLabel(item.id, "channel", e.target.value)} placeholder="渠道" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                       <input value={item.productName} onChange={(e) => updateLabel(item.id, "productName", e.target.value)} placeholder="品名" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />

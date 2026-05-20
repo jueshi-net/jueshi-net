@@ -13,7 +13,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#0D9488" },
     { media: "(prefers-color-scheme: dark)", color: "#0F766E" },
@@ -68,11 +69,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={cn(inter.className, "min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased flex flex-col overflow-x-hidden")}>
+      <body className={cn(inter.className, "min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased flex flex-col")}>
         <Providers>
           <CommandMenuProvider>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 pb-8 pb-[env(safe-area-inset-bottom)]">{children}</main>
             <CommandPalette />
           </CommandMenuProvider>
           <PWARegister />

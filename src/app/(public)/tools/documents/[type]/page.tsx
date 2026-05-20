@@ -683,7 +683,7 @@ export default function DocumentEditorPage() {
                     <h4 className="text-sm font-semibold mb-2 pb-1" style={{ backgroundColor: style.headingBgColor, color: style.primaryColor }}>
                       {section.title}
                     </h4>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
                       {section.fields.map(field => (
                         formData[field.key] && (
                           <div key={field.key} className={field.colspan === 2 ? 'col-span-2' : ''}>
@@ -752,7 +752,7 @@ export default function DocumentEditorPage() {
 
                 {/* Signature */}
                 <div className="mt-8 pt-4 border-t" style={{ borderColor: style.borderColor }}>
-                  <div className="grid grid-cols-2 gap-8 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-xs">
                     <div>
                       <p className="text-gray-500 mb-8">卖方/制单人签字盖章：</p>
                       <p>日期：____________</p>

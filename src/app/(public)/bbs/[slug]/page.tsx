@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, Eye, MessageSquare, Calendar, Lock, Pin, Home, ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { buildTitle, buildCanonical, SITE_URL } from "@/lib/seo";
+import { buildTitle, buildCanonical, SITE_URL, discussionForumPostingJsonLd } from "@/lib/seo";
 import { formatDateTime } from "@/lib/utils";
 import { PostContent } from "@/components/bbs/post-content";
 import { CategoryBadge } from "@/components/bbs/category-badge";
@@ -118,9 +118,24 @@ export default async function PostDetailPage({
   const isLoggedIn = !!session?.user;
 
   const displayName = post.user.name || maskEmail(post.user.email);
+  const plainText = post.content.replace(/<[^>]+>/g, '').slice(0, 200);
+  const jsonLd = discussionForumPostingJsonLd({
+    headline: post.title,
+    description: post.excerpt || plainText,
+    url: buildCanonical(`/bbs/${post.slug}`),
+    datePublished: post.createdAt.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    authorName: displayName,
+    commentCount: comments.length,
+    viewCount: post.viewCount,
+  });
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
       {/* Hero */}
       <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
         <div className="max-w-4xl mx-auto px-4">

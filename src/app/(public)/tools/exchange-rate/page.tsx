@@ -199,7 +199,7 @@ export default function ExchangeRatePage() {
           )}
 
           {/* Conversion form */}
-          <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-end mb-6">
+          <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto_1fr] gap-4 items-end mb-6">
             <div>
               <label className={labelStyles.field}>持有货币</label>
               <select
@@ -281,7 +281,7 @@ export default function ExchangeRatePage() {
           {rateData && (
             <div className="mt-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">常用参考汇率 (1 CNY = ?)</h3>
-              <div className="grid grid-cols-3 gap-2 divide-y divide-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 divide-y divide-gray-100">
                 {CURRENCIES.filter((c) => c.code !== "CNY").map((c) => {
                   const rate = rateData.rates[c.code];
                   if (rate === undefined) return null;

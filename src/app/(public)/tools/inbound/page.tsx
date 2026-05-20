@@ -87,7 +87,7 @@ export default function InboundPage() {
             <div><label className="block text-sm font-medium text-gray-700 mb-1">日期</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">接收人</label><input value={receiver} onChange={(e) => setReceiver(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-sm font-medium text-gray-700 mb-1">承运商</label><input value={carrier} onChange={(e) => setCarrier(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">运单号</label><input value={trackingNo} onChange={(e) => setTrackingNo(e.target.value)} className="w-full px-3 py-2 border rounded-lg text-sm" /></div>
           </div>

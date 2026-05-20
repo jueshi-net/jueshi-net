@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { cardStyles, badgeStyles, buttonVariants } from "@/lib/ui-styles";
 import { scenarioPackages, type ScenarioPackage } from "@/data/scenario-packages";
+import { softwareApplicationJsonLd, buildCanonical } from "@/lib/seo";
 
 // Icon map
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -87,6 +88,12 @@ export default async function ScenarioPackagePage({
   if (!pkg) notFound();
 
   const Icon = ICON_MAP[pkg.icon] || Star;
+  const jsonLd = softwareApplicationJsonLd({
+    name: pkg.title,
+    description: pkg.description,
+    url: buildCanonical(`/packages/${pkg.id}`),
+    category: 'UtilityApplication',
+  });
 
   // Placeholder tools for each scenario (will be populated with real tool data later)
   const placeholderTools = Array.from({ length: pkg.toolCount }, (_, i) => ({
@@ -98,6 +105,10 @@ export default async function ScenarioPackagePage({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
       {/* Hero */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">

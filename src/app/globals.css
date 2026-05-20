@@ -37,6 +37,21 @@ body {
   background: var(--background);
 }
 
+/* Mobile: prevent iOS zoom on input focus (font-size >= 16px) */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area inset support for notched devices and PWA */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
 /* Prevent form inputs from inheriting white text on white bg in dark mode */
 input, textarea, select {
   color: inherit;

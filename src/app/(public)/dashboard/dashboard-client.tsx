@@ -15,7 +15,7 @@ import RecommendedPackages from "@/components/dashboard/recommended-packages";
 import MembershipCard from "@/components/dashboard/membership-card";
 import GrowthTaskSummary from "@/components/dashboard/growth-task-summary";
 import NotificationSummaryCard from "@/components/dashboard/notification-summary-card";
-import { buttonVariants, cardStyles, inputStyles } from "@/lib/ui-styles";
+import { buttonVariants, cardStyles, badgeStyles, inputStyles } from "@/lib/ui-styles";
 
 // ===== ALL EXISTING LOGIC PRESERVED =====
 
@@ -56,9 +56,9 @@ const POINT_TYPE_LABELS: Record<string, string> = {
 };
 
 const PRIORITY_CONFIG: Record<string, { label: string; icon: React.ReactNode; badgeClass: string }> = {
-  high: { label: "高", icon: <ArrowUpCircle className="w-3 h-3" />, badgeClass: "bg-red-50 text-red-700" },
-  normal: { label: "中", icon: <MinusCircle className="w-3 h-3" />, badgeClass: "bg-yellow-50 text-yellow-700" },
-  low: { label: "低", icon: <ArrowDownCircle className="w-3 h-3" />, badgeClass: "bg-green-50 text-green-700" },
+  high: { label: "高", icon: <ArrowUpCircle className="w-3 h-3" />, badgeClass: badgeStyles.danger },
+  normal: { label: "中", icon: <MinusCircle className="w-3 h-3" />, badgeClass: badgeStyles.warning },
+  low: { label: "低", icon: <ArrowDownCircle className="w-3 h-3" />, badgeClass: badgeStyles.success },
 };
 
 const SHORTCUTS = [
@@ -365,7 +365,7 @@ export default function DashboardPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">请先登录</h1>
           <p className="text-gray-500 mb-6">工作台、积分、任务和自定义网址功能需要登录后使用</p>
-          <Link href="/login" className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[48px] bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-colors w-full">
+          <Link href="/login" className={`${buttonVariants.primary} w-full justify-center`}>
             前往登录 <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -405,17 +405,17 @@ export default function DashboardPage() {
                 管理你的工具、任务、积分、会员权益和常用资源
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
-                  dashboard.role === "admin" ? "bg-purple-100 text-purple-800" :
-                  dashboard.role === "member" ? "bg-amber-100 text-amber-800" :
-                  dashboard.role === "user" ? "bg-blue-100 text-blue-700" :
-                  "bg-gray-100 text-gray-600"
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  dashboard.role === "admin" ? badgeStyles.purple :
+                  dashboard.role === "member" ? badgeStyles.warning :
+                  dashboard.role === "user" ? badgeStyles.info :
+                  badgeStyles.neutral
                 }`}>
                   {roleIcons[dashboard.role]}
                   {roleLabels[dashboard.role] || dashboard.role}
                 </span>
                 {memberInfo?.isMember && memberInfo.memberUntil && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 ${badgeStyles.warning}`}>
                     <Crown className="w-3 h-3" />
                     会员至 {new Date(memberInfo.memberUntil).toLocaleDateString("zh-CN")}
                   </span>
@@ -423,10 +423,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link href="#my-links" className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">
+              <Link href="#my-links" className={`inline-flex items-center gap-2 px-4 py-2.5 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-colors`}>
                 <Plus className="w-4 h-4" /> 前往添加网址
               </Link>
-              <Link href="/dashboard/points" className={buttonVariants.primary + " bg-white text-teal-700 hover:bg-teal-50"}>
+              <Link href="/dashboard/points" className={`${buttonVariants.primary} bg-white text-teal-700 hover:bg-teal-50 border-0`}>
                 <TrendingUp className="w-4 h-4" /> 积分明细
               </Link>
             </div>
@@ -509,7 +509,7 @@ export default function DashboardPage() {
                 {rewards.map((r) => {
                   const canAfford = userPoints >= r.costPoints;
                   return (
-                    <div key={r.id} className={`rounded-lg border p-3 ${canAfford ? "bg-white" : "bg-gray-50 opacity-60"}`}>
+                    <div key={r.id} className={`${cardStyles.base.replace("p-5", "p-3")} ${canAfford ? "" : "bg-gray-50 opacity-60"}`}>
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 bg-amber-50 rounded-lg flex flex-col items-center justify-center">
                           <span className="text-xs font-bold text-amber-600">{r.costPoints}</span>
@@ -522,11 +522,7 @@ export default function DashboardPage() {
                       <button
                         onClick={() => handleRedeem(r.id, r.name, r.costPoints)}
                         disabled={!canAfford || redeemingId === r.id}
-                        className={`w-full py-2 min-h-[44px] rounded-lg text-xs font-medium transition-colors ${
-                          canAfford
-                            ? buttonVariants.primary
-                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                        }`}
+                        className={`w-full ${canAfford ? buttonVariants.primary : "bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg text-sm font-medium min-h-[44px]"}`}
                       >
                         {redeemingId === r.id ? "兑换中..." : canAfford ? "兑换" : "积分不足"}
                       </button>
@@ -558,7 +554,7 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-gray-900 truncate">{draft.title}</p>
                       <p className="text-xs text-gray-400">{draft.toolKey} · {new Date(draft.updatedAt).toLocaleDateString("zh-CN")}</p>
                     </div>
-                    <Link href={`/tools/${draft.toolKey.replace(/_/g, "-")}?draftId=${draft.id}`} className="text-sm text-teal-600 hover:text-teal-700 font-medium ml-3 shrink-0 min-h-[44px] flex items-center">
+                    <Link href={`/tools/${draft.toolKey.replace(/_/g, "-")}?draftId=${draft.id}`} className={`${buttonVariants.ghost} ml-3 shrink-0`}>
                       打开 <ArrowRight className="w-3 h-3 ml-0.5" />
                     </Link>
                   </div>
@@ -604,12 +600,12 @@ export default function DashboardPage() {
                 <Target className="w-5 h-5 text-teal-600" />
                 今日待办
               </h2>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {(["pending", "done", "archived"] as const).map((f) => (
                   <button
                     key={f}
                     onClick={() => setTaskFilter(f)}
-                    className={`px-3 py-2 min-h-[44px] text-xs rounded-lg font-medium transition-all ${taskFilter === f ? buttonVariants.primary : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                    className={`px-3 py-2 min-h-[44px] text-xs rounded-full font-medium transition-all ${taskFilter === f ? buttonVariants.primary : badgeStyles.neutral + " hover:bg-gray-200 cursor-pointer"}`}
                   >
                     {f === "pending" ? `待办 (${dashboard.taskStats.pending})` : f === "done" ? `已完成 (${dashboard.taskStats.done})` : `归档 (${dashboard.taskStats.archived})`}
                   </button>
@@ -620,7 +616,8 @@ export default function DashboardPage() {
           <div className="p-5">
             {/* Daily cap warning */}
             {taskFilter === "pending" && taskCapReached && (
-              <div className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+              <div className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 flex items-center gap-2">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">⚠️</span>
                 今日任务积分已达上限（20/20），仍可继续完成任务但不再加分
               </div>
             )}
@@ -669,8 +666,8 @@ export default function DashboardPage() {
                   return (
                     <div
                       key={task.id}
-                      className={`flex items-center gap-3 p-4 transition-all ${
-                        task.status === "done" ? "bg-gray-50" : "hover:bg-gray-50"
+                      className={`flex items-center gap-3 px-4 py-3 transition-colors ${
+                        task.status === "done" ? "bg-gray-50/50" : "hover:bg-gray-50"
                       }`}
                     >
                       {task.status === "pending" && (
@@ -697,7 +694,7 @@ export default function DashboardPage() {
                             {prio.icon}{prio.label}
                           </span>
                           {task.pointsAwarded && task.status === "done" && (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700">
+                            <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${badgeStyles.success}`}>
                               <Star className="w-3 h-3" />+2
                             </span>
                           )}
@@ -777,7 +774,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {myRewards.map((r) => {
                   return (
-                    <div key={r.id} className="flex items-center gap-3 p-4 rounded-lg border">
+                    <div key={r.id} className={`${cardStyles.base.replace("p-5", "p-4")} flex items-center gap-3`}>
                       {r.rewardType === "word_export_coupon" && <Ticket className="w-5 h-5 text-blue-500 flex-shrink-0" />}
                       {r.rewardType === "member_trial" && <Shield className="w-5 h-5 text-amber-500 flex-shrink-0" />}
                       {r.rewardType === "no_branding_coupon" && <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0" />}
@@ -786,10 +783,10 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-400">×{r.rewardValue}</p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          r.status === "active" ? "bg-green-100 text-green-800" :
-                          r.status === "used" ? "bg-gray-100 text-gray-600" :
-                          "bg-red-100 text-red-800"
+                        <span className={`${
+                          r.status === "active" ? badgeStyles.success :
+                          r.status === "used" ? badgeStyles.neutral :
+                          badgeStyles.danger
                         }`}>
                           {r.status === "active" ? "可用" : r.status === "used" ? "已使用" : "已过期"}
                         </span>
@@ -855,7 +852,7 @@ export default function DashboardPage() {
                 <Link
                   key={s.href}
                   href={s.href}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:bg-teal-50 hover:border-teal-200 transition-all min-h-[44px]"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 bg-white hover:bg-teal-50 hover:border-teal-200 hover:shadow-sm transition-all min-h-[44px]"
                 >
                   <span className="text-teal-600">{s.icon}</span>
                   <span className="text-xs font-medium text-gray-700 text-center">{s.label}</span>
@@ -868,7 +865,7 @@ export default function DashboardPage() {
         {/* Toast Notification */}
         {toast && (
           <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
-            toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+            toast.type === "success" ? "bg-teal-600 text-white" : "bg-red-600 text-white"
           }`}>
             {toast.message}
           </div>

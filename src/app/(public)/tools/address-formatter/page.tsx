@@ -207,7 +207,7 @@ export default function AddressFormatterPage() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelStyles.field}>姓名（拼音/英文）</label>
                   <input className={inputStyles}
@@ -233,7 +233,7 @@ export default function AddressFormatterPage() {
                   placeholder="如: Apt 4B 或 Unit 12" value={form.apt} onChange={e => update('apt', e.target.value)} />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelStyles.field}>城市</label>
                   <input className={inputStyles}

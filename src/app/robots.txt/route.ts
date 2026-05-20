@@ -1,27 +1,30 @@
 import { NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
+import { SITE_URL } from '@/lib/seo';
 
 export async function GET() {
-  const siteUrl = 'https://jueshi.net';
-
-  const robots = `User-agent: *
+  const content = `User-agent: *
 Allow: /
-
-Disallow: /admin
-Disallow: /api
+Allow: /tools
+Allow: /tracking
+Allow: /bbs
+Allow: /topics
+Allow: /guides
+Allow: /packages
+Allow: /ai-tools
+Allow: /starter
 Disallow: /dashboard
+Disallow: /my-links
 Disallow: /settings
-Disallow: /favorites
+Disallow: /admin
 Disallow: /login
-Disallow: /checkout
-Disallow: /nav
-Disallow: /register
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /api/
+Disallow: /preview/
 
-Sitemap: ${siteUrl}/sitemap.xml
-Host: ${siteUrl}`;
-
-  return new NextResponse(robots, {
-    headers: { 'Content-Type': 'text/plain' },
+Sitemap: ${SITE_URL}/sitemap.xml
+`;
+  return new NextResponse(content, {
+    headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'public, max-age=86400' },
   });
 }

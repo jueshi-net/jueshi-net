@@ -178,7 +178,7 @@ export default function ProductCopyPage() {
                   <p className="text-xs text-gray-400 mt-1">{sellingPoints.length}/500</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">目标平台</label>
                     <select
