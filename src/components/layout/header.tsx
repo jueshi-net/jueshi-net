@@ -37,7 +37,7 @@ function SearchTrigger() {
   return (
     <button
       onClick={() => setOpen(true)}
-      className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[180px] border border-gray-200 dark:border-gray-700"
+      className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors min-h-[44px] min-w-[140px] border border-gray-200 dark:border-gray-700 flex-shrink"
     >
       <Search className="w-4 h-4" />
       <span className="flex-1 text-left">搜索…</span>
@@ -99,17 +99,17 @@ export default function Header() {
           </Link>
 
           {/* Center: Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
+          <nav className="hidden lg:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 flex-shrink-0">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] whitespace-nowrap flex-shrink-0"
                 >
-                  <Icon className="w-4 h-4" />
-                  {link.label}
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="whitespace-nowrap">{link.label}</span>
                 </Link>
               );
             })}

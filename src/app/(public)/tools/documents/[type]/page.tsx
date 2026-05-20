@@ -16,6 +16,7 @@ import { permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
 import { AdSlot } from '@/components/ad-slot';
 import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
+import { Loader2 } from 'lucide-react';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -58,6 +59,7 @@ export default function DocumentEditorPage() {
   const [wordExportsToday, setWordExportsToday] = useState(0);
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const [exporting, setExporting] = useState(false);
+  const lastExportRef = useRef<number>(0);
 
   const style = documentStyles.find(s => s.id === selectedStyle) || documentStyles[0];
 
@@ -221,9 +223,10 @@ export default function DocumentEditorPage() {
         backgroundColor: '#ffffff',
         scale: A4_EXPORT_SCALE,
         useCORS: true,
-        logging: false,
         allowTaint: true,
-        // NO width/height/windowWidth/windowHeight — let the div's CSS width control it
+        logging: false,
+        windowWidth: A4_WIDTH,
+        windowHeight: Math.ceil(a4Page.scrollHeight),
         foreignObjectRendering: false,
         scrollX: 0,
         scrollY: 0,
@@ -359,8 +362,8 @@ export default function DocumentEditorPage() {
             <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">
               <Printer className="w-4 h-4" /> 打印/PDF
             </button>
-            <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50">
-              <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
+            <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-green-600 text-white hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title={exporting ? '正在生成高清图片，请稍候...' : '导出 PNG'}>
+              {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : 'PNG'}
             </button>
             <button onClick={handleExportWord}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
@@ -618,8 +621,8 @@ export default function DocumentEditorPage() {
                   <button onClick={handlePrint} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium">
                     <Printer className="w-4 h-4" /> 打印 / PDF
                   </button>
-                  <button onClick={handleExportPNG} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium disabled:opacity-50">
-                    <Image className="w-4 h-4" /> {exporting ? '生成中...' : '导出 PNG'}
+                  <button onClick={handleExportPNG} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed" title={exporting ? '正在生成高清图片，请稍候...' : '导出 PNG'}>
+                    {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : '导出 PNG'}
                   </button>
                   <button onClick={handleExportWord}
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-xl font-medium ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-200 text-gray-400'}`}

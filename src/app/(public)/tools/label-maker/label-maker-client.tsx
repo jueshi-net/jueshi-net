@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Printer, Download, Image, Crown, Plus, Trash2, ChevronDown, Eye, Palette, AlertTriangle, Settings, QrCode, Barcode, Save, Package, FileText } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Image, Crown, Plus, Trash2, ChevronDown, Eye, Palette, AlertTriangle, Settings, QrCode, Barcode, Save, Package, FileText, Loader2 } from 'lucide-react';
 import { getLabelType, getLabelTemplate, labelTypes, labelSizes, labelStyles } from '@/lib/labels/label-types';
 import { usePermissions, authorizeExportClient, createPermissionHelpers } from '@/lib/auth/client-permissions';
 import { permissionMessages } from '@/lib/membership/permissions';
@@ -35,6 +35,7 @@ export default function LabelMakerPage() {
   const [draftId, setDraftId] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<MobileTab>('edit');
   const [exporting, setExporting] = useState(false);
+  const lastExportRef = useRef<number>(0);
   const previewRef = useRef<HTMLDivElement>(null);
   const qrRef = useRef<HTMLDivElement>(null);
   const exportContainerRef = useRef<HTMLDivElement>(null);
@@ -109,6 +110,8 @@ export default function LabelMakerPage() {
 
       const canvas = await html2canvas(a4Page, {
         backgroundColor: '#ffffff', scale: A4_EXPORT_SCALE, useCORS: true, logging: false, allowTaint: true,
+        windowWidth: A4_WIDTH,
+        windowHeight: Math.ceil(a4Page.scrollHeight),
         foreignObjectRendering: false, scrollX: 0, scrollY: 0, x: 0, y: 0,
       });
       document.body.removeChild(tempDiv);
@@ -210,8 +213,8 @@ export default function LabelMakerPage() {
               <button onClick={handlePrint} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-white text-blue-700 rounded-lg font-semibold hover:bg-blue-50 transition-colors min-h-[44px]">
                 <Printer className="w-4 h-4" /> 打印/PDF
               </button>
-              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 min-h-[44px]">
-                <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
+              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1.5 px-4 py-2.5 text-sm bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]" title={exporting ? '正在生成高清图片，请稍候...' : 'PNG'}>
+                {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : 'PNG'}
               </button>
             </div>
           </div>
@@ -237,8 +240,8 @@ export default function LabelMakerPage() {
               <button onClick={handlePrint} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-blue-600 text-white rounded-lg min-h-[44px]">
                 <Printer className="w-3.5 h-3.5" />
               </button>
-              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded-lg disabled:opacity-50 min-h-[44px]">
-                <Image className="w-3.5 h-3.5" />
+              <button onClick={handleExportPNG} disabled={exporting} className="flex items-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]" title={exporting ? '正在生成中...' : 'PNG'}>
+                {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Image className="w-3.5 h-3.5" />}
               </button>
               <span className={`px-2 py-0.5 rounded text-xs ${perms.role === 'member' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
                 {perms.role === 'member' ? '会员' : perms.role === 'user' ? '用户' : '游客'}
@@ -410,8 +413,8 @@ export default function LabelMakerPage() {
                     <button onClick={handlePrint} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium">
                       <Printer className="w-4 h-4" /> 打印/PDF
                     </button>
-                    <button onClick={handleExportPNG} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium disabled:opacity-50">
-                      <Image className="w-4 h-4" /> {exporting ? '生成中...' : 'PNG'}
+                    <button onClick={handleExportPNG} disabled={exporting} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-green-600 text-white rounded-xl hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed" title={exporting ? '正在生成高清图片，请稍候...' : 'PNG'}>
+                      {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : 'PNG'}
                     </button>
                   </div>
                 )}
