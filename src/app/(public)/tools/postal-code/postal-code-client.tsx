@@ -83,7 +83,6 @@ export default function PostalCodePage() {
   const [dbTotal, setDbTotal] = useState(0);
   const [dbPage, setDbPage] = useState(1);
   const [dbTab, setDbTab] = useState<'all' | 'code' | 'city'>('all');
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const country = useMemo(
     () => allCountryData.find(c => c.code === selectedCountryCode) ?? allCountryData[0],
@@ -181,9 +180,9 @@ export default function PostalCodePage() {
         if (match) { matchedCity = match.city; matchedRegion = match.region; }
       }
 
-      // Also query DB for this postal code
+      // Also query DB for this postal code (single optimized request, no prefix fallback)
       if (formatOk) {
-        queryDb(trimmed, selectedCountryCode, 'code');
+        queryDb(trimmed, selectedCountryCode);
       }
     }
 
@@ -207,27 +206,59 @@ export default function PostalCodePage() {
     }
   }, [inputCode, country, selectedCountryCode]);
 
-  // DB search with debounce
-  const queryDb = useCallback(async (q: string, cc: string, t: 'all' | 'code' | 'city') => {
+  // Cleanup abort controller and debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
+  // DB search with AbortController and 300ms debounce
+  // Uses AbortController to cancel in-flight requests when user types again
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const queryDb = useCallback((q: string, cc: string) => {
+    // Clear previous debounce timer
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
     if (!q.trim()) {
       setDbResults([]);
       setDbTotal(0);
+      setDbLoading(false);
       return;
     }
-    setDbLoading(true);
-    try {
-      const params = new URLSearchParams({ q, country: cc });
-      const res = await fetch(`/api/postal-codes?${params}`);
-      const json = await res.json();
-      const results = json.results || json.data || [];
-      setDbResults(results);
-      setDbTotal(json.total || results.length);
-      setDbPage(1);
-    } catch (e) {
-      console.error('DB query failed:', e);
-    } finally {
-      setDbLoading(false);
+
+    // Cancel previous in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
+
+    // Debounce 300ms before firing new request
+    debounceTimerRef.current = setTimeout(async () => {
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setDbLoading(true);
+      try {
+        const params = new URLSearchParams({ q, country: cc });
+        const res = await fetch(`/api/postal-codes?${params}`, {
+          signal: controller.signal,
+        });
+        const json = await res.json();
+        const results = json.results || json.data || [];
+        setDbResults(results);
+        setDbTotal(json.total || results.length);
+        setDbPage(1);
+      } catch (e: any) {
+        if (e.name !== 'AbortError') {
+          console.error('DB query failed:', e);
+        }
+      } finally {
+        setDbLoading(false);
+      }
+    }, 300);
   }, []);
 
   const loadDbPage = useCallback(async (page: number) => {
@@ -247,9 +278,11 @@ export default function PostalCodePage() {
   }, [dbQuery, selectedCountryCode]);
 
   const handleDbSearch = useCallback(() => {
-    queryDb(dbQuery, selectedCountryCode, dbTab);
+    // Cancel debounce and fire immediately on explicit search
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    queryDb(dbQuery, selectedCountryCode);
     trackEvent.postalQuery();
-  }, [dbQuery, selectedCountryCode, dbTab, queryDb]);
+  }, [dbQuery, selectedCountryCode, queryDb]);
 
   // Filtered ranges based on city search (legacy)
   const filteredRanges = useMemo(() => {

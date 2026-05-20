@@ -6,11 +6,14 @@ function normalizePostal(input: string): string {
 }
 
 function looksLikePostalCode(q: string): boolean {
-  // Pure digits, or alphanumeric with 3-10 chars (typical postal code pattern)
   const normalized = normalizePostal(q);
   return /^[A-Z0-9]{2,10}$/.test(normalized);
 }
 
+/**
+ * Optimized postal code query — uses index-driven exact/prefix matching
+ * instead of full-table ILIKE '%...%' scans.
+ */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const action = searchParams.get('action');
@@ -23,124 +26,89 @@ export async function GET(req: NextRequest) {
 
   try {
     const normalized = normalizePostal(query);
-    const originalQuery = query.trim();
+    const isPostal = looksLikePostalCode(query);
+    const isCity = !isPostal;
 
-    const searchByPostal = async (q: string, norm: string, c: string | undefined) => {
-      // Use normalizedPostalCode column (fast, indexed) with fallback to REPLACE
-      // for records not yet backfilled
-      let sql = `
+    let sql: string;
+    let params: any[];
+
+    if (action === 'search-city' || isCity) {
+      // City search — use indexed countryCode + city prefix match
+      const cityPrefix = query.trim().slice(0, 3);
+      sql = `
         SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
                "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
                latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
                "isActive", "createdAt", "updatedAt"
-        FROM postal_codes
-        WHERE "isActive" = true
-        AND (
-          "normalizedPostalCode" ILIKE $1
-          OR "postalCode" ILIKE $2
-          OR REPLACE("postalCode", ' ', '') ILIKE $3
-          OR city ILIKE $4
-          OR province ILIKE $5
-          OR "adminCode1" ILIKE $6
-        )
-      `;
-      const params = [
-        `%${norm}%`,
-        `%${q}%`,
-        `%${norm}%`,
-        `%${q}%`,
-        `%${q}%`,
-        norm,
-      ];
-
-      if (c) {
-        sql += ` AND "countryCode" = $${params.length + 1}`;
-        params.push(c);
-      }
-
-      sql += ` ORDER BY city ASC, "postalCode" ASC LIMIT 50`;
-
-      const results = await prisma.$queryRawUnsafe(sql, ...params);
-      return results as any[];
-    };
-
-    // Prefix fallback: if no exact match, try with prefix
-    const searchByPostalPrefix = async (prefix: string, c: string | undefined) => {
-      let sql = `
-        SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
-               "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
-               latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
-               "isActive", "createdAt", "updatedAt"
-        FROM postal_codes
-        WHERE "isActive" = true
-        AND (
-          "normalizedPostalCode" ILIKE $1
-          OR "postalCode" ILIKE $2
-          OR city ILIKE $3
-          OR province ILIKE $4
-          OR "adminCode1" ILIKE $5
-        )
-      `;
-      const params = [
-        `${prefix}%`,
-        `%${prefix}%`,
-        `%${prefix}%`,
-        `%${prefix}%`,
-        prefix.toUpperCase(),
-      ];
-
-      if (c) {
-        sql += ` AND "countryCode" = $${params.length + 1}`;
-        params.push(c);
-      }
-
-      sql += ` ORDER BY city ASC, "postalCode" ASC LIMIT 50`;
-
-      const results = await prisma.$queryRawUnsafe(sql, ...params);
-      return results as any[];
-    };
-
-    let results: any[];
-
-    if (action === 'search-city') {
-      const params: any[] = [`%${originalQuery}%`];
-      let sql = `
-        SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province,
-               "areaName", "adminName1", "adminCode1",
-               latitude, longitude, accuracy, source
         FROM postal_codes
         WHERE "isActive" = true
         AND city ILIKE $1
       `;
+      params = [`${cityPrefix}%`];
       if (country) {
+        sql += ` AND "countryCode" = $2`;
         params.push(country);
-        sql += ` AND "countryCode" = $${params.length}`;
       }
-      sql += ` ORDER BY "postalCode" ASC LIMIT 50`;
-
-      results = await prisma.$queryRawUnsafe(sql, ...params);
-    } else if (action === 'search-postal') {
-      results = await searchByPostal(originalQuery, normalized, country || undefined);
-      
-      // Prefix fallback: if no results and query looks like a postal code
-      if (results.length === 0 && looksLikePostalCode(query) && normalized.length > 2) {
-        const prefix = normalized.substring(0, 3);
-        results = await searchByPostalPrefix(prefix, country || undefined);
-      }
+      sql += ` ORDER BY city ASC, "postalCode" ASC LIMIT 20`;
     } else {
-      // Default: auto-detect if query looks like postal code or city name
-      results = await searchByPostal(originalQuery, normalized, country || undefined);
-      
-      // Prefix fallback
-      if (results.length === 0 && looksLikePostalCode(query) && normalized.length > 2) {
-        const prefix = normalized.substring(0, 3);
-        results = await searchByPostalPrefix(prefix, country || undefined);
+      // Postal code search — use indexed countryCode + normalizedPostalCode prefix match
+      // This is the HOT path: hits @@index([countryCode, normalizedPostalCode])
+      const prefix = normalized.slice(0, Math.min(normalized.length, 6));
+
+      sql = `
+        SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
+               "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
+               latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
+               "isActive", "createdAt", "updatedAt"
+        FROM postal_codes
+        WHERE "isActive" = true
+        AND "countryCode" = $1
+        AND ("normalizedPostalCode" LIKE $2 OR "normalizedPostalCode" = $2)
+        ORDER BY "normalizedPostalCode" ASC
+        LIMIT 20
+      `;
+      params = [country || 'US', prefix];
+
+      // If no country specified, search across all countries with exact/prefix
+      if (!country) {
+        sql = `
+          SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
+                 "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
+                 latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
+                 "isActive", "createdAt", "updatedAt"
+          FROM postal_codes
+          WHERE "isActive" = true
+          AND "normalizedPostalCode" LIKE $1
+          ORDER BY "normalizedPostalCode" ASC
+          LIMIT 20
+        `;
+        params = [`${prefix}%`];
+      }
+
+      // Exact match fallback: if prefix search returns nothing and query is short, try exact
+      if (normalized.length <= 4 && !country) {
+        sql = `
+          SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
+                 "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
+                 latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
+                 "isActive", "createdAt", "updatedAt"
+          FROM postal_codes
+          WHERE "isActive" = true
+          AND "normalizedPostalCode" = $1
+          ORDER BY "normalizedPostalCode" ASC
+          LIMIT 20
+        `;
+        params = [normalized];
       }
     }
 
+    const results = await prisma.$queryRawUnsafe(sql, ...params);
+    const resultsArray = results as any[];
+
+    // Deduplicate by countryCode + postalCode
     const seen = new Set<string>();
-    const deduped = results.filter((r: any) => {
-      const key = `${r.countryCode}-${(r as any).postalCode}`;
+    const deduped = resultsArray.filter((r: any) => {
+      const key = `${r.countryCode}-${r.postalCode}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
