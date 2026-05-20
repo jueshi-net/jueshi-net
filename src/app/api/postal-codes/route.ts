@@ -63,11 +63,11 @@ export async function GET(req: NextRequest) {
         FROM postal_codes
         WHERE "isActive" = true
         AND "countryCode" = $1
-        AND ("normalizedPostalCode" LIKE $2 OR "normalizedPostalCode" = $2)
+        AND "normalizedPostalCode" LIKE $2
         ORDER BY "normalizedPostalCode" ASC
         LIMIT 20
       `;
-      params = [country || 'US', prefix];
+      params = [country || 'US', `${prefix}%`];
 
       // If no country specified, search across all countries with exact/prefix
       if (!country) {
