@@ -1,6 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/bbs',
+        destination: 'https://bbs.jueshi.net',
+        permanent: true,
+      },
+      {
+        source: '/bbs/:path*',
+        destination: 'https://bbs.jueshi.net/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

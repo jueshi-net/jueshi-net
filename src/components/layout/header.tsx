@@ -55,7 +55,7 @@ const NAV_LINKS = [
   { href: "/guides", label: "指南", icon: BookOpen },
   { href: "/resources", label: "资源", icon: Library },
   { href: "/topics", label: "专题", icon: Target },
-  { href: "/bbs", label: "论坛", icon: MessageSquare },
+  { href: "https://bbs.jueshi.net", label: "论坛", icon: MessageSquare, external: true },
   { href: "/pricing", label: "会员", icon: Gem },
 ];
 
@@ -102,15 +102,17 @@ export default function Header() {
           <nav className="hidden lg:flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 flex-shrink-0">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
+              const LinkComp = link.external ? "a" : Link;
               return (
-                <Link
+                <LinkComp
                   key={link.href}
                   href={link.href}
+                  {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                   className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors min-h-[44px] whitespace-nowrap flex-shrink-0"
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
                   <span className="whitespace-nowrap">{link.label}</span>
-                </Link>
+                </LinkComp>
               );
             })}
           </nav>
@@ -274,16 +276,18 @@ export default function Header() {
             <div className="space-y-0.5">
               {NAV_LINKS.map((link) => {
                 const Icon = link.icon;
+                const LinkComp = link.external ? "a" : Link;
                 return (
-                  <Link
+                  <LinkComp
                     key={link.href}
                     href={link.href}
+                    {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >
                     <Icon className="w-5 h-5 text-gray-400" />
                     <span className="font-medium">{link.label}</span>
-                  </Link>
+                  </LinkComp>
                 );
               })}
             </div>
@@ -293,14 +297,16 @@ export default function Header() {
           <div className="px-4 mb-6">
             <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">论坛</div>
             <div className="space-y-0.5">
-              <Link
-                href="/bbs"
+              <a
+                href="https://bbs.jueshi.net"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
               >
                 <MessageSquare className="w-5 h-5 text-violet-400" />
                 <span className="font-medium">论坛</span>
-              </Link>
+              </a>
             </div>
           </div>
 

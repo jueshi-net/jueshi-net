@@ -32,7 +32,7 @@ export async function updatePostStatus(postId: string, newStatus: string) {
           type: "forum_post_approved",
           title: "帖子审核通过 ✓",
           message: `你的帖子「${postWithUser.title}」已通过审核，现在可以在论坛查看。`,
-          link: `/bbs/${postWithUser.slug}`,
+          link: `https://bbs.jueshi.net/${postWithUser.slug}`,
         });
       }
     } else if (newStatus === "rejected" && existing.status === "pending") {
@@ -46,7 +46,7 @@ export async function updatePostStatus(postId: string, newStatus: string) {
           type: "forum_post_rejected",
           title: "帖子审核未通过",
           message: `你的帖子「${postWithUser.title}」未通过审核。请检查内容是否符合社区规范后重新提交。`,
-          link: "/bbs",
+          link: "https://bbs.jueshi.net",
         });
       }
     }
@@ -143,7 +143,7 @@ export async function updateCommentStatus(commentId: string, newStatus: string) 
           type: "forum_comment_approved",
           title: "评论审核通过 ✓",
           message: "你的评论已通过审核，现在可以在帖子中查看。",
-          link: post ? `/bbs/${post.slug}` : "/bbs",
+          link: post ? `https://bbs.jueshi.net/${post.slug}` : "https://bbs.jueshi.net",
         });
       }
     }

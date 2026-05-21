@@ -77,6 +77,7 @@ interface SearchItem {
   href: string;
   icon: React.ReactNode;
   keywords?: string[];
+  external?: boolean;
 }
 
 const navItems: SearchItem[] = [
@@ -88,7 +89,7 @@ const navItems: SearchItem[] = [
   { id: "nav-guides", title: "实用指南", href: "/guides", icon: <BookOpen className="w-4 h-4" />, keywords: ["guides", "指南", "攻略"] },
   { id: "nav-resources", title: "资源导航", href: "/resources", icon: <Library className="w-4 h-4" />, keywords: ["resources", "资源", "导航"] },
   { id: "nav-topics", title: "专题", href: "/topics", icon: <Target className="w-4 h-4" />, keywords: ["topics", "专题"] },
-  { id: "nav-bbs", title: "论坛", href: "/bbs", icon: <MessageSquare className="w-4 h-4" />, keywords: ["bbs", "论坛", "社区"] },
+  { id: "nav-bbs", title: "论坛", href: "https://bbs.jueshi.net", icon: <MessageSquare className="w-4 h-4" />, keywords: ["bbs", "论坛", "社区"], external: true },
   { id: "nav-pricing", title: "会员与定价", href: "/pricing", icon: <Gem className="w-4 h-4" />, keywords: ["pricing", "会员", "定价", "付费"] },
   { id: "nav-dashboard", title: "我的工作台", href: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" />, keywords: ["dashboard", "工作台", "个人"] },
   { id: "nav-rankings", title: "工具排行榜", href: "/rankings", icon: <TrendingUp className="w-4 h-4" />, keywords: ["rankings", "排行", "热门"] },
@@ -175,7 +176,13 @@ export default function CommandPalette() {
               <CommandItem
                 key={item.id}
                 value={`${item.title} ${item.keywords?.join(" ") || ""}`}
-                onSelect={() => runCommand(() => router.push(item.href))}
+                onSelect={() => runCommand(() => {
+                  if ((item as any).external) {
+                    window.open(item.href, "_blank", "noopener,noreferrer");
+                  } else {
+                    router.push(item.href);
+                  }
+                })}
                 className="data-[selected=true]:bg-gray-100"
               >
                 <span className="mr-2 text-gray-400">{item.icon}</span>
@@ -192,7 +199,13 @@ export default function CommandPalette() {
               <CommandItem
                 key={item.id}
                 value={`${item.title} ${item.subtitle || ""} ${item.keywords?.join(" ") || ""}`}
-                onSelect={() => runCommand(() => router.push(item.href))}
+                onSelect={() => runCommand(() => {
+                  if ((item as any).external) {
+                    window.open(item.href, "_blank", "noopener,noreferrer");
+                  } else {
+                    router.push(item.href);
+                  }
+                })}
                 className="data-[selected=true]:bg-gray-100"
               >
                 <span className="mr-2 text-gray-400">{item.icon}</span>
@@ -214,7 +227,13 @@ export default function CommandPalette() {
               <CommandItem
                 key={item.id}
                 value={`${item.title} ${item.subtitle || ""} ${item.keywords?.join(" ") || ""}`}
-                onSelect={() => runCommand(() => router.push(item.href))}
+                onSelect={() => runCommand(() => {
+                  if ((item as any).external) {
+                    window.open(item.href, "_blank", "noopener,noreferrer");
+                  } else {
+                    router.push(item.href);
+                  }
+                })}
                 className="data-[selected=true]:bg-gray-100"
               >
                 <span className="mr-2 text-blue-500">{item.icon}</span>

@@ -1,6 +1,17 @@
 import Link from "next/link";
 
-const FOOTER_LINKS = {
+interface FooterLink {
+  href: string;
+  label: string;
+  external?: boolean;
+}
+
+interface FooterSection {
+  title: string;
+  links: FooterLink[];
+}
+
+const FOOTER_LINKS: Record<string, FooterSection> = {
   tools: {
     title: "核心工具",
     links: [
@@ -20,7 +31,7 @@ const FOOTER_LINKS = {
       { href: "/topics", label: "专题合集" },
       { href: "/starter", label: "场景工具包" },
       { href: "/rankings", label: "工具排行榜" },
-      { href: "/bbs", label: "论坛" },
+      { href: "https://bbs.jueshi.net", label: "论坛", external: true },
     ],
   },
   user: {
@@ -123,7 +134,16 @@ export default function Footer() {
             <ul className="space-y-2">
               {FOOTER_LINKS.about.links.map((link) => (
                 <li key={link.href}>
-                  {link.href.startsWith("mailto:") ? (
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-500 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : link.href.startsWith("mailto:") ? (
                     <a
                       href={link.href}
                       className="text-sm text-gray-500 dark:text-gray-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors break-words"

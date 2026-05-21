@@ -6,7 +6,6 @@ export async function GET() {
 Allow: /
 Allow: /tools
 Allow: /tracking
-Allow: /bbs
 Allow: /topics
 Allow: /guides
 Allow: /packages

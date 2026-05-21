@@ -111,7 +111,7 @@ function getGrowthLink(growthType: string): string {
       return "/dashboard/points";
     case "forum_post_approved":
     case "forum_comment_approved":
-      return "/bbs";
+      return "https://bbs.jueshi.net";
     default:
       return "/dashboard/tasks";
   }
