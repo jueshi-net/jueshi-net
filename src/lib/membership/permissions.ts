@@ -14,7 +14,7 @@
 //
 // Migrated to usePermissions():
 // - tools/documents/[type]/page.tsx ✅
-// - tools/label-maker/page.tsx ✅
+// - tools/documents/shipping-label/page.tsx ✅
 
 // 会员权限层 — 仅用于前端 UI 展示，不可作为真实权限依据
 // 真实权限请查询服务端 /api/me/permissions

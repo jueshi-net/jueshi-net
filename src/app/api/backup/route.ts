@@ -13,7 +13,7 @@ export async function GET() {
       prisma.linkItem.findMany({ include: { category: true, favorites: true } }),
       prisma.user.findMany({ select: { id: true, name: true, email: true, role: true, createdAt: true } }),
       prisma.article.findMany({}),
-      prisma.adSlot.findMany(),
+      prisma.adCampaign.findMany(),
       prisma.favorite.findMany(),
       prisma.memo.findMany(),
       prisma.tag.findMany(),

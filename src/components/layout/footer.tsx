@@ -6,7 +6,7 @@ const FOOTER_LINKS = {
     links: [
       { href: "/tools/postal-code", label: "邮编查询" },
       { href: "/tools/documents", label: "单据中心" },
-      { href: "/tools/label-maker", label: "唛头标签" },
+      { href: "/tools/documents/shipping-label", label: "唛头标签" },
       { href: "/ai-tools/product-copy", label: "AI 商品文案" },
       { href: "/ai-tools/translate-polish", label: "AI 翻译润色" },
       { href: "/ai-tools/document-summary", label: "AI 文件摘要" },

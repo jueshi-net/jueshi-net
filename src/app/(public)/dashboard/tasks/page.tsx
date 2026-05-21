@@ -33,7 +33,7 @@ export default async function TasksPage() {
   });
 
   let levelInfo = null;
-  if (user) {
+  if (user?.levelKey) {
     const level = await prisma.userLevel.findUnique({
       where: { key: user.levelKey },
       select: { name: true, iconText: true, color: true, minGrowth: true, maxGrowth: true },

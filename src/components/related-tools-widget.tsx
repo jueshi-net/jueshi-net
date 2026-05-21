@@ -35,7 +35,7 @@ const TOOL_RELATIONSHIPS: Record<string, RelatedTool[]> = {
   ],
   invoice: [
     { name: 'HS编码', href: '/tools/hs-code', emoji: '🔍', desc: '查询海关编码' },
-    { name: '唛头面单', href: '/tools/label-maker', emoji: '🏷️', desc: '生成外箱唛头标签' },
+    { name: '唛头面单', href: '/tools/documents/shipping-label', emoji: '🏷️', desc: '生成外箱唛头标签' },
   ],
   quote: [
     { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '查询实时汇率' },
@@ -51,7 +51,7 @@ const TOOL_RELATIONSHIPS: Record<string, RelatedTool[]> = {
   ],
   documents: [
     { name: '发票生成', href: '/tools/invoice', emoji: '🧾', desc: '快速生成发票' },
-    { name: '唛头面单', href: '/tools/label-maker', emoji: '🏷️', desc: '生成外箱标签' },
+    { name: '唛头面单', href: '/tools/documents/shipping-label', emoji: '🏷️', desc: '生成外箱标签' },
   ],
 };
 

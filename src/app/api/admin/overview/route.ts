@@ -40,9 +40,9 @@ export async function GET() {
 
     // Ads
     const [adTotal, adActive, adInactive] = await Promise.all([
-      prisma.adSlot.count(),
-      prisma.adSlot.count({ where: { isActive: true } }),
-      prisma.adSlot.count({ where: { isActive: false } }),
+      prisma.adCampaign.count(),
+      prisma.adCampaign.count({ where: { isActive: true } }),
+      prisma.adCampaign.count({ where: { isActive: false } }),
     ]);
 
     // Reviews by status

@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -56,7 +57,7 @@ export default function LoginPage() {
         const res = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email, password, name, inviteCode }),
         });
         const data = await res.json();
         if (!data.success) {
@@ -191,6 +192,26 @@ export default function LoginPage() {
                       </button>
                     </div>
                   </div>
+
+                  {!isLogin && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">邀请码 (Invite Code) *</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={inviteCode}
+                          onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                          className="w-full pl-4 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-gray-900 font-mono tracking-widest min-h-[48px]"
+                          placeholder="如 PIONEER2026"
+                          required={!isLogin}
+                          maxLength={20}
+                        />
+                      </div>
+                      <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
+                        🔒 当前为内测阶段，仅限先锋探路官凭邀请码入驻
+                      </p>
+                    </div>
+                  )}
 
                   {error && (
                     <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3 border border-red-100">

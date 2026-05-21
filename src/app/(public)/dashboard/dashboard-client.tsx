@@ -63,7 +63,7 @@ const PRIORITY_CONFIG: Record<string, { label: string; icon: React.ReactNode; ba
 
 const SHORTCUTS = [
   { label: "单据生成", href: "/tools/documents", icon: <FileText className="w-5 h-5" /> },
-  { label: "唛头标签", href: "/tools/label-maker", icon: <Tag className="w-5 h-5" /> },
+  { label: "唛头标签", href: "/tools/documents/shipping-label", icon: <Tag className="w-5 h-5" /> },
   { label: "邮编查询", href: "/tools/postal-code", icon: <MapPin className="w-5 h-5" /> },
   { label: "物流追踪", href: "/tracking", icon: <Truck className="w-5 h-5" /> },
   { label: "Memo", href: "/tools/memo", icon: <StickyNote className="w-5 h-5" /> },

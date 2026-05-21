@@ -72,7 +72,7 @@ export async function GET() {
     { path: '/tools', priority: '0.9', changeFreq: 'weekly' },
     { path: '/tools/postal-code', priority: '0.9', changeFreq: 'monthly' },
     { path: '/tools/documents', priority: '0.9', changeFreq: 'monthly' },
-    { path: '/tools/label-maker', priority: '0.9', changeFreq: 'monthly' },
+    { path: '/tools/documents/shipping-label', priority: '0.9', changeFreq: 'monthly' },
     { path: '/ai-tools/product-copy', priority: '0.8', changeFreq: 'monthly' },
     { path: '/ai-tools/translate-polish', priority: '0.8', changeFreq: 'monthly' },
     { path: '/ai-tools/document-summary', priority: '0.8', changeFreq: 'monthly' },

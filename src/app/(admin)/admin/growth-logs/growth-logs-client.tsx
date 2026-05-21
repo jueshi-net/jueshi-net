@@ -17,7 +17,7 @@ interface GrowthLog {
     id: string;
     email: string;
     name: string | null;
-    levelKey: string;
+    levelKey: string | null;
     growthValue: number;
   };
 }
@@ -190,7 +190,7 @@ export default function GrowthLogsClient({
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
                       <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                        {LEVEL_LABELS[log.user.levelKey] || log.user.levelKey}
+                        {log.user.levelKey ? (LEVEL_LABELS[log.user.levelKey] || log.user.levelKey) : "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">

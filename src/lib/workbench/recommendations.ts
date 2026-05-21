@@ -19,7 +19,7 @@ export interface RecommendedPackage {
  */
 export const DEFAULT_RECOMMENDED_TOOLS: ToolRecommendation[] = [
   { key: "documents", title: "外贸单据", href: "/tools/documents", icon: "FileText" },
-  { key: "label-maker", title: "唛头面单", href: "/tools/label-maker", icon: "Tag" },
+  { key: "label-maker", title: "唛头面单", href: "/tools/documents/shipping-label", icon: "Tag" },
   { key: "postal-code", title: "邮编查询", href: "/tools/postal-code", icon: "MapPin" },
   { key: "tracking", title: "物流查询", href: "/tracking", icon: "Truck" },
   { key: "memo", title: "Memo", href: "/tools/memo", icon: "StickyNote" },
@@ -96,7 +96,7 @@ export function getRecommendedPackages(profileType: string | null): RecommendedP
             { key: "tracking", title: "物流查询", href: "/tracking", icon: "Truck" },
             { key: "postal-code", title: "邮编查询", href: "/tools/postal-code", icon: "MapPin" },
             { key: "shipping-calculator", title: "运费计算", href: "/tools/shipping-calculator", icon: "Calculator" },
-            { key: "label-maker", title: "唛头面单", href: "/tools/label-maker", icon: "Tag" },
+            { key: "label-maker", title: "唛头面单", href: "/tools/documents/shipping-label", icon: "Tag" },
             { key: "memo", title: "Memo", href: "/tools/memo", icon: "StickyNote" },
           ],
         },

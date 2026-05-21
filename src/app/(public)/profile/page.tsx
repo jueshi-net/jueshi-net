@@ -20,7 +20,6 @@ export default async function ProfilePage() {
       _count: {
         select: {
           links: true,
-          ownedWorkspaces: true,
           favorites: true,
           memos: true,
         },
@@ -33,7 +32,6 @@ export default async function ProfilePage() {
 
   const stats = [
     { label: '导航链接', value: user._count.links, icon: LinkIcon, color: 'blue', href: '/my-links' },
-    { label: '工作区', value: user._count.ownedWorkspaces, icon: FolderOpen, color: 'green', href: '/dashboard' },
     { label: '收藏', value: user._count.favorites, icon: Star, color: 'purple', href: '/favorites' },
     { label: '备忘录', value: user._count.memos, icon: FolderOpen, color: 'orange', href: '/tools/memo' },
   ];

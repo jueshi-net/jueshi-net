@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
       createdAt: true,
       updatedAt: true,
       publishedAt: true,
-      _count: { select: { tags: true } },
     },
   });
 

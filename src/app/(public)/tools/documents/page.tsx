@@ -41,6 +41,7 @@ const docCards = [
   { icon: FileBadge, label: "销售合同", sub: "Sales Contract", href: "/tools/documents/sales-contract", desc: "买卖双方权利义务约定" },
   { icon: ClipboardList, label: "订舱委托书", sub: "Booking Form", href: "/tools/documents/booking-form", desc: "委托货代订舱的正式单据" },
   { icon: Shield, label: "报关资料", sub: "Customs Docs", href: "/tools/documents/customs-declaration", desc: "海关申报所需全套资料" },
+  { icon: FileText, label: "唛头标签", sub: "Shipping Label", href: "/tools/documents/shipping-label", desc: "外箱唛头、集运入库贴、合箱标签" },
 ];
 
 export default function DocumentsHubPage() {
@@ -179,9 +180,9 @@ export default function DocumentsHubPage() {
         <DocumentGrid coreDocs={coreDocs} secondTierDocs={secondTierDocs} />
       </div>
 
-      {/* Label-maker CTA */}
+      {/* Shipping Label CTA (integrated) */}
       <div className="max-w-6xl mx-auto px-4 pb-8">
-        <Link href="/tools/label-maker" className="block bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+        <Link href="/tools/documents/shipping-label" className="block bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-bold mb-1">📦 需要生成箱唛/面单？</h3>

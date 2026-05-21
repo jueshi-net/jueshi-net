@@ -12,14 +12,24 @@ export async function POST(req: Request) {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    include: { ownedWorkspaces: true }
+    select: { id: true },
   });
 
-  if (!user || !user.ownedWorkspaces.length) {
+  if (!user) {
+    return NextResponse.json({ error: '用户不存在' }, { status: 404 });
+  }
+
+  // Get user's workspace
+  const workspace = await prisma.workspace.findFirst({
+    where: { ownerId: user.id },
+    select: { id: true },
+  });
+
+  if (!workspace) {
     return NextResponse.json({ error: '工作区不存在' }, { status: 404 });
   }
 
-  const workspaceId = user.ownedWorkspaces[0].id;
+  const workspaceId = workspace.id;
 
   const { action, ids, data } = await req.json();
 

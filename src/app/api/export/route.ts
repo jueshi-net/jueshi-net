@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
           });
           break;
         case 'ads':
-          data.ads = await prisma.adSlot.findMany({
+          data.ads = await prisma.adCampaign.findMany({
             orderBy: { createdAt: 'desc' }
           });
           break;

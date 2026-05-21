@@ -20,8 +20,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
-        id: true, name: true, email: true, image: true, role: true,
-        ownedWorkspaces: true, createdAt: true,
+        id: true, name: true, email: true, image: true, role: true, createdAt: true,
       },
     });
 

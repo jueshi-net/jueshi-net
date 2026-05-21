@@ -2,7 +2,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
-import { AdSlot } from '@/components/ad-slot';
+import { AdSlot } from '@/components/ads/AdSlot';
+import { CountryInfoSection } from '@/components/country-info-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 import { trackEvent } from '@/lib/analytics';
@@ -705,10 +706,12 @@ export default function PostalCodePage() {
                     <Database className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                     <p className="text-base font-medium text-gray-600 mb-1">没有找到完全匹配</p>
                     <p className="text-sm text-gray-400 mb-4">可以尝试输入邮编前缀、城市名或省州名</p>
-                    <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
-                      <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
-                    </a>
+                    {country.officialLookupUrl && (
+                      <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                        <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
+                      </a>
+                    )}
                   </div>
                 )}
 
@@ -847,21 +850,28 @@ export default function PostalCodePage() {
                   如需精确查询具体地址的邮编，请访问{country.name}邮政官网：
                 </p>
                 <div className="space-y-3">
-                  <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                    className={`${buttonVariants.primary} w-full justify-center`}>
-                    <ExternalLink className="w-4 h-4" /> 查询邮编 — {country.officialName}
-                  </a>
-                  <a href={country.officialUrl} target="_blank" rel="noopener noreferrer"
-                    className={`${buttonVariants.secondary} w-full justify-center`}>
-                    <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 首页
-                  </a>
+                  {country.officialLookupUrl && (
+                    <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                      className={`${buttonVariants.primary} w-full justify-center`}>
+                      <ExternalLink className="w-4 h-4" /> 查询邮编 — {country.officialName}
+                    </a>
+                  )}
+                  {country.officialUrl && (
+                    <a href={country.officialUrl} target="_blank" rel="noopener noreferrer"
+                      className={`${buttonVariants.secondary} w-full justify-center`}>
+                      <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 首页
+                    </a>
+                  )}
+                  {!country.officialLookupUrl && !country.officialUrl && (
+                    <p className="text-sm text-gray-400 text-center py-2">暂无官方查询链接</p>
+                  )}
                 </div>
 
                 {/* Quick links to all countries */}
                 <div className="mt-5 pt-4 border-t border-gray-200">
                   <p className="text-xs font-semibold text-gray-400 mb-2">各国官方邮编查询</p>
                   <div className="space-y-2">
-                    {allCountryData.filter(c => c.code !== country.code).map(c => (
+                    {allCountryData.filter(c => c.code !== country.code && c.officialLookupUrl).map(c => (
                       <a key={c.code} href={c.officialLookupUrl} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-2 text-sm text-gray-600 hover:text-teal-600 transition-colors">
                         <span>{c.flag}</span>
@@ -919,6 +929,11 @@ export default function PostalCodePage() {
         </div>
 
         <RelatedGuidesSection slugs={["canada-postal-code-format"]} />
+
+        {/* ===== AD SLOT + COUNTRY INFO ===== */}
+        <AdSlot placement="tool-postal-code-mid" country={country.name} className="mt-8 mb-8" />
+
+        <CountryInfoSection countryCode={selectedCountryCode} countryName={country.name} className="mb-8" />
 
         {/* FAQ */}
         <FAQSection title="邮编查询常见问题" items={[

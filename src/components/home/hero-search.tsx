@@ -13,7 +13,7 @@ export default function HeroSearch() {
   return (
     <button
       type="button"
-      onClick={() => setOpen(true)}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
       className="relative w-full flex items-center px-5 py-3.5 bg-white/95 backdrop-blur-sm rounded-xl text-base min-h-[56px] shadow-xl border border-transparent text-left text-gray-400 hover:border-gray-200 transition-colors cursor-text"
     >
       <Search className="w-5 h-5 text-gray-400 mr-3 flex-shrink-0" />

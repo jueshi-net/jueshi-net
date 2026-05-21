@@ -20,15 +20,15 @@ model User {
   memberUntil          DateTime?          // 会员体验到期时间
   profileType          String?            @map("profile_type")  // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
   growthValue          Int                @default(0)           @map("growth_value")  // v1.20.19: 成长值（不可消费）
-  levelKey             String             @default("lv1")       @map("level_key")     // v1.20.19: 当前等级 key
+  levelKey             String?            @default("lv1")       @map("level_key")     // v1.20.19: 当前等级 key (不建 FK，避免数据漂移)
+  badges               String[]           @default([])            @map("badges")       // v1.21: 勋章标识 ['BLACK_GOLD_PIONEER']
   // Stripe subscription fields
   stripeCustomerId     String?            @unique @map("stripe_customer_id")
   stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
   stripePriceId        String?            @map("stripe_price_id")
   stripeCurrentPeriodEnd DateTime?        @map("stripe_current_period_end")
-  userLevel            UserLevel?         @relation(fields: [levelKey], references: [key])
   createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  updatedAt            DateTime           @default(now()) @updatedAt
   workbenchLinks       WorkbenchLink[]
   toolFavorites        ToolFavorite[]
   toolReviews          ToolReview[]
@@ -46,7 +46,6 @@ model User {
   subscriptions        UserSubscription[]
   webhooks             Webhook[]
   workspaceMemberships WorkspaceMember[]
-  ownedWorkspaces      Workspace[]        @relation("WorkspaceOwner")
   pointLedgers         PointLedger[]
   dailyCheckIns        DailyCheckIn[]
   userTasks            UserTask[]
@@ -131,7 +130,7 @@ model LinkItem {
   clicks       Int        @default(0)
   status       String     @default("active")
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  updatedAt    DateTime   @default(now()) @updatedAt
   favorites    Favorite[]
   tags         LinkTag[]
   category     Category?  @relation(fields: [categoryId], references: [id])
@@ -152,7 +151,7 @@ model Category {
   sortOrder Int        @default(0)
   parentId  String?
   createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  updatedAt DateTime   @default(now()) @updatedAt
   parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children  Category[] @relation("CategoryHierarchy")
   links     LinkItem[]
@@ -215,14 +214,13 @@ model Workspace {
   name        String
   description String?
   icon        String?
-  ownerId     String
+  ownerId     String?
   isPublic    Boolean           @default(false)
   slug        String            @unique
   createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  updatedAt   DateTime          @default(now()) @updatedAt
   links       LinkItem[]
   members     WorkspaceMember[]
-  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@map("workspaces")
 }
@@ -315,28 +313,58 @@ model Notification {
   @@map("notifications")
 }
 
-model AdSlot {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  position    String
-  type        String    @default("image") // image / code / text
-  imageUrl    String?   @map("imageUrl")
-  linkUrl     String?   @map("linkUrl")
-  targetUrl   String?   @map("target_url")
-  altText     String?   @map("altText")
-  title       String?
-  description String?
-  buttonText  String?   @map("button_text")
-  code        String?
-  startDate   DateTime
-  endDate     DateTime?
-  isActive    Boolean   @default(true)
-  clicks      Int       @default(0)
-  impressions Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model AdCampaign {
+  id              String   @id @default(cuid())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  @@map("ad_slots")
+  // 内部管理
+  title           String   @unique // 内部管理名称
+  adType          String   @default("DIRECT") @map("ad_type") // DIRECT | NETWORK
+
+  // 直投广告字段
+  imageUrl        String?  @map("image_url") // 直投广告图片 URL
+  targetUrl       String?  @map("target_url") // 直投广告落地页链接
+
+  // 网盟广告字段
+  codeSnippet     String?  @map("code_snippet") @db.Text // Google Ads 等 HTML/JS 代码
+
+  // 投放配置
+  placements      String[] // 允许投放的位置列表
+  targetCountries String[] @default([]) @map("target_countries") // 定向国家代码（空=通投）
+  isActive        Boolean  @default(true) @map("is_active")
+
+  // 统计
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+
+  // 时间控制
+  startDate       DateTime @default(now()) @map("start_date")
+  endDate         DateTime? @map("end_date")
+
+  // 优先级（数值越高越优先）
+  priority        Int      @default(0)
+
+  @@index([isActive, adType])
+  @@index([isActive, startDate, endDate])
+  @@map("ad_campaigns")
+}
+
+// ─── 邀请码系统 ────────────────────────────────────────────────────────────────
+model InviteCode {
+  id          String    @id @default(cuid())
+  code        String    @unique                  // 邀请码，如 PIONEER2026
+  maxUses     Int       @default(100)             @map("max_uses")      // 最大使用次数
+  usedCount   Int       @default(0)               @map("used_count")    // 已使用次数
+  isActive    Boolean   @default(true)            @map("is_active")     // 是否可用
+  createdAt   DateTime  @default(now())           @map("created_at")
+  expiresAt   DateTime?                           @map("expires_at")    // 过期时间（NULL=永不过期）
+  createdBy   String?                             @map("created_by")    // 创建者（admin email）
+  note        String?                             // 备注说明
+
+  @@index([isActive, code])
+  @@index([expiresAt])
+  @@map("invite_codes")
 }
 
 model Article {
@@ -351,12 +379,11 @@ model Article {
   views       Int          @default(0)
   publishedAt DateTime?
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  updatedAt   DateTime     @default(now()) @updatedAt
   category    String?      // 文章分类：跨境寄送/海外生活/出海经营
   seoTitle    String?       // SEO 标题
   seoDescription String?   // SEO 描述
   relatedTools  String[] @default([]) // 关联工具路由
-  tags        ArticleTag[]
 
   @@index([status])
   @@index([category])
@@ -365,12 +392,10 @@ model Article {
 
 model ArticleTag {
   id        String   @id @default(cuid())
-  articleId String
+  articleId String?
   tag       String
   createdAt DateTime @default(now())
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
-  @@unique([articleId, tag])
   @@map("article_tags")
 }
 
@@ -387,7 +412,7 @@ model Resource {
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now()) @updatedAt
 
   @@index([category])
   @@index([isActive])
@@ -405,7 +430,7 @@ model Subscription {
   isActive    Boolean            @default(true)
   sortOrder   Int                @default(0)
   createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  updatedAt   DateTime           @default(now()) @updatedAt
   users       UserSubscription[]
 
   @@map("subscriptions")
@@ -486,12 +511,12 @@ model NewsletterBroadcast {
 
 model PostalCode {
   id            String   @id @default(cuid())
-  country       String
-  countryCode   String
+  country       String?
+  countryCode   String?
   province      String?
-  city          String
+  city          String?
   district      String?
-  postalCode    String
+  postalCode    String?
   normalizedPostalCode String?  // 去空格/横线的大写版本，如 V6B0A1, SW1A1AA
   areaName      String?
   adminName1    String?  // 省/州名
@@ -506,9 +531,8 @@ model PostalCode {
   sourceUrl     String   @default("https://download.geonames.org/export/zip/")
   sourceVersion String?  // import date
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt     DateTime @default(now()) @updatedAt
 
-  @@unique([countryCode, postalCode])
   @@index([postalCode])
   @@index([normalizedPostalCode])
   @@index([countryCode, normalizedPostalCode])
@@ -531,7 +555,7 @@ model HSCode {
   notes         String?
   isActive      Boolean  @default(true)
   createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  updatedAt     DateTime @default(now()) @updatedAt
   parent        HSCode?  @relation("HSHierarchy", fields: [parentId], references: [id])
   children      HSCode[] @relation("HSHierarchy")
 
@@ -559,7 +583,7 @@ model ExportLog {
 // 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
 model EventLog {
   id          String   @id @default(cuid())
-  eventType   String         // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+  eventType   String   @default("")   // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
   toolName    String?          // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
   action      String?  // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
   path        String?  // 页面路径，如 /tools/tracking
@@ -841,9 +865,8 @@ model UserLevel {
   sortOrder   Int      @map("sort_order")  @default(0)
   isActive    Boolean  @map("is_active")   @default(true)
   createdAt   DateTime @map("created_at")  @default(now())
-  updatedAt   DateTime @map("updated_at")  @updatedAt
+  updatedAt   DateTime @map("updated_at")  @default(now()) @updatedAt
 
-  users       User[]
   @@map("user_levels")
 }
 

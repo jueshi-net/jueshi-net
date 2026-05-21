@@ -38,11 +38,7 @@ export async function GET() {
         levelKey: true,
         role: true,
         memberUntil: true,
-        userLevel: { select: { key: true, name: true, minGrowth: true, maxGrowth: true, iconText: true, color: true, benefits: true } },
-        badgeAwards: {
-          include: { badge: { select: { id: true, key: true, name: true, iconText: true, color: true, category: true, description: true } } },
-          orderBy: { awardedAt: "desc" },
-        },
+        badges: true,
       },
     });
 
@@ -65,13 +61,10 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       data: {
-        // Original fields (for Dashboard MembershipCard, tasks, points)
         growthValue: user.growthValue,
         levelKey: user.levelKey,
-        level: user.userLevel,
-        badges: user.badgeAwards.map(a => ({ ...a.badge, awardedAt: a.awardedAt, reason: a.reason })),
+        badges: user.badges || [],
         nextLevel,
-        // v1.20.34: Membership status fields
         isActiveMember,
         membershipStatus: isActiveMember ? "active" : "inactive",
         membershipExpiresAt: user.memberUntil,

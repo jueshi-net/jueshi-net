@@ -150,9 +150,9 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       prisma.resource.count({ where: { isActive: true } }),
       prisma.resource.count({ where: { isActive: false } }),
       prisma.resource.groupBy({ by: ["category"] }),
-      prisma.adSlot.count(),
-      prisma.adSlot.count({ where: { isActive: true } }),
-      prisma.adSlot.count({ where: { isActive: false } }),
+      prisma.adCampaign.count(),
+      prisma.adCampaign.count({ where: { isActive: true } }),
+      prisma.adCampaign.count({ where: { isActive: false } }),
       prisma.pointLedger.count(),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { gt: 0 } } }),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { lt: 0 } } }),
@@ -161,7 +161,9 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
     // Build usersByLevel map
     const levelMap: Record<string, number> = {};
     for (const l of usersByLevel) {
-      levelMap[l.levelKey] = l._count.levelKey;
+      if (l.levelKey) {
+        levelMap[l.levelKey] = l._count.levelKey;
+      }
     }
     // Ensure all levels exist
     for (const lv of ["lv1", "lv2", "lv3", "lv4", "lv5"]) {
