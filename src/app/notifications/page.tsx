@@ -155,6 +155,22 @@ export default function NotificationsPage() {
                         <a
                           href={notif.link}
                           className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                          onClick={async (e) => {
+                            // Mark as read before navigating
+                            try {
+                              await fetch("/api/notifications/mark-read", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ ids: [notif.id] }),
+                              });
+                              setNotifications(prev =>
+                                prev.map(n => n.id === notif.id ? { ...n, isRead: true } : n)
+                              );
+                              setUnreadCount(prev => Math.max(0, prev - 1));
+                            } catch (error) {
+                              console.error("Failed to mark as read:", error);
+                            }
+                          }}
                         >
                           <ExternalLink className="h-3 w-3" />
                           查看详情

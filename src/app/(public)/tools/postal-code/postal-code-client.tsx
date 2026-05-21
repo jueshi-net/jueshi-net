@@ -718,8 +718,8 @@ export default function PostalCodePage() {
                   </div>
                 )}
 
-                {/* Initial empty state */}
-                {!dbLoading && !dbQuery && (
+                {/* Initial empty state — hidden when results exist */}
+                {!dbLoading && !dbQuery && dbResults.length === 0 && (
                   <div className="text-center py-8 bg-gray-50 rounded-lg">
                     <Database className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                     <p className="text-sm text-gray-400">输入邮编或城市名，查询具体地址信息</p>

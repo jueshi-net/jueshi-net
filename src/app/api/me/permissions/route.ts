@@ -41,6 +41,7 @@ export async function GET() {
       memoMax: limits.maxMemos,
       companyProfilesMax: limits.maxCompanyProfiles,
       labelBatchMax: limits.labelBatchLimit,
+      maxDrafts: limits.maxDrafts,
       canUploadLogo: limits.canUploadLogo,
       canUseCustomStyle: limits.canUseCustomStyle,
       canRemoveBranding: limits.canRemoveBranding,

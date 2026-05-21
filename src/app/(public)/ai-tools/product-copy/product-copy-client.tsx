@@ -40,7 +40,14 @@ export default function ProductCopyPage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        // Graceful fallback for API errors (missing key, rate limit, etc.)
+        if (res.status === 500 || res.status === 503) {
+          setError("AI 服务暂时不可用，可能是 API 配置未完成或额度不足。请稍后再试，或使用手动撰写。");
+          setLoading(false);
+          return;
+        }
         setError(data.error || "生成失败");
+        setLoading(false);
         return;
       }
       try {
@@ -49,8 +56,8 @@ export default function ProductCopyPage() {
         setResult({ raw: data.result });
       }
       setUsage(data.usage);
-    } catch {
-      setError("请求失败，请重试");
+    } catch (err: any) {
+      setError(`请求失败：${err?.message || '网络错误'}，请检查连接后重试`);
     } finally {
       setLoading(false);
     }

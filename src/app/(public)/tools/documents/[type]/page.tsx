@@ -307,17 +307,17 @@ export default function DocumentEditorPage() {
       {/* Print styles */}
       <style jsx global>{`
         @media print {
-          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-          body * { visibility: hidden !important; display: none !important; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+          body > * { visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
           [data-document-preview], [data-document-preview] * { visibility: visible !important; }
           [data-document-preview] {
             position: absolute !important; left: 0 !important; top: 0 !important;
             width: 100% !important; max-width: 210mm !important; margin: 0 auto !important;
             padding: 15mm !important; box-shadow: none !important; border: none !important;
-            background: white !important;
+            background: white !important; overflow: visible !important; height: auto !important;
           }
           table, tr, td, th { page-break-inside: avoid !important; }
-          @page { margin: 10mm; }
+          @page { margin: 10mm; size: A4; }
         }
       `}</style>
 

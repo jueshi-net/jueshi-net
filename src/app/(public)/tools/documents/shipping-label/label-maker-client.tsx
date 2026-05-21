@@ -160,16 +160,16 @@ export default function LabelMakerPage() {
     <>
       <style jsx global>{`
         @media print {
-          html, body { background: white !important; margin: 0 !important; padding: 0 !important; }
-          body * { visibility: hidden !important; display: none !important; }
+          html, body { background: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+          body > * { visibility: hidden !important; height: 0 !important; overflow: hidden !important; }
           [data-label-preview], [data-label-preview] * { visibility: visible !important; }
           [data-label-preview] {
             position: absolute !important; left: 0 !important; top: 0 !important;
             width: 100% !important; max-width: 210mm !important; margin: 0 auto !important;
             padding: 15mm !important; box-shadow: none !important; border: none !important;
-            background: white !important;
+            background: white !important; overflow: visible !important; height: auto !important;
           }
-          @page { margin: 10mm; }
+          @page { margin: 10mm; size: A4; }
         }
       `}</style>
 
@@ -311,16 +311,24 @@ export default function LabelMakerPage() {
                       </select>
                     </div>
                   )}
-                  {p.canUploadLogo() && (
-                    <div>
-                      <label className="text-xs text-gray-500 mb-1 block">公司 Logo</label>
-                      <input type="file" accept="image/*" className="w-full text-sm"
-                        onChange={e => {
-                          const file = e.target.files?.[0];
-                          if (file) { const reader = new FileReader(); reader.onload = ev => updateField('logoUrl', ev.target?.result); reader.readAsDataURL(file); }
-                        }} />
-                    </div>
-                  )}
+                    {p.canUploadLogo() && (
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">公司 Logo</label>
+                        <input type="file" accept="image/*" className="w-full text-sm"
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) { const reader = new FileReader(); reader.onload = ev => updateField('logoUrl', ev.target?.result); reader.readAsDataURL(file); }
+                          }} />
+                      </div>
+                    )}
+                    {!p.canUploadLogo() && (
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">公司 Logo（占位）</label>
+                        <div className="w-full h-16 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50 text-gray-400 text-xs">
+                          <Image className="w-4 h-4 mr-1" /> 登录后上传 Logo
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
 
@@ -401,7 +409,7 @@ export default function LabelMakerPage() {
               <AdSlot placement="label-maker-bottom" variant="card" className="print:hidden" />
 
               <div className="text-center text-xs text-gray-400">
-                游客最多保存 3 份草稿 | <Link href="/tools/documents" className="text-blue-500">去单据生成器 →</Link>
+                游客最多保存 <strong>{perms.limits.maxDrafts ?? 3}</strong> 份草稿 | <Link href="/tools/documents" className="text-blue-500">去单据生成器 →</Link>
               </div>
             </div>
 
