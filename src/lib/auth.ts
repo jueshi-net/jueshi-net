@@ -24,22 +24,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials.password as string;
         const name = credentials.name as string | undefined;
 
-        let user = await prisma.user.findUnique({ where: { email } });
+        const userRecord = await prisma.user.findUnique({
+          where: { email },
+          select: {
+            id: true, email: true, name: true, password: true,
+            role: true,
+          },
+        });
 
-        if (user) {
-          if (!user.password) return null;
-          const isValid = await bcrypt.compare(password, user.password);
+        if (userRecord) {
+          if (!userRecord.password) return null;
+          const isValid = await bcrypt.compare(password, userRecord.password);
           if (!isValid) return null;
           return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
+            id: userRecord.id,
+            email: userRecord.email,
+            name: userRecord.name,
+            role: userRecord.role,
           };
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        user = await prisma.user.create({
+        const newUser = await prisma.user.create({
           data: {
             email,
             name: name || email.split("@")[0],
@@ -48,20 +54,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        // Auto-create workspace for new users
-        await prisma.workspace.create({
-          data: {
-            ownerId: user.id,
-            name: `${user.name || user.email?.split("@")[0]}的工作台`,
-            slug: `ws-${user.id.slice(0, 8)}`,
-          },
-        });
-
         return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          role: newUser.role,
         };
       },
     }),
