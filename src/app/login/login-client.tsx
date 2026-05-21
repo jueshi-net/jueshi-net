@@ -23,9 +23,9 @@ const TRUST_POINTS = [
   { icon: Sparkles, label: "AI 工具与资源收藏", desc: "翻译、摘要、文案一键生成" },
 ];
 
-export default function LoginPage() {
+export default function LoginPage({ defaultMode = "login" }: { defaultMode?: "login" | "signup" }) {
   const router = useRouter();
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(defaultMode === "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");

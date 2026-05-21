@@ -232,6 +232,9 @@ export default function PostalCodePage() {
       return;
     }
 
+    // Always set loading when starting a new query (fixes stale loading on rapid type→clear)
+    setDbLoading(true);
+
     // Cancel previous in-flight request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();

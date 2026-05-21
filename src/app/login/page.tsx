@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LoginPage() {
-  return <LoginClient />;
+export default async function LoginPage(props: { searchParams: Promise<{ mode?: string }> }) {
+  const searchParams = await props.searchParams;
+  const mode = searchParams.mode === "signup" ? "signup" : "login";
+  return <LoginClient defaultMode={mode} />;
 }
