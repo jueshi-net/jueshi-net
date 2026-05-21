@@ -28,9 +28,13 @@ export default function AdminHealthPage() {
 
   if (!health) return <div className="p-12 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto" /></div>;
 
+  // Normalize API status values ('healthy' or 'ok' both mean healthy)
+  const isHealthy = health.status === 'ok' || health.status === 'healthy';
+  const isDbOk = health.database === 'ok' || health.database === 'healthy';
+
   const checks = [
-    { name: '应用服务', status: health.status === 'ok' ? 'ok' : 'error', detail: health.status === 'ok' ? '运行正常' : '服务异常', icon: Server },
-    { name: '数据库连接', status: health.database ? 'ok' : 'error', detail: health.database ? '连接正常' : '连接失败', icon: Database },
+    { name: '应用服务', status: isHealthy ? 'ok' : 'error', detail: isHealthy ? '运行正常' : '服务异常', icon: Server },
+    { name: '数据库连接', status: isDbOk ? 'ok' : 'error', detail: isDbOk ? '连接正常' : '连接失败', icon: Database },
     { name: '响应时间', status: health.responseTime < 500 ? 'ok' : health.responseTime < 1000 ? 'warn' : 'error', detail: `${health.responseTime}ms`, icon: Clock },
     { name: '系统时间', status: 'ok', detail: new Date().toLocaleString('zh-CN'), icon: Clock },
   ];
@@ -100,13 +104,13 @@ export default function AdminHealthPage() {
 
       {/* 总体状态 */}
       <div className={`rounded-xl p-6 text-center ${
-        health.status === 'ok' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+        isHealthy ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
       }`}>
-        <h2 className={`text-xl font-bold ${health.status === 'ok' ? 'text-green-700' : 'text-red-700'}`}>
-          {health.status === 'ok' ? '✅ 系统运行正常' : '❌ 系统存在异常'}
+        <h2 className={`text-xl font-bold ${isHealthy ? 'text-green-700' : 'text-red-700'}`}>
+          {isHealthy ? '✅ 所有服务正常运行' : '❌ 系统存在异常，请检查日志或探针配置'}
         </h2>
-        <p className={`text-sm mt-1 ${health.status === 'ok' ? 'text-green-600' : 'text-red-600'}`}>
-          {health.message || '所有服务正常运行'}
+        <p className={`text-sm mt-1 ${isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+          {isHealthy ? `运行时间: ${Math.floor(health.uptime)}s · Node ${health.version}` : health.message}
         </p>
       </div>
     </div>

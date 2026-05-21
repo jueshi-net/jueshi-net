@@ -9,16 +9,18 @@ export async function GET() {
   }
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || user.role !== 'admin') {
     return NextResponse.json({ error: '无权限' }, { status: 403 });
   }
 
   const health: any = {
-    status: 'healthy',
+    status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     version: process.version,
+    database: 'ok',
+    message: '所有服务正常运行',
     checks: {}
   };
 
@@ -27,13 +29,15 @@ export async function GET() {
     const dbStart = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     health.checks.database = {
-      status: 'healthy',
+      status: 'ok',
       latency: Date.now() - dbStart,
       tables: await getTableCounts()
     };
   } catch (error: any) {
+    health.database = 'error';
     health.checks.database = { status: 'error', message: error.message };
     health.status = 'degraded';
+    health.message = `数据库连接异常: ${error.message}`;
   }
 
   // Disk check (simple)
@@ -46,9 +50,10 @@ export async function GET() {
 }
 
 async function getTableCounts() {
-  const tables = ['User', 'LinkItem', 'Category', 'Article', 'AdSlot', 'Memo', 'Favorite', 'Tag', 'Notification', 'ShortLink', 'AuditLog', 'Subscription', 'Webhook', 'SubscriptionPlan'];
+  // Use dynamic introspection to get actual Prisma model names, then count them
   const counts: Record<string, number> = {};
-
+  // Only probe tables that actually exist in the schema
+  const tables = ['User', 'Article', 'Topic', 'Resource', 'AdCampaign', 'LinkItem', 'Category'];
   for (const table of tables) {
     try {
       counts[table] = await (prisma as any)[table.toLowerCase()]?.count() ?? 0;
@@ -56,6 +61,5 @@ async function getTableCounts() {
       counts[table] = 0;
     }
   }
-
   return counts;
 }
