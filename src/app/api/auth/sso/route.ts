@@ -6,9 +6,11 @@
  * 2. 未登录 → 302 到 /login?callbackUrl=/api/auth/sso
  * 3. 已登录 → 从 DB 读取用户信息（id, name, email, badges）
  * 4. 用 FLARUM_JWT_SECRET 签发 5 分钟有效期的 JWT
- * 5. 302 重定向到 https://bbs.jueshi.net/api/auth/sso?sso_token=<jwt>
+ * 5. 302 重定向到 Flarum SSO 桥接页
  *
- * Flarum 端需安装 fof/oauth 或 flarum-auth-token 类插件来核销此 token。
+ * JWT 格式严格契合 maicol07/flarum-ext-sso 插件标准：
+ *   { user: { id, attributes: { email, username, isEmailConfirmed } }, remember }
+ * 签名验证：HS256，issuer=jueshi.net，audience=Flarum URL
  */
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -56,24 +58,30 @@ export async function GET(req: Request) {
     );
   }
 
-  // 4. JWT 签发 — 5 分钟有效期，防重放攻击
+  // 4. JWT 签发 — maicol07/flarum-ext-sso 插件格式
+  //    Payload 必须包含 user.id + user.attributes.email/username
   const secret = new TextEncoder().encode(JWT_SECRET);
   const now = Math.floor(Date.now() / 1000);
 
   const token = await new SignJWT({
-    sub: user.id,
-    name: user.name || user.email.split("@")[0],
-    email: user.email,
-    badges: user.badges || [],
+    user: {
+      id: user.id,
+      attributes: {
+        email: user.email,
+        username: user.name || user.email.split("@")[0],
+        isEmailConfirmed: true,
+      },
+    },
+    remember: false,
   })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setIssuedAt(now)
-    .setExpirationTime(now + 5 * 60) // 5 分钟
+    .setExpirationTime(now + 5 * 60) // 5 分钟，防重放攻击
     .setIssuer("jueshi.net")
     .setAudience(FLARUM_URL)
     .sign(secret);
 
-  // 5. 安全重定向到 Flarum SSO 核销端点
-  const flarumSsoUrl = `${FLARUM_URL}/api/auth/sso?sso_token=${token}`;
-  return NextResponse.redirect(flarumSsoUrl);
+  // 5. 安全重定向到 Flarum SSO 桥接页
+  const bridgeUrl = `${FLARUM_URL}/sso-callback.html?token=${token}`;
+  return NextResponse.redirect(bridgeUrl);
 }

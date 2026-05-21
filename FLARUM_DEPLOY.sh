@@ -37,13 +37,13 @@ echo "[1/8] Installing system dependencies..."
 apt-get update -qq
 apt-get install -y --no-install-recommends \
   mariadb-server mariadb-client \
-  php8.2 php8.2-fpm php8.2-cli \
-  php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip \
-  php8.2-gd php8.2-mysql php8.2-tokenizer php8.2-bcmath \
-  php8.2-fileinfo php8.2-opcache \
+  php8.3 php8.3-fpm php8.3-cli \
+  php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip \
+  php8.3-gd php8.3-mysql php8.3-tokenizer php8.3-bcmath \
+  php8.3-fileinfo php8.3-opcache \
   nginx unzip curl git
 
-echo "✅ PHP 8.2 + MariaDB + extensions installed"
+echo "✅ PHP 8.3 + MariaDB + extensions installed"
 
 # Start MariaDB if not running
 systemctl enable mariadb
@@ -89,9 +89,9 @@ fi
 echo "[5/7] Setting file permissions..."
 chown -R www-data:www-data "${FLARUM_DIR}"
 chmod -R 755 "${FLARUM_DIR}"
-# Flarum needs write access to these directories
-chmod -R 775 "${FLARUM_DIR}/storage"
-chmod -R 775 "${FLARUM_DIR}/assets"
+# Flarum needs write access to these directories (may not exist yet)
+[[ -d "${FLARUM_DIR}/storage" ]] && chmod -R 775 "${FLARUM_DIR}/storage"
+[[ -d "${FLARUM_DIR}/assets" ]] && chmod -R 775 "${FLARUM_DIR}/assets"
 
 echo "✅ Permissions set (www-data:www-data)"
 
@@ -132,7 +132,7 @@ server {
     # PHP-FPM pass
     location ~ \.php$ {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
         fastcgi_index index.php;
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
@@ -168,7 +168,7 @@ echo "✅ Nginx configured and reloaded"
 echo "[7/7] Tuning PHP-FPM..."
 
 # Increase upload limits and memory
-cat > /etc/php/8.2/fpm/conf.d/99-flarum.ini <<PHP_EOF
+cat > /etc/php/8.3/fpm/conf.d/99-flarum.ini <<PHP_EOF
 upload_max_filesize = 64M
 post_max_size = 64M
 memory_limit = 256M
@@ -180,7 +180,7 @@ opcache.max_accelerated_files = 10000
 opcache.revalidate_freq = 60
 PHP_EOF
 
-systemctl restart php8.2-fpm
+systemctl restart php8.3-fpm
 echo "✅ PHP-FPM restarted with Flarum settings"
 
 # ─── Summary ────────────────────────────────────────────────
@@ -206,5 +206,5 @@ echo " Files:"
 echo "  Install dir : ${FLARUM_DIR}"
 echo "  Web root    : ${FLARUM_DIR}/public"
 echo "  Nginx config: /etc/nginx/sites-available/flarum"
-echo "  PHP config  : /etc/php/8.2/fpm/conf.d/99-flarum.ini"
+echo "  PHP config  : /etc/php/8.3/fpm/conf.d/99-flarum.ini"
 echo ""
