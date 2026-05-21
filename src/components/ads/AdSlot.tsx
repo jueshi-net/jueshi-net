@@ -96,26 +96,14 @@ export function AdSlot({ placement, country, className = '' }: AdSlotProps) {
     }
   }, [ad?.id, ad?.codeSnippet, ad?.adType]);
 
+  // Loading skeleton — 短暂加载中不占位，避免布局跳动
   if (loading) {
-    return (
-      <div className={`animate-pulse bg-gray-100 rounded-xl h-24 ${className}`} />
-    );
+    return null;
   }
 
-  // No matching ad — show placeholder
+  // 无匹配广告 → 彻底隐身，不渲染任何 DOM
   if (!ad) {
-    return (
-      <div className={`border-2 border-dashed border-amber-300 bg-amber-50/50 rounded-xl p-6 text-center ${className}`}>
-        <Megaphone className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-        <p className="text-sm font-semibold text-amber-700 mb-1">📢 广告位招租</p>
-        <p className="text-xs text-amber-600/80">
-          {country ? `${country} · ` : ''}位置：{placement}
-        </p>
-        <p className="text-xs text-amber-500/60 mt-1">
-          联系 jueshi.net 获取投放
-        </p>
-      </div>
-    );
+    return null;
   }
 
   // DIRECT: Image + link ad
