@@ -12,10 +12,10 @@ FLARUM_DIR="/var/www/flarum"
 PHP_FPM_POOL="www"         # default pool name on Ubuntu
 DB_NAME="flarum"
 DB_USER="flarum"
-DB_PASS=""                 # ← SET THIS before running!
-ADMIN_EMAIL=""             # ← SET THIS before running!
-ADMIN_USER=""              # ← SET THIS before running!
-ADMIN_PASS=""              # ← SET THIS before running!
+DB_PASS="Flarum2026!Secure"    # ← Change after first run!
+ADMIN_EMAIL="admin@jueshi.net"
+ADMIN_USER="admin"
+ADMIN_PASS="FlarumAdm1n!2026"  # ← Change after first run!
 
 # ─── Pre-flight checks ──────────────────────────────────────
 if [[ $EUID -ne 0 ]]; then
@@ -33,16 +33,22 @@ echo " Flarum Deployment: ${FLARUM_DOMAIN}"
 echo "========================================="
 
 # ─── 1. System Dependencies ─────────────────────────────────
-echo "[1/7] Installing system dependencies..."
+echo "[1/8] Installing system dependencies..."
 apt-get update -qq
 apt-get install -y --no-install-recommends \
+  mariadb-server mariadb-client \
   php8.2 php8.2-fpm php8.2-cli \
   php8.2-mbstring php8.2-xml php8.2-curl php8.2-zip \
   php8.2-gd php8.2-mysql php8.2-tokenizer php8.2-bcmath \
   php8.2-fileinfo php8.2-opcache \
   nginx unzip curl git
 
-echo "✅ PHP 8.2 + extensions installed"
+echo "✅ PHP 8.2 + MariaDB + extensions installed"
+
+# Start MariaDB if not running
+systemctl enable mariadb
+systemctl start mariadb
+echo "✅ MariaDB started"
 
 # ─── 2. Composer ────────────────────────────────────────────
 echo "[2/7] Installing Composer..."
