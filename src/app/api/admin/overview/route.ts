@@ -38,11 +38,12 @@ export async function GET() {
       prisma.resource.groupBy({ by: ["category"] }).then((r: any[]) => r.length),
     ]);
 
-    // Ads — table may not exist yet
-    const safeCount = async (fn: () => Promise<number>) => { try { return await fn(); } catch { return 0; } };
-    const adTotal = await safeCount(() => prisma.adCampaign.count());
-    const adActive = await safeCount(() => prisma.adCampaign.count({ where: { isActive: true } }));
-    const adInactive = await safeCount(() => prisma.adCampaign.count({ where: { isActive: false } }));
+    // Ads
+    const [adTotal, adActive, adInactive] = await Promise.all([
+      prisma.adCampaign.count(),
+      prisma.adCampaign.count({ where: { isActive: true } }),
+      prisma.adCampaign.count({ where: { isActive: false } }),
+    ]);
 
     // Reviews by status
     const [reviewTotal, reviewPending, reviewApproved, reviewRejected, reviewHidden] = await Promise.all([

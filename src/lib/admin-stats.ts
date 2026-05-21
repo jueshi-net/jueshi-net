@@ -1,4 +1,4 @@
-// Server-side admin stats loader — v1.21.1: safe adCampaign guards
+// Server-side admin stats loader — v1.21.1: full production DB alignment
 // Avoids client-side fetch auth cookie issues. Queries DB directly.
 import { prisma } from "@/lib/prisma";
 
@@ -46,10 +46,6 @@ function safe(n: number | null | undefined): number {
   return n ?? 0;
 }
 
-async function safeCount(fn: () => Promise<number>): Promise<number> {
-  try { return await fn(); } catch { return 0; }
-}
-
 export async function loadAdminStats(): Promise<AdminStatsData | null> {
   try {
     const now = new Date();
@@ -65,6 +61,7 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       userCount, memberCount, adminCount,
       articleTotal, articlePublished, articleDraft, articleArchived,
       resTotal, resActive, resInactive, resCats,
+      adTotal, adActive, adInactive,
       ledgerCount, totalIssuedAgg, totalSpentAgg,
     ] = await Promise.all([
       prisma.toolReview.count({ where: { status: "pending" } }),
@@ -104,15 +101,14 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       prisma.resource.count({ where: { isActive: true } }),
       prisma.resource.count({ where: { isActive: false } }),
       prisma.resource.groupBy({ by: ["category"] }),
+      // adCampaign — table exists after prisma db push
+      prisma.adCampaign.count(),
+      prisma.adCampaign.count({ where: { isActive: true } }),
+      prisma.adCampaign.count({ where: { isActive: false } }),
       prisma.pointLedger.count(),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { gt: 0 } } }),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { lt: 0 } } }),
     ]);
-
-    // Safe adCampaign queries — table may not exist in production yet
-    const adTotal = await safeCount(() => prisma.adCampaign.count());
-    const adActive = await safeCount(() => prisma.adCampaign.count({ where: { isActive: true } }));
-    const adInactive = await safeCount(() => prisma.adCampaign.count({ where: { isActive: false } }));
 
     const levelMap: Record<string, number> = {};
     for (const l of usersByLevel) {
