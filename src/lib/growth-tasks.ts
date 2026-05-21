@@ -9,7 +9,7 @@ export interface GrowthTask {
   title: string;
   description: string;
   rewardGrowth: number;
-  actionType: "checkin" | "tool_review" | "forum_post" | "forum_comment" | "workspace_visit" | "member_visit";
+  actionType: "checkin" | "tool_review" | "workspace_visit" | "member_visit";
   targetUrl: string;
   badgeKey?: string;
   badgeName?: string;
@@ -51,11 +51,11 @@ export const GROWTH_TASKS: GrowthTask[] = [
     title: "发布论坛帖子",
     description: "在社区分享你的经验或提问",
     rewardGrowth: 20,
-    actionType: "forum_post",
+    actionType: "tool_review",
     targetUrl: "https://bbs.jueshi.net/new",
     category: "community",
     sortOrder: 3,
-    isActive: true,
+    isActive: false,
   },
   {
     id: "task-forum-comment",
@@ -63,11 +63,11 @@ export const GROWTH_TASKS: GrowthTask[] = [
     title: "评论论坛帖子",
     description: "参与社区讨论，回复他人的帖子",
     rewardGrowth: 5,
-    actionType: "forum_comment",
+    actionType: "tool_review",
     targetUrl: "https://bbs.jueshi.net",
     category: "community",
     sortOrder: 4,
-    isActive: true,
+    isActive: false,
   },
   {
     id: "task-workspace-visit",
@@ -115,17 +115,11 @@ export async function getUserTaskStatus(userId: string) {
   });
   results.set("tool_review_approved", { completed: reviewCount > 0, count: reviewCount });
 
-  // 3. forum_post_published: 是否有 published 论坛帖
-  const postCount = await prisma.forumPost.count({
-    where: { userId, status: "published" },
-  });
-  results.set("forum_post_published", { completed: postCount > 0, count: postCount });
+  // 3. forum_post_published: 论坛已迁移至 Flarum，任务停用
+  results.set("forum_post_published", { completed: false, count: 0 });
 
-  // 4. forum_comment_published: 是否有 published 论坛评论
-  const commentCount = await prisma.forumComment.count({
-    where: { userId, status: "published" },
-  });
-  results.set("forum_comment_published", { completed: commentCount > 0, count: commentCount });
+  // 4. forum_comment_published: 论坛已迁移至 Flarum，任务停用
+  results.set("forum_comment_published", { completed: false, count: 0 });
 
   // 5. workspace_visit: 通过 growth_logs 判断今天是否已访问工作台并获奖励
   const visitDateKey = dateKey;

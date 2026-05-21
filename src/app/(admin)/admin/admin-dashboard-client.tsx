@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {
   Users, FileText, ExternalLink, ArrowUpRight,
-  MessageSquare, MessageCircle, Bell, TrendingUp, CheckCircle,
+  Bell, TrendingUp, CheckCircle,
   Activity, Award, ChevronRight, Clock, BarChart3, Shield,
   Star, Database, Settings, HeartPulse, AlertCircle, FolderOpen,
 } from "lucide-react";
@@ -24,8 +24,8 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
   const s = stats;
 
   // Calculate total pending
-  const totalPending = s ? (s.pending.reviews + s.pending.forumPosts + s.pending.forumComments + s.pending.draftTopics) : 0;
-  const pendingUrgent = s ? (s.pending.reviews + s.pending.forumPosts + s.pending.forumComments) : 0;
+  const totalPending = s ? (s.pending.reviews + s.pending.draftTopics) : 0;
+  const pendingUrgent = s ? s.pending.reviews : 0;
 
   return (
     <div className="space-y-6">
@@ -54,10 +54,8 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
               <span className={badgeStyles.success}>全部已处理</span>
             )}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             <PendingCard label="待审核点评" count={s.pending.reviews} href="/admin/tool-reviews" icon={Star} color="amber" />
-            <PendingCard label="待审帖子" count={s.pending.forumPosts} href="/admin/forum" icon={MessageCircle} color="amber" />
-            <PendingCard label="待审评论" count={s.pending.forumComments} href="/admin/forum" icon={MessageSquare} color="amber" />
             <PendingCard label="草稿专题" count={s.pending.draftTopics} href="/admin/topics" icon={FileText} color="gray" />
             <PendingCard label="未读通知" count={s.pending.unreadNotifications} href="/admin/notifications" icon={Bell} color="blue" />
           </div>
@@ -76,10 +74,9 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             <BarChart3 className="w-5 h-5 text-blue-500" />
             核心数据概览
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-3">
             <StatMini label="用户总数" value={s.overview.usersTotal} sub={`今日 +${s.overview.usersToday}`} color="blue" />
             <StatMini label="已发布专题" value={s.overview.topicsPublished} color="purple" />
-            <StatMini label="已发布帖子" value={s.overview.forumPostsPublished} color="violet" />
             <StatMini label="已通过点评" value={s.overview.reviewsApproved} color="green" />
             <StatMini label="成长日志" value={s.overview.growthLogsTotal} sub={`今日 +${s.growth.logsToday}`} color="teal" />
             <StatMini label="通知总数" value={s.overview.notificationsTotal} sub={`未读 ${s.content.notifications.unread}`} color="indigo" />
@@ -148,7 +145,7 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             <FolderOpen className="w-5 h-5 text-purple-500" />
             内容运营
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <ContentCard title="专题" total={s.content.topics.published + s.content.topics.draft + s.content.topics.archived} href="/admin/topics" items={[
               { label: "已发布", value: s.content.topics.published, color: "text-green-600" },
               { label: "草稿", value: s.content.topics.draft, color: "text-gray-500" },
@@ -159,12 +156,6 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
               { label: "已通过", value: s.content.reviews.approved, color: "text-green-600" },
               { label: "已拒绝", value: s.content.reviews.rejected, color: "text-red-500" },
               { label: "已隐藏", value: s.content.reviews.hidden, color: "text-gray-400" },
-            ]} />
-            <ContentCard title="论坛" total={s.content.forumPosts.total + s.content.forumComments.total} href="/admin/forum" items={[
-              { label: "帖子待审", value: s.content.forumPosts.pending, color: "text-amber-600" },
-              { label: "帖子已发布", value: s.content.forumPosts.published, color: "text-green-600" },
-              { label: "评论待审", value: s.content.forumComments.pending, color: "text-amber-600" },
-              { label: "评论已发布", value: s.content.forumComments.published, color: "text-green-600" },
             ]} />
             <ContentCard title="通知" total={s.content.notifications.total} href="/admin/notifications" items={[
               { label: "未读", value: s.content.notifications.unread, color: "text-blue-600" },
@@ -269,7 +260,8 @@ const QUICK_ACTIONS: QuickAction[] = [
   { label: "等级勋章", href: "/admin/levels", icon: Award, desc: "管理等级规则、勋章库与用户授予", bg: "bg-amber-50", iconColor: "text-amber-600" },
   { label: "成长日志", href: "/admin/growth-logs", icon: TrendingUp, desc: "查看用户成长流水、类型筛选与搜索", bg: "bg-emerald-50", iconColor: "text-emerald-600" },
   { label: "点评审核", href: "/admin/tool-reviews", icon: Star, desc: "审核用户提交的工具评价，通过后发放成长值", bg: "bg-yellow-50", iconColor: "text-yellow-600" },
-  { label: "论坛管理", href: "/admin/forum", icon: MessageCircle, desc: "管理帖子、评论、分类、审核状态与锁定", bg: "bg-violet-50", iconColor: "text-violet-600" },
+  { label: "广告管理", href: "/admin/ads", icon: ExternalLink, desc: "管理广告位、广告活动与投放状态", bg: "bg-rose-50", iconColor: "text-rose-600" },
+  { label: "邀请码管理", href: "/admin/invites", icon: Shield, desc: "生成/停用邀请码、查看注册进度", bg: "bg-cyan-50", iconColor: "text-cyan-600" },
   { label: "专题管理", href: "/admin/topics", icon: FileText, desc: "管理专题内容、APP 评级清单与 YouTube 视频", bg: "bg-purple-50", iconColor: "text-purple-600" },
   { label: "通知管理", href: "/admin/notifications", icon: Bell, desc: "查看通知记录、发送通知给用户、群发公告", bg: "bg-indigo-50", iconColor: "text-indigo-600" },
   { label: "文章管理", href: "/admin/cms", icon: FileText, desc: "管理网站文章、指南与教程内容", bg: "bg-orange-50", iconColor: "text-orange-600" },

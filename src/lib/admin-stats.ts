@@ -6,8 +6,6 @@ export interface AdminStatsData {
   // ===== Pending items (今日待处理) =====
   pending: {
     reviews: number;
-    forumPosts: number;
-    forumComments: number;
     draftTopics: number;
     unreadNotifications: number;
   };
@@ -16,7 +14,6 @@ export interface AdminStatsData {
     usersTotal: number;
     usersToday: number;
     topicsPublished: number;
-    forumPostsPublished: number;
     reviewsApproved: number;
     growthLogsTotal: number;
     notificationsTotal: number;
@@ -39,8 +36,6 @@ export interface AdminStatsData {
   content: {
     topics: { published: number; draft: number; archived: number };
     reviews: { pending: number; approved: number; rejected: number; hidden: number; total: number };
-    forumPosts: { pending: number; published: number; hidden: number; rejected: number; total: number };
-    forumComments: { pending: number; published: number; hidden: number; rejected: number; total: number };
     notifications: { unread: number; read: number; total: number };
   };
   // ===== Legacy (keep for backward compat) =====
@@ -65,15 +60,12 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
     const [
       // Pending items
       reviewsPending,
-      forumPostsPending,
-      forumCommentsPending,
       draftTopics,
       unreadNotifs,
       // Core overview
       usersTotal,
       usersToday,
       topicsPublished,
-      forumPostsPublished,
       reviewsApproved,
       growthLogsTotal,
       notifsTotal,
@@ -84,8 +76,6 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       // Content ops
       topicsPublished2, topicsDraft, topicsArchived,
       reviewsTotal, reviewsPending2, reviewsApproved2, reviewsRejected, reviewsHidden,
-      fpTotal, fpPending, fpPublished, fpHidden, fpRejected,
-      fcTotal, fcPending, fcPublished, fcHidden, fcRejected,
       notifsUnread, notifsRead, notifsTotal2,
       // Legacy
       userCount, memberCount, adminCount,
@@ -96,15 +86,12 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
     ] = await Promise.all([
       // --- Pending items ---
       prisma.toolReview.count({ where: { status: "pending" } }),
-      prisma.forumPost.count({ where: { status: "pending" } }),
-      prisma.forumComment.count({ where: { status: "pending" } }),
       prisma.topic.count({ where: { status: "draft" } }),
       prisma.notification.count({ where: { isRead: false } }),
       // --- Core overview ---
       prisma.user.count(),
       prisma.user.count({ where: { createdAt: { gte: startOfDay } } }),
       prisma.topic.count({ where: { status: "published" } }),
-      prisma.forumPost.count({ where: { status: "published" } }),
       prisma.toolReview.count({ where: { status: "approved" } }),
       prisma.growthLog.count(),
       prisma.notification.count(),
@@ -125,16 +112,6 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       prisma.toolReview.count({ where: { status: "approved" } }),
       prisma.toolReview.count({ where: { status: "rejected" } }),
       prisma.toolReview.count({ where: { status: "hidden" } }),
-      prisma.forumPost.count(),
-      prisma.forumPost.count({ where: { status: "pending" } }),
-      prisma.forumPost.count({ where: { status: "published" } }),
-      prisma.forumPost.count({ where: { status: "hidden" } }),
-      prisma.forumPost.count({ where: { status: "rejected" } }),
-      prisma.forumComment.count(),
-      prisma.forumComment.count({ where: { status: "pending" } }),
-      prisma.forumComment.count({ where: { status: "published" } }),
-      prisma.forumComment.count({ where: { status: "hidden" } }),
-      prisma.forumComment.count({ where: { status: "rejected" } }),
       prisma.notification.count({ where: { isRead: false } }),
       prisma.notification.count({ where: { isRead: true } }),
       prisma.notification.count(),
@@ -174,8 +151,6 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       // Pending
       pending: {
         reviews: reviewsPending,
-        forumPosts: forumPostsPending,
-        forumComments: forumCommentsPending,
         draftTopics: draftTopics,
         unreadNotifications: unreadNotifs,
       },
@@ -184,7 +159,6 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
         usersTotal,
         usersToday,
         topicsPublished,
-        forumPostsPublished,
         reviewsApproved,
         growthLogsTotal,
         notificationsTotal: notifsTotal,
@@ -207,8 +181,6 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       content: {
         topics: { published: topicsPublished2, draft: topicsDraft, archived: topicsArchived },
         reviews: { total: safe(reviewsTotal), pending: safe(reviewsPending2), approved: safe(reviewsApproved2), rejected: safe(reviewsRejected), hidden: safe(reviewsHidden) },
-        forumPosts: { total: safe(fpTotal), pending: safe(fpPending), published: safe(fpPublished), hidden: safe(fpHidden), rejected: safe(fpRejected) },
-        forumComments: { total: safe(fcTotal), pending: safe(fcPending), published: safe(fcPublished), hidden: safe(fcHidden), rejected: safe(fcRejected) },
         notifications: { unread: safe(notifsUnread), read: safe(notifsRead), total: safe(notifsTotal2) },
       },
       // Legacy

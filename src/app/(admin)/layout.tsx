@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, MessageCircle, Activity, Database } from "lucide-react";
+import { Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database, ExternalLink } from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 const navItems = [
   { href: "/admin", label: "总控台", icon: LayoutDashboard },
   { href: "/admin/users", label: "用户管理", icon: Users },
-  { href: "/admin/forum", label: "论坛与内容", icon: MessageCircle },
+  { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
+  { href: "/admin/invites", label: "邀请码管理", icon: Shield },
   { href: "/admin/notifications", label: "通知中心", icon: Bell },
   { href: "/admin/health", label: "系统健康", icon: Activity },
   { href: "/admin/backup", label: "数据备份", icon: Database },
