@@ -92,7 +92,8 @@ export async function POST(req: Request) {
     existingUrls.set(r.url, { id: r.id, name: r.name });
   }
 
-  for (const [idx, res] of resources.entries()) {
+  for (let idx = 0; idx < resources.length; idx++) {
+    const res = resources[idx];
     const name = (res.name || '').trim();
     const url = (res.url || '').trim();
 
@@ -199,7 +200,7 @@ export async function POST(req: Request) {
             topicId: topic.id,
             name,
             officialUrl: (matchedResource.url || '').trim(),
-            description: matchedResource.description || '',
+            description: matchedResource.description || null,
             category: matchedResource.category || 'life',
             rating: null,
             iconText: name.slice(0, 2).toUpperCase(),
@@ -207,7 +208,7 @@ export async function POST(req: Request) {
             sortOrder: i,
           };
         })
-        .filter(Boolean);
+        .filter((item): item is NonNullable<typeof item> => item !== null);
 
       if (itemsData.length > 0) {
         await prisma.topicItem.createMany({
