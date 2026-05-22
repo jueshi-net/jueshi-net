@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database, ExternalLink } from "lucide-react";
+import { Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database, ExternalLink, Upload } from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -19,6 +19,7 @@ const navItems = [
   { href: "/admin/health", label: "系统健康", icon: Activity },
   { href: "/admin/backup", label: "数据备份", icon: Database },
   { href: "/admin/settings", label: "系统设置", icon: Settings },
+  { href: "/admin/resources/import", label: "资源导入", icon: Upload },
 ];
 
 export default async function AdminLayout({
