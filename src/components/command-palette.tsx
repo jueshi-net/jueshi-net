@@ -161,9 +161,16 @@ export default function CommandPalette() {
   );
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="搜索工具、场景包、页面…" className="border-none focus:ring-0 text-base" />
-        <CommandList>
+    <CommandDialog
+      open={open}
+      onOpenChange={setOpen}
+      overlayClassName="fixed inset-0 z-[99998] bg-black/50 backdrop-blur-sm"
+      contentClassName="fixed left-[50%] top-[50%] z-[99999] w-full max-w-lg translate-x-[-50%] translate-y-[-50%] overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl"
+    >
+      {/* Force wrapper to establish proper sizing context */}
+      <div className="flex flex-col max-h-[min(80vh,560px)] sm:max-h-[min(75vh,600px)]">
+        <CommandInput placeholder="搜索工具、场景包、页面…" className="border-none focus:ring-0 text-base px-4" />
+        <CommandList className="overflow-y-auto overscroll-contain">
           <CommandEmpty>
             <div className="py-6 text-center text-sm text-gray-400">
               未找到匹配结果
@@ -249,7 +256,7 @@ export default function CommandPalette() {
         </CommandList>
 
         {/* Footer */}
-        <div className="border-t border-gray-100 px-4 py-2.5 flex items-center gap-3 text-xs text-gray-400">
+        <div className="border-t border-gray-100 px-4 py-2.5 flex items-center gap-3 text-xs text-gray-400 shrink-0">
           <kbd className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-gray-100 rounded text-[10px] font-mono">
             <span>⌘</span>K
           </kbd>
@@ -260,6 +267,7 @@ export default function CommandPalette() {
           <span>关闭</span>
           <span className="ml-auto">海外百宝箱 Command Palette</span>
         </div>
-      </CommandDialog>
+      </div>
+    </CommandDialog>
   );
 }
