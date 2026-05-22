@@ -2,7 +2,10 @@ import { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database, ExternalLink, Upload } from "lucide-react";
+import {
+  Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database,
+  ExternalLink, Upload, FolderOpen, Globe, BookOpen
+} from "lucide-react";
 
 
 export const metadata: Metadata = {
@@ -10,16 +13,34 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const navItems = [
-  { href: "/admin", label: "总控台", icon: LayoutDashboard },
-  { href: "/admin/users", label: "用户管理", icon: Users },
-  { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
-  { href: "/admin/invites", label: "邀请码管理", icon: Shield },
-  { href: "/admin/notifications", label: "通知中心", icon: Bell },
-  { href: "/admin/health", label: "系统健康", icon: Activity },
-  { href: "/admin/backup", label: "数据备份", icon: Database },
-  { href: "/admin/settings", label: "系统设置", icon: Settings },
-  { href: "/admin/resources/import", label: "资源导入", icon: Upload },
+const navSections = [
+  {
+    title: "核心运营",
+    items: [
+      { href: "/admin", label: "总控台", icon: LayoutDashboard },
+      { href: "/admin/users", label: "用户管理", icon: Users },
+      { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
+      { href: "/admin/invites", label: "邀请码管理", icon: Shield },
+    ]
+  },
+  {
+    title: "内容管理 (CMS)",
+    items: [
+      { href: "/admin/topics", label: "专题管理", icon: FolderOpen },
+      { href: "/admin/resources", label: "资源大厅", icon: Globe },
+      { href: "/admin/cms", label: "文章与指南", icon: BookOpen },
+      { href: "/admin/resources/import", label: "资源导入", icon: Upload },
+    ]
+  },
+  {
+    title: "系统与运维",
+    items: [
+      { href: "/admin/notifications", label: "通知中心", icon: Bell },
+      { href: "/admin/health", label: "系统健康", icon: Activity },
+      { href: "/admin/backup", label: "数据备份", icon: Database },
+      { href: "/admin/settings", label: "系统设置", icon: Settings },
+    ]
+  }
 ];
 
 export default async function AdminLayout({
@@ -44,16 +65,25 @@ export default async function AdminLayout({
             <Shield className="w-5 h-5 text-blue-400" />
             <span className="font-semibold">管理后台</span>
           </div>
-          <nav className="space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </Link>
+          <nav className="space-y-4">
+            {navSections.map((section) => (
+              <div key={section.title}>
+                <div className="px-3 mb-1 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  {section.title}
+                </div>
+                <div className="space-y-1">
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                    >
+                      <item.icon className="w-5 h-5" />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </nav>
         </aside>
