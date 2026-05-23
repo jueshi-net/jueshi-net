@@ -5,8 +5,8 @@ import Link from 'next/link';
 import {
   Home, ChevronRight, Crown, Zap, Globe, Shield, Settings,
   Package, Truck, Calculator, FileText, MapPin, Search,
-  BarChart3, Bookmark, ExternalLink, Star, StarOff,
-  GripVertical, MoreHorizontal, Clock, Calendar, ArrowUpRight,
+  BarChart3, Bookmark, ArrowUpRight, Clock, Star, StarOff,
+  GripVertical, Plus,
 } from 'lucide-react';
 
 // ===== MOCK DATA =====
@@ -52,17 +52,16 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300 hover:-translate-y-[2px]"
+      className="group relative bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300 hover:-translate-y-[2px]"
     >
       <Wrapper
         href={href || '#'}
         {...(!card.isInternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-        className="block p-4"
+        className="block p-3.5"
       >
-        {/* Top row: icon + title + actions */}
         <div className="flex items-start gap-3">
           {/* Icon */}
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
             hovered
               ? 'bg-teal-50 text-teal-600 ring-1 ring-teal-100 scale-105'
               : 'bg-gray-50 text-gray-400 ring-1 ring-gray-100'
@@ -80,31 +79,48 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-400 mt-0.5 truncate leading-relaxed">{card.desc}</p>
+            <p className="text-[11px] text-gray-400 mt-0.5 truncate leading-relaxed">{card.desc}</p>
           </div>
 
           {/* External link icon */}
-          {!card.isInternal && <ArrowUpRight className="w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-0.5" />}
+          {!card.isInternal && <ArrowUpRight className="w-3 h-3 text-gray-300 flex-shrink-0 mt-0.5" />}
         </div>
       </Wrapper>
 
-      {/* Hover overlay: favorite + drag handle */}
-      <div className={`absolute top-3 right-3 flex items-center gap-0.5 transition-all duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+      {/* Hover overlay: favorite + drag */}
+      <div className={`absolute top-2 right-2 flex items-center gap-0.5 transition-all duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(); }}
-          className="p-1 rounded-md hover:bg-gray-100 transition-colors"
-          title={isFav ? '取消收藏' : '收藏'}
+          className="p-1 rounded hover:bg-gray-100 transition-colors"
         >
           {isFav
             ? <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            : <StarOff className="w-3.5 h-3.5 text-gray-300 hover:text-amber-400 transition-colors" />
+            : <StarOff className="w-3.5 h-3.5 text-gray-300 hover:text-amber-400" />
           }
         </button>
-        <div className="p-1 rounded-md cursor-grab active:cursor-grabbing" title="拖拽排序">
-          <GripVertical className="w-3.5 h-3.5 text-gray-200 hover:text-gray-400 transition-colors" />
+        <div className="p-1 rounded cursor-grab" title="拖拽">
+          <GripVertical className="w-3.5 h-3.5 text-gray-200 hover:text-gray-400" />
         </div>
       </div>
     </div>
+  );
+}
+
+// ===== Add Placeholder Card =====
+
+function AddCard() {
+  return (
+    <button
+      className="rounded-xl border-2 border-dashed border-gray-200 hover:border-teal-300 hover:bg-teal-50/30 transition-all duration-300 flex flex-col items-center justify-center gap-2 py-6 sm:py-8 group cursor-pointer"
+      onClick={() => {}}
+    >
+      <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-teal-100 flex items-center justify-center transition-colors">
+        <Plus className="w-5 h-5 text-gray-300 group-hover:text-teal-600 transition-colors" />
+      </div>
+      <span className="text-xs font-medium text-gray-300 group-hover:text-teal-600 transition-colors text-center leading-snug">
+        添加自定义网址<br className="sm:hidden" />或工具
+      </span>
+    </button>
   );
 }
 
@@ -113,8 +129,8 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
 export default function WorkbenchClient() {
   const [loading, setLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(false);
-  const [userInfo, setUserInfo] = useState({ name: '', email: '', role: 'guest', image: '' });
-  const [totalCount, setTotalCount] = useState(5);
+  const [userInfo, setUserInfo] = useState({ name: '', email: '', role: 'user', image: '' });
+  const [totalCount, setTotalCount] = useState(11); // Mock: 11/20
   const totalLimit = 20;
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
@@ -132,7 +148,7 @@ export default function WorkbenchClient() {
         if (res.ok) {
           const d = await res.json();
           setUserInfo({ name: d.user?.name || d.user?.email?.split('@')[0] || '用户', email: d.user?.email || '', role: d.user?.role || 'user', image: d.user?.image || '' });
-          setTotalCount(d.limits?.usedCount || 0);
+          setTotalCount(d.limits?.usedCount || 11);
         }
       } catch {
         setUserInfo({ name: '澈', email: 'user@local.test', role: 'user', image: '' });
@@ -140,7 +156,7 @@ export default function WorkbenchClient() {
     })();
   }, []);
 
-  // Load memo from localStorage
+  // Load memo
   useEffect(() => {
     try {
       const saved = localStorage.getItem('wb:memo');
@@ -177,7 +193,7 @@ export default function WorkbenchClient() {
   const dateStr = now.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
   const pct = Math.round((totalCount / totalLimit) * 100);
   const role = ROLE_META[userInfo.role] || ROLE_META.user;
-  const initial = (userInfo.image ? '' : (userInfo.name?.[0]?.toUpperCase() || 'U'));
+  const initial = userInfo.name?.[0]?.toUpperCase() || 'U';
 
   const fmtMemo = (d: Date | null) => {
     if (!d) return '尚未保存';
@@ -230,26 +246,25 @@ export default function WorkbenchClient() {
               <Home className="w-3.5 h-3.5" /> 首页
             </Link>
             <ChevronRight className="w-3 h-3 text-gray-300" />
-            <span className="text-gray-700 font-medium">我的工作台</span>
+            <span className="text-gray-700 font-medium">工作台</span>
           </div>
           <button
             onClick={() => setShowManager(!showManager)}
             className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors text-gray-300 hover:text-gray-500"
-            title="管理挂件"
           >
             <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-5">
 
-        {/* ===== Identity & Quota Card ===== */}
-        <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        {/* ===== 1. Identity & Quota ===== */}
+        <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             {/* Left: Avatar + Name + Role */}
-            <div className="flex items-center gap-3.5">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold transition-all ${
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                 userInfo.image
                   ? 'overflow-hidden'
                   : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'
@@ -260,28 +275,26 @@ export default function WorkbenchClient() {
                 }
               </div>
               <div>
-                <p className="text-[15px] font-bold text-gray-900 tracking-tight">{userInfo.name || '用户'}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold ${role.cls}`}>
-                    {role.icon}
-                    {role.label}
-                  </span>
-                </div>
+                <p className="text-sm font-bold text-gray-900 tracking-tight">{userInfo.name || '用户'}</p>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold mt-0.5 ${role.cls}`}>
+                  {role.icon}
+                  {role.label}
+                </span>
               </div>
             </div>
 
-            {/* Right: Quota + Upgrade CTA */}
-            <div className="flex items-center gap-5 sm:gap-6">
-              <div className="min-w-[160px]">
-                <div className="flex items-baseline justify-between mb-1.5">
-                  <span className="text-[11px] font-medium text-gray-400 uppercase tracking-wider">收藏容量</span>
+            {/* Right: Quota + Upgrade */}
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="min-w-[140px]">
+                <div className="flex items-baseline justify-between mb-1">
+                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">收藏容量</span>
                   <span className="text-sm font-bold text-gray-800 tabular-nums">
                     <span className={pct >= 80 ? 'text-amber-500' : ''}>{totalCount}</span>
                     <span className="text-gray-300 font-normal mx-0.5">/</span>
                     {totalLimit}
                   </span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ease-out ${
                       pct >= 80
@@ -294,9 +307,9 @@ export default function WorkbenchClient() {
               </div>
               <Link
                 href="/pricing"
-                className="group inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl shadow-md shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 hover:from-teal-600 hover:to-emerald-600 transition-all duration-200 whitespace-nowrap"
+                className="group inline-flex items-center gap-1.5 px-3.5 py-2 text-[11px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl shadow-md shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 transition-all whitespace-nowrap"
               >
-                <Crown className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+                <Crown className="w-3 h-3 group-hover:rotate-12 transition-transform" />
                 解锁无上限
               </Link>
             </div>
@@ -308,14 +321,11 @@ export default function WorkbenchClient() {
           <div className="bg-white rounded-xl border border-gray-100/80 p-4 animate-in fade-in slide-in-from-top-2">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">挂件管理</p>
             {[
-              { key: 'memo' as const, label: '备忘录', desc: '快速记录想法与备忘' },
-              { key: 'clock' as const, label: '时钟', desc: '当前时间与日期' },
+              { key: 'memo' as const, label: '备忘录' },
+              { key: 'clock' as const, label: '时钟' },
             ].map(w => (
-              <label key={w.key} className="flex items-center justify-between py-2 cursor-pointer group">
-                <div>
-                  <span className="text-sm font-medium text-gray-700">{w.label}</span>
-                  <span className="text-xs text-gray-400 ml-2">{w.desc}</span>
-                </div>
+              <label key={w.key} className="flex items-center justify-between py-2 cursor-pointer">
+                <span className="text-sm font-medium text-gray-700">{w.label}</span>
                 <div className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${widgets[w.key] ? 'bg-teal-500' : 'bg-gray-200'}`}
                   onClick={() => setWidgets(p => ({ ...p, [w.key]: !p[w.key] }))}>
                   <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${widgets[w.key] ? 'translate-x-4' : 'translate-x-0.5'}`} />
@@ -325,64 +335,17 @@ export default function WorkbenchClient() {
           </div>
         )}
 
-        {/* ===== Widget Panel ===== */}
-        {(widgets.memo || widgets.clock) && (
-          <div className="grid sm:grid-cols-2 gap-4">
-            {/* Memo */}
-            {widgets.memo && (
-              <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 transition-all duration-200 hover:shadow-md hover:border-gray-200">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-amber-50 ring-1 ring-amber-100 flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 2v6h6"/><path d="M12 13v-1"/><path d="M8 17h8"/></svg>
-                    </div>
-                    <h3 className="text-sm font-semibold text-gray-900 tracking-tight">备忘录</h3>
-                  </div>
-                  <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                    <Clock className="w-3 h-3" />
-                    {fmtMemo(memoSavedAt)}
-                  </div>
-                </div>
-                <textarea
-                  value={memoText}
-                  onChange={e => handleMemoChange(e.target.value)}
-                  placeholder="写下你的想法、待办或备忘..."
-                  rows={4}
-                  className="w-full text-sm text-gray-700 placeholder:text-gray-300 bg-amber-50/20 rounded-xl border-0 resize-none focus:outline-none focus:ring-2 focus:ring-amber-100 p-3 transition-all"
-                  spellCheck={false}
-                />
-              </div>
-            )}
-
-            {/* Clock */}
-            {widgets.clock && (
-              <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 transition-all duration-200 hover:shadow-md hover:border-gray-200">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-teal-50 ring-1 ring-teal-100 flex items-center justify-center">
-                    <Clock className="w-3.5 h-3.5 text-teal-500" />
-                  </div>
-                  <h3 className="text-sm font-semibold text-gray-900 tracking-tight">时钟</h3>
-                </div>
-                <div className="text-center py-3">
-                  <p className="text-4xl font-bold text-gray-900 tracking-tight tabular-nums">{timeStr}</p>
-                  <p className="text-xs text-gray-400 mt-2 font-medium">{dateStr}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ===== Section Title ===== */}
-        <div className="flex items-center gap-2.5 pt-1">
-          <div className="w-1 h-5 bg-gradient-to-b from-teal-400 to-emerald-500 rounded-full" />
+        {/* ===== 2. Section: 我的收藏 ===== */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm">📌</span>
           <div>
-            <h2 className="text-[15px] font-bold text-gray-900 tracking-tight">我的收藏</h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">站内工具与外部网址，统一收藏管理</p>
+            <h2 className="text-sm font-bold text-gray-900 tracking-tight">我的快捷工具与导航</h2>
+            <p className="text-[11px] text-gray-400 mt-0.5">{totalCount} 个已收藏</p>
           </div>
         </div>
 
-        {/* ===== Mixed Card Grid ===== */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {/* ===== 2. Mixed Card Grid ===== */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
           {MOCK_CARDS.map(card => (
             <WBCard
               key={card.id}
@@ -391,12 +354,68 @@ export default function WorkbenchClient() {
               onToggle={() => toggleFav(card.id, card.title, !!favorites[card.id])}
             />
           ))}
+          <AddCard />
         </div>
 
+        {/* ===== 3. Section: 效率组件 ===== */}
+        {(widgets.memo || widgets.clock) && (
+          <>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-sm">💡</span>
+              <div>
+                <h2 className="text-sm font-bold text-gray-900 tracking-tight">效率组件</h2>
+                <p className="text-[11px] text-gray-400 mt-0.5">备忘录 · 时钟</p>
+              </div>
+            </div>
+
+            {/* Horizontal scroll on mobile, grid on desktop */}
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:snap-none sm:pb-0 sm:-mx-0">
+              {/* Memo */}
+              {widgets.memo && (
+                <div className="min-w-[260px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-3.5 transition-all hover:shadow-md hover:border-gray-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-6 h-6 rounded-md bg-amber-50 ring-1 ring-amber-100 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M14 2v6h6"/></svg>
+                      </div>
+                      <h3 className="text-xs font-semibold text-gray-900">备忘录</h3>
+                    </div>
+                    <span className="text-[10px] text-gray-400">{fmtMemo(memoSavedAt)}</span>
+                  </div>
+                  <textarea
+                    value={memoText}
+                    onChange={e => handleMemoChange(e.target.value)}
+                    placeholder="快速记录..."
+                    rows={3}
+                    className="w-full text-xs text-gray-700 placeholder:text-gray-300 bg-amber-50/20 rounded-lg border-0 resize-none focus:outline-none focus:ring-2 focus:ring-amber-100 p-2.5"
+                    spellCheck={false}
+                  />
+                </div>
+              )}
+
+              {/* Clock */}
+              {widgets.clock && (
+                <div className="min-w-[200px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-3.5 transition-all hover:shadow-md hover:border-gray-200">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <div className="w-6 h-6 rounded-md bg-teal-50 ring-1 ring-teal-100 flex items-center justify-center">
+                      <Clock className="w-3 h-3 text-teal-500" />
+                    </div>
+                    <h3 className="text-xs font-semibold text-gray-900">时钟</h3>
+                  </div>
+                  <div className="text-center py-1">
+                    <p className="text-2xl font-bold text-gray-900 tracking-tight tabular-nums">{timeStr}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 font-medium">{dateStr}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
         {/* Footer hint */}
-        <div className="text-center py-6 border-t border-gray-100/50">
-          <p className="text-xs text-gray-300">更多工具将逐步接入</p>
-          <Link href="/resources" className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 mt-1 transition-colors font-medium">
+        <div className="text-center py-4 border-t border-gray-100/50">
+          <p className="text-[11px] text-gray-300">更多工具将逐步接入</p>
+          <Link href="/resources" className="inline-flex items-center gap-1 text-[11px] text-teal-600 hover:text-teal-700 mt-0.5 transition-colors font-medium">
             浏览网址导航 <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
