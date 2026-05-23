@@ -8,6 +8,8 @@ import {
   BarChart3, Bookmark, ArrowUpRight, Clock, Star, StarOff,
   GripVertical, Plus,
 } from 'lucide-react';
+import { UserNavSidebar, UserNavBreadcrumb } from '@/components/user/UserSidebar';
+import TodoWidget from '@/components/user/TodoWidget';
 
 // ===== MOCK DATA =====
 
@@ -60,7 +62,6 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
         className="block p-3.5"
       >
         <div className="flex items-start gap-3">
-          {/* Icon */}
           <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
             hovered
               ? 'bg-teal-50 text-teal-600 ring-1 ring-teal-100 scale-105'
@@ -68,8 +69,6 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
           }`}>
             {card.icon}
           </div>
-
-          {/* Title + desc */}
           <div className="flex-1 min-w-0 pt-0.5">
             <div className="flex items-center gap-1.5">
               <h3 className="text-sm font-semibold text-gray-900 truncate">{card.title}</h3>
@@ -81,39 +80,22 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
             </div>
             <p className="text-[11px] text-gray-400 mt-0.5 truncate leading-relaxed">{card.desc}</p>
           </div>
-
-          {/* External link icon */}
           {!card.isInternal && <ArrowUpRight className="w-3 h-3 text-gray-300 flex-shrink-0 mt-0.5" />}
         </div>
       </Wrapper>
-
-      {/* Hover overlay: favorite + drag */}
       <div className={`absolute top-2 right-2 flex items-center gap-0.5 transition-all duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(); }}
-          className="p-1 rounded hover:bg-gray-100 transition-colors"
-        >
-          {isFav
-            ? <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            : <StarOff className="w-3.5 h-3.5 text-gray-300 hover:text-amber-400" />
-          }
+        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggle(); }} className="p-1 rounded hover:bg-gray-100">
+          {isFav ? <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> : <StarOff className="w-3.5 h-3.5 text-gray-300 hover:text-amber-400" />}
         </button>
-        <div className="p-1 rounded cursor-grab" title="拖拽">
-          <GripVertical className="w-3.5 h-3.5 text-gray-200 hover:text-gray-400" />
-        </div>
+        <div className="p-1 rounded cursor-grab"><GripVertical className="w-3.5 h-3.5 text-gray-200 hover:text-gray-400" /></div>
       </div>
     </div>
   );
 }
 
-// ===== Add Placeholder Card =====
-
 function AddCard() {
   return (
-    <button
-      className="rounded-xl border-2 border-dashed border-gray-200 hover:border-teal-300 hover:bg-teal-50/30 transition-all duration-300 flex flex-col items-center justify-center gap-2 py-6 sm:py-8 group cursor-pointer"
-      onClick={() => {}}
-    >
+    <button className="rounded-xl border-2 border-dashed border-gray-200 hover:border-teal-300 hover:bg-teal-50/30 transition-all duration-300 flex flex-col items-center justify-center gap-2 py-6 sm:py-8 group cursor-pointer">
       <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-teal-100 flex items-center justify-center transition-colors">
         <Plus className="w-5 h-5 text-gray-300 group-hover:text-teal-600 transition-colors" />
       </div>
@@ -130,16 +112,15 @@ export default function WorkbenchClient() {
   const [loading, setLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(false);
   const [userInfo, setUserInfo] = useState({ name: '', email: '', role: 'user', image: '' });
-  const [totalCount, setTotalCount] = useState(11); // Mock: 11/20
+  const [totalCount, setTotalCount] = useState(11);
   const totalLimit = 20;
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const [memoText, setMemoText] = useState('');
   const [memoSavedAt, setMemoSavedAt] = useState<Date | null>(null);
-  const [widgets, setWidgets] = useState({ memo: true, clock: true });
+  const [widgets, setWidgets] = useState({ memo: true, clock: true, todo: true });
   const [showManager, setShowManager] = useState(false);
 
-  // Load user
   useEffect(() => {
     (async () => {
       try {
@@ -156,7 +137,6 @@ export default function WorkbenchClient() {
     })();
   }, []);
 
-  // Load memo
   useEffect(() => {
     try {
       const saved = localStorage.getItem('wb:memo');
@@ -166,7 +146,6 @@ export default function WorkbenchClient() {
     } catch {}
   }, []);
 
-  // Auto-save memo
   const handleMemoChange = (v: string) => {
     setMemoText(v);
     try { localStorage.setItem('wb:memo', v); } catch {}
@@ -175,7 +154,6 @@ export default function WorkbenchClient() {
     setMemoSavedAt(now);
   };
 
-  // Toast auto-dismiss
   useEffect(() => {
     if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }
   }, [toast]);
@@ -238,7 +216,7 @@ export default function WorkbenchClient() {
         </div>
       )}
 
-      {/* ===== Header Bar ===== */}
+      {/* ===== Global Header ===== */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-gray-400">
@@ -257,72 +235,58 @@ export default function WorkbenchClient() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-5">
+      {/* ===== User Center Navigation (Sidebar + Mobile Tabs) ===== */}
+      <UserNavSidebar />
 
-        {/* ===== 1. Identity & Quota ===== */}
+      {/* ===== Main Content ===== */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:ml-0 py-4 space-y-5">
+        {/* Desktop: offset for sidebar */}
+        <div className="lg:hidden" />
+
+        {/* ===== Identity & Quota ===== */}
         <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4 sm:p-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Left: Avatar + Name + Role */}
             <div className="flex items-center gap-3">
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                userInfo.image
-                  ? 'overflow-hidden'
-                  : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'
+                userInfo.image ? 'overflow-hidden' : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'
               }`}>
-                {userInfo.image
-                  ? <img src={userInfo.image} alt="" className="w-full h-full object-cover" />
-                  : initial
-                }
+                {userInfo.image ? <img src={userInfo.image} alt="" className="w-full h-full object-cover" /> : initial}
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-900 tracking-tight">{userInfo.name || '用户'}</p>
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold mt-0.5 ${role.cls}`}>
-                  {role.icon}
-                  {role.label}
+                  {role.icon}{role.label}
                 </span>
               </div>
             </div>
-
-            {/* Right: Quota + Upgrade */}
             <div className="flex items-center gap-4 sm:gap-5">
               <div className="min-w-[140px]">
                 <div className="flex items-baseline justify-between mb-1">
                   <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">收藏容量</span>
                   <span className="text-sm font-bold text-gray-800 tabular-nums">
                     <span className={pct >= 80 ? 'text-amber-500' : ''}>{totalCount}</span>
-                    <span className="text-gray-300 font-normal mx-0.5">/</span>
-                    {totalLimit}
+                    <span className="text-gray-300 font-normal mx-0.5">/</span>{totalLimit}
                   </span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-700 ease-out ${
-                      pct >= 80
-                        ? 'bg-gradient-to-r from-amber-400 to-orange-400'
-                        : 'bg-gradient-to-r from-teal-400 to-emerald-400'
-                    }`}
-                    style={{ width: `${pct}%` }}
-                  />
+                  <div className={`h-full rounded-full transition-all duration-700 ease-out ${pct >= 80 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 'bg-gradient-to-r from-teal-400 to-emerald-400'}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
-              <Link
-                href="/pricing"
-                className="group inline-flex items-center gap-1.5 px-3.5 py-2 text-[11px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl shadow-md shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 transition-all whitespace-nowrap"
-              >
-                <Crown className="w-3 h-3 group-hover:rotate-12 transition-transform" />
-                解锁无上限
+              <Link href="/pricing" className="group inline-flex items-center gap-1.5 px-3.5 py-2 text-[11px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl shadow-md shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 transition-all whitespace-nowrap">
+                <Crown className="w-3 h-3 group-hover:rotate-12 transition-transform" /> 解锁无上限
               </Link>
             </div>
           </div>
         </div>
 
-        {/* ===== Widget Manager ===== */}
+        {/* Widget Manager */}
         {showManager && (
           <div className="bg-white rounded-xl border border-gray-100/80 p-4 animate-in fade-in slide-in-from-top-2">
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">挂件管理</p>
             {[
               { key: 'memo' as const, label: '备忘录' },
               { key: 'clock' as const, label: '时钟' },
+              { key: 'todo' as const, label: '待办事项' },
             ].map(w => (
               <label key={w.key} className="flex items-center justify-between py-2 cursor-pointer">
                 <span className="text-sm font-medium text-gray-700">{w.label}</span>
@@ -335,7 +299,7 @@ export default function WorkbenchClient() {
           </div>
         )}
 
-        {/* ===== 2. Section: 我的收藏 ===== */}
+        {/* ===== Section: 我的收藏 ===== */}
         <div className="flex items-center gap-2">
           <span className="text-sm">📌</span>
           <div>
@@ -344,32 +308,29 @@ export default function WorkbenchClient() {
           </div>
         </div>
 
-        {/* ===== 2. Mixed Card Grid ===== */}
+        {/* ===== Card Grid ===== */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
           {MOCK_CARDS.map(card => (
-            <WBCard
-              key={card.id}
-              card={card}
-              isFav={!!favorites[card.id]}
-              onToggle={() => toggleFav(card.id, card.title, !!favorites[card.id])}
-            />
+            <WBCard key={card.id} card={card} isFav={!!favorites[card.id]} onToggle={() => toggleFav(card.id, card.title, !!favorites[card.id])} />
           ))}
           <AddCard />
         </div>
 
-        {/* ===== 3. Section: 效率组件 ===== */}
-        {(widgets.memo || widgets.clock) && (
+        {/* ===== Section: 效率组件 ===== */}
+        {(widgets.memo || widgets.clock || widgets.todo) && (
           <>
             <div className="flex items-center gap-2 pt-1">
               <span className="text-sm">💡</span>
               <div>
                 <h2 className="text-sm font-bold text-gray-900 tracking-tight">效率组件</h2>
-                <p className="text-[11px] text-gray-400 mt-0.5">备忘录 · 时钟</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">备忘录 · 时钟 · 待办</p>
               </div>
             </div>
 
-            {/* Horizontal scroll on mobile, grid on desktop */}
-            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:snap-none sm:pb-0 sm:-mx-0">
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:snap-none sm:pb-0 sm:-mx-0">
+              {/* Todo Widget */}
+              {widgets.todo && <TodoWidget />}
+
               {/* Memo */}
               {widgets.memo && (
                 <div className="min-w-[260px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-3.5 transition-all hover:shadow-md hover:border-gray-200">
@@ -382,14 +343,7 @@ export default function WorkbenchClient() {
                     </div>
                     <span className="text-[10px] text-gray-400">{fmtMemo(memoSavedAt)}</span>
                   </div>
-                  <textarea
-                    value={memoText}
-                    onChange={e => handleMemoChange(e.target.value)}
-                    placeholder="快速记录..."
-                    rows={3}
-                    className="w-full text-xs text-gray-700 placeholder:text-gray-300 bg-amber-50/20 rounded-lg border-0 resize-none focus:outline-none focus:ring-2 focus:ring-amber-100 p-2.5"
-                    spellCheck={false}
-                  />
+                  <textarea value={memoText} onChange={e => handleMemoChange(e.target.value)} placeholder="快速记录..." rows={3} className="w-full text-xs text-gray-700 placeholder:text-gray-300 bg-amber-50/20 rounded-lg border-0 resize-none focus:outline-none focus:ring-2 focus:ring-amber-100 p-2.5" spellCheck={false} />
                 </div>
               )}
 
@@ -412,7 +366,7 @@ export default function WorkbenchClient() {
           </>
         )}
 
-        {/* Footer hint */}
+        {/* Footer */}
         <div className="text-center py-4 border-t border-gray-100/50">
           <p className="text-[11px] text-gray-300">更多工具将逐步接入</p>
           <Link href="/resources" className="inline-flex items-center gap-1 text-[11px] text-teal-600 hover:text-teal-700 mt-0.5 transition-colors font-medium">

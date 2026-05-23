@@ -6,13 +6,13 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: buildTitle("成长任务中心"),
-  description: "完成日常任务获取成长值和勋章，提升你的社区等级",
+  title: buildTitle("待办与任务"),
+  description: "成长任务中心：完成日常任务获取成长值和勋章",
   robots: { index: false, follow: false },
   alternates: { canonical: buildCanonical("/dashboard/tasks") },
   openGraph: {
-    title: buildTitle("成长任务中心"),
-    description: "完成日常任务获取成长值和勋章，提升你的社区等级",
+    title: buildTitle("待办与任务"),
+    description: "成长任务中心：完成日常任务获取成长值和勋章",
     url: buildCanonical("/dashboard/tasks"),
   },
 };
@@ -25,7 +25,6 @@ export default async function TasksPage() {
 
   const taskStatus = await getUserTaskStatus(session.user.id);
 
-  // Get user's growth value and level info
   const { prisma } = await import("@/lib/prisma");
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -43,19 +42,41 @@ export default async function TasksPage() {
       orderBy: { minGrowth: "asc" },
       select: { name: true, iconText: true, color: true, minGrowth: true },
     });
-    levelInfo = {
-      growthValue: user.growthValue,
-      level,
-      nextLevel,
-    };
+    levelInfo = { growthValue: user.growthValue, level, nextLevel };
   }
 
-  // Build task data with status
   const tasks = GROWTH_TASKS.filter(t => t.isActive).map(t => ({
     ...t,
     completed: taskStatus.get(t.key)?.completed || false,
     count: taskStatus.get(t.key)?.count || 0,
   }));
 
-  return <TasksClient tasks={tasks} levelInfo={levelInfo} />;
+  return (
+    <div className="min-h-screen bg-[#F5F5F7]">
+      {/* User Center Navigation */}
+      <UserCenterShell title="待办与任务">
+        <TasksClient tasks={tasks} levelInfo={levelInfo} />
+      </UserCenterShell>
+    </div>
+  );
+}
+
+import { UserNavSidebar } from "@/components/user/UserSidebar";
+
+function UserCenterShell({ children, title }: { children: React.ReactNode; title: string }) {
+  return (
+    <>
+      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+          <p className="text-xs text-gray-400 flex items-center gap-1.5">
+            <a href="/" className="hover:text-gray-600 transition-colors">首页</a>
+            <span>›</span>
+            <span className="text-gray-700 font-medium">{title}</span>
+          </p>
+        </div>
+      </div>
+      <UserNavSidebar />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">{children}</div>
+    </>
+  );
 }
