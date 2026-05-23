@@ -51,44 +51,5 @@ export default async function TasksPage() {
     count: taskStatus.get(t.key)?.count || 0,
   }));
 
-  return (
-    <div className="min-h-screen bg-[#F5F5F7]">
-      {/* Top bar — breadcrumb hidden on mobile */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400">
-            <a href="/" className="hover:text-gray-600 transition-colors">首页</a>
-            <span className="text-gray-300">›</span>
-            <span className="text-gray-700 font-medium">待办与任务</span>
-          </div>
-          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">待办与任务</span>
-          <div className="w-8" />
-        </div>
-      </div>
-      <UserNavSidebar />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5 lg:ml-0">
-        <TasksClient tasks={tasks} levelInfo={levelInfo} />
-      </div>
-    </div>
-  );
-}
-
-import { UserNavSidebar } from "@/components/user/UserSidebar";
-
-function UserCenterShell({ children, title }: { children: React.ReactNode; title: string }) {
-  return (
-    <>
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <p className="text-xs text-gray-400 flex items-center gap-1.5">
-            <a href="/" className="hover:text-gray-600 transition-colors">首页</a>
-            <span>›</span>
-            <span className="text-gray-700 font-medium">{title}</span>
-          </p>
-        </div>
-      </div>
-      <UserNavSidebar />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5">{children}</div>
-    </>
-  );
+  return <TasksClient tasks={tasks} levelInfo={levelInfo} />;
 }
