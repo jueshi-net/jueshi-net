@@ -18,8 +18,9 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('wb:theme');
-      if (saved) setSelectedTheme(saved);
+      // Try both keys for backwards compatibility
+      const saved = localStorage.getItem('wb:theme') || localStorage.getItem('user_theme_color');
+      if (saved && THEME_COLORS.find(c => c.key === saved)) setSelectedTheme(saved);
     } catch {}
   }, []);
 
@@ -29,7 +30,10 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
 
   const selectTheme = (key: string) => {
     setSelectedTheme(key);
-    try { localStorage.setItem('wb:theme', key); } catch {}
+    try {
+      localStorage.setItem('wb:theme', key);
+      localStorage.setItem('user_theme_color', key);
+    } catch {}
     const color = THEME_COLORS.find(c => c.key === key);
     setToast(`🎨 主题色已更新为「${color?.label}」`);
   };
@@ -39,15 +43,6 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
       {toast && (
         <div className="fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg bg-white/90 border border-gray-100">{toast}</div>
       )}
-
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-sm">⚙️</span>
-        <div>
-          <h1 className="text-sm font-bold text-gray-900 tracking-tight">账号设置</h1>
-          <p className="text-[11px] text-gray-400 mt-0.5">管理个人信息与偏好</p>
-        </div>
-      </div>
 
       {/* Profile */}
       <div className="bg-white rounded-2xl border border-gray-100/80 divide-y divide-gray-50">

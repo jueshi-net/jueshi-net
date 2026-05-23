@@ -78,32 +78,8 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
   })).filter(g => g.tasks.length > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <nav className="flex items-center gap-1.5 text-sm text-teal-100/80 mb-4 min-h-[44px]">
-            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" /> 首页
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/dashboard" className="hover:text-white transition-colors">
-              我的工作台
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-medium">成长任务</span>
-          </nav>
-          <h1 className="text-2xl md:text-3xl font-extrabold mb-2">
-            成长任务中心
-          </h1>
-          <p className="text-teal-100/90 text-sm md:text-base max-w-xl">
-            完成每日任务获取成长值和勋章，提升你的社区等级
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 -mt-5 pb-16 relative z-10">
-        {/* Progress overview */}
+    <div className="space-y-4">
+      {/* Level progress */}
         {levelInfo && (
           <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 shadow-sm">
             <div className="flex items-center gap-3 mb-3">
@@ -271,7 +247,6 @@ export default function TasksClient({ tasks, levelInfo }: { tasks: TaskData[]; l
                 未来权益入口，更多高级功能和专属服务。
               </div>
             </div>
-          </div>
         </div>
       </div>
 
