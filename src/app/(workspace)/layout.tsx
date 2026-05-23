@@ -16,14 +16,15 @@ export default async function WorkspaceLayout({
 
   return (
     <WorkspaceProviders>
-      <div className="flex h-screen w-full bg-[#F5F5F7] overflow-hidden">
-        {/* 左侧固定边栏 — 移动端隐藏 */}
+      <div className="flex flex-col min-h-screen w-full bg-[#F5F5F7]">
         <UserNavSidebar className="hidden md:flex w-64 flex-shrink-0" />
-
-        {/* 右侧主体内容区 */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 flex flex-col w-full">
           <TopBar className="flex-shrink-0" />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+          {/* 🚧 DEBUG PROBE — remove after confirming layout */}
+          <div className="bg-yellow-400 text-black p-2 text-center text-xs font-bold border-b border-yellow-600 shadow-sm z-50">
+            🚧 [DEBUG] Layout 骨架加载成功，以下为子组件内容 🚧
+          </div>
+          <main className="w-full flex-grow p-4 md:p-6 pb-24">{children}</main>
         </div>
       </div>
     </WorkspaceProviders>

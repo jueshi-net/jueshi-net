@@ -159,7 +159,9 @@ export default function PointsPage() {
     );
   }
 
-  if (!data) return null;
+  if (!data) {
+    return <div className="p-10 text-xl font-bold text-orange-600 animate-pulse">⏳ 积分数据为空 (Data is null)</div>;
+  }
 
   const formatTime = (iso: string) => {
     const d = new Date(iso);
