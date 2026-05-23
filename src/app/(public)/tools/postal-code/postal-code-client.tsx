@@ -78,6 +78,57 @@ export default function PostalCodePage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
 
+  // Auto-trigger from URL param (e.g. ?q=90210 from homepage search)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) {
+      setInputCode(q);
+      // Wait for state update then validate
+      setTimeout(() => {
+        const trimmed = q.trim();
+        if (!trimmed) return;
+        const formatOk = country.formatRegex.test(trimmed);
+        // Auto-trigger validation inline (don't wait for user to click)
+        if (formatOk) {
+          queryDb(trimmed, selectedCountryCode);
+        }
+        // Build validation result
+        const normalized = trimmed.toUpperCase().replace(/\s+/g, ' ');
+        let matchedCity: string | undefined;
+        let matchedRegion: string | undefined;
+        if (country.code === 'CA' && /^[A-Z]/.test(normalized)) {
+          const firstLetter = normalized[0];
+          const regionMap: Record<string, string> = {
+            'A': 'NL', 'B': 'NS', 'C': 'PE', 'E': 'NB',
+            'G': 'QC', 'H': 'QC', 'J': 'QC',
+            'K': 'ON', 'L': 'ON', 'M': 'ON', 'N': 'ON', 'P': 'ON',
+            'R': 'MB', 'S': 'SK', 'T': 'AB', 'V': 'BC',
+            'X': 'NT/NU', 'Y': 'YT',
+          };
+          matchedRegion = regionMap[firstLetter] || '';
+          const match = country.ranges.find(r => normalized.startsWith(r.prefix));
+          if (match) { matchedCity = match.city; matchedRegion = match.region; }
+        }
+        if (country.code === 'US' && /^\d{3}/.test(normalized)) {
+          const prefix3 = normalized.slice(0, 3);
+          const match = country.ranges.find(r => r.prefix === prefix3);
+          if (match) { matchedCity = match.city; matchedRegion = match.region; }
+        }
+        let msg = '✅ 邮编格式正确';
+        let deliverability: 'confirmed' | 'likely' | 'unknown' = 'unknown';
+        if (matchedCity) {
+          msg += ` — 可能属于：${matchedCity}, ${matchedRegion}`;
+          deliverability = 'confirmed';
+        } else if (matchedRegion) {
+          msg += ` — 区域：${matchedRegion}`;
+          deliverability = 'likely';
+        }
+        setValidationResult({ valid: formatOk, message: formatOk ? msg : `❌ 格式不正确，应为 ${country.format}`, matchedRegion, matchedCity, deliverability });
+      }, 100);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // DB search state
   const [dbQuery, setDbQuery] = useState('');
   const [dbResults, setDbResults] = useState<DbResult[]>([]);

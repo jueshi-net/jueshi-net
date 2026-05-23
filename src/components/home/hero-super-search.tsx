@@ -26,7 +26,7 @@ export default function HeroSuperSearch() {
     } else if (activeTab === 'all') {
       window.open(`https://www.google.com/search?q=site:jueshi.net+${encodeURIComponent(query)}`, '_blank');
     } else if (activeTab === 'tracking') {
-      window.open(`/tracking?num=${encodeURIComponent(query)}`, '_self');
+      window.open(`/tracking?track_no=${encodeURIComponent(query)}`, '_self');
     } else if (activeTab === 'postal') {
       window.open(`/tools/postal-code?q=${encodeURIComponent(query)}`, '_self');
     } else if (activeTab === 'hs') {

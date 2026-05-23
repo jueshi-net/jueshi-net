@@ -43,6 +43,22 @@ export default function ExchangeRatePage() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [showChart, setShowChart] = useState(false);
 
+  // Auto-trigger from URL param (e.g. ?q=USD转CNY or ?q=EUR转JPY)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) {
+      // Try to parse currency pair: "USD转CNY", "USD-CNY", "USD to CNY", "usd cny"
+      const pairMatch = q.match(/([A-Z]{3})[\s\-\u8f6C\u5230to]+([A-Z]{3})/i);
+      if (pairMatch) {
+        const from = pairMatch[1].toUpperCase();
+        const to = pairMatch[2].toUpperCase();
+        if (CURRENCIES.some(c => c.code === from)) setFromCurrency(from);
+        if (CURRENCIES.some(c => c.code === to)) setToCurrency(to);
+      }
+    }
+  }, []);
+
   const fetchRates = async () => {
     setLoading(true);
     setError(null);

@@ -1,4 +1,5 @@
-import { Library, ExternalLink, Megaphone, Store, Globe, Landmark } from 'lucide-react';
+import { AdSlot } from '@/components/ads/AdSlot';
+import { Library, ExternalLink, Store, Globe, Landmark } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   '电商平台': <Store className="h-3.5 w-3.5" />,
@@ -56,20 +57,8 @@ export default function ResourceNav() {
             </div>
           </a>
         ))}
-        {/* Resource Native Ad */}
-        <a href="#" className="relative flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-800 border border-amber-200/60 dark:border-gray-700 rounded-xl p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
-          <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 bg-amber-400 text-white rounded font-medium">推广</span>
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center justify-center rounded-lg p-2 bg-amber-100 text-amber-600">
-              <Megaphone className="h-3.5 w-3.5" />
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900 dark:text-white text-sm">东南亚海外仓直发</h3>
-              <span className="text-[11px] text-gray-500">最快 3 个工作日出证</span>
-            </div>
-          </div>
-          <span className="text-amber-600 font-medium text-sm">了解 →</span>
-        </a>
+        {/* Resource Native Ad (dynamic from Ad System) */}
+        <AdSlot placement="resource-nav-native" />
       </div>
     </div>
   );

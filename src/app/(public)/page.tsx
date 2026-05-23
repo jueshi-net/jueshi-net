@@ -1,7 +1,7 @@
 import HeroSuperSearch from "@/components/home/hero-super-search";
 import IdentityCards from "@/components/home/identity-cards";
 import MarketOverview from "@/components/home/market-overview";
-import BannerAd from "@/components/home/banner-ad";
+import { AdSlot } from "@/components/ads/AdSlot";
 import ToolGrid from "@/components/home/tool-grid";
 import TopicShowcase from "@/components/home/topic-showcase";
 import ResourceNav from "@/components/home/resource-nav";
@@ -38,8 +38,10 @@ export default function HomePage() {
       {/* 3. Global Market Overview */}
       <section><MarketOverview /></section>
 
-      {/* 4. Banner Ad */}
-      <BannerAd />
+      {/* 4. Banner Ad (dynamic from Ad System) */}
+      <div className="px-4 max-w-7xl mx-auto py-3">
+        <AdSlot placement="home-banner-top" />
+      </div>
 
       {/* 5. Tool Grid with Native Ad */}
       <section><ToolGrid /></section>
@@ -47,8 +49,10 @@ export default function HomePage() {
       {/* 6. Topic Showcase */}
       <section><TopicShowcase /></section>
 
-      {/* 7. Banner Ad */}
-      <BannerAd />
+      {/* 7. Banner Ad (dynamic from Ad System) */}
+      <div className="px-4 max-w-7xl mx-auto py-3">
+        <AdSlot placement="home-banner-bottom" />
+      </div>
 
       {/* 8. Resource Nav with Native Ad */}
       <section><ResourceNav /></section>

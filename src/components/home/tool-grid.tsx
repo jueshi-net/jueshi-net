@@ -1,4 +1,5 @@
-import { Wrench, Truck, MapPin, Hash, Coins, FileText, Sparkles, Calculator, Tag, QrCode, Megaphone, Flame } from 'lucide-react';
+import { AdSlot } from '@/components/ads/AdSlot';
+import { Wrench, Truck, MapPin, Hash, Coins, FileText, Sparkles, Calculator, Tag, QrCode, Flame } from 'lucide-react';
 
 const TOOLS = [
   { name: '商业发票', desc: '外贸必备单据生成', icon: FileText, href: '/tools/commercial-invoice', heat: '2.3k', iconBg: 'from-blue-50 to-indigo-50', iconColor: 'text-blue-600' },
@@ -57,15 +58,8 @@ export default function ToolGrid() {
             </a>
           );
         })}
-        {/* Native Ad Slot */}
-        <div className="relative bg-gradient-to-br from-amber-50 to-orange-50/50 dark:from-gray-800 dark:to-gray-800 border border-amber-200/60 dark:border-gray-700 rounded-xl p-4 flex flex-col justify-center items-center text-center shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
-          <span className="absolute top-2 right-2 text-[10px] px-1.5 py-0.5 bg-amber-400 text-white rounded font-medium">推广</span>
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 text-amber-600 transition-transform duration-200 group-hover:scale-110">
-            <Megaphone className="w-5 h-5" />
-          </div>
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-0.5">跨境物流专线</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">欧美/东南亚 FBA 头程 / 一件代发 / 8折起</p>
-        </div>
+        {/* Native Ad Slot (dynamic from Ad System) */}
+        <AdSlot placement="tool-grid-native" />
       </div>
     </div>
   );

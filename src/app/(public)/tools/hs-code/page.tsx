@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, Package, Filter, Info, ExternalLink, ChevronDown, ChevronUp, AlertCircle, Download, ListOrdered, FileText } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
@@ -24,6 +24,15 @@ export default function HSCodePage() {
   const [filterRisk, setFilterRisk] = useState('all');
   const [batchMode, setBatchMode] = useState(false);
   const [batchInput, setBatchInput] = useState('');
+
+  // Auto-trigger from URL param (e.g. ?q=手机壳 from homepage search)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) {
+      setSearch(q);
+    }
+  }, []);
 
   // CSV export: download filtered results as CSV
   const exportCSV = () => {

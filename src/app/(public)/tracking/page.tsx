@@ -95,6 +95,22 @@ export default function TrackingPage() {
   // Hero query state
   const [heroQuery, setHeroQuery] = useState('');
 
+  // Auto-trigger from URL param (e.g. ?track_no=YT123 from homepage search)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const trackNo = params.get('track_no');
+    if (trackNo) {
+      setHeroQuery(trackNo);
+      // Auto-trigger 17TRACK redirect after mount
+      const nums = parseTrackingNumbers(trackNo);
+      if (nums.length > 0) {
+        const url = `https://www.17track.net/zh-cn#nums=${nums.join(',')}`;
+        trackEvent.trackingClick17track();
+        setTimeout(() => window.open(url, '_blank', 'noopener,noreferrer'), 300);
+      }
+    }
+  }, []);
+
   // Management section state
   const [entries, setEntries] = useState<TrackingEntry[]>(() => loadTracking());
   const [inputValue, setInputValue] = useState('');
