@@ -226,7 +226,8 @@ export default function WorkbenchClient() {
   const now = new Date();
   const pct = Math.round((totalCount / totalLimit) * 100);
   const role = ROLE_META[userInfo.role] || ROLE_META.user;
-  const initial = userInfo.name?.[0]?.toUpperCase() || 'U';
+  const displayName = userInfo.name || userInfo.email.split('@')[0] || '跨境卖家';
+  const initial = displayName[0]?.toUpperCase() || 'C';
 
   const fmtMemo = (d: Date | null) => {
     if (!d) return '尚未保存';
@@ -263,10 +264,6 @@ export default function WorkbenchClient() {
       )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
-        {/* Widget manager toggle — floating top-right */}
-        <div className="flex justify-end">
-          <button onClick={() => setShowManager(!showManager)} className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors text-gray-300 hover:text-gray-500"><Settings className="w-4 h-4" /></button>
-        </div>
 
         {/* ===== 1. Identity & Quota — Two-Layer Mobile ===== */}
         <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4">
@@ -277,7 +274,7 @@ export default function WorkbenchClient() {
                 {userInfo.image ? <img src={userInfo.image} alt="" className="w-full h-full object-cover" /> : initial}
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900 tracking-tight leading-tight">{userInfo.name || '用户'}</p>
+                <p className="text-sm font-bold text-gray-900 tracking-tight leading-tight">{displayName}</p>
                 <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold mt-0.5 ${role.cls}`}>{role.icon}{role.label}</span>
               </div>
             </div>
