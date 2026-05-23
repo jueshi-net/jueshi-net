@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import WorkbenchClient from "./workbench-client";
+import { WorkspaceProviders } from "@/components/user/WorkspaceProviders";
 
 export const metadata: Metadata = {
   title: buildTitle("我的工作台"),
@@ -15,5 +16,9 @@ export const metadata: Metadata = {
 };
 
 export default function WorkbenchPage() {
-  return <WorkbenchClient />;
+  return (
+    <WorkspaceProviders>
+      <WorkbenchClient />
+    </WorkspaceProviders>
+  );
 }
