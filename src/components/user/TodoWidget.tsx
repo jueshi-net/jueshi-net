@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CheckSquare, Check, Plus, ChevronRight, Clock } from 'lucide-react';
+import { getTheme } from './UserPreferencesContext';
 
 interface Todo {
   id: string;
@@ -25,6 +26,7 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 export default function TodoWidget() {
+  const theme = getTheme();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -101,8 +103,8 @@ export default function TodoWidget() {
               onClick={() => toggleTodo(todo.id)}
               className={`mt-0.5 w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center transition-all ${
                 todo.done
-                  ? 'bg-teal-500 border-teal-500 text-white'
-                  : 'border-gray-200 hover:border-teal-300'
+                  ? `${theme.btnBg} ${theme.border} text-white`
+                  : 'border-gray-200 hover:border-gray-300'
               }`}
             >
               {todo.done && <Check className="w-3 h-3" />}

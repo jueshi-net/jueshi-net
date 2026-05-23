@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { UserNavSidebar } from '@/components/user/UserSidebar';
 import TodoWidget from '@/components/user/TodoWidget';
+import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
 
 // ===== MOCK DATA =====
 
@@ -49,6 +50,7 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
   const tag = card.tag ? TAG_MAP[card.tag] : null;
   const href = card.isInternal ? card.route : card.url;
   const Wrapper = card.isInternal ? Link : 'a';
+  const theme = getTheme();
 
   return (
     <div
@@ -58,7 +60,7 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
     >
       <Wrapper href={href || '#'} {...(!card.isInternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className="block p-3.5">
         <div className="flex items-start gap-3">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${hovered ? 'bg-teal-50 text-teal-600 ring-1 ring-teal-100 scale-105' : 'bg-gray-50 text-gray-400 ring-1 ring-gray-100'}`}>
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${hovered ? `${theme.iconBg} ${theme.iconText} ring-1 ring-gray-100 scale-105` : 'bg-gray-50 text-gray-400 ring-1 ring-gray-100'}`}>
             {card.icon}
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
@@ -83,11 +85,11 @@ function WBCard({ card, isFav, onToggle }: { card: typeof MOCK_CARDS[0]; isFav: 
 
 function AddCard() {
   return (
-    <button className="rounded-xl border-2 border-dashed border-gray-200 hover:border-teal-300 hover:bg-teal-50/30 transition-all duration-300 flex flex-col items-center justify-center gap-2 py-6 sm:py-8 group cursor-pointer">
-      <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-teal-100 flex items-center justify-center transition-colors">
-        <Plus className="w-5 h-5 text-gray-300 group-hover:text-teal-600 transition-colors" />
+    <button className="rounded-xl border-2 border-dashed border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 flex flex-col items-center justify-center gap-2 py-6 sm:py-8 group cursor-pointer">
+      <div className="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-gray-100 flex items-center justify-center transition-colors">
+        <Plus className="w-5 h-5 text-gray-300 group-hover:text-gray-500 transition-colors" />
       </div>
-      <span className="text-xs font-medium text-gray-300 group-hover:text-teal-600 transition-colors text-center leading-snug">
+      <span className="text-xs font-medium text-gray-300 group-hover:text-gray-500 transition-colors text-center leading-snug">
         添加自定义网址<br className="sm:hidden" />或工具
       </span>
     </button>
@@ -98,6 +100,7 @@ function AddCard() {
 
 function CalendarWidget() {
   const now = new Date();
+  const theme = getTheme();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
   const today = now.getDate();
@@ -113,8 +116,8 @@ function CalendarWidget() {
   return (
     <div className="min-w-[220px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-3.5 transition-all hover:shadow-md hover:border-gray-200">
       <div className="flex items-center gap-1.5 mb-2">
-        <div className="w-6 h-6 rounded-md bg-indigo-50 ring-1 ring-indigo-100 flex items-center justify-center">
-          <CalIcon className="w-3 h-3 text-indigo-500" />
+        <div className={`w-6 h-6 rounded-md ${theme.badgeBg} ring-1 ring-gray-100 flex items-center justify-center`}>
+          <CalIcon className={`w-3 h-3 ${theme.iconText}`} />
         </div>
         <h3 className="text-xs font-semibold text-gray-900">{monthNames[now.getMonth()]} {now.getFullYear()}</h3>
       </div>
@@ -131,7 +134,7 @@ function CalendarWidget() {
             key={i}
             className={`text-center text-[11px] py-1 rounded-md transition-colors ${
               d === today
-                ? 'bg-teal-500 text-white font-bold'
+                ? `${theme.btnBg} text-white font-bold`
                 : d
                 ? 'text-gray-500 hover:bg-gray-50 cursor-default'
                 : ''
@@ -148,6 +151,8 @@ function CalendarWidget() {
 // ===== Main Page =====
 
 export default function WorkbenchClient() {
+  const { workspaceTitle } = useUserPreferences();
+  const theme = getTheme();
   const [loading, setLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(false);
   const [userInfo, setUserInfo] = useState({ name: '', email: '', role: 'user', image: '' });
@@ -266,7 +271,7 @@ export default function WorkbenchClient() {
             <span className="text-gray-700 font-medium">工作台</span>
           </div>
           {/* Mobile: just the page title */}
-          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">我的工作台</span>
+          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">{workspaceTitle || '我的工作台'}</span>
           <button onClick={() => setShowManager(!showManager)} className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors text-gray-300 hover:text-gray-500"><Settings className="w-4 h-4" /></button>
         </div>
       </div>
@@ -300,7 +305,7 @@ export default function WorkbenchClient() {
                   <div className={`h-full rounded-full transition-all duration-700 ease-out ${pct >= 80 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 'bg-gradient-to-r from-teal-400 to-emerald-400'}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
-              <Link href="/pricing" className="group inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg shadow-sm shadow-teal-500/20 hover:shadow-md transition-all whitespace-nowrap">
+              <Link href="/pricing" className={`group inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-semibold text-white bg-gradient-to-r ${theme.from} ${theme.to} rounded-lg shadow-sm ${theme.shadowColor} hover:shadow-md transition-all whitespace-nowrap`}>
                 <Crown className="w-2.5 h-2.5 group-hover:rotate-12 transition-transform" /> 升级
               </Link>
             </div>
@@ -315,10 +320,10 @@ export default function WorkbenchClient() {
               onClick={handleCheckIn}
               disabled={checkedIn}
               className={`flex flex-col items-center py-2 rounded-xl transition-all ${
-                checkedIn ? 'bg-green-50 cursor-default' : 'bg-teal-50 hover:bg-teal-100 cursor-pointer active:scale-95'
+                checkedIn ? 'bg-green-50 cursor-default' : `${theme.activeBg} ${theme.hoverBg} cursor-pointer active:scale-95`
               }`}
             >
-              <span className={`text-xs font-bold leading-none ${checkedIn ? 'text-green-600' : 'text-teal-700'}`}>{checkedIn ? '✓' : '签到'}</span>
+              <span className={`text-xs font-bold leading-none ${checkedIn ? 'text-green-600' : theme.activeText}`}>{checkedIn ? '✓' : '签到'}</span>
               <span className="text-[10px] text-gray-400 mt-1">{checkedIn ? '已签' : '+10分'}</span>
             </button>
             <div className="flex flex-col items-center py-2 rounded-xl bg-gray-50/50">
@@ -343,7 +348,7 @@ export default function WorkbenchClient() {
             {[{ key: 'memo' as const, label: '备忘录' }, { key: 'calendar' as const, label: '日历' }, { key: 'todo' as const, label: '待办事项' }].map(w => (
               <label key={w.key} className="flex items-center justify-between py-2 cursor-pointer">
                 <span className="text-sm font-medium text-gray-700">{w.label}</span>
-                <div className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${widgets[w.key] ? 'bg-teal-500' : 'bg-gray-200'}`} onClick={() => setWidgets(p => ({ ...p, [w.key]: !p[w.key] }))}>
+                <div className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${widgets[w.key] ? theme.btnBg : 'bg-gray-200'}`} onClick={() => setWidgets(p => ({ ...p, [w.key]: !p[w.key] }))}>
                   <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${widgets[w.key] ? 'translate-x-4' : 'translate-x-0.5'}`} />
                 </div>
               </label>
@@ -398,7 +403,7 @@ export default function WorkbenchClient() {
         {/* Footer */}
         <div className="text-center py-4 border-t border-gray-100/50">
           <p className="text-[11px] text-gray-300">更多工具将逐步接入</p>
-          <Link href="/resources" className="inline-flex items-center gap-1 text-[11px] text-teal-600 hover:text-teal-700 mt-0.5 transition-colors font-medium">浏览网址导航 <ChevronRight className="w-3 h-3" /></Link>
+          <Link href="/resources" className={`inline-flex items-center gap-1 text-[11px] ${theme.iconText} hover:text-gray-900 mt-0.5 transition-colors font-medium`}>浏览网址导航 <ChevronRight className="w-3 h-3" /></Link>
         </div>
       </div>
     </div>
