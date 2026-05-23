@@ -52,7 +52,7 @@ const NAV_LINKS = [
   { href: "/", label: "首页", icon: PackageSearch },
   { href: "/tools", label: "全能工具", icon: Wrench },
   { href: "/topics", label: "专题库", icon: Target },
-  { href: "/resources", label: "严选资源", icon: Library },
+  { href: "/resources", label: "网址导航", icon: Library },
   { href: "https://bbs.jueshi.net", label: "社区", icon: MessageSquare, external: true },
 ];
 
