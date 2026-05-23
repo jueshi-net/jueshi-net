@@ -49,14 +49,11 @@ function SearchTrigger() {
 }
 
 const NAV_LINKS = [
-  { href: "/tools", label: "工具", icon: Wrench },
-  { href: "/ai-tools/product-copy", label: "AI", icon: Sparkles },
-  { href: "/starter", label: "场景包", icon: Briefcase },
-  { href: "/guides", label: "指南", icon: BookOpen },
-  { href: "/resources", label: "资源", icon: Library },
-  { href: "/topics", label: "专题", icon: Target },
-  { href: "https://bbs.jueshi.net", label: "论坛", icon: MessageSquare, external: true },
-  { href: "/pricing", label: "会员", icon: Gem },
+  { href: "/", label: "首页", icon: PackageSearch },
+  { href: "/tools", label: "全能工具", icon: Wrench },
+  { href: "/topics", label: "专题库", icon: Target },
+  { href: "/resources", label: "严选资源", icon: Library },
+  { href: "https://bbs.jueshi.net", label: "社区", icon: MessageSquare, external: true },
 ];
 
 export default function Header() {
