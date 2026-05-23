@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Settings, Check } from 'lucide-react';
+import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
 
 const THEME_COLORS = [
   { key: 'teal', label: '青绿', tw: 'bg-teal-500', ring: 'ring-teal-300', focus: 'focus:ring-teal-200', btn: 'bg-teal-600 hover:bg-teal-700' },
@@ -12,36 +13,24 @@ const THEME_COLORS = [
   { key: 'slate', label: '岩灰', tw: 'bg-slate-600', ring: 'ring-slate-400', focus: 'focus:ring-slate-200', btn: 'bg-slate-600 hover:bg-slate-700' },
 ];
 
-const inputCls = (themeKey: string) => {
-  const c = THEME_COLORS.find(t => t.key === themeKey);
-  return `w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 ${c?.focus || 'focus:ring-teal-200'} transition-all`;
-};
-
-const btnCls = (themeKey: string) => {
-  const c = THEME_COLORS.find(t => t.key === themeKey);
-  return `px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors ${c?.btn || 'bg-teal-600 hover:bg-teal-700'}`;
-};
-
 export default function SettingsClient({ userName, userEmail }: { userName: string; userEmail: string }) {
-  const [selectedTheme, setSelectedTheme] = useState('teal');
+  const { themeColor, workspaceTitle, setThemeColor, setWorkspaceTitle } = useUserPreferences();
+  const theme = getTheme(themeColor);
   const [formName, setFormName] = useState('');
-  const [wbTitle, setWbTitle] = useState('');
+  const [localWbTitle, setLocalWbTitle] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Restore from localStorage on mount
+  // Hydrate form defaults from localStorage / props
   useEffect(() => {
     try {
-      const savedTheme = localStorage.getItem('wb:theme') || localStorage.getItem('user_theme_color');
-      if (savedTheme && THEME_COLORS.find(c => c.key === savedTheme)) setSelectedTheme(savedTheme);
-
       const savedName = localStorage.getItem('wb:user_name');
       if (savedName) setFormName(savedName);
       else if (userName && userName !== '未设置') setFormName(userName);
 
       const savedTitle = localStorage.getItem('wb:workspace_title');
-      if (savedTitle) setWbTitle(savedTitle);
-      else setWbTitle('我的工作台');
+      if (savedTitle) setLocalWbTitle(savedTitle);
+      else setLocalWbTitle('我的工作台');
     } catch {}
   }, [userName]);
 
@@ -50,30 +39,26 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   }, [toast]);
 
   const selectTheme = useCallback((key: string) => {
-    setSelectedTheme(key);
-    try {
-      localStorage.setItem('wb:theme', key);
-      localStorage.setItem('user_theme_color', key);
-    } catch {}
+    setThemeColor(key); // Updates context → triggers global nav re-render
     const color = THEME_COLORS.find(c => c.key === key);
     setToast(`🎨 主题色已更新为「${color?.label}」`);
-  }, []);
+  }, [setThemeColor]);
 
   const saveProfile = useCallback(() => {
     setSaving(true);
-    try {
-      localStorage.setItem('wb:user_name', formName);
-    } catch {}
+    try { localStorage.setItem('wb:user_name', formName); } catch {}
     setTimeout(() => { setSaving(false); setToast('✅ 个人信息已保存'); }, 300);
   }, [formName]);
 
   const saveWorkspace = useCallback(() => {
     setSaving(true);
-    try {
-      localStorage.setItem('wb:workspace_title', wbTitle);
-    } catch {}
+    setWorkspaceTitle(localWbTitle); // Updates context → triggers global nav re-render
     setTimeout(() => { setSaving(false); setToast('✅ 工作台设置已保存'); }, 300);
-  }, [wbTitle]);
+  }, [localWbTitle, setWorkspaceTitle]);
+
+  // Helper: build class strings from theme config
+  const inputCls = `w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 ${theme.ring} transition-all`;
+  const btnCls = `px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors ${theme.btnBg} ${theme.btnHover}`;
 
   return (
     <div className="space-y-4">
@@ -88,12 +73,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
           <div className="space-y-3">
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">姓名</label>
-              <input
-                type="text"
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                className={inputCls(selectedTheme)}
-              />
+              <input type="text" value={formName} onChange={(e) => setFormName(e.target.value)} className={inputCls} />
             </div>
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">邮箱</label>
@@ -106,7 +86,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
                 <span className="text-xs text-gray-400">.jueshi.net</span>
               </div>
             </div>
-            <button onClick={saveProfile} disabled={saving} className={btnCls(selectedTheme)}>
+            <button onClick={saveProfile} disabled={saving} className={btnCls}>
               {saving ? '保存中...' : '保存修改'}
             </button>
           </div>
@@ -117,7 +97,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
           <h2 className="text-sm font-semibold text-gray-900 mb-4">主题颜色</h2>
           <div className="flex flex-wrap gap-3">
             {THEME_COLORS.map(color => {
-              const isSelected = selectedTheme === color.key;
+              const isSelected = themeColor === color.key;
               return (
                 <button
                   key={color.key}
@@ -136,7 +116,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               );
             })}
           </div>
-          <p className="text-[11px] text-gray-400 mt-2">当前主题：<span className="font-medium text-gray-600">{THEME_COLORS.find(c => c.key === selectedTheme)?.label}</span></p>
+          <p className="text-[11px] text-gray-400 mt-2">当前主题：<span className="font-medium text-gray-600">{THEME_COLORS.find(c => c.key === themeColor)?.label}</span></p>
         </div>
 
         {/* Workspace */}
@@ -145,14 +125,9 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
           <div className="space-y-3">
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">工作台标题</label>
-              <input
-                type="text"
-                value={wbTitle}
-                onChange={(e) => setWbTitle(e.target.value)}
-                className={inputCls(selectedTheme)}
-              />
+              <input type="text" value={localWbTitle} onChange={(e) => setLocalWbTitle(e.target.value)} className={inputCls} />
             </div>
-            <button onClick={saveWorkspace} disabled={saving} className={btnCls(selectedTheme)}>
+            <button onClick={saveWorkspace} disabled={saving} className={btnCls}>
               {saving ? '保存中...' : '保存'}
             </button>
           </div>
