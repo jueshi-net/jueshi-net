@@ -165,7 +165,7 @@ export default function WorkbenchClient() {
   const [widgets, setWidgets] = useState({ memo: true, calendar: true, todo: true });
   const [showManager, setShowManager] = useState(false);
   // Stats
-  const [stats] = useState({ points: 1250, docs: 34, tasks: 3 });
+  const [stats, setStats] = useState({ points: 1250, docs: 34, tasks: 3 });
   // Checkin
   const [checkedIn, setCheckedIn] = useState(false);
 
@@ -178,10 +178,30 @@ export default function WorkbenchClient() {
           const d = await res.json();
           setUserInfo({ name: d.user?.name || d.user?.email?.split('@')[0] || '用户', email: d.user?.email || '', role: d.user?.role || 'user', image: d.user?.image || '' });
           setTotalCount(d.limits?.usedCount || 11);
+          // Sync stats from API
+          setStats({ points: d.points || 0, docs: 34, tasks: 3 });
         }
       } catch {
         setUserInfo({ name: '澈', email: 'user@local.test', role: 'user', image: '' });
       } finally { setLoading(false); }
+    })();
+  }, []);
+
+  // Sync check-in status from dashboard API
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/dashboard/summary');
+        if (res.ok) {
+          const d = await res.json();
+          if (d.checkedInToday) {
+            setCheckedIn(true);
+            try { localStorage.setItem('wb:checkedIn', new Date().toISOString()); } catch {}
+          }
+        }
+      } catch {
+        // Fallback to localStorage
+      }
     })();
   }, []);
 
@@ -204,12 +224,24 @@ export default function WorkbenchClient() {
     setMemoSavedAt(now);
   };
 
-  const handleCheckIn = () => {
+  const handleCheckIn = useCallback(async () => {
     if (checkedIn) return;
-    setCheckedIn(true);
-    try { localStorage.setItem('wb:checkedIn', new Date().toISOString()); } catch {}
-    setToast({ message: '✅ 签到成功！积分 +10', type: 'success' });
-  };
+    try {
+      const res = await fetch('/api/checkin', { method: 'POST' });
+      if (res.ok) {
+        setCheckedIn(true);
+        try { localStorage.setItem('wb:checkedIn', new Date().toISOString()); } catch {}
+        const data = await res.json();
+        setToast({ message: `✅ 签到成功！积分 +${data.pointsEarned || 10}`, type: 'success' });
+      } else if (res.status === 409) {
+        setCheckedIn(true);
+        try { localStorage.setItem('wb:checkedIn', new Date().toISOString()); } catch {}
+        setToast({ message: '今天已签到过了', type: 'info' });
+      }
+    } catch {
+      setToast({ message: '签到失败，请重试', type: 'info' });
+    }
+  }, [checkedIn]);
 
   useEffect(() => {
     if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }

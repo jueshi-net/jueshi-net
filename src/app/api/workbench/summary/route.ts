@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     // Get user profile type
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { profileType: true, points: true, memberUntil: true, role: true },
+      select: { name: true, email: true, image: true, profileType: true, points: true, memberUntil: true, role: true },
     });
 
     // Get user's links
@@ -52,6 +52,12 @@ export async function GET(req: Request) {
     const recommendedPackages = getRecommendedPackages(user?.profileType || null);
 
     return NextResponse.json({
+      user: {
+        name: user?.name || null,
+        email: session.user?.email || null,
+        role: user?.role || 'user',
+        image: user?.image || null,
+      },
       profileType: user?.profileType || null,
       links,
       favorites,
