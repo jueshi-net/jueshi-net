@@ -3,14 +3,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
-  Home, ChevronRight, Crown, Zap, Globe, Shield, Settings,
+  ChevronRight, Crown, Zap, Globe, Shield, Settings,
   Package, Truck, Calculator, FileText, MapPin, Search,
   BarChart3, Bookmark, ArrowUpRight, Clock, Star, StarOff,
   GripVertical, Plus, Calendar as CalIcon, TrendingUp, CheckSquare,
 } from 'lucide-react';
-import { UserNavSidebar } from '@/components/user/UserSidebar';
+
 import TodoWidget from '@/components/user/TodoWidget';
-import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
+import { getTheme } from '@/components/user/UserPreferencesContext';
 
 // ===== MOCK DATA =====
 
@@ -151,7 +151,7 @@ function CalendarWidget() {
 // ===== Main Page =====
 
 export default function WorkbenchClient() {
-  const { workspaceTitle } = useUserPreferences();
+  // Sidebar reads workspaceTitle directly from UserPreferencesContext
   const theme = getTheme();
   const [loading, setLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(false);
@@ -257,30 +257,16 @@ export default function WorkbenchClient() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
+    <>
       {toast && (
         <div className={`fixed top-5 right-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg backdrop-blur-xl border ${toast.type === 'success' ? 'bg-white/90 text-gray-900 border-gray-100' : 'bg-amber-50/90 text-amber-800 border-amber-200'}`}>{toast.message}</div>
       )}
 
-      {/* Header — breadcrumb hidden on mobile */}
-      <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
-          <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400">
-            <Link href="/" className="hover:text-gray-600 transition-colors inline-flex items-center gap-1"><Home className="w-3.5 h-3.5" /> 首页</Link>
-            <ChevronRight className="w-3 h-3 text-gray-300" />
-            <span className="text-gray-700 font-medium">工作台</span>
-          </div>
-          {/* Mobile: just the page title */}
-          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">{workspaceTitle || '我的工作台'}</span>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+        {/* Widget manager toggle — floating top-right */}
+        <div className="flex justify-end">
           <button onClick={() => setShowManager(!showManager)} className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors text-gray-300 hover:text-gray-500"><Settings className="w-4 h-4" /></button>
         </div>
-      </div>
-
-      {/* User Navigation */}
-      <UserNavSidebar />
-
-      {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4 lg:ml-0">
 
         {/* ===== 1. Identity & Quota — Two-Layer Mobile ===== */}
         <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4">
@@ -406,6 +392,6 @@ export default function WorkbenchClient() {
           <Link href="/resources" className={`inline-flex items-center gap-1 text-[11px] ${theme.iconText} hover:text-gray-900 mt-0.5 transition-colors font-medium`}>浏览网址导航 <ChevronRight className="w-3 h-3" /></Link>
         </div>
       </div>
-    </div>
+    </>
   );
 }
