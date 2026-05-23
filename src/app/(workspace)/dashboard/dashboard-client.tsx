@@ -3,23 +3,45 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
-  CalendarCheck, Star, CheckCircle, Plus, Trash2, Clock,
-  FileText, Tag, MapPin, Truck, StickyNote, ChevronDown,
-  ArrowUpCircle, ArrowDownCircle, MinusCircle, Gift, BookOpen,
-  Ticket, Shield, Sparkles, TrendingUp, ExternalLink, ChevronRight, Home, Zap, Target, Crown, Package, Receipt, Globe, ArrowRight, MessageSquare,
+  Crown, Shield, Zap, Star, ChevronRight, ArrowRight,
+  Sparkles, Infinity, HeadphonesIcon, Palette, Database,
+  FileText, Link2, Bot, TrendingUp, Clock, Loader2,
 } from "lucide-react";
-import ProfileSelector from "@/components/dashboard/profile-selector";
-import MyTools from "@/components/dashboard/my-tools";
-import MyLinks from "@/components/dashboard/my-links";
-import RecommendedPackages from "@/components/dashboard/recommended-packages";
-import MembershipCard from "@/components/dashboard/membership-card";
-import GrowthTaskSummary from "@/components/dashboard/growth-task-summary";
-import NotificationSummaryCard from "@/components/dashboard/notification-summary-card";
-import { buttonVariants, cardStyles, badgeStyles, inputStyles } from "@/lib/ui-styles";
+import { buttonVariants, cardStyles, badgeStyles } from "@/lib/ui-styles";
 
-// ===== ALL EXISTING LOGIC PRESERVED =====
+// ===== Types =====
 
-// Types
+interface MembershipData {
+  growthValue: number;
+  levelKey: string;
+  level: { key: string; name: string; minGrowth: number; maxGrowth: number | null; iconText: string; color: string; benefits: any } | null;
+  badges: { id: string; key: string; name: string; iconText: string; color: string; category: string; description: string | null; awardedAt: string; reason: string | null }[];
+  nextLevel: { key: string; name: string; minGrowth: number; iconText: string; color: string } | null;
+  isActiveMember: boolean;
+  membershipStatus: "active" | "inactive";
+  membershipExpiresAt: string | null;
+}
+
+interface PermissionsData {
+  authenticated: boolean;
+  role: string;
+  limits: {
+    memoMax: number;
+    companyProfilesMax: number;
+    labelBatchMax: number;
+    maxDrafts: number;
+    canUploadLogo: boolean;
+    canUseCustomStyle: boolean;
+    canRemoveBranding: boolean;
+    canCloudDraft: boolean;
+    canExportWord: boolean;
+    wordExportDailyLimit: number;
+  };
+  points?: number;
+  memberUntil?: string | null;
+  isMember?: boolean;
+}
+
 interface DashboardData {
   role: string;
   points: number;
@@ -32,318 +54,155 @@ interface DashboardData {
   recentLogs: { id: string; type: string; points: number; reason: string | null; createdAt: string }[];
 }
 
-interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  priority: string;
-  category: string | null;
-  dueDate: string | null;
-  pointsAwarded: boolean;
-  createdAt: string;
-  updatedAt: string;
-  completedAt: string | null;
+interface QuotaItem {
+  icon: React.ReactNode;
+  label: string;
+  used: number;
+  total: number;
+  unit: string;
+  upgradeHint: string;
 }
 
+// ===== Quota Progress Bar =====
 
-const POINT_TYPE_LABELS: Record<string, string> = {
-  daily_checkin: "每日签到",
-  task_complete: "完成任务",
-  export_word: "导出 Word",
-  admin_adjust: "管理员调整",
-  reward_redeem: "权益兑换",
-};
+function QuotaBar({ item }: { item: QuotaItem }) {
+  const pct = Math.min((item.used / item.total) * 100, 100);
+  const isWarning = pct >= 80;
+  const isCritical = pct >= 95;
 
-const PRIORITY_CONFIG: Record<string, { label: string; icon: React.ReactNode; badgeClass: string }> = {
-  high: { label: "高", icon: <ArrowUpCircle className="w-3 h-3" />, badgeClass: badgeStyles.danger },
-  normal: { label: "中", icon: <MinusCircle className="w-3 h-3" />, badgeClass: badgeStyles.warning },
-  low: { label: "低", icon: <ArrowDownCircle className="w-3 h-3" />, badgeClass: badgeStyles.success },
-};
+  return (
+    <div className="group">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-500 group-hover:bg-teal-50 group-hover:text-teal-600 transition-colors">
+            {item.icon}
+          </div>
+          <div>
+            <span className="text-sm font-medium text-gray-900">{item.label}</span>
+            {isWarning && (
+              <span className="ml-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">即将用完</span>
+            )}
+          </div>
+        </div>
+        <div className="text-right">
+          <span className={`text-sm font-bold ${isCritical ? "text-red-600" : isWarning ? "text-amber-600" : "text-gray-900"}`}>
+            {item.used}
+          </span>
+          <span className="text-sm text-gray-400"> / {item.total} {item.unit}</span>
+        </div>
+      </div>
+      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-700 ease-out ${
+            isCritical
+              ? "bg-gradient-to-r from-red-400 to-red-500"
+              : isWarning
+              ? "bg-gradient-to-r from-amber-400 to-amber-500"
+              : "bg-gradient-to-r from-teal-400 to-emerald-400"
+          }`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      {pct < 100 && (
+        <p className="text-[11px] text-gray-400 mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          还可使用 {item.total - item.used} {item.unit} · {item.upgradeHint}
+        </p>
+      )}
+    </div>
+  );
+}
 
-const SHORTCUTS = [
-  { label: "单据生成", href: "/tools/documents", icon: <FileText className="w-5 h-5" /> },
-  { label: "唛头标签", href: "/tools/documents/shipping-label", icon: <Tag className="w-5 h-5" /> },
-  { label: "邮编查询", href: "/tools/postal-code", icon: <MapPin className="w-5 h-5" /> },
-  { label: "物流追踪", href: "/tracking", icon: <Truck className="w-5 h-5" /> },
-  { label: "Memo", href: "/tools/memo", icon: <StickyNote className="w-5 h-5" /> },
-];
+// ===== Feature Card =====
 
-export default function DashboardPage() {
+function FeatureCard({ icon, title, desc, locked, upgradeLabel }: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  locked: boolean;
+  upgradeLabel?: string;
+}) {
+  return (
+    <div className={`relative p-5 rounded-2xl border transition-all hover:shadow-md hover:-translate-y-0.5 ${
+      locked
+        ? "bg-gray-50/50 border-gray-100"
+        : "bg-white border-gray-100 hover:border-teal-200"
+    }`}>
+      {locked && (
+        <div className="absolute top-3 right-3">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500">
+            会员专属
+          </span>
+        </div>
+      )}
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
+        locked
+          ? "bg-gray-100 text-gray-400"
+          : "bg-gradient-to-br from-teal-50 to-emerald-50 text-teal-600"
+      }`}>
+        {icon}
+      </div>
+      <h4 className={`text-sm font-semibold mb-1 ${locked ? "text-gray-500" : "text-gray-900"}`}>
+        {title}
+      </h4>
+      <p className={`text-xs leading-relaxed ${locked ? "text-gray-400" : "text-gray-500"}`}>
+        {desc}
+      </p>
+      {locked && upgradeLabel && (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <span className="text-[11px] font-medium text-teal-600 flex items-center gap-1">
+            <Crown className="w-3 h-3" /> {upgradeLabel}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== Main Component =====
+
+export default function DashboardClient() {
+  const [membership, setMembership] = useState<MembershipData | null>(null);
+  const [permissions, setPermissions] = useState<PermissionsData | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
-  const [taskLoading, setTaskLoading] = useState(false);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [taskFilter, setTaskFilter] = useState("pending");
-  const [checkingIn, setCheckingIn] = useState(false);
-  const [completingId, setCompletingId] = useState<string | null>(null);
-  const [taskCapReached, setTaskCapReached] = useState(false);
   const [loginRequired, setLoginRequired] = useState(false);
 
-  // Rewards state
-  const [rewards, setRewards] = useState<any[]>([]);
-  const [userPoints, setUserPoints] = useState(0);
-  const [myRewards, setMyRewards] = useState<any[]>([]);
-  const [redeemingId, setRedeemingId] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-
-  // Member state
-  const [memberInfo, setMemberInfo] = useState<{ isMember: boolean; memberUntil: string | null } | null>(null);
-
-  // Workbench state
-  const [workbenchData, setWorkbenchData] = useState<{
-    profileType: string | null;
-    links: any[];
-    favorites: any[];
-    recommendedTools: any[];
-    recommendedPackages: any[];
-    limits: { maxLinks: number };
-  } | null>(null);
-
-  // Recent drafts
-  const [recentDrafts, setRecentDrafts] = useState<any[]>([]);
-  const [totalDrafts, setTotalDrafts] = useState(0);
-
-  // Fetch dashboard data
-  const fetchDashboard = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await fetch("/api/dashboard/summary");
-      if (res.status === 401) {
-        setLoginRequired(true);
-        setLoading(false);
-        return;
+      // Fetch membership data
+      const memRes = await fetch("/api/me/membership");
+      if (memRes.ok) {
+        const memData = await memRes.json();
+        if (memData?.success) setMembership(memData.data);
       }
-      const data = await res.json();
-      setDashboard(data);
 
-      // Fetch member info
-      try {
-        const permRes = await fetch("/api/me/permissions");
-        if (permRes.ok) {
-          const permData = await permRes.json();
-          setMemberInfo({ isMember: permData.isMember || false, memberUntil: permData.memberUntil || null });
-        }
-      } catch {
-        // Ignore
+      // Fetch permissions
+      const permRes = await fetch("/api/me/permissions");
+      if (permRes.ok) {
+        const permData = await permRes.json();
+        setPermissions(permData);
+      }
+
+      // Fetch dashboard summary for points
+      const dashRes = await fetch("/api/dashboard/summary");
+      if (dashRes.status === 401) {
+        setLoginRequired(true);
+      } else if (dashRes.ok) {
+        const dashData = await dashRes.json();
+        setDashboard(dashData);
       }
     } catch (e) {
-      console.error("Failed to fetch dashboard:", e);
+      console.error("Failed to fetch membership data:", e);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch tasks
-  const fetchTasks = useCallback(async (filter = "pending") => {
-    setTaskLoading(true);
-    try {
-      const res = await fetch(`/api/tasks?status=${filter}`);
-      if (res.ok) {
-        const data = await res.json();
-        setTasks(data.tasks);
-      }
-    } catch (e) {
-      console.error("Failed to fetch tasks:", e);
-    } finally {
-      setTaskLoading(false);
-    }
-  }, []);
-
-  // Fetch rewards
-  const fetchRewards = useCallback(async () => {
-    try {
-      const res = await fetch("/api/rewards");
-      if (res.ok) {
-        const data = await res.json();
-        setRewards(data.items || []);
-        setUserPoints(data.points || 0);
-      }
-    } catch (e) {
-      console.error("Failed to fetch rewards:", e);
-    }
-  }, []);
-
-  // Fetch my rewards
-  const fetchMyRewards = useCallback(async () => {
-    try {
-      const res = await fetch("/api/rewards/my");
-      if (res.ok) {
-        const data = await res.json();
-        setMyRewards(data.rewards || []);
-      }
-    } catch (e) {
-      console.error("Failed to fetch my rewards:", e);
-    }
-  }, []);
-
-  // Fetch workbench data
-  const fetchWorkbench = useCallback(async () => {
-    try {
-      const res = await fetch("/api/workbench/summary");
-      if (res.ok) {
-        const data = await res.json();
-        setWorkbenchData(data);
-      }
-    } catch (e) {
-      console.error("Failed to fetch workbench:", e);
-    }
-  }, []);
-
-  // Fetch recent drafts
-  const fetchRecentDrafts = useCallback(async () => {
-    try {
-      const res = await fetch("/api/me/tool-documents");
-      if (res.ok) {
-        const data = await res.json();
-        setRecentDrafts((data.data || []).slice(0, 3));
-        setTotalDrafts((data.data || []).length);
-      }
-    } catch {
-      // Ignore
-    }
-  }, []);
-
-  // Redeem
-  const handleRedeem = useCallback(async (rewardItemId: string, name: string, cost: number) => {
-    if (userPoints < cost) {
-      setToast({ message: "积分不足", type: "error" });
-      return;
-    }
-    setRedeemingId(rewardItemId);
-    try {
-      const res = await fetch("/api/rewards/redeem", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rewardItemId }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setToast({ message: `兑换成功：${name}`, type: "success" });
-        setUserPoints(data.remainingPoints);
-        fetchRewards();
-        fetchMyRewards();
-        fetchDashboard();
-      } else {
-        setToast({ message: data.error || "兑换失败", type: "error" });
-      }
-    } catch (e) {
-      setToast({ message: "兑换失败，请重试", type: "error" });
-    } finally {
-      setRedeemingId(null);
-    }
-  }, [userPoints, fetchRewards, fetchMyRewards, fetchDashboard]);
-
-  // Auto-dismiss toast
   useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
+    fetchData();
+  }, [fetchData]);
 
-  // Record dashboard visit for growth task (fire-and-forget, once per day)
-  const recordDashboardVisit = useCallback(async () => {
-    try {
-      await fetch("/api/growth-tasks/dashboard-visit", { method: "POST" });
-    } catch {
-      // Ignore errors — this is a background reward task
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchDashboard();
-    fetchTasks(taskFilter);
-    if (!loginRequired) {
-      fetchRewards();
-      fetchMyRewards();
-      fetchWorkbench();
-      fetchRecentDrafts();
-      recordDashboardVisit();
-    }
-  }, [fetchDashboard, fetchTasks, taskFilter, loginRequired, fetchRewards, fetchMyRewards, fetchWorkbench, fetchRecentDrafts, recordDashboardVisit]);
-
-  // Check-in handler
-  const handleCheckIn = useCallback(async () => {
-    setCheckingIn(true);
-    try {
-      const res = await fetch("/api/checkin", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        fetchDashboard();
-      } else if (res.status === 409) {
-        fetchDashboard();
-      }
-    } catch (e) {
-      console.error("Check-in failed:", e);
-    } finally {
-      setCheckingIn(false);
-    }
-  }, [fetchDashboard]);
-
-  // Create task
-  const handleCreateTask = useCallback(async () => {
-    if (!newTaskTitle.trim()) return;
-    try {
-      const res = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTaskTitle.trim() }),
-      });
-      if (res.ok) {
-        setNewTaskTitle("");
-        fetchTasks(taskFilter);
-      }
-    } catch (e) {
-      console.error("Create task failed:", e);
-    }
-  }, [newTaskTitle, taskFilter, fetchTasks]);
-
-  // Complete task
-  const handleCompleteTask = useCallback(async (id: string) => {
-    setCompletingId(id);
-    try {
-      const res = await fetch(`/api/tasks/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "done" }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        if (data.pointsEarned > 0) {
-          if (data.dailyTaskPointsRemaining <= 0) {
-            setTaskCapReached(true);
-          }
-          fetchDashboard();
-        }
-        fetchTasks(taskFilter);
-      }
-    } catch (e) {
-      console.error("Complete task failed:", e);
-    } finally {
-      setCompletingId(null);
-    }
-  }, [taskFilter, fetchTasks, fetchDashboard]);
-
-  // Delete/archive task
-  const handleDeleteTask = useCallback(async (id: string) => {
-    try {
-      const res = await fetch(`/api/tasks/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        fetchTasks(taskFilter);
-      }
-    } catch (e) {
-      console.error("Delete task failed:", e);
-    }
-  }, [taskFilter, fetchTasks]);
-
-  // Format time
-  const formatTime = (iso: string) => {
-    const d = new Date(iso);
-    return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
-  };
-
-  // ===== VISUAL LAYER UPGRADE =====
+  // ===== Loading / Error States =====
 
   if (loading) {
     return (
@@ -364,7 +223,7 @@ export default function DashboardPage() {
             <Shield className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">请先登录</h1>
-          <p className="text-gray-500 mb-6">工作台、积分、任务和自定义网址功能需要登录后使用</p>
+          <p className="text-gray-500 mb-6">会员权益与配额管理需要登录后使用</p>
           <Link href="/login" className={`${buttonVariants.primary} w-full justify-center`}>
             前往登录 <ArrowRight className="w-4 h-4" />
           </Link>
@@ -373,461 +232,333 @@ export default function DashboardPage() {
     );
   }
 
-  if (!dashboard) {
-    // API failed but no login required — show error state instead of blank
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-6 h-6 text-red-400" />
-          </div>
-          <p className="text-sm text-gray-500">数据加载失败，请稍后重试</p>
-          <button onClick={fetchDashboard} className="mt-3 text-sm text-teal-600 hover:text-teal-700 font-medium">重新加载</button>
-        </div>
-      </div>
-    );
-  }
+  // ===== Derived State =====
 
-  const roleLabels: Record<string, string> = { guest: "游客", user: "用户", member: "会员", admin: "管理员" };
-  const roleIcons: Record<string, React.ReactNode> = { guest: <Globe className="w-4 h-4" />, user: <Zap className="w-4 h-4" />, member: <Crown className="w-4 h-4" />, admin: <Shield className="w-4 h-4" /> };
+  const isPremium = membership?.isActiveMember || permissions?.isMember || permissions?.role === "member" || permissions?.role === "admin";
+  const userPoints = permissions?.points ?? dashboard?.points ?? 0;
+  const memberUntil = membership?.membershipExpiresAt || permissions?.memberUntil;
+
+  const roleLabels: Record<string, string> = { guest: "游客", user: "普通用户", member: "高级会员", admin: "管理员" };
+
+  // Quota items (based on real limits from permissions)
+  const quotas: QuotaItem[] = [
+    {
+      icon: <Link2 className="w-4 h-4" />,
+      label: "自定义网址收藏",
+      used: 0, // TODO: fetch from API
+      total: permissions?.limits.memoMax || 20,
+      unit: "个",
+      upgradeHint: "会员可收藏 50 个",
+    },
+    {
+      icon: <FileText className="w-4 h-4" />,
+      label: "云草稿存储",
+      used: 0, // TODO: fetch from API
+      total: permissions?.limits.maxDrafts || 10,
+      unit: "份",
+      upgradeHint: "会员可存 100 份",
+    },
+    {
+      icon: <Bot className="w-4 h-4" />,
+      label: "AI 辅助次数",
+      used: 0, // TODO: fetch from API
+      total: 5,
+      unit: "次/日",
+      upgradeHint: "会员无限制",
+    },
+    {
+      icon: <FileText className="w-4 h-4" />,
+      label: "物流单据生成",
+      used: 0, // TODO: fetch from API
+      total: 10,
+      unit: "份/日",
+      upgradeHint: "会员无限制",
+    },
+    {
+      icon: <Star className="w-4 h-4" />,
+      label: "当前积分余额",
+      used: userPoints,
+      total: Math.max(userPoints + 500, 1000), // visual cap
+      unit: "分",
+      upgradeHint: "积分可兑换专属权益",
+    },
+  ];
+
+  // ===== Render =====
 
   return (
-    <div className="space-y-4">
-      {/* ===== TODAY'S STAT CARDS ===== */}
-      <div className="grid grid-cols-2 gap-3">
-          {[
-            { icon: Star, label: "当前积分", value: dashboard.points, color: "text-amber-600", bg: "bg-amber-50", desc: "可用于兑换权益" },
-            { icon: TrendingUp, label: "今日获得", value: `+${dashboard.todayEarned}`, color: "text-green-600", bg: "bg-green-50", desc: `上限 ${dashboard.dailyPointCap}` },
-            { icon: CalendarCheck, label: "连续签到", value: `${dashboard.checkinStreak}天`, color: "text-blue-600", bg: "bg-blue-50", desc: dashboard.checkinStreak > 0 ? "继续保持！" : "今天还没签到" },
-            { icon: Target, label: "待办任务", value: dashboard.taskStats.pending, color: "text-purple-600", bg: "bg-purple-50", desc: `已完成 ${dashboard.taskStats.done} 个` },
-          ].map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <div key={i} className={`${cardStyles.base} p-4 flex items-start gap-3`}>
-                <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center flex-shrink-0`}>
-                  <Icon className={`w-5 h-5 ${stat.color}`} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-500">{stat.label}</p>
-                  <p className={`text-2xl font-bold tracking-tight ${stat.color}`}>{stat.value}</p>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate">{stat.desc}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+    <div className="space-y-5">
 
-        {/* ===== CHECK-IN + REWARDS PREVIEW ===== */}
-        <div className="grid lg:grid-cols-3 gap-4 mb-6">
-          {/* Check-in card */}
-          <div className={`${cardStyles.base} ${dashboard.checkedInToday ? "!bg-gradient-to-br from-green-50 to-emerald-50 !border-green-200" : ""}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${dashboard.checkedInToday ? "bg-green-100" : "bg-gray-100"}`}>
-                  <CalendarCheck className={`w-6 h-6 ${dashboard.checkedInToday ? "text-green-600" : "text-gray-400"}`} />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900">
-                    {dashboard.checkedInToday ? "今日已签到 ✓" : "每日签到"}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {dashboard.checkedInToday
-                      ? "明天再来签到吧"
-                      : <>+<span className="text-amber-600 font-semibold">{dashboard.role === "member" || dashboard.role === "admin" ? "10" : "5"}</span> 积分</>}
-                  </p>
-                </div>
-              </div>
-              {!dashboard.checkedInToday && (
-                <button
-                  onClick={handleCheckIn}
-                  disabled={checkingIn}
-                  className={buttonVariants.primary}
-                >
-                  {checkingIn ? "签到中..." : "签到"}
-                </button>
-              )}
+      {/* ===== PREMIUM IDENTITY CARD ===== */}
+      {isPremium ? (
+        /* --- VIP State: Dark premium card --- */
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6 shadow-lg">
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-teal-500/10 to-transparent rounded-full translate-y-1/2 -translate-x-1/2" />
+
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Crown icon */}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30 flex-shrink-0">
+              <Crown className="w-7 h-7 text-white" />
             </div>
-          </div>
 
-          {/* Rewards preview */}
-          <div className={`lg:col-span-2 ${cardStyles.base}`}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className={cardStyles.header}>
-                <Gift className="w-5 h-5 text-amber-500" />
-                积分权益兑换
-              </h2>
-              <span className="text-sm text-gray-500">
-                可用 <span className="font-bold text-amber-600">{userPoints}</span> 积分
-              </span>
-            </div>
-            {rewards.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-4">暂无可兑换权益</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {rewards.map((r) => {
-                  const canAfford = userPoints >= r.costPoints;
-                  return (
-                    <div key={r.id} className={`${cardStyles.base.replace("p-5", "p-3")} ${canAfford ? "" : "bg-gray-50 opacity-60"}`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-8 h-8 bg-amber-50 rounded-lg flex flex-col items-center justify-center">
-                          <span className="text-xs font-bold text-amber-600">{r.costPoints}</span>
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{r.name}</p>
-                          <p className="text-xs text-gray-400 truncate">{r.description}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleRedeem(r.id, r.name, r.costPoints)}
-                        disabled={!canAfford || redeemingId === r.id}
-                        className={`w-full ${canAfford ? buttonVariants.primary : "bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg text-sm font-medium min-h-[44px]"}`}
-                      >
-                        {redeemingId === r.id ? "兑换中..." : canAfford ? "兑换" : "积分不足"}
-                      </button>
-                    </div>
-                  );
-                })}
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-lg font-bold text-white">
+                  {roleLabels[permissions?.role || "user"] || "高级会员"}
+                </h2>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <Sparkles className="w-3 h-3" /> 尊享权益
+                </span>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* ===== MY DRAFTS PREVIEW ===== */}
-        {totalDrafts > 0 && (
-          <div className={`${cardStyles.base} mb-6`}>
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className={cardStyles.header}>
-                <FileText className="w-5 h-5 text-teal-600" />
-                我的单据草稿
-              </h2>
-              <Link href="/dashboard/documents" className={buttonVariants.ghost}>
-                查看全部 ({totalDrafts}) <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </Link>
-            </div>
-            <div className="p-5">
-              <div className="divide-y divide-gray-100">
-                {recentDrafts.map((draft) => (
-                  <div key={draft.id} className="flex items-center justify-between py-3 px-2 hover:bg-gray-50 transition-colors rounded-lg">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{draft.title}</p>
-                      <p className="text-xs text-gray-400">{draft.toolKey} · {new Date(draft.updatedAt).toLocaleDateString("zh-CN")}</p>
-                    </div>
-                    <Link href={`/tools/${draft.toolKey.replace(/_/g, "-")}?draftId=${draft.id}`} className={`${buttonVariants.ghost} ml-3 shrink-0`}>
-                      打开 <ArrowRight className="w-3 h-3 ml-0.5" />
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ===== MEMBERSHIP / LEVEL & BADGES ===== */}
-        {!loginRequired && <MembershipCard />}
-
-        {/* ===== GROWTH TASK SUMMARY ===== */}
-        {!loginRequired && <GrowthTaskSummary />}
-        {!loginRequired && <NotificationSummaryCard />}
-
-        {/* ===== WORKBENCH SECTION ===== */}
-        {!loginRequired && workbenchData && (
-          <div className="space-y-6 mb-6" id="my-links">
-            <ProfileSelector
-              currentProfileType={workbenchData.profileType}
-              onUpdate={(pt) => setWorkbenchData(prev => prev ? { ...prev, profileType: pt } : null)}
-            />
-            <MyTools
-              favorites={workbenchData.favorites}
-              recommendedTools={workbenchData.recommendedTools}
-              onRefresh={fetchWorkbench}
-            />
-            <MyLinks
-              links={workbenchData.links}
-              maxLinks={workbenchData.limits.maxLinks}
-              onRefresh={fetchWorkbench}
-            />
-            <RecommendedPackages packages={workbenchData.recommendedPackages} />
-          </div>
-        )}
-
-        {/* ===== TODAY'S TASKS ===== */}
-        <div className={`${cardStyles.base} mb-6`}>
-          <div className="p-5 border-b border-gray-100">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <h2 className={cardStyles.header}>
-                <Target className="w-5 h-5 text-teal-600" />
-                今日待办
-              </h2>
-              <div className="flex gap-1.5">
-                {(["pending", "done", "archived"] as const).map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setTaskFilter(f)}
-                    className={`px-3 py-2 min-h-[44px] text-xs rounded-full font-medium transition-all ${taskFilter === f ? buttonVariants.primary : badgeStyles.neutral + " hover:bg-gray-200 cursor-pointer"}`}
-                  >
-                    {f === "pending" ? `待办 (${dashboard.taskStats.pending})` : f === "done" ? `已完成 (${dashboard.taskStats.done})` : `归档 (${dashboard.taskStats.archived})`}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="p-5">
-            {/* Daily cap warning */}
-            {taskFilter === "pending" && taskCapReached && (
-              <div className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700 flex items-center gap-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">⚠️</span>
-                今日任务积分已达上限（20/20），仍可继续完成任务但不再加分
-              </div>
-            )}
-
-            {/* New task input */}
-            {taskFilter === "pending" && (
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <input
-                  type="text"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreateTask()}
-                  placeholder="添加今天要完成的事项，完成后可获得积分..."
-                  className={inputStyles}
-                />
-                <button
-                  onClick={handleCreateTask}
-                  disabled={!newTaskTitle.trim()}
-                  className={buttonVariants.primary}
-                >
-                  <Plus className="w-4 h-4" /> 添加
-                </button>
-              </div>
-            )}
-
-            {/* Task list */}
-            {taskLoading ? (
-              <div className="text-center text-gray-400 py-8">
-                <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin mx-auto mb-2" />
-                加载中...
-              </div>
-            ) : tasks.length === 0 ? (
-              <div className="text-center py-10">
-                <Target className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 font-medium">
-                  {taskFilter === "pending" ? "暂无待办任务" : taskFilter === "done" ? "暂无已完成任务" : "暂无归档任务"}
-                </p>
-                {taskFilter === "pending" && (
-                  <p className="text-xs text-gray-400 mt-1">添加今天要完成的事项，完成后可获得积分</p>
+              <div className="flex items-center gap-4 text-sm text-gray-300">
+                {memberUntil && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    到期 {new Date(memberUntil).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5 text-amber-400" />
+                  积分 <span className="font-bold text-white">{userPoints}</span>
+                </span>
+                {membership && (
+                  <span className="flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-teal-400" />
+                    成长值 {membership.growthValue}
+                  </span>
                 )}
               </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {tasks.map((task) => {
-                  const prio = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.normal;
-                  return (
-                    <div
-                      key={task.id}
-                      className={`flex items-center gap-3 px-4 py-3 transition-colors ${
-                        task.status === "done" ? "bg-gray-50/50" : "hover:bg-gray-50"
-                      }`}
-                    >
-                      {task.status === "pending" && (
-                        <button
-                          onClick={() => handleCompleteTask(task.id)}
-                          disabled={completingId === task.id}
-                          className="w-5 h-5 border-2 border-gray-300 rounded flex-shrink-0 hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50"
-                          title="标记完成"
-                        />
-                      )}
-                      {task.status === "done" && (
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      )}
-                      {task.status === "archived" && (
-                        <Clock className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                      )}
+            </div>
 
-                      <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-medium ${task.status === "done" ? "line-through text-gray-400" : "text-gray-900"}`}>
-                          {task.title}
-                        </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium ${prio.badgeClass}`}>
-                            {prio.icon}{prio.label}
-                          </span>
-                          {task.pointsAwarded && task.status === "done" && (
-                            <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium ${badgeStyles.success}`}>
-                              <Star className="w-3 h-3" />+2
-                            </span>
-                          )}
-                          {task.dueDate && (
-                            <span className="text-xs text-gray-400">截止 {new Date(task.dueDate).toLocaleDateString("zh-CN")}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {task.status !== "archived" && (
-                        <button
-                          onClick={() => handleDeleteTask(task.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors p-1 min-h-[44px] flex items-center"
-                          title={task.status === "done" ? "归档" : "删除"}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
+            {/* Membership level badge */}
+            {membership?.level && (
+              <div className="flex-shrink-0 text-right">
+                <div className="text-3xl mb-1">{membership.level.iconText}</div>
+                <div className="text-xs text-gray-400">{membership.level.name}</div>
               </div>
             )}
           </div>
-        </div>
 
-        {/* ===== RECENT POINT LOGS ===== */}
-        <div className={`${cardStyles.base} mb-6`}>
-          <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-            <h2 className={cardStyles.header}>
-              <Star className="w-5 h-5 text-amber-500" />
-              最近积分记录
-            </h2>
-            <Link href="/dashboard/points" className={buttonVariants.ghost}>
-              查看全部 <ArrowRight className="w-3.5 h-3.5 ml-1" />
+          {/* Progress to next level */}
+          {membership?.nextLevel && (
+            <div className="relative mt-5 pt-4 border-t border-white/10">
+              <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                <span>距离 {membership.nextLevel.iconText} {membership.nextLevel.name}</span>
+                <span className="text-amber-400 font-medium">
+                  还需 {membership.nextLevel.minGrowth - membership.growthValue} 成长值
+                </span>
+              </div>
+              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-400 to-teal-400 rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.min(
+                      ((membership.growthValue - (membership.level?.minGrowth || 0)) /
+                      (membership.nextLevel.minGrowth - (membership.level?.minGrowth || 0))) * 100,
+                      100
+                    )}%`
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* --- Free State: Clean card with upgrade CTA --- */
+        <div className="relative overflow-hidden rounded-2xl bg-white border border-gray-200 p-6 shadow-sm">
+          {/* Decorative accent */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-teal-50 to-transparent rounded-full -translate-y-1/2 translate-x-1/3" />
+
+          <div className="relative flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Icon */}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-7 h-7 text-gray-500" />
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h2 className="text-lg font-bold text-gray-900">
+                  {roleLabels[permissions?.role || "user"] || "普通用户"}
+                </h2>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${badgeStyles.neutral}`}>
+                  免费版
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5 text-amber-500" />
+                  积分 <span className="font-bold text-gray-900">{userPoints}</span>
+                </span>
+                {membership && (
+                  <span className="flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5 text-teal-500" />
+                    成长值 {membership.growthValue}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Upgrade CTA */}
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 text-white rounded-xl text-sm font-semibold hover:from-teal-700 hover:to-emerald-700 transition-all shadow-md shadow-teal-500/20 hover:shadow-lg hover:shadow-teal-500/30 hover:-translate-y-0.5 min-h-[44px]"
+            >
+              <Crown className="w-4 h-4" />
+              升级高级会员
+              <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="p-5">
-            {dashboard.recentLogs.length === 0 ? (
-              <div className="text-center py-6">
-                <Star className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">暂无积分记录</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-gray-100">
-                {dashboard.recentLogs.slice(0, 5).map((log) => (
-                  <div key={log.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-sm text-gray-700 truncate">{POINT_TYPE_LABELS[log.type] || log.type}</span>
-                      {log.reason && log.reason !== POINT_TYPE_LABELS[log.type] && (
-                        <span className="text-xs text-gray-400 truncate">{log.reason}</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className={`text-sm font-medium ${log.points > 0 ? "text-green-600" : "text-red-600"}`}>
-                        {log.points > 0 ? "+" : ""}{log.points}
-                      </span>
-                      <span className="text-xs text-gray-400">{formatTime(log.createdAt)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* ===== MY REWARDS ===== */}
-        {myRewards.length > 0 && (
-          <div className={`${cardStyles.base} mb-6`}>
-            <div className="p-5 border-b border-gray-100">
-              <h2 className={cardStyles.header}>
-                <Ticket className="w-5 h-5 text-green-500" />
-                我的权益
-              </h2>
-            </div>
-            <div className="p-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {myRewards.map((r) => {
-                  return (
-                    <div key={r.id} className={`${cardStyles.base.replace("p-5", "p-4")} flex items-center gap-3`}>
-                      {r.rewardType === "word_export_coupon" && <Ticket className="w-5 h-5 text-blue-500 flex-shrink-0" />}
-                      {r.rewardType === "member_trial" && <Shield className="w-5 h-5 text-amber-500 flex-shrink-0" />}
-                      {r.rewardType === "no_branding_coupon" && <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0" />}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">{r.rewardItem?.name || r.rewardType}</p>
-                        <p className="text-xs text-gray-400">×{r.rewardValue}</p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`${
-                          r.status === "active" ? badgeStyles.success :
-                          r.status === "used" ? badgeStyles.neutral :
-                          badgeStyles.danger
-                        }`}>
-                          {r.status === "active" ? "可用" : r.status === "used" ? "已使用" : "已过期"}
-                        </span>
-                        <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString("zh-CN")}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ===== POINTS RULES ===== */}
-        <div className={`${cardStyles.base} mb-6`}>
-          <div className="p-5 border-b border-gray-100">
-            <h2 className={cardStyles.header}>
-              <BookOpen className="w-5 h-5 text-blue-500" />
-              积分规则
-            </h2>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Zap className="w-4 h-4 text-blue-600" />
-                  <span className="font-semibold text-gray-900 text-sm">普通用户</span>
-                </div>
-                <ul className="space-y-1.5 text-sm text-gray-600">
-                  <li>• 每日签到 +5 积分</li>
-                  <li>• 完成任务 +2 积分/个</li>
-                  <li>• 任务积分每日最多 +20（10 个任务）</li>
-                  <li>• 每日总积分上限 30</li>
-                </ul>
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Crown className="w-4 h-4 text-amber-600" />
-                  <span className="font-semibold text-gray-900 text-sm">会员</span>
-                </div>
-                <ul className="space-y-1.5 text-sm text-gray-600">
-                  <li>• 每日签到 +10 积分</li>
-                  <li>• 完成任务 +2 积分/个</li>
-                  <li>• 任务积分每日最多 +20</li>
-                  <li>• 每日总积分上限 60</li>
-                </ul>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 border-t border-gray-100 pt-3 mt-4">
-              积分通过签到和完成任务获取，用于兑换站内权益。保持使用工具、养成工作习惯，积分自然增长。
-            </p>
-          </div>
-        </div>
-
-        {/* ===== QUICK SHORTCUTS ===== */}
-        <div className={cardStyles.base}>
-          <div className="p-5 border-b border-gray-100">
-            <h2 className={cardStyles.header}>快速入口</h2>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-              {SHORTCUTS.map((s) => (
-                <Link
-                  key={s.href}
-                  href={s.href}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 bg-white hover:bg-teal-50 hover:border-teal-200 hover:shadow-sm transition-all min-h-[44px]"
-                >
-                  <span className="text-teal-600">{s.icon}</span>
-                  <span className="text-xs font-medium text-gray-700 text-center">{s.label}</span>
-                </Link>
+          {/* Free user teaser */}
+          <div className="relative mt-5 pt-4 border-t border-gray-100">
+            <p className="text-xs text-gray-500 mb-3">升级后可解锁以下权益：</p>
+            <div className="flex flex-wrap gap-2">
+              {["无限云草稿", "AI 无限制", "专属客服", "去品牌水印", "优先新功能"].map((t) => (
+                <span key={t} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-teal-50 text-teal-700 border border-teal-100">
+                  <Sparkles className="w-3 h-3" /> {t}
+                </span>
               ))}
             </div>
           </div>
         </div>
+      )}
 
-        {/* Toast Notification */}
-        {toast && (
-          <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
-            toast.type === "success" ? "bg-teal-600 text-white" : "bg-red-600 text-white"
-          }`}>
-            {toast.message}
+      {/* ===== QUOTA & USAGE DASHBOARD ===== */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <Database className="w-5 h-5 text-teal-600" />
+              我的权益与配额
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">查看各项功能的使用情况与剩余容量</p>
           </div>
-        )}
+          {isPremium && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium bg-teal-50 text-teal-700 border border-teal-100">
+              <Infinity className="w-3 h-3" /> 会员扩容中
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-5">
+          {quotas.map((q, i) => (
+            <QuotaBar key={i} item={q} />
+          ))}
+        </div>
+      </div>
+
+      {/* ===== FEATURES UNLOCK GRID ===== */}
+      <div>
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            升级后可解锁的特权
+          </h3>
+          <p className="text-xs text-gray-400 mt-0.5">高级会员专享，让工作更高效</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <FeatureCard
+            icon={<Infinity className="w-5 h-5" />}
+            title="无限容量"
+            desc="云草稿、网址收藏、工具使用次数无上限，随心使用不设限"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "升级后无限使用"}
+          />
+          <FeatureCard
+            icon={<Bot className="w-5 h-5" />}
+            title="高阶 AI 辅助"
+            desc="每日 AI 辅助次数无限制，智能生成单据、翻译、数据分析"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "每日 5 次 → 无限制"}
+          />
+          <FeatureCard
+            icon={<HeadphonesIcon className="w-5 h-5" />}
+            title="优先客服"
+            desc="专属客服通道，工作日 2 小时内响应，问题优先处理"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "升级后专享"}
+          />
+          <FeatureCard
+            icon={<Palette className="w-5 h-5" />}
+            title="去品牌水印"
+            desc="导出的单据和文档不再带有平台品牌标识，专业形象加分"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "升级后自动移除"}
+          />
+          <FeatureCard
+            icon={<FileText className="w-5 h-5" />}
+            title="高阶汇率工具"
+            desc="实时汇率 API、历史走势、多币种换算、自定义汇率提醒"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "升级后解锁"}
+          />
+          <FeatureCard
+            icon={<TrendingUp className="w-5 h-5" />}
+            title="成长加速"
+            desc="会员签到和任务获得双倍成长值，等级提升更快，专属勋章"
+            locked={!isPremium}
+            upgradeLabel={isPremium ? "已解锁 ✓" : "升级后 2× 加速"}
+          />
+        </div>
+      </div>
+
+      {/* ===== RECENT POINT LOGS (compact) ===== */}
+      {dashboard?.recentLogs && dashboard.recentLogs.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-500" />
+              最近积分记录
+            </h3>
+            <Link href="/dashboard/points" className="text-xs text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1">
+              查看全部 <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="p-5">
+            <div className="divide-y divide-gray-50">
+              {dashboard.recentLogs.slice(0, 3).map((log) => (
+                <div key={log.id} className="flex items-center justify-between py-2.5">
+                  <span className="text-xs text-gray-600">{log.type === "daily_checkin" ? "每日签到" : log.type === "task_complete" ? "完成任务" : log.reason || log.type}</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold ${log.points > 0 ? "text-green-600" : "text-red-600"}`}>
+                      {log.points > 0 ? "+" : ""}{log.points}
+                    </span>
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(log.createdAt).toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== MEMBERSHIP GROWTH (if data available) ===== */}
+      {membership && membership.badges.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-4">
+            <Crown className="w-4 h-4 text-amber-500" />
+            已获得勋章
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {membership.badges.slice(0, 8).map((b) => (
+              <div
+                key={b.id}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-100 text-xs font-medium text-gray-700"
+              >
+                <span className="text-sm">{b.iconText}</span>
+                {b.name}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
