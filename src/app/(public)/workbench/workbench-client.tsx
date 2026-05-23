@@ -257,14 +257,16 @@ export default function WorkbenchClient() {
         <div className={`fixed top-5 right-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg backdrop-blur-xl border ${toast.type === 'success' ? 'bg-white/90 text-gray-900 border-gray-100' : 'bg-amber-50/90 text-amber-800 border-amber-200'}`}>{toast.message}</div>
       )}
 
-      {/* Header */}
+      {/* Header — breadcrumb hidden on mobile */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-gray-100/80">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
+          <div className="hidden md:flex items-center gap-1.5 text-xs text-gray-400">
             <Link href="/" className="hover:text-gray-600 transition-colors inline-flex items-center gap-1"><Home className="w-3.5 h-3.5" /> 首页</Link>
             <ChevronRight className="w-3 h-3 text-gray-300" />
             <span className="text-gray-700 font-medium">工作台</span>
           </div>
+          {/* Mobile: just the page title */}
+          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">我的工作台</span>
           <button onClick={() => setShowManager(!showManager)} className="p-2 rounded-lg hover:bg-gray-100/60 transition-colors text-gray-300 hover:text-gray-500"><Settings className="w-4 h-4" /></button>
         </div>
       </div>
@@ -275,62 +277,61 @@ export default function WorkbenchClient() {
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 space-y-4 lg:ml-0">
 
-        {/* ===== 1. Identity & Quota — High Density ===== */}
+        {/* ===== 1. Identity & Quota — Two-Layer Mobile ===== */}
         <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            {/* Left: Avatar + Name + Role */}
+          {/* Upper layer: Avatar+Name+Role | Quota+Upgrade */}
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-shrink-0">
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold ${userInfo.image ? 'overflow-hidden' : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'}`}>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${userInfo.image ? 'overflow-hidden' : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'}`}>
                 {userInfo.image ? <img src={userInfo.image} alt="" className="w-full h-full object-cover" /> : initial}
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900 tracking-tight">{userInfo.name || '用户'}</p>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold mt-0.5 ${role.cls}`}>{role.icon}{role.label}</span>
+                <p className="text-sm font-bold text-gray-900 tracking-tight leading-tight">{userInfo.name || '用户'}</p>
+                <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold mt-0.5 ${role.cls}`}>{role.icon}{role.label}</span>
               </div>
             </div>
-
-            {/* Middle: Stats — compact */}
-            <div className="flex items-center gap-3 sm:gap-4 flex-1 sm:border-l sm:border-gray-100 sm:pl-4">
-              <button
-                onClick={handleCheckIn}
-                disabled={checkedIn}
-                className={`flex flex-col items-center px-2 py-1 rounded-lg transition-all min-w-[56px] ${
-                  checkedIn
-                    ? 'bg-green-50 cursor-default'
-                    : 'bg-teal-50 hover:bg-teal-100 cursor-pointer active:scale-95'
-                }`}
-              >
-                <span className={`text-xs font-bold ${checkedIn ? 'text-green-600' : 'text-teal-700'}`}>{checkedIn ? '✓ 已签' : '签到'}</span>
-                <span className="text-[10px] text-gray-400">{checkedIn ? '今日' : '+10分'}</span>
-              </button>
-              <div className="flex flex-col items-center px-2">
-                <span className="text-xs font-bold text-gray-800 tabular-nums">{stats.points}</span>
-                <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><TrendingUp className="w-2.5 h-2.5" /> 积分</span>
-              </div>
-              <div className="flex flex-col items-center px-2">
-                <span className="text-xs font-bold text-gray-800 tabular-nums">{stats.docs}</span>
-                <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><FileText className="w-2.5 h-2.5" /> 单据</span>
-              </div>
-              <div className="flex flex-col items-center px-2">
-                <span className="text-xs font-bold text-gray-800 tabular-nums">{stats.tasks}</span>
-                <span className="text-[10px] text-gray-400 flex items-center gap-0.5"><CheckSquare className="w-2.5 h-2.5" /> 待办</span>
-              </div>
-            </div>
-
-            {/* Right: Quota + Upgrade */}
-            <div className="flex items-center gap-4 flex-shrink-0">
-              <div className="min-w-[110px]">
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">收藏</span>
-                  <span className="text-sm font-bold text-gray-800 tabular-nums"><span className={pct >= 80 ? 'text-amber-500' : ''}>{totalCount}</span><span className="text-gray-300 font-normal mx-0.5">/</span>{totalLimit}</span>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="min-w-[100px]">
+                <div className="flex items-baseline justify-between mb-0.5">
+                  <span className="text-[9px] font-medium text-gray-400 uppercase tracking-wider">收藏</span>
+                  <span className="text-xs font-bold text-gray-800 tabular-nums"><span className={pct >= 80 ? 'text-amber-500' : ''}>{totalCount}</span><span className="text-gray-300 font-normal mx-0.5">/</span>{totalLimit}</span>
                 </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                   <div className={`h-full rounded-full transition-all duration-700 ease-out ${pct >= 80 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 'bg-gradient-to-r from-teal-400 to-emerald-400'}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
-              <Link href="/pricing" className="group inline-flex items-center gap-1 px-3 py-2 text-[11px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-xl shadow-md shadow-teal-500/20 hover:shadow-lg transition-all whitespace-nowrap">
-                <Crown className="w-3 h-3 group-hover:rotate-12 transition-transform" /> 升级
+              <Link href="/pricing" className="group inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-semibold text-white bg-gradient-to-r from-teal-500 to-emerald-500 rounded-lg shadow-sm shadow-teal-500/20 hover:shadow-md transition-all whitespace-nowrap">
+                <Crown className="w-2.5 h-2.5 group-hover:rotate-12 transition-transform" /> 升级
               </Link>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="mt-3 mb-2.5 border-t border-gray-50" />
+
+          {/* Lower layer: 4-Grid Stats */}
+          <div className="grid grid-cols-4 gap-2">
+            <button
+              onClick={handleCheckIn}
+              disabled={checkedIn}
+              className={`flex flex-col items-center py-2 rounded-xl transition-all ${
+                checkedIn ? 'bg-green-50 cursor-default' : 'bg-teal-50 hover:bg-teal-100 cursor-pointer active:scale-95'
+              }`}
+            >
+              <span className={`text-xs font-bold leading-none ${checkedIn ? 'text-green-600' : 'text-teal-700'}`}>{checkedIn ? '✓' : '签到'}</span>
+              <span className="text-[10px] text-gray-400 mt-1">{checkedIn ? '已签' : '+10分'}</span>
+            </button>
+            <div className="flex flex-col items-center py-2 rounded-xl bg-gray-50/50">
+              <span className="text-xs font-bold text-gray-800 tabular-nums leading-none">{stats.points}</span>
+              <span className="text-[10px] text-gray-400 mt-1">积分</span>
+            </div>
+            <div className="flex flex-col items-center py-2 rounded-xl bg-gray-50/50">
+              <span className="text-xs font-bold text-gray-800 tabular-nums leading-none">{stats.docs}</span>
+              <span className="text-[10px] text-gray-400 mt-1">单据</span>
+            </div>
+            <div className="flex flex-col items-center py-2 rounded-xl bg-gray-50/50">
+              <span className="text-xs font-bold text-gray-800 tabular-nums leading-none">{stats.tasks}</span>
+              <span className="text-[10px] text-gray-400 mt-1">待办</span>
             </div>
           </div>
         </div>

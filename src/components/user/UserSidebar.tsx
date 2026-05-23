@@ -67,8 +67,8 @@ function MobileStickyTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="lg:hidden">
-      <div className="sticky top-14 z-20 bg-white/90 backdrop-blur-xl border-b border-gray-100/80">
+      <div className="lg:hidden">
+      <div className="sticky top-12 z-20 bg-white/90 backdrop-blur-xl border-b border-gray-100/80">
         <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-4 px-4 py-2 gap-1.5">
           {USER_NAV.map((item) => {
             const ItemIcon = item.icon;

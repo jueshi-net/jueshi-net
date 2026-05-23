@@ -41,10 +41,10 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
       )}
 
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         <span className="text-sm">⚙️</span>
         <div>
-          <h1 className="text-base font-bold text-gray-900 tracking-tight">账号设置</h1>
+          <h1 className="text-sm font-bold text-gray-900 tracking-tight">账号设置</h1>
           <p className="text-[11px] text-gray-400 mt-0.5">管理个人信息与偏好</p>
         </div>
       </div>

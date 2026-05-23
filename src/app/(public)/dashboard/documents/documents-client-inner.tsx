@@ -109,10 +109,10 @@ export default function DocumentsClientInner() {
       )}
 
       {/* Section header */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-3">
         <span className="text-sm">📦</span>
         <div>
-          <h1 className="text-base font-bold text-gray-900 tracking-tight">我的单据</h1>
+          <h1 className="text-sm font-bold text-gray-900 tracking-tight">我的单据</h1>
           <p className="text-[11px] text-gray-400 mt-0.5">{drafts.length} 份草稿</p>
         </div>
       </div>
