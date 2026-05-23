@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock, Tag, Receipt, ClipboardList, FileBadge, Shield, Plane, Package, ExternalLink, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock, Tag, Receipt, Plane, Shield, Sparkles } from "lucide-react";
 import { Metadata } from "next";
-import { getCoreDocuments, getSecondTierDocuments } from "@/lib/documents/document-types";
+import { auth } from "@/lib/auth";
+import { documentTools, getToolHref, getToolIcon, getToolEmoji, getToolColor, onlineToolCount } from "@/lib/document-tools-config";
 import { AdSlot } from "@/components/ad-slot";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { FAQSection } from "@/components/faq-section";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
-import DocumentGrid from "@/components/document-grid";
 import ToolReviewServer from "@/components/tools/tool-review-server";
 
 export const metadata: Metadata = {
@@ -29,24 +29,27 @@ const membershipFeatures = [
 
 const documentScenarios = [
   { icon: Receipt, title: "出口报关", desc: "商业发票 + 装箱单 + 报关资料，一套搞定", href: "/tools/documents/commercial-invoice" },
-  { icon: Plane, title: "国际物流", desc: "订舱委托书、装运通知，货代对接更轻松", href: "/tools/documents/booking-form" },
+  { icon: Plane, title: "国际物流", desc: "订舱委托书、装运通知，货代对接更轻松", href: "/tools/documents/booking-instruction" },
   { icon: Tag, title: "跨境电商", desc: "形式发票、销售合同，平台入驻必备", href: "/tools/documents/proforma-invoice" },
   { icon: Shield, title: "银行议付", desc: "信用证要求的全套单据，格式规范", href: "/tools/documents/commercial-invoice" },
 ];
 
-const docCards = [
-  { icon: Receipt, label: "商业发票", sub: "Commercial Invoice", href: "/tools/documents/commercial-invoice", desc: "实际交易正式单据，用于报关结算" },
-  { icon: Tag, label: "形式发票", sub: "Proforma Invoice", href: "/tools/documents/proforma-invoice", desc: "成交前预估单据，供买方参考" },
-  { icon: Package, label: "装箱单", sub: "Packing List", href: "/tools/documents/packing-list", desc: "货物清单，包含箱数、重量、体积" },
-  { icon: FileBadge, label: "销售合同", sub: "Sales Contract", href: "/tools/documents/sales-contract", desc: "买卖双方权利义务约定" },
-  { icon: ClipboardList, label: "订舱委托书", sub: "Booking Form", href: "/tools/documents/booking-form", desc: "委托货代订舱的正式单据" },
-  { icon: Shield, label: "报关资料", sub: "Customs Docs", href: "/tools/documents/customs-declaration", desc: "海关申报所需全套资料" },
-  { icon: FileText, label: "唛头标签", sub: "Shipping Label", href: "/tools/documents/shipping-label", desc: "外箱唛头、集运入库贴、合箱标签" },
-];
+export default async function DocumentsHubPage() {
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
 
-export default function DocumentsHubPage() {
-  const coreDocs = getCoreDocuments();
-  const secondTierDocs = getSecondTierDocuments();
+  // 统一工具列表 — 从全局配置读取
+  const onlineTools = documentTools.filter(t => t.isOnline);
+
+  // 常用 7 个（featured cards）
+  const featuredKeys = [
+    "commercial-invoice", "proforma-invoice", "packing-list",
+    "sales-contract", "booking-instruction", "customs-declaration-authorization", "label-maker",
+  ];
+  const featuredTools = featuredKeys
+    .map(k => onlineTools.find(t => t.key === k))
+    .filter(Boolean)
+    .slice(0, 7);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,7 +98,7 @@ export default function DocumentsHubPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/tools/documents/drafts"
+                href="/dashboard/documents"
                 className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
               >
                 <Clock className="w-5 h-5" />
@@ -143,27 +146,31 @@ export default function DocumentsHubPage() {
 
       {/* ===== DOCUMENT TYPE CARDS ===== */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <FileText className="w-6 h-6 text-purple-600" />
-          常用单据模板
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <FileText className="w-6 h-6 text-purple-600" />
+            常用单据模板
+          </h2>
+          <span className="text-sm text-gray-400">共 {onlineToolCount} 种</span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {docCards.map((card) => {
-            const Icon = card.icon;
+          {featuredTools.map((tool) => {
+            const Icon = getToolIcon(tool!);
+            const colors = getToolColor(tool!);
             return (
               <Link
-                key={card.label}
-                href={card.href}
+                key={tool!.key}
+                href={isLoggedIn ? getToolHref(tool!) : `/tools/documents/${tool!.key === 'label-maker' ? 'shipping-label' : tool!.key}`}
                 className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-5 hover:shadow-lg hover:border-purple-200 transition-all duration-300 hover:-translate-y-0.5"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-100 transition-colors">
-                    <Icon className="w-6 h-6 text-purple-600" />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${colors.bg} ${colors.icon} group-hover:scale-105`}>
+                    <Icon className="w-6 h-6" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{card.label}</h3>
-                    <p className="text-xs text-gray-400 font-mono mt-0.5">{card.sub}</p>
-                    <p className="text-sm text-gray-500 mt-2">{card.desc}</p>
+                    <h3 className="font-bold text-gray-900 group-hover:text-purple-700 transition-colors">{tool!.titleZh}</h3>
+                    <p className="text-xs text-gray-400 font-mono mt-0.5">{tool!.titleEn}</p>
+                    <p className="text-sm text-gray-500 mt-2">{tool!.description}</p>
                     <div className="flex items-center gap-1 mt-3 text-sm font-medium text-purple-600 group-hover:text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity">
                       立即生成 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -175,9 +182,34 @@ export default function DocumentsHubPage() {
         </div>
       </div>
 
-      {/* Full document grid (core + second tier) */}
+      {/* ===== FULL TOOL GRID (from unified config) ===== */}
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <DocumentGrid coreDocs={coreDocs} secondTierDocs={secondTierDocs} />
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-2">全部单据工具</h2>
+        <p className="text-gray-500 mb-6">{onlineToolCount} 套 · 在线填写 · 自动排版 · 导出 PDF/PNG/Word</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {onlineTools.map(doc => {
+            const Icon = getToolIcon(doc);
+            const emoji = getToolEmoji(doc);
+            return (
+              <Link
+                key={doc.key}
+                href={isLoggedIn ? getToolHref(doc) : `/tools/documents/${doc.key === 'label-maker' ? 'shipping-label' : doc.key}`}
+                className="group bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md hover:border-blue-200 transition-all relative"
+              >
+                <div className="text-3xl mb-3">{emoji}</div>
+                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
+                  {doc.titleZh}
+                </h3>
+                <p className="text-xs text-gray-400 mb-2">{doc.titleEn}</p>
+                <p className="text-xs text-gray-500 mb-3 line-clamp-2">{doc.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">免费</span>
+                  <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* Shipping Label CTA (integrated) */}

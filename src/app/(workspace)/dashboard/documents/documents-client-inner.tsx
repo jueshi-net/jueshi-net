@@ -4,9 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   FileText, Edit3, Trash2, Loader2, Building2, Clock,
-  Plus, X, ArrowLeft,
-  Receipt, Tag, Package, FileBadge, ClipboardList, Shield,
+  Plus, X, ArrowLeft, Search,
 } from 'lucide-react';
+import {
+  documentTools, getToolHref, getToolIcon, getToolEmoji, getToolColor,
+  categoryLabels, onlineToolCount,
+} from '@/lib/document-tools-config';
 
 const TOOL_KEY_LABELS: Record<string, string> = {
   commercial_invoice: '外贸发票',
@@ -16,6 +19,26 @@ const TOOL_KEY_LABELS: Record<string, string> = {
   handover_note: '出货交接单',
   debit_note: 'Debit Note',
   video_script_sop: '短视频 SOP 脚本',
+  proforma_invoice: '形式发票',
+  packing_list: '装箱单',
+  sales_contract: '销售合同',
+  booking_instruction: '订舱委托书',
+  customs_declaration_authorization: '报关委托书',
+  delivery_note: '送货单',
+  freight_statement: '运费对账单',
+  consolidation_inbound_receipt: '集运入库单',
+  consolidation_packing_list: '集运合箱清单',
+  express_declaration: '快递申报单',
+  quotation: '通用报价单',
+  shipping_instruction: '提单补料',
+  trucking_dispatch_order: '拖车派车单',
+  shipping_mark: '唛头模板',
+  container_loading_list: '装柜明细单',
+  return_packing_list: '退货装箱清单',
+  certificate_of_origin_template: '原产地证模板',
+  fumigation_certificate_template: '熏蒸证明模板',
+  letter_of_credit_info_sheet: '信用证资料单',
+  label_maker: '唛头/标签生成器',
 };
 
 const TOOL_KEY_HREFS: Record<string, string> = {
@@ -26,25 +49,26 @@ const TOOL_KEY_HREFS: Record<string, string> = {
   handover_note: '/tools/handover-note',
   debit_note: '/tools/debit-note',
   video_script_sop: '/tools/video-script-sop',
-};
-
-const DOCUMENT_TOOLS = [
-  { icon: FileText, label: '商业发票', sub: 'Commercial Invoice', href: '/tools/documents/commercial-invoice', color: 'teal' },
-  { icon: Tag, label: '形式发票', sub: 'Proforma Invoice', href: '/tools/documents/proforma-invoice', color: 'blue' },
-  { icon: Package, label: '装箱单', sub: 'Packing List', href: '/tools/documents/packing-list', color: 'purple' },
-  { icon: FileBadge, label: '销售合同', sub: 'Sales Contract', href: '/tools/documents/sales-contract', color: 'indigo' },
-  { icon: ClipboardList, label: '订舱委托书', sub: 'Booking Form', href: '/tools/documents/booking-form', color: 'orange' },
-  { icon: Shield, label: '报关资料', sub: 'Customs Docs', href: '/tools/documents/customs-declaration-authorization', color: 'red' },
-  { icon: Receipt, label: '唛头标签', sub: 'Shipping Label', href: '/tools/documents/shipping-label', color: 'teal' },
-];
-
-const colorMap: Record<string, { bg: string; icon: string; hover: string }> = {
-  teal: { bg: 'bg-teal-50', icon: 'text-teal-600', hover: 'hover:border-teal-300' },
-  blue: { bg: 'bg-blue-50', icon: 'text-blue-600', hover: 'hover:border-blue-300' },
-  purple: { bg: 'bg-purple-50', icon: 'text-purple-600', hover: 'hover:border-purple-300' },
-  indigo: { bg: 'bg-indigo-50', icon: 'text-indigo-600', hover: 'hover:border-indigo-300' },
-  orange: { bg: 'bg-orange-50', icon: 'text-orange-600', hover: 'hover:border-orange-300' },
-  red: { bg: 'bg-red-50', icon: 'text-red-600', hover: 'hover:border-red-300' },
+  proforma_invoice: '/tools/documents/proforma-invoice',
+  packing_list: '/tools/documents/packing-list',
+  sales_contract: '/tools/documents/sales-contract',
+  booking_instruction: '/tools/documents/booking-instruction',
+  customs_declaration_authorization: '/tools/documents/customs-declaration-authorization',
+  delivery_note: '/tools/documents/delivery-note',
+  freight_statement: '/tools/documents/freight-statement',
+  consolidation_inbound_receipt: '/tools/documents/consolidation-inbound-receipt',
+  consolidation_packing_list: '/tools/documents/consolidation-packing-list',
+  express_declaration: '/tools/documents/express-declaration',
+  quotation: '/tools/documents/quotation',
+  shipping_instruction: '/tools/documents/shipping-instruction',
+  trucking_dispatch_order: '/tools/documents/trucking-dispatch-order',
+  shipping_mark: '/tools/documents/shipping-mark',
+  container_loading_list: '/tools/documents/container-loading-list',
+  return_packing_list: '/tools/documents/return-packing-list',
+  certificate_of_origin_template: '/tools/documents/certificate-of-origin-template',
+  fumigation_certificate_template: '/tools/documents/fumigation-certificate-template',
+  letter_of_credit_info_sheet: '/tools/documents/letter-of-credit-info-sheet',
+  label_maker: '/tools/documents/shipping-label',
 };
 
 interface Draft {
@@ -64,6 +88,8 @@ export default function DocumentsClientInner() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showNewDocPicker, setShowNewDocPicker] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
 
   const fetchDrafts = useCallback(async (toolKey?: string) => {
     setLoading(true);
@@ -113,6 +139,17 @@ export default function DocumentsClientInner() {
     return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
   };
 
+  // Filter tools for the picker modal
+  const filteredTools = documentTools.filter(t => {
+    if (!t.isOnline) return false;
+    if (filterCategory !== 'all' && t.category !== filterCategory) return false;
+    if (searchTerm) {
+      const s = searchTerm.toLowerCase();
+      if (!t.titleZh.toLowerCase().includes(s) && !t.titleEn.toLowerCase().includes(s) && !t.description.toLowerCase().includes(s)) return false;
+    }
+    return true;
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -157,7 +194,7 @@ export default function DocumentsClientInner() {
             </div>
           </div>
           <button
-            onClick={() => setShowNewDocPicker(true)}
+            onClick={() => { setShowNewDocPicker(true); setSearchTerm(''); setFilterCategory('all'); }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors min-h-[36px]"
           >
             <Plus className="w-3.5 h-3.5" /> 新建单据
@@ -168,32 +205,81 @@ export default function DocumentsClientInner() {
       {/* ===== NEW DOCUMENT PICKER MODAL ===== */}
       {showNewDocPicker && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40" onClick={() => setShowNewDocPicker(false)}>
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[80vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b px-5 py-4 flex items-center justify-between rounded-t-2xl">
-              <h2 className="font-bold text-gray-900">选择单据类型</h2>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-2xl max-h-[85vh] overflow-hidden shadow-xl flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Modal header */}
+            <div className="border-b px-5 py-4 flex items-center justify-between flex-shrink-0">
+              <div>
+                <h2 className="font-bold text-gray-900">选择单据类型</h2>
+                <p className="text-xs text-gray-400 mt-0.5">共 {onlineToolCount} 种单据工具</p>
+              </div>
               <button onClick={() => setShowNewDocPicker(false)} className="p-1 hover:bg-gray-100 rounded-lg min-h-[44px]">
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
-            <div className="p-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {DOCUMENT_TOOLS.map((tool) => {
-                  const Icon = tool.icon;
-                  const c = colorMap[tool.color] || colorMap.teal;
+
+            {/* Search + filter */}
+            <div className="border-b px-5 py-3 space-y-2 flex-shrink-0">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="搜索单据名称..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+              </div>
+              <div className="flex gap-1.5 overflow-x-auto pb-1">
+                <button
+                  onClick={() => setFilterCategory('all')}
+                  className={`px-2.5 py-1 text-xs rounded-full whitespace-nowrap transition-colors ${filterCategory === 'all' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                >
+                  全部 ({filteredTools.length})
+                </button>
+                {Object.entries(categoryLabels).map(([key, label]) => {
+                  const count = documentTools.filter(t => t.isOnline && t.category === key).length;
+                  if (count === 0) return null;
                   return (
-                    <Link key={tool.href} href={tool.href}
-                      className={`group flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-white ${c.hover} hover:shadow-md transition-all`}>
-                      <div className={`w-10 h-10 rounded-lg ${c.bg} flex items-center justify-center flex-shrink-0 ${c.icon} group-hover:scale-110 transition-transform`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900">{tool.label}</p>
-                        <p className="text-xs text-gray-400">{tool.sub}</p>
-                      </div>
-                    </Link>
+                    <button key={key} onClick={() => setFilterCategory(key)}
+                      className={`px-2.5 py-1 text-xs rounded-full whitespace-nowrap transition-colors ${filterCategory === key ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      {label} ({count})
+                    </button>
                   );
                 })}
               </div>
+            </div>
+
+            {/* Tool grid */}
+            <div className="overflow-y-auto flex-1 p-5">
+              {filteredTools.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <Search className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm">未找到匹配的单据</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {filteredTools.map((tool) => {
+                    const Icon = getToolIcon(tool);
+                    const colors = getToolColor(tool);
+                    return (
+                      <Link
+                        key={tool.key}
+                        href={getToolHref(tool)}
+                        className={`group flex items-start gap-3 p-3.5 rounded-xl border border-gray-100 bg-white ${colors.hover} hover:shadow-md transition-all`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0 ${colors.icon}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{tool.titleZh}</p>
+                          <p className="text-xs text-gray-400 truncate">{tool.titleEn}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{tool.description}</p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -238,7 +324,7 @@ export default function DocumentsClientInner() {
             <FileText className="w-12 h-12 text-gray-200 mx-auto mb-4" />
             <p className="text-gray-500 font-medium mb-2">暂无单据草稿</p>
             <p className="text-sm text-gray-400 mb-6">点击下方按钮选择单据类型开始创建</p>
-            <button onClick={() => setShowNewDocPicker(true)}
+            <button onClick={() => { setShowNewDocPicker(true); setSearchTerm(''); setFilterCategory('all'); }}
               className="inline-flex items-center gap-2 px-5 py-3 min-h-[48px] bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-colors">
               <Plus className="w-4 h-4" /> 新建单据
             </button>
