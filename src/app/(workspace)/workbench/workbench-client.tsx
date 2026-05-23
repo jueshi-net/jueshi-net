@@ -226,7 +226,12 @@ export default function WorkbenchClient() {
   const now = new Date();
   const pct = Math.round((totalCount / totalLimit) * 100);
   const role = ROLE_META[userInfo.role] || ROLE_META.user;
-  const displayName = userInfo.name || userInfo.email.split('@')[0] || '跨境卖家';
+  // Normalize name: treat "用户" / "user" as empty (API placeholder)
+  const rawName = userInfo.name;
+  const isPlaceholderName = !rawName || rawName === '用户' || rawName === 'user' || rawName === 'User';
+  const displayName = isPlaceholderName
+    ? (userInfo.email ? userInfo.email.split('@')[0] : '跨境卖家')
+    : rawName;
   const initial = displayName[0]?.toUpperCase() || 'C';
 
   const fmtMemo = (d: Date | null) => {

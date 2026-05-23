@@ -34,7 +34,7 @@ export default function TopBar({ className }: { className?: string }) {
             <span className="text-gray-300">›</span>
             <span className="text-gray-700 font-medium">{title}</span>
           </div>
-          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight">{title}</span>
+          <span className="md:hidden text-sm font-bold text-gray-900 tracking-tight sr-only">{title}</span>
           <div className="w-8" />
         </div>
       </div>
