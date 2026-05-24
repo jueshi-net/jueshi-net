@@ -18,14 +18,14 @@ export default function UserDashboardPage() {
 
   if (loading || !stats) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <h1 className="text-2xl font-bold flex items-center gap-3">

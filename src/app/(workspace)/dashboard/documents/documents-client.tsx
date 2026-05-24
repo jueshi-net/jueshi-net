@@ -146,7 +146,7 @@ export default function DocumentsClient() {
   }
 
   return (
-    <div className="bg-[#F5F5F7] min-h-screen">
+    <div className="bg-[#F5F5F7]">
       {/* ===== TOOLBAR (h-14) ===== */}
       <div className="bg-white border-b sticky top-0 z-40" style={{ height: '56px' }}>
         <div className="max-w-5xl mx-auto px-4 h-full flex items-center justify-between">

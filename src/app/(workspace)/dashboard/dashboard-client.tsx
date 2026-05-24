@@ -206,18 +206,17 @@ export default function DashboardClient() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">加载中...</p>
-        </div>
+      <div className="space-y-5">
+        <div className="h-36 bg-white rounded-2xl border border-gray-100 animate-pulse" />
+        <div className="h-72 bg-white rounded-2xl border border-gray-100 animate-pulse" />
+        <p className="text-center text-xs text-gray-400 animate-pulse">⏳ 会员数据加载中 (Loading Dashboard)...</p>
       </div>
     );
   }
 
   if (loginRequired) {
     return (
-      <div className="flex items-center justify-center py-20 px-4">
+      <div className="flex items-center justify-center px-4 py-20">
         <div className="bg-white rounded-2xl border shadow-sm p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-blue-600" />

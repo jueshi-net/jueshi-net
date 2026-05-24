@@ -75,7 +75,7 @@ export default function NotificationsClient({
   const visible = filter === "unread" ? notifications.filter(n => !n.isRead) : notifications;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       {/* Hero */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white py-8 md:py-12">
         <div className="max-w-4xl mx-auto px-4">

@@ -67,7 +67,20 @@ export default function TodoWidget() {
   const pending = todos.filter(t => !t.done);
   const doneCount = todos.filter(t => t.done).length;
 
-  if (!mounted) return null;
+  // 禁止静默 null — 必须返回可见骨架屏
+  if (!mounted) return (
+    <div className="min-w-[240px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 p-3.5">
+      <div className="flex items-center gap-1.5 mb-2">
+        <div className="w-6 h-6 rounded-md bg-gray-100 animate-pulse" />
+        <div className="h-3 w-16 bg-gray-100 animate-pulse rounded" />
+      </div>
+      <div className="space-y-1.5">
+        <div className="h-4 bg-gray-50 animate-pulse rounded" />
+        <div className="h-4 bg-gray-50 animate-pulse rounded w-3/4" />
+        <div className="h-4 bg-gray-50 animate-pulse rounded w-1/2" />
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-w-[240px] sm:min-w-0 snap-start shrink-0 sm:shrink bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all hover:shadow-md hover:border-gray-200">

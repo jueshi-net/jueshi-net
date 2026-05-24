@@ -274,17 +274,36 @@ export default function WorkbenchClient() {
     return `${Math.floor(m / 60)} 小时前`;
   };
 
+  // LOADING: 必须炸开可见骨架屏，绝对禁止 return null
   if (loading) return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-6 h-6 border-2 border-gray-200 border-t-gray-500 rounded-full animate-spin" />
-        <p className="text-xs text-gray-400 font-medium">加载中...</p>
+    <div className="space-y-4">
+      {/* Identity card skeleton */}
+      <div className="bg-white rounded-2xl border border-gray-100/80 p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gray-200 animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-4 w-24 bg-gray-200 animate-pulse rounded" />
+            <div className="h-3 w-16 bg-gray-100 animate-pulse rounded" />
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-4 gap-2">
+          {[1,2,3,4].map(i => <div key={i} className="h-12 bg-gray-100 animate-pulse rounded-xl" />)}
+        </div>
       </div>
+      {/* Cards skeleton */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
+        {[1,2,3,4,5,6,7,8].map(i => <div key={i} className="h-20 bg-white rounded-xl border border-gray-100 animate-pulse" />)}
+      </div>
+      {/* Widgets skeleton */}
+      <div className="flex gap-3 overflow-hidden">
+        {[1,2,3].map(i => <div key={i} className="min-w-[220px] h-32 bg-white rounded-xl border border-gray-100 animate-pulse" />)}
+      </div>
+      <p className="text-center text-xs text-gray-400 animate-pulse">⏳ 工作台数据加载中 (Loading Workbench)...</p>
     </div>
   );
 
   if (loginRequired) return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center px-4">
+    <div className="flex items-center justify-center px-4 py-20">
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-10 max-w-sm w-full text-center">
         <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-5"><Shield className="w-7 h-7 text-slate-300" /></div>
         <h1 className="text-lg font-bold text-gray-900 mb-1.5 tracking-tight">请先登录</h1>

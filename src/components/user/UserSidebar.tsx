@@ -32,7 +32,7 @@ export function UserNavSidebar({ className }: { className?: string }) {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-60 bg-white border-r border-gray-100/80 min-h-[calc(100vh-3.5rem)] p-4 flex-shrink-0`}>
+      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-60 bg-white border-r border-gray-100/80 h-full p-4 flex-shrink-0`}>
         <Link
           href="/"
           className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 mb-6 transition-colors"

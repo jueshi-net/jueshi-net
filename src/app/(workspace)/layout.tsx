@@ -16,12 +16,12 @@ export default async function WorkspaceLayout({
 
   return (
     <WorkspaceProviders>
-      <div className="flex flex-col min-h-screen w-full bg-[#F5F5F7]">
+      {/* 强制 100dvh 物理高度，防止高度坍塌 */}
+      <div className="flex h-[100dvh] w-full bg-[#F5F5F7] overflow-hidden">
         <UserNavSidebar className="hidden md:flex w-64 flex-shrink-0" />
-        <div className="flex-1 flex flex-col w-full">
+        <div className="flex flex-col flex-1 w-full h-full overflow-hidden">
           <TopBar className="flex-shrink-0" />
-
-          <main className="w-full flex-grow p-4 md:p-6 pb-24">{children}</main>
+          <main className="w-full flex-1 overflow-y-auto p-4 md:p-6 pb-24">{children}</main>
         </div>
       </div>
     </WorkspaceProviders>
