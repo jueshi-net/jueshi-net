@@ -69,29 +69,31 @@ export default function DestinationEditPage() {
   const [activeTab, setActiveTab] = useState<"basic" | "guides" | "services" | "tools">("basic");
 
   const [form, setForm] = useState<FormData>({
-    id: "", slug: slug || "", name: "", nameEn: "", currency: "USD",
+    id: "", slug: "", name: "", nameEn: "", currency: "USD",
     region: "", emoji: "", heroTitle: "", heroSubtitle: "",
     seoTitle: "", seoDescription: "", keywords: "", keyCities: "",
     userCount: "0", docCount: "0", isActive: true,
     tools: [], guides: [], services: [],
   });
 
+  const isEditMode = slug !== "new";
+
   const [countryInput, setCountryInput] = useState("");
 
   useEffect(() => {
-    if (slug) fetchData();
+    if (isEditMode && slug) fetchData();
   }, [slug]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/destinations?id=${slug}`);
+      const res = await fetch(`/api/admin/destinations?slug=${slug}`);
       const data = await res.json();
       if (!data.success) throw new Error(data.error);
       const d = data.data;
       if (!d) {
-        // New destination — pre-fill slug
-        setForm(prev => ({ ...prev, slug: slug || "" }));
+        setMessage({ type: "error", text: `未找到国家 "${slug}"` });
+        setLoading(false);
         return;
       }
       setForm({
@@ -107,8 +109,8 @@ export default function DestinationEditPage() {
         guides: (d.guides || []).map((g: any) => ({ title: g.title, description: g.description, type: g.type })),
         services: (d.services || []).map((s: any) => ({ title: s.title, category: s.category, description: s.description })),
       });
-    } catch {
-      setMessage({ type: "error", text: "获取数据失败" });
+    } catch (e: any) {
+      setMessage({ type: "error", text: `获取数据失败: ${e.message}` });
     } finally {
       setLoading(false);
     }
@@ -232,7 +234,7 @@ export default function DestinationEditPage() {
           <div>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <Globe className="w-5 h-5 text-blue-600" />
-              {form.id ? `编辑国家: ${form.emoji} ${form.name}` : "新增国家"}
+              {isEditMode ? (form.name ? `✏️ 编辑国家: ${form.emoji || ''} ${form.name}` : "✏️ 编辑国家") : "✨ 新增国家"}
             </h1>
             {form.slug && <p className="text-xs text-gray-400 font-mono">/{form.slug}</p>}
           </div>

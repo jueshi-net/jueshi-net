@@ -12,14 +12,29 @@ function adminCheck() {
   })();
 }
 
-// GET: List all destinations
+// GET: List all destinations OR get single by slug/id
 export async function GET(req: NextRequest) {
   const denied = await adminCheck();
   if (denied) return denied;
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
+  const slug = searchParams.get("slug");
 
+  // Single destination lookup by slug
+  if (slug) {
+    const dest = await prisma.destination.findUnique({
+      where: { slug },
+      include: {
+        tools: { orderBy: { sortOrder: "asc" } },
+        guides: { orderBy: { sortOrder: "asc" } },
+        services: { orderBy: { sortOrder: "asc" } },
+      },
+    });
+    return NextResponse.json({ success: true, data: dest });
+  }
+
+  // Single destination lookup by id
   if (id) {
     const dest = await prisma.destination.findUnique({
       where: { id },
@@ -32,6 +47,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true, data: dest });
   }
 
+  // List all
   const destinations = await prisma.destination.findMany({
     include: {
       _count: { select: { tools: true, guides: true, services: true } },
