@@ -5,12 +5,12 @@ import { buildCanonical, buildTitle } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: buildTitle("全球出海市场大盘"),
-  description: "按地区浏览专题与工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
+  title: buildTitle("全球目的地全景向导"),
+  description: "按国家或地区，探索专属于您的政策指南、实用工具与服务 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
   alternates: { canonical: buildCanonical("/destinations") },
   openGraph: {
-    title: buildTitle("全球出海市场大盘"),
-    description: "按地区浏览专题与工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
+    title: buildTitle("全球目的地全景向导"),
+    description: "按国家或地区，探索专属于您的政策指南、实用工具与服务 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
     url: buildCanonical("/destinations"),
   },
 };
@@ -49,7 +49,7 @@ export default async function DestinationsIndexPage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-            🌐 全球出海市场大盘
+            🌍 全球目的地全景向导
           </h1>
 
           <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed">

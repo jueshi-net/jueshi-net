@@ -22,14 +22,14 @@ const TYPEWRITER_PLACEHOLDERS = [
   '搜"日本集运报关指南"...',
 ];
 
-// Apple pill hot tags
+// Apple pill hot tags — status: 'ready' = direct link, 'coming-soon' = toast
 const HOT_TAGS = [
-  { label: '🧾 外贸单据一键生成', href: '/tools/commercial-invoice' },
-  { label: '🎓 留学生集运与行李指南', href: '/starter/student' },
-  { label: '💱 实时汇率与结汇精算', href: '/tools/exchange-rate' },
-  { label: '🎬 短视频出海与引流脚本', href: '/tools/video-script-sop' },
-  { label: '📮 全球邮编与地址校验', href: '/tools/postal-code' },
-  { label: '🌐 海外网络与必备 App', href: '/starter/apps' },
+  { label: '🧾 外贸单据一键生成', href: '/tools/commercial-invoice', status: 'ready' as const },
+  { label: '🎓 留学生集运与行李指南', href: '/starter/student', status: 'coming-soon' as const },
+  { label: '💱 实时汇率与结汇精算', href: '/tools/exchange-rate', status: 'ready' as const },
+  { label: '🎬 短视频出海与引流脚本', href: '/tools/video-script-sop', status: 'ready' as const },
+  { label: '📮 全球邮编与地址校验', href: '/tools/postal-code', status: 'ready' as const },
+  { label: '🌐 跨国网络与实用 App', href: '/starter/apps', status: 'ready' as const },
 ];
 
 export default function HeroSuperSearch() {
@@ -165,20 +165,35 @@ export default function HeroSuperSearch() {
 
         {/* Apple Pill Hot Tags */}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-          {HOT_TAGS.map(tag => (
-            <a
-              key={tag.label}
-              href={tag.href}
-              className="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer
-                text-gray-600 dark:text-gray-300
-                bg-white/60 hover:bg-white dark:bg-gray-800/60 dark:hover:bg-gray-800
-                backdrop-blur-md
-                hover:shadow-sm hover:-translate-y-0.5
-                border border-gray-200/60 dark:border-gray-700/60"
-            >
-              {tag.label}
-            </a>
-          ))}
+          {HOT_TAGS.map(tag => {
+            const pillClass = `px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer
+              text-gray-600 dark:text-gray-300
+              bg-white/60 hover:bg-white dark:bg-gray-800/60 dark:hover:bg-gray-800
+              backdrop-blur-md
+              hover:shadow-sm hover:-translate-y-0.5
+              border border-gray-200/60 dark:border-gray-700/60`;
+            
+            if (tag.status === 'coming-soon') {
+              return (
+                <button
+                  key={tag.label}
+                  onClick={() => alert('🚧 专区模块正在火热建设中，敬请期待！')}
+                  className={pillClass}
+                >
+                  {tag.label}
+                </button>
+              );
+            }
+            return (
+              <a
+                key={tag.label}
+                href={tag.href}
+                className={pillClass}
+              >
+                {tag.label}
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>

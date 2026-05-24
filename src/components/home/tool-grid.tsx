@@ -8,7 +8,7 @@ const AUDIENCE_TABS = [
   { key: 'all', label: '⚡ 综合热门' },
   { key: 'seller', label: '👨‍💼 跨境电商/SOHO' },
   { key: 'student', label: '🎓 留学/定居' },
-  { key: 'nomad', label: '🌍 游民/翻墙/内容' },
+  { key: 'nomad', label: '🌍 数字游民/资讯获取' },
 ];
 
 const TOOLS = [
