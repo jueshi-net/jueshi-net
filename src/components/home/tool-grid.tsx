@@ -1,21 +1,37 @@
+'use client';
+
+import { useState } from 'react';
 import { AdSlot } from '@/components/ads/AdSlot';
 import { Wrench, Truck, MapPin, Hash, Coins, FileText, Sparkles, Calculator, Tag, QrCode, Flame } from 'lucide-react';
 
+const AUDIENCE_TABS = [
+  { key: 'all', label: '⚡ 综合热门' },
+  { key: 'seller', label: '👨‍💼 跨境电商/SOHO' },
+  { key: 'student', label: '🎓 留学/定居' },
+  { key: 'nomad', label: '🌍 游民/翻墙/内容' },
+];
+
 const TOOLS = [
-  { name: '商业发票', desc: '外贸必备单据生成', icon: FileText, href: '/tools/commercial-invoice', heat: '2.3k', iconBg: 'from-blue-50 to-indigo-50', iconColor: 'text-blue-600' },
-  { name: '包裹追踪', desc: '全球快递物流查询', icon: Truck, href: '/tracking', heat: '1.8k', iconBg: 'from-teal-50 to-emerald-50', iconColor: 'text-teal-600' },
-  { name: '邮编查询', desc: '全球国家邮编地址', icon: MapPin, href: '/tools/postal-code', heat: '956', iconBg: 'from-violet-50 to-purple-50', iconColor: 'text-violet-600' },
-  { name: 'HS编码查询', desc: '海关编码税率参考', icon: Hash, href: '/tools/hs-code', heat: '780', iconBg: 'from-amber-50 to-orange-50', iconColor: 'text-amber-600' },
-  { name: '汇率换算', desc: '实时货币转换', icon: Coins, href: '/tools/exchange-rate', heat: '1.2k', iconBg: 'from-emerald-50 to-teal-50', iconColor: 'text-emerald-600' },
-  { name: '运费计算', desc: '体积重计算参考', icon: Calculator, href: '/tools/shipping-calculator', heat: '640', iconBg: 'from-pink-50 to-rose-50', iconColor: 'text-pink-600' },
-  { name: '唛头面单', desc: '一键生成标签', icon: Tag, href: '/tools/shipping-label', heat: '420', iconBg: 'from-sky-50 to-blue-50', iconColor: 'text-sky-600' },
-  { name: '二维码生成', desc: '快速生成QR Code', icon: QrCode, href: '/tools/qrcode', isNew: true, iconBg: 'from-orange-50 to-amber-50', iconColor: 'text-orange-600' },
+  { name: '商业发票', desc: '外贸必备单据生成', icon: FileText, href: '/tools/commercial-invoice', heat: '2.3k', iconBg: 'from-blue-50 to-indigo-50', iconColor: 'text-blue-600', audiences: ['all', 'seller'] },
+  { name: '包裹追踪', desc: '全球快递物流查询', icon: Truck, href: '/tracking', heat: '1.8k', iconBg: 'from-teal-50 to-emerald-50', iconColor: 'text-teal-600', audiences: ['all', 'seller', 'student'] },
+  { name: '邮编查询', desc: '全球国家邮编地址', icon: MapPin, href: '/tools/postal-code', heat: '956', iconBg: 'from-violet-50 to-purple-50', iconColor: 'text-violet-600', audiences: ['all', 'student', 'nomad'] },
+  { name: 'HS编码查询', desc: '海关编码税率参考', icon: Hash, href: '/tools/hs-code', heat: '780', iconBg: 'from-amber-50 to-orange-50', iconColor: 'text-amber-600', audiences: ['all', 'seller'] },
+  { name: '汇率换算', desc: '实时货币转换', icon: Coins, href: '/tools/exchange-rate', heat: '1.2k', iconBg: 'from-emerald-50 to-teal-50', iconColor: 'text-emerald-600', audiences: ['all', 'seller', 'student'] },
+  { name: '运费计算', desc: '体积重计算参考', icon: Calculator, href: '/tools/shipping-calculator', heat: '640', iconBg: 'from-pink-50 to-rose-50', iconColor: 'text-pink-600', audiences: ['all', 'seller', 'student'] },
+  { name: '唛头面单', desc: '一键生成标签', icon: Tag, href: '/tools/shipping-label', heat: '420', iconBg: 'from-sky-50 to-blue-50', iconColor: 'text-sky-600', audiences: ['all', 'seller'] },
+  { name: '二维码生成', desc: '快速生成QR Code', icon: QrCode, href: '/tools/qrcode', isNew: true, iconBg: 'from-orange-50 to-amber-50', iconColor: 'text-orange-600', audiences: ['all', 'nomad', 'seller'] },
 ];
 
 export default function ToolGrid() {
+  const [activeTab, setActiveTab] = useState('all');
+
+  const filteredTools = activeTab === 'all'
+    ? TOOLS
+    : TOOLS.filter(t => t.audiences.includes(activeTab));
+
   return (
     <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-8">
-      <div className="flex items-end justify-between mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-5 gap-3">
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Wrench className="w-5 h-5 text-teal-600" />
@@ -27,8 +43,26 @@ export default function ToolGrid() {
           查看全部 <span className="text-lg leading-none">→</span>
         </a>
       </div>
+
+      {/* Audience Tabs */}
+      <div className="flex flex-wrap gap-1.5 mb-5">
+        {AUDIENCE_TABS.map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer min-h-[36px] ${
+              activeTab === tab.key
+                ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md shadow-teal-500/20'
+                : 'px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer text-gray-600 dark:text-gray-300 bg-white/60 hover:bg-white dark:bg-gray-800/60 dark:hover:bg-gray-800 backdrop-blur-md hover:shadow-sm hover:-translate-y-0.5 border border-gray-200/60 dark:border-gray-700/60'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {TOOLS.map(tool => {
+        {filteredTools.map(tool => {
           const Icon = tool.icon;
           return (
             <a
@@ -58,6 +92,11 @@ export default function ToolGrid() {
             </a>
           );
         })}
+        {filteredTools.length === 0 && (
+          <div className="col-span-2 sm:col-span-3 md:col-span-4 text-center py-8 text-gray-400">
+            该分类下暂无工具
+          </div>
+        )}
         {/* Native Ad Slot (dynamic from Ad System) */}
         <AdSlot placement="tool-grid-native" />
       </div>

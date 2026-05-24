@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Truck, MapPin, Hash, Coins, MessageSquare, ArrowRight } from 'lucide-react';
 
 const TABS = [
@@ -12,9 +12,63 @@ const TABS = [
   { id: 'community', label: '问社区', icon: MessageSquare, placeholder: '如：东南亚TikTok怎么开店？', btn: '发帖' },
 ];
 
+// Typewriter placeholders that cycle every 3s
+const TYPEWRITER_PLACEHOLDERS = [
+  '搜"加拿大海关发票"...',
+  '搜"英国留学生行李托运指南"...',
+  '搜"海外网络节点测试与必备 App"...',
+  '搜"实时汇率换算"...',
+  '搜"马来西亚 Shopee 开店流程"...',
+  '搜"日本集运报关指南"...',
+];
+
+// Apple pill hot tags
+const HOT_TAGS = [
+  { label: '🧾 外贸单据一键生成', href: '/tools/commercial-invoice' },
+  { label: '🎓 留学生集运与行李指南', href: '/starter/student' },
+  { label: '💱 实时汇率与结汇精算', href: '/tools/exchange-rate' },
+  { label: '🎬 短视频出海与引流脚本', href: '/tools/video-script-sop' },
+  { label: '📮 全球邮编与地址校验', href: '/tools/postal-code' },
+  { label: '🌐 海外网络与必备 App', href: '/starter/apps' },
+];
+
 export default function HeroSuperSearch() {
   const [activeTab, setActiveTab] = useState('all');
   const [query, setQuery] = useState('');
+  const [twIndex, setTwIndex] = useState(0);
+  const [twText, setTwText] = useState('');
+  const [twDeleting, setTwDeleting] = useState(false);
+
+  // Typewriter effect
+  useEffect(() => {
+    const current = TYPEWRITER_PLACEHOLDERS[twIndex];
+
+    if (!twDeleting) {
+      // Typing
+      if (twText.length < current.length) {
+        const timeout = setTimeout(() => {
+          setTwText(current.slice(0, twText.length + 1));
+        }, 80);
+        return () => clearTimeout(timeout);
+      } else {
+        // Pause at end, then start deleting
+        const timeout = setTimeout(() => setTwDeleting(true), 2000);
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      // Deleting
+      if (twText.length > 0) {
+        const timeout = setTimeout(() => {
+          setTwText(current.slice(0, twText.length - 1));
+        }, 40);
+        return () => clearTimeout(timeout);
+      } else {
+        // Move to next placeholder
+        setTwDeleting(false);
+        setTwIndex((prev) => (prev + 1) % TYPEWRITER_PLACEHOLDERS.length);
+      }
+    }
+  }, [twText, twIndex, twDeleting]);
 
   const tab = TABS.find(t => t.id === activeTab) || TABS[0];
   const Icon = tab.icon;
@@ -52,14 +106,14 @@ export default function HeroSuperSearch() {
           </div>
         </div>
 
-        {/* Title */}
+        {/* Title —全域化定位 */}
         <h1 className="mb-2 text-center text-3xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
           海外百宝箱
           <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent"> · </span>
-          瑞士军刀式工具箱
+          全域出国基础设施
         </h1>
         <p className="mb-8 text-center text-base text-gray-500 dark:text-gray-400">
-          留学生 · 跨境卖家 · 出海务工 · 海外生活
+          无论您是跨境商户、留学生还是数字游民，这里都有为您定制的出海解法
         </p>
 
         {/* Tabs */}
@@ -84,7 +138,7 @@ export default function HeroSuperSearch() {
           })}
         </div>
 
-        {/* Search Box */}
+        {/* Search Box with Typewriter Placeholder */}
         <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-gray-200/40 dark:shadow-gray-900/50 border border-gray-200/80 dark:border-gray-700 p-1.5 transition-shadow focus-within:shadow-2xl focus-within:shadow-teal-500/10 focus-within:border-teal-300">
           <div className="flex gap-1.5">
             <div className="relative flex-1">
@@ -94,7 +148,7 @@ export default function HeroSuperSearch() {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                placeholder={tab.placeholder}
+                placeholder={twText || tab.placeholder}
                 className="w-full pl-12 pr-4 py-3 bg-transparent rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none text-base"
               />
             </div>
@@ -109,26 +163,20 @@ export default function HeroSuperSearch() {
           </div>
         </div>
 
-        {/* Quick Links & Ads */}
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">
-          <span className="text-gray-400">热门：</span>
-          {[
-            { label: '邮编查询', href: '/tools/postal-code' },
-            { label: 'HS编码', href: '/tools/hs-code' },
-            { label: '商业发票', href: '/tools/commercial-invoice' },
-            { label: '实时汇率', href: '/tools/exchange-rate' },
-          ].map(item => (
-            <a key={item.label} href={item.href} className="rounded-full border border-gray-200 bg-white px-2.5 py-0.5 text-xs text-gray-600 transition hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700">
-              {item.label}
-            </a>
-          ))}
-          <span className="mx-1 h-4 w-px bg-gray-200" />
-          {[
-            { label: '跨境物流专线 8折起', href: '#' },
-            { label: 'TikTok 小店代运营', href: '#' },
-          ].map(ad => (
-            <a key={ad.label} href={ad.href} className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 transition hover:bg-amber-100">
-              <span className="text-[10px]">📢</span> {ad.label}
+        {/* Apple Pill Hot Tags */}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          {HOT_TAGS.map(tag => (
+            <a
+              key={tag.label}
+              href={tag.href}
+              className="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer
+                text-gray-600 dark:text-gray-300
+                bg-white/60 hover:bg-white dark:bg-gray-800/60 dark:hover:bg-gray-800
+                backdrop-blur-md
+                hover:shadow-sm hover:-translate-y-0.5
+                border border-gray-200/60 dark:border-gray-700/60"
+            >
+              {tag.label}
             </a>
           ))}
         </div>

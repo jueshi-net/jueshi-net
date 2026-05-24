@@ -22,7 +22,7 @@ export default function HomePage() {
             { value: '68+', label: '实用工具' },
             { value: '24', label: '精选专题' },
             { value: '7', label: '出海市场' },
-            { value: '每日', label: '持续更新' },
+            { value: '5 类', label: '人群覆盖' },
           ].map(s => (
             <div key={s.label} className="flex flex-col">
               <span className="text-lg font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">{s.value}</span>
