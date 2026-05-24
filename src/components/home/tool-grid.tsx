@@ -49,7 +49,7 @@ export default function ToolGrid() {
         {AUDIENCE_TABS.map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setActiveTab(tab.key); }}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer min-h-[36px] ${
               activeTab === tab.key
                 ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md shadow-teal-500/20'
