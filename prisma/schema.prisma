@@ -1094,6 +1094,80 @@ model UserCustomNav {
   @@map("user_custom_navs")
 }
 
+// ─── v1.31.0: pSEO 聚合页数据库化 ───
+
+model Destination {
+  id             String               @id @default(cuid())
+  slug           String               @unique
+  name           String // 中文名: 加拿大
+  nameEn         String               @map("name_en") // 英文名: Canada
+  currency       String // ISO code: CAD
+  region         String // 区域: 北美
+  emoji          String
+  heroTitle      String               @map("hero_title")
+  heroSubtitle   String               @map("hero_subtitle")
+  seoTitle       String               @map("seo_title")
+  seoDescription String               @map("seo_description")
+  keywords       String[] // SEO keywords
+  keyCities      String[]             @map("key_cities")
+  userCount      String               @default("0") @map("user_count")
+  docCount       String               @default("0") @map("doc_count")
+  isActive       Boolean              @default(true) @map("is_active")
+  sortOrder      Int                  @default(0) @map("sort_order")
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @default(now()) @updatedAt @map("updated_at")
+
+  tools          DestinationTool[]
+  guides         DestinationGuide[]
+  services       DestinationService[]
+
+  @@index([isActive, region])
+  @@index([slug])
+  @@map("destinations")
+}
+
+model DestinationTool {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  toolSlug      String      @map("tool_slug") // 工具 slug, 如 commercial-invoice
+  sortOrder     Int         @default(0) @map("sort_order")
+
+  @@unique([destinationId, toolSlug])
+  @@index([destinationId])
+  @@map("destination_tools")
+}
+
+model DestinationGuide {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  title         String
+  description   String      @db.Text
+  type          String // guide | regulation | tax | logistics | customs
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([destinationId])
+  @@index([type])
+  @@map("destination_guides")
+}
+
+model DestinationService {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  title         String
+  category      String // 仓储 | 物流 | 报关 | 税务 | 合规 | 代购
+  description   String      @db.Text
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([destinationId])
+  @@index([category])
+  @@map("destination_services")
+}
+
 // ─── v1.28.6: 新手引导状态 ───
 model UserOnboardingState {
   id                 String   @id @default(cuid())

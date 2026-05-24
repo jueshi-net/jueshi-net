@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Globe, Shield, FileText, Package, MapPin, DollarSign, Sparkles, ChevronRight } from "lucide-react";
-import { REGION_GROUPS, DESTINATIONS } from "@/lib/destinations-config";
+import { ArrowRight, Globe, FileText, Package, MapPin, DollarSign, Sparkles, ChevronRight } from "lucide-react";
+import { REGION_GROUPS, getAllDestinationsActive } from "@/lib/destinations-db";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -22,8 +22,15 @@ const TOP_TOOLS = [
   { key: "exchange-rate", titleZh: "汇率换算", emoji: "💱", href: "/tools/exchange-rate", Icon: DollarSign, color: "text-orange-600 bg-orange-50" as const },
 ];
 
-export default function DestinationsIndexPage() {
-  const totalCountries = Object.keys(DESTINATIONS).length;
+export default async function DestinationsIndexPage() {
+  let destinations: Awaited<ReturnType<typeof getAllDestinationsActive>> = [];
+  try {
+    destinations = await getAllDestinationsActive();
+  } catch {
+    // DB unreachable during build — render with empty state
+  }
+  const destMap = new Map(destinations.map(d => [d.slug, d]));
+  const totalCountries = destinations.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,8 +62,8 @@ export default function DestinationsIndexPage() {
       <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {REGION_GROUPS.map(group => {
-            const availableCountries = group.destinations
-              .map(slug => DESTINATIONS[slug])
+            const availableCountries = group.slugs
+              .map(slug => destMap.get(slug))
               .filter(Boolean);
             const count = availableCountries.length;
             const firstTwo = availableCountries.slice(0, 3);
@@ -81,12 +88,12 @@ export default function DestinationsIndexPage() {
                     <div className="space-y-1.5">
                       {firstTwo.map(dest => (
                         <Link
-                          key={dest.slug}
-                          href={`/destinations/${dest.slug}`}
+                          key={dest!.slug}
+                          href={`/destinations/${dest!.slug}`}
                           className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group min-h-[44px]"
                         >
-                          <span className="text-base">{dest.emoji}</span>
-                          <span className="text-xs font-medium text-gray-700 group-hover:text-purple-700 transition-colors">{dest.name}</span>
+                          <span className="text-base">{dest!.emoji}</span>
+                          <span className="text-xs font-medium text-gray-700 group-hover:text-purple-700 transition-colors">{dest!.name}</span>
                           <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-purple-500 transition-colors ml-auto" />
                         </Link>
                       ))}

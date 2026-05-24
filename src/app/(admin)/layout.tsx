@@ -27,7 +27,8 @@ const navSections = [
     title: "内容管理 (CMS)",
     items: [
       { href: "/admin/topics", label: "专题管理", icon: FolderOpen },
-      { href: "/admin/resources", label: "资源大厅", icon: Globe },
+      { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
+      { href: "/admin/resources", label: "资源大厅", icon: BookOpen },
       { href: "/admin/cms", label: "文章与指南", icon: BookOpen },
       { href: "/admin/resources/import", label: "资源导入", icon: Upload },
     ]

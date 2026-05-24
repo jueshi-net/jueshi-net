@@ -3,13 +3,38 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, ArrowRight, MapPin, Sparkles, Globe, ArrowUpRight, FileText, Tag, Package, DollarSign, Ship, Shield, Boxes, ClipboardList, Award, Flame, CreditCard, Truck, Mail, Container, ArrowDownUp, LucideIcon, FileText as FileTextIcon } from 'lucide-react';
-import type { DestinationHub } from '@/lib/destinations-config';
+import { Search, ArrowRight, MapPin, Sparkles, Globe, ArrowUpRight, FileText, Tag, Package, DollarSign, Ship, Shield, Boxes, ClipboardList, Award, Flame, CreditCard, Truck, Mail, Container, ArrowDownUp, LucideIcon } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { documentTools, categoryLabels as docCategoryLabels } from '@/lib/document-tools-config';
 
+// ═══ DB model type (from Prisma) ═══
+
+interface DestinationDb {
+  id: string;
+  slug: string;
+  name: string;
+  nameEn: string;
+  currency: string;
+  region: string;
+  emoji: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  seoTitle: string;
+  seoDescription: string;
+  keywords: string[];
+  keyCities: string[];
+  userCount: string;
+  docCount: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  tools: { toolSlug: string; sortOrder: number }[];
+  guides: { title: string; description: string; type: string }[];
+  services: { title: string; category: string; description: string }[];
+}
+
 // ═══ Unified tool data bridge ═══
-// Bridges documentTools + standalone public tools into one lookup
 
 interface HubTool {
   key: string;
@@ -24,33 +49,9 @@ interface HubTool {
 }
 
 const standaloneTools: Record<string, Omit<HubTool, 'Icon' | 'color'>> = {
-  'postal-code': {
-    key: 'postal-code',
-    titleZh: '全球邮编查询',
-    titleEn: 'Postal Code Lookup',
-    description: '查询 200+ 国家和地区的邮政编码与邮编格式',
-    category: 'query',
-    href: '/tools/postal-code',
-    emoji: '📮',
-  },
-  'shipping-calculator': {
-    key: 'shipping-calculator',
-    titleZh: '体积/运费计算器',
-    titleEn: 'Shipping Calculator',
-    description: '计算包裹体积重、材积重，对比不同渠道运费',
-    category: 'logistics',
-    href: '/tools/shipping-calculator',
-    emoji: '📐',
-  },
-  'exchange-rate': {
-    key: 'exchange-rate',
-    titleZh: '实时汇率换算',
-    titleEn: 'Exchange Rate',
-    description: '30+ 货币对实时汇率，支持历史走势参考',
-    category: 'finance',
-    href: '/tools/exchange-rate',
-    emoji: '💱',
-  },
+  'postal-code': { key: 'postal-code', titleZh: '全球邮编查询', titleEn: 'Postal Code Lookup', description: '查询 200+ 国家和地区的邮政编码与邮编格式', category: 'query', href: '/tools/postal-code', emoji: '📮' },
+  'shipping-calculator': { key: 'shipping-calculator', titleZh: '体积/运费计算器', titleEn: 'Shipping Calculator', description: '计算包裹体积重、材积重，对比不同渠道运费', category: 'logistics', href: '/tools/shipping-calculator', emoji: '📐' },
+  'exchange-rate': { key: 'exchange-rate', titleZh: '实时汇率换算', titleEn: 'Exchange Rate', description: '30+ 货币对实时汇率，支持历史走势参考', category: 'finance', href: '/tools/exchange-rate', emoji: '💱' },
 };
 
 const lucideMap: Record<string, LucideIcon> = {
@@ -88,7 +89,6 @@ const emojiMap: Record<string, string> = {
 };
 
 function getToolByKey(key: string): HubTool | null {
-  // Check documentTools first
   const docTool = documentTools.find(t => t.key === key);
   if (docTool) {
     const colors = categoryColorMap[docTool.category] || categoryColorMap.trade;
@@ -96,37 +96,23 @@ function getToolByKey(key: string): HubTool | null {
     let href = `/tools/documents/${docTool.key}`;
     if (docTool.key === 'label-maker') href = '/tools/documents/shipping-label';
     return {
-      key: docTool.key,
-      titleZh: docTool.titleZh,
-      titleEn: docTool.titleEn,
-      description: docTool.description,
-      category: docTool.category,
-      href,
-      emoji: emojiMap[docTool.key] || '📄',
-      Icon,
-      color: colors,
+      key: docTool.key, titleZh: docTool.titleZh, titleEn: docTool.titleEn,
+      description: docTool.description, category: docTool.category, href,
+      emoji: emojiMap[docTool.key] || '📄', Icon, color: colors,
     };
   }
-  // Check standalone tools
   const standalone = standaloneTools[key];
   if (standalone) {
     const colors = categoryColorMap[standalone.category] || categoryColorMap.query;
     const Icon = lucideMap[key] || FileText;
-    return {
-      ...standalone,
-      Icon,
-      color: colors,
-    };
+    return { ...standalone, Icon, color: colors };
   }
   return null;
 }
 
 // ═══ Tool Card Component ═══
 
-const allCategoryLabels: Record<string, string> = {
-  ...docCategoryLabels,
-  query: '通用查询',
-};
+const allCategoryLabels: Record<string, string> = { ...docCategoryLabels, query: '通用查询' };
 
 function ToolCard({ tool }: { tool: HubTool }) {
   const Icon = tool.Icon;
@@ -137,27 +123,17 @@ function ToolCard({ tool }: { tool: HubTool }) {
       href={tool.href}
       className={`group relative bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] ${tool.color.hover} transition-all duration-300 hover:-translate-y-[2px] p-4 flex items-start gap-3.5`}
     >
-      {/* Icon */}
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300 ${tool.color.bg} ${tool.color.icon} group-hover:scale-105 group-hover:ring-1 group-hover:ring-gray-100`}>
         <Icon className="w-5 h-5" />
       </div>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-700 transition-colors truncate">
-            {tool.titleZh}
-          </h3>
-          {/* Category badge */}
-          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border flex-shrink-0 ${tool.color.badge}`}>
-            {label}
-          </span>
+          <h3 className="text-sm font-semibold text-gray-900 group-hover:text-purple-700 transition-colors truncate">{tool.titleZh}</h3>
+          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border flex-shrink-0 ${tool.color.badge}`}>{label}</span>
         </div>
         <p className="text-[11px] text-gray-400 truncate">{tool.titleEn}</p>
         <p className="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{tool.description}</p>
       </div>
-
-      {/* Arrow */}
       <ArrowUpRight className="w-3.5 h-3.5 text-gray-300 flex-shrink-0 mt-1 group-hover:text-purple-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
     </Link>
   );
@@ -165,24 +141,21 @@ function ToolCard({ tool }: { tool: HubTool }) {
 
 // ═══ Main Hero Component ═══
 
-export default function DestinationHero({ dest }: { dest: DestinationHub }) {
+export default function DestinationHero({ dest }: { dest: DestinationDb }) {
   const router = useRouter();
   const [query, setQuery] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-    const slug = query
-      .trim()
-      .toLowerCase()
-      .replace(/[\s\u3000]+/g, '-')
-      .replace(/[^\w\u4e00-\u9fff-]/g, '');
+    const slug = query.trim().toLowerCase().replace(/[\s\u3000]+/g, '-').replace(/[^\w\u4e00-\u9fff-]/g, '');
     router.push(`/destinations/${slug}`);
   };
 
-  // Resolve recommended tools from both config sources
-  const resolvedTools = dest.recommendedTools
-    .map(key => getToolByKey(key))
+  // Resolve recommended tools from DB
+  const resolvedTools = dest.tools
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(t => getToolByKey(t.toolSlug))
     .filter((t): t is HubTool => t !== null);
 
   return (
@@ -204,13 +177,8 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-            {dest.seo.heroTitle}
-          </h1>
-
-          <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed mb-8">
-            {dest.seo.heroSubtitle}
-          </p>
+          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">{dest.heroTitle}</h1>
+          <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed mb-8">{dest.heroSubtitle}</p>
 
           {/* Smart Search */}
           <form onSubmit={handleSearch} className="relative max-w-xl">
@@ -265,9 +233,9 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
       <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border-y border-purple-100/50">
         <div className="max-w-5xl mx-auto px-4 py-8 text-center">
           <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-            已有 <span className="font-bold text-purple-700 text-lg md:text-xl">{dest.stats?.userCount || '—'}</span>{' '}
+            已有 <span className="font-bold text-purple-700 text-lg md:text-xl">{dest.userCount || '—'}</span>{' '}
             跨境商家在本站使用 <span className="font-semibold">{dest.name}</span> 相关工具，
-            累计生成 <span className="font-bold text-indigo-700 text-lg md:text-xl">{dest.stats?.docCount || '—'}</span> 份单据
+            累计生成 <span className="font-bold text-indigo-700 text-lg md:text-xl">{dest.docCount || '—'}</span> 份单据
           </p>
           <p className="text-xs text-gray-400 mt-2">数据实时更新，值得信赖</p>
         </div>
@@ -280,9 +248,7 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
             <svg className="w-5 h-5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" /></svg>
             <h2 className="text-xl font-bold text-gray-900">{dest.name}出海百科与指南</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-6">
-            {dest.guides.length} 篇实操指南与政策解读，助你合规出海
-          </p>
+          <p className="text-sm text-gray-500 mb-6">{dest.guides.length} 篇实操指南与政策解读，助你合规出海</p>
 
           <div className="space-y-3">
             {dest.guides.map((guide, i) => (
@@ -313,9 +279,7 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
                   </div>
                 </summary>
                 <div className="px-4 pb-4 pt-0">
-                  <div className="pl-11 pr-2 text-sm text-gray-600 leading-relaxed">
-                    {guide.description}
-                  </div>
+                  <div className="pl-11 pr-2 text-sm text-gray-600 leading-relaxed">{guide.description}</div>
                 </div>
               </details>
             ))}
@@ -330,16 +294,11 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
             <Shield className="w-5 h-5 text-indigo-600" />
             <h2 className="text-xl font-bold text-gray-900">{dest.name}当地服务商与资源</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-6">
-            精选合规服务商，涵盖仓储、物流、报关、税务等核心环节
-          </p>
+          <p className="text-sm text-gray-500 mb-6">精选合规服务商，涵盖仓储、物流、报关、税务等核心环节</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {dest.services.map((svc, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 hover:shadow-md hover:border-gray-200 transition-all"
-              >
+              <div key={i} className="bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 hover:shadow-md hover:border-gray-200 transition-all">
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
                     <Shield className="w-4 h-4 text-indigo-600" />
@@ -347,9 +306,7 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <h3 className="text-sm font-semibold text-gray-900 truncate">{svc.title}</h3>
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-600 flex-shrink-0">
-                        {svc.category}
-                      </span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-600 flex-shrink-0">{svc.category}</span>
                     </div>
                     <p className="text-xs text-gray-500 leading-relaxed">{svc.description}</p>
                   </div>
