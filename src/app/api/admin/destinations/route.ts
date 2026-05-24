@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: dest });
   } catch (e: any) {
+    console.error('[Destinations API Error]:', e);
     return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
 }
@@ -172,6 +173,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: dest });
   } catch (e: any) {
+    console.error('[Destinations API PUT Error]:', e);
     return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
 }
