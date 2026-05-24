@@ -59,13 +59,23 @@ export default function LabelMakerPage() {
   }, []);
 
   const handleSaveDraft = useCallback(() => {
+    // Guest upsell: save locally but prompt to login for cloud sync
+    if (!perms.authenticated && perms.role === 'guest') {
+      const saved = saveLabelDraft({
+        type: selectedType, title: labelType?.titleZh || selectedType,
+        labelSize: selectedSize, data: formData, style: selectedStyle,
+      }, perms.limits.maxDrafts);
+      setDraftId(saved.id);
+      alert(`💡 草稿已保存到本地（最多 ${perms.limits.maxDrafts} 份）\n\n登录后即可永久保存单据草稿，随时跨设备恢复编辑。`);
+      return;
+    }
     const saved = saveLabelDraft({
       type: selectedType, title: labelType?.titleZh || selectedType,
       labelSize: selectedSize, data: formData, style: selectedStyle,
     }, perms.limits.maxDrafts);
     setDraftId(saved.id);
     alert('草稿已保存');
-  }, [selectedType, labelType, selectedSize, formData, selectedStyle, perms.limits.maxDrafts]);
+  }, [selectedType, labelType, selectedSize, formData, selectedStyle, perms.limits.maxDrafts, perms.authenticated, perms.role]);
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
@@ -190,8 +200,8 @@ export default function LabelMakerPage() {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
-            <button onClick={handleSaveDraft} className="flex items-center gap-1 px-2.5 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors min-h-[36px]" title="保存草稿">
-              <Save className="w-3.5 h-3.5" />
+            <button onClick={handleSaveDraft} className={`flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg transition-colors min-h-[36px] ${!perms.authenticated && perms.role === 'guest' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200' : 'bg-gray-100 hover:bg-gray-200'}`} title={!perms.authenticated && perms.role === 'guest' ? '💡 登录后即可永久保存单据草稿' : '保存草稿'}>
+              {!perms.authenticated && perms.role === 'guest' ? <span>🔒</span> : <Save className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline">草稿</span>
             </button>
             <button onClick={handlePrint} className="flex items-center gap-1 px-2.5 py-1.5 text-xs bg-teal-600 text-white hover:bg-teal-700 rounded-lg transition-colors min-h-[36px]" title="打印/PDF">
@@ -269,7 +279,7 @@ export default function LabelMakerPage() {
                       </select>
                     </div>
                   )}
-                    {p.canUploadLogo() && (
+                    {p.canUploadLogo() ? (
                       <div>
                         <label className="text-xs text-gray-500 mb-1 block">公司 Logo</label>
                         <input type="file" accept="image/*" className="w-full text-sm"
@@ -278,12 +288,19 @@ export default function LabelMakerPage() {
                             if (file) { const reader = new FileReader(); reader.onload = ev => updateField('logoUrl', ev.target?.result); reader.readAsDataURL(file); }
                           }} />
                       </div>
-                    )}
-                    {!p.canUploadLogo() && (
-                      <div>
-                        <label className="text-xs text-gray-500 mb-1 block">公司 Logo（占位）</label>
-                        <div className="w-full h-16 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50 text-gray-400 text-xs">
-                          <Image className="w-4 h-4 mr-1" /> 登录后上传 Logo
+                    ) : (
+                      <div className="relative">
+                        <label className="text-xs text-gray-500 mb-1 block">公司 Logo</label>
+                        <div className="relative w-full h-20 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden group cursor-not-allowed">
+                          {/* Crown upsell overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-amber-50/90 to-yellow-50/90 backdrop-blur-[1px] flex flex-col items-center justify-center z-10">
+                            <Crown className="w-5 h-5 text-amber-500 mb-1" />
+                            <span className="text-xs font-medium text-amber-700">👑 升级会员解锁</span>
+                            <span className="text-[10px] text-amber-500 mt-0.5">自定义公司 Logo · 无水印导出</span>
+                          </div>
+                          {/* Placeholder background */}
+                          <Image className="w-4 h-4 text-gray-300" />
+                          <span className="text-xs text-gray-300 ml-1">Logo 预览</span>
                         </div>
                       </div>
                     )}

@@ -89,14 +89,14 @@ export default async function DocumentsHubPage() {
             </p>
 
             <div className="flex flex-wrap gap-3 mt-6">
-              <Link
-                href="/tools/documents/proforma-invoice"
-                className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors shadow-lg"
+              <a
+                href="#tools-grid"
+                className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors shadow-lg cursor-pointer"
               >
                 <Sparkles className="w-5 h-5" />
                 开始生成单据
                 <ArrowRight className="w-4 h-4" />
-              </Link>
+              </a>
               <Link
                 href="/dashboard/documents"
                 className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
@@ -145,7 +145,7 @@ export default async function DocumentsHubPage() {
       <RecentlyUsedWidget />
 
       {/* ===== DOCUMENT TYPE CARDS ===== */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div id="tools-grid" className="max-w-6xl mx-auto px-4 py-8 scroll-mt-20">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl md:text-2xl font-bold text-gray-900 flex items-center gap-2">
             <FileText className="w-6 h-6 text-purple-600" />

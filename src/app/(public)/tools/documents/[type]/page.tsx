@@ -133,13 +133,23 @@ export default function DocumentEditorPage() {
   }, [lineItems, template]);
 
   const handleSaveDraft = useCallback(() => {
+    // Guest upsell: save locally but prompt to login for cloud sync
+    if (!perms.authenticated && perms.role === 'guest') {
+      const saved = saveDraft({
+        type, title: docType?.titleZh || type, documentNo: formData.documentNo || '',
+        data: formData, lineItems, style: selectedStyle,
+      }, perms.limits.maxDrafts);
+      setDraftId(saved.id);
+      alert(`💡 草稿已保存到本地（最多 ${perms.limits.maxDrafts} 份）\n\n登录后即可永久保存单据草稿，随时跨设备恢复编辑。`);
+      return;
+    }
     const saved = saveDraft({
       type, title: docType?.titleZh || type, documentNo: formData.documentNo || '',
       data: formData, lineItems, style: selectedStyle,
     }, perms.limits.maxDrafts);
     setDraftId(saved.id);
     alert(`草稿已保存（${perms.limits.maxDrafts === 999 ? '无限制' : `最多 ${perms.limits.maxDrafts} 份`}）`);
-  }, [type, docType, formData, lineItems, selectedStyle, perms.limits.maxDrafts]);
+  }, [type, docType, formData, lineItems, selectedStyle, perms.limits.maxDrafts, perms.authenticated, perms.role]);
 
   const handlePrint = useCallback(() => { window.print(); }, []);
 
@@ -355,8 +365,8 @@ export default function DocumentEditorPage() {
                 )}
               </div>
             )}
-            <button onClick={handleSaveDraft} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-              <Save className="w-4 h-4" /> 保存草稿
+            <button onClick={handleSaveDraft} className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${!perms.authenticated && perms.role === 'guest' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200' : 'bg-gray-100 hover:bg-gray-200'}`} title={!perms.authenticated && perms.role === 'guest' ? '💡 登录后即可永久保存单据草稿' : '保存草稿'}>
+              {!perms.authenticated && perms.role === 'guest' ? <span>🔒</span> : <Save className="w-4 h-4" />} 保存草稿
             </button>
             <div className="h-6 w-px bg-gray-200" />
             <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">
@@ -397,9 +407,16 @@ export default function DocumentEditorPage() {
             <div className="bg-white rounded-xl border p-5 mb-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2"><Building2 className="w-4 h-4" /> 公司信息</h2>
-                <button onClick={() => setShowCompanyForm(!showCompanyForm)} className="text-xs text-blue-600 hover:text-blue-700">
-                  {showCompanyForm ? '收起' : '编辑'}
-                </button>
+                <div className="flex items-center gap-2">
+                  {!perms.authenticated && perms.role === 'guest' && (
+                    <span className="text-[10px] text-amber-600 flex items-center gap-0.5 bg-amber-50 px-2 py-0.5 rounded-full" title="登录后解锁公司 Logo 上传">
+                      👑 Logo 上传需登录
+                    </span>
+                  )}
+                  <button onClick={() => setShowCompanyForm(!showCompanyForm)} className="text-xs text-blue-600 hover:text-blue-700">
+                    {showCompanyForm ? '收起' : '编辑'}
+                  </button>
+                </div>
               </div>
               {!showCompanyForm && companyProfile && (
                 <div className="text-sm text-gray-600 space-y-1">
