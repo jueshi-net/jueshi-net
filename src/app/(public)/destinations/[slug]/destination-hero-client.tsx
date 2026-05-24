@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, ArrowRight, MapPin, Sparkles, Globe, ArrowUpRight, FileText, Tag, Package, DollarSign, Ship, Shield, Boxes, ClipboardList, Award, Flame, CreditCard, Truck, Mail, Container, ArrowDownUp, LucideIcon } from 'lucide-react';
+import { Search, ArrowRight, MapPin, Sparkles, Globe, ArrowUpRight, FileText, Tag, Package, DollarSign, Ship, Shield, Boxes, ClipboardList, Award, Flame, CreditCard, Truck, Mail, Container, ArrowDownUp, LucideIcon, FileText as FileTextIcon } from 'lucide-react';
 import type { DestinationHub } from '@/lib/destinations-config';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { documentTools, categoryLabels as docCategoryLabels } from '@/lib/document-tools-config';
@@ -260,6 +260,105 @@ export default function DestinationHero({ dest }: { dest: DestinationHub }) {
           ))}
         </div>
       </div>
+
+      {/* ===== MODULE A: Social Proof Bar ===== */}
+      <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border-y border-purple-100/50">
+        <div className="max-w-5xl mx-auto px-4 py-8 text-center">
+          <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+            已有 <span className="font-bold text-purple-700 text-lg md:text-xl">{dest.stats?.userCount || '—'}</span>{' '}
+            跨境商家在本站使用 <span className="font-semibold">{dest.name}</span> 相关工具，
+            累计生成 <span className="font-bold text-indigo-700 text-lg md:text-xl">{dest.stats?.docCount || '—'}</span> 份单据
+          </p>
+          <p className="text-xs text-gray-400 mt-2">数据实时更新，值得信赖</p>
+        </div>
+      </div>
+
+      {/* ===== MODULE B: Guides & Encyclopedia (Accordion) ===== */}
+      {dest.guides && dest.guides.length > 0 && (
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <div className="flex items-center gap-2 mb-2">
+            <svg className="w-5 h-5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" /></svg>
+            <h2 className="text-xl font-bold text-gray-900">{dest.name}出海百科与指南</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-6">
+            {dest.guides.length} 篇实操指南与政策解读，助你合规出海
+          </p>
+
+          <div className="space-y-3">
+            {dest.guides.map((guide, i) => (
+              <details key={i} className="group bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+                <summary className="flex items-start gap-3 p-4 cursor-pointer list-none select-none hover:bg-gray-50/50 transition-colors min-h-[44px]">
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
+                    guide.type === 'customs' ? 'bg-purple-50 text-purple-600' :
+                    guide.type === 'tax' ? 'bg-amber-50 text-amber-600' :
+                    guide.type === 'logistics' ? 'bg-blue-50 text-blue-600' :
+                    'bg-teal-50 text-teal-600'
+                  }`}>
+                    {guide.type === 'customs' ? '🏛️' : guide.type === 'tax' ? '💰' : guide.type === 'logistics' ? '🚢' : '📖'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-gray-900 leading-snug">{guide.title}</h3>
+                    <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{guide.description}</p>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center gap-2">
+                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                      guide.type === 'customs' ? 'bg-purple-50 text-purple-600' :
+                      guide.type === 'tax' ? 'bg-amber-50 text-amber-600' :
+                      guide.type === 'logistics' ? 'bg-blue-50 text-blue-600' :
+                      'bg-teal-50 text-teal-600'
+                    }`}>
+                      {guide.type === 'customs' ? '报关' : guide.type === 'tax' ? '税务' : guide.type === 'logistics' ? '物流' : '指南'}
+                    </span>
+                    <svg className="w-4 h-4 text-gray-300 group-open:rotate-180 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="6 9 12 15 18 9" /></svg>
+                  </div>
+                </summary>
+                <div className="px-4 pb-4 pt-0">
+                  <div className="pl-11 pr-2 text-sm text-gray-600 leading-relaxed">
+                    {guide.description}
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ===== MODULE C: Local Service Providers ===== */}
+      {dest.services && dest.services.length > 0 && (
+        <div className="max-w-5xl mx-auto px-4 py-10 pb-16">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-xl font-bold text-gray-900">{dest.name}当地服务商与资源</h2>
+          </div>
+          <p className="text-sm text-gray-500 mb-6">
+            精选合规服务商，涵盖仓储、物流、报关、税务等核心环节
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {dest.services.map((svc, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-4 hover:shadow-md hover:border-gray-200 transition-all"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-semibold text-gray-900 truncate">{svc.title}</h3>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-600 flex-shrink-0">
+                        {svc.category}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 leading-relaxed">{svc.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 }
