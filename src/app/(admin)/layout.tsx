@@ -50,9 +50,10 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
-  if ((session.user as any).role !== "admin") {
-    redirect("/dashboard");
+  if (!session?.user) redirect("/login?reason=no-session");
+  const role = (session.user as any).role || "";
+  if (role.toUpperCase() !== "ADMIN") {
+    redirect("/dashboard?error=not-admin");
   }
 
   return (
