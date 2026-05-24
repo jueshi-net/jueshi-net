@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 function adminCheck() {
   return (async () => {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "admin") {
+    if (!session?.user || (session.user as any).role?.toUpperCase() !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
     }
     return null;
