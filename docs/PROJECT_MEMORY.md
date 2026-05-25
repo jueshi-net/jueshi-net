@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.16 (2026-05-25) |
+| 最新稳定版本 | v1.32.17 (2026-05-25) |
 
 ---
 
@@ -278,6 +278,40 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.14** | 2026-05-25 | **Admin 权限硬编码清扫 + AI 矿机重启** — 36 文件 role === 'admin' → isAdminRole()/isElevatedRole() 统一兼容、crawler:daemon npm 脚本、DeepSeek 超时 30s 捕获 |
 | **v1.32.15** | 2026-05-25 | **CSS 零警告净化 + 数字矿机 PM2 守护进程化** — 修复 6 个 print: 变体解析警告（.print\\:hidden → @media print 原生类名）、创建 ecosystem.config.js 双进程配置（xixiong-saas + jueshi-miner）、deploy.sh 追加矿机管理提示 |
 | **v1.32.16** | 2026-05-25 | **源码远端锚定 + Newsletter 捕获引擎落地** — 添加 GitHub 远端仓库 (jueshi-net/jueshi-net)、创建 newsletter-form.tsx 组件（inline/footer 双变体）、/api/newsletter/subscribe 端点（含去重防重逻辑）、首页+Footer+留学生专区三处挂载 |
+| **v1.32.17** | 2026-05-25 | **Git 资产强行闭环 + 邮件发送引擎冷启动** — Resend SDK 集成 + Apple 极简 HTML 欢迎信模板、RESEND_API_KEY 优雅降级保护（无 Key 时 Warn 日志 + 跳过，绝不 500）、动态 import 防客户端 bundle 污染、fire-and-forget 邮件模式 |
+
+---
+
+## 11. 邮件服务配置规范（v1.32.17 起生效）
+
+### 11.1 邮件发送引擎
+
+**供应商：** Resend（resend npm package）
+**环境变量：** `RESEND_API_KEY`（必需，用于发送邮件）
+**模板文件：** `src/lib/email/templates.ts`
+
+### 11.2 优雅降级铁律
+
+**⚠️ 邮件发送绝对不能阻塞核心订阅流程。**
+
+1. **无 API Key 时**：`process.env.RESEND_API_KEY` 为空时，输出 `console.warn("[newsletter/email] RESEND_API_KEY not configured — email skipped (graceful degradation)")` 并优雅跳过，**绝不抛出 500 错误**。
+2. **动态 import**：Resend SDK 使用 `await import("resend")` 动态引入，防止被 Next.js 打包到客户端 bundle（避免 `dns`/`fs`/`net` 污染）。
+3. **Fire-and-forget**：邮件发送在 Prisma 写入成功后异步触发，不 await 返回值，不阻塞 API 响应。
+4. **发送节点**：用户首次订阅 / 重新激活订阅时触发欢迎信。
+
+### 11.3 欢迎信模板
+
+- **发件人**：`海外百宝箱 <hello@jueshi.net>`
+- **主题**：🚀 欢迎订阅出海锦囊 — 海外百宝箱
+- **内容**：Apple 极简 HTML 设计（渐变 Header + 四项价值主张 + CTA 按钮 + 退订链接）
+- **纯文本备选**：同步提供 text 版本，兼容不支持 HTML 的邮件客户端
+
+### 11.4 VPS 环境变量配置
+
+在 `.env.production` 中追加：
+```
+RESEND_API_KEY=re_xxxxxxxxxxxxxxx
+```
 
 ---
 
@@ -336,4 +370,4 @@ pending-urls.txt → 读取首条 URL → 检查 DB 去重 → 随机休眠(3-8s
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.16)*
+*Last updated: 2026-05-25 (v1.32.17)*
