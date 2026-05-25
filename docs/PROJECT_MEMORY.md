@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.15 (2026-05-25) |
+| 最新稳定版本 | v1.32.16 (2026-05-25) |
 
 ---
 
@@ -277,6 +277,7 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.13** | 2026-05-25 | **Stripe 生产支付全链路打通** — Mock→真实 SDK、sk_live_ 强制校验、Webhook 签名验证、Checkout API 鉴权、Pricing 页跳转打通 |
 | **v1.32.14** | 2026-05-25 | **Admin 权限硬编码清扫 + AI 矿机重启** — 36 文件 role === 'admin' → isAdminRole()/isElevatedRole() 统一兼容、crawler:daemon npm 脚本、DeepSeek 超时 30s 捕获 |
 | **v1.32.15** | 2026-05-25 | **CSS 零警告净化 + 数字矿机 PM2 守护进程化** — 修复 6 个 print: 变体解析警告（.print\\:hidden → @media print 原生类名）、创建 ecosystem.config.js 双进程配置（xixiong-saas + jueshi-miner）、deploy.sh 追加矿机管理提示 |
+| **v1.32.16** | 2026-05-25 | **源码远端锚定 + Newsletter 捕获引擎落地** — 添加 GitHub 远端仓库 (jueshi-net/jueshi-net)、创建 newsletter-form.tsx 组件（inline/footer 双变体）、/api/newsletter/subscribe 端点（含去重防重逻辑）、首页+Footer+留学生专区三处挂载 |
 
 ---
 
@@ -335,4 +336,4 @@ pending-urls.txt → 读取首条 URL → 检查 DB 去重 → 随机休眠(3-8s
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.15)*
+*Last updated: 2026-05-25 (v1.32.16)*
