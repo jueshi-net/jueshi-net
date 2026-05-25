@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, Package, Truck, Search, MapPin, Mail, Calculator, Shield, ArrowRight } from "lucide-react";
 import { Metadata } from "next";
+import NewsletterForm from "@/components/ui/newsletter-form";
 
 export const metadata: Metadata = {
   title: "留学生集运专区 — 海外百宝箱",
@@ -189,6 +190,11 @@ export default function StudentShippingPage() {
 
       {/* Footer spacing */}
       <div className="h-12" />
+
+      {/* Newsletter */}
+      <div className="max-w-3xl mx-auto px-4 pb-8">
+        <NewsletterForm />
+      </div>
     </div>
   );
 }

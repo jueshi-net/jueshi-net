@@ -6,6 +6,7 @@ import ToolGrid from "@/components/home/tool-grid";
 import TopicShowcase from "@/components/home/topic-showcase";
 import ResourceNav from "@/components/home/resource-nav";
 import CommunityFireworks from "@/components/home/community-fireworks";
+import NewsletterForm from "@/components/ui/newsletter-form";
 
 export default function HomePage() {
   return (
@@ -57,6 +58,11 @@ export default function HomePage() {
       {/* 8. Resource Nav with Native Ad */}
       <section><ResourceNav /></section>
 
+      {/* 8.5 Newsletter Subscription */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto py-6">
+        <NewsletterForm />
+      </section>
+
       {/* 9. Community */}
       <section><CommunityFireworks /></section>
 
@@ -88,8 +94,23 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 dark:border-gray-800 bg-gray-50/80 dark:bg-gray-900/80 py-8 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} 海外百宝箱 jueshi.net — 为出海人群打造的瑞士军刀
+      <footer className="border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 py-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-left">
+              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                订阅出海锦囊
+              </h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                每周获取最新高阶工具与物流避坑指南
+              </p>
+            </div>
+            <NewsletterForm variant="footer" />
+          </div>
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} 海外百宝箱 jueshi.net — 为出海人群打造的瑞士军刀
+          </div>
+        </div>
       </footer>
     </div>
   );

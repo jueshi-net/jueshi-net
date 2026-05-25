@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
-import { isAdminRole } from '@/lib/auth/permissions';
+import { isAdminRole } from '@/lib/auth/role-utils';
 
 // GET /api/admin/newsletter - 获取订阅者列表和广播历史
 export async function GET() {
