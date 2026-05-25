@@ -177,7 +177,7 @@ export default function VideoScriptSopClient() {
               value={product}
               onChange={(e) => setProduct(e.target.value)}
               placeholder="例如：便携式折叠水杯、AI 翻译耳机、海外仓一件代发服务"
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all min-h-[48px]"
             />
           </div>
 
@@ -191,7 +191,7 @@ export default function VideoScriptSopClient() {
               value={audience}
               onChange={(e) => setAudience(e.target.value)}
               placeholder="例如：25-35 岁北美华人宝妈、东南亚跨境电商新手"
-              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all min-h-[48px]"
             />
           </div>
 
@@ -277,19 +277,19 @@ export default function VideoScriptSopClient() {
               {/* Hook */}
               <div>
                 <h3 className="text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">🎯 黄金钩子（前3秒）</h3>
-                <p className="text-sm text-gray-900 dark:text-gray-100 bg-teal-50/50 dark:bg-teal-900/20 rounded-lg p-3">{result.hook}</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-teal-50/50 dark:bg-teal-900/20 rounded-lg p-3 break-words overflow-wrap-anywhere">{result.hook}</p>
               </div>
 
               {/* Pain Point */}
               <div>
                 <h3 className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">😰 用户痛点</h3>
-                <p className="text-sm text-gray-900 dark:text-gray-100 bg-red-50/50 dark:bg-red-900/20 rounded-lg p-3">{result.painPoint}</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-red-50/50 dark:bg-red-900/20 rounded-lg p-3 break-words overflow-wrap-anywhere">{result.painPoint}</p>
               </div>
 
               {/* Solution */}
               <div>
                 <h3 className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider mb-1">💡 解决方案</h3>
-                <p className="text-sm text-gray-900 dark:text-gray-100 bg-green-50/50 dark:bg-green-900/20 rounded-lg p-3">{result.solution}</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-green-50/50 dark:bg-green-900/20 rounded-lg p-3 break-words overflow-wrap-anywhere">{result.solution}</p>
               </div>
 
               {/* Selling Points */}
@@ -308,7 +308,7 @@ export default function VideoScriptSopClient() {
               {/* Script */}
               <div>
                 <h3 className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">📝 完整口播文案</h3>
-                <div className="text-sm text-gray-900 dark:text-gray-100 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg p-4 whitespace-pre-wrap leading-relaxed">{result.script}</div>
+                <div className="text-sm text-gray-900 dark:text-gray-100 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg p-4 whitespace-pre-wrap leading-relaxed break-words">{result.script}</div>
               </div>
 
               {/* Visual Cues */}
@@ -343,7 +343,7 @@ export default function VideoScriptSopClient() {
               {/* Posting Tips */}
               <div>
                 <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">📋 发布注意事项</h3>
-                <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 whitespace-pre-wrap">{result.postingTips}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 whitespace-pre-wrap break-words">{result.postingTips}</p>
               </div>
             </div>
           </div>
@@ -359,7 +359,7 @@ export default function VideoScriptSopClient() {
                 {copied ? "已复制" : "复制"}
               </button>
             </div>
-            <div className="p-6 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap font-mono bg-gray-50 dark:bg-gray-900/50 max-h-96 overflow-y-auto">
+            <div className="p-6 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words font-mono bg-gray-50 dark:bg-gray-900/50 max-h-96 overflow-y-auto">
               {rawResult}
             </div>
           </div>

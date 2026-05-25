@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.11 (2026-05-25) |
+| 最新稳定版本 | v1.32.12 (2026-05-25) |
 
 ---
 
@@ -113,6 +113,17 @@ dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 ---
 
 ## 4. UI 组件规范
+
+### 4.2 移动端铁律（v1.32.12 起生效）
+
+**⚠️ 所有组件必须遵守以下移动端约束：**
+
+1. **输入框最小触摸区域**：所有 `<input>`, `<textarea>`, `<button>` 必须设置 `min-h-[44px]`（iOS Human Interface Guidelines 标准）。
+2. **数据表格横向滚动防护**：所有包含 `<table>` 或长数据行的容器必须外层包裹 `<div className="w-full overflow-x-auto">`，允许用户横向滑动查看，而不是撑爆页面宽度。
+3. **Paywall/Modal 防截断**：弹窗面板必须设置 `max-h-[90vh] overflow-y-auto mx-4`，确保小屏幕下底部按钮可见且可点击。
+4. **长文本防溢出**：AI 生成内容、用户输入展示区必须添加 `break-words overflow-wrap-anywhere` 防止横向滚动。
+5. **Header 工具栏**：按钮组必须使用 `flex-wrap` 并缩小 `gap`（移动端 `gap-1.5`），标题使用 `text-base sm:text-lg` + `truncate` 防溢出。
+6. **Preview 容器**：发票/单据等复杂预览必须有 `overflow-x-auto` 包裹 + `min-w-[320px]` 确保内容不被压缩变形。
 
 ### 4.1 PaywallModal 组件
 
@@ -249,7 +260,8 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.9** | 2026-05-25 | **AI 生产密钥激活** — .env.production 追加 AI_API_KEY/AI_ENABLED + PM2 --update-env 强制刷新 |
 | **v1.32.10** | 2026-05-25 | **部署基建固化** — deploy.sh 安全脚本（7 重 exclude 保护）+ 留学生集运专区 /starter/student |
 | **v1.32.11** | 2026-05-25 | **HTTPS 鉴权修复 + 全局导航打通** — 生产环境 __Secure-next-auth.session-token Cookie 兼容修复（6 处）+ SOP/学生专区注册至 Cmd+K 搜索与工具广场 |
+| **v1.32.12** | 2026-05-25 | **全站移动端深度适配** — Paywall max-h-[90vh] overflow-y-auto、输入框 min-h-[44px]、发票表格 overflow-x-auto、SOP 长文本 break-words、Header 响应式优化 |
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.11)*
+*Last updated: 2026-05-25 (v1.32.12)*

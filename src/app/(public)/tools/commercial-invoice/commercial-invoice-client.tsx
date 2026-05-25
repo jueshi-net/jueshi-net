@@ -199,18 +199,18 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 overflow-x-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
+      <header className="bg-white border-b border-gray-200 px-3 py-3 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
             <Link href="/tools/document-tools" className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 min-h-[44px] shrink-0">
               <ArrowLeft className="w-4 h-4" /> 返回
             </Link>
-            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2 min-w-0">
+            <h1 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2 min-w-0">
               <FileText className="w-5 h-5 text-teal-600 shrink-0" />
               <span className="truncate">外贸发票生成器</span>
             </h1>
           </div>
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
             {currentDocId && (
               <ToolHistoryPanel documentId={currentDocId} toolKey="commercial_invoice" onRestore={handleRestore} />
             )}
@@ -268,7 +268,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="公司名称" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                 <input value={invoiceNo} onChange={(e) => setInvoiceNo(e.target.value)} placeholder="发票号 (可选)" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-                <textarea value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} placeholder="公司地址" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm sm:col-span-2" />
+                <textarea value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} placeholder="公司地址" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm sm:col-span-2 min-h-[44px]" />
               </div>
             </div>
 
@@ -278,7 +278,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="客户名称" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
                 <input value={invoiceDate} onChange={(e) => setInvoiceDate(e.target.value)} type="date" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-                <textarea value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="客户地址" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm sm:col-span-2" />
+                <textarea value={clientAddress} onChange={(e) => setClientAddress(e.target.value)} placeholder="客户地址" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm sm:col-span-2 min-h-[44px]" />
               </div>
             </div>
 
@@ -314,7 +314,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
                 <div><label className="text-xs text-gray-500">付款方式</label><input value={terms} onChange={(e) => setTerms(e.target.value)} placeholder="T/T" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px]" /></div>
                 <div><label className="text-xs text-gray-500">总计</label><div className="px-3 py-2 bg-gray-50 rounded-lg text-sm font-bold text-teal-700 min-h-[44px] flex items-center">{total.toFixed(2)}</div></div>
               </div>
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="备注" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm mt-3" />
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="备注" rows={2} className="w-full px-3 py-2 border rounded-lg text-sm mt-3 min-h-[44px]" />
             </div>
           </div>
 
@@ -322,7 +322,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
           {showPreview && (
             <div className="lg:sticky lg:top-20 self-start">
               <div ref={previewRef} className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-8 min-h-[700px] overflow-x-auto" style={{ fontFamily: "Arial, sans-serif" }}>
-                <div className="min-w-[280px]">
+                <div className="min-w-[320px]">
                 <h1 className="text-2xl font-bold text-center text-teal-700 mb-6">COMMERCIAL INVOICE</h1>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">

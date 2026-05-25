@@ -66,7 +66,7 @@ export default function PaywallModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="paywall-title"
@@ -79,9 +79,9 @@ export default function PaywallModal({
         onClick={onClose}
       />
 
-      {/* Modal Panel */}
+      {/* Modal Panel — Mobile-first: w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto */}
       <div
-        className={`relative w-full max-w-md transform overflow-hidden rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 p-6 text-left shadow-2xl transition-all duration-300 ${
+        className={`relative w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto transform rounded-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50 p-6 text-left shadow-2xl transition-all duration-300 ${
           visible
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-4"
