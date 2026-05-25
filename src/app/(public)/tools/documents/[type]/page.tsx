@@ -332,7 +332,7 @@ export default function DocumentEditorPage() {
       `}</style>
 
       {/* Top bar */}
-      <div className="bg-white border-b sticky top-0 z-40 print:hidden">
+      <div className="bg-white border-b sticky top-0 z-40 no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/tools/documents" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">
@@ -388,7 +388,7 @@ export default function DocumentEditorPage() {
       </div>
 
       {/* Mobile Tab bar */}
-      <div className="lg:hidden sticky top-[57px] z-30 bg-white border-b print:hidden">
+      <div className="lg:hidden sticky top-[57px] z-30 bg-white border-b no-print">
         <div className="flex">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setMobileTab(tab.id)}
@@ -400,9 +400,9 @@ export default function DocumentEditorPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6 print:block">
+        <div className="flex gap-6 print-block">
           {/* Form panel - shown on desktop always, on mobile only in edit tab */}
-          <div className={`w-full lg:w-1/2 print:hidden ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
+          <div className={`w-full lg:w-1/2 no-print ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
             {/* Company info */}
             <div className="bg-white rounded-xl border p-5 mb-4">
               <div className="flex items-center justify-between mb-4">
@@ -616,10 +616,10 @@ export default function DocumentEditorPage() {
             )}
 
             {/* Ad Slot */}
-            <div className="print:hidden"><AdSlot placement="document-editor-bottom" variant="card" /></div>
+            <div className="no-print"><AdSlot placement="document-editor-bottom" variant="card" /></div>
 
             {/* Disclaimer */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 print:hidden">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 no-print">
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                 <div className="text-xs text-yellow-800">
@@ -631,10 +631,10 @@ export default function DocumentEditorPage() {
           </div>
 
           {/* Preview panel - shown on desktop always, on mobile in preview/export tabs */}
-          <div className={`w-full lg:w-1/2 print:w-full ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
+          <div className={`w-full lg:w-1/2 print-full-width ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
             <div className="lg:sticky lg:top-20">
               {mobileTab === 'export' && (
-                <div className="flex flex-wrap gap-2 mb-4 print:hidden">
+                <div className="flex flex-wrap gap-2 mb-4 no-print">
                   <button onClick={handlePrint} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium">
                     <Printer className="w-4 h-4" /> 打印 / PDF
                   </button>
@@ -651,7 +651,7 @@ export default function DocumentEditorPage() {
 
               {/* Style picker for mobile */}
               {mobileTab === 'preview' && p.canUseCustomStyle() && (
-                <div className="flex items-center justify-between mb-3 print:hidden">
+                <div className="flex items-center justify-between mb-3 no-print">
                   <div className="flex items-center gap-2">
                     {documentStyles.map(s => {
                       if (s.memberOnly && !p.canUseCustomStyle()) return null;
@@ -670,7 +670,7 @@ export default function DocumentEditorPage() {
 
               {/* Document preview container - the actual preview used for both display and print/PNG */}
               <div ref={previewRef} data-document-preview="true"
-                className="document-preview-container bg-white rounded-xl border shadow-sm p-8 print:shadow-none print:border-none print:p-0"
+                className="document-preview-container bg-white rounded-xl border shadow-sm p-8 print-shadow-none print-border-none print-p-0"
                 style={{ fontFamily: 'SimSun, serif', fontSize: '11pt' }}>
                 {/* Document header */}
                 <div className="border-b-2 pb-4 mb-4" style={{ borderColor: style.borderColor }}>
@@ -793,7 +793,7 @@ export default function DocumentEditorPage() {
               </div>
 
               {/* Mobile bottom action bar */}
-              <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 print:hidden">
+              <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 no-print">
                 {mobileTab === 'edit' && (
                   <button onClick={() => setMobileTab('preview')} className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium text-sm">
                     预览单据 →
@@ -816,7 +816,7 @@ export default function DocumentEditorPage() {
                 )}
               </div>
               {/* Spacer for mobile bottom bar */}
-              <div className="lg:hidden h-20 print:hidden" />
+              <div className="lg:hidden h-20 no-print" />
             </div>
           </div>
         </div>

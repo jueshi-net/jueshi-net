@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.14 (2026-05-25) |
+| 最新稳定版本 | v1.32.15 (2026-05-25) |
 
 ---
 
@@ -276,7 +276,63 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.12** | 2026-05-25 | **全站移动端深度适配** — Paywall max-h-[90vh] overflow-y-auto、输入框 min-h-[44px]、发票表格 overflow-x-auto、SOP 长文本 break-words、Header 响应式优化 |
 | **v1.32.13** | 2026-05-25 | **Stripe 生产支付全链路打通** — Mock→真实 SDK、sk_live_ 强制校验、Webhook 签名验证、Checkout API 鉴权、Pricing 页跳转打通 |
 | **v1.32.14** | 2026-05-25 | **Admin 权限硬编码清扫 + AI 矿机重启** — 36 文件 role === 'admin' → isAdminRole()/isElevatedRole() 统一兼容、crawler:daemon npm 脚本、DeepSeek 超时 30s 捕获 |
+| **v1.32.15** | 2026-05-25 | **CSS 零警告净化 + 数字矿机 PM2 守护进程化** — 修复 6 个 print: 变体解析警告（.print\\:hidden → @media print 原生类名）、创建 ecosystem.config.js 双进程配置（xixiong-saas + jueshi-miner）、deploy.sh 追加矿机管理提示 |
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.14)*
+## 10. 数字矿机与后台 Worker 运维篇
+
+### 10.1 矿机架构
+
+**进程名：** `jueshi-miner`
+**脚本：** `scripts/advanced-crawler/daemon.ts`
+**运行时：** `npx tsx` (Node.js 20+)
+**PM2 配置：** `ecosystem.config.js` 中的第 2 个 app 节点
+
+### 10.2 启动与停止命令
+
+```bash
+# VPS 上启动矿机（24/7 守护进程）
+ssh deploy@jueshi.net 'cd /home/deploy/xixiong-saas && NODE_ENV=production pm2 start ecosystem.config.js --only jueshi-miner'
+
+# 查看矿机状态
+ssh deploy@jueshi.net 'pm2 list | grep miner'
+
+# 查看矿机日志
+ssh deploy@jueshi.net 'pm2 logs jueshi-miner --lines 50'
+
+# 停止矿机
+ssh deploy@jueshi.net 'pm2 stop jueshi-miner'
+
+# 重启矿机
+ssh deploy@jueshi.net 'pm2 restart jueshi-miner'
+```
+
+### 10.3 队列管理规则
+
+| 文件 | 用途 | 操作规则 |
+|------|------|---------|
+| `pending-urls.txt` | 待处理 URL 队列 | 每行一个 URL，矿机从顶部逐条消费 |
+| `processed-urls.txt` | 已处理 URL 归档 | 成功/拒绝/超时的 URL 自动追加，**禁止手动删除** |
+| `failed-urls.txt` | 失败重试追踪 | 格式 `url|retryCount`，达到 MAX_RETRIES(3) 后自动移入 processed |
+| `daemon.log` | 运行日志 | 按时间戳滚动，定期清理旧日志（`tail -10000 > daemon.log`） |
+
+### 10.4 矿机工作流程
+
+```
+pending-urls.txt → 读取首条 URL → 检查 DB 去重 → 随机休眠(3-8s)
+  → 抓取页面(crawlUrl) → AI 评估(evaluateWithAI) → 质量打分
+  → 通过 → Prisma upsert 入库 → 移入 processed
+  → 拒绝/失败 → 记录失败计数 → 达 3 次 → 移入 processed
+```
+
+### 10.5 安全注意事项
+
+- **矿机默认不随部署自动启动** — 需主理人手动 `pm2 start` 激活，防止意外消耗 AI API 配额
+- **环境变量依赖** — 需要 `AI_API_KEY`, `AI_API_BASE_URL`, `AI_MODEL`, `DATABASE_URL` 已配置
+- **频率控制** — 每条 URL 之间随机休眠 3-8 秒，防止目标站点反爬
+- **终极容错** — 任何未捕获异常都不会导致进程退出，失败 URL 移入 processed 避免死循环
+
+---
+
+*Last updated: 2026-05-25 (v1.32.15)*

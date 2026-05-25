@@ -186,7 +186,7 @@ export default function LabelMakerPage() {
       <div ref={exportContainerRef} className="hidden" aria-hidden="true" />
 
       {/* ===== UNIFIED TOOLBAR (h-14, all screen sizes) ===== */}
-      <div className="bg-white border-b sticky top-0 z-40 print:hidden" style={{ height: '56px' }}>
+      <div className="bg-white border-b sticky top-0 z-40 no-print" style={{ height: '56px' }}>
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/tools/documents" className="text-sm text-gray-500 hover:text-teal-600 flex items-center gap-1 min-h-[44px]">
@@ -219,7 +219,7 @@ export default function LabelMakerPage() {
       <div className="bg-[#F5F5F7] min-h-screen">
 
         {/* Mobile Tab bar */}
-        <div className="lg:hidden sticky top-[56px] z-30 bg-white border-b print:hidden">
+        <div className="lg:hidden sticky top-[56px] z-30 bg-white border-b no-print">
           <div className="flex">
             {tabs.map(tab => (
               <button key={tab.id} onClick={() => setMobileTab(tab.id)}
@@ -231,21 +231,21 @@ export default function LabelMakerPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 print:hidden">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 no-print">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800">{DISCLAIMER}</p>
             </div>
           </div>
           {template?.disclaimer && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 print:hidden">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 no-print">
               <p className="text-xs text-red-700">⚠️ {template.disclaimer}</p>
             </div>
           )}
 
-          <div className="flex gap-4 print:block">
+          <div className="flex gap-4 print-block">
             {/* Left: Controls - desktop always, mobile only edit tab */}
-            <div className={`w-full lg:w-5/12 print:hidden space-y-4 ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
+            <div className={`w-full lg:w-5/12 no-print space-y-4 ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
               {/* Template selector */}
               <div className="bg-white rounded-xl border p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2"><Package className="w-4 h-4" /> 选择标签类型</h3>
@@ -381,7 +381,7 @@ export default function LabelMakerPage() {
                 </div>
               )}
 
-              <AdSlot placement="label-maker-bottom" variant="card" className="print:hidden" />
+              <AdSlot placement="label-maker-bottom" variant="card" className="no-print" />
 
               <div className="text-center text-xs text-gray-400">
                 游客最多保存 <strong>{perms.limits.maxDrafts ?? 3}</strong> 份草稿 | <Link href="/tools/documents" className="text-blue-500">去单据生成器 →</Link>
@@ -389,10 +389,10 @@ export default function LabelMakerPage() {
             </div>
 
             {/* Preview - desktop always, mobile preview/export tabs */}
-            <div className={`w-full lg:w-7/12 print:w-full ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
+            <div className={`w-full lg:w-7/12 print-full-width ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
               <div className="lg:sticky lg:top-20">
                 {mobileTab === 'export' && (
-                  <div className="flex flex-wrap gap-2 mb-4 print:hidden">
+                  <div className="flex flex-wrap gap-2 mb-4 no-print">
                     <button onClick={handlePrint} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium">
                       <Printer className="w-4 h-4" /> 打印/PDF
                     </button>
@@ -404,7 +404,7 @@ export default function LabelMakerPage() {
 
                 {/* Label preview — v1.20.4 template renderers */}
                 <div ref={previewRef} data-label-preview="true"
-                  className="bg-white border rounded-xl p-4 print:p-0 print:border-0 print:shadow-none overflow-x-hidden"
+                  className="bg-white border rounded-xl p-4 print-p-0 print-border-none print-shadow-none overflow-x-hidden"
                   style={{ fontFamily: 'sans-serif', maxWidth: '100%' }}>
                   <div style={{
                     border: `${style.showBorder ? '2px' : '0'} ${style.showBorder ? 'solid' : 'none'} ${style.borderColor}`,
@@ -446,7 +446,7 @@ export default function LabelMakerPage() {
                 </div>
 
                 {/* Mobile bottom action bar */}
-                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 print:hidden">
+                <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 no-print">
                   {mobileTab === 'edit' && (
                     <button onClick={() => setMobileTab('preview')} className="w-full py-3 min-h-[48px] bg-blue-600 text-white rounded-xl font-medium text-sm">
                       预览 →
@@ -462,15 +462,15 @@ export default function LabelMakerPage() {
                     <button onClick={() => setMobileTab('preview')} className="w-full py-3 min-h-[48px] bg-gray-100 text-gray-700 rounded-xl font-medium text-sm">← 返回预览</button>
                   )}
                 </div>
-                <div className="lg:hidden h-20 print:hidden" />
+                <div className="lg:hidden h-20 no-print" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Tool ads & FAQ */}
-        <AdSlot placement="tool-bottom" className="mb-6 print:hidden" />
-        <div className="print:hidden">
+        <AdSlot placement="tool-bottom" className="mb-6 no-print" />
+        <div className="no-print">
           <FAQSection title="唛头面单常见问题" items={[
             { question: "这个工具可以生成快递面单吗？", answer: "本工具生成的是通用箱唛、仓库标签和寄件信息贴纸，不是任何承运商（DHL/FedEx/UPS/顺丰等）的官方运单。正式快递面单请在对应承运商官网或其系统中生成。" },
             { question: "唛头（Shipping Mark）是什么？", answer: "唛头是外箱上印刷或粘贴的标识信息，通常包括：收货人简称、目的港、箱号（如 1/50 表示共50箱中的第1箱）、产品名、重量尺寸等。用于仓库和物流环节快速识别货物。" },

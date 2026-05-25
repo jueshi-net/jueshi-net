@@ -113,33 +113,32 @@ input, textarea, select {
   }
 
   /* Hide non-printable elements */
-  .print\\:hidden,
+  .no-print,
   nav,
   banner,
   footer,
-  button,
-  .no-print {
+  button {
     display: none !important;
   }
 
   /* Make printable elements full width */
-  .print\\:w-full {
+  .print-full-width {
     width: 100% !important;
   }
 
-  .print\\:block {
+  .print-block {
     display: block !important;
   }
 
-  .print\\:shadow-none {
+  .print-shadow-none {
     box-shadow: none !important;
   }
 
-  .print\\:border-none {
+  .print-border-none {
     border: none !important;
   }
 
-  .print\\:p-0 {
+  .print-p-0 {
     padding: 0 !important;
   }
 
