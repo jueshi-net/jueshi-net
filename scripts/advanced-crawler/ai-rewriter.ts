@@ -79,6 +79,10 @@ URL: ${siteInfo.url}
 域名年龄: ${siteInfo.domainAgeDays ? `${siteInfo.domainAgeDays} 天` : "未知"}`;
 
   try {
+    // Timeout after 30s for AI calls
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
     const resp = await fetch(`${cfg.apiUrl}/chat/completions`, {
       method: "POST",
       headers: {
@@ -95,7 +99,9 @@ URL: ${siteInfo.url}
         max_tokens: 300,
         response_format: { type: "json_object" },
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!resp.ok) {
       const errText = await resp.text();

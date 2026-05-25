@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "deploy": "bash scripts/deploy.sh",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "crawler:daemon": "npx tsx scripts/advanced-crawler/daemon.ts",
+    "crawler:test": "npx tsx scripts/advanced-crawler/daemon-test.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

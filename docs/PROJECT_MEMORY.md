@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.13 (2026-05-25) |
+| 最新稳定版本 | v1.32.14 (2026-05-25) |
 
 ---
 
@@ -275,7 +275,8 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.11** | 2026-05-25 | **HTTPS 鉴权修复 + 全局导航打通** — 生产环境 __Secure-next-auth.session-token Cookie 兼容修复（6 处）+ SOP/学生专区注册至 Cmd+K 搜索与工具广场 |
 | **v1.32.12** | 2026-05-25 | **全站移动端深度适配** — Paywall max-h-[90vh] overflow-y-auto、输入框 min-h-[44px]、发票表格 overflow-x-auto、SOP 长文本 break-words、Header 响应式优化 |
 | **v1.32.13** | 2026-05-25 | **Stripe 生产支付全链路打通** — Mock→真实 SDK、sk_live_ 强制校验、Webhook 签名验证、Checkout API 鉴权、Pricing 页跳转打通 |
+| **v1.32.14** | 2026-05-25 | **Admin 权限硬编码清扫 + AI 矿机重启** — 36 文件 role === 'admin' → isAdminRole()/isElevatedRole() 统一兼容、crawler:daemon npm 脚本、DeepSeek 超时 30s 捕获 |
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.13)*
+*Last updated: 2026-05-25 (v1.32.14)*

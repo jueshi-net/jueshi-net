@@ -1,17 +1,18 @@
 // 24/7 守护进程 — 从 pending 队列中逐条抓取、AI 洗稿、写入生产库
-// 用法: npx tsx scripts/advanced-crawler/daemon.ts
-// 特性: 断点续传、随机节流、无极容错、自动入库
+// 用法: npx tsx scripts/advanced-crawler/daemon.ts  或  npm run crawler:daemon
+// 特性: 断点续传、随机节流、无极容错、自动入库、DeepSeek 超时捕获
 
 // Load env (try .env.production first for VPS, then .env for local)
 import { config } from "dotenv";
 import { resolve } from "path";
+import { existsSync } from "fs";
 
 const envProd = resolve(__dirname, "../../.env.production");
 const envLocal = resolve(__dirname, "../../.env");
 if (existsSync(envProd)) config({ path: envProd });
 else config({ path: envLocal });
 
-import { readFileSync, writeFileSync, appendFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, appendFileSync } from "fs";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { crawlUrl, extractDomain } from "./engine";
