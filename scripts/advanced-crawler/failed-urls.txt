@@ -1,0 +1,15 @@
+https://seller.walmart.com/home|3
+https://www.wayfair.com|3
+https://www.coupang.com|3
+https://wing.coupang.com|3
+https://www.aikuafu.com|3
+https://www.amazon.com/stylesnap|3
+https://www.amazon.co.uk/gp/new-releases|3
+https://www.amazon.de/gp/new-releases|3
+https://www.amazon.fr/gp/new-releases|3
+https://www.amazon.it/gp/new-releases|3
+https://www.amazon.es/gp/new-releases|3
+https://www.amazon.co.jp/gp/new-releases|3
+https://www.amazon.ca/gp/new-releases|3
+https://www.amazon.com.mx/gp/new-releases|3
+https://www.amazon.nl/gp/new-releases|2

@@ -1,0 +1,162 @@
+[
+  {
+    "url": "https://www.usps.com",
+    "name": "Welcome | USPS",
+    "description": "美国邮政官网，提供包裹追踪、邮资计算、在线寄件及邮编查询等核心邮政服务。",
+    "category": "life",
+    "tags": [
+      "美国邮政",
+      "包裹追踪",
+      "在线寄件"
+    ],
+    "favicon": "https://www.usps.com/assets/images/home/favicon.ico",
+    "domainAge": 10545,
+    "qualityScore": 95,
+    "language": "en",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.irs.gov",
+    "name": "Internal Revenue Service | An official website of the United States government",
+    "description": "美国国税局官网，提供税务申报、退税查询、表格下载及税务问题解答，权威可靠。",
+    "category": "tools",
+    "tags": [
+      "税务",
+      "美国",
+      "政府"
+    ],
+    "favicon": "https://www.irs.gov/themes/custom/pup_base/favicon.ico",
+    "domainAge": 10461,
+    "qualityScore": 95,
+    "language": "en",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://auspost.com.au",
+    "name": "Personal, Business, Enterprise & Government solutions - Australia Post",
+    "description": "澳大利亚邮政官网，提供个人及企业邮政、零售、金融和旅行服务，可靠且价格实惠。",
+    "category": "life",
+    "tags": [
+      "澳大利亚邮政",
+      "邮政服务",
+      "海外生活"
+    ],
+    "favicon": "https://auspost.com.au/content/dam/global/favicons/favicon-32x32.png",
+    "domainAge": null,
+    "qualityScore": 90,
+    "language": "en",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.japanpost.jp",
+    "name": "日本郵政",
+    "description": "日本邮政集团官网，提供邮政、储蓄、保险等综合服务，是海外用户了解日本邮政业务的重要入口。",
+    "category": "life",
+    "tags": [
+      "日本邮政",
+      "海外生活",
+      "邮政服务"
+    ],
+    "favicon": "https://www.japanpost.jp/favicon.ico",
+    "domainAge": null,
+    "qualityScore": 85,
+    "language": "ja",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.craigslist.org",
+    "name": "craigslist: los angeles jobs, apartments, for sale, services, community, and events",
+    "description": "美国本土分类信息网站，提供招聘、租房、二手交易、社区活动等本地化服务。",
+    "category": "life",
+    "tags": [
+      "分类信息",
+      "本地生活",
+      "二手交易"
+    ],
+    "favicon": "https://losangeles.craigslist.org/favicon.ico",
+    "domainAge": 10482,
+    "qualityScore": 85,
+    "language": "en",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.gumtree.com",
+    "name": "Gumtree | One of the UK's most popular online marketplaces",
+    "description": "英国知名在线分类市场，免费买卖家具、汽车、电子产品等，支持本地及全国交易。",
+    "category": "life",
+    "tags": [
+      "二手交易",
+      "分类广告",
+      "英国生活"
+    ],
+    "favicon": "https://www.gumtree.com/assets/frontend/favicon.49f3fbf4ec1a73bc9bf55440eba29ff9.ico",
+    "domainAge": 10566,
+    "qualityScore": 85,
+    "language": "en-GB",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.wise.com",
+    "name": "Wise：国际账户 | 汇无国界 | Wise 美国",
+    "description": "Wise提供多币种国际账户，支持40种货币汇款、消费和管理，费率透明，覆盖160多个国家。",
+    "category": "tools",
+    "tags": [
+      "国际汇款",
+      "多币种账户",
+      "跨境金融"
+    ],
+    "favicon": "https://wise.com/public-resources/assets/icons/wise-personal/favicon.png",
+    "domainAge": 11766,
+    "qualityScore": 90,
+    "language": "zh-CN",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.paypal.com",
+    "name": "请稍候，我们正在执行安全检查",
+    "description": "全球领先的在线支付平台，支持安全快捷的国际转账与收款，仅需邮箱即可操作。",
+    "category": "business",
+    "tags": [
+      "在线支付",
+      "跨境转账",
+      "国际收款"
+    ],
+    "favicon": "https://www.paypalobjects.com/en_US/i/icon/pp_favicon_x.ico",
+    "domainAge": 9810,
+    "qualityScore": 95,
+    "language": "en",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.rightmove.co.uk",
+    "name": "Rightmove - UK's number one property website for properties for sale and to rentopen-rightmove-assistantburger_menuopen-rightmove-assistantlog_in",
+    "description": "英国最大房产平台，提供买卖与租赁房源搜索及市场数据。",
+    "category": "life",
+    "tags": [
+      "英国房产",
+      "租房",
+      "买房"
+    ],
+    "favicon": "https://media.rightmove.co.uk/assets/shared-assets/favicons/light/favicon.ico",
+    "domainAge": null,
+    "qualityScore": 90,
+    "language": "en-GB",
+    "sourceType": "third-party"
+  },
+  {
+    "url": "https://www.airbnb.com",
+    "name": "爱彼迎：度假屋、小木屋、海滨住宅、特色房源和体验",
+    "description": "全球领先的短租民宿预订平台，提供超700万套度假屋，覆盖220多个国家和地区。",
+    "category": "life",
+    "tags": [
+      "短租",
+      "民宿",
+      "旅行住宿"
+    ],
+    "favicon": "https://a0.muscache.com/im/pictures/airbnb-platform-assets/AirbnbPlatformAssets-Favicons/original/0d189acb-3f82-4b2c-b95f-ad1d6a803d13.png?im_w=240",
+    "domainAge": 6501,
+    "qualityScore": 95,
+    "language": "zh",
+    "sourceType": "third-party"
+  }
+]

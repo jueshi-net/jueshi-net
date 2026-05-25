@@ -85,7 +85,7 @@ function getRole(): UserRole {
   // 从 localStorage 读取角色（后期接真实用户系统）
   if (typeof window === "undefined") return "guest";
   const saved = localStorage.getItem("bxb_role");
-  if (saved === "member" || saved === "admin") return saved as UserRole;
+  if (saved === "member" || saved === "admin" || saved === "管理员") return saved as UserRole;
   if (saved === "user") return "user";
   return "guest";
 }

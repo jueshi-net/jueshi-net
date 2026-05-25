@@ -14,7 +14,8 @@ export async function requireAdmin() {
   if (result instanceof NextResponse) return result;
 
   const { session } = result;
-  if ((session.user as any).role?.toUpperCase() !== "ADMIN") {
+  const role = (session.user as any).role || "";
+  if (!["管理员", "ADMIN", "admin"].includes(role)) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
   return { session };

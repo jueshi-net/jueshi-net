@@ -7,6 +7,7 @@ import Header from "@/components/layout/header";
 import CommandPalette, { CommandMenuProvider } from "@/components/command-palette";
 import PWARegister from "@/components/PWARegister";
 import CookieConsent from "@/components/common/cookie-consent";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, defaultOpenGraph } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -77,6 +78,9 @@ export default function RootLayout({
           </CommandMenuProvider>
           <PWARegister />
           <CookieConsent />
+          {process.env.NEXT_PUBLIC_GA_ID && (
+            <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          )}
         </Providers>
       </body>
     </html>

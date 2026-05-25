@@ -28,7 +28,7 @@ const navSections = [
     items: [
       { href: "/admin/topics", label: "专题管理", icon: FolderOpen },
       { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
-      { href: "/admin/resources", label: "资源大厅", icon: BookOpen },
+      { href: "/admin/resources", label: "🌍 网址导航大厅", icon: BookOpen },
       { href: "/admin/cms", label: "文章与指南", icon: BookOpen },
       { href: "/admin/resources/import", label: "资源导入", icon: Upload },
     ]
@@ -52,7 +52,7 @@ export default async function AdminLayout({
   const session = await auth();
   if (!session?.user) redirect("/login?reason=no-session");
   const role = (session.user as any).role || "";
-  if (role.toUpperCase() !== "ADMIN") {
+  if (!["管理员", "ADMIN", "admin"].includes(role)) {
     redirect("/dashboard?error=not-admin");
   }
 

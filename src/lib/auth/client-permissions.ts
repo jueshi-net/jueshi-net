@@ -69,7 +69,7 @@ function getFallbackRole(): ClientPermissions {
       loaded: true,
     };
   }
-  if (saved === "admin") {
+  if (saved === "admin" || saved === "管理员") {
     return {
       authenticated: false,
       role: "admin",

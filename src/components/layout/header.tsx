@@ -196,7 +196,7 @@ export default function Header() {
                           <Settings className="w-4 h-4" />
                           设置
                         </Link>
-                        {(session.user as any)?.role === "admin" && (
+                        {["管理员", "admin"].includes((session.user as any)?.role) && (
                           <Link
                             href="/admin"
                             className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 min-h-[44px]"
@@ -394,7 +394,7 @@ export default function Header() {
                     <Settings className="w-5 h-5 text-gray-400" />
                     <span className="font-medium">设置</span>
                   </Link>
-                  {(session?.user as any)?.role === "admin" && (
+                  {["管理员", "admin"].includes((session?.user as any)?.role) && (
                     <Link
                       href="/admin"
                       onClick={() => setMobileMenuOpen(false)}

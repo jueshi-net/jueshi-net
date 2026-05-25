@@ -13,7 +13,8 @@ export interface QuotaResult {
 
 export function getDailyLimit(role: string): number {
   switch (role) {
-    case "admin": return 999;
+    case "admin":
+    case "管理员": return 999;
     case "member": return 50;
     case "user": return 3;
     default: return 1; // guest

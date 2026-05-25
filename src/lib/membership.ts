@@ -20,7 +20,7 @@ export async function isActiveMember(): Promise<boolean> {
     if (!user) return false;
 
     // Admin always has member privileges
-    if (user.role === "admin") return true;
+    if (["管理员", "admin", "member"].includes(user.role)) return true;
 
     // Check explicit member role
     if (user.role === "member") return true;

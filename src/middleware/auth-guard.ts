@@ -6,7 +6,7 @@ export async function requireAdmin(email: string) {
     select: { role: true }
   });
 
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || !['管理员', 'ADMIN', 'admin'].includes(user.role)) {
     throw new Error('无权访问');
   }
 

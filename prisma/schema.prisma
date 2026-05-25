@@ -404,7 +404,7 @@ model ArticleTag {
 model Resource {
   id          String   @id @default(cuid())
   name        String
-  url         String
+  url         String   @unique
   description String?
   category    String // life/logistics/business/templates
   tags        String[] @default([])
@@ -413,11 +413,24 @@ model Resource {
   disclaimer  String? // 免责声明或使用提示
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+
+  // v1.33: 高级爬虫流水线新增字段
+  favicon        String? // 站点 Favicon URL
+  iconUrl        String?   @map("icon_url") // 自定义网站 Logo URL（管理员上传/粘贴）
+  isAd           Boolean   @default(false) @map("is_ad") // 是否为广告（Sponsored）
+  domainAge      Int?      @map("domain_age") // 域名年龄(天)
+  qualityScore   Int       @default(0) @map("quality_score") // AI 质量评分 0-100
+  language       String?   @default("en") // 站点语言
+  lastChecked    DateTime? @map("last_checked") // 最近死链检查时间
+  checkFailCount Int       @default(0) @map("check_fail_count") // 连续检查失败次数
+  rejectedReason String?   @map("rejected_reason") // AI 拒绝原因（灰产/垃圾站等）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([category])
   @@index([isActive])
+  @@index([qualityScore])
   @@map("resources")
 }
 
@@ -1097,29 +1110,29 @@ model UserCustomNav {
 // ─── v1.31.0: pSEO 聚合页数据库化 ───
 
 model Destination {
-  id             String               @id @default(cuid())
-  slug           String               @unique
+  id             String   @id @default(cuid())
+  slug           String   @unique
   name           String // 中文名: 加拿大
-  nameEn         String               @map("name_en") // 英文名: Canada
+  nameEn         String   @map("name_en") // 英文名: Canada
   currency       String // ISO code: CAD
   region         String // 区域: 北美
   emoji          String
-  heroTitle      String               @map("hero_title")
-  heroSubtitle   String               @map("hero_subtitle")
-  seoTitle       String               @map("seo_title")
-  seoDescription String               @map("seo_description")
+  heroTitle      String   @map("hero_title")
+  heroSubtitle   String   @map("hero_subtitle")
+  seoTitle       String   @map("seo_title")
+  seoDescription String   @map("seo_description")
   keywords       String[] // SEO keywords
-  keyCities      String[]             @map("key_cities")
-  userCount      String               @default("0") @map("user_count")
-  docCount       String               @default("0") @map("doc_count")
-  isActive       Boolean              @default(true) @map("is_active")
-  sortOrder      Int                  @default(0) @map("sort_order")
-  createdAt      DateTime             @default(now()) @map("created_at")
-  updatedAt      DateTime             @default(now()) @updatedAt @map("updated_at")
+  keyCities      String[] @map("key_cities")
+  userCount      String   @default("0") @map("user_count")
+  docCount       String   @default("0") @map("doc_count")
+  isActive       Boolean  @default(true) @map("is_active")
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
 
-  tools          DestinationTool[]
-  guides         DestinationGuide[]
-  services       DestinationService[]
+  tools    DestinationTool[]
+  guides   DestinationGuide[]
+  services DestinationService[]
 
   @@index([isActive, region])
   @@index([slug])

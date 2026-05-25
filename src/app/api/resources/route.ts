@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     // Check if user is admin
     const session = await auth();
-    const isAdmin = session?.user?.role === "admin" || session?.user?.role === "ADMIN";
+    const isAdmin = ["管理员", "admin", "ADMIN"].includes(session?.user?.role || "");
 
     const where: any = {};
     if (category) where.category = category;
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "admin" && session.user.role !== "ADMIN")) {
+  if (!session?.user || (!["管理员", "admin", "ADMIN"].includes(session.user.role))) {
     return NextResponse.json({ error: "未授权" }, { status: 403 });
   }
 
@@ -65,6 +65,8 @@ export async function POST(req: NextRequest) {
         disclaimer: body.disclaimer || "",
         isActive: body.isActive !== false,
         sortOrder: body.sortOrder || 0,
+        iconUrl: body.iconUrl || null,
+        isAd: body.isAd || false,
       },
     });
     return NextResponse.json({ success: true, resource });
@@ -75,7 +77,7 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "admin" && session.user.role !== "ADMIN")) {
+  if (!session?.user || (!["管理员", "admin", "ADMIN"].includes(session.user.role))) {
     return NextResponse.json({ error: "未授权" }, { status: 403 });
   }
 
@@ -96,6 +98,8 @@ export async function PATCH(req: NextRequest) {
     if (body.disclaimer !== undefined) data.disclaimer = body.disclaimer;
     if (body.isActive !== undefined) data.isActive = body.isActive;
     if (body.sortOrder !== undefined) data.sortOrder = body.sortOrder;
+    if (body.iconUrl !== undefined) data.iconUrl = body.iconUrl;
+    if (body.isAd !== undefined) data.isAd = body.isAd;
 
     const resource = await prisma.resource.update({ where: { id }, data });
     return NextResponse.json({ success: true, resource });
@@ -106,7 +110,7 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || (session.user.role !== "admin" && session.user.role !== "ADMIN")) {
+  if (!session?.user || (!["管理员", "admin", "ADMIN"].includes(session.user.role))) {
     return NextResponse.json({ error: "未授权" }, { status: 403 });
   }
 

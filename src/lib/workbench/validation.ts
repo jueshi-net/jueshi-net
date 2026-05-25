@@ -84,6 +84,6 @@ export function validateProfileType(profileType: string): LinkValidationResult {
  * Get max links based on role
  */
 export function getMaxLinks(role: string): number {
-  if (role === "member" || role === "admin") return 200;
+  if (["member", "admin", "管理员"].includes(role)) return 200;
   return 20; // user
 }

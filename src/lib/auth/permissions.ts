@@ -110,7 +110,7 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
     const tokenRole = (session.user as any).role;
     if (tokenRole) {
       const role = tokenRole.toLowerCase();
-      if (role === "admin") return "admin";
+      if (role === "admin" || role === "管理员") return "admin";
       if (role === "member") return "member";
       if (role === "user") return "user";
     }
@@ -135,7 +135,7 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
     if (!dbUser) return "guest";
 
     const role = dbUser.role?.toLowerCase();
-    if (role === "admin") return "admin";
+    if (role === "admin" || role === "管理员") return "admin";
     if (role === "member") return "member";
     if (role === "user") return "user";
 
@@ -166,7 +166,7 @@ export async function requireMember() {
   const res = await requireLogin();
   if ("error" in res) return res;
 
-  if (res.role !== "member" && res.role !== "admin") {
+  if (!["member", "admin", "管理员"].includes(res.role)) {
     return { error: new Response(JSON.stringify({ error: "Forbidden: Member required" }), { status: 403 }) };
   }
   return { session: res.session, role: res.role };
@@ -180,7 +180,7 @@ export async function requireAdmin() {
   const res = await requireLogin();
   if ("error" in res) return res;
 
-  if (res.role !== "admin") {
+  if (!["admin", "管理员"].includes(res.role)) {
     return { error: new Response(JSON.stringify({ error: "Forbidden: Admin required" }), { status: 403 }) };
   }
   return { session: res.session, role: res.role };

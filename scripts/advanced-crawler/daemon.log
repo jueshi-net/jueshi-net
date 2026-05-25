@@ -1,0 +1,210 @@
+[2026-05-24T13:11:25.780Z] [INFO] 🤖 守护进程启动...
+[2026-05-24T13:11:25.782Z] [INFO] 待处理文件: /Users/chq/projects/xixiong-saas/scripts/advanced-crawler/pending-urls.txt
+[2026-05-24T13:11:25.782Z] [INFO] 已处理文件: /Users/chq/projects/xixiong-saas/scripts/advanced-crawler/processed-urls.txt
+[2026-05-24T13:11:25.783Z] [INFO] --- 第 1 轮 | 待处理: 594 条 | 已处理: 3 条 | 失败追踪: 0 条 ---
+[2026-05-24T13:11:25.783Z] [INFO] 处理中: https://us.shein.com
+[2026-05-24T13:11:36.059Z] [INFO] 抓取成功: Women's Clothing, Women Fashion Sale | SHEIN USA (2744ms)
+[2026-05-24T13:11:45.578Z] [SUCCESS] AI 通过: [life] 评分:85 "SHEIN美国站，提供女装、配饰等时尚单品，支持免费送货和轻松退货，每日上新。"
+[2026-05-24T13:11:48.489Z] [SUCCESS] ✅ 入库成功: Women's Clothing, Women Fashion Sale | SHEIN USA
+[2026-05-24T13:11:48.493Z] [INFO] --- 第 2 轮 | 待处理: 593 条 | 已处理: 4 条 | 失败追踪: 0 条 ---
+[2026-05-24T13:11:48.493Z] [INFO] 处理中: https://sso.geiwohuo.com
+[2026-05-24T13:11:53.546Z] [INFO] 抓取成功: SHEIN全球商家中心 (190ms)
+[2026-05-24T13:12:01.530Z] [SUCCESS] AI 通过: [business] 评分:85 "SHEIN官方商家入驻平台，提供全球电商运营、供应链管理及销售数据分析服务。"
+[2026-05-24T13:12:04.433Z] [SUCCESS] ✅ 入库成功: SHEIN全球商家中心
+[2026-05-24T13:12:04.436Z] [INFO] --- 第 3 轮 | 待处理: 592 条 | 已处理: 5 条 | 失败追踪: 0 条 ---
+[2026-05-24T13:12:04.437Z] [INFO] 处理中: https://www.walmart.com
+[2026-05-24T13:13:12.926Z] [INFO] 抓取成功: Walmart | Save Money. Live better. (1747ms)
+[2026-05-24T13:13:18.797Z] [SUCCESS] AI 通过: [life] 评分:95 "沃尔玛官网，提供低价商品、免费配送及Walmart+会员服务，覆盖日用百货、食品、电子产品等。"
+[2026-05-24T13:13:21.921Z] [SUCCESS] ✅ 入库成功: Walmart | Save Money. Live better.
+[2026-05-24T13:13:21.925Z] [INFO] --- 第 4 轮 | 待处理: 591 条 | 已处理: 6 条 | 失败追踪: 0 条 ---
+[2026-05-24T13:13:21.925Z] [INFO] 处理中: https://seller.walmart.com/home
+[2026-05-24T13:13:28.476Z] [WARN] 抓取失败 (1/3, HTTP 412): https://seller.walmart.com/home
+[2026-05-24T13:13:28.478Z] [INFO] --- 第 5 轮 | 待处理: 591 条 | 已处理: 6 条 | 失败追踪: 1 条 ---
+[2026-05-24T13:13:28.478Z] [INFO] 处理中: https://seller.walmart.com/home
+[2026-05-24T13:13:36.983Z] [WARN] 抓取失败 (2/3, HTTP 412): https://seller.walmart.com/home
+[2026-05-24T13:13:36.985Z] [INFO] --- 第 6 轮 | 待处理: 591 条 | 已处理: 6 条 | 失败追踪: 1 条 ---
+[2026-05-24T13:13:36.985Z] [INFO] 处理中: https://seller.walmart.com/home
+[2026-05-24T13:13:46.984Z] [WARN] 抓取失败 (3/3, HTTP 412): https://seller.walmart.com/home
+[2026-05-24T13:13:46.985Z] [WARN] ⛔ 超过最大重试次数，放弃: https://seller.walmart.com/home
+[2026-05-24T13:13:46.987Z] [INFO] --- 第 7 轮 | 待处理: 590 条 | 已处理: 7 条 | 失败追踪: 1 条 ---
+[2026-05-24T13:13:46.987Z] [INFO] 处理中: https://www.wayfair.com
+[2026-05-24T13:13:53.896Z] [WARN] 抓取失败 (1/3, HTTP 429): https://www.wayfair.com
+[2026-05-24T13:13:53.897Z] [INFO] --- 第 8 轮 | 待处理: 590 条 | 已处理: 7 条 | 失败追踪: 2 条 ---
+[2026-05-24T13:13:53.897Z] [INFO] 处理中: https://www.wayfair.com
+[2026-05-24T13:14:00.200Z] [WARN] 抓取失败 (2/3, HTTP 429): https://www.wayfair.com
+[2026-05-24T13:14:00.201Z] [INFO] --- 第 9 轮 | 待处理: 590 条 | 已处理: 7 条 | 失败追踪: 2 条 ---
+[2026-05-24T13:14:00.201Z] [INFO] 处理中: https://www.wayfair.com
+[2026-05-24T13:14:05.929Z] [WARN] 抓取失败 (3/3, HTTP 429): https://www.wayfair.com
+[2026-05-24T13:14:05.929Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.wayfair.com
+[2026-05-24T13:14:05.931Z] [INFO] --- 第 10 轮 | 待处理: 589 条 | 已处理: 8 条 | 失败追踪: 2 条 ---
+[2026-05-24T13:14:05.931Z] [INFO] 处理中: https://partners.wayfair.com
+[2026-05-24T13:14:17.437Z] [INFO] 抓取成功: Sign in to Partner HomePartner Home (5367ms)
+[2026-05-24T13:14:24.291Z] [SUCCESS] AI 通过: [business] 评分:85 "Wayfair供应商合作伙伴门户，管理产品、订单和销售数据，助力家居电商出海经营。"
+[2026-05-24T13:14:27.486Z] [SUCCESS] ✅ 入库成功: Sign in to Partner HomePartner Home
+[2026-05-24T13:14:27.489Z] [INFO] --- 第 11 轮 | 待处理: 588 条 | 已处理: 9 条 | 失败追踪: 2 条 ---
+[2026-05-24T13:14:27.489Z] [INFO] 处理中: https://www.coupang.com
+[2026-05-24T13:14:34.126Z] [WARN] 抓取失败 (1/3, HTTP 403): https://www.coupang.com
+[2026-05-24T13:14:34.128Z] [INFO] --- 第 12 轮 | 待处理: 588 条 | 已处理: 9 条 | 失败追踪: 3 条 ---
+[2026-05-24T13:14:34.128Z] [INFO] 处理中: https://www.coupang.com
+[2026-05-24T13:14:39.648Z] [WARN] 抓取失败 (2/3, HTTP 403): https://www.coupang.com
+[2026-05-24T13:14:39.650Z] [INFO] --- 第 13 轮 | 待处理: 588 条 | 已处理: 9 条 | 失败追踪: 3 条 ---
+[2026-05-24T13:14:39.650Z] [INFO] 处理中: https://www.coupang.com
+[2026-05-24T13:14:45.977Z] [WARN] 抓取失败 (3/3, HTTP 403): https://www.coupang.com
+[2026-05-24T13:14:45.978Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.coupang.com
+[2026-05-24T13:14:45.980Z] [INFO] --- 第 14 轮 | 待处理: 587 条 | 已处理: 10 条 | 失败追踪: 3 条 ---
+[2026-05-24T13:14:45.980Z] [INFO] 处理中: https://wing.coupang.com
+[2026-05-24T13:14:57.437Z] [WARN] 抓取失败 (1/3, HTTP 405): https://wing.coupang.com
+[2026-05-24T13:14:57.439Z] [INFO] --- 第 15 轮 | 待处理: 587 条 | 已处理: 10 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:14:57.439Z] [INFO] 处理中: https://wing.coupang.com
+[2026-05-24T13:15:09.897Z] [WARN] 抓取失败 (2/3, HTTP 405): https://wing.coupang.com
+[2026-05-24T13:15:09.899Z] [INFO] --- 第 16 轮 | 待处理: 587 条 | 已处理: 10 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:15:09.900Z] [INFO] 处理中: https://wing.coupang.com
+[2026-05-24T13:15:23.387Z] [WARN] 抓取失败 (3/3, HTTP 405): https://wing.coupang.com
+[2026-05-24T13:15:23.388Z] [WARN] ⛔ 超过最大重试次数，放弃: https://wing.coupang.com
+[2026-05-24T13:15:23.391Z] [INFO] --- 第 17 轮 | 待处理: 586 条 | 已处理: 11 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:15:23.391Z] [INFO] 处理中: https://affiliate.blhltd.com/api/Transitshipment/index
+[2026-05-24T13:15:40.255Z] [INFO] 抓取成功: 发生错误 (6412ms)
+[2026-05-24T13:15:47.703Z] [WARN] AI 拒绝: https://affiliate.blhltd.com/api/Transitshipment/index - 网站返回错误页面，无实质内容，无法评估。
+[2026-05-24T13:15:47.707Z] [INFO] --- 第 18 轮 | 待处理: 585 条 | 已处理: 12 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:15:47.707Z] [INFO] 处理中: https://eric-bot.com
+[2026-05-24T13:15:57.494Z] [INFO] 抓取成功: 睿观_跨境电商侵权风险检测平台_多国商标/专利/版权查询 (572ms)
+[2026-05-24T13:16:06.385Z] [SUCCESS] AI 通过: [business] 评分:85 "AI驱动的跨境电商知识产权风险检测平台，支持多国商标、专利、版权查询，帮助规避TRO侵权风险。"
+[2026-05-24T13:16:09.266Z] [SUCCESS] ✅ 入库成功: 睿观_跨境电商侵权风险检测平台_多国商标/专利/版权查询
+[2026-05-24T13:16:09.268Z] [INFO] --- 第 19 轮 | 待处理: 584 条 | 已处理: 13 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:16:09.268Z] [INFO] 处理中: https://www.alphashop.cn
+[2026-05-24T13:16:18.101Z] [INFO] 抓取成功: 遨虾-阿里巴巴1688官方AI智能体 (657ms)
+[2026-05-24T13:16:22.358Z] [SUCCESS] AI 通过: [tools] 评分:85 "遨虾是阿里巴巴1688官方AI智能体，提供AI选品、选商、素材生成及询盘自动化工具，助力跨境电商高效运营。"
+[2026-05-24T13:16:25.521Z] [SUCCESS] ✅ 入库成功: 遨虾-阿里巴巴1688官方AI智能体
+[2026-05-24T13:16:25.525Z] [INFO] --- 第 20 轮 | 待处理: 583 条 | 已处理: 14 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:16:25.525Z] [INFO] 处理中: https://www.nediya.com/microservice/paypal
+[2026-05-24T13:16:35.673Z] [INFO] 抓取成功: nediya.com (2702ms)
+[2026-05-24T13:16:43.997Z] [SUCCESS] AI 通过: [business] 评分:70 "Nediya提供PayPal微服务解决方案，助力出海企业高效处理跨境支付。"
+[2026-05-24T13:16:46.895Z] [SUCCESS] ✅ 入库成功: nediya.com
+[2026-05-24T13:16:46.898Z] [INFO] --- 第 21 轮 | 待处理: 582 条 | 已处理: 15 条 | 失败追踪: 4 条 ---
+[2026-05-24T13:16:46.898Z] [INFO] 处理中: https://www.aikuafu.com
+[2026-05-24T13:16:50.944Z] [WARN] 抓取失败 (1/3, HTTP 500): https://www.aikuafu.com
+[2026-05-24T13:16:50.945Z] [INFO] --- 第 22 轮 | 待处理: 582 条 | 已处理: 15 条 | 失败追踪: 5 条 ---
+[2026-05-24T13:16:50.946Z] [INFO] 处理中: https://www.aikuafu.com
+[2026-05-24T13:16:58.695Z] [WARN] 抓取失败 (2/3, HTTP 500): https://www.aikuafu.com
+[2026-05-24T13:16:58.696Z] [INFO] --- 第 23 轮 | 待处理: 582 条 | 已处理: 15 条 | 失败追踪: 5 条 ---
+[2026-05-24T13:16:58.697Z] [INFO] 处理中: https://www.aikuafu.com
+[2026-05-24T13:17:07.062Z] [WARN] 抓取失败 (3/3, HTTP 500): https://www.aikuafu.com
+[2026-05-24T13:17:07.063Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.aikuafu.com
+[2026-05-24T13:17:07.065Z] [INFO] --- 第 24 轮 | 待处理: 581 条 | 已处理: 16 条 | 失败追踪: 5 条 ---
+[2026-05-24T13:17:07.065Z] [INFO] 处理中: https://maijiahuideals.cn
+[2026-05-24T13:17:11.334Z] [INFO] 抓取成功: 麦家汇跨境电商 (212ms)
+[2026-05-24T13:17:17.734Z] [SUCCESS] AI 通过: [business] 评分:70 "麦家汇提供亚马逊站外推广、红人视频、营销培训等一站式跨境电商服务。"
+[2026-05-24T13:17:20.609Z] [SUCCESS] ✅ 入库成功: 麦家汇跨境电商
+[2026-05-24T13:17:20.612Z] [INFO] --- 第 25 轮 | 待处理: 580 条 | 已处理: 17 条 | 失败追踪: 5 条 ---
+[2026-05-24T13:17:20.612Z] [INFO] 处理中: https://www.amazon.com/stylesnap
+[2026-05-24T13:17:28.588Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.com/stylesnap
+[2026-05-24T13:17:28.589Z] [INFO] --- 第 26 轮 | 待处理: 580 条 | 已处理: 17 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:17:28.589Z] [INFO] 处理中: https://www.amazon.com/stylesnap
+[2026-05-24T13:17:35.120Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.com/stylesnap
+[2026-05-24T13:17:35.121Z] [INFO] --- 第 27 轮 | 待处理: 580 条 | 已处理: 17 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:17:35.121Z] [INFO] 处理中: https://www.amazon.com/stylesnap
+[2026-05-24T13:17:39.540Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.com/stylesnap
+[2026-05-24T13:17:39.541Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.com/stylesnap
+[2026-05-24T13:17:39.543Z] [INFO] --- 第 28 轮 | 待处理: 579 条 | 已处理: 18 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:17:39.543Z] [INFO] 处理中: https://mail.163.com
+[2026-05-24T13:17:44.878Z] [INFO] 抓取成功: 163网易免费邮-你的专业电子邮局 (208ms)
+[2026-05-24T13:17:52.549Z] [SUCCESS] AI 通过: [tools] 评分:85 "网易163免费邮箱，超10亿用户信赖的专业电子邮局，支持多端协同，安全稳定。"
+[2026-05-24T13:17:55.527Z] [SUCCESS] ✅ 入库成功: 163网易免费邮-你的专业电子邮局
+[2026-05-24T13:17:55.530Z] [INFO] --- 第 29 轮 | 待处理: 578 条 | 已处理: 19 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:17:55.531Z] [INFO] 处理中: https://www.bykol.com/cn/Videos.html
+[2026-05-24T13:18:07.476Z] [INFO] 抓取成功: 开箱视频VIP会员 | 海外网红/亚马逊买家秀第一，8国千名本土模特高效匹配，全网最低价29.9美金 (3008ms)
+[2026-05-24T13:18:15.613Z] [SUCCESS] AI 通过: [business] 评分:75 "开箱视频VIP会员平台，提供海外网红与亚马逊买家秀服务，2000+本土模特高效匹配，助力卖家提升转化率。"
+[2026-05-24T13:18:18.512Z] [SUCCESS] ✅ 入库成功: 开箱视频VIP会员 | 海外网红/亚马逊买家秀第一，8国千名本土模特高效匹配，全网最低价29.9美金
+[2026-05-24T13:18:18.515Z] [INFO] --- 第 30 轮 | 待处理: 577 条 | 已处理: 20 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:18:18.516Z] [INFO] 处理中: https://www.turingmarket.cn
+[2026-05-24T13:18:26.089Z] [INFO] 抓取成功: 网红营销智能体 - AI驱动的网红建联管家 (1840ms)
+[2026-05-24T13:18:31.280Z] [SUCCESS] AI 通过: [business] 评分:75 "AI驱动的网红营销智能体，自动化建联与管理，助力出海品牌高效合作。"
+[2026-05-24T13:18:34.150Z] [SUCCESS] ✅ 入库成功: 网红营销智能体 - AI驱动的网红建联管家
+[2026-05-24T13:18:34.153Z] [INFO] --- 第 31 轮 | 待处理: 576 条 | 已处理: 21 条 | 失败追踪: 6 条 ---
+[2026-05-24T13:18:34.154Z] [INFO] 处理中: https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:42.585Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:42.586Z] [INFO] --- 第 32 轮 | 待处理: 576 条 | 已处理: 21 条 | 失败追踪: 7 条 ---
+[2026-05-24T13:18:42.586Z] [INFO] 处理中: https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:47.825Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:47.827Z] [INFO] --- 第 33 轮 | 待处理: 576 条 | 已处理: 21 条 | 失败追踪: 7 条 ---
+[2026-05-24T13:18:47.827Z] [INFO] 处理中: https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:54.237Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:54.238Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.co.uk/gp/new-releases
+[2026-05-24T13:18:54.240Z] [INFO] --- 第 34 轮 | 待处理: 575 条 | 已处理: 22 条 | 失败追踪: 7 条 ---
+[2026-05-24T13:18:54.241Z] [INFO] 处理中: https://www.amazon.de/gp/new-releases
+[2026-05-24T13:18:58.707Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.de/gp/new-releases
+[2026-05-24T13:18:58.708Z] [INFO] --- 第 35 轮 | 待处理: 575 条 | 已处理: 22 条 | 失败追踪: 8 条 ---
+[2026-05-24T13:18:58.709Z] [INFO] 处理中: https://www.amazon.de/gp/new-releases
+[2026-05-24T13:19:07.262Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.de/gp/new-releases
+[2026-05-24T13:19:07.264Z] [INFO] --- 第 36 轮 | 待处理: 575 条 | 已处理: 22 条 | 失败追踪: 8 条 ---
+[2026-05-24T13:19:07.264Z] [INFO] 处理中: https://www.amazon.de/gp/new-releases
+[2026-05-24T13:19:15.377Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.de/gp/new-releases
+[2026-05-24T13:19:15.378Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.de/gp/new-releases
+[2026-05-24T13:19:15.380Z] [INFO] --- 第 37 轮 | 待处理: 574 条 | 已处理: 23 条 | 失败追踪: 8 条 ---
+[2026-05-24T13:19:15.380Z] [INFO] 处理中: https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:24.710Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:24.711Z] [INFO] --- 第 38 轮 | 待处理: 574 条 | 已处理: 23 条 | 失败追踪: 9 条 ---
+[2026-05-24T13:19:24.712Z] [INFO] 处理中: https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:31.286Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:31.287Z] [INFO] --- 第 39 轮 | 待处理: 574 条 | 已处理: 23 条 | 失败追踪: 9 条 ---
+[2026-05-24T13:19:31.288Z] [INFO] 处理中: https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:36.229Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:36.230Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.fr/gp/new-releases
+[2026-05-24T13:19:36.232Z] [INFO] --- 第 40 轮 | 待处理: 573 条 | 已处理: 24 条 | 失败追踪: 9 条 ---
+[2026-05-24T13:19:36.232Z] [INFO] 处理中: https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:45.413Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:45.414Z] [INFO] --- 第 41 轮 | 待处理: 573 条 | 已处理: 24 条 | 失败追踪: 10 条 ---
+[2026-05-24T13:19:45.415Z] [INFO] 处理中: https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:49.978Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:49.980Z] [INFO] --- 第 42 轮 | 待处理: 573 条 | 已处理: 24 条 | 失败追踪: 10 条 ---
+[2026-05-24T13:19:49.981Z] [INFO] 处理中: https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:57.966Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:57.967Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.it/gp/new-releases
+[2026-05-24T13:19:57.969Z] [INFO] --- 第 43 轮 | 待处理: 572 条 | 已处理: 25 条 | 失败追踪: 10 条 ---
+[2026-05-24T13:19:57.969Z] [INFO] 处理中: https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:07.231Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:07.235Z] [INFO] --- 第 44 轮 | 待处理: 572 条 | 已处理: 25 条 | 失败追踪: 11 条 ---
+[2026-05-24T13:20:07.236Z] [INFO] 处理中: https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:14.194Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:14.195Z] [INFO] --- 第 45 轮 | 待处理: 572 条 | 已处理: 25 条 | 失败追踪: 11 条 ---
+[2026-05-24T13:20:14.195Z] [INFO] 处理中: https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:23.204Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:23.204Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.es/gp/new-releases
+[2026-05-24T13:20:23.207Z] [INFO] --- 第 46 轮 | 待处理: 571 条 | 已处理: 26 条 | 失败追踪: 11 条 ---
+[2026-05-24T13:20:23.207Z] [INFO] 处理中: https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:28.012Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:28.013Z] [INFO] --- 第 47 轮 | 待处理: 571 条 | 已处理: 26 条 | 失败追踪: 12 条 ---
+[2026-05-24T13:20:28.014Z] [INFO] 处理中: https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:33.628Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:33.630Z] [INFO] --- 第 48 轮 | 待处理: 571 条 | 已处理: 26 条 | 失败追踪: 12 条 ---
+[2026-05-24T13:20:33.630Z] [INFO] 处理中: https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:41.906Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:41.907Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.co.jp/gp/new-releases
+[2026-05-24T13:20:41.909Z] [INFO] --- 第 49 轮 | 待处理: 570 条 | 已处理: 27 条 | 失败追踪: 12 条 ---
+[2026-05-24T13:20:41.909Z] [INFO] 处理中: https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:20:49.049Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:20:49.051Z] [INFO] --- 第 50 轮 | 待处理: 570 条 | 已处理: 27 条 | 失败追踪: 13 条 ---
+[2026-05-24T13:20:49.052Z] [INFO] 处理中: https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:20:55.336Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:20:55.337Z] [INFO] --- 第 51 轮 | 待处理: 570 条 | 已处理: 27 条 | 失败追踪: 13 条 ---
+[2026-05-24T13:20:55.337Z] [INFO] 处理中: https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:21:01.844Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:21:01.844Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.ca/gp/new-releases
+[2026-05-24T13:21:01.846Z] [INFO] --- 第 52 轮 | 待处理: 569 条 | 已处理: 28 条 | 失败追踪: 13 条 ---
+[2026-05-24T13:21:01.847Z] [INFO] 处理中: https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:06.600Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:06.602Z] [INFO] --- 第 53 轮 | 待处理: 569 条 | 已处理: 28 条 | 失败追踪: 14 条 ---
+[2026-05-24T13:21:06.602Z] [INFO] 处理中: https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:11.839Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:11.840Z] [INFO] --- 第 54 轮 | 待处理: 569 条 | 已处理: 28 条 | 失败追踪: 14 条 ---
+[2026-05-24T13:21:11.840Z] [INFO] 处理中: https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:20.384Z] [WARN] 抓取失败 (3/3, HTTP 405): https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:20.385Z] [WARN] ⛔ 超过最大重试次数，放弃: https://www.amazon.com.mx/gp/new-releases
+[2026-05-24T13:21:20.387Z] [INFO] --- 第 55 轮 | 待处理: 568 条 | 已处理: 29 条 | 失败追踪: 14 条 ---
+[2026-05-24T13:21:20.387Z] [INFO] 处理中: https://www.amazon.nl/gp/new-releases
+[2026-05-24T13:21:29.716Z] [WARN] 抓取失败 (1/3, HTTP 405): https://www.amazon.nl/gp/new-releases
+[2026-05-24T13:21:29.717Z] [INFO] --- 第 56 轮 | 待处理: 568 条 | 已处理: 29 条 | 失败追踪: 15 条 ---
+[2026-05-24T13:21:29.717Z] [INFO] 处理中: https://www.amazon.nl/gp/new-releases
+[2026-05-24T13:21:37.389Z] [WARN] 抓取失败 (2/3, HTTP 405): https://www.amazon.nl/gp/new-releases
+[2026-05-24T13:21:37.393Z] [INFO] --- 第 57 轮 | 待处理: 568 条 | 已处理: 29 条 | 失败追踪: 15 条 ---
+[2026-05-24T13:21:37.394Z] [INFO] 处理中: https://www.amazon.nl/gp/new-releases
