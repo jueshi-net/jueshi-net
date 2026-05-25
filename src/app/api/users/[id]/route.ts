@@ -5,7 +5,8 @@ import * as bcrypt from "bcryptjs";
 import { isAdminRole } from "@/lib/auth/permissions";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;\n}
+  params: Promise<{ id: string }>;
+}
 
 export async function GET(_req: NextRequest, { params }: RouteParams) {
   try {
