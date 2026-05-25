@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { callAI, isAIEnabled, isMockMode, getEnv } from "@/lib/ai/client";
-import { getProductCopyPrompt, getTranslatePolishPrompt, getDocumentSummaryPrompt, ToolType } from "@/lib/ai/prompts";
+import { getProductCopyPrompt, getTranslatePolishPrompt, getDocumentSummaryPrompt, getVideoScriptSopPrompt, ToolType } from "@/lib/ai/prompts";
 import { getDailyLimit, getCostPoints, hashInput, validateInputLength, getVancouverDateString } from "@/lib/ai/quota";
 
-const VALID_TOOLS: ToolType[] = ["product_copy", "translate_polish", "document_summary"];
+const VALID_TOOLS: ToolType[] = ["product_copy", "translate_polish", "document_summary", "video_script_sop"];
 
 export async function POST(req: Request) {
   // Check if AI is enabled
@@ -115,6 +115,9 @@ export async function POST(req: Request) {
         break;
       case "document_summary":
         ({ systemPrompt, userPrompt } = getDocumentSummaryPrompt(input as any));
+        break;
+      case "video_script_sop":
+        ({ systemPrompt, userPrompt } = getVideoScriptSopPrompt(input as any));
         break;
       default:
         return NextResponse.json({ error: "不支持的工具类型" }, { status: 400 });

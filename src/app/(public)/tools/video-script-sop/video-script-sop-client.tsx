@@ -1,539 +1,390 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Save, Printer, Building2, FileText, Loader2, Eye, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useDocumentToolBase } from "@/lib/use-document-tool-base";
-import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
-import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Wand2, Loader2, Copy, Check, Video, Sparkles, AlertCircle } from "lucide-react";
+import { useFreemiumGate } from "@/hooks/use-freemium-gate";
+import PaywallModal from "@/components/ui/paywall-modal";
 
-// ─── Style constants (UI Design System) ───
-
-const textareaStyles = {
-  base: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-y break-words whitespace-pre-wrap",
-  hint: "text-xs text-gray-400 mt-1",
-};
-
-const cardStyles = {
-  base: "bg-white rounded-xl border border-gray-200 p-4 sm:p-6 space-y-6",
-  section: "space-y-4",
-  sectionHeader: "text-base font-bold text-gray-900 mb-3 flex items-center gap-2",
-  sectionNumber: "w-6 h-6 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center text-xs font-bold",
-};
-
-const buttonVariants = {
-  primary: "inline-flex items-center gap-2 px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm font-medium min-h-[44px] disabled:opacity-50 transition-colors",
-  secondary: "inline-flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm min-h-[44px] transition-colors",
-  chip: (active: boolean, color: "teal" | "pink") =>
-    cn(
-      "px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition-colors",
-      active
-        ? color === "teal"
-          ? "bg-teal-600 text-white border-teal-600"
-          : "bg-pink-600 text-white border-pink-600"
-        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
-    ),
-  previewToggle: "inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 rounded hover:bg-gray-200 min-h-[36px] print:hidden transition-colors",
-};
-
-const inputStyles = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-[44px]";
-
-// ─── Constants ───
-
-const PLATFORMS = ["小红书", "TikTok", "Facebook", "Instagram", "YouTube Shorts", "其他"] as const;
-const VIDEO_TYPES = ["物流科普", "产品介绍", "客户案例", "仓库实拍", "报价解释", "避坑提醒", "教程类", "其他"] as const;
-
-interface FormData {
-  title: string;
-  platform: string;
-  videoType: string;
-  targetAudience: string;
-  coreSellingPoint: string;
-  ctaText: string;
+interface GeneratedSop {
   hook: string;
   painPoint: string;
   solution: string;
-  sellingPoint1: string;
-  sellingPoint2: string;
-  sellingPoint3: string;
-  visualSuggestion: string;
-  voiceoverScript: string;
-  subtitleScript: string;
-  endingCta: string;
-  scenePrep: string;
-  propPrep: string;
-  shotList: string;
-  shootingNotes: string;
-  editingNotes: string;
-  publishChecklist: string;
+  sellingPoints: string[];
+  script: string;
+  visualCues: string[];
+  cta: string;
+  hashtags: string[];
+  postingTips: string;
 }
 
-const emptyForm: FormData = {
-  title: "",
-  platform: "",
-  videoType: "",
-  targetAudience: "",
-  coreSellingPoint: "",
-  ctaText: "",
-  hook: "",
-  painPoint: "",
-  solution: "",
-  sellingPoint1: "",
-  sellingPoint2: "",
-  sellingPoint3: "",
-  visualSuggestion: "",
-  voiceoverScript: "",
-  subtitleScript: "",
-  endingCta: "",
-  scenePrep: "",
-  propPrep: "",
-  shotList: "",
-  shootingNotes: "",
-  editingNotes: "",
-  publishChecklist: "",
-};
+const PLATFORMS = ["抖音", "TikTok", "小红书", "视频号", "快手", "YouTube Shorts", "Instagram Reels"];
+const STYLES = ["口播带货", "剧情演绎", "产品测评", "开箱展示", "对比评测", "知识科普"];
 
-// ─── Sub-components ───
+export default function VideoScriptSopClient() {
+  const router = useRouter();
+  const [product, setProduct] = useState("");
+  const [audience, setAudience] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [style, setStyle] = useState("");
+  const [result, setResult] = useState<GeneratedSop | null>(null);
+  const [rawResult, setRawResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-function TextArea({
-  label,
-  value,
-  onChange,
-  placeholder,
-  rows = 3,
-  hint,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-  rows?: number;
-  hint?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        rows={rows}
-        className={textareaStyles.base}
-      />
-      {hint && <p className={textareaStyles.hint}>{hint}</p>}
-    </div>
-  );
-}
-
-function ChipSelector({
-  label,
-  options,
-  value,
-  onChange,
-  color = "teal",
-}: {
-  label: string;
-  options: readonly string[];
-  value: string;
-  onChange: (value: string) => void;
-  color?: "teal" | "pink";
-}) {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => onChange(value === opt ? "" : opt)}
-            className={buttonVariants.chip(value === opt, color)}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─── Main Component ───
-
-export default function VideoScriptSopClient({ draftId }: { draftId: string | null }) {
-  const [showPreview, setShowPreview] = useState(true);
-  const previewRef = useRef<HTMLDivElement>(null);
-
-  const {
-    form,
-    setForm,
-    update,
-    selectedProfile,
-    handleProfileSelect,
-    currentDocId,
-    saving,
-    saved,
-    saveMsg,
-    loadingDraft,
-    draftError,
-    handleSave,
-    handleRestore,
-    handleReset,
-  } = useDocumentToolBase<FormData>({
-    toolKey: "video-script-sop",
-    emptyForm,
-    localStorageKey: "video-script-sop-draft",
-    getTitle: (f) => (f as FormData).title || "短视频 SOP 脚本草稿",
-    draftId,
+  const freemium = useFreemiumGate({
+    limit: 2,
+    storageKey: "video_sop_count",
   });
 
-  // Preview text generation
-  const generatePreview = useCallback(() => {
-    const f = form as FormData;
-    const lines: string[] = [];
-    lines.push("═══════════════════════════════════════════");
-    lines.push("       短视频 SOP 脚本文档");
-    lines.push("═══════════════════════════════════════════");
-    lines.push("");
-    lines.push("📋 基础信息");
-    lines.push("───────────────────────────────────────────");
-    if (f.title) lines.push(`视频标题: ${f.title}`);
-    if (selectedProfile) lines.push(`品牌/公司: ${selectedProfile.companyName}`);
-    if (f.platform) lines.push(`发布平台: ${f.platform}`);
-    if (f.videoType) lines.push(`视频类型: ${f.videoType}`);
-    if (f.targetAudience) lines.push(`目标受众: ${f.targetAudience}`);
-    if (f.coreSellingPoint) lines.push(`核心卖点: ${f.coreSellingPoint}`);
-    if (f.ctaText) lines.push(`CTA 引导: ${f.ctaText}`);
-    lines.push("");
-    lines.push("🎬 脚本结构");
-    lines.push("───────────────────────────────────────────");
-    if (f.hook) lines.push(`【开头 3 秒钩子】\n${f.hook}`);
-    if (f.painPoint) lines.push(`【痛点描述】\n${f.painPoint}`);
-    if (f.solution) lines.push(`【解决方案】\n${f.solution}`);
-    if (f.sellingPoint1) lines.push(`【关键卖点 1】\n${f.sellingPoint1}`);
-    if (f.sellingPoint2) lines.push(`【关键卖点 2】\n${f.sellingPoint2}`);
-    if (f.sellingPoint3) lines.push(`【关键卖点 3】\n${f.sellingPoint3}`);
-    if (f.visualSuggestion) lines.push(`【画面建议】\n${f.visualSuggestion}`);
-    if (f.voiceoverScript) lines.push(`【口播文案】\n${f.voiceoverScript}`);
-    if (f.subtitleScript) lines.push(`【字幕文案】\n${f.subtitleScript}`);
-    if (f.endingCta) lines.push(`【结尾 CTA】\n${f.endingCta}`);
-    lines.push("");
-    lines.push("📸 拍摄 SOP");
-    lines.push("───────────────────────────────────────────");
-    if (f.scenePrep) lines.push(`【场景准备】\n${f.scenePrep}`);
-    if (f.propPrep) lines.push(`【道具准备】\n${f.propPrep}`);
-    if (f.shotList) lines.push(`【镜头清单】\n${f.shotList}`);
-    if (f.shootingNotes) lines.push(`【拍摄注意事项】\n${f.shootingNotes}`);
-    if (f.editingNotes) lines.push(`【剪辑注意事项】\n${f.editingNotes}`);
-    if (f.publishChecklist) lines.push(`【发布前检查清单】\n${f.publishChecklist}`);
-    lines.push("");
-    lines.push("═══════════════════════════════════════════");
-    lines.push("生成时间: " + new Date().toLocaleString("zh-CN"));
-    if (selectedProfile) lines.push("公司资料: " + selectedProfile.companyName);
-    lines.push("");
-    return lines.join("\n");
-  }, [form, selectedProfile]);
+  // Try to parse raw result
+  useEffect(() => {
+    if (!rawResult) return;
+    try {
+      // Try to extract JSON from the response (might have markdown code fences)
+      const jsonMatch = rawResult.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      const jsonStr = jsonMatch ? jsonMatch[1] : rawResult;
+      const parsed = JSON.parse(jsonStr.trim());
+      setResult(parsed);
+    } catch {
+      // If JSON parse fails, show raw text
+      setResult(null);
+    }
+  }, [rawResult]);
 
-  const previewText = generatePreview();
+  const handleGenerate = useCallback(() => {
+    freemium.handleProtectedAction(() => {
+      doGenerate();
+    });
+  }, [freemium]);
 
-  const f = form as FormData;
+  const doGenerate = async () => {
+    if (!product.trim()) {
+      setError("请输入产品或服务名称");
+      return;
+    }
+    if (!audience.trim()) {
+      setError("请输入目标受众");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setRawResult(null);
+
+    try {
+      const res = await fetch("/api/ai/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toolType: "video_script_sop",
+          input: {
+            product: product.trim(),
+            audience: audience.trim(),
+            platform: platform || "抖音/TikTok/小红书",
+            style: style || "口播带货",
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          window.location.href = "/login?callbackUrl=/tools/video-script-sop";
+          return;
+        }
+        setError(data.error || "生成失败，请稍后再试");
+        return;
+      }
+
+      setRawResult(data.result);
+    } catch {
+      setError("网络错误，请检查网络连接后重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (!rawResult) return;
+    navigator.clipboard.writeText(rawResult).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const handleReset = () => {
+    setProduct("");
+    setAudience("");
+    setPlatform("");
+    setStyle("");
+    setResult(null);
+    setRawResult(null);
+    setError(null);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-teal-900/10">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 print:hidden">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-3 sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/tools/document-tools" className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 min-h-[44px]">
+            <Link href="/tools" className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px]">
               <ArrowLeft className="w-4 h-4" /> 返回
             </Link>
-            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <Video className="w-5 h-5 text-pink-600" /> 短视频 SOP 脚本
-            </h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <CompanyProfilePicker onSelect={handleProfileSelect} selectedId={selectedProfile?.id || null} />
-            {currentDocId && (
-              <ToolHistoryPanel documentId={currentDocId} toolKey="video-script-sop" onRestore={handleRestore} />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6 print:p-0 print:max-w-none">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Editor */}
-          <div className="flex-1 min-w-0 print:hidden">
-            <div className={cardStyles.base}>
-              {/* Section 1: Basic Info */}
-              <div>
-                <h2 className={cardStyles.sectionHeader}>
-                  <span className={cardStyles.sectionNumber}>1</span>
-                  基础信息
-                </h2>
-                <div className={cardStyles.section}>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">项目 / 视频标题</label>
-                    <input
-                      value={f.title}
-                      onChange={(e) => update("title", e.target.value)}
-                      placeholder="如：XX 物流 30 秒带货脚本"
-                      className={inputStyles}
-                    />
-                  </div>
-                  {selectedProfile && (
-                    <div className="bg-teal-50 border border-teal-200 rounded-lg px-3 py-2 text-sm text-teal-700 flex items-center gap-2">
-                      <Building2 className="w-4 h-4 shrink-0" />
-                      <span>已选择：{selectedProfile.companyName}</span>
-                    </div>
-                  )}
-                  <ChipSelector
-                    label="发布平台"
-                    options={PLATFORMS}
-                    value={f.platform}
-                    onChange={(v) => update("platform", v)}
-                    color="teal"
-                  />
-                  <ChipSelector
-                    label="视频类型"
-                    options={VIDEO_TYPES}
-                    value={f.videoType}
-                    onChange={(v) => update("videoType", v)}
-                    color="pink"
-                  />
-                  <TextArea
-                    label="目标受众"
-                    value={f.targetAudience}
-                    onChange={(v) => update("targetAudience", v)}
-                    placeholder="如：25-40 岁跨境电商卖家、集运用户"
-                  />
-                  <TextArea
-                    label="核心卖点"
-                    value={f.coreSellingPoint}
-                    onChange={(v) => update("coreSellingPoint", v)}
-                    placeholder="一句话说清楚你的产品或服务最大的优势是什么"
-                  />
-                  <TextArea
-                    label="CTA 联系方式 / 引导语"
-                    value={f.ctaText}
-                    onChange={(v) => update("ctaText", v)}
-                    placeholder="如：私信我获取报价 / 点击下方链接"
-                  />
-                </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
+                <Video className="w-4 h-4 text-white" />
               </div>
-
-              {/* Section 2: Script Structure */}
-              <div>
-                <h2 className={cardStyles.sectionHeader}>
-                  <span className={cardStyles.sectionNumber}>2</span>
-                  脚本结构
-                </h2>
-                <div className={cardStyles.section}>
-                  <TextArea
-                    label="开头 3 秒钩子"
-                    value={f.hook}
-                    onChange={(v) => update("hook", v)}
-                    placeholder="抓住观众注意力的第一句话，如：90% 的人不知道这个省钱方法"
-                    rows={2}
-                  />
-                  <TextArea
-                    label="痛点描述"
-                    value={f.painPoint}
-                    onChange={(v) => update("painPoint", v)}
-                    placeholder="描述目标用户遇到的具体问题和困扰"
-                  />
-                  <TextArea
-                    label="解决方案"
-                    value={f.solution}
-                    onChange={(v) => update("solution", v)}
-                    placeholder="你的产品/服务如何解决这个痛点"
-                  />
-                  <TextArea
-                    label="关键卖点 1"
-                    value={f.sellingPoint1}
-                    onChange={(v) => update("sellingPoint1", v)}
-                    placeholder="第一个核心卖点"
-                    rows={2}
-                  />
-                  <TextArea
-                    label="关键卖点 2"
-                    value={f.sellingPoint2}
-                    onChange={(v) => update("sellingPoint2", v)}
-                    placeholder="第二个核心卖点"
-                    rows={2}
-                  />
-                  <TextArea
-                    label="关键卖点 3"
-                    value={f.sellingPoint3}
-                    onChange={(v) => update("sellingPoint3", v)}
-                    placeholder="第三个核心卖点（可选）"
-                    rows={2}
-                  />
-                  <TextArea
-                    label="画面建议"
-                    value={f.visualSuggestion}
-                    onChange={(v) => update("visualSuggestion", v)}
-                    placeholder="每个段落建议拍什么画面、用什么镜头"
-                  />
-                  <TextArea
-                    label="口播文案"
-                    value={f.voiceoverScript}
-                    onChange={(v) => update("voiceoverScript", v)}
-                    placeholder="完整的口播逐字稿"
-                    rows={4}
-                  />
-                  <TextArea
-                    label="字幕文案"
-                    value={f.subtitleScript}
-                    onChange={(v) => update("subtitleScript", v)}
-                    placeholder="视频字幕文字（可与口播一致或简化）"
-                    rows={4}
-                  />
-                  <TextArea
-                    label="结尾 CTA"
-                    value={f.endingCta}
-                    onChange={(v) => update("endingCta", v)}
-                    placeholder="引导观众行动的话术，如关注、私信、点击链接"
-                  />
-                </div>
-              </div>
-
-              {/* Section 3: Shooting SOP */}
-              <div>
-                <h2 className={cardStyles.sectionHeader}>
-                  <span className={cardStyles.sectionNumber}>3</span>
-                  拍摄 SOP
-                </h2>
-                <div className={cardStyles.section}>
-                  <TextArea
-                    label="场景准备"
-                    value={f.scenePrep}
-                    onChange={(v) => update("scenePrep", v)}
-                    placeholder="需要准备的拍摄场地、背景布置、光线等"
-                  />
-                  <TextArea
-                    label="道具准备"
-                    value={f.propPrep}
-                    onChange={(v) => update("propPrep", v)}
-                    placeholder="需要用到的产品、包装盒、标签、道具等"
-                  />
-                  <TextArea
-                    label="镜头清单"
-                    value={f.shotList}
-                    onChange={(v) => update("shotList", v)}
-                    placeholder="按顺序列出每个镜头的内容、角度、时长"
-                  />
-                  <TextArea
-                    label="拍摄注意事项"
-                    value={f.shootingNotes}
-                    onChange={(v) => update("shootingNotes", v)}
-                    placeholder="拍摄时需要特别注意的事项"
-                  />
-                  <TextArea
-                    label="剪辑注意事项"
-                    value={f.editingNotes}
-                    onChange={(v) => update("editingNotes", v)}
-                    placeholder="剪辑时的要点、转场、配乐、字幕样式等"
-                  />
-                  <TextArea
-                    label="发布前检查清单"
-                    value={f.publishChecklist}
-                    onChange={(v) => update("publishChecklist", v)}
-                    placeholder="标题、标签、封面、描述、发布时间等检查项"
-                  />
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3 pt-2 border-t border-gray-100">
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className={buttonVariants.primary}
-                >
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                  保存草稿
-                </button>
-                <button
-                  onClick={() => setShowPreview(!showPreview)}
-                  className={buttonVariants.secondary}
-                >
-                  <Eye className="w-4 h-4" /> {showPreview ? "隐藏预览" : "显示预览"}
-                </button>
-                <button
-                  onClick={() => window.print()}
-                  className={buttonVariants.secondary}
-                >
-                  <Printer className="w-4 h-4" /> 打印
-                </button>
-                <button
-                  onClick={handleReset}
-                  className={buttonVariants.secondary}
-                >
-                  <Printer className="w-4 h-4 rotate-180" /> 清空
-                </button>
-              </div>
-
-              {/* Status messages */}
-              {loadingDraft && (
-                <div className="text-sm px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
-                </div>
-              )}
-              {draftError && (
-                <div className="text-sm px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">
-                  {draftError}
-                </div>
-              )}
-              {saveMsg && (
-                <div
-                  className={cn(
-                    "text-sm px-3 py-2 rounded-lg border",
-                    saved
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200"
-                  )}
-                >
-                  {saveMsg}
-                </div>
-              )}
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white">短视频 SOP 生成器</h1>
             </div>
           </div>
-
-          {/* Preview Panel */}
-          {showPreview && (
-            <div className="w-full lg:w-96 xl:w-[28rem] shrink-0 print:w-full print:max-w-none">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 sticky top-4 print:static print:border-none print:p-0 print:shadow-none">
-                <div className="flex items-center justify-between mb-3 print:hidden">
-                  <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                    <FileText className="w-4 h-4" /> 预览
-                  </h3>
-                  <button
-                    onClick={() => window.print()}
-                    className={buttonVariants.previewToggle}
-                  >
-                    <Printer className="w-3.5 h-3.5" /> 打印
-                  </button>
-                </div>
-                <div
-                  ref={previewRef}
-                  className="bg-gray-50 rounded-lg p-4 text-sm font-mono whitespace-pre-wrap break-words text-gray-800 max-h-[80vh] overflow-y-auto print:max-h-none print:overflow-visible print:bg-white print:p-0"
-                >
-                  {previewText || "填写内容后将在此生成预览..."}
-                </div>
-              </div>
-            </div>
+          {freemium.mounted && freemium.remaining > 0 && !document.cookie.includes("next-auth") && (
+            <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full">
+              剩余免费 {freemium.remaining} 次
+            </span>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Print-only preview wrapper */}
-      <div className="hidden print:block print:p-8">
-        <pre className="text-sm whitespace-pre-wrap break-words font-mono text-gray-800">
-          {previewText}
-        </pre>
-      </div>
+      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Error */}
+        {error && (
+          <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-300">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Input Form */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-6 space-y-5 shadow-sm">
+          <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <Sparkles className="w-4 h-4 text-teal-500" />
+            <span>产品与受众信息</span>
+          </div>
+
+          {/* Product */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              产品 / 服务名称 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={product}
+              onChange={(e) => setProduct(e.target.value)}
+              placeholder="例如：便携式折叠水杯、AI 翻译耳机、海外仓一件代发服务"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Audience */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+              目标受众 <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={audience}
+              onChange={(e) => setAudience(e.target.value)}
+              placeholder="例如：25-35 岁北美华人宝妈、东南亚跨境电商新手"
+              className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Platform */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">发布平台</label>
+            <div className="flex flex-wrap gap-2">
+              {PLATFORMS.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPlatform(platform === p ? "" : p)}
+                  className={`px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition-all ${
+                    platform === p
+                      ? "bg-teal-600 text-white border-teal-600 shadow-md shadow-teal-500/20"
+                      : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-teal-400"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Style */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">视频风格</label>
+            <div className="flex flex-wrap gap-2">
+              {STYLES.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStyle(style === s ? "" : s)}
+                  className={`px-3 py-1.5 rounded-lg text-sm border min-h-[44px] transition-all ${
+                    style === s
+                      ? "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                      : "bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:border-emerald-400"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Generate Button */}
+          <button
+            onClick={handleGenerate}
+            disabled={loading}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                AI 正在生成爆款 SOP...
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-4 h-4" />
+                生成爆款 SOP
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Result */}
+        {result && (
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-sm overflow-hidden">
+            {/* Result Header */}
+            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-700/30">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                AI 生成结果
+              </span>
+              <button
+                onClick={handleCopy}
+                className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors min-h-[44px]"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? "已复制" : "复制"}
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Hook */}
+              <div>
+                <h3 className="text-xs font-semibold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1">🎯 黄金钩子（前3秒）</h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-teal-50/50 dark:bg-teal-900/20 rounded-lg p-3">{result.hook}</p>
+              </div>
+
+              {/* Pain Point */}
+              <div>
+                <h3 className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1">😰 用户痛点</h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-red-50/50 dark:bg-red-900/20 rounded-lg p-3">{result.painPoint}</p>
+              </div>
+
+              {/* Solution */}
+              <div>
+                <h3 className="text-xs font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider mb-1">💡 解决方案</h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-green-50/50 dark:bg-green-900/20 rounded-lg p-3">{result.solution}</p>
+              </div>
+
+              {/* Selling Points */}
+              <div>
+                <h3 className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-1">⭐ 核心卖点</h3>
+                <ul className="space-y-1.5">
+                  {result.sellingPoints?.map((sp, i) => (
+                    <li key={i} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                      <span className="w-5 h-5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
+                      {sp}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Script */}
+              <div>
+                <h3 className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-1">📝 完整口播文案</h3>
+                <div className="text-sm text-gray-900 dark:text-gray-100 bg-blue-50/50 dark:bg-blue-900/20 rounded-lg p-4 whitespace-pre-wrap leading-relaxed">{result.script}</div>
+              </div>
+
+              {/* Visual Cues */}
+              <div>
+                <h3 className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-1">🎬 画面建议</h3>
+                <ul className="space-y-1.5">
+                  {result.visualCues?.map((vc, i) => (
+                    <li key={i} className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2">
+                      <span className="text-amber-500 shrink-0">▸</span>
+                      {vc}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* CTA */}
+              <div>
+                <h3 className="text-xs font-semibold text-pink-600 dark:text-pink-400 uppercase tracking-wider mb-1">📢 行动号召（CTA）</h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 bg-pink-50/50 dark:bg-pink-900/20 rounded-lg p-3 font-medium">{result.cta}</p>
+              </div>
+
+              {/* Hashtags */}
+              <div>
+                <h3 className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1"># 推荐标签</h3>
+                <div className="flex flex-wrap gap-2">
+                  {result.hashtags?.map((tag, i) => (
+                    <span key={i} className="text-sm text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-2.5 py-1 rounded-full">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Posting Tips */}
+              <div>
+                <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">📋 发布注意事项</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 whitespace-pre-wrap">{result.postingTips}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Raw result fallback */}
+        {rawResult && !result && (
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-700/30">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">AI 原始输出</span>
+              <button onClick={handleCopy} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 transition-colors min-h-[44px]">
+                {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? "已复制" : "复制"}
+              </button>
+            </div>
+            <div className="p-6 text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap font-mono bg-gray-50 dark:bg-gray-900/50 max-h-96 overflow-y-auto">
+              {rawResult}
+            </div>
+          </div>
+        )}
+
+        {/* Reset */}
+        {(result || rawResult) && (
+          <button
+            onClick={handleReset}
+            className="w-full py-2.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          >
+            ← 重新生成
+          </button>
+        )}
+      </main>
+
+      {/* Freemium Paywall Modal */}
+      <PaywallModal
+        isOpen={freemium.showPaywall}
+        onClose={() => freemium.setShowPaywall(false)}
+        title="免费试用次数已用尽"
+        description="您已使用 2 次免费 SOP 生成。登录解锁无限生成，或升级高级版解锁全部 AI 工具。"
+        onLogin={() => { freemium.setShowPaywall(false); router.push("/login?callbackUrl=/tools/video-script-sop"); }}
+        onUpgrade={() => { freemium.setShowPaywall(false); router.push("/pricing"); }}
+      />
     </div>
   );
 }

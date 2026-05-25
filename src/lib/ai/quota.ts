@@ -39,6 +39,7 @@ export function validateInputLength(toolType: string, totalLength: number): { va
     product_copy: 2000,
     translate_polish: 3000,
     document_summary: 6000,
+    video_script_sop: 1000,
   };
   const limit = limits[toolType] || 2000;
   if (totalLength > limit) {

@@ -1,7 +1,7 @@
 // src/lib/ai/prompts.ts — Structured prompts for AI tools
 // Each prompt returns a system prompt and user prompt
 
-export type ToolType = "product_copy" | "translate_polish" | "document_summary";
+export type ToolType = "product_copy" | "translate_polish" | "document_summary" | "video_script_sop";
 
 interface ProductCopyInput {
   productName: string;
@@ -98,6 +98,51 @@ export function getDocumentSummaryPrompt(input: DocumentSummaryInput) {
 ${input.text}
 
 请分析并生成摘要。`;
+
+  return { systemPrompt, userPrompt };
+}
+
+// ─── Video Script SOP ───────────────────────────────────────────────────────
+
+interface VideoScriptSopInput {
+  product: string;
+  audience: string;
+  platform?: string;
+  style?: string;
+}
+
+export function getVideoScriptSopPrompt(input: VideoScriptSopInput) {
+  const platform = input.platform || "抖音/TikTok/小红书";
+  const style = input.style || "口播带货";
+
+  const systemPrompt = `你是一个专业的短视频引流 SOP 策划专家，擅长为出海产品设计爆款短视频脚本。
+
+要求：
+1. 以 JSON 格式输出，包含以下字段：
+   - hook: "开头 3 秒黄金钩子（抓眼球）"
+   - painPoint: "用户痛点描述"
+   - solution: "产品如何解决痛点"
+   - sellingPoints: ["卖点1", "卖点2", "卖点3"]
+   - script: "完整口播文案（60-90秒）"
+   - visualCues: ["画面建议1", "画面建议2", "画面建议3"]
+   - cta: "行动号召（CTA）"
+   - hashtags: ["#标签1", "#标签2", "#标签3", "#标签4", "#标签5"]
+   - postingTips: "发布注意事项（发布时间、标题建议等）"
+2. 钩子必须在前 3 秒内制造强烈好奇或共鸣
+3. 文案口语化、有节奏感、适合口播
+4. 画面建议要具体可执行（如"手持产品特写+背景虚化"）
+5. CTA 明确具体（如"点击下方链接立即体验"）
+6. 标签 5 个，兼顾泛流量和精准流量
+7. 不要输出除 JSON 外的任何内容
+8. 平台风格：${platform}
+9. 视频风格：${style}`;
+
+  const userPrompt = `产品名称/服务：${input.product}
+目标受众：${input.audience}
+发布平台：${platform}
+视频风格：${style}
+
+请生成完整的短视频引流 SOP 脚本。`;
 
   return { systemPrompt, userPrompt };
 }
