@@ -143,7 +143,7 @@ export default function VideoScriptSopClient() {
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">短视频 SOP 生成器</h1>
             </div>
           </div>
-          {freemium.mounted && freemium.remaining > 0 && !document.cookie.includes("next-auth") && (
+          {freemium.mounted && freemium.remaining > 0 && !document.cookie.includes("next-auth.session-token") && !document.cookie.includes("__Secure-next-auth.session-token") && (
             <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full">
               剩余免费 {freemium.remaining} 次
             </span>

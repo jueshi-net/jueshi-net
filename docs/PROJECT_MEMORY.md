@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.6 (2026-05-25) |
+| 最新稳定版本 | v1.32.11 (2026-05-25) |
 
 ---
 
@@ -180,6 +180,31 @@ if (role === "admin" || role === "管理员") return "admin";
 
 当前存在多个权限文件（见上），逻辑可能有重复。新增权限逻辑时应优先复用 `permissions.ts` 中的 `requireAdmin()` / `requireMember()` 等函数，避免创建新的权限校验入口。
 
+### 6.3 生产环境 HTTPS Cookie 前缀踩坑（v1.32.11 修复）
+
+**问题**：NextAuth 在生产 HTTPS 环境下会自动给 session cookie 加上 `__Secure-` 前缀，实际 Cookie 名称为 `__Secure-next-auth.session-token`，而非本地 HTTP 下的 `next-auth.session-token`。
+
+**旧代码（仅 HTTP 有效）**：
+```typescript
+document.cookie.includes("next-auth")  // ❌ 生产 HTTPS 下永远返回 false
+```
+
+**修复后（兼容 HTTP + HTTPS）**：
+```typescript
+document.cookie.includes("next-auth.session-token") ||
+document.cookie.includes("__Secure-next-auth.session-token")  // ✅ 双端兼容
+```
+
+**涉及修复文件（6 处）**：
+- `src/hooks/use-freemium-gate.ts` — 核心 freemium 拦截 hook
+- `src/app/(public)/tools/video-script-sop/video-script-sop-client.tsx` — 剩余次数显示
+- `src/app/(public)/tools/documents/shipping-label/label-maker-client.tsx` — 评价面板
+- `src/app/(public)/ai-tools/product-copy/product-copy-client.tsx` — 评价面板
+- `src/app/(public)/ai-tools/translate-polish/translate-polish-client.tsx` — 评价面板
+- `src/app/(public)/ai-tools/document-summary/document-summary-client.tsx` — 评价面板
+
+**⚠️ 铁律**：任何新的客户端登录态判定逻辑必须同时检查 `next-auth.session-token` 和 `__Secure-next-auth.session-token`，或优先使用 `useSession()` hook。
+
 ---
 
 ## 7. 部署铁律
@@ -222,7 +247,9 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.7** | **当前** | **PROJECT_MEMORY 建立 + Freemium 拦截逻辑实装 + Google Spider Ping** |
 | **v1.32.8** | 2026-05-25 | 视频 SOP 生成器落地 + .cursorrules + AI 路由扩展 |
 | **v1.32.9** | 2026-05-25 | **AI 生产密钥激活** — .env.production 追加 AI_API_KEY/AI_ENABLED + PM2 --update-env 强制刷新 |
+| **v1.32.10** | 2026-05-25 | **部署基建固化** — deploy.sh 安全脚本（7 重 exclude 保护）+ 留学生集运专区 /starter/student |
+| **v1.32.11** | 2026-05-25 | **HTTPS 鉴权修复 + 全局导航打通** — 生产环境 __Secure-next-auth.session-token Cookie 兼容修复（6 处）+ SOP/学生专区注册至 Cmd+K 搜索与工具广场 |
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.7)*
+*Last updated: 2026-05-25 (v1.32.11)*

@@ -32,6 +32,7 @@ import {
   Sparkles,
   Package,
   Star,
+  GraduationCap,
 } from "lucide-react";
 import { scenarioPackages } from "@/data/scenario-packages";
 
@@ -95,6 +96,7 @@ const navItems: SearchItem[] = [
   { id: "nav-rankings", title: "工具排行榜", href: "/rankings", icon: <TrendingUp className="w-4 h-4" />, keywords: ["rankings", "排行", "热门"] },
   { id: "nav-tracking", title: "包裹追踪", href: "/tracking", icon: <Package className="w-4 h-4" />, keywords: ["tracking", "包裹", "物流"] },
   { id: "nav-starter", title: "场景包列表", href: "/starter", icon: <Briefcase className="w-4 h-4" />, keywords: ["starter", "场景", "新手"] },
+  { id: "nav-student", title: "留学生集运专区", href: "/starter/student", icon: <GraduationCap className="w-4 h-4" />, keywords: ["student", "留学生", "集运", "海运", "回国"] },
 ];
 
 const toolItems: SearchItem[] = [

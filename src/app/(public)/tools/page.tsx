@@ -51,6 +51,7 @@ export default function ToolsCenterPage() {
         { name: "AI 商品文案", href: "/ai-tools/product-copy", icon: Sparkles, desc: "一键生成多平台商品标题、五点描述、SEO 关键词", status: "体验版" as const, users: "电商卖家/代购" },
         { name: "AI 翻译润色", href: "/ai-tools/translate-polish", icon: Globe, desc: "商务邮件翻译、英文润色、多语言沟通", status: "体验版" as const, users: "外贸/留学生" },
         { name: "AI 文档摘要", href: "/ai-tools/document-summary", icon: BookOpen, desc: "合同/协议/PDF 快速摘要、风险提示、关键条款提取", status: "体验版" as const, users: "商务/法律/留学" },
+        { name: "短视频 SOP 生成器", href: "/tools/video-script-sop", icon: Sparkles, desc: "AI 自动生成爆款短视频脚本，支持多平台多风格", status: "体验版" as const, users: "电商卖家/内容创作者" },
       ]
     },
     {
@@ -226,6 +227,12 @@ export default function ToolsCenterPage() {
                   className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]"
                 >
                   🛍️ 反向海淘
+                </Link>
+                <Link
+                  href="/starter/student"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]"
+                >
+                  🎒 留学生集运
                 </Link>
                 <Link
                   href="/starter/student-paper"

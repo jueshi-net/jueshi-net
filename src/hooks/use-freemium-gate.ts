@@ -50,9 +50,12 @@ const DEFAULT_LIMIT = 2;
 const DEFAULT_STORAGE_KEY = "freemium_export_count";
 
 function isAuthenticated(): boolean {
-  // Check for NextAuth session cookie
+  // Check for NextAuth session cookie — supports both HTTP and production HTTPS
   if (typeof document === "undefined") return false;
-  return document.cookie.includes("next-auth");
+  return (
+    document.cookie.includes("next-auth.session-token") ||
+    document.cookie.includes("__Secure-next-auth.session-token")
+  );
 }
 
 export function useFreemiumGate(

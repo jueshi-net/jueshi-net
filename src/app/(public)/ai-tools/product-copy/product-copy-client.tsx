@@ -344,7 +344,7 @@ export default function ProductCopyPage() {
         </div>
 
         {/* Tool Reviews */}
-        <ToolReviewPanel toolKey="product-copy" isLoggedIn={typeof window !== 'undefined' && document.cookie.includes('next-auth')} />
+        <ToolReviewPanel toolKey="product-copy" isLoggedIn={typeof window !== 'undefined' && (document.cookie.includes('next-auth.session-token') || document.cookie.includes('__Secure-next-auth.session-token'))} />
 
         <AdSlot placement="tool-bottom" className="mt-8" variant="card" />
       </div>
