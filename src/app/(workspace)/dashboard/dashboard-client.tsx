@@ -8,7 +8,7 @@ import {
   FileText, Link2, Bot, TrendingUp, Clock, Loader2,
 } from "lucide-react";
 import { buttonVariants, cardStyles, badgeStyles } from "@/lib/ui-styles";
-import { isAdminRole } from "@/lib/auth/permissions";
+import { isAdminRole } from "@/lib/auth/role-utils";
 
 // ===== Types =====
 

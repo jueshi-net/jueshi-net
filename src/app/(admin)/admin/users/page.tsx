@@ -18,7 +18,7 @@ interface AdminData {
 
 import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
 import { tableStyles, badgeStyles, buttonVariants, cardStyles } from "@/lib/ui-styles";
-import { isAdminRole } from "@/lib/auth/permissions";
+import { isAdminRole } from "@/lib/auth/role-utils";
 
 const ROLE_LABELS: Record<string, string> = { user: "用户", member: "会员", admin: "管理员" };
 const ROLE_BADGE: Record<string, string> = { user: badgeStyles.info, member: badgeStyles.warning, admin: badgeStyles.purple };

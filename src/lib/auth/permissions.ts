@@ -1,6 +1,6 @@
 // src/lib/auth/permissions.ts
 // Server-side permission validation module.
-// DO NOT use this on the client side. Use src/lib/membership/permissions.ts for UI hints.
+// DO NOT use this on the client side. Use src/lib/auth/role-utils.ts for UI hints.
 //
 // PERMISSION SOURCE: Role is ALWAYS read fresh from the database users table.
 // JWT session only provides userId/email for lookup — never trusted as permission source.
@@ -9,28 +9,10 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createHash } from "crypto";
 
+// Re-export shared role utilities (safe for client components)
+export { isAdminRole, isElevatedRole } from "./role-utils";
+
 export type ServerRole = "guest" | "user" | "member" | "admin";
-
-/**
- * Robust admin role check — handles all historical variants.
- * 
- * Accepted values: 'admin', 'ADMIN', '管理员', 'Admin', 'administrator'
- * This covers: original English, all-caps, Chinese, and any case-insensitive match.
- */
-export function isAdminRole(role: string | null | undefined): boolean {
-  if (!role) return false;
-  const normalized = role.trim().toLowerCase();
-  return normalized === "admin" || normalized === "administrator" || normalized === "管理员";
-}
-
-/**
- * Robust member-or-admin check — both have elevated privileges.
- */
-export function isElevatedRole(role: string | null | undefined): boolean {
-  if (!role) return false;
-  const normalized = role.trim().toLowerCase();
-  return normalized === "admin" || normalized === "administrator" || normalized === "管理员" || normalized === "member";
-}
 
 export interface UserLimits {
   maxDrafts: number;
