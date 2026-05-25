@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/admin/newsletter - 获取订阅者列表和广播历史
 export async function GET() {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -35,7 +36,7 @@ export async function GET() {
 // POST /api/admin/newsletter - 创建并发送广播
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
 // DELETE /api/admin/newsletter/[id] - 删除广播记录
 export async function DELETE(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

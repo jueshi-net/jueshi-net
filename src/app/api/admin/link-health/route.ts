@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/admin/link-health - 检查链接健康状态
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest) {
 // POST /api/admin/link-health/check - 手动触发健康检查
 export async function POST() {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

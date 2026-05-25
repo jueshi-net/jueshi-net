@@ -2,10 +2,10 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import * as bcrypt from "bcryptjs";
+import { isAdminRole } from "@/lib/auth/permissions";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
-}
+  params: Promise<{ id: string }>;\n}
 
 export async function GET(_req: NextRequest, { params }: RouteParams) {
   try {
@@ -13,7 +13,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     if (!session?.user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    if (session.user.id !== id && (session.user as any).role !== "ADMIN") {
+    if (session.user.id !== id && !isAdminRole((session.user as any).role)) {
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const body = await req.json();
-    const isAdmin = (session.user as any).role === "ADMIN";
+    const isAdmin = isAdminRole((session.user as any).role);
 
     // Admin can modify any user, regular users can only modify themselves
     if (!isAdmin && session.user.id !== id) {
@@ -65,7 +65,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   try {
     const session = await auth();
-    if (!session?.user || (session.user as any).role !== "ADMIN") {
+    if (!session?.user || !isAdminRole((session.user as any).role)) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
     }
 

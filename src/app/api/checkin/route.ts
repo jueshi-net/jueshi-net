@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
+import { getCurrentUserRole, isElevatedRole, getUserLimits } from "@/lib/auth/permissions";
 import { getTodayDateKey, getDateKey } from "@/lib/date-utils";
 import { addGrowthValue } from "@/lib/growth-helpers";
 
@@ -21,7 +21,7 @@ export async function POST() {
   const role = await getCurrentUserRole();
 
   // Determine points based on role
-  const checkinPoints = role === "member" || role === "admin" ? 10 : 5;
+  const checkinPoints = isElevatedRole(role) ? 10 : 5;
 
   // Use timezone-aware date key (America/Vancouver)
   const dateKey = getTodayDateKey();

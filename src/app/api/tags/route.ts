@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/tags - 获取所有标签
 export async function GET() {
@@ -18,7 +19,7 @@ export async function GET() {
 // POST /api/tags - 创建标签（管理员）
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
 // DELETE /api/tags - 删除标签
 export async function DELETE(req: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 const SETTINGS_FILE = path.join(process.cwd(), 'data', 'system-settings.json');
 
@@ -29,7 +30,7 @@ async function writeSettings(data: Record<string, unknown>) {
 // GET /api/admin/settings - 获取系统设置
 export async function GET() {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -40,7 +41,7 @@ export async function GET() {
 // POST /api/admin/settings - 更新系统设置
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

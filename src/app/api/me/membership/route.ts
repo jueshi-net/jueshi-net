@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isElevatedRole } from "@/lib/auth/permissions";
 
 export async function GET() {
   try {
@@ -56,7 +57,7 @@ export async function GET() {
     }
 
     // Check active member status
-    const isActiveMember = user.role === "admin" || user.role === "member" || !!(user.memberUntil && user.memberUntil > new Date());
+    const isActiveMember = isElevatedRole(user.role) || !!(user.memberUntil && user.memberUntil > new Date());
 
     return NextResponse.json({
       success: true,

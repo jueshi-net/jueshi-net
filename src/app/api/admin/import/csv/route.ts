@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // POST /api/admin/import/csv - 批量导入链接
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

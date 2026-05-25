@@ -85,7 +85,9 @@ function getRole(): UserRole {
   // 从 localStorage 读取角色（后期接真实用户系统）
   if (typeof window === "undefined") return "guest";
   const saved = localStorage.getItem("bxb_role");
-  if (saved === "member" || saved === "admin" || saved === "管理员") return saved as UserRole;
+  const normalized = (saved || "").toLowerCase();
+  if (saved === "member") return "member";
+  if (normalized === "admin" || saved === "管理员") return "admin";
   if (saved === "user") return "user";
   return "guest";
 }
@@ -174,7 +176,7 @@ export function canBatchGenerateLabels(): boolean {
 
 export function getLabelBatchLimit(): number {
   const role = getRoleInfo().role;
-  if (role === 'member' || role === 'admin') return 100;
+  if (['member', 'admin', '管理员'].includes(role)) return 100;
   if (role === 'user') return 10;
   return 3;
 }

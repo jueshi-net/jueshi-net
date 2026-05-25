@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 export async function GET() {
   const session = await auth();
@@ -9,7 +10,7 @@ export async function GET() {
   }
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user || user.role !== 'admin') {
+  if (!user || !isAdminRole(user.role)) {
     return NextResponse.json({ error: '无权限' }, { status: 403 });
   }
 

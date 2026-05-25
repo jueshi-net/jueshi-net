@@ -1,6 +1,7 @@
 // GET /api/admin/overview — real-time admin dashboard stats
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { isAdminRole } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -11,7 +12,7 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { role: true } });
-    if (!user || user.role !== "admin") {
+    if (!user || !isAdminRole(user.role)) {
       return NextResponse.json({ error: "无权限" }, { status: 403 });
     }
 

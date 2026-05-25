@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { isAdminRole } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -93,6 +94,6 @@ export async function POST(req: NextRequest) {
 async function requireAdmin() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  if ((session.user as any).role !== "ADMIN") return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  if (!isAdminRole((session.user as any).role)) return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   return { session };
 }

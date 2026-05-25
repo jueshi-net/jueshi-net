@@ -21,6 +21,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 export async function POST(req: Request) {
   // ─── Admin guard ─────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     select: { role: true },
   });
 
-  if (!user || user.role !== 'admin') {
+  if (!user || !isAdminRole(user.role)) {
     return NextResponse.json({ error: '需要管理员权限' }, { status: 403 });
   }
 

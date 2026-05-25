@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { User, Mail, Calendar, Link as LinkIcon, FolderOpen, Star, Settings, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 export const metadata: Metadata = {
   title: '个人中心 - 海外百宝箱',
@@ -97,7 +98,7 @@ export default async function ProfilePage() {
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-500">角色</span>
                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">
-                  {user.role === 'admin' ? '管理员' : '普通用户'}
+                  {isAdminRole(user.role) ? '管理员' : '普通用户'}
                 </span>
               </div>
               <div className="flex justify-between py-2">
@@ -162,7 +163,7 @@ export default async function ProfilePage() {
             <Link href="/notifications" className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm">
               通知中心
             </Link>
-            {user.role === 'admin' && (
+            {isAdminRole(user.role) && (
               <Link href="/admin" className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">
                 管理后台
               </Link>

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { callAI, isAIEnabled, isMockMode, getEnv } from "@/lib/ai/client";
 import { getProductCopyPrompt, getTranslatePolishPrompt, getDocumentSummaryPrompt, getVideoScriptSopPrompt, ToolType } from "@/lib/ai/prompts";
 import { getDailyLimit, getCostPoints, hashInput, validateInputLength, getVancouverDateString } from "@/lib/ai/quota";
+import { isElevatedRole } from "@/lib/auth/permissions";
 
 const VALID_TOOLS: ToolType[] = ["product_copy", "translate_polish", "document_summary", "video_script_sop"];
 
@@ -187,7 +188,7 @@ export async function POST(req: Request) {
   });
 
   // Calculate new remaining
-  const newRemaining = remaining > 0 ? remaining - 1 : (role === "member" || role === "admin") ? dailyLimit - usageCount - 1 : null;
+  const newRemaining = remaining > 0 ? remaining - 1 : isElevatedRole(role) ? dailyLimit - usageCount - 1 : null;
 
   // For guest, show how many left (0 since they used their only one)
   const displayRemaining = role === "guest" ? 0 : (newRemaining ?? null);

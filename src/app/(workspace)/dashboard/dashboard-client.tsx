@@ -8,6 +8,7 @@ import {
   FileText, Link2, Bot, TrendingUp, Clock, Loader2,
 } from "lucide-react";
 import { buttonVariants, cardStyles, badgeStyles } from "@/lib/ui-styles";
+import { isAdminRole } from "@/lib/auth/permissions";
 
 // ===== Types =====
 
@@ -233,7 +234,7 @@ export default function DashboardClient() {
 
   // ===== Derived State =====
 
-  const isPremium = membership?.isActiveMember || permissions?.isMember || permissions?.role === "member" || permissions?.role === "admin";
+  const isPremium = membership?.isActiveMember || permissions?.isMember || permissions?.role === "member" || isAdminRole(permissions?.role);
   const userPoints = permissions?.points ?? dashboard?.points ?? 0;
   const memberUntil = membership?.membershipExpiresAt || permissions?.memberUntil;
 

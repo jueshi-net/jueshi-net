@@ -11,6 +11,27 @@ import { createHash } from "crypto";
 
 export type ServerRole = "guest" | "user" | "member" | "admin";
 
+/**
+ * Robust admin role check — handles all historical variants.
+ * 
+ * Accepted values: 'admin', 'ADMIN', '管理员', 'Admin', 'administrator'
+ * This covers: original English, all-caps, Chinese, and any case-insensitive match.
+ */
+export function isAdminRole(role: string | null | undefined): boolean {
+  if (!role) return false;
+  const normalized = role.trim().toLowerCase();
+  return normalized === "admin" || normalized === "administrator" || normalized === "管理员";
+}
+
+/**
+ * Robust member-or-admin check — both have elevated privileges.
+ */
+export function isElevatedRole(role: string | null | undefined): boolean {
+  if (!role) return false;
+  const normalized = role.trim().toLowerCase();
+  return normalized === "admin" || normalized === "administrator" || normalized === "管理员" || normalized === "member";
+}
+
 export interface UserLimits {
   maxDrafts: number;
   maxCompanyProfiles: number;

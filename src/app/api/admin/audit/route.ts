@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/admin/audit - 获取审计日志
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

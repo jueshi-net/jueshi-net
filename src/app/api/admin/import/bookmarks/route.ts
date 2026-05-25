@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 import { generateSlug, deduplicateLinks, getUniqueCategories } from '@/lib/bookmark-parser';
 
 /**
@@ -11,7 +12,7 @@ import { generateSlug, deduplicateLinks, getUniqueCategories } from '@/lib/bookm
  */
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/feedback - 获取反馈列表（管理员）
 export async function GET(req: Request) {
@@ -10,7 +11,7 @@ export async function GET(req: Request) {
   }
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || !isAdminRole(user.role)) {
     return NextResponse.json({ error: '无权限' }, { status: 403 });
   }
 
@@ -62,7 +63,7 @@ export async function PATCH(req: Request) {
   }
 
   const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!user || user.role !== 'ADMIN') {
+  if (!user || !isAdminRole(user.role)) {
     return NextResponse.json({ error: '无权限' }, { status: 403 });
   }
 

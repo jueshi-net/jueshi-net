@@ -18,6 +18,7 @@ interface AdminData {
 
 import { GROWTH_TYPE_LABELS } from "@/lib/growth-type-labels";
 import { tableStyles, badgeStyles, buttonVariants, cardStyles } from "@/lib/ui-styles";
+import { isAdminRole } from "@/lib/auth/permissions";
 
 const ROLE_LABELS: Record<string, string> = { user: "用户", member: "会员", admin: "管理员" };
 const ROLE_BADGE: Record<string, string> = { user: badgeStyles.info, member: badgeStyles.warning, admin: badgeStyles.purple };
@@ -185,7 +186,7 @@ export default function AdminUsersPage() {
 
   const userCount = data.users.filter(u => u.role === "user").length;
   const memberCount = data.users.filter(u => u.role === "member").length;
-  const adminCount = data.users.filter(u => u.role === "admin").length;
+  const adminCount = data.users.filter(u => isAdminRole(u.role)).length;
 
   return (
     <div className="space-y-6">

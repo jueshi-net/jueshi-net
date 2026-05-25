@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { isAdminRole } from "@/lib/auth/permissions";
 
 // AI generate endpoint — uses any OpenAI-compatible API
 // Set env vars: AI_API_BASE_URL, AI_API_KEY, AI_MODEL
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (!session?.user || (session.user as any).role !== "admin") {
+  if (!session?.user || !isAdminRole((session.user as any).role)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
   }
 

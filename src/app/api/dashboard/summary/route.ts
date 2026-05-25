@@ -4,7 +4,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { getCurrentUserRole, getUserLimits } from "@/lib/auth/permissions";
+import { getCurrentUserRole, getUserLimits, isElevatedRole, isAdminRole } from "@/lib/auth/permissions";
 import { getTodayDateKey, getTodayRange } from "@/lib/date-utils";
 
 export async function GET() {
@@ -43,7 +43,7 @@ export async function GET() {
   });
 
   // Daily point cap by role
-  const dailyPointCap = role === "admin" ? 999 : role === "member" ? 60 : 30;
+  const dailyPointCap = isAdminRole(role) ? 999 : isElevatedRole(role) ? 60 : 30;
 
   // Task stats
   const taskStats = await prisma.userTask.groupBy({

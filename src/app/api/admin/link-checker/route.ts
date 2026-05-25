@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
+import { isAdminRole } from '@/lib/auth/permissions';
 
 // GET /api/link-checker - 获取需要检查的链接
 export async function GET() {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
@@ -21,7 +22,7 @@ export async function GET() {
 // POST /api/link-checker/check - 检查单个链接
 export async function POST(req: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== 'admin') {
+  if (!session?.user || !isAdminRole(session.user.role)) {
     return NextResponse.json({ error: '未授权' }, { status: 403 });
   }
 
