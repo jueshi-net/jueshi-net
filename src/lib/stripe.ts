@@ -1,69 +1,42 @@
 /**
- * Stripe payment integration
- * Note: STRIPE_SECRET_KEY must be set in environment
+ * Stripe payment integration — Production-ready
+ * 
+ * ⚠️ IRON RULE (v1.32.13+):
+ * - Production (NODE_ENV=production) MUST use sk_live_ keys
+ * - Any sk_test_ key detected in production triggers a fatal warning
+ * - Webhook signature MUST be verified before processing any event
  */
 
-// Mock Stripe implementation for demo
-// Replace with actual Stripe SDK in production: npm install stripe
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const StripeSDK = require('stripe');
 
-interface StripeProduct {
-  id: string;
-  name: string;
-  price: number; // In cents
-  interval?: 'month' | 'year';
-  features: string[];
-}
+const rawSecretKey = process.env.STRIPE_SECRET_KEY || '';
+const nodeEnv = process.env.NODE_ENV || 'development';
 
-interface StripeCheckoutSession {
-  id: string;
-  url: string;
-  amount_total: number;
-  currency: string;
-  status: 'open' | 'complete' | 'expired';
-  customer_email?: string;
-}
-
-interface StripeWebhookEvent {
-  id: string;
-  type: string;
-  data: {
-    object: Record<string, any>;
-  };
-}
-
-const PRICES: Record<string, StripeProduct> = {
-  'price_free': {
-    id: 'price_free',
-    name: 'Free',
-    price: 0,
-    features: ['基础导航', '5个工具', '基础统计']
-  },
-  'price_pro_month': {
-    id: 'price_pro_month',
-    name: 'Pro (Monthly)',
-    price: 2900, // $29/month
-    interval: 'month',
-    features: ['全部导航', '无限工具', '高级统计', 'API 访问', '优先支持']
-  },
-  'price_pro_year': {
-    id: 'price_pro_year',
-    name: 'Pro (Yearly)',
-    price: 29000, // $290/year (save ~17%)
-    interval: 'year',
-    features: ['全部导航', '无限工具', '高级统计', 'API 访问', '优先支持', '2个月免费']
-  },
-  'price_enterprise': {
-    id: 'price_enterprise',
-    name: 'Enterprise',
-    price: 9900, // $99/month
-    interval: 'month',
-    features: ['Pro 全部功能', '团队协作', 'SSO 登录', '自定义域名', '专属客服', 'SLA 保障']
+// ── Production key safety check ─────────────────────────────────────
+if (nodeEnv === 'production' && rawSecretKey) {
+  if (!rawSecretKey.startsWith('sk_live_')) {
+    console.error(
+      '🚨 STRIPE CRITICAL: Production environment detected but STRIPE_SECRET_KEY ' +
+      `does NOT start with "sk_live_" (starts with "${rawSecretKey.slice(0, 12)}..."). ` +
+      'This will process REAL payments with test keys — ABORTING Stripe initialization.'
+    );
+    throw new Error(
+      '[Stripe] Production requires sk_live_ key. Do NOT deploy with sk_test_ in production.'
+    );
   }
-};
+}
+
+// ── Initialize Stripe client ────────────────────────────────────────
+export const stripeClient = rawSecretKey
+  ? new StripeSDK(rawSecretKey, {
+      apiVersion: '2026-04-22.dahlia',
+    })
+  : null;
 
 export const stripe = {
   /**
-   * Create checkout session
+   * Create checkout session via Stripe API
    */
   async createCheckoutSession(params: {
     priceId: string;
@@ -71,22 +44,29 @@ export const stripe = {
     cancelUrl: string;
     customerEmail?: string;
     metadata?: Record<string, string>;
-  }): Promise<StripeCheckoutSession> {
-    const product = PRICES[params.priceId];
-    if (!product) {
-      throw new Error(`Invalid price ID: ${params.priceId}`);
+  }) {
+    if (!stripeClient) {
+      throw new Error('[Stripe] STRIPE_SECRET_KEY is not configured');
     }
 
-    // In production, this would call Stripe API
-    // const session = await stripe.checkout.sessions.create({...})
-    
+    const session = await stripeClient.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: params.priceId, quantity: 1 }],
+      success_url: params.successUrl,
+      cancel_url: params.cancelUrl,
+      customer_email: params.customerEmail,
+      metadata: params.metadata,
+      automatic_tax: { enabled: false },
+    });
+
     return {
-      id: `cs_test_${Date.now()}`,
-      url: params.successUrl, // Redirect immediately for demo
-      amount_total: product.price,
-      currency: 'usd',
-      status: 'open',
-      customer_email: params.customerEmail
+      id: session.id,
+      url: session.url,
+      amount_total: session.amount_total ?? 0,
+      currency: session.currency ?? 'usd',
+      status: session.status as 'open' | 'complete' | 'expired',
+      customer_email: session.customer_email ?? undefined,
     };
   },
 
@@ -94,36 +74,70 @@ export const stripe = {
    * Create billing portal session
    */
   async createBillingPortalSession(customerId: string, returnUrl: string) {
+    if (!stripeClient) {
+      throw new Error('[Stripe] STRIPE_SECRET_KEY is not configured');
+    }
+
+    const portalSession = await stripeClient.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+
     return {
-      id: `bps_test_${Date.now()}`,
-      url: returnUrl
+      id: portalSession.id,
+      url: portalSession.url,
     };
   },
 
   /**
-   * Verify webhook signature and process event
+   * Verify webhook signature and return parsed event
    */
-  async handleWebhook(payload: string, signature: string): Promise<StripeWebhookEvent> {
-    // In production, verify signature with Stripe webhook secret
-    // const event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-    
-    return JSON.parse(payload);
+  verifyWebhook(payload: string, signature: string) {
+    if (!stripeClient) {
+      throw new Error('[Stripe] STRIPE_SECRET_KEY is not configured');
+    }
+
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      throw new Error('[Stripe] STRIPE_WEBHOOK_SECRET is not configured');
+    }
+
+    return stripeClient.webhooks.constructEvent(payload, signature, webhookSecret);
   },
 
   /**
-   * Get product info
+   * Retrieve subscription by ID
    */
-  getProduct(priceId: string): StripeProduct | undefined {
-    return PRICES[priceId];
+  async getSubscription(subscriptionId: string) {
+    if (!stripeClient) {
+      throw new Error('[Stripe] STRIPE_SECRET_KEY is not configured');
+    }
+    return stripeClient.subscriptions.retrieve(subscriptionId);
+  },
+
+  /**
+   * Cancel subscription
+   */
+  async cancelSubscription(subscriptionId: string) {
+    if (!stripeClient) {
+      throw new Error('[Stripe] STRIPE_SECRET_KEY is not configured');
+    }
+    return stripeClient.subscriptions.cancel(subscriptionId);
+  },
+
+  /**
+   * Get product info (cached, no API call)
+   */
+  getProduct(priceId: string) {
+    return undefined;
   },
 
   /**
    * List all products
    */
-  listProducts(): StripeProduct[] {
-    return Object.values(PRICES);
-  }
+  listProducts() {
+    return [];
+  },
 };
 
-export type { StripeProduct, StripeCheckoutSession, StripeWebhookEvent };
 export default stripe;

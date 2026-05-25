@@ -21,7 +21,7 @@
 | SSH 用户 | deploy@jueshi.net (root 登录失败) |
 | PM2 工作目录 | /home/deploy/xixiong-saas |
 | 部署方式 | rsync → rm -rf .next → npm run build → pm2 reload |
-| 最新稳定版本 | v1.32.12 (2026-05-25) |
+| 最新稳定版本 | v1.32.13 (2026-05-25) |
 
 ---
 
@@ -239,7 +239,20 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 
 ---
 
-## 8. 测试账号
+## 8. 商业化与支付铁律（v1.32.13 起生效）
+
+**⚠️ 涉及资金流动，必须零容忍任何未捕获异常。**
+
+1. **Stripe 生产密钥强制校验**：`src/lib/stripe.ts` 在 `NODE_ENV=production` 时检测 `STRIPE_SECRET_KEY` 是否以 `sk_live_` 开头。如使用 `sk_test_` 则 **直接 throw Error 阻止启动**，并输出高优先级日志。
+2. **Webhook 签名必须校验**：所有 `/api/webhooks/stripe` 请求必须通过 `stripe.webhooks.constructEvent()` 验证签名。签名无效直接返回 400，不执行任何业务逻辑。
+3. **会员状态更新必须后台异步**：`checkout.session.completed` 事件触发后，由 Webhook 后端调用 Prisma 更新 `User` 模型的 `stripeSubscriptionId` / `stripeCurrentPeriodEnd` 字段。**严禁前端伪造成功状态或直接修改会员权限。**
+4. **Success/Cancel URL 严禁写死 localhost**：必须使用 `process.env.NEXT_PUBLIC_SITE_URL || 'https://jueshi.net'` 动态构建。
+5. **Checkout API 必须鉴权**：未登录用户调用 `/api/checkout` 返回 401 + `redirectTo`，前端自动跳转 `/login?callbackUrl=/pricing`。
+6. **订阅取消处理**：`customer.subscription.deleted` 事件触发后，清空用户 `stripeSubscriptionId` / `stripePriceId` / `stripeCurrentPeriodEnd`，降级为免费用户。
+
+---
+
+## 9. 测试账号
 
 | 角色 | Email | 密码 |
 |------|-------|------|
@@ -261,7 +274,8 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | **v1.32.10** | 2026-05-25 | **部署基建固化** — deploy.sh 安全脚本（7 重 exclude 保护）+ 留学生集运专区 /starter/student |
 | **v1.32.11** | 2026-05-25 | **HTTPS 鉴权修复 + 全局导航打通** — 生产环境 __Secure-next-auth.session-token Cookie 兼容修复（6 处）+ SOP/学生专区注册至 Cmd+K 搜索与工具广场 |
 | **v1.32.12** | 2026-05-25 | **全站移动端深度适配** — Paywall max-h-[90vh] overflow-y-auto、输入框 min-h-[44px]、发票表格 overflow-x-auto、SOP 长文本 break-words、Header 响应式优化 |
+| **v1.32.13** | 2026-05-25 | **Stripe 生产支付全链路打通** — Mock→真实 SDK、sk_live_ 强制校验、Webhook 签名验证、Checkout API 鉴权、Pricing 页跳转打通 |
 
 ---
 
-*Last updated: 2026-05-25 (v1.32.12)*
+*Last updated: 2026-05-25 (v1.32.13)*
