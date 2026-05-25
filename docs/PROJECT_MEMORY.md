@@ -220,6 +220,8 @@ ssh deploy@jueshi.net "cd /home/deploy/xixiong-saas && rm -rf .next && npm run b
 | v1.32.5 | 2026-05-25 | Prisma 动态 env 彻底修复 + pSEO 21国数据注入 |
 | v1.32.6 | 2026-05-25 | GA4/Clarity 探针 + 动态 Sitemap + PaywallModal 组件 |
 | **v1.32.7** | **当前** | **PROJECT_MEMORY 建立 + Freemium 拦截逻辑实装 + Google Spider Ping** |
+| **v1.32.8** | 2026-05-25 | 视频 SOP 生成器落地 + .cursorrules + AI 路由扩展 |
+| **v1.32.9** | 2026-05-25 | **AI 生产密钥激活** — .env.production 追加 AI_API_KEY/AI_ENABLED + PM2 --update-env 强制刷新 |
 
 ---
 

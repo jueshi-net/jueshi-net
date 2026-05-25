@@ -1,12 +1,13 @@
 {
   "name": "kuajing-baoxian",
-  "version": "1.32.9",
+  "version": "1.32.10",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@localhost:5432/xixiong} next build",
     "start": "next start",
     "lint": "eslint",
+    "deploy": "bash scripts/deploy.sh",
     "postinstall": "prisma generate"
   },
   "dependencies": {
