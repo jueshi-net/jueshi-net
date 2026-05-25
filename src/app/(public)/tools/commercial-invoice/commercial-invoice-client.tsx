@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Printer, Building2, Plus, Trash2, FileText, Loader2, Eye, Code } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
 import { useDraftLoader } from "@/lib/use-draft-loader";
+import { useFreemiumGate } from "@/hooks/use-freemium-gate";
+import PaywallModal from "@/components/ui/paywall-modal";
 
 interface LineItem {
   id: string;
@@ -34,6 +37,13 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // ── Freemium Gate: unauthenticated users get 2 free exports ────────
+  const freemium = useFreemiumGate({
+    limit: 2,
+    storageKey: "invoice_export_count",
+  });
 
   // Load draft from URL param
   const loadDraftData = useCallback((dataJson: string) => {
@@ -159,6 +169,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     }
   };
 
+  // Wrapped print handler — Freemium gate intercepts when quota exhausted
   const handlePrint = () => {
     const printContent = previewRef.current;
     if (!printContent) return;
@@ -177,6 +188,12 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     `);
     win.document.close();
     win.print();
+  };
+
+  const handlePrintWithGate = () => {
+    freemium.handleProtectedAction(() => {
+      handlePrint();
+    });
   };
 
   return (
@@ -204,7 +221,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存草稿
             </button>
             <button onClick={handleReset} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">🗑️ 清空</button>
-            <button onClick={handlePrint} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 min-h-[44px]">
+            <button onClick={handlePrintWithGate} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 min-h-[44px]">
               <Printer className="w-4 h-4" /> 打印/PDF
             </button>
           </div>
@@ -362,6 +379,16 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
           )}
         </div>
       </div>
+
+      {/* Freemium Paywall Modal */}
+      <PaywallModal
+        isOpen={freemium.showPaywall}
+        onClose={() => freemium.setShowPaywall(false)}
+        title="免费试用次数已用尽"
+        description="您已使用 2 次免费导出。登录解锁无限导出，或升级高级版解锁全部权益。"
+        onLogin={() => { freemium.setShowPaywall(false); router.push("/login?callbackUrl=/tools/commercial-invoice"); }}
+        onUpgrade={() => { freemium.setShowPaywall(false); router.push("/pricing"); }}
+      />
     </div>
   );
 }
