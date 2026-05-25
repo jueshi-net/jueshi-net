@@ -8,6 +8,7 @@ import CommandPalette, { CommandMenuProvider } from "@/components/command-palett
 import PWARegister from "@/components/PWARegister";
 import CookieConsent from "@/components/common/cookie-consent";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, defaultOpenGraph } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -80,6 +81,17 @@ export default function RootLayout({
           <CookieConsent />
           {process.env.NEXT_PUBLIC_GA_ID && (
             <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+          )}
+          {process.env.NEXT_PUBLIC_CLARITY_ID && (
+            <Script id="microsoft-clarity" strategy="lazyOnload">
+              {`
+                (function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+                })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
+              `}
+            </Script>
           )}
         </Providers>
       </body>
