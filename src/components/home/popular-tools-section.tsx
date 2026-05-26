@@ -21,7 +21,8 @@ for (const pkg of SCENARIO_PACKAGES) {
 export default async function PopularToolsSection() {
   let rankings: any[] = [];
   try {
-    const res = await fetch("http://127.0.0.1:3000/api/tools/rankings", {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+    const res = await fetch(`${baseUrl}/api/tools/rankings`, {
       cache: "no-store",
     });
     if (res.ok) {

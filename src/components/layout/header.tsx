@@ -142,7 +142,7 @@ export default function Header() {
                       <div className="fixed inset-0 z-40" onClick={() => setShowUserMenu(false)} />
                       <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50">
                         <Link
-                          href="/dashboard"
+                          href="/workspace"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
@@ -150,7 +150,7 @@ export default function Header() {
                           我的工作台
                         </Link>
                         <Link
-                          href="/dashboard/tasks"
+                          href="/workspace"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
@@ -158,7 +158,7 @@ export default function Header() {
                           成长任务
                         </Link>
                         <Link
-                          href="/dashboard/notifications"
+                          href="/workspace"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
@@ -174,7 +174,7 @@ export default function Header() {
                           我的收藏
                         </Link>
                         <Link
-                          href="/dashboard/documents"
+                          href="/workspace"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
@@ -182,7 +182,7 @@ export default function Header() {
                           我的单据
                         </Link>
                         <Link
-                          href="/dashboard/points"
+                          href="/workspace"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 min-h-[44px]"
                           onClick={() => setShowUserMenu(false)}
                         >
@@ -340,7 +340,7 @@ export default function Header() {
               {status === "authenticated" ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href="/workspace"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >
@@ -348,7 +348,7 @@ export default function Header() {
                     <span className="font-medium">我的工作台</span>
                   </Link>
                   <Link
-                    href="/dashboard/tasks"
+                    href="/workspace"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >
@@ -356,7 +356,7 @@ export default function Header() {
                     <span className="font-medium">成长任务</span>
                   </Link>
                   <Link
-                    href="/dashboard/notifications"
+                    href="/workspace"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >
@@ -364,7 +364,7 @@ export default function Header() {
                     <span className="font-medium">通知中心</span>
                   </Link>
                   <Link
-                    href="/dashboard/points"
+                    href="/workspace"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >
@@ -380,7 +380,7 @@ export default function Header() {
                     <span className="font-medium">我的收藏</span>
                   </Link>
                   <Link
-                    href="/dashboard/documents"
+                    href="/workspace"
                     onClick={() => setMobileMenuOpen(false)}
                     className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-h-[44px]"
                   >

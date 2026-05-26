@@ -38,7 +38,7 @@ export default function GrowthTaskSummary() {
             {completedCount}/{tasks.length} 已完成
           </span>
         </div>
-        <Link href="/dashboard/tasks" className="inline-flex items-center gap-1 px-3 py-2 text-sm text-teal-600 hover:text-teal-700 min-h-[44px]">
+        <Link href="/workspace" className="inline-flex items-center gap-1 px-3 py-2 text-sm text-teal-600 hover:text-teal-700 min-h-[44px]">
           查看全部 <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

@@ -40,7 +40,7 @@ const ROLE_META: Record<string, { label: string; icon: React.ReactNode; cls: str
   admin: { label: '管理员', icon: <Shield className="w-3.5 h-3.5" />, cls: 'bg-violet-50 text-violet-700 ring-1 ring-violet-200' },
   member: { label: '会员', icon: <Crown className="w-3.5 h-3.5" />, cls: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200' },
   user: { label: '普通用户', icon: <Zap className="w-3.5 h-3.5" />, cls: 'bg-slate-50 text-slate-600 ring-1 ring-slate-200' },
-  guest: { label: '游客', icon: <Globe className="w-3.5 h-3.5" />, cls: 'bg-slate-50 text-slate-400 ring-1 ring-slate-100' },
+  
 };
 
 // ===== WorkbenchCard =====

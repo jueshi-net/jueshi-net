@@ -13,11 +13,6 @@ interface Todo {
   priority: 'high' | 'normal' | 'low';
 }
 
-const MOCK_TODOS: Todo[] = [
-  { id: '1', title: '完善清关资料', done: false, due: '明天', priority: 'high' },
-  { id: '2', title: '续费物流服务', done: false, due: '周五', priority: 'normal' },
-  { id: '3', title: '更新产品定价表', done: false, priority: 'low' as const },
-];
 
 const PRIORITY_COLORS: Record<string, string> = {
   high: 'bg-red-400',
@@ -38,10 +33,10 @@ export default function TodoWidget() {
       if (saved) {
         setTodos(JSON.parse(saved));
       } else {
-        setTodos(MOCK_TODOS);
+        setTodos([]);
       }
     } catch {
-      setTodos(MOCK_TODOS);
+      setTodos([]);
     }
   }, []);
 
@@ -163,7 +158,7 @@ export default function TodoWidget() {
       {/* See All */}
       <div className="px-3.5 pb-2.5">
         <Link
-          href="/dashboard/tasks"
+          href="/workspace"
           className="flex items-center justify-center gap-1 text-[10px] text-violet-600 hover:text-violet-700 font-medium py-1.5 rounded-lg hover:bg-violet-50/50 transition-all"
         >
           查看全部待办 <ChevronRight className="w-3 h-3" />

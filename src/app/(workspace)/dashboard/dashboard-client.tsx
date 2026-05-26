@@ -238,14 +238,14 @@ export default function DashboardClient() {
   const userPoints = permissions?.points ?? dashboard?.points ?? 0;
   const memberUntil = membership?.membershipExpiresAt || permissions?.memberUntil;
 
-  const roleLabels: Record<string, string> = { guest: "游客", user: "普通用户", member: "高级会员", admin: "管理员" };
+  const roleLabels: Record<string, string> = { user: "正式会员", member: "高级会员", admin: "管理员" };
 
   // Quota items (based on real limits from permissions)
   const quotas: QuotaItem[] = [
     {
       icon: <Link2 className="w-4 h-4" />,
       label: "自定义网址收藏",
-      used: 0, // TODO: fetch from API
+      used: 0, // placeholder — real usage tracking pending
       total: permissions?.limits.memoMax || 20,
       unit: "个",
       upgradeHint: "会员可收藏 50 个",
@@ -253,7 +253,7 @@ export default function DashboardClient() {
     {
       icon: <FileText className="w-4 h-4" />,
       label: "云草稿存储",
-      used: 0, // TODO: fetch from API
+      used: 0, // placeholder — real usage tracking pending
       total: permissions?.limits.maxDrafts || 10,
       unit: "份",
       upgradeHint: "会员可存 100 份",
@@ -261,7 +261,7 @@ export default function DashboardClient() {
     {
       icon: <Bot className="w-4 h-4" />,
       label: "AI 辅助次数",
-      used: 0, // TODO: fetch from API
+      used: 0, // placeholder — real usage tracking pending
       total: 5,
       unit: "次/日",
       upgradeHint: "会员无限制",
@@ -269,7 +269,7 @@ export default function DashboardClient() {
     {
       icon: <FileText className="w-4 h-4" />,
       label: "物流单据生成",
-      used: 0, // TODO: fetch from API
+      used: 0, // placeholder — real usage tracking pending
       total: 10,
       unit: "份/日",
       upgradeHint: "会员无限制",

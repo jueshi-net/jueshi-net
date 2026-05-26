@@ -160,12 +160,12 @@ export default function ApiDocsPage() {
       {/* Base URL */}
       <div className="bg-gray-900 dark:bg-gray-950 rounded-xl p-4 mb-8">
         <div className="flex items-center justify-between">
-          <code className="text-green-400 text-sm">Base URL: http://localhost:3000</code>
+          <code className="text-green-400 text-sm">Base URL: {process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || "https://jueshi.net"}</code>
           <button
-            onClick={() => copyToClipboard("http://localhost:3000")}
+            onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_APP_URL || "https://jueshi.net")}
             className="text-gray-400 hover:text-white"
           >
-            {copied === "http://localhost:3000" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+            {copied === (process.env.NEXT_PUBLIC_APP_URL || "https://jueshi.net") ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
           </button>
         </div>
       </div>

@@ -17,7 +17,8 @@ export default async function SharePage({ params }: SharePageProps) {
     notFound();
   }
 
-  const shareUrl = `http://localhost:3000/share/${id}`;
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "";
+  const shareUrl = `${baseUrl}/share/${id}`;
   const encodedUrl = encodeURIComponent(link.url);
 
   return (

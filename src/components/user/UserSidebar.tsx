@@ -10,9 +10,9 @@ import { useUserPreferences, getTheme } from './UserPreferencesContext';
 
 const NAV_ITEMS = [
   { href: '/workbench', labelKey: 'workbench', icon: Home, emoji: '🏠' },
-  { href: '/dashboard/tasks', labelKey: 'tasks', icon: CheckSquare, emoji: '✅' },
-  { href: '/dashboard', labelKey: 'membership', icon: Crown, emoji: '👑' },
-  { href: '/dashboard/documents', labelKey: 'documents', icon: FileText, emoji: '📦' },
+  { href: '/workspace', labelKey: 'tasks', icon: CheckSquare, emoji: '✅' },
+  { href: '/workspace', labelKey: 'membership', icon: Crown, emoji: '👑' },
+  { href: '/workspace', labelKey: 'documents', icon: FileText, emoji: '📦' },
   { href: '/settings', labelKey: 'settings', icon: Settings, emoji: '⚙️' },
 ];
 
