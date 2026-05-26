@@ -1,0 +1,3552 @@
+{
+  "round": 23,
+  "timestamp": "2026-05-10T04:45:48.088Z",
+  "baseUrl": "http://localhost:3000",
+  "headless": true,
+  "mobileViewport": "iPhone 13 (390x844)",
+  "pages": [
+    {
+      "name": "home",
+      "status": "passed",
+      "title": "海外华人的常用工具箱",
+      "popularToolsExist": true,
+      "coreCardsFound": 3,
+      "time": "2026-05-10T04:46:00.631Z"
+    },
+    {
+      "name": "tracking",
+      "status": "passed",
+      "hasResults": true,
+      "copyExists": true,
+      "link17Exists": true,
+      "analyticsSent": 1,
+      "time": "2026-05-10T04:46:02.422Z"
+    },
+    {
+      "name": "shipping-calculator",
+      "status": "passed",
+      "time": "2026-05-10T04:46:03.434Z"
+    },
+    {
+      "name": "hs-code",
+      "status": "passed",
+      "searchTerms": [
+        "手机壳",
+        "茶叶",
+        "沙发",
+        "剪刀",
+        "猫粮"
+      ],
+      "riskLabels": 1,
+      "analytics": 6,
+      "time": "2026-05-10T04:46:10.010Z"
+    },
+    {
+      "name": "postal-code",
+      "status": "passed",
+      "time": "2026-05-10T04:46:14.710Z"
+    },
+    {
+      "name": "exchange-rate",
+      "status": "passed",
+      "hasDisclaimer": true,
+      "analytics": 1,
+      "time": "2026-05-10T04:46:18.435Z"
+    },
+    {
+      "name": "memo",
+      "status": "passed",
+      "analytics": 2,
+      "time": "2026-05-10T04:46:21.735Z"
+    },
+    {
+      "name": "resources",
+      "status": "passed",
+      "categories": 4,
+      "analytics": 0,
+      "time": "2026-05-10T04:46:26.456Z"
+    },
+    {
+      "name": "guides",
+      "status": "passed",
+      "time": "2026-05-10T04:46:32.232Z"
+    },
+    {
+      "name": "api-stats",
+      "status": 403,
+      "note": "Stats protected (403) - expected in production",
+      "time": "2026-05-10T04:46:32.245Z"
+    },
+    {
+      "name": "rate-limit",
+      "status": "passed",
+      "got429": true,
+      "time": "2026-05-10T04:46:36.685Z"
+    }
+  ],
+  "errors": [],
+  "failedRequests": [
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.152Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.152Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.152Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.154Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.154Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rlgz",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.154Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/volumetric-weight-explained?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/cbm-shipping-volume-calculator?_rsc=1rxu4",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:03.447Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.695Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/hs-code-beginner-guide?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/commercial-invoice-how-to-fill?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:09.930Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:10.017Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:10.017Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:10.017Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:10.017Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/api/events",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:10.017Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/canada-postal-code-format?_rsc=hak0a",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:14.659Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/canada-postal-code-format?_rsc=hak0a",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:14.659Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/canada-postal-code-format?_rsc=hak0a",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:14.659Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/canada-postal-code-format?_rsc=hak0a",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:14.659Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/canada-postal-code-format?_rsc=hak0a",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:14.659Z"
+    },
+    {
+      "page": "home",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "tracking",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "home",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "tracking",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY",
+      "failure": "net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:21.820Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=8hje6",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.166Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.695Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.696Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.700Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:22.701Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1n6d9",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.274Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.849Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.850Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:23.856Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/templates?_rsc=1vss3",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:24.175Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.007Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.008Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.012Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.013Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/nav?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.340Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/templates?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.346Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/nav?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.350Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:25.354Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/templates/cmow3qkxn0012jy63fijqe041?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/templates/cmow3qlco0013jy63kulehx72?_rsc=gb7bt",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.148Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.175Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1i3ya",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.176Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/business?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.181Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/logistics?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/resources/life?_rsc=1exf1",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:26.182Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.164Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.165Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?category=%E6%B5%B7%E5%A4%96%E7%94%9F%E6%B4%BB&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=r4s2m",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.168Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?category=%E5%87%BA%E6%B5%B7%E7%BB%8F%E8%90%A5&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.214Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?category=%E8%B7%A8%E5%A2%83%E5%AF%84%E9%80%81&_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.218Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.220Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/restricted-items-shipping-guide?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:27.396Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/how-to-evaluate-shipping-quote?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.317Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/guides/what-is-consolidation-shipping?_rsc=1gq0x",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:29.435Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/nav?_rsc=u2155",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.210Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/nav?_rsc=paiy5",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:30.223Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "hs-code",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "postal-code",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "exchange-rate",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "memo",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "resources",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "guides",
+      "url": "http://localhost:3000/api/guides?slugs=volumetric-weight-explained,cbm-shipping-volume-calculator",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-10T04:46:32.240Z"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "page": "home",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:17.390Z"
+    },
+    {
+      "page": "home",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Access to fetch at 'https://api.frankfurter.app/2026-04-10..2026-05-10?from=EUR&to=USD,CNY' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: net::ERR_FAILED",
+      "time": "2026-05-10T04:46:18.236Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-10T04:46:25.591Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "guides",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "time": "2026-05-10T04:46:32.240Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "shipping-calculator",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "hs-code",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "postal-code",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "exchange-rate",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "memo",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "resources",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    },
+    {
+      "page": "guides",
+      "text": "Failed to load resource: the server responded with a status of 429 (Too Many Requests)",
+      "time": "2026-05-10T04:46:36.684Z"
+    }
+  ],
+  "p0": [],
+  "p1": [],
+  "p2": [],
+  "p3": [],
+  "timings": {
+    "home-load": 103,
+    "home-click-物流追踪": 538,
+    "home-click-运费/CBM": 520,
+    "home-click-HS编码": 522,
+    "home-click-邮编地址": 519,
+    "home-click-汇率查询": 530,
+    "home-click-工作便签": 520,
+    "tracking-load": 46,
+    "tracking-parse": 218,
+    "tracking-copy-one": 222,
+    "tracking-17track": 232,
+    "shipping-load": 38,
+    "shipping-calc": 693,
+    "hs-load": 147,
+    "postal-load": 48,
+    "postal-validate-CA": 229,
+    "postal-validate-US": 222,
+    "postal-validate-GB": 220,
+    "postal-validate-AU": 229,
+    "postal-validate-NZ": 231,
+    "exchange-load": 57,
+    "exchange-convert": 224,
+    "memo-load": 76,
+    "memo-add": 123,
+    "memo-export": 123,
+    "resources-load": 34,
+    "guides-load": 1696
+  },
+  "analyticsSample": [
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "article_click",
+        "toolName": "blog",
+        "action": "click_related_运费估算器",
+        "path": "/guides/how-to-evaluate-shipping-quote",
+        "sessionId": "d600b4c2-b59c-4373-835d-464cbcc868c5"
+      },
+      "time": "2026-05-10T04:46:30.723Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:32.248Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:32.475Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:32.706Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:32.940Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:33.175Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:33.403Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:33.636Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:33.878Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:34.114Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:34.352Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:34.581Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:34.810Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:35.039Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:35.269Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:35.499Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:35.728Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:35.958Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:36.187Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:36.421Z"
+    },
+    {
+      "url": "http://localhost:3000/api/events",
+      "method": "POST",
+      "post": {
+        "eventType": "tool_click",
+        "toolName": "rate-test",
+        "action": "test"
+      },
+      "time": "2026-05-10T04:46:36.682Z"
+    }
+  ],
+  "reportFile": "round-23.md"
+}

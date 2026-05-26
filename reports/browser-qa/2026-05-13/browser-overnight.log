@@ -1,0 +1,11 @@
+[2026-05-13T05:46:21.593Z] ========== Round 1 START ==========
+[2026-05-13T05:46:21.593Z] BASE_URL=http://localhost:3000, HEADLESS=true, MOBILE=1
+[2026-05-13T05:46:21.961Z] [home] Starting test...
+[2026-05-13T05:46:34.373Z] [home] Completed: title="海外华人的常用工具箱", popularTools=true, coreCards=3
+[2026-05-13T05:46:34.373Z] [tracking] Starting test...
+[2026-05-13T05:47:14.414Z] ERROR in round 1: page.fill: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('textarea')[22m
+
+[2026-05-13T05:47:14.531Z] Report saved: round-1.md, round-1.json
+[2026-05-13T05:47:14.531Z] Screenshots: /Users/chq/projects/xixiong-saas/reports/browser-qa/2026-05-13/screenshots/

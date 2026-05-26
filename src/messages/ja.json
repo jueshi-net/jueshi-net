@@ -1,0 +1,46 @@
+{
+  "Navigation": {
+    "home": "ホーム",
+    "myLinks": "マイリンク",
+    "tools": "ツール",
+    "blog": "ブログ",
+    "favorites": "お気に入り",
+    "analytics": "分析",
+    "export": "エクスポート",
+    "pricing": "料金",
+    "help": "ヘルプ",
+    "settings": "設定",
+    "profile": "プロフィール",
+    "admin": "管理"
+  },
+  "Common": {
+    "search": "検索",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "confirm": "確認",
+    "back": "戻る",
+    "next": "次へ",
+    "prev": "前へ",
+    "noData": "データがありません",
+    "success": "成功",
+    "failed": "失敗"
+  },
+  "Auth": {
+    "login": "ログイン",
+    "register": "登録",
+    "logout": "ログアウト",
+    "email": "メール",
+    "password": "パスワード",
+    "forgotPassword": "パスワードを忘れた",
+    "resetPassword": "パスワードリセット",
+    "confirmEmail": "メール確認",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "hasAccount": "すでにアカウントをお持ちですか？",
+    "signUpNow": "今すぐ登録"
+  }
+}

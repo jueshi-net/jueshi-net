@@ -1,0 +1,16 @@
+# .cursorrules — IDE 级 AI 强制约束
+
+# ⚠️ 适用于所有 AI Agent 介入本项目开发时
+
+ALWAYS read docs/PROJECT_MEMORY.md before writing any code, modifying databases, or planning architecture.
+Maintain the Glassmorphism UI style and strict Next.js App Router conventions.
+
+## Hard Rules:
+1. **Memory First**: 任何代码/DB/架构变更前，必须先读取 docs/PROJECT_MEMORY.md
+2. **Prisma Config**: 动态 NODE_ENV 加载 (.env vs .env.production)，禁止静态 dotenv/config
+3. **DB Safety**: 禁止在 VPS 执行 prisma db push/reset，必须通过 migrate deploy
+4. **SSR Safety**: localStorage 必须在 useEffect 内读取，配合 mounted state 防 Hydration 冲突
+5. **UI Style**: Glassmorphism (backdrop-blur-xl, bg-white/80, border-white/20)
+6. **Auth**: 角色校验兼容英文和中文 ("admin" || "管理员")
+7. **PaywallModal**: 无状态纯 UI 组件，通过 props 控制，不管理业务逻辑
+8. **FreemiumGate**: 使用 useFreemiumGate Hook 管理免登录试用配额

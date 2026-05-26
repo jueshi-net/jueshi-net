@@ -1,0 +1,218 @@
+{
+  "round": 1,
+  "timestamp": "2026-05-12T01:12:13.195Z",
+  "baseUrl": "http://localhost:3000",
+  "headless": true,
+  "mobileViewport": "iPhone 13 (390x844)",
+  "pages": [
+    {
+      "name": "home",
+      "status": "passed",
+      "title": "海外华人的常用工具箱",
+      "popularToolsExist": true,
+      "coreCardsFound": 0,
+      "time": "2026-05-12T01:12:15.782Z"
+    }
+  ],
+  "errors": [
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「运费/CBM」入口不存在: /tools/shipping-calculator",
+      "time": "2026-05-12T01:12:15.775Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「HS编码」入口不存在: /tools/hs-code",
+      "time": "2026-05-12T01:12:15.776Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「邮编地址」入口不存在: /tools/postal-code",
+      "time": "2026-05-12T01:12:15.777Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「汇率查询」入口不存在: /tools/exchange-rate",
+      "time": "2026-05-12T01:12:15.778Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「工作便签」入口不存在: /tools/memo",
+      "time": "2026-05-12T01:12:15.779Z"
+    },
+    {
+      "severity": 0,
+      "page": "runner",
+      "message": "Round 1 crashed: page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('textarea')\n",
+      "time": "2026-05-12T01:12:55.821Z"
+    }
+  ],
+  "failedRequests": [
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/0enn66z31d9zd.css",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:13.551Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/16o2vcck91i_-.js",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:13.556Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/0lb~m4vjxg8aj.css",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:13.729Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/11wt56eno9yu0.js",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:13.733Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/0enn66z31d9zd.css",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.241Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/16o2vcck91i_-.js",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.243Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/0lb~m4vjxg8aj.css",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.797Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/_next/static/chunks/0lb~m4vjxg8aj.css",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.797Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/_next/static/chunks/11wt56eno9yu0.js",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.799Z"
+    },
+    {
+      "page": "tracking",
+      "url": "http://localhost:3000/_next/static/chunks/11wt56eno9yu0.js",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-12T01:12:15.799Z"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-12T01:12:13.551Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-12T01:12:13.556Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:13.729Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:13.733Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-12T01:12:15.241Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-12T01:12:15.243Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:15.797Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:15.797Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:15.799Z"
+    },
+    {
+      "page": "tracking",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "time": "2026-05-12T01:12:15.799Z"
+    }
+  ],
+  "p0": [
+    {
+      "severity": 0,
+      "page": "runner",
+      "message": "Round 1 crashed: page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('textarea')\n",
+      "time": "2026-05-12T01:12:55.821Z"
+    }
+  ],
+  "p1": [
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「运费/CBM」入口不存在: /tools/shipping-calculator",
+      "time": "2026-05-12T01:12:15.775Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「HS编码」入口不存在: /tools/hs-code",
+      "time": "2026-05-12T01:12:15.776Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「邮编地址」入口不存在: /tools/postal-code",
+      "time": "2026-05-12T01:12:15.777Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「汇率查询」入口不存在: /tools/exchange-rate",
+      "time": "2026-05-12T01:12:15.778Z"
+    },
+    {
+      "severity": 1,
+      "page": "home",
+      "message": "热门工具「工作便签」入口不存在: /tools/memo",
+      "time": "2026-05-12T01:12:15.779Z"
+    }
+  ],
+  "p2": [],
+  "p3": [],
+  "timings": {
+    "home-load": 116,
+    "home-click-物流追踪": 584,
+    "tracking-load": 10029
+  },
+  "analyticsSample": [],
+  "reportFile": "round-1.md"
+}

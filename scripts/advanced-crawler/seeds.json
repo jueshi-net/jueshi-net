@@ -1,0 +1,22 @@
+[
+  { "url": "https://www.usps.com", "suggestedCategory": "logistics", "suggestedTags": ["美国", "邮政", "快递"] },
+  { "url": "https://www.irs.gov", "suggestedCategory": "business", "suggestedTags": ["美国", "税务", "报税"] },
+  { "url": "https://www.canadapost.ca", "suggestedCategory": "logistics", "suggestedTags": ["加拿大", "邮政"] },
+  { "url": "https://www.royalmail.com", "suggestedCategory": "logistics", "suggestedTags": ["英国", "邮政", "快递"] },
+  { "url": "https://auspost.com.au", "suggestedCategory": "logistics", "suggestedTags": ["澳大利亚", "邮政"] },
+  { "url": "https://www.japanpost.jp", "suggestedCategory": "logistics", "suggestedTags": ["日本", "邮政", "快递"] },
+  { "url": "https://www.craigslist.org", "suggestedCategory": "life", "suggestedTags": ["美国", "二手", "租房"] },
+  { "url": "https://www.gumtree.com", "suggestedCategory": "life", "suggestedTags": ["英国", "澳洲", "二手"] },
+  { "url": "https://www.wise.com", "suggestedCategory": "business", "suggestedTags": ["汇款", "汇率", "跨境支付"] },
+  { "url": "https://www.paypal.com", "suggestedCategory": "business", "suggestedTags": ["支付", "收款"] },
+  { "url": "https://www.zillow.com", "suggestedCategory": "life", "suggestedTags": ["美国", "房产", "租房"] },
+  { "url": "https://www.realestate.com.au", "suggestedCategory": "life", "suggestedTags": ["澳大利亚", "房产"] },
+  { "url": "https://www.rightmove.co.uk", "suggestedCategory": "life", "suggestedTags": ["英国", "房产"] },
+  { "url": "https://www.aa.com", "suggestedCategory": "life", "suggestedTags": ["机票", "航空"] },
+  { "url": "https://www.skyscanner.net", "suggestedCategory": "life", "suggestedTags": ["机票", "比价"] },
+  { "url": "https://www.airbnb.com", "suggestedCategory": "life", "suggestedTags": ["住宿", "短租"] },
+  { "url": "https://www.booking.com", "suggestedCategory": "life", "suggestedTags": ["酒店", "住宿"] },
+  { "url": "https://www.trustpilot.com", "suggestedCategory": "business", "suggestedTags": ["评价", "信用"] },
+  { "url": "https://www.yelp.com", "suggestedCategory": "life", "suggestedTags": ["本地", "餐厅", "评价"] },
+  { "url": "https://www.dhl.com", "suggestedCategory": "logistics", "suggestedTags": ["国际快递", "物流"] }
+]

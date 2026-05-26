@@ -1,0 +1,1230 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                     String               @id @default(cuid())
+  name                   String?
+  email                  String               @unique
+  emailVerified          DateTime?
+  image                  String?
+  password               String?
+  role                   String               @default("user")
+  points                 Int                  @default(0) // 积分缓存
+  checkinStreak          Int                  @default(0) // 连续签到天数
+  lastCheckinDate        String? // 最后一次签到日期 YYYY-MM-DD
+  memberUntil            DateTime? // 会员体验到期时间
+  profileType            String?              @map("profile_type") // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
+  growthValue            Int                  @default(0) @map("growth_value") // v1.20.19: 成长值（不可消费）
+  levelKey               String?              @default("lv1") @map("level_key") // v1.20.19: 当前等级 key (不建 FK，避免数据漂移)
+  badges                 String[]             @default([]) @map("badges") // v1.21: 勋章标识 ['BLACK_GOLD_PIONEER']
+  isPremium              Boolean              @default(false) @map("is_premium") // v1.28.6: 付费门控 (免费用户收藏上限20)
+  // Stripe subscription fields
+  stripeCustomerId       String?              @unique @map("stripe_customer_id")
+  stripeSubscriptionId   String?              @unique @map("stripe_subscription_id")
+  stripePriceId          String?              @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime?            @map("stripe_current_period_end")
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @default(now()) @updatedAt
+  workbenchLinks         WorkbenchLink[]
+  toolFavorites          ToolFavorite[]
+  toolReviews            ToolReview[]
+  aiUsageLogs            AIUsageLog[]
+  accounts               Account[]
+  auditLogs              AuditLog[]
+  favorites              Favorite[]
+  feedback               Feedback[]
+  links                  LinkItem[]
+  memos                  Memo[]
+  notifications          Notification[]
+  sessions               Session[]
+  shortLinks             ShortLink[]
+  preferences            UserPreference?
+  subscriptions          UserSubscription[]
+  webhooks               Webhook[]
+  workspaceMemberships   WorkspaceMember[]
+  pointLedgers           PointLedger[]
+  dailyCheckIns          DailyCheckIn[]
+  userTasks              UserTask[]
+  userRewards            UserReward[]
+  badgeAwards            UserBadgeAward[]
+  growthLogs             GrowthLog[]
+  companyProfiles        UserCompanyProfile[]
+  toolDocumentDrafts     ToolDocumentDraft[]
+  userWidgetConfigs      UserWidgetConfig[]
+  userCustomNavs         UserCustomNav[]
+  userOnboardingState    UserOnboardingState?
+  userFavorites          UserFavorite[]
+  documentHistories      DocumentHistory[]
+
+  @@map("users")
+}
+
+model UserPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  theme           String   @default("system")
+  language        String   @default("zh-CN")
+  emailNotif      Boolean  @default(true)
+  compactMode     Boolean  @default(false)
+  itemsPerPage    Int      @default(20)
+  defaultCategory String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model LinkItem {
+  id           String     @id @default(cuid())
+  title        String
+  url          String
+  description  String?
+  icon         String?
+  categoryName String?
+  categoryId   String?
+  userId       String?
+  workspaceId  String?
+  sortOrder    Int        @default(0)
+  isPinned     Boolean    @default(false)
+  isFeatured   Boolean    @default(false)
+  clicks       Int        @default(0)
+  status       String     @default("active")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+  favorites    Favorite[]
+  tags         LinkTag[]
+  category     Category?  @relation(fields: [categoryId], references: [id])
+  user         User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@map("links")
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  icon      String?
+  color     String?
+  sortOrder Int        @default(0)
+  parentId  String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryHierarchy")
+  links     LinkItem[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  links     LinkTag[]
+
+  @@map("tags")
+}
+
+model LinkTag {
+  id        String   @id @default(cuid())
+  linkId    String
+  tagId     String
+  createdAt DateTime @default(now())
+  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([linkId, tagId])
+  @@map("link_tags")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  linkId    String
+  createdAt DateTime @default(now())
+  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, linkId])
+  @@map("favorites")
+}
+
+model Memo {
+  id        String    @id @default(cuid())
+  title     String
+  content   String?
+  category  String?
+  userId    String
+  isPinned  Boolean   @default(false)
+  color     String?
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("memos")
+}
+
+model Workspace {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  ownerId     String?
+  isPublic    Boolean           @default(false)
+  slug        String            @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now()) @updatedAt
+  links       LinkItem[]
+  members     WorkspaceMember[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        String    @default("member")
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model ShortLink {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  url         String
+  userId      String?
+  title       String?
+  description String?
+  expiresAt   DateTime?
+  password    String?
+  clicks      Int       @default(0)
+  lastClickAt DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("short_links")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  details   String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  subject   String
+  content   String
+  page      String?
+  email     String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("feedback")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String    @default("info")
+  link      String?
+  isRead    Boolean   @default(false)
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([type])
+  @@map("notifications")
+}
+
+model AdCampaign {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 内部管理
+  title  String @unique // 内部管理名称
+  adType String @default("DIRECT") @map("ad_type") // DIRECT | NETWORK
+
+  // 直投广告字段
+  imageUrl  String? @map("image_url") // 直投广告图片 URL
+  targetUrl String? @map("target_url") // 直投广告落地页链接
+
+  // 网盟广告字段
+  codeSnippet String? @map("code_snippet") @db.Text // Google Ads 等 HTML/JS 代码
+
+  // 投放配置
+  placements      String[] // 允许投放的位置列表
+  targetCountries String[] @default([]) @map("target_countries") // 定向国家代码（空=通投）
+  isActive        Boolean  @default(true) @map("is_active")
+
+  // 统计
+  impressions Int @default(0)
+  clicks      Int @default(0)
+
+  // 时间控制
+  startDate DateTime  @default(now()) @map("start_date")
+  endDate   DateTime? @map("end_date")
+
+  // 优先级（数值越高越优先）
+  priority Int @default(0)
+
+  @@index([isActive, adType])
+  @@index([isActive, startDate, endDate])
+  @@map("ad_campaigns")
+}
+
+// ─── 邀请码系统 ────────────────────────────────────────────────────────────────
+model InviteCode {
+  id        String    @id @default(cuid())
+  code      String    @unique // 邀请码，如 PIONEER2026
+  maxUses   Int       @default(100) @map("max_uses") // 最大使用次数
+  usedCount Int       @default(0) @map("used_count") // 已使用次数
+  isActive  Boolean   @default(true) @map("is_active") // 是否可用
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime? @map("expires_at") // 过期时间（NULL=永不过期）
+  createdBy String?   @map("created_by") // 创建者（admin email）
+  note      String? // 备注说明
+
+  @@index([isActive, code])
+  @@index([expiresAt])
+  @@map("invite_codes")
+}
+
+model Article {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  content        String
+  excerpt        String?
+  coverImage     String?
+  author         String?
+  status         String    @default("draft")
+  views          Int       @default(0)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+  category       String? // 文章分类：跨境寄送/海外生活/出海经营
+  seoTitle       String? // SEO 标题
+  seoDescription String? // SEO 描述
+  relatedTools   String[]  @default([]) // 关联工具路由
+
+  @@index([status])
+  @@index([category])
+  @@map("articles")
+}
+
+model ArticleTag {
+  id        String   @id @default(cuid())
+  articleId String?
+  tag       String
+  createdAt DateTime @default(now())
+
+  @@map("article_tags")
+}
+
+model Resource {
+  id          String   @id @default(cuid())
+  name        String
+  url         String   @unique
+  description String?
+  category    String // life/logistics/business/templates
+  tags        String[] @default([])
+  sourceType  String   @default("third-party") // official/third-party/internal
+  usage       String? // 适用场景/使用提示
+  disclaimer  String? // 免责声明或使用提示
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+
+  // v1.33: 高级爬虫流水线新增字段
+  favicon        String? // 站点 Favicon URL
+  iconUrl        String?   @map("icon_url") // 自定义网站 Logo URL（管理员上传/粘贴）
+  isAd           Boolean   @default(false) @map("is_ad") // 是否为广告（Sponsored）
+  domainAge      Int?      @map("domain_age") // 域名年龄(天)
+  qualityScore   Int       @default(0) @map("quality_score") // AI 质量评分 0-100
+  language       String?   @default("en") // 站点语言
+  lastChecked    DateTime? @map("last_checked") // 最近死链检查时间
+  checkFailCount Int       @default(0) @map("check_fail_count") // 连续检查失败次数
+  rejectedReason String?   @map("rejected_reason") // AI 拒绝原因（灰产/垃圾站等）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@index([qualityScore])
+  @@map("resources")
+}
+
+model Subscription {
+  id          String             @id @default(cuid())
+  name        String             @unique
+  slug        String             @unique
+  description String?
+  price       Float
+  interval    String
+  features    String?
+  isActive    Boolean            @default(true)
+  sortOrder   Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
+  users       UserSubscription[]
+
+  @@map("subscriptions")
+}
+
+model UserSubscription {
+  id                String       @id @default(cuid())
+  userId            String
+  subscriptionId    String
+  status            String       @default("active")
+  startDate         DateTime     @default(now())
+  endDate           DateTime?
+  cancelAtPeriodEnd Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subscriptionId])
+  @@map("user_subscriptions")
+}
+
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  price       Float
+  interval    String
+  features    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("subscription_plans")
+}
+
+model Webhook {
+  id            String    @id @default(cuid())
+  userId        String?
+  url           String
+  events        String
+  secret        String?
+  isActive      Boolean   @default(true)
+  lastTriggered DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User?     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("webhooks")
+}
+
+model EmailSubscription {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  token       String?
+  confirmed   Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  confirmedAt DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("email_subscriptions")
+}
+
+model NewsletterBroadcast {
+  id        String   @id @default(cuid())
+  subject   String
+  content   String
+  status    String   @default("draft")
+  sentCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletter_broadcasts")
+}
+
+model PostalCode {
+  id                   String   @id @default(cuid())
+  country              String?
+  countryCode          String?
+  province             String?
+  city                 String?
+  district             String?
+  postalCode           String?
+  normalizedPostalCode String? // 去空格/横线的大写版本，如 V6B0A1, SW1A1AA
+  areaName             String?
+  adminName1           String? // 省/州名
+  adminCode1           String? // 省/州缩写
+  adminName2           String?
+  adminCode2           String?
+  latitude             Float?
+  longitude            Float?
+  accuracy             Int? // 精度等级 1-6
+  isActive             Boolean  @default(true)
+  source               String   @default("GeoNames")
+  sourceUrl            String   @default("https://download.geonames.org/export/zip/")
+  sourceVersion        String? // import date
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now()) @updatedAt
+
+  @@index([postalCode])
+  @@index([normalizedPostalCode])
+  @@index([countryCode, normalizedPostalCode])
+  @@index([country, city])
+  @@index([countryCode, postalCode])
+  @@index([countryCode, city])
+  @@index([adminCode1])
+  @@map("postal_codes")
+}
+
+model HSCode {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  level         Int
+  parentId      String?
+  description   String
+  descriptionEn String?
+  category      String?
+  taxRate       Float?
+  notes         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  parent        HSCode?  @relation("HSHierarchy", fields: [parentId], references: [id])
+  children      HSCode[] @relation("HSHierarchy")
+
+  @@index([category])
+  @@index([description])
+  @@map("hs_codes")
+}
+
+// 导出日志：用于追踪每日导出次数和权限审计
+model ExportLog {
+  id           String   @id @default(cuid())
+  userId       String? // null for guest attempts
+  exportType   String // word/png/pdf/document/label
+  documentType String? // commercial-invoice/quotation/packing-list/label-maker etc
+  ipHash       String? // anonymized IP
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([exportType])
+  @@index([createdAt])
+  @@map("export_logs")
+}
+
+// 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
+model EventLog {
+  id        String   @id @default(cuid())
+  eventType String   @default("") // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+  toolName  String? // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
+  action    String? // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
+  path      String? // 页面路径，如 /tools/tracking
+  sessionId String? // 匿名 sessionId（localStorage 生成，不关联用户身份）
+  createdAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([toolName])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@map("event_logs")
+}
+
+// 积分流水：所有积分变动必须写入此表
+model PointLedger {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String // daily_checkin / task_complete / export_word / admin_adjust / reward_redeem
+  points    Int // 正数=增加，负数=扣减
+  reason    String? // 说明文字，如"每日签到"、"完成任务"
+  relatedId String? // 关联记录 ID（如 task ID、checkin ID）
+  metadata  Json? // 额外元数据
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("point_ledgers")
+}
+
+// 每日签到：防止重复签到
+model DailyCheckIn {
+  id        String   @id @default(cuid())
+  userId    String
+  dateKey   String // YYYY-MM-DD
+  points    Int // 获得的积分数
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dateKey])
+  @@index([userId])
+  @@index([dateKey])
+  @@map("daily_check_ins")
+}
+
+// 用户待办任务
+model UserTask {
+  id            String    @id @default(cuid())
+  userId        String
+  title         String
+  description   String?
+  status        String    @default("pending") // pending / done / archived
+  priority      String    @default("normal") // low / normal / high
+  category      String?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  pointsAwarded Boolean   @default(false) // 是否已发放积分
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("user_tasks")
+}
+
+// 积分兑换商品配置
+model RewardItem {
+  id          String       @id @default(cuid())
+  code        String       @unique // word_export_1x, word_export_3x, member_1day, no_branding_1x
+  name        String // 显示名称
+  description String? // 说明
+  costPoints  Int // 兑换所需积分
+  rewardType  String // word_export_coupon / member_trial / no_branding_coupon
+  rewardValue Int // 券数量或天数
+  enabled     Boolean      @default(true)
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  userRewards UserReward[]
+
+  @@index([enabled])
+  @@index([sortOrder])
+  @@map("reward_items")
+}
+
+// 用户已兑换权益
+model UserReward {
+  id           String     @id @default(cuid())
+  userId       String
+  rewardItemId String
+  rewardType   String // 冗余字段，便于查询
+  rewardValue  Int // 券数量或天数
+  status       String     @default("active") // active / used / expired
+  expiresAt    DateTime?
+  usedAt       DateTime?
+  createdAt    DateTime   @default(now())
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardItem   RewardItem @relation(fields: [rewardItemId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([rewardType])
+  @@index([expiresAt])
+  @@map("user_rewards")
+}
+
+// NOTE: Adding memberUntil field to User model
+
+// 工作台自定义网址收藏
+model WorkbenchLink {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String // 标题，max 80
+  url         String // 网址，http/https
+  description String? // 描述，max 200
+  iconUrl     String? // 图标 URL
+  category    String? // 分类
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("workbench_links")
+}
+
+// 站内工具收藏
+model ToolFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  toolKey   String
+  sortOrder Int      @default(0) // v1.28.6: 拖拽排序 (order)
+  toolId    String?  @map("tool_id") // v1.28.6: 关联 Tool 模型
+  tool      Tool?    @relation(fields: [toolId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, toolKey])
+  @@index([userId])
+  @@index([toolId])
+  @@map("tool_favorites")
+}
+
+// 工具短评
+model ToolReview {
+  id                 String    @id @default(cuid())
+  userId             String
+  toolKey            String // 工具标识
+  rating             Int // 1-5 评分
+  content            String // 5-300 字短评
+  status             String    @default("pending") // pending / approved / rejected / hidden
+  pointsAwarded      Boolean   @default(false)
+  reviewedRewardedAt DateTime? // v1.20.20: 成长值/勋章奖励发放时间（防重复）
+  ipHash             String?
+  userAgent          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([toolKey])
+  @@index([status])
+  @@index([createdAt])
+  @@map("tool_reviews")
+}
+
+// AI 工具使用记录
+model AIUsageLog {
+  id           String   @id @default(cuid())
+  userId       String?
+  toolType     String // product_copy / translate_polish / document_summary
+  inputHash    String? // SHA256 hash of input, not raw text
+  outputTokens Int?
+  costPoints   Int      @default(0)
+  ipHash       String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([toolType])
+  @@index([createdAt])
+  @@map("ai_usage_logs")
+}
+
+// 专题系统
+model Topic {
+  id                 String    @id @default(cuid())
+  slug               String    @unique
+  title              String
+  subtitle           String?
+  summary            String?
+  status             String    @default("draft") // draft / published / archived
+  templateType       String    @default("rating_list")
+  coverEmoji         String?
+  coverImage         String?
+  heroBadges         Json? // [{label, color}]
+  suitableFor        Json? // string[]
+  tags               Json? // string[]
+  youtubeUrl         String?
+  youtubeVideoId     String?
+  youtubeTitle       String?
+  youtubeDescription String?
+  youtubeThumbnail   String?
+  seoTitle           String?
+  seoDescription     String?
+  publishedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  items    TopicItem[]
+  sections TopicSection[]
+
+  @@index([status])
+  @@index([slug])
+  @@map("topics")
+}
+
+model TopicItem {
+  id                 String   @id @default(cuid())
+  topicId            String
+  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  name               String
+  alias              String?
+  rating             String? // S/A/B/C/D
+  category           String?
+  iconText           String?
+  iconBg             String?
+  iconFg             String?
+  installPriority    String? // 先装 / 高频 / 按需 / 了解即可
+  description        String?
+  analogy            String?
+  suitableFor        String?
+  beginnerAdvice     String?
+  riskTip            String?
+  officialUrl        String?
+  isBeginnerFriendly Boolean  @default(false)
+  sortOrder          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([sortOrder])
+  @@map("topic_items")
+}
+
+model TopicSection {
+  id        String   @id @default(cuid())
+  topicId   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  type      String // intro / notice / faq / cta / custom_text
+  title     String?
+  content   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([sortOrder])
+  @@map("topic_sections")
+}
+
+// ===== v1.20.19: Membership levels, growth value, badges =====
+
+model UserLevel {
+  id          String   @id @default(cuid())
+  key         String   @unique // lv1, lv2, lv3, lv4, lv5
+  name        String // Lv.1 新手
+  minGrowth   Int      @map("min_growth") // 0, 100, 500, 1500, 5000
+  maxGrowth   Int?     @map("max_growth") // 99, 499, 1499, 4999, null
+  description String?
+  benefits    Json? // ["签到+2积分", "AI+5次/日"]
+  iconText    String   @map("icon_text") // 🌱
+  color       String // green-500
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("user_levels")
+}
+
+model UserBadge {
+  id            String   @id @default(cuid())
+  key           String   @unique // first_login, checkin_first, etc.
+  name          String // 初来乍到
+  description   String?
+  iconText      String   @map("icon_text") // 🎉
+  color         String // purple-500
+  category      String // checkin/review/topic/forum/member/system
+  conditionText String?  @map("condition_text") // "完成首次签到"
+  isActive      Boolean  @default(true) @map("is_active")
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  awards UserBadgeAward[]
+
+  @@map("user_badges")
+}
+
+model UserBadgeAward {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String    @map("badge_id")
+  badge     UserBadge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  reason    String? // "自动授予"/"后台手动授予"
+  awardedAt DateTime  @default(now()) @map("awarded_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@map("user_badge_awards")
+}
+
+model GrowthLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // checkin/task/review/topic/admin_adjust/system
+  value     Int // +5, +10, -10
+  reason    String? // "每日签到"/"后台调整"
+  refType   String?  @map("ref_type") // "daily_check_in", "tool_review"
+  refId     String?  @map("ref_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("growth_logs")
+}
+
+// ─── v1.20.32: Document Tools Foundation ───
+
+model UserCompanyProfile {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profileName     String   @map("profile_name") // "西雄供应链默认资料"
+  companyName     String   @map("company_name")
+  companyNameEn   String?  @map("company_name_en")
+  contactName     String?  @map("contact_name")
+  phone           String?
+  email           String?
+  website         String?
+  address         String?
+  cityPostal      String?  @map("city_postal")
+  taxId           String?  @map("tax_id")
+  bankCnyInfo     String?  @map("bank_cny_info")
+  bankUsdInfo     String?  @map("bank_usd_info")
+  defaultCurrency String   @default("USD") @map("default_currency")
+  logoDataUrl     String?  @map("logo_data_url") // base64 data URL, max ~500KB
+  logoText        String?  @map("logo_text") // fallback text logo
+  isDefault       Boolean  @default(false) @map("is_default")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  drafts  ToolDocumentDraft[]
+  history UserCompanyProfileHistory[]
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("user_company_profiles")
+}
+
+model UserCompanyProfileHistory {
+  id           String             @id @default(cuid())
+  userId       String             @map("user_id")
+  profileId    String             @map("profile_id")
+  profile      UserCompanyProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  snapshotJson String             @map("snapshot_json")
+  action       String // create/update/restore/logo_update
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  @@index([profileId])
+  @@index([userId])
+  @@map("user_company_profile_history")
+}
+
+model ToolDocumentDraft {
+  id               String              @id @default(cuid())
+  userId           String              @map("user_id")
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyProfileId String?             @map("company_profile_id")
+  companyProfile   UserCompanyProfile? @relation(fields: [companyProfileId], references: [id], onDelete: SetNull)
+  toolKey          String              @map("tool_key") // quote_sheet/inbound_receipt/handover_note/commercial_invoice/shipping_label/debit_note/video_script_sop
+  title            String
+  dataJson         String              @map("data_json") // current form data as JSON
+  previewJson      String?             @map("preview_json") // optional preview config
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  history ToolDocumentHistory[]
+
+  @@index([userId])
+  @@index([toolKey])
+  @@index([companyProfileId])
+  @@map("tool_document_drafts")
+}
+
+model ToolDocumentHistory {
+  id           String            @id @default(cuid())
+  userId       String            @map("user_id")
+  documentId   String            @map("document_id")
+  document     ToolDocumentDraft @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  snapshotJson String            @map("snapshot_json")
+  action       String // create/update/restore/export
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  @@index([documentId])
+  @@index([userId])
+  @@map("tool_document_history")
+}
+
+// ─── v1.28.6: 工具库基建 (支撑工具卡片四要素) ───
+model Tool {
+  id          String  @id @default(cuid())
+  name        String // 工具名称
+  slug        String  @unique // URL slug, 如 tracking, postal-code
+  description String? // 极简描述 (一行截断)
+  icon        String? // Lucide icon 名, 如 'Search' / 'Package'
+  category    String  @default("general") // 分类: logistics / ecommerce / tax / ai / life / business / templates
+  url         String? // 外部跳转 URL (第三方工具)
+  route       String? // 站内路由, 如 /tools/tracking
+  isInternal  Boolean @default(true) // 站内工具 vs 外部链接
+  sourceType  String  @default("official") // official / third-party / internal
+
+  // 四要素扩展字段
+  popularityScore Int     @default(0) @map("popularity_score") // 热度分 (渲染排序)
+  popularityTag   String? @map("popularity_tag") // 角标: hot / new / recommended / free / paid
+  isScenarioPack  Boolean @default(false) @map("is_scenario_pack") // 是否场景包
+
+  // 展示控制
+  isActive  Boolean @default(true) @map("is_active")
+  sortOrder Int     @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  favorites ToolFavorite[]
+
+  @@index([category])
+  @@index([isActive, popularityScore(sort: Desc)])
+  @@index([slug])
+  @@map("tools")
+}
+
+// ─── v1.28.6: 聚合页兜底 (防呆与空状态) ───
+model HubSeoContent {
+  id             String   @id @default(cuid())
+  countryCode    String?  @map("country_code") // 国家代码, 如 US / CA
+  provinceCode   String?  @map("province_code") // 省/州代码
+  logisticsIntro String?  @map("logistics_intro") @db.Text // 物流介绍
+  tips           Json? // 使用提示列表
+  hasData        Boolean  @default(false) @map("has_data") // 核心防呆: false 时前端级联菜单禁用，展示"内容建设中"
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([countryCode, provinceCode])
+  @@index([hasData])
+  @@map("hub_seo_contents")
+}
+
+// ─── v1.28.6: 工作台小挂件配置 (Memo/Calendar 开关) ───
+model UserWidgetConfig {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  widgetKey String   @map("widget_key") // memo / calendar / weather / etc.
+  isVisible Boolean  @default(true) @map("is_visible")
+  position  Int      @default(0) // 排序位置
+  settings  Json? // 小挂件自定义设置
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([userId, widgetKey])
+  @@index([userId])
+  @@map("user_widget_configs")
+}
+
+// ─── v1.28.6: 用户自定义外部网址导航 ───
+model UserCustomNav {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String // 站点名称
+  url         String // 外部 URL
+  icon        String? // Lucide icon 名
+  description String? // 简短描述
+  category    String?  @default("general") // 分类
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([category])
+  @@map("user_custom_navs")
+}
+
+// ─── v1.31.0: pSEO 聚合页数据库化 ───
+
+model Destination {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String // 中文名: 加拿大
+  nameEn         String   @map("name_en") // 英文名: Canada
+  currency       String // ISO code: CAD
+  region         String // 区域: 北美
+  emoji          String
+  heroTitle      String   @map("hero_title")
+  heroSubtitle   String   @map("hero_subtitle")
+  seoTitle       String   @map("seo_title")
+  seoDescription String   @map("seo_description")
+  keywords       String[] // SEO keywords
+  keyCities      String[] @map("key_cities")
+  userCount      String   @default("0") @map("user_count")
+  docCount       String   @default("0") @map("doc_count")
+  isActive       Boolean  @default(true) @map("is_active")
+  sortOrder      Int      @default(0) @map("sort_order")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  tools    DestinationTool[]
+  guides   DestinationGuide[]
+  services DestinationService[]
+
+  @@index([isActive, region])
+  @@index([slug])
+  @@map("destinations")
+}
+
+model DestinationTool {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  toolSlug      String      @map("tool_slug") // 工具 slug, 如 commercial-invoice
+  sortOrder     Int         @default(0) @map("sort_order")
+
+  @@unique([destinationId, toolSlug])
+  @@index([destinationId])
+  @@map("destination_tools")
+}
+
+model DestinationGuide {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  title         String
+  description   String      @db.Text
+  type          String // guide | regulation | tax | logistics | customs
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([destinationId])
+  @@index([type])
+  @@map("destination_guides")
+}
+
+model DestinationService {
+  id            String      @id @default(cuid())
+  destinationId String      @map("destination_id")
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  title         String
+  category      String // 仓储 | 物流 | 报关 | 税务 | 合规 | 代购
+  description   String      @db.Text
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([destinationId])
+  @@index([category])
+  @@map("destination_services")
+}
+
+// ─── v1.28.6: 新手引导状态 ───
+model UserOnboardingState {
+  id                 String   @id @default(cuid())
+  userId             String   @unique @map("user_id")
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workbenchDismissed Boolean  @default(false) @map("workbench_dismissed") // 工作台引导关闭
+  resourceDismissed  Boolean  @default(false) @map("resource_dismissed") // 资源库引导关闭
+  firstToolUsed      Boolean  @default(false) @map("first_tool_used") // 首次使用工具
+  firstFavoriteAdded Boolean  @default(false) @map("first_favorite_added") // 首次收藏
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@map("user_onboarding_states")
+}
+
+// ─── v1.36.0: User Favorites (C端收藏) ───
+model UserFavorite {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceType String   @map("resource_type") // tool / topic / article
+  resourceUrl  String   @map("resource_url")
+  title        String
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, resourceUrl])
+  @@index([userId])
+  @@map("user_favorites")
+}
+
+// ─── v1.36.0: Document History (单据历史) ───
+model DocumentHistory {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentType   String   @map("document_type") // pi / ci / packing-list / label...
+  documentData   String   @map("document_data") @db.Text // JSON string
+  documentNo     String?  @map("document_no")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([userId, documentType])
+  @@map("document_histories")
+}

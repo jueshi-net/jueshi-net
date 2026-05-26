@@ -1,0 +1,1749 @@
+[
+  {
+    "slug": "singapore",
+    "name": "新加坡",
+    "nameEn": "Singapore",
+    "emoji": "🇸🇬",
+    "region": "东南亚",
+    "currency": "SGD",
+    "heroTitle": "新加坡出海全能工具箱",
+    "heroSubtitle": "覆盖新加坡海关、税务、物流全链路，助您高效拓展东南亚市场。",
+    "seoTitle": "新加坡出海工具箱 - 海关、税务、物流一站式服务",
+    "seoDescription": "为出海新加坡的跨境电商和外贸企业提供全套工具与指南，涵盖新加坡海关清关流程、GST 税率（9%）、物流时效（3-5天）、原产地证等关键信息，助力企业合规高效运营。",
+    "keywords": [
+      "新加坡出海",
+      "新加坡海关",
+      "新加坡GST",
+      "新加坡物流",
+      "新加坡清关",
+      "东南亚电商",
+      "新加坡原产地证",
+      "新加坡贸易合规",
+      "新加坡货运",
+      "新加坡进口"
+    ],
+    "keyCities": [
+      "新加坡市",
+      "裕廊东",
+      "乌节路",
+      "樟宜",
+      "滨海湾"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "新加坡海关清关流程指南",
+        "description": "详解新加坡进口清关步骤：提交入境许可证（Inward Permit）、海关查验、关税与GST缴纳。GST税率9%，货值低于400新元可免税。",
+        "type": "customs"
+      },
+      {
+        "title": "新加坡GST注册与申报指南",
+        "description": "年营业额超过100万新元的企业必须注册GST。指南涵盖注册流程、申报周期（每季度）、抵扣规则及零税率与免税商品区分。",
+        "type": "tax"
+      },
+      {
+        "title": "新加坡物流运输时效与成本指南",
+        "description": "中国至新加坡海运5-7天，空运2-3天；末端派送由新加坡邮政或Ninja Van等完成。建议选择双清包税渠道降低风险。",
+        "type": "logistics"
+      },
+      {
+        "title": "新加坡原产地证（CO）申请指南",
+        "description": "中国-东盟自贸区优惠原产地证（Form E）可减免关税。指南介绍申请材料、流程及注意事项，适用于新加坡进口商。",
+        "type": "guide"
+      },
+      {
+        "title": "新加坡进口管制与禁运物品清单",
+        "description": "新加坡禁止进口口香糖、电子烟等物品；食品、药品需额外许可。指南列出常见管制商品及合规要求。",
+        "type": "customs"
+      }
+    ],
+    "services": [
+      {
+        "title": "新加坡海外仓一件代发",
+        "category": "仓储",
+        "description": "提供新加坡本地仓储（面积5000平米起），支持一件代发、FBA中转、退货处理。仓储费低至0.5新元/件/天，操作费1.2新元/单。"
+      },
+      {
+        "title": "中国-新加坡专线物流",
+        "category": "物流",
+        "description": "头程海运/空运+末端派送，海运时效5-7天，空运2-3天。提供双清包税服务，支持普货、敏感货。价格低至12元/kg（空运）。"
+      },
+      {
+        "title": "新加坡进口报关代理",
+        "category": "报关",
+        "description": "专业处理新加坡进口清关，包括单证审核、关税计算、查验应对。服务费150新元/票，GST代缴服务。"
+      },
+      {
+        "title": "新加坡GST税务合规服务",
+        "category": "税务",
+        "description": "协助企业注册GST、季度申报、退税申请。提供税务筹划建议，确保合规。年服务费2000新元起。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "proforma-invoice",
+      "certificate-of-origin-template",
+      "shipping-calculator",
+      "exchange-rate",
+      "postal-code"
+    ]
+  },
+  {
+    "slug": "uk",
+    "name": "英国",
+    "nameEn": "United Kingdom",
+    "emoji": "🇬🇧",
+    "region": "欧洲",
+    "currency": "GBP",
+    "heroTitle": "英国出海全能工具箱",
+    "heroSubtitle": "一站式管理英国出口单据、物流、税务与合规，助力跨境贸易高效落地。",
+    "seoTitle": "英国出海必备工具与指南 | 跨境贸易合规",
+    "seoDescription": "面向英国市场的跨境出海平台，提供商业发票、装箱单、原产地证、出口报关、物流追踪、VAT税务等核心工具与百科指南。覆盖英国海关政策、增值税门槛、物流时效等关键信息，助力商家高效合规出口英国。",
+    "keywords": [
+      "英国出口",
+      "英国VAT",
+      "英国海关",
+      "英国物流",
+      "英国贸易合规",
+      "英国原产地证",
+      "英国商业发票",
+      "英国清关",
+      "英国市场",
+      "跨境英国"
+    ],
+    "keyCities": [
+      "伦敦",
+      "曼彻斯特",
+      "伯明翰",
+      "利物浦",
+      "格拉斯哥"
+    ],
+    "userCount": "8,500+",
+    "docCount": "32,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "英国出口报关流程与文件要求",
+        "description": "英国海关要求出口商提供商业发票、装箱单、原产地证等文件，增值税税率20%，部分商品享受零税率。需注册EORI号，货值超过135英镑需缴纳VAT。",
+        "type": "customs"
+      },
+      {
+        "title": "英国VAT注册与申报指南",
+        "description": "在英国销售商品，年营业额超过85,000英镑需注册VAT。标准税率20%，低税率7.5%（首年6.5%）。每季度申报一次，需提供销售和进口数据。",
+        "type": "tax"
+      },
+      {
+        "title": "英国物流渠道与时效对比",
+        "description": "海运约30-45天，空运3-7天，铁路15-20天。推荐使用FBA头程、专线小包或海外仓。注意清关需提供CE/UKCA认证。",
+        "type": "logistics"
+      },
+      {
+        "title": "英国进口清关与关税计算",
+        "description": "进口关税按HS编码计算，平均税率4.2%。货值低于135英镑免关税，但需缴纳VAT。需提供商业发票、提单、原产地证等。",
+        "type": "guide"
+      },
+      {
+        "title": "英国原产地证申请与优惠税率",
+        "description": "中国出口英国可申请FORM A原产地证，享受普惠制优惠关税。需提供产品明细和HS编码，部分商品可减免关税。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "英国海外仓一件代发",
+        "category": "仓储",
+        "description": "伦敦、伯明翰等地海外仓，支持FBA中转、一件代发、退货处理。仓储费低至0.5英镑/件/天，最快当日出库。"
+      },
+      {
+        "title": "英国专线物流",
+        "category": "物流",
+        "description": "空运专线3-5个工作日，海运30天到港，支持上门揽收、全程追踪。提供CE/UKCA认证代办服务。"
+      },
+      {
+        "title": "英国VAT税务申报",
+        "category": "税务",
+        "description": "专业会计师处理VAT注册、季度申报、年度结算。标准税率20%，低税率7.5%，协助申请VAT退税。"
+      },
+      {
+        "title": "英国清关代理",
+        "category": "报关",
+        "description": "提供英国进口清关、HS编码归类、关税计算、文件审核。处理海关查验，确保货物快速放行。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "customs-declaration-authorization",
+      "shipping-mark",
+      "shipping-calculator",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "germany",
+    "name": "德国",
+    "nameEn": "Germany",
+    "emoji": "🇩🇪",
+    "region": "欧洲",
+    "currency": "EUR",
+    "heroTitle": "德国出海全能工具箱",
+    "heroSubtitle": "提供符合德国海关和增值税要求的全套单证与物流工具，助力您的商品高效进入欧洲核心市场。",
+    "seoTitle": "德国出海工具 | 跨境出口德国必备单证与指南",
+    "seoDescription": "为出口德国商家提供商业发票、装箱单、原产地证等必备单证工具，以及德国海关清关流程、19% VAT政策、物流时效等实操指南。覆盖柏林、汉堡、慕尼黑等主要港口城市，帮助您高效合规地拓展德国市场。",
+    "keywords": [
+      "德国出海",
+      "德国清关",
+      "德国VAT",
+      "德国物流",
+      "德国商业发票",
+      "德国原产地证",
+      "德国海关",
+      "德国出口单证",
+      "德国跨境电商"
+    ],
+    "keyCities": [
+      "柏林",
+      "汉堡",
+      "慕尼黑",
+      "法兰克福",
+      "杜塞尔多夫"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "德国海关清关流程与文件要求",
+        "description": "详细说明德国海关对进口货物的监管要求，包括EORI号注册、进口报关单（Zollanmeldung）的填写要点，以及ATA单证册的使用场景。",
+        "type": "customs"
+      },
+      {
+        "title": "德国VAT注册与申报指南",
+        "description": "介绍德国增值税（Umsatzsteuer）的标准税率19%、低税率7%的适用范围，以及远程销售阈值（10,000欧元）和OSS一站式申报流程。",
+        "type": "tax"
+      },
+      {
+        "title": "德国物流运输与仓储时效",
+        "description": "分析从中国到德国的主要海运航线（如上海-汉堡约30天）、空运时效（5-7天）及最后一公里配送（DHL、DPD），并提供FBA入仓注意事项。",
+        "type": "logistics"
+      },
+      {
+        "title": "德国产品合规与CE认证",
+        "description": "针对电子产品、玩具、医疗器械等品类，详解CE标志、WEEE注册、德国包装法（VerpackG）的合规要求，避免海关扣留。",
+        "type": "guide"
+      },
+      {
+        "title": "德国市场选品与消费趋势",
+        "description": "基于德国电商市场数据（如Statista），推荐热销品类（家居、工具、自行车配件等），并分析季节性促销节点（如黑色星期五、圣诞市场）。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "德国海外仓一件代发",
+        "description": "在汉堡、法兰克福设有仓储中心，提供FBA中转、退货处理及本地配送服务，支持DHL和DPD，覆盖全德1-2日达。",
+        "category": "仓储"
+      },
+      {
+        "title": "中德海运整柜/拼柜",
+        "description": "提供上海、宁波至汉堡、不莱梅的周班船期，整柜20GP/40HQ，拼柜拼箱服务，含报关、拖车及保险。",
+        "category": "物流"
+      },
+      {
+        "title": "德国进口清关代理",
+        "description": "专业处理德国海关查验，协助准备商业发票、原产地证、CE证书等文件，解决EORI号申请和关税归类问题。",
+        "category": "报关"
+      },
+      {
+        "title": "德国VAT注册与申报",
+        "description": "协助德国本土VAT注册、季度/年度申报，以及OSS VAT申报，提供税务筹划建议，避免罚金。",
+        "category": "税务"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "shipping-instruction",
+      "delivery-note",
+      "quotation",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "usa",
+    "name": "美国",
+    "nameEn": "United States",
+    "emoji": "🇺🇸",
+    "region": "北美",
+    "currency": "USD",
+    "heroTitle": "美国出海全能工具箱",
+    "heroSubtitle": "一站式解决对美贸易中的物流、清关、税务及合规难题，助力卖家高效拓展美国市场。",
+    "seoTitle": "美国出海指南 | 跨境出口美国必备工具与百科",
+    "seoDescription": "面向出口美国的跨境电商卖家，提供美国海关政策、税务门槛、物流时效等深度指南，以及商业发票、装箱单、原产地证等核心工具。覆盖美国主要港口和城市，助力合规出海，降低贸易风险。",
+    "keywords": [
+      "美国出口",
+      "美国清关",
+      "美国税务",
+      "美国物流",
+      "跨境电商美国",
+      "美国海关",
+      "原产地证美国",
+      "美国贸易合规"
+    ],
+    "keyCities": [
+      "洛杉矶",
+      "纽约",
+      "芝加哥",
+      "休斯顿",
+      "西雅图"
+    ],
+    "userCount": "12,000+",
+    "docCount": "45,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "美国海关清关流程与注意事项",
+        "description": "详细解析美国海关清关步骤，包括ISF申报、AMS舱单、CBP查验等，重点关注纺织品、电子产品等高敏感品类。",
+        "type": "customs"
+      },
+      {
+        "title": "美国销售税与所得税指南",
+        "description": "介绍美国各州销售税门槛（如经济关联Nexus）、联邦企业所得税率，以及跨境电商卖家常见的税务合规要求。",
+        "type": "tax"
+      },
+      {
+        "title": "美国FBA物流与海外仓操作指南",
+        "description": "涵盖亚马逊FBA头程运输、海外仓一件代发模式，对比海运、空运、快递的时效与成本，推荐热门仓库地址。",
+        "type": "logistics"
+      },
+      {
+        "title": "美国原产地证与关税优惠",
+        "description": "解释如何申请FORM A、COO等原产地证，利用USMCA（美墨加协定）享受关税减免，以及301关税豁免流程。",
+        "type": "guide"
+      },
+      {
+        "title": "美国产品合规与认证要求",
+        "description": "列出出口美国必备的认证：FCC（电子产品）、FDA（食品/药品）、UL（电器）、CPSC（儿童用品）等，以及标签法规。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "美国海运整柜/拼箱服务",
+        "description": "提供中国主要港口至洛杉矶、纽约等基本港的海运服务，时效约15-25天，含AMS/ISF申报。",
+        "category": "物流"
+      },
+      {
+        "title": "美国保税仓与FBA中转",
+        "description": "位于洛杉矶、亚特兰大的保税仓，支持FBA补货、一件代发，免仓储费30天，提供贴标/质检服务。",
+        "category": "仓储"
+      },
+      {
+        "title": "美国海关清关代理",
+        "description": "拥有CBP认证的报关行，处理纺织品、电子产品、家具等品类清关，提供关税预归类与反倾销应对。",
+        "category": "报关"
+      },
+      {
+        "title": "美国税务合规与EIN注册",
+        "description": "协助注册美国EIN、申请销售税许可证，提供各州销售税申报及联邦所得税代报服务。",
+        "category": "税务"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "proforma-invoice",
+      "shipping-mark",
+      "label-maker",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "australia",
+    "name": "澳大利亚",
+    "nameEn": "Australia",
+    "emoji": "🇦🇺",
+    "region": "澳洲",
+    "currency": "AUD",
+    "heroTitle": "澳大利亚出海全能工具箱",
+    "heroSubtitle": "一站式管理对澳出口的物流、关务与合规，助力您的商品快速进入澳洲市场。",
+    "seoTitle": "澳大利亚跨境电商出口指南 | 工具与合规服务",
+    "seoDescription": "面向澳大利亚出口的全面工具箱：涵盖商业发票、装箱单、原产地证等文档生成，对接澳洲海关清关要求、GST税务规则与检疫标准。提供仓储、物流、报关等本地化服务商推荐，帮助卖家高效合规出海澳洲。",
+    "keywords": [
+      "澳大利亚出口",
+      "澳洲清关",
+      "GST税务",
+      "原产地证",
+      "澳洲物流",
+      "跨境电商澳大利亚",
+      "澳洲海关",
+      "检疫标准",
+      "澳洲仓储",
+      "出口合规"
+    ],
+    "keyCities": [
+      "悉尼",
+      "墨尔本",
+      "布里斯班",
+      "珀斯",
+      "阿德莱德"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "澳大利亚进口清关流程与文件要求",
+        "description": "详解澳洲海关对商业发票、装箱单、原产地证、熏蒸证书等文件的要求，以及低价值货物（<1000 AUD）的简化清关流程。",
+        "type": "customs"
+      },
+      {
+        "title": "澳大利亚GST与关税计算指南",
+        "description": "了解澳洲10% GST（商品及服务税）的征收门槛、递延缴纳选项，以及不同商品类别的关税税率（如纺织品、电子产品等）。",
+        "type": "tax"
+      },
+      {
+        "title": "澳大利亚生物安全与检疫要求",
+        "description": "针对木制品、食品、化妆品等高风险商品，介绍澳洲农业、渔业和林业部（DAFF）的进口条件及熏蒸处理标准。",
+        "type": "guide"
+      },
+      {
+        "title": "中澳物流渠道对比：海运与空运时效",
+        "description": "对比中国至澳洲主要港口（悉尼、墨尔本）的海运时效（约15-25天）与空运时效（3-7天），以及FBA澳洲仓的配送建议。",
+        "type": "logistics"
+      },
+      {
+        "title": "澳大利亚产品标签与合规要求",
+        "description": "涵盖商品标签的语言、制造商信息、成分说明、安全警告等规定，以及针对电子产品的RCM认证要求。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "澳洲海外仓一件代发",
+        "category": "仓储",
+        "description": "悉尼、墨尔本自营仓，支持FBA中转、退货处理及一件代发，最快当日出库。"
+      },
+      {
+        "title": "中澳专线物流",
+        "category": "物流",
+        "description": "提供海运拼箱、整柜及空运服务，全程追踪，悉尼港清关后2-3天派送。"
+      },
+      {
+        "title": "澳洲进口报关代理",
+        "category": "报关",
+        "description": "专业处理澳洲海关清关、查验应对及DAFF检疫，提供GST递延服务。"
+      },
+      {
+        "title": "澳洲税务与合规咨询",
+        "category": "税务",
+        "description": "协助注册ABN、申请GST抵扣，提供产品标签及认证合规审核。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "fumigation-certificate-template",
+      "shipping-calculator",
+      "exchange-rate",
+      "label-maker"
+    ]
+  },
+  {
+    "slug": "france",
+    "name": "法国",
+    "nameEn": "France",
+    "emoji": "🇫🇷",
+    "region": "欧洲",
+    "currency": "EUR",
+    "heroTitle": "法国出海全能工具箱",
+    "heroSubtitle": "专为出口法国及欧盟市场打造的智能工具平台，提供合规单证、物流跟踪、税务计算与海关政策一站式服务，助力跨境贸易高效通关。",
+    "seoTitle": "法国出海工具 | 跨境电商必备单证与物流指南",
+    "seoDescription": "面向出口法国的跨境电商卖家，提供商业发票、装箱单、原产地证等核心单证生成工具，以及法国VAT税务、物流时效、海关政策等实用指南。覆盖巴黎、马赛、里昂等主要港口城市，帮助您高效拓展法国及欧盟市场。",
+    "keywords": [
+      "法国出口",
+      "法国VAT",
+      "法国海关",
+      "法国物流",
+      "法国清关",
+      "法国商业发票",
+      "法国原产地证",
+      "法国跨境电商",
+      "法国税务",
+      "法国仓储"
+    ],
+    "keyCities": [
+      "巴黎",
+      "马赛",
+      "里昂",
+      "勒阿弗尔",
+      "尼斯"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "法国增值税（VAT）注册与申报指南",
+        "description": "详解法国VAT注册流程、税率（标准20%）、免税门槛及季度申报要求，适用于远程销售和本地仓储卖家。",
+        "type": "tax"
+      },
+      {
+        "title": "法国海关清关流程与文件要求",
+        "description": "介绍法国海关清关步骤、所需单证（商业发票、装箱单、原产地证等）及常见查验原因，帮助避免延误。",
+        "type": "customs"
+      },
+      {
+        "title": "法国物流渠道与时效对比",
+        "description": "比较快递（DHL/FedEx 3-5天）、空运（5-7天）、海运（20-30天）及铁路（15-20天）的时效、成本和适用场景。",
+        "type": "logistics"
+      },
+      {
+        "title": "法国进出口贸易合规要点",
+        "description": "涵盖CE认证、REACH法规、产品标签要求及禁止进口商品清单，确保产品符合欧盟标准。",
+        "type": "guide"
+      },
+      {
+        "title": "法国原产地证（COO）办理指南",
+        "description": "说明如何申请优惠原产地证（FORM A）用于减免关税，以及一般原产地证的办理流程与所需资料。",
+        "type": "customs"
+      }
+    ],
+    "services": [
+      {
+        "title": "法国海外仓一件代发",
+        "description": "提供巴黎、里昂等城市仓储服务，支持FBA中转、退货处理及本地配送，2-3天覆盖全法。",
+        "category": "仓储"
+      },
+      {
+        "title": "法国专线物流（空/海运）",
+        "description": "每周固定航班/船期，提供门到门服务，含清关与派送，空运3-5天，海运20-25天。",
+        "category": "物流"
+      },
+      {
+        "title": "法国VAT税务代理",
+        "description": "协助法国VAT注册、季度申报及税务代表，提供合规建议，避免罚金。",
+        "category": "税务"
+      },
+      {
+        "title": "法国海关清关代理",
+        "description": "专业处理法国进口清关，包括商品归类、关税计算、查验应对，确保快速放行。",
+        "category": "报关"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "shipping-mark",
+      "label-maker",
+      "postal-code",
+      "shipping-calculator"
+    ]
+  },
+  {
+    "slug": "japan",
+    "name": "日本",
+    "nameEn": "Japan",
+    "emoji": "🇯🇵",
+    "region": "日韩",
+    "currency": "JPY",
+    "heroTitle": "日本出海全能工具箱",
+    "heroSubtitle": "为跨境电商和外贸企业提供日本市场准入、物流清关、税务合规一站式解决方案，助力高效拓展日本市场。",
+    "seoTitle": "日本出海指南 | 跨境电商与外贸工具平台",
+    "seoDescription": "专注日本出海的全能工具箱，提供日本海关政策、税务合规、物流仓储、市场分析等一站式服务。覆盖东京、大阪、横滨等主要城市，帮助中国商家快速进入日本市场，降低运营成本，提升竞争力。",
+    "keywords": [
+      "日本跨境电商",
+      "日本海关",
+      "日本税务",
+      "日本物流",
+      "日本市场准入",
+      "日本清关",
+      "日本消费税",
+      "日本仓储",
+      "日本出口",
+      "日本贸易"
+    ],
+    "keyCities": [
+      "东京",
+      "大阪",
+      "横滨",
+      "名古屋",
+      "福冈"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "日本进口清关流程与注意事项",
+        "description": "详解日本海关清关流程，包括必要文件、关税税率、消费税计算、禁止进口物品清单及常见问题。",
+        "type": "customs"
+      },
+      {
+        "title": "日本消费税（JCT）合规指南",
+        "description": "针对跨境电商的日本消费税（10%）注册、申报和抵扣规则，年销售额超1000万日元需注册。",
+        "type": "tax"
+      },
+      {
+        "title": "日本FBA与海外仓操作指南",
+        "description": "如何选择日本FBA或第三方海外仓，仓储费用、配送时效（东京圈次日达）及退货处理。",
+        "type": "logistics"
+      },
+      {
+        "title": "日本市场选品与品牌注册指南",
+        "description": "分析日本消费者偏好，推荐热门品类（美妆、母婴、家居），以及商标注册流程（约6-8个月）。",
+        "type": "guide"
+      },
+      {
+        "title": "日本食品进口与检验检疫须知",
+        "description": "食品进口需符合日本食品卫生法，提供成分表、原产地证明，部分产品需检疫。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "日本专业仓储服务",
+        "category": "仓储",
+        "description": "东京、大阪核心仓库，支持FBA转运、一件代发，提供库存管理、质检、贴标等增值服务。"
+      },
+      {
+        "title": "日本海空运物流专线",
+        "category": "物流",
+        "description": "中国至日本海运（7-10天）、空运（2-3天），双清包税，可承运带电、化妆品等敏感货。"
+      },
+      {
+        "title": "日本进口清关代理",
+        "category": "报关",
+        "description": "专业日本海关申报，处理复杂商品归类，降低查验率，提供关税预付及关税优化方案。"
+      },
+      {
+        "title": "日本消费税（JCT）申报代理",
+        "category": "税务",
+        "description": "协助注册JCT号，季度/年度申报，合规开票，享受进项抵扣，避免税务风险。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "proforma-invoice",
+      "customs-declaration-authorization",
+      "shipping-mark",
+      "label-maker",
+      "postal-code",
+      "shipping-calculator",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "new-zealand",
+    "name": "新西兰",
+    "nameEn": "New Zealand",
+    "emoji": "🇳🇿",
+    "region": "澳洲",
+    "currency": "NZD",
+    "heroTitle": "新西兰出海全能工具箱",
+    "heroSubtitle": "提供新西兰清关、税务、物流一站式解决方案，助您轻松开拓南太平洋市场。",
+    "seoTitle": "新西兰出海指南 - 跨境贸易工具与合规服务",
+    "seoDescription": "新西兰出口必备工具集：商业发票、装箱单、原产地证等文档一键生成。了解新西兰海关政策、GST税务门槛、物流时效，对接专业仓储与报关服务商。覆盖奥克兰、惠灵顿、基督城等主要城市，助力中国卖家高效出海新西兰。",
+    "keywords": [
+      "新西兰出口",
+      "新西兰清关",
+      "新西兰GST",
+      "新西兰物流",
+      "原产地证",
+      "商业发票",
+      "新西兰海关",
+      "新西兰贸易",
+      "奥克兰仓储",
+      "新西兰电商"
+    ],
+    "keyCities": [
+      "奥克兰",
+      "惠灵顿",
+      "基督城",
+      "汉密尔顿",
+      "陶朗加"
+    ],
+    "userCount": "1,200+",
+    "docCount": "8,500+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "新西兰进口清关流程与单证要求",
+        "description": "新西兰海关要求进口货物必须提供商业发票、装箱单、原产地证（如需优惠税率）。货值超1000新西兰元需报关。生物安全要求严格，木制品需熏蒸证书。",
+        "type": "customs"
+      },
+      {
+        "title": "新西兰GST与关税计算指南",
+        "description": "新西兰商品服务税（GST）为15%，进口商品货值超1000新西兰元需缴纳。大部分商品关税税率在0%-10%之间，纺织品和鞋类较高。",
+        "type": "tax"
+      },
+      {
+        "title": "新西兰物流时效与运输方式",
+        "description": "从中国海运至新西兰主要港口（奥克兰、陶朗加）约15-25天，空运5-7天。新西兰邮政和DHL提供本地派送服务。",
+        "type": "logistics"
+      },
+      {
+        "title": "新西兰原产地证办理指南",
+        "description": "出口新西兰可申请普惠制原产地证（FORM F）或一般原产地证（CO），享受关税减免。需在贸促会或海关办理。",
+        "type": "guide"
+      },
+      {
+        "title": "新西兰商业发票注意事项",
+        "description": "发票需包含发货人、收货人、货物描述、HS编码、数量、单价、总价、原产国。新西兰海关对低报价值审查严格。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "奥克兰海外仓一件代发",
+        "category": "仓储",
+        "description": "位于奥克兰的海外仓，提供FBA中转、一件代发、退货处理，支持新西兰本地快递派送，48小时出库。"
+      },
+      {
+        "title": "新西兰双清包税专线",
+        "category": "物流",
+        "description": "中国至新西兰海运/空运双清包税，包含报关、清关、GST代缴，全程追踪，时效15-25天。"
+      },
+      {
+        "title": "新西兰海关合规报关服务",
+        "category": "报关",
+        "description": "专业报关团队，处理新西兰海关申报、查验应对、生物安全检疫，确保货物快速放行。"
+      },
+      {
+        "title": "新西兰GST注册与申报服务",
+        "category": "税务",
+        "description": "为跨境电商卖家提供新西兰GST注册、季度申报、抵扣服务，年销售额超6万新西兰元需注册。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "proforma-invoice",
+      "shipping-mark",
+      "postal-code",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "south-korea",
+    "name": "韩国",
+    "nameEn": "South Korea",
+    "emoji": "🇰🇷",
+    "region": "日韩",
+    "currency": "KRW",
+    "heroTitle": "韩国出海全能工具箱",
+    "heroSubtitle": "覆盖中韩跨境物流、韩国海关清关、K-REACH合规、韩国关税计算等一站式服务，助力您的商品高效进入韩国市场。",
+    "seoTitle": "韩国出海指南 | 跨境物流、清关、税务合规工具",
+    "seoDescription": "为出口韩国企业提供专业工具：韩国海关清关流程、K-REACH法规、关税查询、中韩物流时效。韩国跨境电商必备，支持CJ物流、大韩通运等本地服务商对接。",
+    "keywords": [
+      "韩国清关",
+      "中韩物流",
+      "K-REACH",
+      "韩国关税",
+      "韩国跨境电商",
+      "韩国海关",
+      "韩国贸易合规",
+      "韩国物流时效",
+      "韩国出口指南",
+      "韩国税务"
+    ],
+    "keyCities": [
+      "首尔",
+      "釜山",
+      "仁川",
+      "大邱",
+      "光州"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "韩国海关清关流程与注意事项",
+        "description": "详解韩国海关清关步骤：电子申报、货物查验、关税缴纳。韩国海关对低价值货物（低于150美元）免征关税，但需注意K-REACH和KC认证要求。",
+        "type": "customs"
+      },
+      {
+        "title": "中韩物流时效与渠道选择",
+        "description": "中韩海运约3-5天，空运1-2天。推荐仁川港和釜山港作为主要入境港。CJ物流、大韩通运等提供门到门服务，支持电商小包和B2B整柜。",
+        "type": "logistics"
+      },
+      {
+        "title": "韩国税务合规与增值税指南",
+        "description": "韩国增值税标准税率10%，出口可零税率。年销售额超过8,000万韩元需登记为一般纳税人。企业所得税税率9%-24%。",
+        "type": "tax"
+      },
+      {
+        "title": "韩国K-REACH法规与化学品合规",
+        "description": "K-REACH要求年进口量超过1吨的化学物质需注册。预注册截止至2023年，新物质需提前申报。合规周期约6-12个月。",
+        "type": "guide"
+      },
+      {
+        "title": "韩国KC认证与产品准入要求",
+        "description": "电子电器、儿童产品、化妆品等需KC认证。认证周期约4-8周，费用视产品类别而定。未认证产品可能被海关扣留。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "CJ物流韩国仓储与配送",
+        "category": "仓储",
+        "description": "提供首尔、仁川等地仓储服务，支持FBA转运、一件代发。仓储费每立方米每月约15,000韩元，操作费另计。"
+      },
+      {
+        "title": "大韩通运中韩海运专线",
+        "category": "物流",
+        "description": "中国至韩国海运拼箱/整柜，时效3-5天。提供双清包税服务，可承接化工品、电子产品等特殊货物。"
+      },
+      {
+        "title": "韩国海关AEO认证报关行",
+        "category": "报关",
+        "description": "专业韩国进口报关，熟悉K-REACH、KC认证要求。提供电子申报、关税预付、查验协助，平均清关时间1-2天。"
+      },
+      {
+        "title": "韩国税务代理与增值税退税",
+        "category": "税务",
+        "description": "协助韩国公司注册、增值税申报、企业所得税筹划。提供出口退税服务，退税周期约2-4周。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "proforma-invoice",
+      "certificate-of-origin-template",
+      "shipping-calculator",
+      "exchange-rate",
+      "customs-declaration-authorization"
+    ]
+  },
+  {
+    "slug": "thailand",
+    "name": "泰国",
+    "nameEn": "Thailand",
+    "emoji": "🇹🇭",
+    "region": "东南亚",
+    "currency": "THB",
+    "heroTitle": "泰国出海全能工具箱",
+    "heroSubtitle": "一站式处理对泰贸易单据、物流、报关与税务，助您轻松拓展泰国市场。",
+    "seoTitle": "泰国出海工具 | 跨境贸易文档与物流指南",
+    "seoDescription": "面向对泰出口企业，提供商业发票、装箱单、原产地证等必备单据模板，以及泰国海关政策、物流时效、税务门槛等实用信息。支持泰国主要港口和机场，助您高效完成清关与运输。",
+    "keywords": [
+      "泰国出口",
+      "泰国海关",
+      "泰国物流",
+      "泰国税务",
+      "泰国原产地证",
+      "泰国商业发票",
+      "泰国装箱单",
+      "泰国清关",
+      "东南亚贸易",
+      "泰国货运"
+    ],
+    "keyCities": [
+      "曼谷",
+      "清迈",
+      "普吉岛",
+      "芭堤雅",
+      "罗勇"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "泰国海关清关流程指南",
+        "description": "泰国海关要求进口商提供商业发票、装箱单、原产地证（如适用）等文件。货值低于1500泰铢可免关税，但需缴纳7%增值税。建议提前通过电子系统提交申报，缩短通关时间。",
+        "type": "customs"
+      },
+      {
+        "title": "泰国进口税务与增值税详解",
+        "description": "泰国增值税标准税率为7%，进口时由海关代征。关税税率0-80%不等，平均约10%。部分商品如机械设备、原材料可享受减免。需提供Form E或Form D以申请东盟自贸区优惠关税。",
+        "type": "tax"
+      },
+      {
+        "title": "泰国物流运输时效与选择",
+        "description": "海运至林查班港约15-20天，空运至素万那普机场约3-5天。陆运经老挝或柬埔寨需注意边境通关时间。建议选择有泰国本地分支的物流商，可提供门到门服务。",
+        "type": "logistics"
+      },
+      {
+        "title": "泰国商业发票与装箱单填写规范",
+        "description": "发票需用英文填写，包含发货人、收货人、货物描述、数量、单价、总价、原产国等。装箱单需列明每个箱子的重量、尺寸、件数。泰国海关对品名描述要求详细，避免模糊词汇。",
+        "type": "guide"
+      },
+      {
+        "title": "泰国原产地证申请与使用",
+        "description": "中国出口至泰国可申请Form E（东盟自贸区）或一般原产地证。Form E可享受零关税或优惠税率，需在货物出运前或出运后3天内申请。需提供发票、装箱单及工厂证明。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "泰国本地仓储服务",
+        "category": "仓储",
+        "description": "提供曼谷、林查班港附近仓库，面积1000-5000平米，可支持FBA转运、一件代发。含库存管理系统，支持中泰双语服务。"
+      },
+      {
+        "title": "中泰物流专线",
+        "category": "物流",
+        "description": "海运、空运、陆运专线，时效稳定。海运15-20天，空运3-5天，陆运7-10天。提供报关、清关一站式服务，可代办Form E。"
+      },
+      {
+        "title": "泰国进口报关代理",
+        "category": "报关",
+        "description": "专业代理泰国进口报关，处理海关查验、关税缴纳、文件补交等。熟悉泰国海关法规，可协助申请关税减免。"
+      },
+      {
+        "title": "泰国税务合规咨询",
+        "category": "税务",
+        "description": "提供泰国增值税注册、申报、退税服务。协助企业了解泰国税法，优化税务结构，避免罚款。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "proforma-invoice",
+      "shipping-instruction",
+      "booking-instruction",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "vietnam",
+    "name": "越南",
+    "nameEn": "Vietnam",
+    "emoji": "🇻🇳",
+    "region": "东南亚",
+    "currency": "VND",
+    "heroTitle": "🇻🇳 越南出海全能工具箱",
+    "heroSubtitle": "一站式处理越南出口单证、物流、税务与海关申报，助力快速开拓东南亚市场。",
+    "seoTitle": "越南出海指南 | 出口越南必备工具、物流与合规",
+    "seoDescription": "全面了解越南出口流程：掌握越南海关政策、增值税门槛、物流时效，使用智能工具生成商业发票、装箱单、原产地证等必备单证，对接本地优质仓储与报关服务，轻松拓展越南市场。",
+    "keywords": [
+      "越南出口",
+      "越南海关",
+      "越南增值税",
+      "越南物流",
+      "越南产地证",
+      "越南商业发票",
+      "越南装箱单",
+      "越南报关",
+      "越南仓储",
+      "东南亚贸易"
+    ],
+    "keyCities": [
+      "胡志明市",
+      "河内",
+      "海防",
+      "岘港",
+      "芹苴"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "越南出口单证全流程指南",
+        "description": "详解出口越南所需的核心单证：商业发票、装箱单、原产地证（C/O form D/E）、提单、报关单，以及越南海关对单证的特殊要求（如发票需显示HS编码、原产地）。",
+        "type": "guide"
+      },
+      {
+        "title": "越南物流与海运时效",
+        "description": "从中国主要港口（上海、深圳、宁波）到胡志明市、海防的海运时效约5-8天，空运2-3天。提供整柜、拼箱及快递方案，并提示越南港口拥堵与清关排队情况。",
+        "type": "logistics"
+      },
+      {
+        "title": "越南增值税与关税政策",
+        "description": "越南增值税标准税率10%，部分商品适用5%或0%。进口关税根据HS编码从0%到30%不等。掌握增值税抵扣流程、海关估价规则，以及避免双重征税的注意事项。",
+        "type": "tax"
+      },
+      {
+        "title": "越南海关申报与查验要点",
+        "description": "越南海关要求电子申报（VNACCS/VCIS系统），重点查验商品：电子产品、纺织品、食品、化妆品。需提供真实发票、原产地证，避免低报价格导致罚没。",
+        "type": "customs"
+      },
+      {
+        "title": "越南原产地证办理指南",
+        "description": "中国-东盟自贸区适用Form E，可享受关税减免。办理需提供商业发票、装箱单、原产地证明文件，经中国贸促会或海关签发。部分产品需满足区域价值成分≥40%。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "越南FBA头程物流服务",
+        "category": "物流",
+        "description": "提供中国至越南全境的海运、空运、陆运服务，支持双清包税，时效5-10天，可派送至亚马逊仓库或海外仓。"
+      },
+      {
+        "title": "越南海关清关代理",
+        "category": "报关",
+        "description": "专业处理越南海关申报、查验、税费支付，熟悉各类商品监管条件，提供HS编码归类与单证预审，降低查验率。"
+      },
+      {
+        "title": "越南海外仓一件代发",
+        "category": "仓储",
+        "description": "在胡志明市、河内设仓，提供仓储、拣货、打包、本地派送服务，支持COD收款，覆盖越南全境，当日达/次日达。"
+      },
+      {
+        "title": "越南税务合规与咨询",
+        "category": "税务",
+        "description": "协助企业注册越南税号，代理增值税申报、企业所得税汇算清缴，提供转让定价文档与税务筹划，避免税务风险。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "proforma-invoice",
+      "booking-instruction",
+      "customs-declaration-authorization",
+      "shipping-mark",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "indonesia",
+    "name": "印度尼西亚",
+    "nameEn": "Indonesia",
+    "emoji": "🇮🇩",
+    "region": "东南亚",
+    "currency": "IDR",
+    "heroTitle": "印度尼西亚出海全能工具箱",
+    "heroSubtitle": "一站式管理印尼贸易单据、物流追踪、关税计算与合规文件，助力高效开拓东南亚最大市场。",
+    "seoTitle": "印尼出海工具 | 印尼贸易文档与物流解决方案",
+    "seoDescription": "为出口印度尼西亚的企业提供全套贸易文档、物流管理、关税计算和合规工具。覆盖雅加达、泗水、棉兰等主要港口，支持印尼海关政策与税务门槛，帮助您高效处理商业发票、装箱单、原产地证等关键文件。",
+    "keywords": [
+      "印尼出海",
+      "印度尼西亚贸易",
+      "印尼物流",
+      "印尼关税",
+      "印尼海关",
+      "东南亚出口",
+      "印尼商业发票",
+      "印尼原产地证",
+      "印尼物流追踪",
+      "印尼税务合规"
+    ],
+    "keyCities": [
+      "雅加达",
+      "泗水",
+      "棉兰",
+      "万隆",
+      "登巴萨"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "印尼进口清关流程与文件要求",
+        "description": "详解印尼进口清关步骤：从提交PIB（进口报关单）到查验放行，必备文件包括商业发票、装箱单、原产地证（FORM E享关税优惠）、提单等。注意印尼对电子产品、化妆品等有SNI认证要求。",
+        "type": "guide"
+      },
+      {
+        "title": "印尼物流运输时效与港口选择",
+        "description": "中国至印尼主要港口海运时效：雅加达（约7-10天）、泗水（约10-14天）。推荐使用雅加达丹戎不碌港，清关效率较高。空运至雅加达约3-5天。",
+        "type": "logistics"
+      },
+      {
+        "title": "印尼进口关税与税收政策",
+        "description": "印尼进口关税税率0-30%，增值税11%（2024年），所得税2.5%-10%。利用FORM E可享东盟-中国自贸区关税优惠。注意BMS（奢侈品销售税）针对特定商品。",
+        "type": "tax"
+      },
+      {
+        "title": "印尼海关查验与合规注意事项",
+        "description": "印尼海关查验率较高，重点关注进口许可证（API）、原产地证、产品认证（SNI、BPOM等）。避免低报价格，否则面临罚款或扣押。建议使用预清关服务。",
+        "type": "customs"
+      },
+      {
+        "title": "印尼电商市场与B2B出口指南",
+        "description": "印尼电商平台Tokopedia、Shopee、Lazada占据主要份额。B2B出口需注册进口商（API-U），注意清真认证（MUI）对食品、化妆品的影响。印尼消费者偏好货到付款。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "印尼保税仓储与一件代发",
+        "category": "仓储",
+        "description": "在雅加达提供保税仓储服务，支持一件代发，库存管理实时更新，日处理订单2000+，覆盖爪哇岛主要城市。"
+      },
+      {
+        "title": "印尼双清包税专线",
+        "category": "物流",
+        "description": "中国至印尼双清包税海运/空运专线，包印尼进口关税，时效稳定（海运12-15天，空运5-7天），适合高价值货物。"
+      },
+      {
+        "title": "印尼进口报关与SNI认证代办",
+        "category": "报关",
+        "description": "专业处理印尼进口报关，代办SNI认证、BPOM认证，税率优化建议，确保清关顺利，降低查验风险。"
+      },
+      {
+        "title": "印尼税务合规与转让定价咨询",
+        "category": "税务",
+        "description": "提供印尼企业所得税、增值税申报，转让定价文档准备，协助应对税务稽查，确保合规运营。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "proforma-invoice",
+      "certificate-of-origin-template",
+      "shipping-mark",
+      "shipping-calculator",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "philippines",
+    "name": "菲律宾",
+    "nameEn": "Philippines",
+    "emoji": "🇵🇭",
+    "region": "东南亚",
+    "currency": "PHP",
+    "heroTitle": "菲律宾出海全能工具箱",
+    "heroSubtitle": "一站式处理菲律宾进出口报关、物流追踪、税务合规，助您高效拓展东南亚市场。",
+    "seoTitle": "菲律宾出海工具箱 - 报关、物流、税务合规指南",
+    "seoDescription": "面向菲律宾市场的跨境电商与贸易企业，提供菲律宾海关政策、清关流程、物流时效、税务门槛等专业指南。集成商业发票、装箱单、原产地证等核心工具，帮助您高效完成菲律宾进出口业务。",
+    "keywords": [
+      "菲律宾出海",
+      "菲律宾报关",
+      "菲律宾物流",
+      "菲律宾税务",
+      "菲律宾清关",
+      "东南亚跨境电商",
+      "菲律宾原产地证",
+      "菲律宾商业发票",
+      "菲律宾装箱单",
+      "菲律宾海关政策"
+    ],
+    "keyCities": [
+      "马尼拉",
+      "宿务",
+      "达沃",
+      "卡加延德奥罗",
+      "伊洛伊洛"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "菲律宾海关清关流程与文件要求",
+        "description": "详解菲律宾海关清关步骤，包括电子申报、文件审核、查验与放行，所需文件如商业发票、装箱单、原产地证等。",
+        "type": "customs"
+      },
+      {
+        "title": "菲律宾进口关税与增值税计算",
+        "description": "菲律宾进口关税税率范围0-30%，增值税12%，部分产品征收消费税。介绍CIF价值计算方法及优惠税率申请条件。",
+        "type": "tax"
+      },
+      {
+        "title": "菲律宾物流渠道与时效对比",
+        "description": "对比空运（5-7天）、海运（15-25天）、快递（3-5天）等渠道，推荐适合不同货值的物流方案。",
+        "type": "logistics"
+      },
+      {
+        "title": "菲律宾产品认证与合规要求",
+        "description": "菲律宾强制要求PS/ICC认证，电子产品需符合BPS标准，食品需FDA注册，介绍认证流程与周期。",
+        "type": "guide"
+      },
+      {
+        "title": "菲律宾跨境电商税务合规指南",
+        "description": "菲律宾对跨境电商征收12%增值税，年销售额超过300万比索需注册为增值税纳税人，介绍BIR注册与申报流程。",
+        "type": "tax"
+      }
+    ],
+    "services": [
+      {
+        "title": "菲律宾海外仓一件代发",
+        "category": "仓储",
+        "description": "马尼拉、宿务等地海外仓，支持FBA中转、一件代发，仓储费低至PHP 20/件/天，48小时出库。"
+      },
+      {
+        "title": "菲律宾双清包税专线",
+        "category": "物流",
+        "description": "中国至菲律宾空海运双清包税，海运20-25天，空运5-7天，提供门到门服务，支持COD代收货款。"
+      },
+      {
+        "title": "菲律宾进口报关代理",
+        "category": "报关",
+        "description": "专业代理菲律宾进口报关，处理海关查验、关税计算、文件审核，提供HS编码归类与优惠税率申请。"
+      },
+      {
+        "title": "菲律宾增值税注册与申报",
+        "category": "税务",
+        "description": "协助企业完成BIR注册、增值税申报，年销售额300万比索以上强制登记，提供月度/季度申报服务。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "shipping-mark",
+      "quotation",
+      "shipping-calculator",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "saudi-arabia",
+    "name": "沙特阿拉伯",
+    "nameEn": "Saudi Arabia",
+    "emoji": "🇸🇦",
+    "region": "中东",
+    "currency": "SAR",
+    "heroTitle": "沙特阿拉伯出海全能工具箱",
+    "heroSubtitle": "一站式解决沙特进出口贸易所需的文档、物流、清关与合规问题，助您快速开拓中东市场。",
+    "seoTitle": "沙特阿拉伯出海工具箱 - 跨境贸易与物流指南",
+    "seoDescription": "沙特阿拉伯是中东最大的经济体，拥有庞大的消费市场。本平台提供沙特出口所需的商业发票、装箱单、原产地证等模板，以及物流、清关和税务指南，帮助跨境卖家高效完成沙特进出口流程。",
+    "keywords": [
+      "沙特阿拉伯出海",
+      "沙特贸易",
+      "沙特清关",
+      "沙特物流",
+      "沙特关税",
+      "沙特增值税",
+      "沙特原产地证",
+      "中东跨境",
+      "沙特商业发票"
+    ],
+    "keyCities": [
+      "利雅得",
+      "吉达",
+      "达曼",
+      "麦加",
+      "麦地那"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "沙特进出口流程与清关指南",
+        "description": "详解沙特进口清关流程，包括SABER认证、海关编码、所需文件清单及关税税率（通常5%-20%）。",
+        "type": "guide"
+      },
+      {
+        "title": "沙特物流运输攻略",
+        "description": "沙特主要港口（吉达、达曼）和空运枢纽，时效约15-25天，建议选择DP World等物流商。",
+        "type": "logistics"
+      },
+      {
+        "title": "沙特增值税与关税政策",
+        "description": "沙特增值税15%，部分商品免税；关税起征点1000里亚尔，注意反倾销税。",
+        "type": "tax"
+      },
+      {
+        "title": "沙特海关申报与合规要求",
+        "description": "沙特海关要求电子申报，需提供商业发票、装箱单、原产地证等，部分商品需SASO认证。",
+        "type": "customs"
+      },
+      {
+        "title": "沙特市场准入与产品认证",
+        "description": "电子产品、化妆品等需SABER认证；食品需SFDA注册；药品需SFDA批准。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "沙特仓储服务",
+        "category": "仓储",
+        "description": "在利雅得和吉达提供海外仓服务，支持FBA转运与一件代发，仓储费低至0.5里亚尔/件/天。"
+      },
+      {
+        "title": "沙特专线物流",
+        "category": "物流",
+        "description": "提供中国至沙特空海运专线，海运20-25天，空运5-7天，可跟踪，支持双清包税。"
+      },
+      {
+        "title": "沙特清关代理",
+        "category": "报关",
+        "description": "专业处理沙特清关，包括SABER认证、海关查验、关税缴纳，清关时效1-3天。"
+      },
+      {
+        "title": "沙特税务合规服务",
+        "category": "税务",
+        "description": "协助沙特增值税注册与申报，企业所得税咨询，避免税务罚款。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "booking-instruction",
+      "customs-declaration-authorization",
+      "quotation",
+      "shipping-mark"
+    ]
+  },
+  {
+    "slug": "uae",
+    "name": "阿联酋",
+    "nameEn": "UAE",
+    "emoji": "🇦🇪",
+    "region": "中东",
+    "currency": "AED",
+    "heroTitle": "阿联酋出海全能工具箱",
+    "heroSubtitle": "提供涵盖物流、清关、税务、仓储的一站式服务，助力企业高效开拓中东市场",
+    "seoTitle": "阿联酋出海指南 - 跨境物流、清关、税务一站式服务平台",
+    "seoDescription": "面向阿联酋的出海企业提供全面的物流、清关、税务和仓储解决方案。深入了解阿联酋海关政策、增值税门槛、物流时效等关键信息，覆盖迪拜、阿布扎比、沙迦等主要城市。平台已服务8,500+商家，处理32,000+单据，助您高效开拓中东市场。",
+    "keywords": [
+      "阿联酋出海",
+      "迪拜物流",
+      "中东清关",
+      "阿联酋增值税",
+      "跨境物流",
+      "阿联酋仓储",
+      "中东贸易",
+      "阿联酋海关",
+      "跨境电商",
+      "中东市场"
+    ],
+    "keyCities": [
+      "迪拜",
+      "阿布扎比",
+      "沙迦",
+      "阿治曼",
+      "拉斯海马"
+    ],
+    "userCount": "8,500+",
+    "docCount": "32,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "阿联酋海关清关流程与注意事项",
+        "description": "详解阿联酋海关清关步骤，包括电子申报、文件审核、查验放行等环节。注意需提供商业发票、原产地证、提单等文件，部分商品需取得ESMA认证。",
+        "type": "customs"
+      },
+      {
+        "title": "阿联酋增值税(VAT)注册与申报指南",
+        "description": "阿联酋VAT税率为5%，年营业额超过37.5万迪拉姆的企业必须注册。介绍注册流程、申报周期、零税率和免税项目，以及罚款规则。",
+        "type": "tax"
+      },
+      {
+        "title": "迪拜物流时效与运输方式选择",
+        "description": "从中国到迪拜海运约15-20天，空运3-5天，快递3-7天。介绍杰贝阿里港、迪拜机场等主要枢纽，以及自贸区内的物流优势。",
+        "type": "logistics"
+      },
+      {
+        "title": "阿联酋自由贸易区优惠政策与入驻指南",
+        "description": "阿联酋有40多个自贸区，如迪拜多种商品中心(DMCC)、阿布扎比哈利法工业区(KIZAD)。介绍100%外资、免税、利润汇回自由等政策。",
+        "type": "guide"
+      },
+      {
+        "title": "阿联酋进口关税与豁免条件",
+        "description": "一般关税5%，部分商品如猪肉、酒类税率更高。GCC国家原产地商品免税，自贸区之间转移货物可豁免关税。",
+        "type": "tax"
+      }
+    ],
+    "services": [
+      {
+        "title": "迪拜海外仓一件代发",
+        "category": "仓储",
+        "description": "在迪拜提供5000平米仓储空间，支持FBA中转、一件代发、贴标换标，日均处理2000+订单，覆盖全阿联酋次日达。"
+      },
+      {
+        "title": "中东专线物流（空运/海运）",
+        "category": "物流",
+        "description": "提供从中国主要港口到杰贝阿里港的海运整柜/拼箱服务，以及到迪拜机场的空运服务，全程跟踪，时效稳定。"
+      },
+      {
+        "title": "阿联酋进口清关代理",
+        "category": "报关",
+        "description": "专业处理阿联酋海关申报，提供ESMA认证、SABER系统注册等增值服务，处理各类敏感货物如化妆品、电子产品。"
+      },
+      {
+        "title": "阿联酋VAT税务申报服务",
+        "category": "税务",
+        "description": "协助企业完成VAT注册、季度申报、零申报及税务稽查应对，确保合规，避免罚款。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "shipping-calculator",
+      "exchange-rate",
+      "customs-declaration-authorization",
+      "label-maker"
+    ]
+  },
+  {
+    "slug": "mexico",
+    "name": "墨西哥",
+    "nameEn": "Mexico",
+    "emoji": "🇲🇽",
+    "region": "北美",
+    "currency": "MXN",
+    "heroTitle": "墨西哥出海全能工具箱",
+    "heroSubtitle": "提供墨西哥市场拓展所需的全套文档、物流、清关及合规工具，助力高效出海。",
+    "seoTitle": "墨西哥跨境出海指南 - 清关、物流、税务一站式服务",
+    "seoDescription": "面向墨西哥市场的出海工具箱，涵盖商业发票、装箱单、原产地证等必备文档，支持墨西哥NOM认证、RFC税务登记及进口清关流程。提供墨西哥城、蒙特雷等主要城市物流服务，助力企业高效拓展拉美市场。",
+    "keywords": [
+      "墨西哥清关",
+      "墨西哥物流",
+      "墨西哥税务",
+      "墨西哥NOM认证",
+      "墨西哥RFC",
+      "墨西哥出口",
+      "墨西哥进口单证",
+      "墨西哥跨境",
+      "墨西哥市场",
+      "墨西哥贸易"
+    ],
+    "keyCities": [
+      "墨西哥城",
+      "蒙特雷",
+      "瓜达拉哈拉",
+      "蒂华纳",
+      "坎昆"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "墨西哥进口清关流程详解",
+        "description": "墨西哥进口需提供商业发票、装箱单、提单及原产地证，部分商品需NOM认证。关税税率0%-35%，增值税16%。建议提前申请RFC税号，清关时效约3-7天。",
+        "type": "customs"
+      },
+      {
+        "title": "墨西哥税务合规指南",
+        "description": "墨西哥企业所得税30%，增值税16%。跨境电商需注册RFC并代扣增值税。年销售额低于200万比索可享简易制度。",
+        "type": "tax"
+      },
+      {
+        "title": "墨西哥物流运输方案",
+        "description": "中国至墨西哥海运约25-35天，空运5-8天。主要港口：曼萨尼约、拉萨罗卡德纳斯。推荐使用墨西哥城或蒙特雷的海外仓，配送时效2-5天。",
+        "type": "logistics"
+      },
+      {
+        "title": "墨西哥NOM认证须知",
+        "description": "电子、玩具、纺织品等需NOM认证，认证周期4-8周，费用500-3000美元不等。未认证产品可能被扣留或罚款。",
+        "type": "guide"
+      },
+      {
+        "title": "墨西哥原产地证办理指南",
+        "description": "中墨未签FTA，但可凭一般原产地证享受最惠国待遇。需在贸促会或海关办理，提供商业发票及装箱单，时效1-2个工作日。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "墨西哥海外仓仓储服务",
+        "category": "仓储",
+        "description": "提供墨西哥城、蒙特雷海外仓，支持FBA中转、一件代发，仓储费低至$0.5/立方/天，操作费$1.5/单。"
+      },
+      {
+        "title": "墨西哥门到门物流专线",
+        "category": "物流",
+        "description": "中国至墨西哥双清包税专线，海运30-40天，空运7-10天，可承运普货、带电、纺织品等，提供实时追踪。"
+      },
+      {
+        "title": "墨西哥进口清关代理",
+        "category": "报关",
+        "description": "专业处理墨西哥进口清关，包括NOM认证、RFC注册、关税预归类，清关时效3-5天，成功率98%以上。"
+      },
+      {
+        "title": "墨西哥RFC税务登记服务",
+        "category": "税务",
+        "description": "协助中国卖家注册墨西哥RFC税号，办理增值税代扣代缴，年处理300+案例，平均下号时间15个工作日。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "proforma-invoice",
+      "shipping-mark",
+      "exchange-rate",
+      "postal-code"
+    ]
+  },
+  {
+    "slug": "brazil",
+    "name": "巴西",
+    "nameEn": "Brazil",
+    "emoji": "🇧🇷",
+    "region": "拉美",
+    "currency": "BRL",
+    "heroTitle": "巴西出海全能工具箱",
+    "heroSubtitle": "一站式解决对巴贸易中的物流、税务、清关难题，助您快速开拓拉美最大市场。",
+    "seoTitle": "巴西跨境出海工具与指南 | 清关、税务、物流一站式服务",
+    "seoDescription": "面向出口巴西的中国企业，提供巴西海关政策、税务合规、物流时效等专业指南，以及商业发票、装箱单、原产地证等必备工具。覆盖圣保罗、里约热内卢等主要城市，助力高效出海。",
+    "keywords": [
+      "巴西出口",
+      "巴西清关",
+      "巴西税务",
+      "巴西物流",
+      "巴西贸易指南",
+      "巴西海关政策",
+      "巴西市场",
+      "巴西跨境电商",
+      "巴西进口关税",
+      "巴西贸易合规"
+    ],
+    "keyCities": [
+      "圣保罗",
+      "里约热内卢",
+      "巴西利亚",
+      "萨尔瓦多",
+      "马瑙斯"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "巴西海关清关流程与关键文件",
+        "description": "详解巴西海关清关步骤，包括Siscomex系统登记、进口许可证申请、商业发票、装箱单、提单等必备文件要求，以及常见扣货原因与应对策略。",
+        "type": "customs"
+      },
+      {
+        "title": "巴西进口税制与税务合规指南",
+        "description": "介绍巴西主要进口税种：II（关税）、IPI（工业产品税）、ICMS（商品流通税）、PIS/COFINS等，税率范围及计算方式，以及税务优惠政策（如Ex-tarifário）。",
+        "type": "tax"
+      },
+      {
+        "title": "巴西物流运输方式与时效对比",
+        "description": "对比海运（圣保罗港、桑托斯港）、空运（瓜鲁柳斯机场）、陆运（与邻国联通）的时效、成本及适用货物类型，提供最优物流方案建议。",
+        "type": "logistics"
+      },
+      {
+        "title": "巴西市场准入与产品认证要求",
+        "description": "介绍ANVISA（卫生监督局）、INMETRO（质量认证）等机构对电子、医疗、食品等产品的强制性认证流程，以及标签、包装等合规要求。",
+        "type": "guide"
+      },
+      {
+        "title": "巴西贸易风险防范与合同要点",
+        "description": "分析巴西贸易常见风险：外汇波动、付款延迟、法律纠纷等，提供合同条款设计、支付方式选择（如信用证）、信用保险等防范措施。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "巴西圣保罗保税仓服务",
+        "category": "仓储",
+        "description": "位于圣保罗保税区内，提供货物存储、分拣、贴标、一件代发等服务，支持B2B和B2C。可暂缓缴纳进口关税，降低资金压力。"
+      },
+      {
+        "title": "巴西海运整柜/拼箱物流",
+        "category": "物流",
+        "description": "提供从中国主要港口到桑托斯、里约热内卢等港口的海运服务，包含订舱、报关、拖车、清关及内陆运输，时效约30-40天。"
+      },
+      {
+        "title": "巴西进口清关代理",
+        "category": "报关",
+        "description": "专业处理巴西海关清关手续，包括Siscomex系统录入、进口许可证办理、关税核算、查验应对等，助力货物快速放行。"
+      },
+      {
+        "title": "巴西税务咨询与合规服务",
+        "category": "税务",
+        "description": "提供巴西ICMS、IPI、PIS/COFINS等税种申报、税务筹划、转让定价分析及税务争议解决，帮助企业降低税负并规避风险。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "proforma-invoice",
+      "certificate-of-origin-template",
+      "shipping-mark",
+      "shipping-calculator",
+      "exchange-rate"
+    ]
+  },
+  {
+    "slug": "spain",
+    "name": "西班牙",
+    "nameEn": "Spain",
+    "emoji": "🇪🇸",
+    "region": "欧洲",
+    "currency": "EUR",
+    "heroTitle": "西班牙出海全能工具箱",
+    "heroSubtitle": "覆盖西班牙全境的物流、清关、税务一站式服务，助您轻松进入伊比利亚市场",
+    "seoTitle": "西班牙跨境电商工具 | 西班牙出海指南 | 物流清关税费一站式平台",
+    "seoDescription": "西班牙是欧洲第四大电商市场，拥有超过3000万在线消费者。本平台提供西班牙专线物流（时效5-7天）、增值税（IVA 21%）申报、海关清关（TARIC编码）等一站式工具，帮助卖家高效管理从中国到西班牙的跨境贸易。覆盖马德里、巴塞罗那、瓦伦西亚等主要城市，支持商业发票、装箱单、原产地证等文件生成，降低合规风险。",
+    "keywords": [
+      "西班牙跨境电商",
+      "西班牙物流专线",
+      "西班牙关税",
+      "西班牙增值税IVA",
+      "西班牙清关",
+      "马德里海外仓",
+      "西班牙贸易指南",
+      "出口西班牙文件",
+      "西班牙市场准入",
+      "西班牙海关TARIC"
+    ],
+    "keyCities": [
+      "马德里",
+      "巴塞罗那",
+      "瓦伦西亚",
+      "塞维利亚",
+      "马拉加"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "西班牙进口清关流程与关税计算",
+        "description": "西班牙海关采用TARIC编码系统，进口关税税率在0%-17%之间，增值税IVA标准税率21%，部分商品适用10%或4%低税率。清关需提供商业发票、装箱单、提单及原产地证，货值低于150欧元可免关税但需缴纳IVA。",
+        "type": "customs"
+      },
+      {
+        "title": "西班牙增值税（IVA）注册与申报指南",
+        "description": "非欧盟企业在西班牙销售商品需注册西班牙VAT（NIF-IVA）。远程销售阈值35,000欧元，超过则需在西班牙申报。季度申报Model 303，年度汇总Model 390。IOSS适用于B2C低价值商品（≤150欧元）。",
+        "type": "tax"
+      },
+      {
+        "title": "西班牙物流专线选择与时效对比",
+        "description": "中国到西班牙主要物流渠道：国际快递（DHL/UPS 3-5天）、空运专线（5-7天）、海运拼箱（25-30天）、铁路（18-22天）。建议高价值商品用快递，大货重货走海运。西班牙本地派送主要依赖Correos、SEUR、MRW等。",
+        "type": "logistics"
+      },
+      {
+        "title": "西班牙产品合规与认证要求",
+        "description": "电子产品需CE标志和RoHS合规；纺织品需符合REACH法规；玩具需EN71标准；食品接触材料需FDA或EU合规。西班牙消费者保护法要求产品标签使用西班牙语，并提供售后服务。",
+        "type": "guide"
+      },
+      {
+        "title": "西班牙电商市场概况与选品建议",
+        "description": "西班牙2023年电商规模超600亿欧元，热销品类：时尚、电子、家居、美妆。主要平台：Amazon.es、El Corte Inglés、Carrefour。建议选品注重性价比，物流时效是竞争关键。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "西班牙海外仓一件代发",
+        "category": "仓储",
+        "description": "位于马德里和巴塞罗那的海外仓，面积超10,000平方米，支持FBA补货、一件代发、退货处理。24小时出库，西班牙全境2-3日达。"
+      },
+      {
+        "title": "西班牙专线小包直邮",
+        "category": "物流",
+        "description": "中国直飞西班牙空运专线，每周6班，头程空运+尾程Correos派送，平均时效5-7个工作日。可接内置电池、粉末等敏感货。"
+      },
+      {
+        "title": "西班牙VAT注册与申报服务",
+        "category": "税务",
+        "description": "专业税务代理协助西班牙VAT注册（5-7个工作日下号），季度Model 303申报，年度Model 390。支持IOSS申报，提供税务合规咨询。"
+      },
+      {
+        "title": "西班牙海关清关代理",
+        "category": "报关",
+        "description": "提供西班牙海关预清关、TARIC编码归类、关税计算、文件审核。处理查验、扣押等异常情况，确保货物快速放行。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "postal-code",
+      "shipping-calculator",
+      "exchange-rate",
+      "label-maker"
+    ]
+  },
+  {
+    "slug": "italy",
+    "name": "意大利",
+    "nameEn": "Italy",
+    "emoji": "🇮🇹",
+    "region": "欧洲",
+    "currency": "EUR",
+    "heroTitle": "意大利出海全能工具箱",
+    "heroSubtitle": "一站式搞定意大利出口清关、VAT税务和物流，助力中国卖家高效进入意大利市场。",
+    "seoTitle": "意大利出海指南 | 清关、VAT、物流工具与百科",
+    "seoDescription": "意大利出海必备工具与百科。了解意大利海关政策、VAT注册门槛、物流时效等关键信息。提供商业发票、装箱单、原产地证等文件生成工具，以及优质仓储、报关、税务服务商推荐。助力中国卖家高效拓展意大利市场。",
+    "keywords": [
+      "意大利出口",
+      "意大利清关",
+      "意大利VAT",
+      "意大利物流",
+      "意大利海关",
+      "意大利贸易",
+      "意大利跨境电商",
+      "意大利货运",
+      "意大利原产地证",
+      "意大利税务"
+    ],
+    "keyCities": [
+      "米兰",
+      "罗马",
+      "那不勒斯",
+      "都灵",
+      "博洛尼亚"
+    ],
+    "userCount": "6,200+",
+    "docCount": "28,000+",
+    "isActive": true,
+    "guides": [
+      {
+        "title": "意大利进口清关流程与单证要求",
+        "description": "意大利海关要求商业发票、装箱单、提单、原产地证等。货值超过22欧元需缴纳VAT，超过150欧元需缴纳关税。提供电子申报系统，建议使用AEO认证报关行。",
+        "type": "customs"
+      },
+      {
+        "title": "意大利VAT注册与申报指南",
+        "description": "非欧盟卖家在意大利存储商品或向消费者销售（远程销售阈值35,000欧元）需注册VAT。标准税率22%，季度申报。需指定意大利税务代表。",
+        "type": "tax"
+      },
+      {
+        "title": "意大利物流运输与时效说明",
+        "description": "海运至热那亚港约30天，空运至米兰约5-7天。末端派送常用GLS、BRT、Poste Italiane。建议使用海外仓提升时效。",
+        "type": "logistics"
+      },
+      {
+        "title": "意大利出口产品合规要求",
+        "description": "CE标志、RoHS、REACH等。食品接触材料需符合EU 1935/2004。电子产品需WEEE注册。纺织品需标签标明成分。",
+        "type": "guide"
+      },
+      {
+        "title": "意大利原产地证办理流程",
+        "description": "优惠原产地证（FORM A）用于普惠制，非优惠原产地证用于一般贸易。需商会或海关签发，电子版可接受。",
+        "type": "guide"
+      }
+    ],
+    "services": [
+      {
+        "title": "意大利仓储服务",
+        "category": "仓储",
+        "description": "米兰、罗马等地海外仓，提供FBA中转、一件代发、退货处理。支持WMS系统对接。"
+      },
+      {
+        "title": "意大利物流专线",
+        "category": "物流",
+        "description": "中国至意大利海运、空运、铁路专线，双清包税，全程追踪。时效稳定。"
+      },
+      {
+        "title": "意大利报关服务",
+        "category": "报关",
+        "description": "专业报关行处理意大利海关申报，提供HS归类、关税估算、单证审核。AEO认证。"
+      },
+      {
+        "title": "意大利VAT税务服务",
+        "category": "税务",
+        "description": "意大利VAT注册、季度申报、税务代表服务。本地会计师对接，合规保障。"
+      }
+    ],
+    "tools": [
+      "commercial-invoice",
+      "packing-list",
+      "certificate-of-origin-template",
+      "fumigation-certificate-template",
+      "shipping-calculator",
+      "exchange-rate",
+      "shipping-mark"
+    ]
+  }
+]

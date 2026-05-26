@@ -1,0 +1,134 @@
+{
+  "Navigation": {
+    "home": "Home",
+    "myLinks": "My Links",
+    "tools": "Tools",
+    "blog": "Blog",
+    "favorites": "Favorites",
+    "analytics": "Analytics",
+    "export": "Export",
+    "pricing": "Pricing",
+    "help": "Help Center",
+    "settings": "Settings",
+    "profile": "Profile",
+    "admin": "Admin"
+  },
+  "Common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "prev": "Previous",
+    "noData": "No data available",
+    "success": "Success",
+    "failed": "Failed"
+  },
+  "HomePage": {
+    "hero": {
+      "title": "One-Stop Cross-Border Logistics Platform",
+      "subtitle": "Express tracking, shipping schedules, customs tools, translation & payments—everything you need in one place",
+      "cta": "Get Started",
+      "ctaSecondary": "Learn More"
+    },
+    "stats": {
+      "links": "Total Links",
+      "categories": "Categories",
+      "users": "Active Users",
+      "tools": "Useful Tools"
+    },
+    "features": {
+      "title": "Core Features",
+      "navigation": {
+        "title": "Smart Navigation",
+        "desc": "49+ logistics tools with categorized navigation"
+      },
+      "tools": {
+        "title": "Practical Tools",
+        "desc": "Shipping calculator, customs generator, currency converter & more"
+      },
+      "analytics": {
+        "title": "Data Analytics",
+        "desc": "Click statistics, trend analysis, category distribution visualization"
+      },
+      "management": {
+        "title": "Admin Management",
+        "desc": "Complete CMS, user management, data backup"
+      }
+    }
+  },
+  "Tools": {
+    "title": "Tools Collection",
+    "subtitle": "Professional cross-border logistics tools to boost your daily work",
+    "categories": {
+      "calculator": "Calculator",
+      "document": "Document Generator",
+      "converter": "Converter",
+      "utility": "Utility"
+    },
+    "shippingCalculator": {
+      "title": "Shipping Calculator",
+      "desc": "Compare multiple carriers to find the best shipping solution"
+    },
+    "customsGenerator": {
+      "title": "Customs Generator",
+      "desc": "Quickly generate commercial invoices and customs documents"
+    },
+    "exchangeRate": {
+      "title": "Currency Converter",
+      "desc": "Real-time exchange rates with multi-currency support"
+    },
+    "qrCode": {
+      "title": "QR Code Generator",
+      "desc": "Generate QR codes for links, easy to share"
+    },
+    "containerCalculator": {
+      "title": "Container Calculator",
+      "desc": "Calculate optimal container loading plans"
+    }
+  },
+  "Analytics": {
+    "title": "Analytics Center",
+    "subtitle": "Real-time monitoring and deep insights",
+    "totalClicks": "Total Clicks",
+    "activeLinks": "Active Links",
+    "activeUsers": "Active Users",
+    "avgCTR": "Average CTR",
+    "clickTrend": "Click Trend",
+    "categoryDist": "Category Distribution",
+    "topLinks": "Top Links",
+    "deviceDist": "Device Distribution",
+    "hourlyTraffic": "24h Traffic",
+    "conversionFunnel": "Conversion Funnel",
+    "weeklyComparison": "Weekly Comparison",
+    "exportReport": "Export Report",
+    "vsLastPeriod": "vs Last Period",
+    "bestPrice": "Best Price"
+  },
+  "Auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password",
+    "confirmEmail": "Confirm Email",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUpNow": "Sign Up Now"
+  },
+  "Footer": {
+    "about": "About Us",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2024 KuaiJingBao Supply Chain. All rights reserved."
+  }
+}

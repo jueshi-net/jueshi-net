@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f9fafb;
+  --foreground: #111827;
+  --primary: #0d9488;
+  --primary-hover: #0f766e;
+  --primary-light: #ccfbf1;
+  --secondary: #64748b;
+  --accent: #3b82f6;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --border: #e5e7eb;
+  --card: #ffffff;
+  --card-hover: #f3f4f6;
+}
+
+.dark {
+  --background: #111827;
+  --foreground: #f9fafb;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-light: #1e3a5f;
+  --secondary: #9ca3af;
+  --accent: #fbbf24;
+  --success: #34d399;
+  --danger: #f87171;
+  --border: #374151;
+  --card: #1f2937;
+  --card-hover: #374151;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Mobile: prevent iOS zoom on input focus (font-size >= 16px) */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area inset support for notched devices and PWA */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+
+/* Prevent form inputs from inheriting white text on white bg in dark mode */
+input, textarea, select {
+  color: inherit;
+}
+
+/* Ensure inputs inside light-colored containers always have visible text */
+.bg-white input,
+.bg-white textarea,
+.bg-white select,
+.bg-gray-50 input,
+.bg-gray-50 textarea,
+.bg-gray-50 select {
+  color: #111827;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Print styles for document generator */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+  }
+
+  /* Hide non-printable elements */
+  .no-print,
+  nav,
+  banner,
+  footer,
+  button {
+    display: none !important;
+  }
+
+  /* Make printable elements full width */
+  .print-full-width {
+    width: 100% !important;
+  }
+
+  .print-block {
+    display: block !important;
+  }
+
+  .print-shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print-border-none {
+    border: none !important;
+  }
+
+  .print-p-0 {
+    padding: 0 !important;
+  }
+
+  /* Document preview styles for print */
+  [ref] {
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Ensure borders print clearly */
+  .border, td, th {
+    border-color: #000 !important;
+  }
+
+  /* Remove shadows and backgrounds */
+  .shadow-sm, .shadow, .shadow-lg, .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  .bg-gray-50, .bg-blue-50, .bg-green-50, .bg-amber-50, .bg-yellow-50, .bg-orange-50, .bg-red-50 {
+    background-color: white !important;
+  }
+
+  /* Link URLs visible in print */
+  a[href]::after {
+    content: none;
+  }
+}
+
+/* Next.js print override — prevents white pages from global overflow/height constraints */
+@media print {
+  html, body, main, #__next, [data-reactroot] {
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    min-height: auto !important;
+    max-height: none !important;
+  }
+  /* Hide Next.js RSC hydration markers */
+  [data-nextjs-dialog-root],
+  [data-nextjs-toast],
+  [data-nextjs-dev] {
+    display: none !important;
+  }
+  /* Label maker: ensure preview container is visible in print */
+  [data-label-preview] {
+    visibility: visible !important;
+    position: static !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* DOM Transplantation Print Isolation - v1.32.31 */
+@media print {
+  /* 1. 蒸发 Next.js 框架的一切外壳 */
+  body.jueshi-in-printing > *:not(#jueshi-print-clone-root) {
+    display: none !important;
+  }
+
+  /* 2. 刚性锁死零边距，这是隐去浏览器默认页眉页脚的绝对核心 */
+  @page {
+    size: A4;
+    margin: 0 !important; /* 强制将浏览器页眉页脚的空间挤压为 0 */
+  }
+
+  /* 3. 接管实体：将 15mm 的专业安全边距以 padding 形式赋予发票主体 */
+  body.jueshi-in-printing #jueshi-print-clone-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    padding: 15mm !important; /* 确保内容具有高级的呼吸感，且不贴边 */
+    box-sizing: border-box !important;
+  }
+}

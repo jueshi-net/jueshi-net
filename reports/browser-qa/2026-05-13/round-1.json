@@ -1,0 +1,102 @@
+{
+  "round": 1,
+  "timestamp": "2026-05-13T05:46:21.593Z",
+  "baseUrl": "http://localhost:3000",
+  "headless": true,
+  "mobileViewport": "iPhone 13 (390x844)",
+  "pages": [
+    {
+      "name": "home",
+      "status": "passed",
+      "title": "海外华人的常用工具箱",
+      "popularToolsExist": true,
+      "coreCardsFound": 3,
+      "time": "2026-05-13T05:46:34.373Z"
+    }
+  ],
+  "errors": [
+    {
+      "severity": 0,
+      "page": "runner",
+      "message": "Round 1 crashed: page.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea')\u001b[22m\n",
+      "time": "2026-05-13T05:47:14.415Z"
+    }
+  ],
+  "failedRequests": [
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-13T05:46:26.300Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-13T05:46:26.301Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/rss.xml?_rsc=avf1e",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-13T05:46:26.301Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/nav?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-13T05:46:26.317Z"
+    },
+    {
+      "page": "home",
+      "url": "http://localhost:3000/guides?_rsc=1smru",
+      "failure": "net::ERR_ABORTED",
+      "time": "2026-05-13T05:46:26.317Z"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-13T05:46:24.315Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-13T05:46:26.301Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-13T05:46:26.632Z"
+    },
+    {
+      "page": "home",
+      "text": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)",
+      "time": "2026-05-13T05:46:28.306Z"
+    }
+  ],
+  "p0": [
+    {
+      "severity": 0,
+      "page": "runner",
+      "message": "Round 1 crashed: page.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('textarea')\u001b[22m\n",
+      "time": "2026-05-13T05:47:14.415Z"
+    }
+  ],
+  "p1": [],
+  "p2": [],
+  "p3": [],
+  "timings": {
+    "home-load": 143,
+    "home-click-物流追踪": 540,
+    "home-click-运费/CBM": 523,
+    "home-click-HS编码": 522,
+    "home-click-邮编地址": 526,
+    "home-click-汇率查询": 517,
+    "home-click-工作便签": 526,
+    "tracking-load": 10035
+  },
+  "analyticsSample": [],
+  "reportFile": "round-1.md"
+}

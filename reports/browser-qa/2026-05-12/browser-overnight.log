@@ -1,0 +1,107 @@
+[2026-05-12T00:50:33.250Z] ========== Round 1 START ==========
+[2026-05-12T00:50:33.251Z] BASE_URL=http://localhost:3000, HEADLESS=true, MOBILE=1
+[2026-05-12T00:50:33.594Z] [home] Starting test...
+[2026-05-12T00:50:35.907Z] [home] Completed: title="海外华人的常用工具箱", popularTools=true, coreCards=0
+[2026-05-12T00:50:35.908Z] [tracking] Starting test...
+[2026-05-12T00:50:37.706Z] [tracking] Completed: hasResults=true, analytics=1
+[2026-05-12T00:50:37.707Z] [shipping-calculator] Starting test...
+[2026-05-12T00:50:38.663Z] [shipping-calculator] Completed
+[2026-05-12T00:50:38.666Z] [hs-code] Starting test...
+[2026-05-12T00:50:45.248Z] [hs-code] CSV download: hs-codes-2026-05-12.csv
+[2026-05-12T00:50:45.250Z] [hs-code] Completed: searches=5, analytics=6
+[2026-05-12T00:50:45.250Z] [postal-code] Starting test...
+[2026-05-12T00:50:49.927Z] [postal-code] Completed
+[2026-05-12T00:50:49.928Z] [exchange-rate] Starting test...
+[2026-05-12T00:50:58.746Z] [exchange-rate] History chart: data shown
+[2026-05-12T00:50:58.747Z] [exchange-rate] Proxy API /api/exchange-rate/history called ✓
+[2026-05-12T00:50:58.972Z] [exchange-rate] Completed: disclaimer=true, analytics=0
+[2026-05-12T00:50:58.972Z] [starter] Starting test...
+[2026-05-12T00:50:59.082Z] [starter] Completed: title="外网新手资源清单", links=32
+[2026-05-12T00:50:59.082Z] [memo] Starting test...
+[2026-05-12T00:51:02.336Z] [memo] Completed: analytics=2
+[2026-05-12T00:51:02.338Z] [resources] Starting test...
+[2026-05-12T00:51:07.086Z] [resources] Completed: categories=4, analytics=0
+[2026-05-12T00:51:07.088Z] [guides] Starting test...
+[2026-05-12T00:51:11.346Z] [guides] Completed
+[2026-05-12T00:51:11.346Z] [documents] Starting test...
+[2026-05-12T00:51:45.744Z] ERROR in round 1: locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('text=添加一行').first()
+    - locator resolved to <button class="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">…</button>
+  - attempting click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <button class="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">…</button> from <div class="bg-white border-b sticky top-0 z-40 print:hidden">…</div> subtree intercepts pointer events
+  - retrying click action
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <label class="block text-xs font-medium text-gray-500 mb-1">…</label> from <div class="bg-white rounded-xl border p-5 mb-4">…</div> subtree intercepts pointer events
+  - retrying click action
+    - waiting 20ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <button class="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">…</button> from <div class="bg-white border-b sticky top-0 z-40 print:hidden">…</div> subtree intercepts pointer events
+  2 × retrying click action
+      - waiting 100ms
+      - waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <a href="/tools/documents" class="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">…</a> from <div class="bg-white border-b sticky top-0 z-40 print:hidden">…</div> subtree intercepts pointer events
+  12 × retrying click action
+       - waiting 500ms
+       - waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div class="bg-white rounded-xl border p-5 mb-4">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+       - waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <h2 class="font-semibold text-gray-900 mb-4">单据信息</h2> from <div class="bg-white rounded-xl border p-5 mb-4">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+       - waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <a href="/tools/documents" class="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">…</a> from <div class="bg-white border-b sticky top-0 z-40 print:hidden">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+       - waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <a href="/tools/documents" class="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">…</a> from <div class="bg-white border-b sticky top-0 z-40 print:hidden">…</div> subtree intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+    - waiting for element to be visible, enabled and stable
+    - element is visible, enabled and stable
+    - scrolling into view if needed
+    - done scrolling
+    - <div class="bg-white rounded-xl border p-5 mb-4">…</div> intercepts pointer events
+  - retrying click action
+    - waiting 500ms
+
+[2026-05-12T00:51:45.869Z] Report saved: round-1.md, round-1.json
+[2026-05-12T00:51:45.870Z] Screenshots: /Users/chq/projects/xixiong-saas/reports/browser-qa/2026-05-12/screenshots/
+[2026-05-12T01:12:13.196Z] ========== Round 1 START ==========
+[2026-05-12T01:12:13.196Z] BASE_URL=http://localhost:3000, HEADLESS=true, MOBILE=1
+[2026-05-12T01:12:13.520Z] [home] Starting test...
+[2026-05-12T01:12:15.782Z] [home] Completed: title="海外华人的常用工具箱", popularTools=true, coreCards=0
+[2026-05-12T01:12:15.783Z] [tracking] Starting test...
+[2026-05-12T01:12:55.820Z] ERROR in round 1: page.fill: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator('textarea')
+
+[2026-05-12T01:12:55.916Z] Report saved: round-1.md, round-1.json
+[2026-05-12T01:12:55.916Z] Screenshots: /Users/chq/projects/xixiong-saas/reports/browser-qa/2026-05-12/screenshots/
