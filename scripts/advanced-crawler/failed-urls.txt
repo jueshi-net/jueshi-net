@@ -119,3 +119,8 @@ https://www.sephora.my|3
 https://www.qoo10.sg|3
 https://www.carousell.sg|3
 https://www.sephora.sg|3
+https://fptshop.com.vn|3
+https://www.iherb.com|3
+https://www.powerbuy.co.th/th|3
+https://www.central.co.th/th|3
+https://www.jib.co.th/web|1
