@@ -40,6 +40,7 @@ export interface AdminStatsData {
   ads: { total: number; active: number; inactive: number };
   reviews: { total: number; pending: number; approved: number; rejected: number; hidden: number };
   points: { totalIssued: number; totalSpent: number; ledgerCount: number };
+  documents: { total: number; today: number; recent: Array<{ id: string; documentType: string; documentNo: string | null; userEmail: string; createdAt: string }> };
 }
 
 function safe(n: number | null | undefined): number {
@@ -62,6 +63,7 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       articleTotal, articlePublished, articleDraft, articleArchived,
       resTotal, resActive, resInactive, resCats,
       adTotal, adActive, adInactive,
+      docTotal, docToday, docRecent,
       ledgerCount, totalIssuedAgg, totalSpentAgg,
     ] = await Promise.all([
       prisma.toolReview.count({ where: { status: "pending" } }),
@@ -105,6 +107,12 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       prisma.adCampaign.count(),
       prisma.adCampaign.count({ where: { isActive: true } }),
       prisma.adCampaign.count({ where: { isActive: false } }),
+      prisma.documentHistory.count(),
+      prisma.documentHistory.count({ where: { createdAt: { gte: startOfDay } } }),
+      prisma.documentHistory.findMany({
+        take: 10, orderBy: { createdAt: "desc" },
+        include: { user: { select: { email: true } } },
+      }),
       prisma.pointLedger.count(),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { gt: 0 } } }),
       prisma.pointLedger.aggregate({ _sum: { points: true }, where: { points: { lt: 0 } } }),
@@ -148,6 +156,13 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       ads: { total: adTotal, active: adActive, inactive: adInactive },
       reviews: { total: reviewsTotal, pending: reviewsPending, approved: reviewsApproved, rejected: reviewsRejected, hidden: reviewsHidden },
       points: { totalIssued: safe(totalIssuedAgg._sum.points), totalSpent: Math.abs(safe(totalSpentAgg._sum.points)), ledgerCount },
+      documents: {
+        total: safe(docTotal), today: safe(docToday),
+        recent: docRecent.map((d: any) => ({
+          id: d.id, documentType: d.documentType, documentNo: d.documentNo,
+          userEmail: d.user?.email || "anonymous", createdAt: d.createdAt.toISOString(),
+        })),
+      },
     };
   } catch (err) {
     console.error("Admin stats load error:", err);

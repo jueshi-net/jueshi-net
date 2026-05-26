@@ -165,6 +165,49 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
         </div>
       )}
 
+{/* ===== 6. 单据生成流水 ===== */}
+      {s && (
+        <div>
+          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-rose-500" />
+            单据生成流水
+            <span className="text-xs text-gray-400">(最近 {s.documents.recent.length} 条)</span>
+          </h2>
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-50 border-b">
+                    <th className="px-4 py-2.5 text-left font-medium text-gray-500">单据类型</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-gray-500">单据号</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-gray-500">用户</th>
+                    <th className="px-4 py-2.5 text-left font-medium text-gray-500">生成时间</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {s.documents.recent.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-4 py-8 text-center text-gray-400">暂无单据记录</td>
+                    </tr>
+                  ) : (
+                    s.documents.recent.map((doc) => (
+                      <tr key={doc.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-2 font-medium text-gray-700">{doc.documentType}</td>
+                        <td className="px-4 py-2 font-mono text-gray-500">{doc.documentNo || "—"}</td>
+                        <td className="px-4 py-2 text-gray-500 truncate max-w-[180px]">{doc.userEmail}</td>
+                        <td className="px-4 py-2 text-gray-400">
+                          {new Date(doc.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ===== 5. 快捷操作区 ===== */}
       <div>
         <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
@@ -253,7 +296,7 @@ function ContentCard({ title, total, href, items }: { title: string; total: numb
   );
 }
 
-// ===== Quick actions =====
+      // ===== Quick actions =====
 interface QuickAction { label: string; href: string; icon: any; desc: string; bg: string; iconColor: string }
 const QUICK_ACTIONS: QuickAction[] = [
   { label: "用户管理", href: "/admin/users", icon: Users, desc: "查看/编辑用户、角色、积分、会员到期时间", bg: "bg-blue-50", iconColor: "text-blue-600" },

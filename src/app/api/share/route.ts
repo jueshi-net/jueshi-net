@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       icon: link.icon,
       category: link.categoryName || link.categoryId,
       createdAt: link.createdAt,
-      shareUrl: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/share/${link.id}`,
+      shareUrl: `${process.env.NEXT_PUBLIC_URL || "https://jueshi.net"}/share/${link.id}`,
     };
 
     return NextResponse.json({ link: shareData });
