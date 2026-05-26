@@ -81,6 +81,7 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
             <StatMini label="成长日志" value={s.overview.growthLogsTotal} sub={`今日 +${s.growth.logsToday}`} color="teal" />
             <StatMini label="通知总数" value={s.overview.notificationsTotal} sub={`未读 ${s.content.notifications.unread}`} color="indigo" />
             <StatMini label="短评总数" value={s.content.reviews.total} sub={`待审 ${s.content.reviews.pending}`} color="amber" />
+            <StatMini label="生成单据" value={s.documents.total} sub={`今日 +${s.documents.today}`} color="rose" />
           </div>
         </div>
       )}
