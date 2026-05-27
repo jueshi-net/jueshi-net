@@ -16,7 +16,7 @@ const MAX_CONTENT_LENGTH = 50000; // 单篇内容上限 50KB
 // 合法分类与对应物理目录
 const CATEGORY_DIRS: Record<string, string> = {
   topics: "topics",
-  destinations: "destinations",
+  destinations: "countries",
 };
 
 function escapeFrontmatter(value: string): string {
