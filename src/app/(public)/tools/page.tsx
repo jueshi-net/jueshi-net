@@ -94,7 +94,7 @@ export default function ToolsCenterPage() {
             <span>出海商家 · 海外华人 · 留学生 的效率工具箱</span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">工具中心</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">工具中心</h1>
           <p className="text-lg text-blue-100 max-w-2xl mx-auto leading-relaxed">
             查包裹、算运费、做单据、查邮编、AI 文案生成 —— 一个站搞定。<br className="hidden sm:block" />
             所有工具免费使用，无需安装软件，打开浏览器即可操作。

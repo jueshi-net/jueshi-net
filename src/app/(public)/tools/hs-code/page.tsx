@@ -94,7 +94,7 @@ export default function HSCodePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="bg-gradient-to-r from-teal-500 to-blue-600 text-white py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">全球海关HS编码查询系统</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">全球海关HS编码查询系统</h1>
           <p className="text-lg text-teal-100">常见商品英文申报名、HS编码候选、申报注意事项速查</p>
         </div>
       </div>

@@ -360,6 +360,15 @@ export default function PostalCodePage() {
     });
   }, []);
 
+
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 1500);
+    } catch { /* ignore */ }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ===== HERO ===== */}

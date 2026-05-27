@@ -80,7 +80,7 @@ export default async function DocumentsHubPage() {
               </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
+            <h1 className="text-2xl md:text-2xl font-extrabold mb-3 leading-tight">
               外贸/国际物流通用单据生成器
             </h1>
             <p className="text-lg text-indigo-100/90 max-w-2xl leading-relaxed">

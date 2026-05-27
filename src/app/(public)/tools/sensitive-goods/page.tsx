@@ -150,7 +150,7 @@ export default function SensitiveGoodsPage() {
       {/* Hero */}
       <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">敏感货参考查询</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-4">敏感货参考查询</h1>
           <p className="text-lg text-orange-100">了解常见物品的邮寄分类参考，非任何服务商的接货规则</p>
         </div>
       </div>

@@ -274,7 +274,7 @@ export default function ExchangeRatePage() {
           <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <DollarSign className="w-8 h-8 text-green-600" />
           </div>
-          <h1 className="text-3xl font-extrabold text-gray-900">实时国际汇率转换器 & 结汇精算</h1>
+          <h1 className="text-2xl font-extrabold text-gray-900">实时国际汇率转换器 & 结汇精算</h1>
           <p className="text-gray-500 mt-2">支持 150+ 全球法币 · 双向转换 · URL 参数直达</p>
         </div>
 
