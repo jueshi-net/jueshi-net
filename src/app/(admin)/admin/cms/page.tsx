@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus, Edit2, Archive, X, Save, FileText, Eye, Code, Loader2, AlertCircle, LinkIcon, Search, Send, BookOpen, List, MessageSquare, CheckCircle, Hash, Lightbulb, ArrowUp } from "lucide-react";
 import { marked } from "marked";
 
+const CATEGORIES = ["跨境寄送", "海外生活", "出海经营", "AI工具", "网址导航指南"];
+
 interface Article {
   id: string;
   title: string;
@@ -16,6 +18,7 @@ interface Article {
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
+  category: string | null;
 }
 
 const MD_TEMPLATES = [
@@ -34,7 +37,7 @@ export default function AdminCMSPage() {
   const [editing, setEditing] = useState<Article | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "draft", tags: "",
+    title: "", slug: "", content: "", summary: "", cover: "", category: "", authorId: "", status: "draft", tags: "",
   });
   const [showPreview, setShowPreview] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -82,6 +85,8 @@ export default function AdminCMSPage() {
         content: formData.content,
         excerpt: formData.summary.trim() || null,
         status: newStatus || formData.status,
+        category: formData.category || null,
+        coverImage: formData.cover.trim() || null,
         author: formData.authorId || null,
       };
       if (seoTitle.trim()) payload.seoTitle = seoTitle.trim();
@@ -123,6 +128,7 @@ export default function AdminCMSPage() {
         content: full.content || "",
         summary: full.excerpt || article.summary || "",
         cover: full.coverImage || "",
+        category: full.category || "",
         authorId: full.author || "",
         status: full.status || article.status,
         tags: article.tags,
@@ -132,7 +138,7 @@ export default function AdminCMSPage() {
     } catch {
       setFormData({
         title: article.title, slug: article.slug, content: "", summary: article.summary || "",
-        cover: "", authorId: "", status: article.status, tags: article.tags,
+        cover: "", category: "", authorId: "", status: article.status, tags: article.tags,
       });
       setSeoTitle("");
       setSeoDesc("");
@@ -140,7 +146,7 @@ export default function AdminCMSPage() {
     setShowForm(true);
   };
 
-  const resetForm = () => { setEditing(null); setShowForm(false); setShowPreview(false); setSaving(false); setFormData({ title: "", slug: "", content: "", summary: "", cover: "", authorId: "", status: "draft", tags: "" }); setSeoTitle(""); setSeoDesc(""); };
+  const resetForm = () => { setEditing(null); setShowForm(false); setShowPreview(false); setSaving(false); setFormData({ title: "", slug: "", content: "", summary: "", cover: "", category: "", authorId: "", status: "draft", tags: "" }); setSeoTitle(""); setSeoDesc(""); };
 
   const publishedCount = articles.filter(a => a.status === "published").length;
   const draftCount = articles.filter(a => a.status === "draft").length;
@@ -261,6 +267,19 @@ export default function AdminCMSPage() {
                 <div className="text-xs text-gray-400 mt-0.5 text-right">{formData.summary.length}/300</div>
               </div>
 
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">分类 *</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500 min-h-[44px]"
+                >
+                  <option value="">不分类</option>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">标签</label>
@@ -341,6 +360,7 @@ export default function AdminCMSPage() {
                 <th className="text-left px-4 py-3 font-medium text-gray-500">标题</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden sm:table-cell">Slug</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500">状态</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">分类</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">标签</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">发布</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 hidden xl:table-cell">更新</th>
@@ -356,6 +376,18 @@ export default function AdminCMSPage() {
                     <span className={`px-2 py-0.5 rounded text-xs ${a.status === "published" ? "bg-green-50 text-green-600" : a.status === "draft" ? "bg-yellow-50 text-yellow-600" : a.status === "archived" ? "bg-gray-100 text-gray-500" : "bg-gray-100 text-gray-400"}`}>
                       {a.status === "published" ? "已发布" : a.status === "draft" ? "草稿" : a.status === "archived" ? "已归档" : a.status}
                     </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs hidden md:table-cell">
+                    {a.category ? (
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        a.category === "AI工具" ? "bg-violet-100 text-violet-700" :
+                        a.category === "跨境寄送" ? "bg-blue-100 text-blue-700" :
+                        a.category === "海外生活" ? "bg-green-100 text-green-700" :
+                        "bg-gray-100 text-gray-700"
+                      }`}>
+                        {a.category}
+                      </span>
+                    ) : "—"}
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">{a.tags}</td>
                   <td className="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("zh-CN") : "—"}</td>
