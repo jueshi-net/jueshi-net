@@ -1,0 +1,42 @@
+{
+  "name": "海外百宝箱 - 海外华人的常用工具与资源平台",
+  "short_name": "海外百宝箱",
+  "description": "查包裹、算运费、做单据、查邮编、找资源，一个站搞定。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "工具中心",
+      "url": "/tools",
+      "description": "所有实用工具"
+    },
+    {
+      "name": "跨境寄送",
+      "url": "/shipping",
+      "description": "物流追踪、运费估算、地址格式"
+    },
+    {
+      "name": "我的工作台",
+      "url": "/dashboard",
+      "description": "收藏、最近使用、备忘录"
+    }
+  ]
+}

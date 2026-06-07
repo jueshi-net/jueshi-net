@@ -1,0 +1,1 @@
+-- Baseline migration (previously applied)\nSELECT 1;

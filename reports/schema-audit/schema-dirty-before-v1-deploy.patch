@@ -1,0 +1,897 @@
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+index 8dd4dba..3346213 100644
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -6,56 +6,12 @@ datasource db {
+   provider = "postgresql"
+ }
+ 
+-model User {
+-  id                   String             @id @default(cuid())
+-  name                 String?
+-  email                String             @unique
+-  emailVerified        DateTime? @map("emailverified")
+-  image                String?
+-  password             String?
+-  role                 String             @default("user")
+-  createdAt            DateTime           @default(now()) @map("createdat")
+-  updatedAt            DateTime           @updatedAt @map("updatedat")
+-  accounts             Account[]
+-  auditLogs            AuditLog[]
+-  favorites            Favorite[]
+-  feedback             Feedback[]
+-  links                LinkItem[]
+-  memos                Memo[]
+-  notifications        Notification[]
+-  sessions             Session[]
+-  shortLinks           ShortLink[]
+-  preferences          UserPreference?
+-  subscriptions        UserSubscription[]
+-  webhooks             Webhook[]
+-  workspaceMemberships WorkspaceMember[]
+-  ownedWorkspaces      Workspace[]        @relation("WorkspaceOwner")
+-
+-  @@map("users")
+-}
+-
+-model UserPreference {
+-  id              String   @id @default(cuid())
+-  userId          String   @unique @map("userid")
+-  theme           String   @default("system")
+-  language        String   @default("zh-CN")
+-  emailNotif      Boolean  @default(true) @map("emailnotif")
+-  compactMode     Boolean  @default(false) @map("compactmode")
+-  itemsPerPage    Int      @default(20) @map("itemsperpage")
+-  defaultCategory String? @map("defaultcategory")
+-  createdAt       DateTime @default(now()) @map("createdat")
+-  updatedAt       DateTime @updatedAt @map("updatedat")
+-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+-
+-  @@map("user_preferences")
+-}
+-
+-model Account {
+-  id                String  @id @default(cuid())
+-  userId            String @map("userid")
++model accounts {
++  id                String  @id
++  userid            String
+   type              String
+   provider          String
+-  providerAccountId String @map("provideraccountid")
++  provideraccountid String
+   refresh_token     String?
+   access_token      String?
+   expires_at        Int?
+@@ -63,445 +19,447 @@ model Account {
+   scope             String?
+   id_token          String?
+   session_state     String?
+-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+-
+-  @@unique([provider, providerAccountId])
+-  @@map("accounts")
+-}
+-
+-model Session {
+-  id           String   @id @default(cuid())
+-  sessionToken String   @unique @map("sessiontoken")
+-  userId       String @map("userid")
+-  expires      DateTime
+-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
++  users             users   @relation(fields: [userid], references: [id], onDelete: Cascade)
+ 
+-  @@map("sessions")
++  @@unique([provider, provideraccountid])
+ }
+ 
+-model VerificationToken {
+-  identifier String
+-  token      String   @unique
+-  expires    DateTime
+-
+-  @@unique([identifier, token])
+-  @@map("verification_tokens")
++model ad_slots {
++  id          String    @id
++  name        String    @unique
++  position    String
++  imageurl    String
++  linkurl     String
++  alttext     String?
++  startdate   DateTime
++  enddate     DateTime?
++  isactive    Boolean   @default(true)
++  clicks      Int       @default(0)
++  impressions Int       @default(0)
++  createdat   DateTime  @default(now())
++  updatedat   DateTime
+ }
+ 
+-model LinkItem {
+-  id           String     @id @default(cuid())
+-  title        String
+-  url          String
+-  description  String?
+-  icon         String?
+-  categoryName String? @map("categoryname")
+-  categoryId   String? @map("categoryid")
+-  userId       String? @map("userid")
+-  workspaceId  String? @map("workspaceid")
+-  sortOrder    Int        @default(0) @map("sortorder")
+-  isPinned     Boolean    @default(false) @map("ispinned")
+-  isFeatured   Boolean    @default(false) @map("isfeatured")
+-  clicks       Int        @default(0)
+-  status       String     @default("active")
+-  createdAt    DateTime   @default(now()) @map("createdat")
+-  updatedAt    DateTime   @updatedAt @map("updatedat")
+-  favorites    Favorite[]
+-  tags         LinkTag[]
+-  category     Category?  @relation(fields: [categoryId], references: [id])
+-  user         User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+-  workspace    Workspace? @relation(fields: [workspaceId], references: [id])
+-
+-  @@index([userId])
+-  @@index([workspaceId])
+-  @@map("links")
+-}
+-
+-model Category {
+-  id        String     @id @default(cuid())
+-  name      String     @unique
+-  slug      String     @unique
+-  icon      String?
+-  color     String?
+-  sortOrder Int        @default(0) @map("sortorder")
+-  parentId  String? @map("parentid")
+-  createdAt DateTime   @default(now()) @map("createdat")
+-  updatedAt DateTime   @updatedAt @map("updatedat")
+-  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+-  children  Category[] @relation("CategoryHierarchy")
+-  links     LinkItem[]
++model article_tags {
++  id        String   @id
++  articleid String
++  tag       String
++  createdat DateTime @default(now())
++  articles  articles @relation(fields: [articleid], references: [id], onDelete: Cascade)
++
++  @@unique([articleid, tag])
++}
++
++model articles {
++  id             String         @id
++  title          String
++  slug           String         @unique
++  content        String
++  excerpt        String?
++  coverimage     String?
++  author         String?
++  status         String         @default("draft")
++  views          Int            @default(0)
++  publishedat    DateTime?
++  createdat      DateTime       @default(now())
++  updatedat      DateTime
++  category       String?
++  relatedtools   String[]       @default([])
++  seodescription String?
++  seotitle       String?
++  article_tags   article_tags[]
+ 
+-  @@map("categories")
++  @@index([category])
++  @@index([status])
+ }
+ 
+-model Tag {
+-  id        String    @id @default(cuid())
+-  name      String    @unique
+-  createdAt DateTime  @default(now()) @map("createdat")
+-  links     LinkTag[]
++model audit_logs {
++  id        String   @id
++  userid    String?
++  action    String
++  entity    String?
++  entityid  String?
++  details   String?
++  ip        String?
++  useragent String?
++  createdat DateTime @default(now())
++  users     users?   @relation(fields: [userid], references: [id])
+ 
+-  @@map("tags")
+-}
++  @@index([action])
++  @@index([createdat])
++  @@index([userid])
++}
++
++model categories {
++  id               String       @id
++  name             String       @unique
++  slug             String       @unique
++  icon             String?
++  color            String?
++  sortorder        Int          @default(0)
++  parentid         String?
++  createdat        DateTime     @default(now())
++  updatedat        DateTime
++  categories       categories?  @relation("categoriesTocategories", fields: [parentid], references: [id])
++  other_categories categories[] @relation("categoriesTocategories")
++  links            links[]
++}
++
++model email_subscriptions {
++  id          String    @id
++  email       String    @unique
++  token       String?
++  confirmed   Boolean   @default(false)
++  isactive    Boolean   @default(true)
++  confirmedat DateTime?
++  expiresat   DateTime?
++  createdat   DateTime  @default(now())
++  updatedat   DateTime
++}
++
++model event_logs {
++  id        String   @id
++  eventtype String
++  toolname  String?
++  action    String?
++  path      String?
++  sessionid String?
++  createdat DateTime @default(now())
++
++  @@index([createdat])
++  @@index([eventtype])
++  @@index([sessionid])
++  @@index([toolname])
++}
++
++model favorites {
++  id        String   @id
++  userid    String
++  linkid    String
++  createdat DateTime @default(now())
++  links     links    @relation(fields: [linkid], references: [id], onDelete: Cascade)
++  users     users    @relation(fields: [userid], references: [id], onDelete: Cascade)
++
++  @@unique([userid, linkid])
++}
++
++model feedback {
++  id        String   @id
++  userid    String?
++  type      String
++  subject   String
++  content   String
++  page      String?
++  email     String?
++  status    String   @default("pending")
++  createdat DateTime @default(now())
++  updatedat DateTime
++  users     users?   @relation(fields: [userid], references: [id])
+ 
+-model LinkTag {
+-  id        String   @id @default(cuid())
+-  linkId    String @map("linkid")
+-  tagId     String @map("tagid")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+-  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
++  @@index([status])
++  @@index([userid])
++}
++
++model hs_codes {
++  id             String     @id
++  code           String     @unique
++  level          Int
++  parentid       String?
++  description    String
++  descriptionen  String?
++  category       String?
++  taxrate        Float?
++  notes          String?
++  isactive       Boolean    @default(true)
++  createdat      DateTime   @default(now())
++  updatedat      DateTime
++  hs_codes       hs_codes?  @relation("hs_codesTohs_codes", fields: [parentid], references: [id])
++  other_hs_codes hs_codes[] @relation("hs_codesTohs_codes")
+ 
+-  @@unique([linkId, tagId])
+-  @@map("link_tags")
++  @@index([category])
++  @@index([description])
+ }
+ 
+-model Favorite {
+-  id        String   @id @default(cuid())
+-  userId    String @map("userid")
+-  linkId    String @map("linkid")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  link      LinkItem @relation(fields: [linkId], references: [id], onDelete: Cascade)
+-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
++model link_tags {
++  id        String   @id
++  linkid    String
++  tagid     String
++  createdat DateTime @default(now())
++  links     links    @relation(fields: [linkid], references: [id], onDelete: Cascade)
++  tags      tags     @relation(fields: [tagid], references: [id], onDelete: Cascade)
+ 
+-  @@unique([userId, linkId])
+-  @@map("favorites")
++  @@unique([linkid, tagid])
+ }
+ 
+-model Memo {
+-  id        String   @id @default(cuid())
++model links {
++  id           String      @id
++  title        String
++  url          String
++  description  String?
++  icon         String?
++  categoryname String?
++  categoryid   String?
++  userid       String?
++  workspaceid  String?
++  sortorder    Int         @default(0)
++  ispinned     Boolean     @default(false)
++  isfeatured   Boolean     @default(false)
++  clicks       Int         @default(0)
++  status       String      @default("active")
++  createdat    DateTime    @default(now())
++  updatedat    DateTime
++  favorites    favorites[]
++  link_tags    link_tags[]
++  categories   categories? @relation(fields: [categoryid], references: [id])
++  users        users?      @relation(fields: [userid], references: [id], onDelete: Cascade)
++  workspaces   workspaces? @relation(fields: [workspaceid], references: [id])
++
++  @@index([userid])
++  @@index([workspaceid])
++}
++
++model memos {
++  id        String   @id
+   title     String
+   content   String?
+   category  String?
+-  userId    String @map("userid")
+-  isPinned  Boolean  @default(false) @map("ispinned")
++  userid    String
++  ispinned  Boolean  @default(false)
+   color     String?
+-  createdAt DateTime @default(now()) @map("createdat")
+-  updatedAt DateTime @updatedAt @map("updatedat")
+-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+-
+-  @@index([userId])
+-  @@map("memos")
+-}
+-
+-model Workspace {
+-  id          String            @id @default(cuid())
+-  name        String
+-  description String?
+-  icon        String?
+-  ownerId     String @map("ownerid")
+-  isPublic    Boolean           @default(false) @map("ispublic")
+-  slug        String            @unique
+-  createdAt   DateTime          @default(now()) @map("createdat")
+-  updatedAt   DateTime          @updatedAt @map("updatedat")
+-  links       LinkItem[]
+-  members     WorkspaceMember[]
+-  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+-
+-  @@map("workspaces")
+-}
+-
+-model WorkspaceMember {
+-  id          String    @id @default(cuid())
+-  workspaceId String @map("workspaceid")
+-  userId      String @map("userid")
+-  role        String    @default("member")
+-  createdAt   DateTime  @default(now()) @map("createdat")
+-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+-
+-  @@unique([workspaceId, userId])
+-  @@map("workspace_members")
+-}
+-
+-model ShortLink {
+-  id          String    @id @default(cuid())
+-  code        String    @unique
+-  url         String
+-  userId      String? @map("userid")
+-  title       String?
+-  description String?
+-  expiresAt   DateTime? @map("expiresat")
+-  password    String?
+-  clicks      Int       @default(0)
+-  lastClickAt DateTime? @map("lastclickat")
+-  isActive    Boolean   @default(true) @map("isactive")
+-  createdAt   DateTime  @default(now()) @map("createdat")
+-  updatedAt   DateTime  @updatedAt @map("updatedat")
+-  user        User?     @relation(fields: [userId], references: [id])
++  createdat DateTime @default(now())
++  updatedat DateTime
++  users     users    @relation(fields: [userid], references: [id], onDelete: Cascade)
+ 
+-  @@index([userId])
+-  @@map("short_links")
++  @@index([userid])
+ }
+ 
+-model AuditLog {
+-  id        String   @id @default(cuid())
+-  userId    String? @map("userid")
+-  action    String
+-  entity    String?
+-  entityId  String? @map("entityid")
+-  details   String?
+-  ip        String?
+-  userAgent String? @map("useragent")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  user      User?    @relation(fields: [userId], references: [id])
+-
+-  @@index([userId])
+-  @@index([action])
+-  @@index([createdAt])
+-  @@map("audit_logs")
+-}
+-
+-model Feedback {
+-  id        String   @id @default(cuid())
+-  userId    String? @map("userid")
+-  type      String
++model newsletter_broadcasts {
++  id        String   @id
+   subject   String
+   content   String
+-  page      String?
+-  email     String?
+-  status    String   @default("pending")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  updatedAt DateTime @updatedAt @map("updatedat")
+-  user      User?    @relation(fields: [userId], references: [id])
+-
+-  @@index([userId])
+-  @@index([status])
+-  @@map("feedback")
++  status    String   @default("draft")
++  sentcount Int      @default(0)
++  createdat DateTime @default(now())
++  updatedat DateTime
+ }
+ 
+-model Notification {
+-  id        String   @id @default(cuid())
+-  userId    String @map("userid")
++model notifications {
++  id        String   @id
++  userid    String
+   title     String
+   message   String
+   type      String   @default("info")
+   link      String?
+-  isRead    Boolean  @default(false) @map("isread")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
++  isread    Boolean  @default(false)
++  createdat DateTime @default(now())
++  users     users    @relation(fields: [userid], references: [id], onDelete: Cascade)
+ 
+-  @@index([userId])
+-  @@index([isRead])
+-  @@map("notifications")
++  @@index([isread])
++  @@index([userid])
+ }
+ 
+-model AdSlot {
+-  id          String    @id @default(cuid())
+-  name        String    @unique
+-  position    String
+-  imageUrl    String @map("imageurl")
+-  linkUrl     String @map("linkurl")
+-  altText     String? @map("alttext")
+-  startDate   DateTime @map("startdate")
+-  endDate     DateTime? @map("enddate")
+-  isActive    Boolean   @default(true) @map("isactive")
+-  clicks      Int       @default(0)
+-  impressions Int       @default(0)
+-  createdAt   DateTime  @default(now()) @map("createdat")
+-  updatedAt   DateTime  @updatedAt @map("updatedat")
+-
+-  @@map("ad_slots")
+-}
+-
+-model Article {
+-  id          String       @id @default(cuid())
+-  title       String
+-  slug        String       @unique
+-  content     String
+-  excerpt     String?
+-  coverImage  String? @map("coverimage")
+-  author      String?
+-  status      String       @default("draft")
+-  views       Int          @default(0)
+-  publishedAt DateTime? @map("publishedat")
+-  createdAt   DateTime     @default(now()) @map("createdat")
+-  updatedAt   DateTime     @updatedAt @map("updatedat")
+-  category    String?      // 文章分类：跨境寄送/海外生活/出海经营
+-  seoTitle    String? @map("seotitle")       // SEO 标题
+-  seoDescription String? @map("seodescription") // SEO 描述
+-  relatedTools  String[] @default([]) @map("relatedtools") // 关联工具路由
+-  tags        ArticleTag[]
+-
+-  @@index([status])
+-  @@index([category])
+-  @@map("articles")
+-}
+-
+-model ArticleTag {
+-  id        String   @id @default(cuid())
+-  articleId String @map("articleid")
+-  tag       String
+-  createdAt DateTime @default(now()) @map("createdat")
+-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
++model postal_codes {
++  id          String   @id
++  country     String
++  countrycode String
++  province    String?
++  city        String
++  district    String?
++  postalcode  String
++  areaname    String?
++  latitude    Float?
++  longitude   Float?
++  isactive    Boolean  @default(true)
++  createdat   DateTime @default(now())
++  updatedat   DateTime
+ 
+-  @@unique([articleId, tag])
+-  @@map("article_tags")
++  @@unique([country, postalcode])
++  @@index([country, city])
++  @@index([postalcode])
+ }
+ 
+-model Resource {
+-  id          String   @id @default(cuid())
++model resources {
++  id          String   @id
+   name        String
+   url         String
+   description String?
+-  category    String   // life/logistics/business/templates
++  category    String
+   tags        String[] @default([])
+-  sourceType  String   @default("third-party") @map("sourcetype") // official/third-party/internal
+-  usage       String?  // 适用场景/使用提示
+-  disclaimer  String?  // 免责声明或使用提示
+-  isActive    Boolean  @default(true) @map("isactive")
+-  sortOrder   Int      @default(0) @map("sortorder")
+-  createdAt   DateTime @default(now()) @map("createdat")
+-  updatedAt   DateTime @updatedAt @map("updatedat")
++  sourcetype  String   @default("third-party")
++  usage       String?
++  disclaimer  String?
++  isactive    Boolean  @default(true)
++  sortorder   Int      @default(0)
++  createdat   DateTime @default(now())
++  updatedat   DateTime
+ 
+   @@index([category])
+-  @@index([isActive])
+-  @@map("resources")
++  @@index([isactive])
+ }
+ 
+-model Subscription {
+-  id          String             @id @default(cuid())
+-  name        String             @unique
+-  slug        String             @unique
++model sessions {
++  id           String   @id
++  sessiontoken String   @unique
++  userid       String
++  expires      DateTime
++  users        users    @relation(fields: [userid], references: [id], onDelete: Cascade)
++}
++
++model short_links {
++  id          String    @id
++  code        String    @unique
++  url         String
++  userid      String?
++  title       String?
+   description String?
+-  price       Float
+-  interval    String
+-  features    String?
+-  isActive    Boolean            @default(true) @map("isactive")
+-  sortOrder   Int                @default(0) @map("sortorder")
+-  createdAt   DateTime           @default(now()) @map("createdat")
+-  updatedAt   DateTime           @updatedAt @map("updatedat")
+-  users       UserSubscription[]
+-
+-  @@map("subscriptions")
+-}
+-
+-model UserSubscription {
+-  id                String       @id @default(cuid())
+-  userId            String @map("userid")
+-  subscriptionId    String @map("subscriptionid")
+-  status            String       @default("active")
+-  startDate         DateTime     @default(now()) @map("startdate")
+-  endDate           DateTime? @map("enddate")
+-  cancelAtPeriodEnd Boolean      @default(false) @map("cancelatperiodend")
+-  createdAt         DateTime     @default(now()) @map("createdat")
+-  updatedAt         DateTime     @updatedAt @map("updatedat")
+-  subscription      Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+-  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+-
+-  @@unique([userId, subscriptionId])
+-  @@map("user_subscriptions")
+-}
+-
+-model SubscriptionPlan {
+-  id          String   @id @default(cuid())
++  expiresat   DateTime?
++  password    String?
++  clicks      Int       @default(0)
++  lastclickat DateTime?
++  isactive    Boolean   @default(true)
++  createdat   DateTime  @default(now())
++  updatedat   DateTime
++  users       users?    @relation(fields: [userid], references: [id])
++
++  @@index([userid])
++}
++
++model subscription_plans {
++  id          String   @id
+   name        String   @unique
+   description String?
+   price       Float
+   interval    String
+   features    String?
+-  isActive    Boolean  @default(true) @map("isactive")
+-  createdAt   DateTime @default(now()) @map("createdat")
+-  updatedAt   DateTime @updatedAt @map("updatedat")
++  isactive    Boolean  @default(true)
++  createdat   DateTime @default(now())
++  updatedat   DateTime
++}
++
++model subscriptions {
++  id                 String               @id
++  name               String               @unique
++  slug               String               @unique
++  description        String?
++  price              Float
++  interval           String
++  features           String?
++  isactive           Boolean              @default(true)
++  sortorder          Int                  @default(0)
++  createdat          DateTime             @default(now())
++  updatedat          DateTime
++  user_subscriptions user_subscriptions[]
++}
++
++model tags {
++  id        String      @id
++  name      String      @unique
++  createdat DateTime    @default(now())
++  link_tags link_tags[]
++}
++
++model user_preferences {
++  id              String   @id
++  userid          String   @unique
++  theme           String   @default("system")
++  language        String   @default("zh-CN")
++  emailnotif      Boolean  @default(true)
++  compactmode     Boolean  @default(false)
++  itemsperpage    Int      @default(20)
++  defaultcategory String?
++  createdat       DateTime @default(now())
++  updatedat       DateTime
++  users           users    @relation(fields: [userid], references: [id], onDelete: Cascade)
++}
++
++model user_subscriptions {
++  id                String        @id
++  userid            String
++  subscriptionid    String
++  status            String        @default("active")
++  startdate         DateTime      @default(now())
++  enddate           DateTime?
++  cancelatperiodend Boolean       @default(false)
++  createdat         DateTime      @default(now())
++  updatedat         DateTime
++  subscriptions     subscriptions @relation(fields: [subscriptionid], references: [id], onDelete: Cascade)
++  users             users         @relation(fields: [userid], references: [id], onDelete: Cascade)
++
++  @@unique([userid, subscriptionid])
++}
++
++model users {
++  id                 String               @id
++  name               String?
++  email              String               @unique
++  emailverified      DateTime?
++  image              String?
++  password           String?
++  role               String               @default("user")
++  createdat          DateTime             @default(now())
++  updatedat          DateTime
++  accounts           accounts[]
++  audit_logs         audit_logs[]
++  favorites          favorites[]
++  feedback           feedback[]
++  links              links[]
++  memos              memos[]
++  notifications      notifications[]
++  sessions           sessions[]
++  short_links        short_links[]
++  user_preferences   user_preferences?
++  user_subscriptions user_subscriptions[]
++  webhooks           webhooks[]
++  workspace_members  workspace_members[]
++  workspaces         workspaces[]
++}
++
++model verification_tokens {
++  identifier String
++  token      String   @unique
++  expires    DateTime
+ 
+-  @@map("subscription_plans")
++  @@unique([identifier, token])
+ }
+ 
+-model Webhook {
+-  id            String    @id @default(cuid())
+-  userId        String? @map("userid")
++model webhooks {
++  id            String    @id
++  userid        String?
+   url           String
+   events        String
+   secret        String?
+-  isActive      Boolean   @default(true) @map("isactive")
+-  lastTriggered DateTime? @map("lasttriggered")
+-  createdAt     DateTime  @default(now()) @map("createdat")
+-  updatedAt     DateTime  @updatedAt @map("updatedat")
+-  user          User?     @relation(fields: [userId], references: [id])
+-
+-  @@index([userId])
+-  @@map("webhooks")
+-}
+-
+-model EmailSubscription {
+-  id          String    @id @default(cuid())
+-  email       String    @unique
+-  token       String?
+-  confirmed   Boolean   @default(false)
+-  isActive    Boolean   @default(true) @map("isactive")
+-  confirmedAt DateTime? @map("confirmedat")
+-  expiresAt   DateTime? @map("expiresat")
+-  createdAt   DateTime  @default(now()) @map("createdat")
+-  updatedAt   DateTime  @updatedAt @map("updatedat")
+-
+-  @@map("email_subscriptions")
+-}
+-
+-model NewsletterBroadcast {
+-  id        String   @id @default(cuid())
+-  subject   String
+-  content   String
+-  status    String   @default("draft")
+-  sentCount Int      @default(0) @map("sentcount")
+-  createdAt DateTime @default(now()) @map("createdat")
+-  updatedAt DateTime @updatedAt @map("updatedat")
+-
+-  @@map("newsletter_broadcasts")
+-}
+-
+-model PostalCode {
+-  id          String   @id @default(cuid())
+-  country     String
+-  countryCode String @map("countrycode")
+-  province    String?
+-  city        String
+-  district    String?
+-  postalCode  String @map("postalcode")
+-  areaName    String? @map("areaname")
+-  latitude    Float?
+-  longitude   Float?
+-  isActive    Boolean  @default(true) @map("isactive")
+-  createdAt   DateTime @default(now()) @map("createdat")
+-  updatedAt   DateTime @updatedAt @map("updatedat")
+-
+-  @@unique([country, postalCode])
+-  @@index([country, city])
+-  @@index([postalCode])
+-  @@map("postal_codes")
+-}
+-
+-model HSCode {
+-  id            String   @id @default(cuid())
+-  code          String   @unique
+-  level         Int
+-  parentId      String? @map("parentid")
+-  description   String
+-  descriptionEn String? @map("descriptionen")
+-  category      String?
+-  taxRate       Float? @map("taxrate")
+-  notes         String?
+-  isActive      Boolean  @default(true) @map("isactive")
+-  createdAt     DateTime @default(now()) @map("createdat")
+-  updatedAt     DateTime @updatedAt @map("updatedat")
+-  parent        HSCode?  @relation("HSHierarchy", fields: [parentId], references: [id])
+-  children      HSCode[] @relation("HSHierarchy")
+-
+-  @@index([category])
+-  @@index([description])
+-  @@map("hs_codes")
+-}
+-
+-// 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
+-model EventLog {
+-  id          String   @id @default(cuid())
+-  eventType   String   @map("eventtype")       // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+-  toolName    String?  @map("toolname")         // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
+-  action      String?  // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
+-  path        String?  // 页面路径，如 /tools/tracking
+-  sessionId   String?  @map("sessionid")        // 匿名 sessionId（localStorage 生成，不关联用户身份）
+-  createdAt   DateTime @default(now()) @map("createdat")
+-
+-  @@index([eventType])
+-  @@index([toolName])
+-  @@index([createdAt])
+-  @@index([sessionId])
+-  @@map("event_logs")
++  isactive      Boolean   @default(true)
++  lasttriggered DateTime?
++  createdat     DateTime  @default(now())
++  updatedat     DateTime
++  users         users?    @relation(fields: [userid], references: [id])
++
++  @@index([userid])
++}
++
++model workspace_members {
++  id          String     @id
++  workspaceid String
++  userid      String
++  role        String     @default("member")
++  createdat   DateTime   @default(now())
++  users       users      @relation(fields: [userid], references: [id], onDelete: Cascade)
++  workspaces  workspaces @relation(fields: [workspaceid], references: [id], onDelete: Cascade)
++
++  @@unique([workspaceid, userid])
++}
++
++model workspaces {
++  id                String              @id
++  name              String
++  description       String?
++  icon              String?
++  ownerid           String
++  ispublic          Boolean             @default(false)
++  slug              String              @unique
++  createdat         DateTime            @default(now())
++  updatedat         DateTime
++  links             links[]
++  workspace_members workspace_members[]
++  users             users               @relation(fields: [ownerid], references: [id], onDelete: Cascade)
+ }
