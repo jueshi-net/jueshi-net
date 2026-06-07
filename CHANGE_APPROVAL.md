@@ -79,3 +79,10 @@
    - 首页 Hero 搜索框必须是功能组件（use client + onChange + onClick + onKeyDown），不得为死 UI。
    - 输入关键词 → `router.push(/tools?q=关键词)` → /tools 搜索结果页正确展示。
    - 任何首页布局调整不得破坏 Hero 搜索交互。
+
+11. **Quote-Sheet Engine Migration（v1.20.43.4）**
+   - `/tools/quote-sheet` 使用 Document Tool Engine 架构（useDocumentToolEngine）。
+   - `quotation` 是 legacy 入口（/tools/documents/quotation），`quote-sheet` 是 modern canonical 工具。
+   - 旧草稿 `quote_sheet` toolKey 的 dataJson 必须兼容恢复。
+   - PNG/Word 导出失败不得阻断页面主功能。
+   - 禁止修改 /tools/documents/quotation。

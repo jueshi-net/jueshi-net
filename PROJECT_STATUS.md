@@ -2,12 +2,15 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.8.4 (Release Hygiene & Search Acceptance Lock) |
-| **State** | **CN_EN_SEARCH_LOCKED** |
-| **Last Audit** | 2026-06-08 (20 中文关键词 + 5 首页搜索 + 5 英文回归全量验证通过，首页 Hero 搜索从死 UI 修复为功能组件，生产 build + PM2 部署完成) |
-| **Tool Center Search** | **CN/EN VERIFIED** — 24 工具中英文混合搜索全量验收通过 |
-| **Homepage Hero Search** | **VERIFIED** — 5 中文关键词首页搜索跳转正确 |
+| **Version** | v1.20.43.4 (Quote-Sheet Single Tool Engine Migration) |
+| **State** | **ENGINE_MIGRATED** |
+| **Last Audit** | 2026-06-08 (Quote Sheet 迁移到 Document Tool Engine 架构，useDocumentToolEngine + quote-sheet-types + quote-sheet-preview + quote-sheet-client 拆分完成，PNG/Word 导出已实现，事件埋点 Tool_View/Document_Save/Document_Export 已接入) |
+| **Quote Sheet** | **ENGINE_MIGRATED** — 使用 useDocumentToolEngine，表单/保存/恢复/打印/PNG/Word 导出全部就绪 |
+| **Quote Sheet Export PNG** | **VERIFIED** — Blob 导出 + html2canvas fallback |
+| **Quote Sheet Export Word** | **VERIFIED** — Blob .doc 方案 |
+| **Quote Sheet Events** | **VERIFIED** — Tool_View / Document_Save / Document_Export 写入 EventLog |
 | **Dashboard State** | **UNCHANGED / VERIFIED** — git diff -- src/app/\(workspace\) = 0 |
+| **Legacy Quotation** | **RETAINED** — /tools/documents/quotation 保持可用，未修改 |
 | **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** — 24 tools (23 documents + 1 ai-content) |
 | **Homepage Doc Tools** | **DYNAMICIZED** — reads Tool table category=documents, modern-first order, 12 displayed |
 
