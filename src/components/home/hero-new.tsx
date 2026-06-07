@@ -1,7 +1,20 @@
+"use client";
+
+import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Search, ArrowRight, Box, Check } from "lucide-react";
 
 export default function HeroSection({ stats }: { stats: { tools: number; users: number; docs: number; topics: number } }) {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const handleSearch = useCallback(() => {
+    const q = query.trim();
+    if (!q) return;
+    router.push(`/tools?q=${encodeURIComponent(q)}`);
+  }, [query, router]);
+
   const trustItems = [
     stats.tools > 0 ? `已上线 ${stats.tools} 个专业工具` : "专业工具持续更新",
     stats.docs > 0 ? `已生成 ${stats.docs}+ 份单据` : "草稿永久保存",
@@ -30,8 +43,18 @@ export default function HeroSection({ stats }: { stats: { tools: number; users: 
             <div className="mt-6 max-w-lg mx-auto lg:mx-0">
               <div className="flex items-center shadow-lg rounded-2xl border border-gray-200 bg-white overflow-hidden">
                 <Search className="w-5 h-5 text-gray-400 ml-4 shrink-0" />
-                <input type="text" placeholder="搜索工具、文章、专题…" className="flex-1 h-12 px-3 text-base bg-transparent focus:outline-none placeholder:text-gray-400" />
-                <button className="h-12 px-5 bg-teal-600 text-white text-sm font-semibold hover:bg-teal-700 transition-colors shrink-0 flex items-center gap-1.5">
+                <input
+                  type="text"
+                  placeholder="搜索工具、文章、专题…"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") handleSearch(); }}
+                  className="flex-1 h-12 px-3 text-base bg-transparent focus:outline-none placeholder:text-gray-400"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="h-12 px-5 bg-teal-600 text-white text-sm font-semibold hover:bg-teal-700 transition-colors shrink-0 flex items-center gap-1.5"
+                >
                   <Search className="w-4 h-4" /><span className="hidden sm:inline">搜索</span>
                 </button>
               </div>
