@@ -68,3 +68,9 @@
    - 展示规则：现代工具优先（6 个），然后 legacy tools，最多显示 12 个。
    - DB 查询失败时显示安全空状态（6 个现代工具 fallback），不显示假数据。
    - 不破坏首页布局，不引入客户端 JS。
+
+9. **Tool Center Chinese Search（v1.20.42.6.8.3）**
+   - 面向海外华人的工具，搜索必须支持中文关键词，不得只支持英文 slug/name。
+   - 使用 `src/lib/tool-search-aliases.ts` 维护 24 个工具的中文关键词 + 英文别名映射，不修改数据库结构。
+   - `/tools?q=发票` 应命中 Commercial Invoice + Proforma Invoice。
+   - 英文搜索必须完全回归（invoice, packing, sales 等不能变差）。

@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.8.2 (Legacy Save Event & Homepage Dynamicization) |
-| **State** | **LEGACY_TOOLS_VERIFIED_AFTER_SAVE_EVENT_FIX** |
-| **Last Audit** | 2026-06-08 (Document_Save/Export events verified, homepage dynamicized, 3-tool event chain validated) |
+| **Version** | v1.20.42.6.8.3 (Tool Center Chinese Search Fix) |
+| **State** | **CN_SEARCH_VERIFIED** |
+| **Last Audit** | 2026-06-08 (中文搜索全量验证通过，24 工具关键词映射，英文搜索回归测试通过) |
 | **Dashboard State** | **HYBRID_RESTORED_VERIFIED** (unchanged) |
 | **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** — 24 tools (23 documents + 1 ai-content) |
 | **Homepage Doc Tools** | **DYNAMICIZED** — reads Tool table category=documents, modern-first order, 12 displayed |
