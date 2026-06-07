@@ -2,10 +2,11 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.7 (Dashboard Acceptance Lock) |
-| **State** | **HYBRID_RESTORED_VERIFIED** |
-| **Last Audit** | 2026-06-08 (Dashboard acceptance passed, 7 pages + mobile screenshot verified) |
-| **Dashboard State** | **HYBRID_RESTORED_VERIFIED** |
+| **Version** | v1.20.42.6.8 (Legacy Tool Table Finalization) |
+| **State** | **LEGACY_TOOLS_FINALIZED** |
+| **Last Audit** | 2026-06-08 (Legacy document tools upserted to Tool table, 16 created, 5 duplicates skipped) |
+| **Dashboard State** | **HYBRID_RESTORED_VERIFIED** (unchanged) |
+| **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** |
 
 ## Version History
 

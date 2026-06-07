@@ -29,8 +29,17 @@
 
 | Route | Status | Notes |
 |---|---|---|
-| `/tools` | ✅ Active | 统一工具中心 |
-| `/tools/documents` | ✅ Active | 旧版单据模板入口（SEO/landing） |
+| `/tools` | ✅ Active | 统一工具中心 — Tool 表驱动，含 23 个工具 (7 现代 + 16 legacy) |
+| `/tools?cat=documents` | ✅ Active | 单据工具筛选 — 22 个 document tools |
+| `/tools/documents/[type]` | ✅ Active | 旧版单据模板编辑器 (21 个可用工具) |
+| `/tools/commercial-invoice` | ✅ Active | 现代工具 |
+| `/tools/quote-sheet` | ✅ Active | 现代工具 |
+| `/tools/inbound-receipt` | ✅ Active | 现代工具 |
+| `/tools/shipping-label` | ✅ Active | 现代工具 |
+| `/tools/shipping-mark` | ✅ Active | 现代工具 |
+| `/tools/documents/proforma-invoice` | ✅ Active | Legacy tool, upserted to Tool table |
+| `/tools/documents/sales-contract` | ✅ Active | Legacy tool, upserted to Tool table |
+| `/tools/documents/packing-list` | ✅ Active | Legacy tool, upserted to Tool table |
 | `/tools/handover-note` | ✅ Active | 单据工具 |
 | `/tools/debit-note` | ✅ Active | 单据工具 |
 | `/login` | ✅ Active | 登录页 |
