@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { calculateToolScore } from "./tool-ranking";
 import { ToolCenterItem } from "./tool-types";
+import { matchesAlias } from "./tool-search-aliases";
 
 // Re-export type for convenience in Server Components
 export type { ToolCenterItem };
@@ -95,14 +96,15 @@ export async function getToolsData(query?: string, category?: string, sort?: str
     };
   });
 
-  // Search filter (case insensitive)
+  // Search filter (case insensitive + alias support)
   if (query) {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
     enrichedTools = enrichedTools.filter(
       (t) =>
         t.name.toLowerCase().includes(q) ||
         t.description?.toLowerCase().includes(q) ||
-        t.slug.toLowerCase().includes(q)
+        t.slug.toLowerCase().includes(q) ||
+        matchesAlias(t.slug, q)
     );
   }
 
