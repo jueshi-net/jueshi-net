@@ -2,9 +2,9 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.8.3 (Tool Center Chinese Search Fix) |
-| **State** | **CN_SEARCH_VERIFIED** |
-| **Last Audit** | 2026-06-08 (中文搜索全量验证通过，24 工具关键词映射，英文搜索回归测试通过) |
+| **Version** | v1.20.42.6.8.3.1 (Tool Center Chinese Search Acceptance Check + Homepage Hero Fix) |
+| **State** | **CN_SEARCH_FULLY_VERIFIED** |
+| **Last Audit** | 2026-06-08 (20 中文关键词 + 5 首页搜索 + 5 英文回归全量验证通过，首页 Hero 搜索从死 UI 修复为功能组件) |
 | **Dashboard State** | **HYBRID_RESTORED_VERIFIED** (unchanged) |
 | **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** — 24 tools (23 documents + 1 ai-content) |
 | **Homepage Doc Tools** | **DYNAMICIZED** — reads Tool table category=documents, modern-first order, 12 displayed |
