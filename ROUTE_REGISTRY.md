@@ -6,21 +6,24 @@
 
 | Route | Page | Status | Notes |
 |---|---|---|---|
-| `/workspace` | 我的工作台 | ✅ Active | Dashboard home: welcome, stats, quick links |
-| `/workspace/tasks` | 待办与任务 | ✅ Active | Growth tasks, static placeholder |
-| `/workspace/member` | 会员与权益 | ✅ Active | Role, benefits comparison, upgrade CTA |
-| `/workspace/documents` | 我的单据 | ✅ Active | Draft/history list, search, delete, create |
-| `/workspace/company-profiles` | 公司资料 | ✅ Active | Company profile CRUD, logo upload |
-| `/workspace/favorites` | 我的收藏 | ✅ Active | Saved tools/resources list |
-| `/workspace/settings` | 账号设置 | ✅ Active | Name, email, theme, workspace title, logout |
+| `/workspace` | 我的工作台 | ✅ Active | Server-rendered: welcome, stats, favorites, doc history, quick links |
+| `/workspace/tasks` | 待办与任务 | ✅ Active | Growth tasks with category grouping, checkin, level progress |
+| `/workspace/member` | 会员与权益 | ✅ Active | Role, memberUntil, quota display, benefits comparison table |
+| `/workspace/documents` | 我的单据 | ✅ Active | Draft list with search, edit, delete, create |
+| `/workspace/company-profiles` | 公司资料 | ✅ Active | Company profile CRUD with modal, logo upload gate |
+| `/workspace/favorites` | 我的收藏 | ✅ Active | Saved tools/resources with filter tabs |
+| `/workspace/settings` | 账号设置 | ✅ Active | Name, email, 6 theme colors, workspace title, logout |
 
 ## 旧路由兼容（Redirect）
 
 | Old Route | Redirects To | Status |
 |---|---|---|
+| `/dashboard` | `/workspace` | ✅ 307 |
+| `/dashboard/tasks` | `/workspace/tasks` | ✅ 307 |
 | `/dashboard/documents` | `/workspace/documents` | ✅ 307 |
-| `/favorites` | `/workspace/favorites` | ✅ 307 |
 | `/settings` | `/workspace/settings` | ✅ 307 |
+| `/favorites` | `/workspace/favorites` | ✅ 307 |
+| `/workbench` | `/workspace` | ✅ 307 |
 
 ## 公共页面（无需登录）
 

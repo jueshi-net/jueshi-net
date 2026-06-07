@@ -18,7 +18,13 @@
    - 重点排查：动态组件变量（必须大写开头 PascalCase）、import/export 混用、lucide-react 图标名不存在。
    - 修复后必须在 VPS 上 grep 确认修复代码已部署，不能仅信任本地 git status。
 
-4. **版本发布门禁**
+4. **Dashboard 验收必须截图**
+   - 每次 Dashboard 改动后，必须逐页截图验证 `/workspace`、`/workspace/tasks`、`/workspace/member`、`/workspace/documents`、`/workspace/company-profiles`、`/workspace/favorites`、`/workspace/settings`。
+   - 截图必须包含 Sidebar 和主内容区。
+   - 不允许仅凭 HTTP 状态码或构建通过就标记 VERIFIED。
+   - 不允许通过隐藏菜单或临时拼页方式"修复"。必须截图验收 7 个完整模块。
+
+5. **版本发布门禁**
    - 同一 tag 名必须在本地和 VPS 指向相同 commit。
    - 发布前执行 release hygiene：git status clean、tag consistency、关键文件 md5 比对。
    - 禁止 dual-tag 情况。

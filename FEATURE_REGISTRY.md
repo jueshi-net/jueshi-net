@@ -34,7 +34,7 @@
 | **Document Tool Engine** | `useDocumentToolEngine`, Layouts | P1 | v1.20.43.1 → v1.20.43.3.2 | ✅ PILOT_AUTH_VERIFIED (Handover/Debit Notes Authenticated. Save/Restore/Print OK. Slug Fixed) |
 | **Header Auth State** | `header.tsx`, `useSession` | P0 | v1.20.42.5 | ✅ FIXED_VERIFIED (Login state correctly reflects session, user menu added) |
 | **Tool IA Cleanup** | Header/Footer Nav, `/tools/documents` positioning | P0 | v1.20.42.5 | ✅ P0_IMPLEMENTED (工具中心 / 单据模板 naming corrected, legacy page positioned as template hub) |
-|| **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.5 | 🔄 TEMP_RECONSTRUCTED — NOT_ORIGINAL — PENDING_SOURCE_RECOVERY |
+|| **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.6 | 🔄 HYBRID_RESTORED_PENDING_USER_ACCEPTANCE — Restored from 0528 snapshot components, unified /workspace/* routes, 7 complete modules |
 | **Legacy Document Tools Data Bridge** | `/api/events` bridge | P1 | v1.20.42.6 | ⏸️ PARTIAL (Event bridge done, Tool table seed pending) |
 | **Export Document Set Generator** | Product Planning | P2 | Future | 🆕 PLANNED (See below) |
 | **Project Brain** | AI Project Management | P1 | v1.20.45+ | PLANNED (登记中) |

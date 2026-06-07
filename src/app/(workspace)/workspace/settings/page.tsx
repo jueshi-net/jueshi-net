@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { buildCanonical, buildTitle } from '@/lib/seo';
 import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 import SettingsClient from './settings-client';
 
 export const metadata: Metadata = {
@@ -12,6 +13,6 @@ export const metadata: Metadata = {
 
 export default async function SettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) return null;
+  if (!session?.user?.id) redirect("/login?callbackUrl=/workspace/settings");
   return <SettingsClient userName={session.user.name || ''} userEmail={session.user.email || ''} />;
 }

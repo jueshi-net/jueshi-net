@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Check } from 'lucide-react';
+import { Settings, Check, LogOut } from 'lucide-react';
 import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
+import Link from 'next/link';
 
 const THEME_COLORS = [
   { key: 'teal', label: '青绿', tw: 'bg-teal-500', ring: 'ring-teal-300', focus: 'focus:ring-teal-200', btn: 'bg-teal-600 hover:bg-teal-700' },
@@ -26,20 +27,21 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
     try {
       const savedName = localStorage.getItem('wb:user_name');
       if (savedName) setFormName(savedName);
-      else if (userName && userName !== '未设置') setFormName(userName);
+      else if (userName && userName !== '未设置' && !['用户', 'user', 'User'].includes(userName)) setFormName(userName);
 
       const savedTitle = localStorage.getItem('wb:workspace_title');
       if (savedTitle) setLocalWbTitle(savedTitle);
       else setLocalWbTitle('我的工作台');
     } catch {}
-  }, [userName]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }
   }, [toast]);
 
   const selectTheme = useCallback((key: string) => {
-    setThemeColor(key); // Updates context → triggers global nav re-render
+    setThemeColor(key);
     const color = THEME_COLORS.find(c => c.key === key);
     setToast(`🎨 主题色已更新为「${color?.label}」`);
   }, [setThemeColor]);
@@ -52,22 +54,21 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
 
   const saveWorkspace = useCallback(() => {
     setSaving(true);
-    setWorkspaceTitle(localWbTitle); // Updates context → triggers global nav re-render
+    setWorkspaceTitle(localWbTitle);
     setTimeout(() => { setSaving(false); setToast('✅ 工作台设置已保存'); }, 300);
   }, [localWbTitle, setWorkspaceTitle]);
 
-  // Helper: build class strings from theme config
   const inputCls = `w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 ${theme.ring} transition-all`;
   const btnCls = `px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors ${theme.btnBg} ${theme.btnHover}`;
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-2xl mx-auto space-y-4">
       {toast && (
         <div className="fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg bg-white/90 border border-gray-100">{toast}</div>
       )}
 
-      {/* Profile */}
       <div className="bg-white rounded-2xl border border-gray-100/80 divide-y divide-gray-50">
+        {/* Profile */}
         <div className="p-5">
           <h2 className="text-sm font-semibold text-gray-900 mb-4">个人信息</h2>
           <div className="space-y-3">
@@ -131,6 +132,13 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               {saving ? '保存中...' : '保存'}
             </button>
           </div>
+        </div>
+
+        {/* Logout */}
+        <div className="p-5">
+          <Link href="/api/auth/signout" className="inline-flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+            <LogOut className="w-4 h-4" /> 退出登录
+          </Link>
         </div>
       </div>
     </div>

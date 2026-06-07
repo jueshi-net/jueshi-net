@@ -2,15 +2,16 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.5 (Dashboard Original Source Recovery & Version Control Lock) |
-| **State** | **IN_PROGRESS** |
-| **Last Audit** | 2026-06-08 (Searching for original Dashboard source, establishing Git version control) |
-| **Dashboard State** | **TEMP_RECONSTRUCTED_PENDING_ORIGINAL_RECOVERY** |
+| **Version** | v1.20.42.6.6 (Hybrid Dashboard Restoration) |
+| **State** | **IMPLEMENTED_PENDING_USER_ACCEPTANCE** |
+| **Last Audit** | 2026-06-08 (Hybrid restore from 0528 snapshot, 7 workspace modules rebuilt) |
+| **Dashboard State** | **HYBRID_RESTORED_PENDING_USER_ACCEPTANCE** |
 
 ## Previous Version History
 
 | Version | State | Notes |
 |---|---|---|
+| v1.20.42.6.5 | COMPLETED | Source recovery: found 0528 snapshot + v1.20.39 tarball |
 | v1.20.42.6.4 | PARTIAL | React crash fixed, but Dashboard still hand-crafted reconstruction |
 | v1.20.42.6.3 | FAILED | Dashboard was reconstructed manually, not restored from original source |
 | v1.20.42.6.2 | FAILED | Hidden missing modules instead of restoring them |

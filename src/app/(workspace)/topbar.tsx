@@ -12,25 +12,15 @@ const PAGE_TITLES: Record<string, string> = {
   "/workspace/company-profiles": "公司资料",
   "/workspace/favorites": "我的收藏",
   "/workspace/settings": "账号设置",
-  "/workbench": "工作台",
-  "/dashboard": "会员与权益",
-  "/dashboard/tasks": "待办与任务",
-  "/dashboard/documents": "我的单据",
-  "/dashboard/notifications": "通知中心",
-  "/dashboard/points": "积分与会员中心",
-  "/dashboard/stats": "数据看板",
-  "/settings": "账号设置",
-  "/my-links": "我的自定义链接",
-  "/favorites": "我的收藏",
 };
 
 export default function TopBar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { workspaceTitle } = useUserPreferences();
 
-  // Use custom workspaceTitle for workbench, otherwise map from pathname
-  const title = pathname === "/workbench"
-    ? (workspaceTitle || "工作台")
+  // Use custom workspaceTitle for /workspace, otherwise map from pathname
+  const title = pathname === "/workspace"
+    ? (workspaceTitle || "我的工作台")
     : (PAGE_TITLES[pathname] || "工作台");
 
   return (
