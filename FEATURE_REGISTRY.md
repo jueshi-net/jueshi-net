@@ -49,7 +49,8 @@
 | **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.7 | ✅ HYBRID_RESTORED_VERIFIED — 7 pages + mobile screenshot accepted. |
 | **Legacy Document Tools Data Bridge** | `/api/events` bridge + Tool table upsert | P1 | v1.20.42.6.8.2 | ✅ VERIFIED_AFTER_SAVE_EVENT_FIX — 17 legacy tools upserted (16 + shipping-mark), 4 canonical duplicates skipped. Full event chain verified: Tool_Click (from tool_center), Tool_View (page load), Document_Save (localStorage, saveMode field), Document_Export (png/word, exportType field). ToolMetricDaily populated (views/clicks/saves). |
 | **Homepage Document Tools** | `document-tools-section.tsx` | P2 | v1.20.42.6.8.2 | ✅ DYNAMICIZED — reads Tool table category=documents, modern-first order, max 12 displayed, safe fallback on DB failure, CTA → /tools?cat=documents |
-| **Tool Center Search** | `/tools?q=` | P0 | v1.20.42.6.8.3 | ✅ CN/EN VERIFIED — 24 tools with Chinese keyword aliases, full regression on English search |
+|| **Tool Center Search** | `/tools?q=` | P0 | v1.20.42.6.8.3 | ✅ CN/EN VERIFIED — 24 tools with Chinese keyword aliases (tool-search-aliases.ts), full regression on English search, 20 CN keywords + 5 EN keywords all precise |
+|| **Homepage Hero Search** | `/ → /tools?q=` | P0 | v1.20.42.6.8.4 | ✅ VERIFIED — Hero search box functional (onChange + onClick + onKeyDown), 5 CN keywords tested, all redirect to /tools?q= with correct results |
 | **Export Document Set Generator** | Product Planning | P2 | Future | 🆕 PLANNED (See below) |
 | **Project Brain** | AI Project Management | P1 | v1.20.45+ | PLANNED (登记中) |
 

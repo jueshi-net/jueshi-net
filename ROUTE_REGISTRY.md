@@ -30,7 +30,7 @@
 | Route | Status | Notes |
 |---|---|---|
 | `/tools` | ✅ Active | 统一工具中心 — Tool 表驱动，含 24 个工具 (23 documents + 1 ai-content) |
-| `/tools?q=xxx` | ✅ Active | 支持中文 + 英文混合搜索，24 工具关键词全量映射 |
+|| `/tools?q=xxx` | ✅ VERIFIED | 支持中文 + 英文混合搜索，24 工具关键词全量映射。20 中文关键词 + 5 英文关键词全量验收通过。首页 Hero 搜索 → /tools?q= 跳转正确 |
 | `/tools?cat=documents` | ✅ Active | 单据工具筛选 — 23 个 document tools (6 modern + 17 legacy) |
 | `/tools/documents/[type]` | ✅ Active | 旧版单据模板编辑器 (21 个可用工具，动态 [type] 路由)，Document_Save/Export 事件已接入 |
 | `/tools/documents/shipping-mark` | ✅ Active | Legacy tool, upserted to Tool table via dynamic [type] route |
