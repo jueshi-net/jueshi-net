@@ -207,7 +207,7 @@ export default function DocumentEditorPage() {
           event: 'Document_Save',
           toolSlug: type,
           source: 'legacy_documents',
-          isGuest: true,
+          saveMode: 'localStorage',
         }),
       }).catch(() => {});
 
@@ -228,7 +228,7 @@ export default function DocumentEditorPage() {
         event: 'Document_Save',
         toolSlug: type,
         source: 'legacy_documents',
-        isGuest: false,
+        saveMode: 'localStorage',
       }),
     }).catch(() => {});
 
@@ -425,10 +425,10 @@ export default function DocumentEditorPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          event: 'Tool_Click',
+          event: 'Document_Export',
           toolSlug: type,
-          action: 'export_png',
           source: 'legacy_documents',
+          exportType: 'png',
         }),
       }).catch(() => {});
     } catch (error) {
@@ -472,10 +472,10 @@ export default function DocumentEditorPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        event: 'Tool_Click',
+        event: 'Document_Export',
         toolSlug: type,
-        action: 'export_word',
         source: 'legacy_documents',
+        exportType: 'word',
       }),
     }).catch(() => {});
   }, [p, selectedStyle, previewRef, docType, formData.documentNo, type]);

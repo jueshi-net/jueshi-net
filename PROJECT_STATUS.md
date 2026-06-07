@@ -2,12 +2,12 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.8.1 (Legacy Tool Table Verification & Canonical Fix) |
-| **State** | **LEGACY_TOOLS_VERIFIED** |
-| **Last Audit** | 2026-06-08 (Canonical map fixed, shipping-mark upserted, event chain verified for proforma/packing/sales) |
+| **Version** | v1.20.42.6.8.2 (Legacy Save Event & Homepage Dynamicization) |
+| **State** | **LEGACY_TOOLS_VERIFIED_AFTER_SAVE_EVENT_FIX** |
+| **Last Audit** | 2026-06-08 (Document_Save/Export events verified, homepage dynamicized, 3-tool event chain validated) |
 | **Dashboard State** | **HYBRID_RESTORED_VERIFIED** (unchanged) |
 | **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** — 24 tools (23 documents + 1 ai-content) |
-| **Homepage Doc Tools** | **PENDING_DYNAMICIZATION** — still hardcoded DOC_TOOLS, CTA points to /tools?cat=documents |
+| **Homepage Doc Tools** | **DYNAMICIZED** — reads Tool table category=documents, modern-first order, 12 displayed |
 
 ## Version History
 

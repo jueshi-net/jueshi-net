@@ -53,3 +53,18 @@
    - 必须用真实测试账号（user-test@jueshi.net、admin-test@jueshi.net）验证。
    - 未登录访问所有 /workspace/* 必须 307 跳转 /login。
    - admin 登录必须看到管理后台入口。
+
+7. **Legacy Document Tool Events（v1.20.42.6.8.2）**
+   - 旧版单据工具（/tools/documents/[type]）的保存/导出必须触发事件：
+     - 保存草稿（localStorage）→ `Document_Save` with `saveMode: "localStorage"`, `source: "legacy_documents"`
+     - PNG 导出 → `Document_Export` with `exportType: "png"`, `source: "legacy_documents"`
+     - Word 导出 → `Document_Export` with `exportType: "word"`, `source: "legacy_documents"`
+   - 事件写入 EventLog，即使保存失败也不影响保存操作。
+   - Document_Save 和 Tool_Click/Tool_View 进入 ToolMetricDaily（views/clicks/saves）。
+   - Document_Export 仅进入 EventLog，暂不进入 ToolMetricDaily。
+
+8. **Homepage Document Tools Dynamicization（v1.20.42.6.8.2）**
+   - `document-tools-section.tsx` 改为 Server Component，动态读取 Tool 表 `category=documents` 且 `isActive=true` 的工具。
+   - 展示规则：现代工具优先（6 个），然后 legacy tools，最多显示 12 个。
+   - DB 查询失败时显示安全空状态（6 个现代工具 fallback），不显示假数据。
+   - 不破坏首页布局，不引入客户端 JS。

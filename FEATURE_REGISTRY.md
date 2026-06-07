@@ -47,8 +47,8 @@
 | **Header Auth State** | `header.tsx`, `useSession` | P0 | v1.20.42.5 | ✅ FIXED_VERIFIED (Login state correctly reflects session, user menu added) |
 | **Tool IA Cleanup** | Header/Footer Nav, `/tools/documents` positioning | P0 | v1.20.42.5 | ✅ P0_IMPLEMENTED (工具中心 / 单据模板 naming corrected, legacy page positioned as template hub) |
 | **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.7 | ✅ HYBRID_RESTORED_VERIFIED — 7 pages + mobile screenshot accepted. |
-| **Legacy Document Tools Data Bridge** | `/api/events` bridge + Tool table upsert | P1 | v1.20.42.6.8 | ✅ VERIFIED — 17 legacy tools upserted (16 + shipping-mark), 4 canonical duplicates skipped. Event chain verified: Tool_Click/Tool_View/Tool_Export. ToolMetricDaily populated. Document_Save: client-side only (localStorage), not server-tracked yet. |
-| **Homepage Document Tools** | `document-tools-section.tsx` | P2 | v1.20.42.6.8+ | ⏸️ PENDING_DYNAMICIZATION — hardcoded DOC_TOOLS (7 modern tools), CTA → /tools?cat=documents |
+| **Legacy Document Tools Data Bridge** | `/api/events` bridge + Tool table upsert | P1 | v1.20.42.6.8.2 | ✅ VERIFIED_AFTER_SAVE_EVENT_FIX — 17 legacy tools upserted (16 + shipping-mark), 4 canonical duplicates skipped. Full event chain verified: Tool_Click (from tool_center), Tool_View (page load), Document_Save (localStorage, saveMode field), Document_Export (png/word, exportType field). ToolMetricDaily populated (views/clicks/saves). |
+| **Homepage Document Tools** | `document-tools-section.tsx` | P2 | v1.20.42.6.8.2 | ✅ DYNAMICIZED — reads Tool table category=documents, modern-first order, max 12 displayed, safe fallback on DB failure, CTA → /tools?cat=documents |
 | **Export Document Set Generator** | Product Planning | P2 | Future | 🆕 PLANNED (See below) |
 | **Project Brain** | AI Project Management | P1 | v1.20.45+ | PLANNED (登记中) |
 
