@@ -40,14 +40,13 @@
    - 发布前执行 release hygiene：git status clean、tag consistency、关键文件 md5 比对。
    - 禁止 dual-tag 情况。
 
-6. **Canonical 去重规则（v1.20.42.6.8 生效）**
+6. **Canonical 去重规则（v1.20.42.6.8.1 修正）**
    - 以下旧版工具与现代工具功能重叠，**不得**在 /tools 中重复展示：
      - `commercial-invoice` → canonical: `commercial-invoice` (现代工具)
      - `quotation` → canonical: `quote-sheet` (现代工具)
      - `consolidation-inbound-receipt` → canonical: `inbound-receipt` (现代工具)
      - `label-maker` → canonical: `shipping-label` (现代工具，route 相同)
-     - `shipping-mark` → canonical: `shipping-mark` (现代工具)
-   - 旧版重复工具保留旧路由 `/tools/documents/[type]` 可用，但不在 Tool 表中标记 active。
+   - `shipping-mark`: 经确认为非重复工具，/tools/documents/shipping-mark 页面可用，已 upsert 到 Tool 表 active。
    - 任何新增工具必须检查 canonical map，禁止重复工具污染 /tools。
 
 6. **登录态验证**

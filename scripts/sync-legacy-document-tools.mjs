@@ -21,7 +21,8 @@ const CANONICAL_MAP = {
   "quotation": "quote-sheet",
   "consolidation-inbound-receipt": "inbound-receipt",
   "label-maker": "shipping-label",
-  "shipping-mark": "shipping-mark",
+  // shipping-mark: NOT a duplicate — /tools/documents/shipping-mark page exists and works
+  // shipping-mark: null, // will be upserted as active
   // Non-duplicate legacy tools — safe to add
   "proforma-invoice": null,
   "sales-contract": null,
