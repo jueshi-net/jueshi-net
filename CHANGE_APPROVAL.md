@@ -1,8 +1,19 @@
 # Change Approval Rules — jueshi.net / xixiong-saas
 
-## Dashboard 改动验收铁律
+## Dashboard 核心用户资产区保护规则
 
-1. **截图验证完整菜单和 7 个子页面**
+> **v1.20.42.6.7 新增** — Dashboard 属于核心用户资产区。
+
+1. **Dashboard 是核心用户资产区**
+   - `/workspace/*` 是用户的第一触点，任何修改必须严格管控。
+   - 以后任何 Dashboard 修改必须：
+     1. 先创建 Git commit，明确修改范围
+     2. 不得隐藏菜单（7 个菜单必须始终完整可见）
+     3. 不得用空页面冒充恢复（必须有真实内容和清晰空状态）
+     4. 必须提供 7 页面 + 移动端截图验收
+     5. 未通过截图验收不得标记 VERIFIED
+
+2. **截图验证完整菜单和 7 个子页面**
    - 每次 Dashboard 改动后，必须逐页截图验证 `/workspace`、`/workspace/tasks`、`/workspace/member`、`/workspace/documents`、`/workspace/company-profiles`、`/workspace/favorites`、`/workspace/settings`。
    - 截图必须包含 Sidebar 和主内容区。
    - 不允许仅凭 HTTP 状态码或构建通过就标记 VERIFIED。

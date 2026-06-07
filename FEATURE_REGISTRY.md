@@ -27,6 +27,18 @@
 | **Analytics API** | `/api/admin/analytics/home` | ✅ FIXED & VERIFIED — Supports `?range=today/7d/30d`, BigInt/Prisma mapping fixed |
 | **Ads Dispatch** | `/api/ads/dispatch` | ✅ VERIFIED — Returns `{ad:null}` when empty, 400 on missing params |
 
+## DASHBOARD — VERIFIED (v1.20.42.6.7)
+
+| Feature | Module | Verification |
+|---|---|---|
+| **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | ✅ VERIFIED — 7 pages + mobile screenshot accepted. Unified /workspace/* routes. |
+| **Dashboard Tasks** | `/workspace/tasks` | ✅ VERIFIED — Growth tasks, checkin, level progress. Screenshot: 02-tasks.png |
+| **Dashboard Member** | `/workspace/member` | ✅ VERIFIED — Identity card, quotas, benefits comparison. Screenshot: 03-member.png |
+| **Dashboard Documents** | `/workspace/documents` | ✅ VERIFIED — Draft list, search, CRUD. Screenshot: 04-documents.png |
+| **Dashboard Company Profiles** | `/workspace/company-profiles` | ✅ VERIFIED — Company CRUD modal, member gate. Screenshot: 05-company-profiles.png |
+| **Dashboard Favorites** | `/workspace/favorites` | ✅ VERIFIED — Saved tools filter, card grid. Screenshot: 06-favorites.png |
+| **Dashboard Settings** | `/workspace/settings` | ✅ VERIFIED — Profile form, theme selector, logout. Screenshot: 07-settings.png |
+
 ## PLANNED — Future Features (Backlog)
 
 | Feature | Module | Priority | Target Version | Status |
@@ -34,7 +46,7 @@
 | **Document Tool Engine** | `useDocumentToolEngine`, Layouts | P1 | v1.20.43.1 → v1.20.43.3.2 | ✅ PILOT_AUTH_VERIFIED (Handover/Debit Notes Authenticated. Save/Restore/Print OK. Slug Fixed) |
 | **Header Auth State** | `header.tsx`, `useSession` | P0 | v1.20.42.5 | ✅ FIXED_VERIFIED (Login state correctly reflects session, user menu added) |
 | **Tool IA Cleanup** | Header/Footer Nav, `/tools/documents` positioning | P0 | v1.20.42.5 | ✅ P0_IMPLEMENTED (工具中心 / 单据模板 naming corrected, legacy page positioned as template hub) |
-|| **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.6 | 🔄 HYBRID_RESTORED_PENDING_USER_ACCEPTANCE — Restored from 0528 snapshot components, unified /workspace/* routes, 7 complete modules |
+| **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.7 | ✅ HYBRID_RESTORED_VERIFIED — 7 pages + mobile screenshot accepted. |
 | **Legacy Document Tools Data Bridge** | `/api/events` bridge | P1 | v1.20.42.6 | ⏸️ PARTIAL (Event bridge done, Tool table seed pending) |
 | **Export Document Set Generator** | Product Planning | P2 | Future | 🆕 PLANNED (See below) |
 | **Project Brain** | AI Project Management | P1 | v1.20.45+ | PLANNED (登记中) |

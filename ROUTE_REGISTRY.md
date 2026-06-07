@@ -6,13 +6,13 @@
 
 | Route | Page | Status | Notes |
 |---|---|---|---|
-| `/workspace` | 我的工作台 | ✅ Active | Server-rendered: welcome, stats, favorites, doc history, quick links |
-| `/workspace/tasks` | 待办与任务 | ✅ Active | Growth tasks with category grouping, checkin, level progress |
-| `/workspace/member` | 会员与权益 | ✅ Active | Role, memberUntil, quota display, benefits comparison table |
-| `/workspace/documents` | 我的单据 | ✅ Active | Draft list with search, edit, delete, create |
-| `/workspace/company-profiles` | 公司资料 | ✅ Active | Company profile CRUD with modal, logo upload gate |
-| `/workspace/favorites` | 我的收藏 | ✅ Active | Saved tools/resources with filter tabs |
-| `/workspace/settings` | 账号设置 | ✅ Active | Name, email, 6 theme colors, workspace title, logout |
+| `/workspace` | 我的工作台 | ✅ VERIFIED | Server-rendered: welcome, stats, favorites, doc history, quick links. Screenshot: 01-workspace.png |
+| `/workspace/tasks` | 待办与任务 | ✅ VERIFIED | Growth tasks with category grouping, checkin, level progress. Screenshot: 02-tasks.png |
+| `/workspace/member` | 会员与权益 | ✅ VERIFIED | Role, memberUntil, quota display, benefits comparison table. Screenshot: 03-member.png |
+| `/workspace/documents` | 我的单据 | ✅ VERIFIED | Draft list with search, edit, delete, create. Screenshot: 04-documents.png |
+| `/workspace/company-profiles` | 公司资料 | ✅ VERIFIED | Company profile CRUD with modal, logo upload gate. Screenshot: 05-company-profiles.png |
+| `/workspace/favorites` | 我的收藏 | ✅ VERIFIED | Saved tools/resources with filter tabs. Screenshot: 06-favorites.png |
+| `/workspace/settings` | 账号设置 | ✅ VERIFIED | Name, email, 6 theme colors, workspace title, logout. Screenshot: 07-settings.png |
 
 ## 旧路由兼容（Redirect）
 

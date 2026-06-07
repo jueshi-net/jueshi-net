@@ -27,6 +27,7 @@
 # QA reports and screenshots (local only)
 reports/browser-qa/
 test-results/
+screenshots/
 playwright-report/
 
 # debug

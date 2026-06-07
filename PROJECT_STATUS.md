@@ -2,15 +2,17 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.42.6.6 (Hybrid Dashboard Restoration) |
-| **State** | **IMPLEMENTED_PENDING_USER_ACCEPTANCE** |
-| **Last Audit** | 2026-06-08 (Hybrid restore from 0528 snapshot, 7 workspace modules rebuilt) |
-| **Dashboard State** | **HYBRID_RESTORED_PENDING_USER_ACCEPTANCE** |
+| **Version** | v1.20.42.6.7 (Dashboard Acceptance Lock) |
+| **State** | **HYBRID_RESTORED_VERIFIED** |
+| **Last Audit** | 2026-06-08 (Dashboard acceptance passed, 7 pages + mobile screenshot verified) |
+| **Dashboard State** | **HYBRID_RESTORED_VERIFIED** |
 
-## Previous Version History
+## Version History
 
 | Version | State | Notes |
 |---|---|---|
+| v1.20.42.6.7 | HYBRID_RESTORED_VERIFIED | Dashboard Acceptance Lock — 7 pages + mobile verified, screenshots archived, status locked |
+| v1.20.42.6.6 | COMPLETED | Hybrid Dashboard Restoration from 0528 snapshot — 7 workspace modules rebuilt |
 | v1.20.42.6.5 | COMPLETED | Source recovery: found 0528 snapshot + v1.20.39 tarball |
 | v1.20.42.6.4 | PARTIAL | React crash fixed, but Dashboard still hand-crafted reconstruction |
 | v1.20.42.6.3 | FAILED | Dashboard was reconstructed manually, not restored from original source |
