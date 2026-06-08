@@ -84,6 +84,8 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     });
 
     // Write EventLog for Document_Save (server-side, reliable)
+    // Normalize toolSlug to hyphenated form (e.g. quote_sheet → quote-sheet)
+    const eventSlug = existing.toolKey === "quote_sheet" ? "quote-sheet" : existing.toolKey;
     try {
       await prisma.eventLog.create({
         data: {
@@ -91,7 +93,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
           toolName: existing.toolKey,
           action: JSON.stringify({
             type: "Document_Save",
-            toolSlug: existing.toolKey,
+            toolSlug: eventSlug,
             documentId: id,
             source: "document_tool_engine",
           }),
