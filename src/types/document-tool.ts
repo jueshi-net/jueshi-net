@@ -66,6 +66,9 @@ export interface DocumentToolEngineResult<T> {
   /** Error state from useDraftLoader or validation */
   error: string | null;
   
+  /** Setter for error state */
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  
   /** Save loading state */
   saving: boolean;
   

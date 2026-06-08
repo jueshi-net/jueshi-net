@@ -10,7 +10,7 @@
  * Composes useDraftLoader for draft retrieval.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDraftLoader } from '@/lib/use-draft-loader';
 import { trackEvent } from '@/lib/tracking';
@@ -35,10 +35,13 @@ export function useDocumentToolEngine<T extends object>({
 
   const [data, setData] = useState<T>(defaultData);
   const [currentDocId, setCurrentDocId] = useState<string | null>(draftId);
+  // Use ref as single source of truth to avoid stale closures in async saves
+  const currentDocIdRef = useRef<string | null>(draftId);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const savingRef = useRef(false); // guard against concurrent saves
 
   // Handle draft data loading
   const handleDraftData = useCallback((dataJson: string) => {
@@ -48,6 +51,7 @@ export function useDocumentToolEngine<T extends object>({
       
       if (draftId) {
         setCurrentDocId(draftId);
+        currentDocIdRef.current = draftId;
       }
 
       onAfterRestore?.();
@@ -57,9 +61,7 @@ export function useDocumentToolEngine<T extends object>({
     }
   }, [deserialize, draftId, onAfterRestore]);
 
-  const { loadingDraft, draftError } = useDraftLoader(() => draftId, (dataJson: string) => {
-    handleDraftData(dataJson);
-  });
+  const { loadingDraft, draftError } = useDraftLoader(() => draftId, handleDraftData);
 
   useEffect(() => {
     if (draftError) {
@@ -69,17 +71,29 @@ export function useDocumentToolEngine<T extends object>({
 
   // Save handler
   const handleSave = useCallback(async () => {
+    if (savingRef.current) {
+      console.log('[useDocumentToolEngine] save already in progress, skipping');
+      return;
+    }
+
+    console.log('[useDocumentToolEngine] handleSave called', { toolKey, currentDocId: currentDocIdRef.current, hasValidate: !!validate });
     if (validate) {
       const result: DocumentToolValidationResult = validate(data);
       if (!result.valid) {
+        console.log('[useDocumentToolEngine] validation failed', result.error);
         setError(result.error || '表单验证失败');
         return;
       }
     }
 
+    console.log('[useDocumentToolEngine] setting saving=true');
     setSaving(true);
+    savingRef.current = true;
     setError(null);
     setSaved(false);
+
+    // Snapshot the docId at call time to avoid stale closure
+    const docId = currentDocIdRef.current;
 
     try {
       const serializedData = serialize(data);
@@ -90,38 +104,52 @@ export function useDocumentToolEngine<T extends object>({
         companyProfileId: serializedData.companyProfileId as string | undefined,
       });
 
-      const method = currentDocId ? 'PUT' : 'POST';
-      const url = currentDocId ? `/api/me/tool-documents/${currentDocId}` : '/api/me/tool-documents';
+      const method = docId ? 'PUT' : 'POST';
+      const url = docId ? `/api/me/tool-documents/${docId}` : '/api/me/tool-documents';
 
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        credentials: 'include',
       });
 
       if (res.ok) {
         const result = await res.json();
         
-        // If it's a new draft, update the currentDocId
-        if (!currentDocId && result.data?.id) {
-          setCurrentDocId(result.data.id);
+        // If it's a new draft, update the currentDocId + URL
+        if (!docId && result.data?.id) {
+          const newId = result.data.id;
+          setCurrentDocId(newId);
+          currentDocIdRef.current = newId;
+
+          // Update URL to include draftId without triggering navigation
+          const newUrl = `${window.location.pathname}?draftId=${newId}`;
+          window.history.replaceState(null, '', newUrl);
           
           // Trigger TrackEvent for Document_Save
           trackEvent('Document_Save', {
             toolSlug: toolKey,
-            source: 'tool_engine',
-            documentId: result.data.id,
+            source: 'document_tool_engine',
+            documentId: newId,
+          });
+        } else if (docId) {
+          // Track PUT saves too
+          trackEvent('Document_Save', {
+            toolSlug: toolKey,
+            source: 'document_tool_engine',
+            documentId: docId,
           });
         }
 
         setSaved(true);
-        setSaveMsg(currentDocId ? '已更新草稿' : '已保存草稿');
+        setSaveMsg(docId ? '已更新草稿' : '已保存草稿');
         setTimeout(() => {
           setSaved(false);
           setSaveMsg(null);
         }, 3000);
 
-        onAfterSave?.(result.data?.id || currentDocId || '');
+        onAfterSave?.(result.data?.id || docId || '');
       } else {
         const errData = await res.json().catch(() => ({}));
         if (res.status === 401) {
@@ -134,8 +162,9 @@ export function useDocumentToolEngine<T extends object>({
       setError(mapApiErrorToMessage(e));
     } finally {
       setSaving(false);
+      savingRef.current = false;
     }
-  }, [data, toolKey, serialize, validate, currentDocId, onAfterSave]);
+  }, [data, toolKey, serialize, validate, onAfterSave]);
 
   // Restore handler (called from ToolHistoryPanel)
   const handleRestore = useCallback((dataJson: string) => {
@@ -171,6 +200,7 @@ export function useDocumentToolEngine<T extends object>({
     setData,
     loadingDraft,
     error,
+    setError,
     saving,
     saved,
     saveMsg,

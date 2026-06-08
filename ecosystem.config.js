@@ -22,6 +22,7 @@ module.exports = {
       env_production: {
         NODE_ENV: "production",
         PORT: "3000",
+        DATABASE_URL: "postgresql://bxb_user:Bxb2024%21Prod@127.0.0.1:5432/bxb_prod?schema=public",
       },
       max_memory_restart: "1G",
       error_file: "/home/deploy/.pm2/logs/xixiong-saas-error.log",

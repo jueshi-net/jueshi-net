@@ -39,7 +39,7 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
 
   const {
     data, setData,
-    loadingDraft, error,
+    loadingDraft, error, setError,
     saving, saved, saveMsg, currentDocId,
     handleSave, handleRestore, handleReset, openPrintWindow,
   } = engine;
@@ -85,47 +85,77 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
     openPrintWindow("供应链报价单", contentHtml, styles);
   }, [openPrintWindow]);
 
-  // Handle PNG Export
+  // Handle PNG Export — dynamic import html2canvas
   const handleExportPNG = useCallback(async () => {
     setExporting(true);
     try {
       const el = previewRef.current;
-      if (!el) return;
+      if (!el) {
+        setError("预览内容不存在，无法导出 PNG");
+        return;
+      }
 
-      const html2canvas = (window as any).html2canvas;
-      if (html2canvas) {
-        const canvas = await html2canvas(el, { scale: 2, useCORS: true });
-        const link = document.createElement("a");
-        link.download = `quote-sheet-${data.quoteDate}.png`;
-        link.href = canvas.toDataURL("image/png");
-        link.click();
+      // Dynamically import html2canvas
+      let html2canvas = (window as any).html2canvas;
+      if (!html2canvas) {
+        try {
+          const mod = await import("html2canvas");
+          html2canvas = mod.default;
+          (window as any).html2canvas = html2canvas;
+        } catch {
+          setError("html2canvas 加载失败，请刷新页面后重试");
+          return;
+        }
+      }
 
-        // Track Document_Export event
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
+      const link = document.createElement("a");
+      const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      link.download = `quote-sheet-${ts}.png`;
+      link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Track Document_Export event
+      try {
         navigator.sendBeacon(
           "/api/events",
           JSON.stringify({
             event: "Document_Export",
             toolSlug: "quote-sheet",
             source: "document_tool_engine",
-            exportType: "png",
+            format: "png",
+            documentId: currentDocId || "",
             ts: Date.now(),
           })
         );
-      } else {
-        // Fallback: open print window for PNG
-        handlePrint();
-      }
-    } catch {
-      // Export failed — don't block main functionality
+      } catch { /* ignore tracking errors */ }
+    } catch (e) {
+      console.error("[PNG Export] html2canvas failed, falling back to print:", e);
+      // Fallback: open print window so user can Save as PNG
+      const contentHtml = previewRef.current?.innerHTML || "";
+      const styles = `
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f5f5f5; }
+        h1 { text-align: center; color: #0d9488; }
+        .total { text-align: right; font-size: 18px; font-weight: bold; }
+      `;
+      openPrintWindow("供应链报价单", contentHtml, styles);
     }
     setExporting(false);
-  }, [data.quoteDate, handlePrint]);
+  }, [currentDocId, setError, openPrintWindow]);
 
   // Handle Word Export (Blob .doc approach)
   const handleExportWord = useCallback(() => {
     try {
       const el = previewRef.current;
-      if (!el) return;
+      if (!el) {
+        setError("预览内容不存在，无法导出 Word");
+        return;
+      }
 
       const html = `
         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
@@ -142,26 +172,33 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
 
       const blob = new Blob(["\ufeff", html], { type: "application/msword" });
       const link = document.createElement("a");
-      link.download = `quote-sheet-${data.quoteDate}.doc`;
+      const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      link.download = `quote-sheet-${ts}.doc`;
       link.href = URL.createObjectURL(blob);
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
 
       // Track Document_Export event
-      navigator.sendBeacon(
-        "/api/events",
-        JSON.stringify({
-          event: "Document_Export",
-          toolSlug: "quote-sheet",
-          source: "document_tool_engine",
-          exportType: "word",
-          ts: Date.now(),
-        })
-      );
-    } catch {
-      // Export failed — don't block main functionality
+      try {
+        navigator.sendBeacon(
+          "/api/events",
+          JSON.stringify({
+            event: "Document_Export",
+            toolSlug: "quote-sheet",
+            source: "document_tool_engine",
+            format: "word",
+            documentId: currentDocId || "",
+            ts: Date.now(),
+          })
+        );
+      } catch { /* ignore tracking errors */ }
+    } catch (e) {
+      console.error("[Word Export] Failed:", e);
+      setError("Word 导出失败，请重试");
     }
-  }, [data.quoteDate]);
+  }, [currentDocId, setError]);
 
   // Line item manipulation
   const addLine = useCallback(() => {

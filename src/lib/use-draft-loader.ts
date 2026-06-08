@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
  * Hook to load a draft by draftId from URL params.
@@ -11,16 +11,22 @@ export function useDraftLoader(
   const [loadingDraft, setLoadingDraft] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
   const [draftLoaded, setDraftLoaded] = useState(false);
+  const loadedDraftIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const draftId = getDraftId();
     if (!draftId) return;
 
+    // Hydration guard: do not re-fetch the same draftId
+    if (loadedDraftIdRef.current === draftId) return;
+
     let cancelled = false;
     setLoadingDraft(true);
     setDraftError(null);
 
-    fetch(`/api/me/tool-documents/${draftId}`)
+    fetch(`/api/me/tool-documents/${draftId}`, {
+      credentials: 'include',
+    })
       .then(async (res) => {
         if (!res.ok) {
           if (res.status === 401) { window.location.href = "/login"; return; }
@@ -33,6 +39,7 @@ export function useDraftLoader(
         const draft = json.data;
         if (draft?.dataJson) {
           loadDraftData(draft.dataJson);
+          loadedDraftIdRef.current = draftId;
           setDraftLoaded(true);
         }
       })
