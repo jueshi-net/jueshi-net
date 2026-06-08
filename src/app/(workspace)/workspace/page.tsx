@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2, Bell, ArrowUpRight, Sparkles, TrendingUp, DollarSign, Award, ChevronRight } from "lucide-react";
+import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2, Bell, ArrowUpRight, Sparkles, TrendingUp, DollarSign, Award, ChevronRight, StickyNote, BarChart3, Globe, Briefcase, Megaphone } from "lucide-react";
 import DeleteDocButton from "@/components/workspace/DeleteDocButton";
 
 export const metadata: Metadata = {
@@ -42,19 +42,27 @@ export default async function WorkspacePage() {
 
   const userId = session.user.id;
 
-  const [favorites, docHistory, companyProfiles, membershipData, taskSummary] = await Promise.allSettled([
-    prisma.userFavorite.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 6 }),
+  const results = await Promise.allSettled([
+    prisma.userFavorite.findMany({ where: { userId, resourceType: "tool" }, orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.userCustomNav.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 6 }),
     prisma.documentHistory.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 5 }).catch(() => []),
     prisma.userCompanyProfile.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }),
-    prisma.user.findUnique({ where: { id: userId }, select: { role: true, memberUntil: true, growthValue: true, levelKey: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { role: true, memberUntil: true, growthValue: true, levelKey: true, points: true } }),
     prisma.growthLog.count({ where: { userId } }),
+    prisma.userBadgeAward.count({ where: { userId } }),
+    prisma.memo.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }).catch(() => []),
   ]);
 
-  const favs = favorites.status === "fulfilled" ? favorites.value : [];
-  const docs = docHistory.status === "fulfilled" ? docHistory.value : [];
-  const profiles = companyProfiles.status === "fulfilled" ? companyProfiles.value : [];
-  const user = membershipData.status === "fulfilled" ? membershipData.value : null;
-  const taskCount = taskSummary.status === "fulfilled" ? taskSummary.value : 0;
+  const [favToolsRes, navLinksRes, docHistoryRes, companyProfilesRes, membershipDataRes, taskSummaryRes, badgeCountRes, memosRes] = results;
+
+  const favTools = favToolsRes.status === "fulfilled" ? favToolsRes.value : [];
+  const navLinks = navLinksRes.status === "fulfilled" ? navLinksRes.value : [];
+  const docs = docHistoryRes.status === "fulfilled" ? docHistoryRes.value : [];
+  const profiles = companyProfilesRes.status === "fulfilled" ? companyProfilesRes.value : [];
+  const user = membershipDataRes.status === "fulfilled" ? membershipDataRes.value : null;
+  const taskCount = taskSummaryRes.status === "fulfilled" ? taskSummaryRes.value : 0;
+  const badgeCount = badgeCountRes.status === "fulfilled" ? badgeCountRes.value : 0;
+  const recentMemos = memosRes.status === "fulfilled" ? memosRes.value : [];
 
   const memberLevel = user?.levelKey === "member" ? "会员" : user?.levelKey === "admin" ? "管理员" : "免费版用户";
 
@@ -84,7 +92,7 @@ export default async function WorkspacePage() {
         </Link>
         <Link href="/workspace/favorites" className="bg-white rounded-xl border border-gray-100 p-4 hover:border-teal-200 hover:shadow-sm transition-all">
           <div className="flex items-center gap-2 mb-2"><Heart className="w-4 h-4 text-red-500" /><span className="text-xs text-gray-500">我的收藏</span></div>
-          <div className="text-2xl font-bold text-gray-900">{favs.length}</div>
+          <div className="text-2xl font-bold text-gray-900">{favTools.length + navLinks.length}</div>
         </Link>
         <Link href="/workspace/company-profiles" className="bg-white rounded-xl border border-gray-100 p-4 hover:border-teal-200 hover:shadow-sm transition-all">
           <div className="flex items-center gap-2 mb-2"><Building2 className="w-4 h-4 text-purple-500" /><span className="text-xs text-gray-500">公司资料</span></div>
@@ -96,36 +104,109 @@ export default async function WorkspacePage() {
         </Link>
       </div>
 
-      {/* Favorites */}
+      {/* 我的成长卡片 */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-purple-500" />
+            <h2 className="text-sm font-bold text-gray-900">我的成长</h2>
+          </div>
+          <Link href="/workspace/member" className="text-xs text-teal-600 hover:underline">查看详情 →</Link>
+        </div>
+        <Link href="/workspace/member" className="block bg-gradient-to-r from-purple-50 to-teal-50 border border-purple-100 rounded-xl p-4 hover:shadow-sm transition-all">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <div className="text-xs text-gray-500">当前等级</div>
+              <div className="text-sm font-bold text-gray-900 mt-1">{user?.levelKey === 'lv1' ? 'Lv.1 新手' : user?.levelKey === 'lv2' ? 'Lv.2 进阶' : user?.levelKey === 'lv3' ? 'Lv.3 精英' : user?.levelKey === 'lv4' ? 'Lv.4 大师' : user?.levelKey === 'lv5' ? 'Lv.5 传奇' : 'Lv.1 新手'}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500">成长值</div>
+              <div className="text-sm font-bold text-gray-900 mt-1">{user?.growthValue ?? 0}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500">积分</div>
+              <div className="text-sm font-bold text-gray-900 mt-1">{user?.points ?? 0}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500">勋章</div>
+              <div className="text-sm font-bold text-gray-900 mt-1">{badgeCount} 枚</div>
+            </div>
+          </div>
+        </Link>
+      </section>
+
+      {/* 常用工具 / 常用网址 */}
+      {(favTools.length > 0 || navLinks.length > 0) && (
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-teal-500" />
+              <h2 className="text-sm font-bold text-gray-900">常用工具 / 网址</h2>
+            </div>
+            <Link href="/workspace/favorites" className="text-xs text-teal-600 hover:underline">管理 →</Link>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {favTools.map(fav => (
+              <Link key={fav.id} href={`/tools/${fav.resourceUrl.replace('/tools/', '')}`} className="bg-white border border-gray-100 rounded-xl p-3 hover:border-teal-200 hover:shadow-sm transition-all group">
+                <div className="flex items-center gap-3">
+                  <span className="text-base shrink-0">🔧</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate group-hover:text-teal-700">{fav.title}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">工具</div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {navLinks.map(link => (
+              <a key={link.id} href={link.url} target="_blank" rel="noopener noreferrer" className="bg-white border border-gray-100 rounded-xl p-3 hover:border-teal-200 hover:shadow-sm transition-all group">
+                <div className="flex items-center gap-3">
+                  <span className="text-base shrink-0">🌐</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate group-hover:text-teal-700">{link.title}</div>
+                    <div className="text-[10px] text-gray-400 mt-0.5">网址</div>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Favorites (original placeholder) */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Heart className="w-4 h-4 text-red-500" />
             <h2 className="text-sm font-bold text-gray-900">我的资源夹</h2>
           </div>
-          {favs.length > 0 && <Link href="/workspace/favorites" className="text-xs text-teal-600 hover:underline">查看全部 →</Link>}
+          <Link href="/workspace/favorites" className="text-xs text-teal-600 hover:underline">查看全部 →</Link>
         </div>
+        <div className="bg-white border border-gray-100 rounded-xl p-6 text-center">
+           <p className="text-xs text-gray-400">前往 <Link href="/workspace/favorites" className="text-teal-600 hover:underline">我的收藏</Link> 管理全部收藏</p>
+        </div>
+      </section>
 
-        {favs.length === 0 ? (
-          <div className="bg-white border border-gray-100 rounded-xl p-8 text-center">
-            <Heart className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500 mb-1">还没有收藏任何资源</p>
-            <p className="text-xs text-gray-400 mb-3">浏览工具中心，点击收藏按钮即可添加到资源夹</p>
-            <Link href="/tools" className="inline-flex items-center gap-1 px-3 py-1.5 bg-teal-600 text-white rounded-lg text-xs hover:bg-teal-700">
-              去发现工具 <ExternalLink className="w-3 h-3" />
-            </Link>
+      {/* 最近备忘 */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <StickyNote className="w-4 h-4 text-amber-500" />
+            <h2 className="text-sm font-bold text-gray-900">最近备忘</h2>
           </div>
+          <Link href="/workspace/memos" className="text-xs text-teal-600 hover:underline">全部备忘 →</Link>
+        </div>
+        {recentMemos.length === 0 ? (
+          <Link href="/workspace/memos" className="block bg-white border border-gray-100 rounded-xl p-6 text-center hover:border-teal-200 transition-all">
+            <StickyNote className="w-6 h-6 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 mb-1">暂无备忘录</p>
+            <p className="text-xs text-gray-400">点击创建你的第一条备忘</p>
+          </Link>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {favs.map(fav => (
-              <Link key={fav.id} href={fav.resourceUrl} className="bg-white border border-gray-100 rounded-xl p-4 hover:border-teal-200 hover:shadow-sm transition-all group">
-                <div className="flex items-start gap-3">
-                  <span className="text-lg shrink-0 mt-0.5">{fav.resourceType === "topic" ? "📚" : fav.resourceType === "article" ? "📝" : "🔧"}</span>
-                  <div className="min-w-0">
-                    <div className="font-medium text-sm text-gray-900 group-hover:text-teal-700 truncate">{fav.title}</div>
-                    <div className="text-xs text-gray-400 mt-1">{fav.resourceType} · {new Date(fav.createdAt).toLocaleDateString("zh-CN")}</div>
-                  </div>
-                </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {recentMemos.map(memo => (
+              <Link key={memo.id} href="/workspace/memos" className="bg-white border border-gray-100 rounded-xl p-3 hover:shadow-sm transition-all">
+                <div className="text-xs font-medium text-gray-900 truncate mb-1">{memo.title}</div>
+                <div className="text-[10px] text-gray-400 line-clamp-2">{memo.content || "无内容"}</div>
               </Link>
             ))}
           </div>
@@ -208,16 +289,16 @@ export default async function WorkspacePage() {
         </div>
       </section>
 
-      {/* Coming soon / reserved cards */}
+      {/* 更多服务 / 未来能力入口 */}
       <section>
         <h2 className="text-sm font-bold text-gray-900 mb-3">更多服务</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
             { icon: Bell, label: "通知中心", href: "/workspace/notifications", status: "ready" as const },
             { icon: TrendingUp, label: "常用工具", href: "/workspace/favorites", status: "ready" as const },
+            { icon: StickyNote, label: "备忘录", href: "/workspace/memos", status: "ready" as const },
             { icon: Sparkles, label: "任务链", status: "coming-soon" as const },
             { icon: DollarSign, label: "汇率关注", status: "coming-soon" as const },
-            { icon: Award, label: "等级与勋章", status: "coming-soon" as const },
           ].map(item => (
             item.status === "ready" ? (
               <Link key={item.label} href={item.href} className="flex items-center gap-2 bg-gradient-to-br from-teal-50 to-white border border-teal-100 rounded-xl p-3 hover:shadow-sm transition-all group">
@@ -232,6 +313,20 @@ export default async function WorkspacePage() {
                 <span className="text-[10px] text-gray-400 ml-auto">规划中</span>
               </div>
             )
+          ))}
+        </div>
+        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { icon: Briefcase, label: "黄页信用" },
+            { icon: Megaphone, label: "广告合作" },
+            { icon: Award, label: "等级与勋章" },
+            { icon: BarChart3, label: "落地页运营" },
+          ].map(item => (
+            <div key={item.label} className="flex items-center gap-2 bg-gray-50/50 border border-gray-100 rounded-xl p-3 opacity-50">
+              <item.icon className="w-4 h-4 text-gray-400" />
+              <span className="text-xs font-medium text-gray-500">{item.label}</span>
+              <span className="text-[10px] text-gray-400 ml-auto">规划中</span>
+            </div>
           ))}
         </div>
       </section>
