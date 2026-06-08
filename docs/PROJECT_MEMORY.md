@@ -241,6 +241,28 @@
 
 ---
 
+## 🛡️ Dashboard/Admin 保护规则 (v1.20.42.6.11 锁定)
+
+### 路由保护
+1. `/workspace` 是正式工作台路由，不得替换为其他路径。
+2. `/workbench` 仅作为兼容跳转，不得作为主入口。
+3. Dashboard 当前 8 个用户端页面不得被删除：`/workspace`, `/workspace/documents`, `/workspace/company-profiles`, `/workspace/favorites`, `/workspace/notifications`, `/workspace/member`, `/workspace/tasks`, `/workspace/settings`。
+4. UserSidebar / MobileTabs 不得随意替换或移除。
+5. 后续工具迁移不得修改 `src/app/(workspace)` 目录结构。
+6. 后续 Auth 修改必须回归 `/workspace` 首屏加载测试。
+7. 后续 Dashboard 新功能只能增量增强，不得用简化版覆盖现有页面。
+
+### Admin 导航保护
+8. Admin 导航 5 组 21 项结构不得随意删减。
+9. 新增 Admin 页面必须先有完整功能，禁止加入 404 空菜单。
+10. 高级工具型页面（如 webhooks、import-bookmarks）不得误放入核心运营入口。
+
+### 数据库红线
+11. Dashboard/Admin 相关功能不得新增 Prisma schema/migration，除非先单独报告并获得确认。
+12. 通知、收藏、成长值等现有表结构不得随意修改字段类型。
+
+---
+
 ## 📝 三期待办方向（待规划）
 
 - [ ] UX 精修：各页面 UI 统一与交互优化
