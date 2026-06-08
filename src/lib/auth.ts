@@ -20,27 +20,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         name: { label: "Name", type: "text" },
       },
       async authorize(credentials) {
-        // ===== BYPASS FOR TESTING =====
-        if (credentials?.email === 'test@jueshi.net' && credentials?.password === '***') {
-          const realUser = await prisma.user.findUnique({ where: { email: 'test@jueshi.net' } });
-          if (realUser) {
-            return { id: realUser.id, email: realUser.email, name: realUser.name, role: realUser.role };
-          }
-          return { id: "test-bypass-id", email: "test@jueshi.net", name: "测试特权账号", role: "user" };
-        }
-        if (credentials?.email === '9833416@qq.com' && credentials?.password === '***') {
-          const realUser = await prisma.user.findUnique({ where: { email: '9833416@qq.com' } });
-          if (realUser) {
-            return { id: realUser.id, email: realUser.email, name: realUser.name, role: realUser.role };
-          }
-        }
-        // ===== END BYPASS =====
-
         if (!credentials?.email || !credentials?.password) return null;
 
         const email = credentials.email as string;
         const password = credentials.password as string;
-        const name = credentials.name as string | undefined;
 
         let userRecord;
         try {
@@ -50,36 +33,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        if (userRecord) {
-          if (!userRecord.password) {
-            return null;
-          }
-          const isValid = await bcrypt.compare(password, userRecord.password);
-          if (!isValid) return null;
-          return {
-            id: userRecord.id,
-            email: userRecord.email,
-            name: userRecord.name,
-            role: userRecord.role,
-          };
+        if (!userRecord) {
+          console.warn(`[AUTH] Login failed: user not found (${email})`);
+          return null;
         }
 
-        // Auto-register
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await prisma.user.create({
-          data: {
-            email,
-            name: name || email.split("@")[0],
-            password: hashedPassword,
-            role: "user",
-          },
-        });
+        if (!userRecord.password) {
+          console.warn(`[AUTH] Login failed: user has no password hash (${email})`);
+          return null;
+        }
+
+        const isValid = await bcrypt.compare(password, userRecord.password);
+        if (!isValid) {
+          console.warn(`[AUTH] Login failed: incorrect password (${email})`);
+          return null;
+        }
 
         return {
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name,
-          role: newUser.role,
+          id: userRecord.id,
+          email: userRecord.email,
+          name: userRecord.name,
+          role: userRecord.role,
         };
       },
     }),

@@ -14,15 +14,18 @@ module.exports = {
   apps: [
     {
       name: "xixiong-saas",
-      script: "npm",
-      args: "start",
       cwd: "/home/deploy/xixiong-saas",
       instances: 1,
       exec_mode: "fork",
+      // SECURITY: No secrets in this file.
+      // AUTH_SECRET, AUTH_URL, NEXTAUTH_URL, DATABASE_URL are loaded from .env.production
+      // by the wrapper script (scripts/pm2-start.sh).
+      // Keys NOT in this env block are inherited from the shell environment.
+      script: "/home/deploy/xixiong-saas/scripts/pm2-start.sh",
+      interpreter: "none",
       env: {
         NODE_ENV: "production",
         PORT: "3000",
-        DATABASE_URL: "postgresql://bxb_user:Bxb2024%21Prod%40Secure@127.0.0.1:5432/bxb_prod?schema=public",
       },
       max_memory_restart: "1G",
       error_file: "/home/deploy/.pm2/logs/xixiong-saas-error.log",
