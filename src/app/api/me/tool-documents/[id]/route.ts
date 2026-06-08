@@ -82,6 +82,24 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
         action: "update",
       },
     });
+
+    // Write EventLog for Document_Save (server-side, reliable)
+    try {
+      await prisma.eventLog.create({
+        data: {
+          eventType: "Document_Save",
+          toolName: existing.toolKey,
+          action: JSON.stringify({
+            type: "Document_Save",
+            toolSlug: existing.toolKey,
+            documentId: id,
+            source: "document_tool_engine",
+          }),
+        },
+      });
+    } catch (err) {
+      console.error("[tool-documents PUT] EventLog write failed:", err);
+    }
   }
 
   return NextResponse.json({ success: true, data: updated });

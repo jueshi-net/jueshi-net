@@ -72,5 +72,24 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // Write EventLog for Document_Save (server-side, reliable)
+  try {
+    await prisma.eventLog.create({
+      data: {
+        eventType: "Document_Save",
+        toolName: toolKey,
+        action: JSON.stringify({
+          type: "Document_Save",
+          toolSlug: toolKey,
+          documentId: draft.id,
+          source: "document_tool_engine",
+        }),
+      },
+    });
+  } catch (err) {
+    console.error("[tool-documents POST] EventLog write failed:", err);
+    // Don't fail the save if EventLog fails
+  }
+
   return NextResponse.json({ success: true, data: draft }, { status: 201 });
 }
