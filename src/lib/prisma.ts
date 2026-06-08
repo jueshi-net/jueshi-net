@@ -5,10 +5,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Neon pooler URL (fast, low-latency connections)
-const dbUrl =
-  process.env.DATABASE_URL ??
-  "postgresql://neondb_owner:npg_eL9DhSpQHZ5a@ep-morning-sun-amgb7w40-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&pgbouncer=true";
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error(
+    "DATABASE_URL is not set. Provide it via .env.local (dev) or .env.production / PM2 env_production (prod). " +
+    "No fallback is allowed — fail fast to prevent connecting to the wrong database."
+  );
+}
 
 const adapter = new PrismaPg({ connectionString: dbUrl });
 
