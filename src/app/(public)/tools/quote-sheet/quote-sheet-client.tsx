@@ -7,7 +7,7 @@
 
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Save, Printer, FileText, Loader2, Building2, Eye, Code, Plus, Trash2, Download } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
@@ -24,18 +24,17 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
   const [showPreview, setShowPreview] = useState(true);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
   const [exporting, setExporting] = useState(false);
+  const hasTrackedView = useRef(false);
 
   const engine = useDocumentToolEngine<QuoteSheetData>({
-    toolKey: "quote_sheet",
+    toolKey: "quote-sheet",
     defaultData: defaultQuoteSheetData,
     serialize,
     deserialize,
-    onAfterSave: () => {},
+    onAfterSave: (_docId: string) => {},
     onAfterRestore: () => {
       setSelectedProfile(null);
     },
-    getTitle: (data) => `报价单 ${data.quoteDate}`,
-    draftId,
   });
 
   const {
@@ -44,6 +43,26 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
     saving, saved, saveMsg, currentDocId,
     handleSave, handleRestore, handleReset, openPrintWindow,
   } = engine;
+
+  // Track Tool_View on mount (once)
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      hasTrackedView.current = true;
+      try {
+        navigator.sendBeacon(
+          "/api/events",
+          JSON.stringify({
+            event: "Tool_View",
+            toolSlug: "quote-sheet",
+            source: "document_tool_engine",
+            ts: Date.now(),
+          })
+        );
+      } catch {
+        // ignore
+      }
+    }
+  }, []);
 
   // Handle Company Profile Selection
   const handleProfileSelect = useCallback((profile: CompanyProfile) => {
@@ -66,14 +85,13 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
     openPrintWindow("供应链报价单", contentHtml, styles);
   }, [openPrintWindow]);
 
-  // Handle PNG Export (uses html2canvas if available, falls back to print)
+  // Handle PNG Export
   const handleExportPNG = useCallback(async () => {
     setExporting(true);
     try {
       const el = previewRef.current;
       if (!el) return;
 
-      // Try html2canvas if it exists globally (e.g. loaded via CDN)
       const html2canvas = (window as any).html2canvas;
       if (html2canvas) {
         const canvas = await html2canvas(el, { scale: 2, useCORS: true });
@@ -81,17 +99,22 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
         link.download = `quote-sheet-${data.quoteDate}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
+
+        // Track Document_Export event
+        navigator.sendBeacon(
+          "/api/events",
+          JSON.stringify({
+            event: "Document_Export",
+            toolSlug: "quote-sheet",
+            source: "document_tool_engine",
+            exportType: "png",
+            ts: Date.now(),
+          })
+        );
       } else {
         // Fallback: open print window for PNG
         handlePrint();
       }
-
-      // Track Document_Export event
-      trackEvent("Document_Export" as any, {
-        toolSlug: "quote_sheet",
-        source: "document_tool_engine",
-        exportType: "png",
-      });
     } catch {
       // Export failed — don't block main functionality
     }
@@ -125,11 +148,16 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
       URL.revokeObjectURL(link.href);
 
       // Track Document_Export event
-      trackEvent("Document_Export" as any, {
-        toolSlug: "quote_sheet",
-        source: "document_tool_engine",
-        exportType: "word",
-      });
+      navigator.sendBeacon(
+        "/api/events",
+        JSON.stringify({
+          event: "Document_Export",
+          toolSlug: "quote-sheet",
+          source: "document_tool_engine",
+          exportType: "word",
+          ts: Date.now(),
+        })
+      );
     } catch {
       // Export failed — don't block main functionality
     }

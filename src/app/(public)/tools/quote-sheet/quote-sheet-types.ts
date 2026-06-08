@@ -48,6 +48,7 @@ export const defaultQuoteSheetData: QuoteSheetData = {
  */
 export function serialize(data: QuoteSheetData): Record<string, unknown> {
   return {
+    title: `报价单 ${data.quoteDate}`,
     companyName: data.companyName,
     companyContact: data.companyContact,
     companyEmail: data.companyEmail,

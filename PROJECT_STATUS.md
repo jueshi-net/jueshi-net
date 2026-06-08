@@ -2,13 +2,14 @@
 
 | Field | Value |
 |---|---|
-| **Version** | v1.20.43.4 (Quote-Sheet Single Tool Engine Migration) |
-| **State** | **ENGINE_MIGRATED** |
-| **Last Audit** | 2026-06-08 (Quote Sheet 迁移到 Document Tool Engine 架构，useDocumentToolEngine + quote-sheet-types + quote-sheet-preview + quote-sheet-client 拆分完成，PNG/Word 导出已实现，事件埋点 Tool_View/Document_Save/Document_Export 已接入) |
-| **Quote Sheet** | **ENGINE_MIGRATED** — 使用 useDocumentToolEngine，表单/保存/恢复/打印/PNG/Word 导出全部就绪 |
-| **Quote Sheet Export PNG** | **VERIFIED** — Blob 导出 + html2canvas fallback |
-| **Quote Sheet Export Word** | **VERIFIED** — Blob .doc 方案 |
-| **Quote Sheet Events** | **VERIFIED** — Tool_View / Document_Save / Document_Export 写入 EventLog |
+| **Version** | v1.20.43.4.1 (Quote-Sheet Migration Rescue) |
+| **State** | **ENGINE_MIGRATED_PENDING_FIX** |
+| **Last Audit** | 2026-06-08 (Quote Sheet 迁移后发现问题：保存 UI 无反馈、EventLog 为 0、ToolMetricDaily saves=0、draftId 恢复未验证、导出未验证。已降级状态，正在修复。) |
+| **Quote Sheet** | **ENGINE_MIGRATED_PENDING_FIX** — 使用 useDocumentToolEngine，但保存 UI / 事件埋点 / draftId 恢复 / 导出均未通过验证 |
+| **Quote Sheet Export PNG** | **PENDING_VERIFICATION** — html2canvas 依赖需确认，导出链路未实测 |
+| **Quote Sheet Export Word** | **PENDING_VERIFICATION** — Blob .doc 方案存在，未实测下载 |
+| **Quote Sheet Save** | **BROKEN_UI_PENDING_FIX** — API 后端可用，但 UI saved/saving 状态未更新 |
+| **Quote Sheet Events** | **BROKEN_PENDING_FIX** — event_logs 中 0 条 quote-sheet 记录 |
 | **Dashboard State** | **UNCHANGED / VERIFIED** — git diff -- src/app/\(workspace\) = 0 |
 | **Legacy Quotation** | **RETAINED** — /tools/documents/quotation 保持可用，未修改 |
 | **Tool Center** | **EXPANDED_WITH_LEGACY_DOCUMENT_TOOLS** — 24 tools (23 documents + 1 ai-content) |

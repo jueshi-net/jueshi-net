@@ -49,10 +49,10 @@
 | **Dashboard Layout & Sidebar** | `layout.tsx`, `UserSidebar.tsx` | P0 | v1.20.42.6.7 | ✅ HYBRID_RESTORED_VERIFIED — 7 pages + mobile screenshot accepted. |
 | **Legacy Document Tools Data Bridge** | `/api/events` bridge + Tool table upsert | P1 | v1.20.42.6.8.2 | ✅ VERIFIED_AFTER_SAVE_EVENT_FIX — 17 legacy tools upserted (16 + shipping-mark), 4 canonical duplicates skipped. Full event chain verified: Tool_Click (from tool_center), Tool_View (page load), Document_Save (localStorage, saveMode field), Document_Export (png/word, exportType field). ToolMetricDaily populated (views/clicks/saves). |
 | **Homepage Document Tools** | `document-tools-section.tsx` | P2 | v1.20.42.6.8.2 | ✅ DYNAMICIZED — reads Tool table category=documents, modern-first order, max 12 displayed, safe fallback on DB failure, CTA → /tools?cat=documents |
-|| **Quote Sheet** | `/tools/quote-sheet` | P0 | v1.20.43.4 | ✅ ENGINE_MIGRATED — 拆分 page.tsx (Server) + quote-sheet-client.tsx (Client) + quote-sheet-types.ts + quote-sheet-preview.tsx，使用 useDocumentToolEngine |
-|| **Quote Sheet Export PNG** | `/tools/quote-sheet` | P1 | v1.20.43.4 | ✅ VERIFIED — html2canvas fallback 到打印窗口 |
-|| **Quote Sheet Export Word** | `/tools/quote-sheet` | P1 | v1.20.43.4 | ✅ VERIFIED — Blob .doc 方案 |
-|| **Quote Sheet Events** | `/api/events` | P1 | v1.20.43.4 | ✅ VERIFIED — Tool_View / Document_Save / Document_Export 写入 EventLog，ToolMetricDaily saves 累加 |
+|| **Quote Sheet** | `/tools/quote-sheet` | P0 | v1.20.43.4.1 | ⚠️ ENGINE_MIGRATED_PENDING_FIX — 拆分 page.tsx + quote-sheet-client.tsx + quote-sheet-types.ts + quote-sheet-preview.tsx，使用 useDocumentToolEngine。保存 UI / 事件埋点 / draftId 恢复 / 导出均待修复验证 |
+|| **Quote Sheet Export PNG** | `/tools/quote-sheet` | P1 | v1.20.43.4.1 | ⚠️ PENDING_VERIFICATION — html2canvas 依赖需确认 |
+|| **Quote Sheet Export Word** | `/tools/quote-sheet` | P1 | v1.20.43.4.1 | ⚠️ PENDING_VERIFICATION — Blob .doc 方案存在，未实测 |
+|| **Quote Sheet Events** | `/api/events` | P1 | v1.20.43.4.1 | ⚠️ BROKEN — event_logs 中 0 条 quote-sheet 记录，ToolMetricDaily saves=0 |
 || **Homepage Hero Search** | `/ → /tools?q=` | P0 | v1.20.42.6.8.4 | ✅ VERIFIED — Hero search box functional (onChange + onClick + onKeyDown), 5 CN keywords tested, all redirect to /tools?q= with correct results |
 | **Export Document Set Generator** | Product Planning | P2 | Future | 🆕 PLANNED (See below) |
 | **Project Brain** | AI Project Management | P1 | v1.20.45+ | PLANNED (登记中) |
