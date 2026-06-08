@@ -29,8 +29,8 @@ async function run() {
   
   // Check ToolMetricDaily
   const metrics = await client.query(
-    `SELECT "toolSlug", date, views, saves FROM tool_metric_dailies 
-     WHERE "toolSlug" = 'quote-sheet' ORDER BY date DESC LIMIT 3`
+    `SELECT "tool_slug" as "toolSlug", date, views, saves FROM tool_metric_dailies 
+     WHERE "tool_slug" = 'quote-sheet' ORDER BY date DESC LIMIT 3`
   );
   console.log('\n=== ToolMetricDaily (quote-sheet) ===');
   console.table(metrics.rows);

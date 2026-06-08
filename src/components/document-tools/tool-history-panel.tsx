@@ -43,8 +43,14 @@ export default function ToolHistoryPanel({ documentId, toolKey, onRestore }: Too
     if (open) fetchHistory();
   }, [open, documentId]);
 
-  const handleRestore = async (entry: HistoryEntry) => {
-    if (!confirm("确定要恢复到此历史版本吗？当前未保存的修改将被覆盖。")) return;
+  const [pendingRestoreId, setPendingRestoreId] = useState<string | null>(null);
+
+  const handleRestoreClick = (entry: HistoryEntry) => {
+    setPendingRestoreId(entry.id);
+  };
+
+  const handleRestoreConfirm = async (entry: HistoryEntry) => {
+    setPendingRestoreId(null);
     setRestoring(entry.id);
     setError("");
     try {
@@ -55,7 +61,6 @@ export default function ToolHistoryPanel({ documentId, toolKey, onRestore }: Too
       });
       if (res.ok) {
         const d = await res.json();
-        // Extract dataJson from the restored document
         if (d.data?.dataJson) {
           onRestore(d.data.dataJson);
         }
@@ -67,6 +72,21 @@ export default function ToolHistoryPanel({ documentId, toolKey, onRestore }: Too
       }
     } catch { setError("网络错误"); }
     setRestoring(null);
+  };
+
+  const handleRestoreCancel = () => {
+    setPendingRestoreId(null);
+  };
+
+  const extractPreview = (snapshotJson: string) => {
+    try {
+      const d = JSON.parse(snapshotJson);
+      // Quote Sheet specific preview
+      if (d.clientName && d.clientName !== "—") return d.clientName;
+      if (d.companyName && d.companyName !== "—") return d.companyName;
+      if (d.title) return d.title;
+      return "已保存";
+    } catch { return "已保存"; }
   };
 
   const actionLabel = (action: string) => {
@@ -100,27 +120,48 @@ export default function ToolHistoryPanel({ documentId, toolKey, onRestore }: Too
             {loading && <div className="px-4 py-8 text-center text-sm text-gray-400"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />加载中...</div>}
             {!loading && error && <div className="px-4 py-3 text-sm text-red-600">{error}</div>}
             {!loading && history.length === 0 && <div className="px-4 py-8 text-center text-sm text-gray-400">暂无历史记录</div>}
-            {!loading && history.map((entry, idx) => (
-              <div key={entry.id} className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">{actionLabel(entry.action)}</span>
-                  <span className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(entry.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+            {!loading && history.map((entry, idx) => {
+              const isPending = pendingRestoreId === entry.id;
+              const isRestoring = restoring === entry.id;
+              return (
+                <div key={entry.id} className="px-4 py-3 border-b border-gray-50 hover:bg-gray-50">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded">{actionLabel(entry.action)}</span>
+                    <span className="text-xs text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(entry.createdAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-2 truncate">
+                    {extractPreview(entry.snapshotJson)}
+                  </div>
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleRestoreConfirm(entry)}
+                        disabled={isRestoring}
+                        className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 disabled:opacity-50 min-h-[32px]"
+                      >
+                        {isRestoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}
+                        确认恢复
+                      </button>
+                      <button
+                        onClick={handleRestoreCancel}
+                        className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 min-h-[32px]"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleRestoreClick(entry)}
+                      disabled={isRestoring}
+                      className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 disabled:opacity-50 min-h-[32px]"
+                    >
+                      {isRestoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}
+                      恢复此版本
+                    </button>
+                  )}
                 </div>
-                <div className="text-xs text-gray-500 mb-2 truncate">
-                  {entry.snapshotJson ? (() => {
-                    try { const d = JSON.parse(entry.snapshotJson); return d.items?.length ? `${d.items.length} 个商品` : d.title || "已保存"; } catch { return "已保存"; }
-                  })() : "已保存"}
-                </div>
-                <button
-                  onClick={() => handleRestore(entry)}
-                  disabled={restoring === entry.id}
-                  className="inline-flex items-center gap-1 text-xs text-teal-600 hover:text-teal-700 disabled:opacity-50 min-h-[32px]"
-                >
-                  {restoring === entry.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}
-                  恢复此版本
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </>
       )}
