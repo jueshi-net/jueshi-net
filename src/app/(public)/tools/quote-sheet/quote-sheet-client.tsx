@@ -85,16 +85,10 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
     openPrintWindow("供应链报价单", contentHtml, styles);
   }, [openPrintWindow]);
 
-  // Handle PNG Export — dynamic import html2canvas
+  // Handle PNG Export — dynamic import html2canvas + export-safe DOM
   const handleExportPNG = useCallback(async () => {
     setExporting(true);
     try {
-      const el = previewRef.current;
-      if (!el) {
-        setError("预览内容不存在，无法导出 PNG");
-        return;
-      }
-
       // Dynamically import html2canvas
       let html2canvas = (window as any).html2canvas;
       if (!html2canvas) {
@@ -108,7 +102,15 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
         }
       }
 
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' });
+      // Create export-safe hidden element with inline styles only
+      const container = document.createElement("div");
+      container.style.cssText = "position:absolute;left:-9999px;top:0;";
+      container.innerHTML = buildExportHtml();
+      document.body.appendChild(container);
+
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" });
+      document.body.removeChild(container);
+
       const link = document.createElement("a");
       const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
       link.download = `quote-sheet-${ts}.png`;
@@ -132,21 +134,11 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
         );
       } catch { /* ignore tracking errors */ }
     } catch (e) {
-      console.error("[PNG Export] html2canvas failed, falling back to print:", e);
-      // Fallback: open print window so user can Save as PNG
-      const contentHtml = previewRef.current?.innerHTML || "";
-      const styles = `
-        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #f5f5f5; }
-        h1 { text-align: center; color: #0d9488; }
-        .total { text-align: right; font-size: 18px; font-weight: bold; }
-      `;
-      openPrintWindow("供应链报价单", contentHtml, styles);
+      console.error("[PNG Export] html2canvas failed:", e);
+      setError("PNG 导出失败: " + (e instanceof Error ? e.message : String(e)));
     }
     setExporting(false);
-  }, [currentDocId, setError, openPrintWindow]);
+  }, [currentDocId, setError]);
 
   // Handle Word Export (Blob .doc approach)
   const handleExportWord = useCallback(() => {
@@ -225,6 +217,56 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
   }, [setData]);
 
   const total = calculateTotals(data.lines);
+
+  // Build export-safe HTML with inline hex/rgb styles (no Tailwind lab()/oklch())
+  // Plain function (not useCallback) so it captures data/total from closure
+  function buildExportHtml(): string {
+    const lines = data.lines.map(l => `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #e5e7eb;">${l.description || "—"}${l.weight ? ` <span style="color:#9ca3af;font-size:12px;">(${l.weight})</span>` : ""}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;">${l.qty}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;">${l.pricePerUnit.toFixed(2)}</td>
+        <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;">${(l.qty * l.pricePerUnit).toFixed(2)}</td>
+      </tr>`).join("");
+
+    const channels = data.lines.filter(l => l.channel).map(l => `${l.description}→${l.channel}`).join("; ");
+    const notes = data.lines.filter(l => l.notes).map(l => `<p style="font-size:12px;color:#4b5563;margin:2px 0;">${l.description}: ${l.notes}</p>`).join("");
+
+    return `
+      <div style="font-family:Arial,sans-serif;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:32px;min-width:280px;max-width:800px;">
+        <h1 style="font-size:24px;font-weight:bold;text-align:center;color:#0f766e;margin-bottom:24px;">供应链报价单</h1>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+          <div>
+            <p style="font-size:12px;color:#6b7280;margin-bottom:4px;">报价方</p>
+            <p style="font-weight:bold;">${data.companyName || "—"}</p>
+            <p style="font-size:14px;color:#4b5563;">${data.companyContact}${data.companyEmail ? ` · ${data.companyEmail}` : ""}</p>
+          </div>
+          <div>
+            <p style="font-size:12px;color:#6b7280;margin-bottom:4px;">客户</p>
+            <p style="font-weight:bold;">${data.clientName || "—"}</p>
+            <p style="font-size:14px;color:#4b5563;">${data.clientContact || "—"}</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;font-size:14px;">
+          <div><span style="color:#6b7280;">报价日期: </span><span style="font-weight:500;">${data.quoteDate}</span></div>
+          <div><span style="color:#6b7280;">有效期至: </span><span style="font-weight:500;">${data.validUntil || "—"}</span></div>
+        </div>
+        <table style="width:100%;font-size:14px;margin-bottom:24px;border-collapse:collapse;">
+          <thead><tr style="background:#f9fafb;">
+            <th style="text-align:left;padding:8px;border-bottom:1px solid #e5e7eb;font-weight:500;">描述</th>
+            <th style="text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;font-weight:500;">数量</th>
+            <th style="text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;font-weight:500;">单价</th>
+            <th style="text-align:right;padding:8px;border-bottom:1px solid #e5e7eb;font-weight:500;">小计</th>
+          </tr></thead>
+          <tbody>${lines}</tbody>
+        </table>
+        <div style="text-align:right;">
+          <span style="font-size:18px;font-weight:bold;color:#0f766e;">总计: ${total.toFixed(2)}</span>
+        </div>
+        ${channels ? `<p style="font-size:12px;color:#6b7280;margin-top:16px;">渠道: ${channels}</p>` : ""}
+        ${notes ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e5e7eb;"><p style="font-size:12px;color:#6b7280;margin-bottom:4px;">备注</p>${notes}</div>` : ""}
+      </div>`;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
