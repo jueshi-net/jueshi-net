@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database,
-  ExternalLink, Upload, FolderOpen, Globe, BookOpen,
+  ExternalLink, Upload, FolderOpen, Globe, BookOpen, LayoutTemplate, Megaphone,
   MessageSquare, BarChart3, Award, TrendingUp, FileCheck, Link2,
 } from "lucide-react";
 
@@ -36,12 +36,14 @@ const navSections = [
       { href: "/admin/links", label: "网址管理", icon: Link2 },
       { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
       { href: "/admin/resources/import", label: "资源导入", icon: Upload },
+      { href: "/admin/landing-pages", label: "落地页管理", icon: LayoutTemplate },
     ]
   },
   {
     title: "广告与数据",
     items: [
       { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
+      { href: "/admin/ad-placements", label: "广告位管理", icon: Megaphone },
       { href: "/admin/analytics", label: "数据分析", icon: BarChart3 },
     ]
   },

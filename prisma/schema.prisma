@@ -1257,3 +1257,52 @@ model ToolMetricDaily {
   @@index([date])
   @@map("tool_metric_dailies")
 }
+
+// ─── v1.20.42.6.14: Ad Placement Inventory ───
+
+model AdPlacement {
+  id          String   @id @default(cuid())
+  key         String   @unique // e.g. home.hero_below, tool.result_below
+  name        String   // Display name, e.g. "首页首屏下方"
+  pageType    String   @map("page_type") // home / tool / article / topic / landing / yellowpage / task / workspace
+  zone        String   // hero_below / sidebar / result_below / content_mid / footer / native_card
+  device      String   @default("all") // all / desktop / mobile
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([pageType])
+  @@index([isActive])
+  @@map("ad_placements")
+}
+
+// ─── v1.20.42.6.14: Landing Page Configuration (Admin only, no public rendering yet) ───
+
+model LandingPage {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  seoTitle         String?  @map("seo_title")
+  seoDescription   String?  @map("seo_description") @db.Text
+  pageType         String   @map("page_type") // country / tool / topic / guide / city / postal / landing
+  status           String   @default("draft") // draft / published / hidden
+  heroSection      Json?    @map("hero_section") // {title, subtitle, ctaText, ctaUrl, backgroundImage}
+  primaryTool      String?  @map("primary_tool") // Tool slug
+  relatedTools     String[] @map("related_tools") // Tool slugs
+  relatedTopics    String[] @map("related_topics") // Topic slugs
+  relatedArticles  String[] @map("related_articles") // Article slugs
+  faqItems         Json?    @map("faq_items") // [{question, answer}]
+  officialLinks    Json?    @map("official_links") // [{label, url, icon}]
+  adPlacements     Json?    @map("ad_placements") // [{placementKey, enabled, campaignIds}]
+  ctaConfig        Json?    @map("cta_config") // {text, url, style}
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+  publishedAt      DateTime? @map("published_at")
+
+  @@index([status])
+  @@index([pageType])
+  @@index([slug])
+  @@map("landing_pages")
+}
