@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2 } from "lucide-react";
+import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2, Bell, ArrowUpRight, Sparkles, TrendingUp, DollarSign, Award, ChevronRight } from "lucide-react";
 import DeleteDocButton from "@/components/workspace/DeleteDocButton";
 
 export const metadata: Metadata = {
@@ -204,6 +204,34 @@ export default async function WorkspacePage() {
               <span className="text-lg">{link.emoji}</span>
               <span className="text-xs font-medium text-gray-700">{link.label}</span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Coming soon / reserved cards */}
+      <section>
+        <h2 className="text-sm font-bold text-gray-900 mb-3">更多服务</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {[
+            { icon: Bell, label: "通知中心", href: "/workspace/notifications", status: "ready" as const },
+            { icon: TrendingUp, label: "常用工具", href: "/workspace/favorites", status: "ready" as const },
+            { icon: Sparkles, label: "任务链", status: "coming-soon" as const },
+            { icon: DollarSign, label: "汇率关注", status: "coming-soon" as const },
+            { icon: Award, label: "等级与勋章", status: "coming-soon" as const },
+          ].map(item => (
+            item.status === "ready" ? (
+              <Link key={item.label} href={item.href} className="flex items-center gap-2 bg-gradient-to-br from-teal-50 to-white border border-teal-100 rounded-xl p-3 hover:shadow-sm transition-all group">
+                <item.icon className="w-4 h-4 text-teal-600" />
+                <span className="text-xs font-medium text-teal-700">{item.label}</span>
+                <ChevronRight className="w-3 h-3 text-teal-400 ml-auto group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            ) : (
+              <div key={item.label} className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl p-3 opacity-60">
+                <item.icon className="w-4 h-4 text-gray-400" />
+                <span className="text-xs font-medium text-gray-500">{item.label}</span>
+                <span className="text-[10px] text-gray-400 ml-auto">规划中</span>
+              </div>
+            )
           ))}
         </div>
       </section>

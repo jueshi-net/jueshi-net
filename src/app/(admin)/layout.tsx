@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database,
-  ExternalLink, Upload, FolderOpen, Globe, BookOpen
+  ExternalLink, Upload, FolderOpen, Globe, BookOpen,
+  MessageSquare, BarChart3, Award, TrendingUp, FileCheck, Link2,
 } from "lucide-react";
 
 
@@ -19,24 +20,42 @@ const navSections = [
     items: [
       { href: "/admin", label: "总控台", icon: LayoutDashboard },
       { href: "/admin/users", label: "用户管理", icon: Users },
-      { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
+      { href: "/admin/feedback", label: "反馈管理", icon: MessageSquare },
+      { href: "/admin/tool-reviews", label: "工具点评", icon: FileCheck },
+      { href: "/admin/levels", label: "等级与勋章", icon: Award },
+      { href: "/admin/growth-logs", label: "成长值流水", icon: TrendingUp },
       { href: "/admin/invites", label: "邀请码管理", icon: Shield },
     ]
   },
   {
-    title: "内容管理 (CMS)",
+    title: "内容与资源",
     items: [
       { href: "/admin/topics", label: "专题管理", icon: FolderOpen },
-      { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
-      { href: "/admin/resources", label: "🌍 网址导航大厅", icon: BookOpen },
       { href: "/admin/cms", label: "文章与指南", icon: BookOpen },
+      { href: "/admin/resources", label: "🌍 网址导航大厅", icon: Globe },
+      { href: "/admin/links", label: "网址管理", icon: Link2 },
+      { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
       { href: "/admin/resources/import", label: "资源导入", icon: Upload },
     ]
   },
   {
-    title: "系统与运维",
+    title: "广告与数据",
+    items: [
+      { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
+      { href: "/admin/analytics", label: "数据分析", icon: BarChart3 },
+    ]
+  },
+  {
+    title: "通知与消息",
     items: [
       { href: "/admin/notifications", label: "通知中心", icon: Bell },
+      { href: "/admin/newsletter", label: "邮件广播", icon: MessageSquare },
+    ]
+  },
+  {
+    title: "系统与安全",
+    items: [
+      { href: "/admin/audit", label: "审计日志", icon: Activity },
       { href: "/admin/health", label: "系统健康", icon: Activity },
       { href: "/admin/backup", label: "数据备份", icon: Database },
       { href: "/admin/settings", label: "系统设置", icon: Settings },

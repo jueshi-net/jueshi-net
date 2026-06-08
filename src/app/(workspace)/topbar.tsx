@@ -7,6 +7,7 @@ import { useUserPreferences } from "@/components/user/UserPreferencesContext";
 const PAGE_TITLES: Record<string, string> = {
   "/workspace": "我的工作台",
   "/workspace/tasks": "待办与任务",
+  "/workspace/notifications": "通知中心",
   "/workspace/member": "会员与权益",
   "/workspace/documents": "我的单据",
   "/workspace/company-profiles": "公司资料",

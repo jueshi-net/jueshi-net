@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Home, Target, Crown, FileText, Building2, Heart, Settings,
+  Home, Target, Crown, FileText, Building2, Heart, Settings, Bell,
   ArrowLeft,
 } from 'lucide-react';
 import { useUserPreferences, getTheme } from './UserPreferencesContext';
@@ -11,6 +11,7 @@ import { useUserPreferences, getTheme } from './UserPreferencesContext';
 const NAV_ITEMS = [
   { href: '/workspace', labelKey: 'workbench', icon: Home, emoji: '🏠' },
   { href: '/workspace/tasks', labelKey: 'tasks', icon: Target, emoji: '✅' },
+  { href: '/workspace/notifications', labelKey: 'notifications', icon: Bell, emoji: '🔔' },
   { href: '/workspace/member', labelKey: 'member', icon: Crown, emoji: '👑' },
   { href: '/workspace/documents', labelKey: 'documents', icon: FileText, emoji: '📦' },
   { href: '/workspace/company-profiles', labelKey: 'profiles', icon: Building2, emoji: '🏢' },
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
 const LABELS: Record<string, string> = {
   workbench: '我的工作台',
   tasks: '待办与任务',
+  notifications: '通知',
   member: '会员与权益',
   documents: '我的单据',
   profiles: '公司资料',
