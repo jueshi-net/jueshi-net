@@ -96,6 +96,8 @@
 | `AuditLog` / `Feedback` | 审计与反馈 | - |
 | `Notification` | 通知 | - |
 | `AdCampaign` | 广告活动 | - |
+| `AdPlacement` | 广告位库存 | 19 (种子数据) |
+| `LandingPage` | 落地页配置 | 0 (仅后台) |
 | `InviteCode` | 邀请码 | - |
 | `Article` | 文章/指南 | 20 |
 | `Resource` | 导航资源 | 928 |
@@ -123,9 +125,10 @@
 | `UserFavorite` | 用户收藏(新) | - |
 
 ### 前端路由结构
-#### 🔧 管理后台 (`/admin/*`) — 28 页面
+#### 🔧 管理后台 (`/admin/*`) — 30 页面
 - `/admin` — Dashboard 总览
 - `/admin/ads` — 广告管理
+- `/admin/ad-placements` — 广告位管理 (v1.20.42.6.14)
 - `/admin/analytics` — 数据分析
 - `/admin/audit` — 审计日志
 - `/admin/backup` — 数据库备份
@@ -137,6 +140,7 @@
 - `/admin/health` — 健康检查
 - `/admin/import` / `import-bookmarks` — 数据导入
 - `/admin/invites` — 邀请码管理
+- `/admin/landing-pages` — 落地页管理 (v1.20.42.6.14)
 - `/admin/levels` — 等级管理
 - `/admin/link-health` — 链接健康监控
 - `/admin/links` — 链接管理
@@ -241,7 +245,7 @@
 
 ---
 
-## 🛡️ Dashboard/Admin 保护规则 (v1.20.42.6.11 锁定)
+## 🛡️ Dashboard/Admin 保护规则 (v1.20.42.6.11 锁定, v1.20.42.6.14 扩展)
 
 ### 路由保护
 1. `/workspace` 是正式工作台路由，不得替换为其他路径。
@@ -253,13 +257,20 @@
 7. 后续 Dashboard 新功能只能增量增强，不得用简化版覆盖现有页面。
 
 ### Admin 导航保护
-8. Admin 导航 5 组 21 项结构不得随意删减。
+8. Admin 导航 5 组 23 项结构不得随意删减（v1.20.42.6.14 从 21 增至 23）。
 9. 新增 Admin 页面必须先有完整功能，禁止加入 404 空菜单。
 10. 高级工具型页面（如 webhooks、import-bookmarks）不得误放入核心运营入口。
+10.1. 已新增: "落地页管理" (/admin/landing-pages) → 内容与资源分组
+10.2. 已新增: "广告位管理" (/admin/ad-placements) → 广告与数据分组
 
 ### 数据库红线
 11. Dashboard/Admin 相关功能不得新增 Prisma schema/migration，除非先单独报告并获得确认。
 12. 通知、收藏、成长值等现有表结构不得随意修改字段类型。
+
+### v1.20.42.6.14 新增红线
+13. **禁止前台广告渲染**：`AdPlacement` 仅为广告位库存定义，不代表任何前台展示能力。`LandingPage` 当前仅后台配置，不代表公开发布。
+14. 任何前台广告渲染或公开落地页路由 (`/lp/[slug]`) 的开发必须单独报告并获得用户确认后方可启动。
+15. `AdCampaign` 现有字段含义不得修改，`AdCampaign.placements` 字段不得删除。
 
 ---
 

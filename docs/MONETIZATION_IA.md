@@ -181,9 +181,87 @@ AdRule (投放规则) → 关联 Placement + Campaign
 4. 所有新增 Prisma migration 必须先经过审计并用户确认后方可执行。
 5. 广告位配置变更不得影响工具核心操作区域。
 
+
+
 ---
 
-## 6. 下一阶段建议
+## 7. v1.20.42.6.14 实际落地情况
+
+### 7.1 已实现的模型
+
+**AdPlacement (广告位)**
+```prisma
+model AdPlacement {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  pageType    String   // home / tool / article / topic / landing / yellowpage / task / workspace
+  zone        String   // hero_below / sidebar / result_below / content_mid / footer / native_card
+  device      String   @default("all") // all / desktop / mobile
+  description String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime
+  updatedAt   DateTime
+}
+```
+
+**LandingPage (落地页配置)**
+```prisma
+model LandingPage {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  seoTitle         String?
+  seoDescription   String?  @db.Text
+  pageType         String   // country / tool / topic / guide / city / postal / landing
+  status           String   @default("draft") // draft / published / hidden
+  heroSection      Json?
+  primaryTool      String?
+  relatedTools     String[]
+  relatedTopics    String[]
+  relatedArticles  String[]
+  faqItems         Json?
+  officialLinks    Json?
+  adPlacements     Json?
+  ctaConfig        Json?
+  createdAt        DateTime
+  updatedAt        DateTime
+  publishedAt      DateTime?
+}
+```
+
+### 7.2 已创建的 Admin 路由
+
+| 路由 | 类型 | 功能 |
+|---|---|---|
+| `/admin/ad-placements` | 页面 | 广告位列表/新建/编辑/启用停用/搜索/筛选 |
+| `/admin/landing-pages` | 页面 | 落地页列表/新建/编辑/状态切换/搜索/筛选 |
+| `/api/admin/ad-placements` | API | GET 列表 (支持 pageType/device/search/isActive 筛选), POST 创建 |
+| `/api/admin/ad-placements/[id]` | API | PUT 更新, DELETE 删除 |
+| `/api/admin/landing-pages` | API | GET 列表 (支持 pageType/status/search 筛选), POST 创建 |
+| `/api/admin/landing-pages/[id]` | API | PUT 更新 (含状态切换/发布时自动设置 publishedAt), DELETE 删除 |
+
+### 7.3 Admin 导航变更
+
+- 原 5 组 21 项 → 现 5 组 **23 项**
+- 新增: "落地页管理" → 内容与资源分组
+- 新增: "广告位管理" → 广告与数据分组
+
+### 7.4 仍未实现
+
+| 模块 | 状态 | 说明 |
+|---|---|---|
+| AdCreative (素材库) | 🔴 未实现 | 长期规划 |
+| AdEvent (展示/点击日志) | 🔴 未实现 | 需前端埋点 |
+| AdRule (投放规则) | 🔴 未实现 | 长期规划 |
+| 前台广告渲染 | 🔴 未实现 | **本轮禁止** |
+| 公开落地页渲染 | 🔴 未实现 | 仅后台配置 |
+| 基础广告位种子 | ✅ 已执行 | 19 个广告位已写入生产 DB (幂等) |
+
+---
+
+## 8. 下一阶段建议
 
 **推荐进入 `Landing Page & Ad Inventory Blueprint MVP` (v1.20.42.6.14)：**
 1. 新增 `AdPlacement` 模型与 Admin 管理页
