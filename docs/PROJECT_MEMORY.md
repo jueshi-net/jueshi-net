@@ -272,6 +272,12 @@
 14. 任何前台广告渲染或公开落地页路由 (`/lp/[slug]`) 的开发必须单独报告并获得用户确认后方可启动。
 15. `AdCampaign` 现有字段含义不得修改，`AdCampaign.placements` 字段不得删除。
 
+### v1.20.42.6.15 新增红线
+16. AdCreative / AdEvent / AdRule 当前仅规划，不实现。
+17. AdPlacement 当前仅为广告位库存，不代表任何前台展示或投放能力。
+18. LandingPage 当前仅为后台配置模型，无公开路由渲染。
+19. `prisma/migrations/` 必须与 `_prisma_migrations` 表保持同步，禁止未提交 migration 导致 DB schema 漂移。
+
 ---
 
 ## 📝 三期待办方向（待规划）
