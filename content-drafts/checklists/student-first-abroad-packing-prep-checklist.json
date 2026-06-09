@@ -1,0 +1,455 @@
+{
+  "slug": "student-first-abroad-packing-prep-checklist",
+  "title": "留学生第一次出国行李准备清单",
+  "seoTitle": "留学生第一次出国行李准备清单（完整版）",
+  "seoDescription": "专为留学生 / 海外华人设计的第一次出国留学，准备行李和文件清单，涵盖所有必要步骤和避坑指南，助你系统性地完成准备工作。",
+  "pageType": "checklist",
+  "status": "draft",
+  "relatedTools": [
+    "address-formatter",
+    "invoice",
+    "shipping-calculator"
+  ],
+  "relatedTopics": [],
+  "relatedArticles": [],
+  "ctaConfig": {
+    "text": "开始使用工具",
+    "url": "/tools"
+  },
+  "heroSection": {
+    "checklistType": "packing",
+    "audience": "留学生 / 海外华人",
+    "region": "通用",
+    "city": "",
+    "scenario": "第一次出国留学，准备行李和文件",
+    "difficulty": "easy",
+    "estimatedTime": "2-3小时",
+    "quickAnswer": "[待补充] 留学生第一次出国行李准备清单的核心结论。",
+    "summary": "[待补充] 本清单涵盖第一次出国留学，准备行李和文件的所有必要步骤，帮助用户系统性地完成准备工作。",
+    "sections": [
+      {
+        "id": "sec-1",
+        "title": "一、证件与文件",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-1-item-1",
+            "title": "[待补充] 一、证件与文件 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-2",
+            "title": "[待补充] 一、证件与文件 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-3",
+            "title": "[待补充] 一、证件与文件 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-4",
+            "title": "[待补充] 一、证件与文件 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-2",
+        "title": "二、电子产品与充电器",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-2-item-1",
+            "title": "[待补充] 二、电子产品与充电器 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-2",
+            "title": "[待补充] 二、电子产品与充电器 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-3",
+            "title": "[待补充] 二、电子产品与充电器 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-4",
+            "title": "[待补充] 二、电子产品与充电器 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-3",
+        "title": "三、衣物与生活用品",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-3-item-1",
+            "title": "[待补充] 三、衣物与生活用品 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、衣物与生活用品",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-2",
+            "title": "[待补充] 三、衣物与生活用品 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、衣物与生活用品",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-3",
+            "title": "[待补充] 三、衣物与生活用品 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、衣物与生活用品",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-4",
+            "title": "[待补充] 三、衣物与生活用品 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、衣物与生活用品",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-4",
+        "title": "四、药品与健康",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-4-item-1",
+            "title": "[待补充] 四、药品与健康 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-2",
+            "title": "[待补充] 四、药品与健康 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-3",
+            "title": "[待补充] 四、药品与健康 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-4",
+            "title": "[待补充] 四、药品与健康 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-5",
+        "title": "五、财务与银行卡",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-5-item-1",
+            "title": "[待补充] 五、财务与银行卡 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-2",
+            "title": "[待补充] 五、财务与银行卡 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-3",
+            "title": "[待补充] 五、财务与银行卡 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-4",
+            "title": "[待补充] 五、财务与银行卡 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      }
+    ],
+    "avoidPitfalls": [
+      "不要携带超过海关规定限额的现金（需申报）",
+      "不要携带含违禁成分的中成药（如含麻黄碱类药物）",
+      "不要把重要证件放在托运行李中",
+      "不要忘记转换插头和电压适配"
+    ],
+    "nextSteps": [
+      "第一次使用集运注意事项清单",
+      "海外租房入住检查清单"
+    ],
+    "lastReviewedAt": "2026-06-09",
+    "requiresHumanReview": true,
+    "internalLinks": {
+      "backToTopic": "",
+      "relatedTools": [
+        "/tools/address-formatter",
+        "/tools/invoice",
+        "/tools/shipping-calculator"
+      ],
+      "relatedArticles": [],
+      "nextChecklists": [
+        "first-use-shipping-tips-checklist",
+        "check-checklist"
+      ]
+    }
+  },
+  "faqItems": [
+    {
+      "question": "出国留学可以带多少现金？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "哪些药品不能带上飞机？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "托运和随身行李怎么分配？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "国外买不到的东西有哪些？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "证件丢了怎么办？",
+      "answer": "[待 Hermes 生成具体回答]"
+    }
+  ],
+  "officialLinks": [
+    {
+      "label": "目的地国签证要求",
+      "url": "",
+      "needsReview": true
+    },
+    {
+      "label": "航空公司行李规定",
+      "url": "",
+      "needsReview": true
+    },
+    {
+      "label": "海关携带现金申报规定",
+      "url": "",
+      "needsReview": true
+    }
+  ],
+  "_topicPackSource": "student-first-abroad-packing-checklist.yaml",
+  "_generatedAt": "2026-06-09T14:33:53.536Z",
+  "publish_mode": "draft",
+  "requiresHumanReview": true
+}

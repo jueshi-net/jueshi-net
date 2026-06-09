@@ -387,7 +387,31 @@
 
 ## v1.20.42.6.26 Quote Sheet 路径记录
 
-- 当前正式单据路径倾向：`/tools/documents/quotation`（Workspace 内链指向此路径，`/tools/quote` 自动 307 重定向至此）
-- `/tools/quote-sheet` 仍存在，是独立工具页（表单填写 + 预览）
-- 两者功能相似，长期需要 canonical/重定向治理（合并或明确主次）
-- 本轮不处理 Quote Sheet 路径合并，仅记录状态
+- 当前正式单据路径倾向：`/tools/documents/quotation`（Workspace 内链指向此路径，`/tools/quote` 自动 308 重定向至此）
+- `/tools/quote-sheet` 已 308 永久重定向到 `/tools/documents/quotation`
+- 两者已合并，只有一个 canonical 页面渲染 Quote Sheet 内容
+- sitemap 只输出 `/tools/documents/quotation`
+- 所有内部链接统一指向 `/tools/documents/quotation`
+
+## v1.20.42.6.27 Git 流程规范
+
+- 本地和 VPS 曾因直接在 VPS commit 导致同内容不同 hash
+- 文件内容可通过 MD5 校验对齐，但 git history 分叉
+- **推荐流程**：本地开发 → git commit → rsync 到 VPS → VPS git reset --hard 对齐本地 → PM2 reload
+- 或在 VPS commit 后，必须 `git fetch` 回本地合并
+- 不要长期保留两套分叉历史
+
+## v1.20.42.6.28 Hermes ContentOps Skill
+
+- Skill 位置：`hermes/skills/checklist-contentops/SKILL.md`
+- 配套目录：
+  - `content-drafts/topic-packs/` — 选题包 YAML 示例
+  - `content-drafts/checklists/` — 生成的 draft JSON
+- Wrapper 脚本：`scripts/hermes-generate-checklist-draft.mjs`
+  - 读取 topic pack → 生成 draft JSON → 校验 → 保存
+  - `--import-draft` 参数可选导入数据库（强制 status=draft）
+  - 不调用外部 LLM API（由 Hermes Agent 负责生成正文）
+- 校验脚本：`scripts/validate-checklist-draft.mjs`
+- 导入脚本：`scripts/import-checklist-draft.mjs`（已修复本地/VPS 兼容）
+- 永远只生成 draft，不自动 published
+- 所有 draft 必须经过人工审核后才由 Admin 发布

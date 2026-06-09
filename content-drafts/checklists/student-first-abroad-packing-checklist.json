@@ -1,0 +1,383 @@
+{
+  "slug": "student-first-abroad-packing-checklist",
+  "title": "留学生第一次出国行李准备清单",
+  "seoTitle": "留学生第一次出国行李准备清单（完整版）",
+  "seoDescription": "专为留学生设计的出国行清单，涵盖证件、电子产品、生活用品、药品、财务等五大类，含避坑指南和FAQ，助你系统完成第一次出国准备。",
+  "pageType": "checklist",
+  "status": "draft",
+  "relatedTools": [
+    "address-formatter",
+    "invoice",
+    "shipping-calculator"
+  ],
+  "relatedTopics": [],
+  "relatedArticles": [],
+  "ctaConfig": {
+    "text": "开始使用工具",
+    "url": "/tools"
+  },
+  "heroSection": {
+    "checklistType": "packing",
+    "audience": "留学生 / 海外华人",
+    "region": "通用",
+    "city": "",
+    "scenario": "第一次出国留学，准备行李和文件",
+    "difficulty": "easy",
+    "estimatedTime": "2-3小时",
+    "quickAnswer": "出国行李核心原则：证件随身带、药品提前查、现金不超额、电子产品备转换插头。重要文件不要放托运。",
+    "summary": "本清单专为第一次出国留学的同学设计，涵盖证件与文件、电子产品与充电器、衣物与生活用品、药品与健康、财务与银行卡五大类共 20+ 项准备事项。每项标注优先级和注意事项，帮助你系统性地完成行前准备，避免常见坑点。",
+    "sections": [
+      {
+        "id": "sec-1",
+        "title": "一、证件与文件",
+        "description": "所有证件类物品必须随身携带，切勿放入托运行李。",
+        "items": [
+          {
+            "id": "sec-1-item-1",
+            "title": "护照（有效期 6 个月以上）",
+            "description": "检查护照有效期，确保从入境日期起至少还有 6 个月。如即将到期，请先换新护照。",
+            "category": "证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前 1-2 个月",
+            "warning": "[需人工核验] 不同国家对护照有效期的要求可能不同，请以目的地国移民局官网为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "目的地国签证要求", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-2",
+            "title": "签证及 I-20 / CAS 等入学文件",
+            "description": "打印签证页和录取文件，随身携带。建议电子版备份到手机和云端。",
+            "category": "证件与文件",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-3",
+            "title": "身份证（备用）",
+            "description": "国内转机或回国时使用，建议携带。",
+            "category": "证件与文件",
+            "required": false,
+            "priority": "medium",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-4",
+            "title": "证件照片（一寸/两寸各若干张）",
+            "description": "办理国外学生证、银行卡等可能需要。",
+            "category": "证件与文件",
+            "required": false,
+            "priority": "low",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-2",
+        "title": "二、电子产品与充电器",
+        "description": "提前确认目的国的电压和插头类型。",
+        "items": [
+          {
+            "id": "sec-2-item-1",
+            "title": "转换插头（万能型）",
+            "description": "确认目的国插座类型（如英国为英标 G 型，美国为美标 A/B 型），购买对应转换插头。",
+            "category": "电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前 1-2 周",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-2",
+            "title": "笔记本电脑及充电器",
+            "description": "注意部分国家电压为 220V，部分为 110V。大多数笔记本充电器支持 100-240V 宽电压，可直接使用。",
+            "category": "电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-3",
+            "title": "手机及充电线",
+            "description": "确保手机支持目的国频段。建议提前开通国际漫游或购买目的国 SIM 卡。",
+            "category": "电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-4",
+            "title": "充电宝（随身登机）",
+            "description": "充电宝额定能量不超过 100Wh 可随身携带，100-160Wh 需航司批准，超过 160Wh 禁止携带。切勿托运。",
+            "category": "电子产品与充电器",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "[需人工核验] 各航空公司对充电宝的规定可能有差异，请以所乘航班航司规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "航空公司行李规定", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-3",
+        "title": "三、衣物与生活用品",
+        "description": "根据目的地气候和季节准备，到达后可在当地补充。",
+        "items": [
+          {
+            "id": "sec-3-item-1",
+            "title": "应季衣物（2-3 套换洗）",
+            "description": "到达后根据当地季节购买更多。建议带一件轻薄外套应对机舱冷气。",
+            "category": "衣物与生活用品",
+            "required": true,
+            "priority": "medium",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-2",
+            "title": "眼镜/隐形眼镜及护理液",
+            "description": "国外配镜需要处方且价格昂贵。建议多带一副备用眼镜和足够使用 1-2 个月的隐形眼镜及护理液。",
+            "category": "衣物与生活用品",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-3",
+            "title": "毛巾、洗漱用品（旅行装）",
+            "description": "到达第一天使用，之后可在当地超市购买。",
+            "category": "衣物与生活用品",
+            "required": false,
+            "priority": "low",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-4",
+            "title": "雨伞 / 折叠雨衣",
+            "description": "轻便折叠伞，应对到达后可能的降雨。",
+            "category": "衣物与生活用品",
+            "required": false,
+            "priority": "low",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-4",
+        "title": "四、药品与健康",
+        "description": "携带常用药，但务必确认成分是否合规。",
+        "items": [
+          {
+            "id": "sec-4-item-1",
+            "title": "常用感冒药、肠胃药",
+            "description": "如感冒灵、整肠生等。确保包装完整，保留说明书。",
+            "category": "药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "[需人工核验] 部分国家（如日本、新西兰）对含麻黄碱、可待因成分的药品有严格限制，入境前务必确认。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "目的地国药品入境规定", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-2",
+            "title": "创可贴、碘伏棉棒",
+            "description": "处理小伤口使用。",
+            "category": "药品与健康",
+            "required": false,
+            "priority": "medium",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-3",
+            "title": "个人处方药（含医生证明）",
+            "description": "如有长期服用的处方药，携带足够用量并附上医生处方或证明（建议英文翻译）。",
+            "category": "药品与健康",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "[需人工核验] 部分处方药在国外可能属于管制药品，需提前确认是否需要申报。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-4",
+            "title": "口罩（若干）",
+            "description": "机舱内佩戴，备用几个即可。",
+            "category": "药品与健康",
+            "required": false,
+            "priority": "low",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-5",
+        "title": "五、财务与银行卡",
+        "description": "确保有足够的资金支付到达初期的费用。",
+        "items": [
+          {
+            "id": "sec-5-item-1",
+            "title": "外币现金（不超过海关限额）",
+            "description": "建议携带等值 500-1000 美元或欧元的小额钞票，用于到达初期的交通和餐饮。",
+            "category": "财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前",
+            "warning": "[需人工核验] 中国出境携带现金限额为等值 5000 美元，超过需申报。目的国入境也有现金申报要求，请以当地海关规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "海关携带现金申报规定", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-2",
+            "title": "Visa/Mastercard 信用卡",
+            "description": "确保已开通境外使用功能。建议携带一张父母附属卡作为备用。",
+            "category": "财务与银行卡",
+            "required": true,
+            "priority": "high",
+            "timing": "出发前 1-2 周",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-3",
+            "title": "国内银行卡（银联）",
+            "description": "部分国外 ATM 支持银联取现，手续费因银行而异。",
+            "category": "财务与银行卡",
+            "required": false,
+            "priority": "medium",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-4",
+            "title": "重要财务信息备份",
+            "description": "记录银行卡号、挂失电话、境外客服电话等信息，保存在手机和云端。",
+            "category": "财务与银行卡",
+            "required": true,
+            "priority": "medium",
+            "timing": "出发前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      }
+    ],
+    "avoidPitfalls": [
+      "不要携带超过海关规定限额的现金（中国出境限等值 5000 美元，各国入境规定不同，需申报）。",
+      "不要携带含违禁成分的中成药（如含麻黄碱的感冒药、含可待因的止咳糖浆等，部分国家视为毒品）。",
+      "不要把重要证件（护照、签证、I-20）放在托运行李中——必须随身携带。",
+      "不要忘记转换插头和电压适配（确认目的国电压和插头类型，大多数笔记本充电器支持 100-240V 可直接使用）。"
+    ],
+    "nextSteps": [
+      "第一次使用集运注意事项清单",
+      "海外租房入住检查清单"
+    ],
+    "lastReviewedAt": "2026-06-09",
+    "requiresHumanReview": true,
+    "internalLinks": {
+      "backToTopic": "",
+      "relatedTools": [
+        "/tools/address-formatter",
+        "/tools/invoice",
+        "/tools/shipping-calculator"
+      ],
+      "relatedArticles": [],
+      "nextChecklists": [
+        "first-use-shipping-tips-checklist",
+        "checklist"
+      ]
+    }
+  },
+  "faqItems": [
+    {
+      "question": "出国留学可以带多少现金？",
+      "answer": "中国海关规定，出境携带人民币现钞不超过 2 万元，外币现钞不超过等值 5000 美元。超过限额需向海关申报。同时，目的国入境也有现金申报要求（如美国超过 10000 美元需申报）。建议携带等值 500-1000 美元的小额钞票即可，其余通过信用卡或银行转账解决。"
+    },
+    {
+      "question": "哪些药品不能带上飞机？",
+      "answer": "含麻黄碱成分的药品（如新康泰克、白加黑）、含可待因的止咳糖浆、安眠药等精神类药物在部分国家属于管制药品，可能被禁止入境。含动物成分的中药（如牛黄、鹿茸）也可能被海关扣留。建议出行前查询目的地国海关和药监部门的规定，携带药品保留原包装和说明书。"
+    },
+    {
+      "question": "托运和随身行李怎么分配？",
+      "answer": "随身行李放：护照、签证、入学文件、现金、信用卡、手机、充电宝、贵重物品。托运行李放：衣物、洗漱用品、非贵重物品。注意：充电宝、锂电池严禁托运，必须随身携带。液体（洗漱用品）随身携带单瓶不超过 100ml，总量不超过 1L。"
+    },
+    {
+      "question": "国外买不到的东西有哪些？",
+      "answer": "眼镜/隐形眼镜（国外配镜需要处方且价格昂贵）、特定品牌的亚洲护肤品、部分中成药、中文书籍、适合亚洲人尺码的衣物。建议这些物品在国内准备好带到国外。"
+    },
+    {
+      "question": "证件丢了怎么办？",
+      "answer": "护照在国外丢失：立即向当地警察局报案获取报案证明，然后联系中国驻当地使领馆申请补办旅行证或护照。签证/I-20 丢失：联系学校国际学生办公室，申请补发文件。建议出发前将所有证件扫描或拍照备份到手机和云端。"
+    }
+  ],
+  "officialLinks": [
+    { "label": "目的地国签证要求", "url": "", "needsReview": true },
+    { "label": "航空公司行李规定", "url": "", "needsReview": true },
+    { "label": "海关携带现金申报规定", "url": "", "needsReview": true }
+  ],
+  "_topicPackSource": "student-first-abroad-packing-checklist.yaml",
+  "_generatedAt": "2026-06-09T14:33:53.536Z",
+  "publish_mode": "draft",
+  "requiresHumanReview": true
+}

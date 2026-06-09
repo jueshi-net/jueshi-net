@@ -1,0 +1,459 @@
+{
+  "slug": "first-use-shipping-tips-checklist",
+  "title": "第一次使用集运注意事项清单",
+  "seoTitle": "第一次使用集运注意事项清单（完整版）",
+  "seoDescription": "专为海外华人 / 跨境电商卖家 / SOHO设计的第一次使用集运服务向海外发货清单，涵盖所有必要步骤和避坑指南，助你系统性地完成准备工作。",
+  "pageType": "checklist",
+  "status": "draft",
+  "relatedTools": [
+    "address-formatter",
+    "shipping-calculator",
+    "postal-code",
+    "invoice"
+  ],
+  "relatedTopics": [
+    "cross-border-shipping"
+  ],
+  "relatedArticles": [],
+  "ctaConfig": {
+    "text": "开始使用工具",
+    "url": "/tools"
+  },
+  "heroSection": {
+    "checklistType": "shipping",
+    "audience": "海外华人 / 跨境电商卖家 / SOHO",
+    "region": "通用",
+    "city": "",
+    "scenario": "第一次使用集运服务向海外发货",
+    "difficulty": "medium",
+    "estimatedTime": "1-2小时",
+    "quickAnswer": "[待补充] 第一次使用集运注意事项清单的核心结论。",
+    "summary": "[待补充] 本清单涵盖第一次使用集运服务向海外发货的所有必要步骤，帮助用户系统性地完成准备工作。",
+    "sections": [
+      {
+        "id": "sec-1",
+        "title": "一、下单前准备",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-1-item-1",
+            "title": "[待补充] 一、下单前准备 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-2",
+            "title": "[待补充] 一、下单前准备 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-3",
+            "title": "[待补充] 一、下单前准备 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-4",
+            "title": "[待补充] 一、下单前准备 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "一、下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-2",
+        "title": "二、仓库地址与收件人填写",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-2-item-1",
+            "title": "[待补充] 二、仓库地址与收件人填写 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-2",
+            "title": "[待补充] 二、仓库地址与收件人填写 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-3",
+            "title": "[待补充] 二、仓库地址与收件人填写 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-4",
+            "title": "[待补充] 二、仓库地址与收件人填写 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "二、仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-3",
+        "title": "三、包裹入库与申报规范",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-3-item-1",
+            "title": "[待补充] 三、包裹入库与申报规范 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-2",
+            "title": "[待补充] 三、包裹入库与申报规范 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-3",
+            "title": "[待补充] 三、包裹入库与申报规范 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-4",
+            "title": "[待补充] 三、包裹入库与申报规范 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "三、包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-4",
+        "title": "四、支付与国际运费",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-4-item-1",
+            "title": "[待补充] 四、支付与国际运费 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-2",
+            "title": "[待补充] 四、支付与国际运费 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-3",
+            "title": "[待补充] 四、支付与国际运费 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-4",
+            "title": "[待补充] 四、支付与国际运费 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "四、支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-5",
+        "title": "五、物流追踪与签收",
+        "description": "",
+        "items": [
+          {
+            "id": "sec-5-item-1",
+            "title": "[待补充] 五、物流追踪与签收 - 第 1 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-2",
+            "title": "[待补充] 五、物流追踪与签收 - 第 2 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-3",
+            "title": "[待补充] 五、物流追踪与签收 - 第 3 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-4",
+            "title": "[待补充] 五、物流追踪与签收 - 第 4 项",
+            "description": "[待 Hermes 生成具体内容]",
+            "category": "五、物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "",
+            "warning": "[需人工核验] 请确认具体内容",
+            "relatedToolSlug": "",
+            "officialLink": {
+              "label": "",
+              "url": ""
+            },
+            "completedDefault": false
+          }
+        ]
+      }
+    ],
+    "avoidPitfalls": [
+      "不要低报商品价值（海关可能扣货罚款）",
+      "不要寄送禁运物品（电池、液体、粉末需确认）",
+      "不要忘记拍照留底（发货前拍摄包裹内容）",
+      "不要忽视保险选项（高价值物品建议购买物流保险）"
+    ],
+    "nextSteps": [
+      "商业发票准备清单",
+      "国际快递发货前检查清单"
+    ],
+    "lastReviewedAt": "2026-06-09",
+    "requiresHumanReview": true,
+    "internalLinks": {
+      "backToTopic": "/topics/cross-border-shipping",
+      "relatedTools": [
+        "/tools/address-formatter",
+        "/tools/shipping-calculator",
+        "/tools/postal-code",
+        "/tools/invoice"
+      ],
+      "relatedArticles": [],
+      "nextChecklists": [
+        "prep-checklist",
+        "dispatch-check-checklist"
+      ]
+    }
+  },
+  "faqItems": [
+    {
+      "question": "第一次集运最容易出错的地方是什么？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "集运和普通国际快递有什么区别？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "怎么知道我的包裹是否超重或超大？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "集运运费一般怎么计算？",
+      "answer": "[待 Hermes 生成具体回答]"
+    },
+    {
+      "question": "包裹丢了怎么办？",
+      "answer": "[待 Hermes 生成具体回答]"
+    }
+  ],
+  "officialLinks": [
+    {
+      "label": "中国海关个人物品邮寄规定",
+      "url": "",
+      "needsReview": true
+    },
+    {
+      "label": "目的地国海关入境规定",
+      "url": "",
+      "needsReview": true
+    },
+    {
+      "label": "集运公司服务条款",
+      "url": "",
+      "needsReview": true
+    }
+  ],
+  "_topicPackSource": "first-shipping-checklist.yaml",
+  "_generatedAt": "2026-06-09T14:33:49.284Z",
+  "publish_mode": "draft",
+  "requiresHumanReview": true
+}

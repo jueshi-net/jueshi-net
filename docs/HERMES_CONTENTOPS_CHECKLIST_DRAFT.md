@@ -1,8 +1,27 @@
 # Hermes ContentOps Checklist Draft Generator — 规范与红线
 
-> **版本：** v1.20.42.6.25
+> **版本：** v1.20.42.6.28
 > **日期：** 2026-06-09
-> **状态：** ✅ MVP 已建立
+> **状态：** ✅ Skill MVP 已建立
+
+---
+
+## 0. Skill 位置
+
+Hermes Skill 已封装到：
+
+```
+hermes/skills/checklist-contentops/SKILL.md
+```
+
+配套文件：
+- `content-drafts/topic-packs/` — 选题包示例（YAML）
+- `content-drafts/checklists/` — 生成的 draft JSON
+- `scripts/hermes-generate-checklist-draft.mjs` — wrapper 脚本（生成 + 校验 + 可选导入）
+- `scripts/validate-checklist-draft.mjs` — 校验脚本
+- `scripts/import-checklist-draft.mjs` — 导入脚本
+
+Hermes Agent 加载 `checklist-contentops` skill 后，即可根据选题包生成 checklist draft JSON。
 
 ---
 

@@ -1,0 +1,45 @@
+# Topic Pack: 留学生第一次出国行李准备清单
+# 用于 Hermes ContentOps Checklist Draft Generator
+# 将此文件传给 hermes-generate-checklist-draft.mjs 生成 draft JSON
+
+type: checklist
+title: 留学生第一次出国行李准备清单
+audience: 留学生 / 海外华人
+region: 通用
+city: ""
+scenario: 第一次出国留学，准备行李和文件
+primary_intent: 帮助留学生系统性地准备出国前的所有行李和证件
+difficulty: easy
+estimated_time: "2-3小时"
+sections:
+  - 证件与文件
+  - 电子产品与充电器
+  - 衣物与生活用品
+  - 药品与健康
+  - 财务与银行卡
+related_tools:
+  - address-formatter
+  - invoice
+  - shipping-calculator
+related_topics: []
+related_articles: []
+official_links_needed:
+  - 目的地国签证要求
+  - 航空公司行李规定
+  - 海关携带现金申报规定
+pitfalls:
+  - 不要携带超过海关规定限额的现金（需申报）
+  - 不要携带含违禁成分的中成药（如含麻黄碱类药物）
+  - 不要把重要证件放在托运行李中
+  - 不要忘记转换插头和电压适配
+faq_questions:
+  - 出国留学可以带多少现金？
+  - 哪些药品不能带上飞机？
+  - 托运和随身行李怎么分配？
+  - 国外买不到的东西有哪些？
+  - 证件丢了怎么办？
+next_steps:
+  - 第一次使用集运注意事项清单
+  - 海外租房入住检查清单
+publish_mode: draft
+requires_human_review: true

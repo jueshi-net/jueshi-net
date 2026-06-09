@@ -1,0 +1,47 @@
+# Topic Pack: 第一次使用集运注意事项清单
+# 用于 Hermes ContentOps Checklist Draft Generator
+# 将此文件传给 hermes-generate-checklist-draft.mjs 生成 draft JSON
+
+type: checklist
+title: 第一次使用集运注意事项清单
+audience: 海外华人 / 跨境电商卖家 / SOHO
+region: 通用
+city: ""
+scenario: 第一次使用集运服务向海外发货
+primary_intent: 帮助用户完成第一次集运发货前的全部准备和避坑
+difficulty: medium
+estimated_time: "1-2小时"
+sections:
+  - 下单前准备
+  - 仓库地址与收件人填写
+  - 包裹入库与申报规范
+  - 支付与国际运费
+  - 物流追踪与签收
+related_tools:
+  - address-formatter
+  - shipping-calculator
+  - postal-code
+  - invoice
+related_topics:
+  - cross-border-shipping
+related_articles: []
+official_links_needed:
+  - 中国海关个人物品邮寄规定
+  - 目的地国海关入境规定
+  - 集运公司服务条款
+pitfalls:
+  - 不要低报商品价值（海关可能扣货罚款）
+  - 不要寄送禁运物品（电池、液体、粉末需确认）
+  - 不要忘记拍照留底（发货前拍摄包裹内容）
+  - 不要忽视保险选项（高价值物品建议购买物流保险）
+faq_questions:
+  - 第一次集运最容易出错的地方是什么？
+  - 集运和普通国际快递有什么区别？
+  - 怎么知道我的包裹是否超重或超大？
+  - 集运运费一般怎么计算？
+  - 包裹丢了怎么办？
+next_steps:
+  - 商业发票准备清单
+  - 国际快递发货前检查清单
+publish_mode: draft
+requires_human_review: true

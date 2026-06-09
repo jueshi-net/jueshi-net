@@ -100,8 +100,17 @@ INSERT INTO landing_pages (
 const sqlFile = `/tmp/import-checklist-${slug}.sql`;
 writeFileSync(sqlFile, sql);
 
+// Detect environment: run locally if DATABASE_URL is set, otherwise use VPS
+const isVps = !process.env.DATABASE_URL;
+let cmd;
+if (isVps) {
+  cmd = `cd /home/deploy/xixiong-saas && NODE_ENV=production npx prisma db execute --file ${sqlFile}`;
+} else {
+  cmd = `npx prisma db execute --file ${sqlFile}`;
+}
+
 try {
-  execSync(`cd /home/deploy/xixiong-saas && NODE_ENV=production npx prisma db execute --file ${sqlFile}`, {
+  execSync(cmd, {
     stdio: "inherit"
   });
   console.log(`\n✅ draft 已导入: ${slug}`);
