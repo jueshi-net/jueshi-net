@@ -64,7 +64,7 @@ export default async function WorkspacePage() {
   const badgeCount = badgeCountRes.status === "fulfilled" ? badgeCountRes.value : 0;
   const recentMemos = memosRes.status === "fulfilled" ? memosRes.value : [];
 
-  const memberLevel = user?.levelKey === "member" ? "会员" : user?.levelKey === "admin" ? "管理员" : "免费版用户";
+  const memberLevel = user?.role === "管理员" ? "管理员" : user?.levelKey === "member" ? "会员" : "免费版用户";
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">

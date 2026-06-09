@@ -21,6 +21,7 @@ export default function Header() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === "authenticated";
   const userRole = (session?.user as any)?.role;
+  const isAdmin = ["管理员", "ADMIN", "admin"].includes(userRole);
   const userEmail = session?.user?.email || "User";
   const userInitial = userEmail.charAt(0).toUpperCase();
 
@@ -102,12 +103,12 @@ export default function Header() {
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                     <div className="px-3 py-2 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                      <p className="text-xs text-gray-500">{userRole === 'admin' ? '管理员' : '注册用户'}</p>
+                      <p className="text-xs text-gray-500">{isAdmin ? '管理员' : '注册用户'}</p>
                     </div>
                     <Link href="/workbench" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <LayoutDashboard className="w-4 h-4" /> 工作台
                     </Link>
-                    {userRole === 'admin' && (
+                    {isAdmin && (
                       <Link href="/admin/homepage" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         <ShieldCheck className="w-4 h-4" /> 管理后台
                       </Link>
@@ -167,12 +168,12 @@ export default function Header() {
                 <>
                   <div className="px-4 py-2 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                    <p className="text-xs text-gray-500">{userRole === 'admin' ? '管理员' : '注册用户'}</p>
+                    <p className="text-xs text-gray-500">{isAdmin ? '管理员' : '注册用户'}</p>
                   </div>
                   <Link href="/workbench" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
                     <LayoutDashboard className="w-5 h-5 text-gray-500" /> <span className="font-medium">工作台</span>
                   </Link>
-                  {userRole === 'admin' && (
+                  {isAdmin && (
                     <Link href="/admin/homepage" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
                       <ShieldCheck className="w-5 h-5 text-gray-500" /> <span className="font-medium">管理后台</span>
                     </Link>
