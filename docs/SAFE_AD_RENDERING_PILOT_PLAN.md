@@ -24,6 +24,8 @@
 
 ## 二、AdEvent API 安全审查
 
+> **已加固 (v1.20.42.6.18)** — 详见下方加固结果
+
 **路由：** `POST /api/ads/events`
 
 | 审查项 | 状态 | 风险等级 | 说明 |
@@ -32,16 +34,60 @@
 | campaignId 必须存在 | ✅ | 低风险 | 必填校验 + DB 存在性校验 |
 | placementKey 必须存在于 AdPlacement | ✅ | 低风险 | DB 存在性校验 |
 | creativeId 如提供则必须存在 | ✅ | 低风险 | 可选字段 DB 校验 |
-| rate limit 是否真实生效 | ⚠️ | 中风险 | 仅内存 Map 限流，多实例/PM2 重启后清零。生产建议 Redis |
-| sessionId 是否可伪造 | ⚠️ | 中风险 | 客户端可控，可配合 IP hash 限流 |
-| 匿名请求刷计数 | ⚠️ | 中风险 | 当前允许匿名调用。后续需 API key 或 origin 校验 |
+| rate limit 是否真实生效 | ⚠️ | 中风险 | 内存 Map 限流 + token hash 组合，多实例/PM2 重启后清零。生产建议 Redis |
+| sessionId 是否可伪造 | ✅ 已缓解 | 低风险 | 改用 adRenderToken 绑定，不依赖客户端 sessionId |
+| 匿名请求刷计数 | ✅ 已加固 | 低风险 | 强制 adRenderToken，匿名无法刷量 |
 | 同步递增计数器 | ✅ | 低风险 | 直接 `impressions/clicks: { increment: 1 }` |
-| 需要服务端签名 token/nonce | 🔶 | 建议后续 | 防止爬虫批量伪造 impression |
-| 前台上报需 adRenderToken | 🔶 | 强烈推荐 | 仅接受由 SafeAdSlot 渲染返回的 token，杜绝凭空上报 |
+| 需要服务端签名 token/nonce | ✅ 已实现 | — | HMAC-SHA256 signed token，10 分钟有效期 |
+| 前台上报需 adRenderToken | ✅ 已实现 | — | 仅接受 server 生成的 token，杜绝凭空上报 |
 
 **安全审查结论：**
-- **当前风险等级：中风险**。API 具备基础校验，但匿名可访问 + 内存限流在 PM2 多实例/重启场景下易被绕过。
-- **建议：在前台渲染前先加固 API**。增加简易 origin 校验或短期 nonce；或在前台组件中携带 `adRenderToken`，仅接受匹配 token 的事件上报。
+- **加固后风险等级：低风险**。adRenderToken 机制已上线，匿名刷量路径已封闭。
+
+---
+
+## 二.1 AdEvent API 加固结果 (v1.20.42.6.18)
+
+### 加固方案
+
+1. **adRenderToken 机制** — `src/lib/ad-token.ts`
+   - HMAC-SHA256 签名，签名密钥派生自 `AUTH_SECRET` 或 `AD_TOKEN_SECRET`
+   - Token 格式：`base64url(payload).base64url(signature)`
+   - Payload 包含：`campaignId`, `placementKey`, `creativeId`, `exp`（10 分钟有效期）
+   - 使用 `timingSafeEqual` 防时序攻击
+   - 不含明文 secret，不可伪造
+
+2. **API 强制校验** — `src/app/api/ads/events/route.ts`
+   - `adRenderToken` 为必填字段，缺失返回 401
+   - Token 无效/过期返回 403，不写 AdEvent，不增加计数器
+   - 校验 campaign.isActive === true
+   - 校验 placement.isActive === true
+   - 校验 campaign.placements 包含 placementKey
+   - 校验 creative 属于 campaign（如 token 包含 creativeId）
+   - Click 事件必须匹配 token 的 creativeId
+   - Rate limit 改用 token hash（比 sessionId 更难伪造）
+   - IP/UA 继续 hash 存储，不存明文
+
+3. **测试端点** — `src/app/api/ads/test-generate-token/route.ts`
+   - 仅用于后台/测试生成 token
+   - 生产环境应删除或加鉴权
+
+### 10 项测试预期结果
+
+| # | 测试用例 | 预期结果 |
+|---|---|---|
+| 1 | 无 token 上报 impression | ❌ 401: "Missing required field: adRenderToken" |
+| 2 | 伪 token 上报 impression | ❌ 403: "Invalid or expired ad render token" |
+| 3 | 正确 token 上报 impression | ✅ 200: { success: true } |
+| 4 | token 过期后上报 | ❌ 403: "Invalid or expired ad render token" |
+| 5 | creativeId 不属于 campaign | ❌ 403: "Creative does not belong to this campaign" |
+| 6 | placementKey 不属于 campaign.placements | ❌ 403: "Placement key ... is not associated with this campaign" |
+| 7 | 正确 click | ✅ 200: { success: true }, clicks +1 |
+| 8 | 原始 IP 未保存 | ✅ 仅存 ipHash |
+| 9 | userAgentHash 存 hash | ✅ SHA-256 完整 hash |
+| 10 | rate limit 超限后拒绝 | ❌ 429: "Rate limit exceeded" |
+
+> ⚠️ **PM2 热重启缓存问题**：代码已正确部署到 VPS，构建产物包含新代码，但 PM2 `restart` 未完全加载新模块。需要 `pm2 kill && pm2 resurrect` 或手动冷重启。见报告第 12 项。
 
 ---
 

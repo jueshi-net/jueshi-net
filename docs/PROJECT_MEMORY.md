@@ -307,6 +307,16 @@
 39. AdEvent API 需后续加固 (adRenderToken/nonce)，当前匿名可访问为中风险
 40. SafeAdSlot 组件仅规划，未开发
 
+### v1.20.42.6.18 AdEvent API Hardening + Miner Health Audit 记录
+41. 已实现 `adRenderToken` 机制 (`src/lib/ad-token.ts`)：HMAC-SHA256 签名，10 分钟有效期，timing-safe 校验
+42. `POST /api/ads/events` 已加固：强制 adRenderToken，缺失返回 401，无效返回 403，不写事件不增计数
+43. 新增 6 项关系校验：campaign/placement/creative 三级关联验证，click 必须匹配 token 的 creativeId
+44. 新增测试端点 `POST /api/ads/test-generate-token`（生产环境应删除或加鉴权）
+45. **jueshi-miner 异常根因**：`scripts/advanced-crawler/daemon.ts` 文件不存在（仅保留 daemon.log），PM2 配置指向已删除脚本导致 3503 次重启
+46. jueshi-miner 已停用（`pm2 stop` + 从 ecosystem.config.js 移除 autorestart），不影响主站
+47. PM2 热重启 (restart) 存在模块缓存问题，新代码需冷重启 (`pm2 kill && pm2 resurrect` 或 `stop + start`) 才能生效
+48. 广告事件 API 安全红线：必须使用 adRenderToken，禁止匿名上报，禁止保存原始 IP/UA
+
 ---
 
 ## 📝 三期待办方向（待规划）
