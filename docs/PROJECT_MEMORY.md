@@ -426,3 +426,14 @@
 - 所有 draft 已导入 LandingPage，status 全部为 draft
 - draft 页面返回 404，不进入 sitemap
 - Git 文件内容本地/VPS 完全一致（MD5 校验通过）
+
+## v1.20.42.6.29.1 Publish Audit + Review Gate
+
+- student-first-abroad-packing-checklist 从 published 恢复为 draft（原因：官方链接空 URL、requiresHumanReview=true、backToTopic 为空）
+- import-checklist-draft.mjs 语义修复：DO 块检测已 published 的 slug，输出警告并保留 status/published_at
+- Admin 发布前审核门槛：
+  - 阻止 published：requiresHumanReview=true、官方链接空 URL/needsReview、sections<3、items<10、faq<5、pitfalls<5、tools<3、seoTitle/description 空
+  - 警告不阻止：backToTopic 空、nextSteps 空、relatedArticles 空
+  - 编辑页面显示红/黄/绿三色审核状态 banner
+  - handleStatus 一键发布也触发同样验证
+- 无新数据库字段，使用现有 heroSection.requiresHumanReview 作为审核标记
