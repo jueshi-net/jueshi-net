@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit2, Search, X, Save, Loader2, Trash2, Eye, EyeOff, ExternalLink, AlertTriangle } from "lucide-react";
 
-const PAGE_TYPES = ["country", "tool", "topic", "guide", "city", "postal", "landing"];
+const PAGE_TYPES = ["country", "tool", "topic", "guide", "city", "postal", "landing", "checklist"];
 const STATUSES = ["draft", "published", "hidden"];
 
 interface LandingPage {
@@ -44,7 +44,7 @@ export default function LandingPagesClient() {
   const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({ pageType: "", status: "", search: "" });
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "" });
+  const [form, setForm] = useState({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
 
   const fetchPages = async () => {
     setLoading(true);
@@ -71,11 +71,20 @@ export default function LandingPagesClient() {
       relatedTopics: form.relatedTopics.split(",").map(s => s.trim()).filter(Boolean),
       relatedArticles: form.relatedArticles.split(",").map(s => s.trim()).filter(Boolean),
     };
+    if (form.pageType === "checklist" && form.heroSectionJson) {
+      try {
+        data.heroSection = JSON.parse(form.heroSectionJson);
+      } catch (e) {
+        alert("清单 JSON 格式错误: " + (e as Error).message);
+        setSaving(false);
+        return;
+      }
+    }
     const url = editing ? `/api/admin/landing-pages/${editing.id}` : "/api/admin/landing-pages";
     const method = editing ? "PUT" : "POST";
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     if (res.ok) {
-      setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "" });
+      setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
       setEditing(null);
       setShowForm(false);
       fetchPages();
@@ -88,7 +97,7 @@ export default function LandingPagesClient() {
 
   const handleEdit = (p: LandingPage) => {
     setEditing(p);
-    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", ") });
+    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", "), heroSectionJson: p.heroSection ? JSON.stringify(p.heroSection, null, 2) : "" });
     setShowForm(true);
   };
 
@@ -131,7 +140,7 @@ export default function LandingPagesClient() {
           <h1 className="text-xl font-bold text-gray-900">落地页管理</h1>
           <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/test-safe-landing-20" className="text-teal-600 hover:underline">/lp/[slug]</a></p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "" }); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
+        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" }); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建落地页
         </button>
       </div>
@@ -204,6 +213,13 @@ export default function LandingPagesClient() {
               <label className="block text-xs font-medium text-gray-500 mb-1">SEO 描述</label>
               <textarea value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
             </div>
+            {form.pageType === "checklist" && (
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-gray-500 mb-1">清单数据结构 (JSON)</label>
+                <textarea value={form.heroSectionJson} onChange={e => setForm(f => ({ ...f, heroSectionJson: e.target.value }))} rows={8} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder='{"checklistType": "shipping", "audience": "...", "sections": [...]}' />
+                <p className="text-xs text-gray-400 mt-1">支持 checklistType, audience, region, sections, checklistItems, avoidPitfalls, quickAnswer 等字段</p>
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
             {editing && editing.status === "published" && (
@@ -275,14 +291,18 @@ export default function LandingPagesClient() {
                           <div className="text-xs text-amber-600 mt-0.5" title={warnings.join("; ")}>⚠ {warnings.length} 个无效引用</div>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-gray-500 hidden lg:table-cell"><span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded">{p.pageType}</span></td>
+                      <td className="px-4 py-2.5 text-xs text-gray-500 hidden lg:table-cell">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${p.pageType === 'checklist' ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+                          {p.pageType === 'checklist' ? '清单' : p.pageType}
+                        </span>
+                      </td>
                       <td className="px-4 py-2.5">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${statusColors[p.status]}`}>{statusLabels[p.status]}</span>
                       </td>
                       <td className="px-4 py-2.5 text-xs hidden lg:table-cell">
                         {p.status === "published" ? (
-                          <a href={`/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline flex items-center gap-1">
-                            /lp/{p.slug} <ExternalLink className="w-3 h-3" />
+                          <a href={p.pageType === 'checklist' ? `/checklists/${p.slug}` : `/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline flex items-center gap-1">
+                            {p.pageType === 'checklist' ? `/checklists/` : `/lp/`}{p.slug} <ExternalLink className="w-3 h-3" />
                           </a>
                         ) : (
                           <span className="text-gray-300">—</span>
@@ -295,7 +315,7 @@ export default function LandingPagesClient() {
                       <td className="px-4 py-2.5 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {p.status === "published" && (
-                            <a href={`/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-1 text-teal-500 hover:text-teal-700 rounded" title="打开公开页"><Eye className="w-3.5 h-3.5" /></a>
+                            <a href={p.pageType === 'checklist' ? `/checklists/${p.slug}` : `/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-1 text-teal-500 hover:text-teal-700 rounded" title="打开公开页"><Eye className="w-3.5 h-3.5" /></a>
                           )}
                           {p.status !== "published" && <button onClick={() => handleStatus(p, "published")} className="p-1 text-gray-400 hover:text-green-600 rounded" title="发布"><Eye className="w-3.5 h-3.5" /></button>}
                           {p.status !== "hidden" && <button onClick={() => handleStatus(p, "hidden")} className="p-1 text-gray-400 hover:text-red-500 rounded" title="隐藏"><EyeOff className="w-3.5 h-3.5" /></button>}

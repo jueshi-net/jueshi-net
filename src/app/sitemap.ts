@@ -56,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic pages (DB dependent)
   let articlePages: MetadataRoute.Sitemap = [];
   let lpPages: MetadataRoute.Sitemap = [];
+  let checklistPages: MetadataRoute.Sitemap = [];
 
   try {
     // Published Articles
@@ -74,7 +75,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Published Landing Pages
     const landingPages = await prisma.landingPage.findMany({
-      where: { status: "published" },
+      where: { status: "published", pageType: { not: "checklist" } },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
     });
@@ -85,9 +86,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.6,
     }));
+
+    // Published Checklists
+    const checklists = await prisma.landingPage.findMany({
+      where: { status: "published", pageType: "checklist" },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    checklistPages = checklists.map((c) => ({
+      url: `${BASE_URL}/checklists/${c.slug}`,
+      lastModified: c.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
   } catch (e) {
     console.error("[sitemap] DB fetch failed, returning static pages + tools only");
   }
 
-  return [...staticPages, ...tools, ...articlePages, ...lpPages];
+  return [...staticPages, ...tools, ...articlePages, ...lpPages, ...checklistPages];
 }
