@@ -341,6 +341,18 @@
 
 *本文档为所有后续操作的潜意识基础。执行任何三期代码前，必须阅读并遵守上述规范。*
 
+## v1.20.42.6.21 Landing Page Admin Preview + Content IA Notes
+
+- Admin /admin/landing-pages 增强：列表新增公开 URL / 预览摘要 / 无效 slug warning
+- 编辑页新增"打开公开页"按钮（仅 published）+ 预览摘要 + 无效引用 warning
+- API /api/admin/landing-pages GET 增加 heroSection/faqItems/officialLinks/ctaConfig 字段
+- SEO metadata 确认正常（title/og:title/description/canonical/twitter:card 全部存在且非空）
+- landing.block_between 广告链路验证通过：resolve → SafeAdSlot → impression/click → AdEvent
+- 专题/清单长期规划已写入 docs/CONTENT_IA_LONG_TERM.md（详见 19.1 报告）
+- SEO 内链长期规划已写入 docs/CONTENT_IA_LONG_TERM.md 第十章（详见 19.2 报告）
+- 未开发清单页 / 未批量 SEO / 未扩大广告位
+- 修改文件：landing-pages-client.tsx + route.ts（仅 Admin 增强，不影响前台）
+
 ## v1.20.42.6.19.2 SEO & Internal Linking Long-term Planning
 
 详见 `docs/CONTENT_IA_LONG_TERM.md` 第十章：

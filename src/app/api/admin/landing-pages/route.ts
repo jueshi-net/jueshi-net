@@ -34,6 +34,12 @@ export async function GET(req: NextRequest) {
   const pages = await prisma.landingPage.findMany({
     where,
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true, slug: true, title: true, seoTitle: true, seoDescription: true,
+      pageType: true, status: true, primaryTool: true, relatedTools: true,
+      relatedTopics: true, relatedArticles: true, createdAt: true, publishedAt: true,
+      heroSection: true, faqItems: true, officialLinks: true, ctaConfig: true,
+    },
   });
   return NextResponse.json(pages);
 }

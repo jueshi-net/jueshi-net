@@ -25,6 +25,7 @@
 |---|---|---|
 | v1.20.42.6.19.1 | Content IA Long-term Planning Note | ✅ 文档已写入 |
 | v1.20.42.6.19.2 | SEO & Internal Linking Long-term Planning Note | ✅ 文档已写入 |
+| v1.20.42.6.21 | Landing Page Related Content + Admin Preview + Content IA Notes | 进行中 |
 
 ---
 
