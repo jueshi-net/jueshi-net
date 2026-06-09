@@ -89,6 +89,23 @@
 
 > ⚠️ **PM2 热重启缓存问题**：代码已正确部署到 VPS，构建产物包含新代码，但 PM2 `restart` 未完全加载新模块。需要 `pm2 kill && pm2 resurrect` 或手动冷重启。见报告第 12 项。
 
+### v1.20.42.6.18.1 运行时激活结果
+
+| # | 测试用例 | 预期 | 运行时结果 |
+|---|---|---|---|
+| 1 | 无 token 上报 impression | ❌ 401 | ✅ **通过**: `{"error":"Missing required field: adRenderToken"}` HTTP 401 |
+| 2 | 伪 token 上报 impression | ❌ 403 | ✅ **通过**: `{"error":"Invalid or expired ad render token"}` HTTP 403 |
+| 3 | `/api/ads/test-generate-token` 端点 | ❌ 404 (已删除) | ✅ **通过**: 返回 404 HTML 页面，端点已彻底移除 |
+| 4 | token 过期后上报 | ❌ 403 | ⏳ 需真实 campaign 数据验证 |
+| 5 | creativeId 不属于 campaign | ❌ 403 | ⏳ 需真实 campaign 数据验证 |
+| 6 | placementKey 不属于 campaign.placements | ❌ 403 | ⏳ 需真实 campaign 数据验证 |
+| 7 | 正确 click | ✅ 200 | ⏳ 需真实 campaign 数据验证 |
+| 8 | 原始 IP 未保存 | ✅ 仅 ipHash | ✅ 代码验证通过 |
+| 9 | userAgentHash 存 hash | ✅ SHA-256 | ✅ 代码验证通过 |
+| 10 | rate limit 超限后拒绝 | ❌ 429 | ✅ 代码验证通过 |
+
+**测试 token 生成方式**：`scripts/test-ad-token.mjs` 本地脚本（读取 .env.local 的 AUTH_SECRET，不在生产暴露）
+
 ---
 
 ## 三、第一批安全广告位规划

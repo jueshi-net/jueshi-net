@@ -311,11 +311,20 @@
 41. 已实现 `adRenderToken` 机制 (`src/lib/ad-token.ts`)：HMAC-SHA256 签名，10 分钟有效期，timing-safe 校验
 42. `POST /api/ads/events` 已加固：强制 adRenderToken，缺失返回 401，无效返回 403，不写事件不增计数
 43. 新增 6 项关系校验：campaign/placement/creative 三级关联验证，click 必须匹配 token 的 creativeId
-44. 新增测试端点 `POST /api/ads/test-generate-token`（生产环境应删除或加鉴权）
+44. ~~新增测试端点 `POST /api/ads/test-generate-token`~~ → **v1.20.42.6.18.1 已删除**，改用 `scripts/test-ad-token.mjs` 本地脚本
 45. **jueshi-miner 异常根因**：`scripts/advanced-crawler/daemon.ts` 文件不存在（仅保留 daemon.log），PM2 配置指向已删除脚本导致 3503 次重启
 46. jueshi-miner 已停用（`pm2 stop` + 从 ecosystem.config.js 移除 autorestart），不影响主站
-47. PM2 热重启 (restart) 存在模块缓存问题，新代码需冷重启 (`pm2 kill && pm2 resurrect` 或 `stop + start`) 才能生效
+47. PM2 热重启 (restart) 存在模块缓存问题，新代码需冷重启 (pkill -9 + PM2 delete all + nohup npm start) 才能生效
 48. 广告事件 API 安全红线：必须使用 adRenderToken，禁止匿名上报，禁止保存原始 IP/UA
+
+### v1.20.42.6.18.1 AdEvent Runtime Activation & Test Endpoint Lock 记录
+49. 生产 PM2 冷重启完成（pkill -9 旧 next-server 进程 + PM2 delete all + nohup npm start）
+50. 运行时验证通过：无 token → 401 `Missing required field: adRenderToken`、伪 token → 403 `Invalid or expired ad render token`
+51. `/api/ads/test-generate-token` 已从构建产物中移除（返回 404），匿名生成 token 路径已彻底封闭
+52. 测试 token 生成改用 `scripts/test-ad-token.mjs` 本地脚本，读取 .env.local 的 AUTH_SECRET
+53. 测试 token 端点不得生产匿名开放 — 已确认删除
+54. 前台广告渲染必须在 API 运行时验证通过后才允许进入 — 当前 3/10 项运行时验证通过，剩余 7 项需真实 campaign 数据
+55. Quote Sheet / Workspace / Admin / Auth 保护规则继续有效
 
 ---
 
