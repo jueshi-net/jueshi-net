@@ -341,6 +341,17 @@
 
 *本文档为所有后续操作的潜意识基础。执行任何三期代码前，必须阅读并遵守上述规范。*
 
+## v1.20.42.6.19.2 SEO & Internal Linking Long-term Planning
+
+详见 `docs/CONTENT_IA_LONG_TERM.md` 第十章：
+
+- 页面角色与搜索意图防冲突：专题(攻略) / 清单(步骤) / 工具(执行) / 文章(对比) / 落地页(场景)
+- 内链路径模型：专题 → 清单 → 工具 → 用户资产
+- 锚文本规范：必须具体描述目标页，禁止泛化锚文本（"点击这里"）
+- 内链规则：专题至少 2 清单 + 3 工具 + 2 文章链接；清单每步绑工具；落地页禁止孤岛
+- Hermes ContentOps 生成内容时必须同时输出 internal_links 配置
+- 纯文档规划，零代码/零数据库/零 Admin/零前台变更
+
 ## v1.20.42.6.19.1 Content IA Long-term Planning
 
 详见 `docs/CONTENT_IA_LONG_TERM.md`：
