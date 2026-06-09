@@ -2,7 +2,18 @@
 
 > **Generated**: 2026-06-08
 > **Version**: v1.20.42.6.15
-> **Status**: 规划完成，零代码变更
+> **Status**: 规划完成，migration baseline 已修复
+
+---
+
+## 0. v1.20.42.6.15.1 Migration Baseline 修复状态
+
+✅ **已完成** (详见 v1.20.42.6.15.1 Report)
+- 修复了 migration 历史与生产 DB schema 不一致问题
+- 补齐 `20260514000000_sync_schema` 占位 migration
+- 新增 `20260609013309_baseline_full_schema` 完整 baseline migration (67 表, IF NOT EXISTS 幂等)
+- 临时空数据库验证通过: 20 个 migration 全部应用, 68 表与生产 DB 完全一致
+- **AdCreative / AdEvent 开发前置条件满足**
 
 ---
 

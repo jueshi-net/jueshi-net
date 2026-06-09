@@ -278,6 +278,13 @@
 18. LandingPage 当前仅为后台配置模型，无公开路由渲染。
 19. `prisma/migrations/` 必须与 `_prisma_migrations` 表保持同步，禁止未提交 migration 导致 DB schema 漂移。
 
+### v1.20.42.6.15.1 Migration Baseline 修复记录
+20. 已补齐 `20260514000000_sync_schema` 占位 migration (DB 有记录但 repo 缺失)
+21. 已新增 `20260609013309_baseline_full_schema` 完整 baseline migration (67 表, IF NOT EXISTS 幂等)
+22. 临时空数据库验证: 20 migrations 全部应用, 68 表与生产 DB 完全一致
+23. 后续新增数据库模型必须随代码提交 migration SQL，禁止 schema.prisma 变更但 migration 缺失
+24. 生产 DB 不允许手工漂移，所有 schema 变更必须通过 migration 文件
+
 ---
 
 ## 📝 三期待办方向（待规划）
