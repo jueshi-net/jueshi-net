@@ -384,3 +384,10 @@
 - 前台广告渲染前必须完成 AdEvent 生产运行时验证(10 项)
 - html/codeSnippet 类型广告禁止前台渲染（安全限制）
 - 新增广告位必须先在 AdPlacement 表中注册，否则 resolve API 返回 null
+
+## v1.20.42.6.26 Quote Sheet 路径记录
+
+- 当前正式单据路径倾向：`/tools/documents/quotation`（Workspace 内链指向此路径，`/tools/quote` 自动 307 重定向至此）
+- `/tools/quote-sheet` 仍存在，是独立工具页（表单填写 + 预览）
+- 两者功能相似，长期需要 canonical/重定向治理（合并或明确主次）
+- 本轮不处理 Quote Sheet 路径合并，仅记录状态

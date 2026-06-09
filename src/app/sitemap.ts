@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const toolSlugs = [
     "shipping-calculator", "shipping-estimator", "hs-code", "sensitive-goods",
     "postal-code", "address-formatter", "invoice", "commercial-invoice",
-    "quote", "quote-sheet", "customs-generator", "qrcode", "exchange-rate",
+    "customs-generator", "qrcode", "exchange-rate",
     "tracking", "documents", "shipping-mark", "container", "handover-note",
     "receipt", "debit-note", "shipping-label", "inbound-receipt", "memo",
     "inbound", "zip", "video-script-sop", "document-tools",
@@ -52,6 +52,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.8,
   }));
+
+  // Canonical Quote Sheet page (not /tools/quote or /tools/quote-sheet)
+  const quoteSheetPage: MetadataRoute.Sitemap = [{
+    url: `${BASE_URL}/tools/documents/quotation`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }];
 
   // Dynamic pages (DB dependent)
   let articlePages: MetadataRoute.Sitemap = [];
@@ -104,5 +112,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("[sitemap] DB fetch failed, returning static pages + tools only");
   }
 
-  return [...staticPages, ...tools, ...articlePages, ...lpPages, ...checklistPages];
+  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages];
 }

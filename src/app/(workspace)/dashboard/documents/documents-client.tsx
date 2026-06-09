@@ -22,7 +22,7 @@ const TOOL_KEY_LABELS: Record<string, string> = {
 const TOOL_KEY_HREFS: Record<string, string> = {
   commercial_invoice: "/tools/commercial-invoice",
   shipping_label: "/tools/documents/shipping-label",
-  quote_sheet: "/tools/quote-sheet",
+  quote_sheet: "/tools/documents/quotation",
   inbound_receipt: "/tools/inbound-receipt",
   handover_note: "/tools/handover-note",
   debit_note: "/tools/debit-note",

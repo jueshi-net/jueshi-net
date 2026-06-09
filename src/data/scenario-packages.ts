@@ -178,7 +178,7 @@ export const SCENARIO_PACKAGES: OldScenarioPackage[] = [
         groupName: "单据生成",
         tools: [
           { name: "商业发票", url: "/tools/commercial-invoice", category: "invoice", scenario: "invoice", targetUsers: [], painPoint: "不会做发票", description: "自动生成商业发票", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["发票"], sourceNote: "", toolKey: "commercial-invoice" },
-          { name: "报价单", url: "/tools/quote-sheet", category: "quote", scenario: "quote", targetUsers: [], painPoint: "不会做报价单", description: "专业报价单生成", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["报价"], sourceNote: "", toolKey: "quote-sheet" },
+          { name: "报价单", url: "/tools/documents/quotation", category: "quote", scenario: "quote", targetUsers: [], painPoint: "不会做报价单", description: "专业报价单生成", freePlan: "免费", paidPlan: "N/A", accessCN: "fast", accessOverseas: "fast", beginnerFriendly: true, recommended: true, tags: ["报价"], sourceNote: "", toolKey: "quote-sheet" },
         ],
       },
     ],

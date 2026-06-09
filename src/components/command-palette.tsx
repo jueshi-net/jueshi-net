@@ -101,7 +101,7 @@ const navItems: SearchItem[] = [
 
 const toolItems: SearchItem[] = [
   { id: "tool-invoice", title: "商业发票", href: "/tools/commercial-invoice", icon: <FileText className="w-4 h-4" />, subtitle: "国际贸易必备", keywords: ["invoice", "发票", "商业"] },
-  { id: "tool-quote", title: "报价单", href: "/tools/quote-sheet", icon: <TrendingUp className="w-4 h-4" />, subtitle: "专业报价单生成", keywords: ["quote", "报价", "价格"] },
+  { id: "tool-quote", title: "报价单", href: "/tools/documents/quotation", icon: <TrendingUp className="w-4 h-4" />, subtitle: "专业报价单生成", keywords: ["quote", "报价", "价格"] },
   { id: "tool-mark", title: "唛头面单", href: "/tools/documents?type=mark", icon: <Tag className="w-4 h-4" />, subtitle: "一键生成唛头标签", keywords: ["mark", "唛头", "面单", "标签"] },
   { id: "tool-hs", title: "HS 编码查询", href: "/tools/hs-code", icon: <Shield className="w-4 h-4" />, subtitle: "报关必备", keywords: ["hs", "编码", "海关", "报关"] },
   { id: "tool-postal", title: "邮编查询", href: "/tools/postal-code", icon: <MapPin className="w-4 h-4" />, subtitle: "全球邮编地址", keywords: ["postal", "邮编", "地址"] },
@@ -123,7 +123,7 @@ const toolItems: SearchItem[] = [
   { id: "tool-debit", title: "借记通知单", href: "/tools/debit-note", icon: <FileText className="w-4 h-4" />, subtitle: "借记单生成", keywords: ["debit", "借记", "通知"] },
   { id: "tool-handover", title: "交接单", href: "/tools/handover-note", icon: <FileText className="w-4 h-4" />, subtitle: "交接单据", keywords: ["handover", "交接"] },
   { id: "tool-shipping-mark", title: "运输唛头", href: "/tools/shipping-mark", icon: <Tag className="w-4 h-4" />, subtitle: "运输标记", keywords: ["mark", "唛头", "运输"] },
-  { id: "tool-quote-page", title: "报价工具", href: "/tools/quote", icon: <TrendingUp className="w-4 h-4" />, subtitle: "报价计算", keywords: ["quote", "报价"] },
+  { id: "tool-quote-page", title: "报价工具", href: "/tools/documents/quotation", icon: <TrendingUp className="w-4 h-4" />, subtitle: "报价计算", keywords: ["quote", "报价"] },
   { id: "tool-inbound-receipt", title: "入库签收", href: "/tools/inbound-receipt", icon: <FileText className="w-4 h-4" />, subtitle: "入库签收单", keywords: ["inbound", "入库", "签收"] },
 ];
 

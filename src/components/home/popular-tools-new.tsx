@@ -17,7 +17,7 @@ const FALLBACK_TOOLS = [
   { name: "Commercial Invoice", desc: "自动生成商业发票模板", href: "/tools/commercial-invoice", icon: "FileText", usage: 9800, favs: 720, rating: "4.8", updated: "1天前" },
   { name: "运费计算器", desc: "多渠道运费比价与估算", href: "/tools/shipping-calculator", icon: "Calculator", usage: 8500, favs: 650, rating: "4.7", updated: "2天前" },
   { name: "体积重计算器", desc: "快递计费重量换算", href: "/tools/shipping-estimator", icon: "Calculator", usage: 7200, favs: 540, rating: "4.6", updated: "5天前" },
-  { name: "报价单生成器", desc: "标准外贸报价单模板", href: "/tools/quote-sheet", icon: "FileText", usage: 6100, favs: 480, rating: "4.8", updated: "1周前" },
+  { name: "报价单生成器", desc: "标准外贸报价单模板", href: "/tools/documents/quotation", icon: "FileText", usage: 6100, favs: 480, rating: "4.8", updated: "1周前" },
   { name: "短视频 SOP", desc: "短视频脚本制作模板", href: "/tools/video-script-sop", icon: "Sparkles", usage: 5400, favs: 420, rating: "4.5", updated: "3天前" },
   { name: "HS 编码查询", desc: "51,838 条海关商品编码", href: "/tools/hs-code", icon: "Hash", usage: 4800, favs: 380, rating: "4.9", updated: "实时更新" },
   { name: "物流追踪", desc: "多承运商包裹实时跟踪", href: "/tracking", icon: "Truck", usage: 4200, favs: 340, rating: "4.4", updated: "2小时前" },

@@ -26,7 +26,7 @@ const TOOL_RELATIONSHIPS: Record<string, RelatedTool[]> = {
     { name: '汇率查询', href: '/tools/exchange-rate', emoji: '💱', desc: '查询实时汇率' },
   ],
   'exchange-rate': [
-    { name: '报价单', href: '/tools/quote', emoji: '💵', desc: '生成报价单和收据' },
+    { name: '报价单', href: '/tools/documents/quotation', emoji: '💵', desc: '生成报价单和收据' },
     { name: '发票生成', href: '/tools/invoice', emoji: '🧾', desc: '生成商业发票' },
   ],
   memo: [
