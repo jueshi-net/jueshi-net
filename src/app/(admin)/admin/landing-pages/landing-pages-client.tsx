@@ -138,6 +138,25 @@ export default function LandingPagesClient() {
         return;
       }
     }
+
+    // Publish gate: validate checklist before allowing published
+    if (data.status === "published" && data.pageType === "checklist") {
+      const tempPage: LandingPage = {
+        ...editing,
+        ...data,
+        id: editing?.id || "",
+        relatedTools: data.relatedTools,
+        relatedTopics: data.relatedTopics,
+        relatedArticles: data.relatedArticles,
+      };
+      const publishErrors = validateChecklistPublish(tempPage);
+      if (publishErrors.length > 0) {
+        alert("清单发布审核未通过，以下问题必须解决后才能发布为 published：\n\n" + publishErrors.join("\n"));
+        setSaving(false);
+        return;
+      }
+    }
+
     const url = editing ? `/api/admin/landing-pages/${editing.id}` : "/api/admin/landing-pages";
     const method = editing ? "PUT" : "POST";
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
@@ -166,6 +185,14 @@ export default function LandingPagesClient() {
   };
 
   const handleStatus = async (p: LandingPage, newStatus: string) => {
+    // Publish gate for checklist
+    if (newStatus === "published" && p.pageType === "checklist") {
+      const publishErrors = validateChecklistPublish(p);
+      if (publishErrors.length > 0) {
+        alert("清单发布审核未通过，以下问题必须解决后才能发布为 published：\n\n" + publishErrors.join("\n"));
+        return;
+      }
+    }
     const res = await fetch(`/api/admin/landing-pages/${p.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: newStatus }) });
     if (res.ok) fetchPages();
   };
@@ -191,6 +218,91 @@ export default function LandingPagesClient() {
       if (!(p.relatedTopics || []).length && !hs.internalLinks?.backToTopic) warnings.push(`清单缺少所属专题链接`);
       if (!hs.nextSteps || hs.nextSteps.length === 0) warnings.push(`清单缺少下一步推荐`);
     }
+    return warnings;
+  };
+
+  // Checklist publish gate validation — blocks published status
+  const validateChecklistPublish = (page: LandingPage): string[] => {
+    const errors: string[] = [];
+    if (page.pageType !== "checklist") return errors;
+    const hs = page.heroSection || {};
+
+    // Block: requiresHumanReview=true
+    if (hs.requiresHumanReview === true) {
+      errors.push("❌ 清单标记为「需人工核验」，必须完成所有人工核验项后才允许发布。");
+    }
+
+    // Block: officialLinks with empty URLs or needsReview=true
+    const ol = page.officialLinks || [];
+    const emptyUrls = ol.filter((l: any) => !l.url || l.url === "");
+    const needsReview = ol.filter((l: any) => l.needsReview === true);
+    if (emptyUrls.length > 0) {
+      errors.push(`❌ 有 ${emptyUrls.length} 个官方链接 URL 为空，必须填写完整后才允许发布。`);
+    }
+    if (needsReview.length > 0) {
+      errors.push(`❌ 有 ${needsReview.length} 个官方链接标记为「待核验」，必须完成核验后才允许发布。`);
+    }
+
+    // Block: sections < 3
+    const sections = hs.sections || [];
+    if (!Array.isArray(sections) || sections.length < 3) {
+      errors.push(`❌ 分组数量不足（${Array.isArray(sections) ? sections.length : 0} < 3），至少需要 3 个分组。`);
+    }
+
+    // Block: checklistItems < 10
+    const totalItems = Array.isArray(sections)
+      ? sections.reduce((sum: number, s: any) => sum + (Array.isArray(s.items) ? s.items.length : 0), 0)
+      : 0;
+    if (totalItems < 10) {
+      errors.push(`❌ 清单步骤数量不足（${totalItems} < 10），至少需要 10 个步骤。`);
+    }
+
+    // Block: faqItems < 5
+    const faqs = Array.isArray(page.faqItems) ? page.faqItems.length : 0;
+    if (faqs < 5) {
+      errors.push(`❌ FAQ 数量不足（${faqs} < 5），至少需要 5 个。`);
+    }
+
+    // Block: avoidPitfalls < 5
+    const pitfalls = Array.isArray(hs.avoidPitfalls) ? hs.avoidPitfalls.length : 0;
+    if (pitfalls < 5) {
+      errors.push(`❌ 避坑提醒数量不足（${pitfalls} < 5），至少需要 5 条。`);
+    }
+
+    // Block: relatedTools < 3
+    const tools = Array.isArray(page.relatedTools) ? page.relatedTools.length : 0;
+    if (tools < 3) {
+      errors.push(`❌ 相关工具数量不足（${tools} < 3），至少需要 3 个。`);
+    }
+
+    // Block: seoTitle or seoDescription empty
+    if (!page.seoTitle) errors.push("❌ SEO 标题为空。");
+    if (!page.seoDescription) errors.push("❌ SEO 描述为空。");
+
+    return errors;
+  };
+
+  // Warnings (non-blocking) for checklist editing
+  const getChecklistPublishWarnings = (page: LandingPage): string[] => {
+    const warnings: string[] = [];
+    if (page.pageType !== "checklist") return warnings;
+    const hs = page.heroSection || {};
+
+    // Warning: backToTopic empty
+    if (!(hs.internalLinks?.backToTopic)) {
+      warnings.push("⚠️ 所属专题链接为空，建议填写以增强内链。");
+    }
+
+    // Warning: nextSteps empty
+    if (!hs.nextSteps || hs.nextSteps.length === 0) {
+      warnings.push("⚠️ 下一步推荐为空，建议添加以提高页面间导航。");
+    }
+
+    // Warning: relatedArticles empty
+    if (!page.relatedArticles || page.relatedArticles.length === 0) {
+      warnings.push("⚠️ 未关联相关文章，建议添加以增强内容深度。");
+    }
+
     return warnings;
   };
 
@@ -496,6 +608,47 @@ export default function LandingPagesClient() {
           {/* Warnings & Preview */}
           {editing && (
             <div className="border-t border-gray-100 pt-4 mt-4">
+              {/* Checklist Publish Gate Banner */}
+              {editing.pageType === "checklist" && (() => {
+                const errors = validateChecklistPublish(editing);
+                const warnings = getChecklistPublishWarnings(editing);
+                if (errors.length > 0) {
+                  return (
+                    <div className="mb-3 flex items-start gap-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-3">
+                      <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-bold mb-1">🚫 清单发布审核未通过 — 以下问题必须解决后才允许发布为 published：</div>
+                        <div className="space-y-0.5">
+                          {errors.map((e, i) => <div key={i}>{e}</div>)}
+                        </div>
+                        <div className="mt-2 text-gray-600">
+                          提示：清单发布前必须完成人工核验——官方链接、政策/法律/海关/签证相关内容、内链、FAQ。
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                if (warnings.length > 0) {
+                  return (
+                    <div className="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="font-bold mb-1">⚠️ 发布审核通过，但有以下改进建议：</div>
+                        <div className="space-y-0.5">
+                          {warnings.map((w, i) => <div key={i}>{w}</div>)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="mb-3 flex items-start gap-2 text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <span className="text-base">✅</span>
+                    <span>清单发布审核通过，所有必填项已完成。可以安全发布。</span>
+                  </div>
+                );
+              })()}
+
               {getSlugWarnings(editing).length > 0 && (
                 <div className="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />

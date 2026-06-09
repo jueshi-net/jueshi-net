@@ -47,7 +47,7 @@ try {
   process.exit(1);
 }
 
-// 4. 构造 SQL
+// 4. 构造 SQL（保护 published 内容不被覆盖）
 const slug = data.slug;
 console.log(`\n📝 写入 LandingPage draft: ${slug}`);
 
@@ -59,7 +59,20 @@ const toolsArr = (data.relatedTools || []).map(t => `'${t.replace(/'/g, "''")}'`
 const topicsArr = (data.relatedTopics || []).map(t => `'${t.replace(/'/g, "''")}'`).join(", ");
 const articlesArr = (data.relatedArticles || []).map(t => `'${t.replace(/'/g, "''")}'`).join(", ");
 
+// 如果目标 slug 已经是 published，DO UPDATE 不覆盖 status/published_at
+// 同时输出来明确警告
 const sql = `
+-- 检查是否已 published
+DO $$
+DECLARE
+  current_status TEXT;
+BEGIN
+  SELECT status INTO current_status FROM landing_pages WHERE slug = '${slug.replace(/'/g, "''")}';
+  IF current_status = 'published' THEN
+    RAISE NOTICE '⚠️  目标 slug \"%\" 已为 published，未覆盖。如需回退为 draft，请人工执行 review reset。', '${slug.replace(/'/g, "''")}';
+  END IF;
+END $$;
+
 INSERT INTO landing_pages (
   id, slug, title, seo_title, seo_description, page_type, status,
   hero_section, faq_items, official_links, related_tools, related_topics, related_articles,
@@ -87,6 +100,7 @@ INSERT INTO landing_pages (
   seo_description = EXCLUDED.seo_description,
   page_type = EXCLUDED.page_type,
   status = CASE WHEN landing_pages.status = 'published' THEN 'published' ELSE EXCLUDED.status END,
+  published_at = CASE WHEN landing_pages.status = 'published' THEN landing_pages.published_at ELSE NULL END,
   hero_section = EXCLUDED.hero_section,
   faq_items = EXCLUDED.faq_items,
   official_links = EXCLUDED.official_links,
