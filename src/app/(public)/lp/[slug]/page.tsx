@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: page.seoDescription || undefined,
     },
     alternates: {
-      canonical: `/lp/${page.slug}`,
+      canonical: `https://jueshi.net/lp/${page.slug}`,
     },
   };
 }
