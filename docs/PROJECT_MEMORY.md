@@ -290,6 +290,15 @@
 26. `prisma migrate status` 现已显示 `Database schema is up to date!`，无 pending migration
 27. AdCreative / AdEvent Backend MVP 前置条件全部满足
 
+### v1.20.42.6.16 AdCreative & AdEvent Backend MVP 记录
+28. 已新增 `AdCreative` 模型 (ad_creatives 表) 与 `AdEvent` 模型 (ad_events 表)
+29. 已新增 `/admin/ad-creatives` 广告素材管理页面 (CRUD 完整)
+30. 已增强 `/admin/ads`: 显示素材数量、非法 placement key 警告
+31. 已新增 `POST /api/ads/events` 广告事件 API (impression/click)
+32. AdCreative 当前只是后台素材库，不代表前台渲染
+33. AdEvent 当前只是日志基础，不代表前台自动埋点
+34. 仍禁止前台广告渲染
+
 ---
 
 ## 📝 三期待办方向（待规划）

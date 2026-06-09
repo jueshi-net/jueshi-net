@@ -15,8 +15,17 @@
 - 临时空数据库验证通过: 20 个 migration 全部应用, 68 表与生产 DB 完全一致
 - **AdCreative / AdEvent 开发前置条件满足**
 
-### v1.20.42.6.15.2 Resolve 状态
+### v1.20.42.6.15.2 Baseline Resolve 状态
 ✅ `prisma migrate status` 现已显示 `Database schema is up to date!`，无 pending migration。
+
+### v1.20.42.6.16 实际落地
+✅ **已完成**
+- `AdCreative` 模型: 13 字段 (campaignId, title, creativeType, imageUrl, targetUrl, codeSnippet, headline, bodyText, ctaText, isActive, sortOrder, createdAt, updatedAt)
+- `AdEvent` 模型: 15 字段 (campaignId, placementKey, creativeId, eventType, pageType, pagePath, userId, sessionId, country, device, referrer, ipHash, userAgentHash, createdAt)
+- `/admin/ad-creatives`: 完整 CRUD 页面，支持按 Campaign/类型筛选，图片素材预览，HTML 安全风险提示
+- `/admin/ads` 增强: 显示关联素材数量，非法 placement key 警告
+- `POST /api/ads/events`: 广告事件 API，校验 campaign/placement/creative，IP 和 UA 自动 hash，rate limit 100/min，同步更新计数器
+- Admin 导航: 24 项 (新增"广告素材")
 
 ---
 
