@@ -415,3 +415,14 @@
 - 导入脚本：`scripts/import-checklist-draft.mjs`（已修复本地/VPS 兼容）
 - 永远只生成 draft，不自动 published
 - 所有 draft 必须经过人工审核后才由 Admin 发布
+
+## v1.20.42.6.29 Batch Draft Trial
+
+- 已生成 3 个真实 draft：
+  1. `student-first-abroad-packing-checklist` — 留学生行李清单（5 sections, 20 items, 5 FAQ, 5 pitfalls）
+  2. `first-shipping-checklist` — 集运新手清单（5 sections, 20 items, 5 FAQ, 5 pitfalls）
+  3. `toronto-rental-viewing-checklist` — 多伦多租房避坑（5 sections, 20 items, 5 FAQ, 5 pitfalls）
+- Validator 规则修正：sections>=3, items>=10, faq>=5, pitfalls>=5(error), tools>=3, officialLinks>=2+needsReview
+- 所有 draft 已导入 LandingPage，status 全部为 draft
+- draft 页面返回 404，不进入 sitemap
+- Git 文件内容本地/VPS 完全一致（MD5 校验通过）

@@ -1,7 +1,7 @@
 # 海外百宝箱 Roadmap
 
 **最后更新：** 2026-06-09
-**当前版本线：** v1.20.42.6.28
+**当前版本线：** v1.20.42.6.29
 
 ---
 
@@ -26,6 +26,7 @@
 | v1.20.42.6.26 | Checklist Admin Polish + Internal Linking MVP | ✅ 完成 |
 | v1.20.42.6.27 | Quote Sheet Canonical Cleanup + Git State Alignment | ✅ 完成 |
 | v1.20.42.6.28 | Hermes ContentOps Skill MVP | ✅ 完成 |
+| v1.20.42.6.29 | Checklist Batch Draft Trial | ✅ 完成 |
 
 ---
 

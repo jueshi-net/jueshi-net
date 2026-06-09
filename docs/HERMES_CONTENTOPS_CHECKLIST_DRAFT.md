@@ -154,7 +154,7 @@ Hermes 根据选题包生成以下 JSON，通过 `scripts/import-checklist-draft
 | `relatedTopics` | 输入 | 专题 slug 数组 |
 | `relatedArticles` | 输入 | 文章 slug 数组 |
 | `heroSection` | 生成 | 见下方 heroSection 结构 |
-| `faqItems` | 生成 | 至少 3 个 FAQ |
+| `faqItems` | 生成 | 至少 5 个 FAQ |
 | `officialLinks` | 生成 | 占位，URL 可为空 |
 | `ctaConfig` | 默认 | `{ text: "开始使用工具", url: "/tools" }` |
 
