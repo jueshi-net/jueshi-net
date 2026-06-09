@@ -1,7 +1,7 @@
 # 海外百宝箱 Roadmap
 
 **最后更新：** 2026-06-09
-**当前版本线：** v1.20.42.6.23
+**当前版本线：** v1.20.42.6.25
 
 ---
 
@@ -21,6 +21,8 @@
 | v1.20.42.6.22.1 | Admin Role Display & RBAC Consistency Fix | ✅ 完成 |
 | v1.20.42.6.22.2 | Real Browser Admin Login Redirect Fix | ✅ 完成 |
 | v1.20.42.6.23 | Checklist Content MVP Planning + Data Shape | ✅ 完成（仅规划） |
+| v1.20.42.6.24 | Checklist MVP Implementation | ✅ 完成 |
+| v1.20.42.6.25 | Hermes ContentOps Draft Generator + Test Cleanup | ✅ 完成 |
 
 ---
 
@@ -37,13 +39,12 @@
 
 ## 待规划方向
 
-### 内容架构（详见 `docs/CONTENT_IA_LONG_TERM.md`、`docs/CHECKLIST_CONTENT_MVP_PLAN.md`）
+### 内容架构（详见 `docs/CONTENT_IA_LONG_TERM.md`、`docs/CHECKLIST_CONTENT_MVP_PLAN.md`、`docs/HERMES_CONTENTOPS_CHECKLIST_DRAFT.md`）
 - [x] 专题栏目：知识地图 / 资源集合 / 主题入口（规划已写入）
 - [x] 清单栏目：行动步骤 / 避坑核对 / 场景任务单（MVP 规划已写入 `CHECKLIST_CONTENT_MVP_PLAN.md`）
-- [ ] 清单 Admin 编辑视图（Phase 1）
-- [ ] 清单前台页面 `/checklists/[slug]`（Phase 2）
-- [ ] Hermes ContentOps 生成清单 draft（Phase 3）
-- [ ] 从 LandingPage 拆分独立 Checklist 模型（Phase 4）
+- [x] 清单公开页面 `/checklists/[slug]` + Admin 支持
+- [x] Hermes ContentOps Draft Generator（校验 + 导入脚本）
+- [ ] 清单 Admin 结构化表单编辑（Phase 2 polish）
 - [ ] 专题 → 清单 → 工具 → 用户资产 转化路径
 - [ ] AI 内容发布规范（SEO 友好）
 

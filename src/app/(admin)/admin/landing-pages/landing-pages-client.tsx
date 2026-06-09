@@ -138,7 +138,8 @@ export default function LandingPagesClient() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">落地页管理</h1>
-          <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/test-safe-landing-20" className="text-teal-600 hover:underline">/lp/[slug]</a></p>
+          <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/[slug]" className="text-teal-600 hover:underline">/lp/[slug]</a></p>
+          <p className="text-xs text-amber-600 mt-1">💡 清单提示：可使用 Hermes ContentOps 生成 checklist draft JSON，人工审核后再发布为 published。</p>
         </div>
         <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" }); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建落地页
