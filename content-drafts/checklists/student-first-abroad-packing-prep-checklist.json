@@ -387,7 +387,8 @@
       "不要携带超过海关规定限额的现金（需申报）",
       "不要携带含违禁成分的中成药（如含麻黄碱类药物）",
       "不要把重要证件放在托运行李中",
-      "不要忘记转换插头和电压适配"
+      "不要忘记转换插头和电压适配",
+      "不要携带过多现金或贵重物品在随身包中（分散放置降低被盗风险）"
     ],
     "nextSteps": [
       "第一次使用集运注意事项清单",
@@ -449,7 +450,7 @@
     }
   ],
   "_topicPackSource": "student-first-abroad-packing-checklist.yaml",
-  "_generatedAt": "2026-06-09T14:33:53.536Z",
+  "_generatedAt": "2026-06-09T15:10:40.312Z",
   "publish_mode": "draft",
   "requiresHumanReview": true
 }

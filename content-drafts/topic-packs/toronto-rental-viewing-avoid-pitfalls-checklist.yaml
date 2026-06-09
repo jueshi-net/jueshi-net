@@ -1,0 +1,46 @@
+# Topic Pack: 多伦多租房看房避坑清单
+# 用于 Hermes ContentOps Checklist Draft Generator
+# 将此文件传给 hermes-generate-checklist-draft.mjs 生成 draft JSON
+
+type: checklist
+title: 多伦多租房看房避坑清单
+audience: 留学生 / 新移民 / 海外华人
+region: 北美
+city: 多伦多
+scenario: 在多伦多租房看房时需要检查的事项和避坑指南
+primary_intent: 帮助留学生在多伦多租房时系统性地检查房屋状况、识别潜在风险、避免常见坑点
+difficulty: medium
+estimated_time: "2-3小时"
+sections:
+  - 房源基本信息核实
+  - 房屋内部状况检查
+  - 安全与安保
+  - 合同与法律条款
+  - 周边环境与交通
+related_tools:
+  - address-formatter
+  - shipping-calculator
+  - invoice
+related_topics: []
+related_articles: []
+official_links_needed:
+  - 安大略省租赁法规
+  - 多伦多租房指导价
+  - 安省租客与房东委员会 LTB
+pitfalls:
+  - 不要签署口头协议或未经审核的租赁合同（必须书面且符合 LTB 标准）
+  - 不要支付现金押金（必须通过可追踪方式，押金不得超过一个月租金）
+  - 不要忽略房屋虫害和霉菌问题（看房时重点检查卫生间和厨房角落）
+  - 不要轻信"包水电"口头承诺（必须在合同中明确写清包含哪些费用）
+  - 不要忽略暖气和热水供应（加拿大冬季极其重要，确认暖气类型和费用承担方）
+faq_questions:
+  - 多伦多租房押金一般多少钱？
+  - 签合同前需要检查哪些关键点？
+  - 二房东转租是否合法？
+  - 遇到房东不退押金怎么办？
+  - 租房需要买租客保险吗？
+next_steps:
+  - 留学生第一次出国行李准备清单
+  - 海外租房入住检查清单
+publish_mode: draft
+requires_human_review: true

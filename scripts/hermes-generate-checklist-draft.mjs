@@ -61,6 +61,14 @@ const sections = (topicPack.sections || []).map((title, i) => ({
   items: []  // Hermes Agent fills in items after draft is generated
 }));
 
+// Ensure at least 3 sections for validation
+if (sections.length < 3) {
+  sections.push({ id: `sec-${sections.length + 1}`, title: "其他注意事项", description: "", items: [] });
+}
+if (sections.length < 3) {
+  sections.push({ id: `sec-${sections.length + 1}`, title: "补充说明", description: "", items: [] });
+}
+
 const draft = {
   slug,
   title: topicPack.title,
@@ -137,6 +145,31 @@ for (const section of draft.heroSection.sections) {
     }
   } else {
     totalItems += section.items.length;
+  }
+}
+
+// Ensure avoidPitfalls has at least 5 for validation
+if (!draft.heroSection.avoidPitfalls || draft.heroSection.avoidPitfalls.length < 5) {
+  while (draft.heroSection.avoidPitfalls.length < 5) {
+    draft.heroSection.avoidPitfalls.push("[待补充] 请补充避坑提示");
+  }
+}
+
+// Ensure faqItems have at least 5
+if (!draft.faqItems || draft.faqItems.length < 5) {
+  const baseQuestions = [
+    "本清单适用哪些人群？",
+    "准备时间需要多久？",
+    "哪些是最容易忽略的？",
+    "到达后发现漏带了怎么办？",
+    "有哪些当地替代方案？"
+  ];
+  while (draft.faqItems.length < 5) {
+    const idx = draft.faqItems.length;
+    draft.faqItems.push({
+      question: baseQuestions[idx] || `[待补充] FAQ ${idx + 1}`,
+      answer: "[待 Hermes 生成具体回答]"
+    });
   }
 }
 

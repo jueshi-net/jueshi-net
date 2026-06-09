@@ -1,45 +1,42 @@
 {
-  "slug": "first-use-shipping-tips-checklist",
-  "title": "第一次使用集运注意事项清单",
-  "seoTitle": "第一次使用集运注意事项清单（完整版）",
-  "seoDescription": "专为海外华人 / 跨境电商卖家 / SOHO设计的第一次使用集运服务向海外发货清单，涵盖所有必要步骤和避坑指南，助你系统性地完成准备工作。",
+  "slug": "pitfalls-checklist",
+  "title": "多伦多租房看房避坑清单",
+  "seoTitle": "多伦多租房看房避坑清单（完整版）",
+  "seoDescription": "专为留学生 / 新移民 / 海外华人设计的在多伦多租房看房时需要检查的事项和避坑指南清单，涵盖所有必要步骤和避坑指南，助你系统性地完成准备工作。",
   "pageType": "checklist",
   "status": "draft",
   "relatedTools": [
     "address-formatter",
     "shipping-calculator",
-    "postal-code",
     "invoice"
   ],
-  "relatedTopics": [
-    "cross-border-shipping"
-  ],
+  "relatedTopics": [],
   "relatedArticles": [],
   "ctaConfig": {
     "text": "开始使用工具",
     "url": "/tools"
   },
   "heroSection": {
-    "checklistType": "shipping",
-    "audience": "海外华人 / 跨境电商卖家 / SOHO",
-    "region": "通用",
-    "city": "",
-    "scenario": "第一次使用集运服务向海外发货",
+    "checklistType": "rental",
+    "audience": "留学生 / 新移民 / 海外华人",
+    "region": "北美",
+    "city": "多伦多",
+    "scenario": "在多伦多租房看房时需要检查的事项和避坑指南",
     "difficulty": "medium",
-    "estimatedTime": "1-2小时",
-    "quickAnswer": "[待补充] 第一次使用集运注意事项清单的核心结论。",
-    "summary": "[待补充] 本清单涵盖第一次使用集运服务向海外发货的所有必要步骤，帮助用户系统性地完成准备工作。",
+    "estimatedTime": "2-3小时",
+    "quickAnswer": "[待补充] 多伦多租房看房避坑清单的核心结论。",
+    "summary": "[待补充] 本清单涵盖在多伦多租房看房时需要检查的事项和避坑指南的所有必要步骤，帮助用户系统性地完成准备工作。",
     "sections": [
       {
         "id": "sec-1",
-        "title": "一、下单前准备",
+        "title": "一、房源基本信息核实",
         "description": "",
         "items": [
           {
             "id": "sec-1-item-1",
-            "title": "[待补充] 一、下单前准备 - 第 1 项",
+            "title": "[待补充] 一、房源基本信息核实 - 第 1 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "一、下单前准备",
+            "category": "一、房源基本信息核实",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -53,9 +50,9 @@
           },
           {
             "id": "sec-1-item-2",
-            "title": "[待补充] 一、下单前准备 - 第 2 项",
+            "title": "[待补充] 一、房源基本信息核实 - 第 2 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "一、下单前准备",
+            "category": "一、房源基本信息核实",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -69,9 +66,9 @@
           },
           {
             "id": "sec-1-item-3",
-            "title": "[待补充] 一、下单前准备 - 第 3 项",
+            "title": "[待补充] 一、房源基本信息核实 - 第 3 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "一、下单前准备",
+            "category": "一、房源基本信息核实",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -85,9 +82,9 @@
           },
           {
             "id": "sec-1-item-4",
-            "title": "[待补充] 一、下单前准备 - 第 4 项",
+            "title": "[待补充] 一、房源基本信息核实 - 第 4 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "一、下单前准备",
+            "category": "一、房源基本信息核实",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -103,14 +100,14 @@
       },
       {
         "id": "sec-2",
-        "title": "二、仓库地址与收件人填写",
+        "title": "二、房屋内部状况检查",
         "description": "",
         "items": [
           {
             "id": "sec-2-item-1",
-            "title": "[待补充] 二、仓库地址与收件人填写 - 第 1 项",
+            "title": "[待补充] 二、房屋内部状况检查 - 第 1 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "二、仓库地址与收件人填写",
+            "category": "二、房屋内部状况检查",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -124,9 +121,9 @@
           },
           {
             "id": "sec-2-item-2",
-            "title": "[待补充] 二、仓库地址与收件人填写 - 第 2 项",
+            "title": "[待补充] 二、房屋内部状况检查 - 第 2 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "二、仓库地址与收件人填写",
+            "category": "二、房屋内部状况检查",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -140,9 +137,9 @@
           },
           {
             "id": "sec-2-item-3",
-            "title": "[待补充] 二、仓库地址与收件人填写 - 第 3 项",
+            "title": "[待补充] 二、房屋内部状况检查 - 第 3 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "二、仓库地址与收件人填写",
+            "category": "二、房屋内部状况检查",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -156,9 +153,9 @@
           },
           {
             "id": "sec-2-item-4",
-            "title": "[待补充] 二、仓库地址与收件人填写 - 第 4 项",
+            "title": "[待补充] 二、房屋内部状况检查 - 第 4 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "二、仓库地址与收件人填写",
+            "category": "二、房屋内部状况检查",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -174,14 +171,14 @@
       },
       {
         "id": "sec-3",
-        "title": "三、包裹入库与申报规范",
+        "title": "三、安全与安保",
         "description": "",
         "items": [
           {
             "id": "sec-3-item-1",
-            "title": "[待补充] 三、包裹入库与申报规范 - 第 1 项",
+            "title": "[待补充] 三、安全与安保 - 第 1 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "三、包裹入库与申报规范",
+            "category": "三、安全与安保",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -195,9 +192,9 @@
           },
           {
             "id": "sec-3-item-2",
-            "title": "[待补充] 三、包裹入库与申报规范 - 第 2 项",
+            "title": "[待补充] 三、安全与安保 - 第 2 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "三、包裹入库与申报规范",
+            "category": "三、安全与安保",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -211,9 +208,9 @@
           },
           {
             "id": "sec-3-item-3",
-            "title": "[待补充] 三、包裹入库与申报规范 - 第 3 项",
+            "title": "[待补充] 三、安全与安保 - 第 3 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "三、包裹入库与申报规范",
+            "category": "三、安全与安保",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -227,9 +224,9 @@
           },
           {
             "id": "sec-3-item-4",
-            "title": "[待补充] 三、包裹入库与申报规范 - 第 4 项",
+            "title": "[待补充] 三、安全与安保 - 第 4 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "三、包裹入库与申报规范",
+            "category": "三、安全与安保",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -245,14 +242,14 @@
       },
       {
         "id": "sec-4",
-        "title": "四、支付与国际运费",
+        "title": "四、合同与法律条款",
         "description": "",
         "items": [
           {
             "id": "sec-4-item-1",
-            "title": "[待补充] 四、支付与国际运费 - 第 1 项",
+            "title": "[待补充] 四、合同与法律条款 - 第 1 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "四、支付与国际运费",
+            "category": "四、合同与法律条款",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -266,9 +263,9 @@
           },
           {
             "id": "sec-4-item-2",
-            "title": "[待补充] 四、支付与国际运费 - 第 2 项",
+            "title": "[待补充] 四、合同与法律条款 - 第 2 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "四、支付与国际运费",
+            "category": "四、合同与法律条款",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -282,9 +279,9 @@
           },
           {
             "id": "sec-4-item-3",
-            "title": "[待补充] 四、支付与国际运费 - 第 3 项",
+            "title": "[待补充] 四、合同与法律条款 - 第 3 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "四、支付与国际运费",
+            "category": "四、合同与法律条款",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -298,9 +295,9 @@
           },
           {
             "id": "sec-4-item-4",
-            "title": "[待补充] 四、支付与国际运费 - 第 4 项",
+            "title": "[待补充] 四、合同与法律条款 - 第 4 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "四、支付与国际运费",
+            "category": "四、合同与法律条款",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -316,14 +313,14 @@
       },
       {
         "id": "sec-5",
-        "title": "五、物流追踪与签收",
+        "title": "五、周边环境与交通",
         "description": "",
         "items": [
           {
             "id": "sec-5-item-1",
-            "title": "[待补充] 五、物流追踪与签收 - 第 1 项",
+            "title": "[待补充] 五、周边环境与交通 - 第 1 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "五、物流追踪与签收",
+            "category": "五、周边环境与交通",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -337,9 +334,9 @@
           },
           {
             "id": "sec-5-item-2",
-            "title": "[待补充] 五、物流追踪与签收 - 第 2 项",
+            "title": "[待补充] 五、周边环境与交通 - 第 2 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "五、物流追踪与签收",
+            "category": "五、周边环境与交通",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -353,9 +350,9 @@
           },
           {
             "id": "sec-5-item-3",
-            "title": "[待补充] 五、物流追踪与签收 - 第 3 项",
+            "title": "[待补充] 五、周边环境与交通 - 第 3 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "五、物流追踪与签收",
+            "category": "五、周边环境与交通",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -369,9 +366,9 @@
           },
           {
             "id": "sec-5-item-4",
-            "title": "[待补充] 五、物流追踪与签收 - 第 4 项",
+            "title": "[待补充] 五、周边环境与交通 - 第 4 项",
             "description": "[待 Hermes 生成具体内容]",
-            "category": "五、物流追踪与签收",
+            "category": "五、周边环境与交通",
             "required": true,
             "priority": "high",
             "timing": "",
@@ -387,74 +384,73 @@
       }
     ],
     "avoidPitfalls": [
-      "不要低报商品价值（海关可能扣货罚款）",
-      "不要寄送禁运物品（电池、液体、粉末需确认）",
-      "不要忘记拍照留底（发货前拍摄包裹内容）",
-      "不要忽视保险选项（高价值物品建议购买物流保险）",
-      "不要使用不正规的集运渠道（可能导致包裹被扣或丢失）"
+      "不要签署口头协议或未经审核的租赁合同（必须书面且符合 LTB 标准）",
+      "不要支付现金押金（必须通过可追踪方式，押金不得超过一个月租金）",
+      "不要忽略房屋虫害和霉菌问题（看房时重点检查卫生间和厨房角落）",
+      "不要轻信\"包水电\"口头承诺（必须在合同中明确写清包含哪些费用）",
+      "不要忽略暖气和热水供应（加拿大冬季极其重要，确认暖气类型和费用承担方）"
     ],
     "nextSteps": [
-      "商业发票准备清单",
-      "国际快递发货前检查清单"
+      "留学生第一次出国行李准备清单",
+      "海外租房入住检查清单"
     ],
     "lastReviewedAt": "2026-06-09",
     "requiresHumanReview": true,
     "internalLinks": {
-      "backToTopic": "/topics/cross-border-shipping",
+      "backToTopic": "",
       "relatedTools": [
         "/tools/address-formatter",
         "/tools/shipping-calculator",
-        "/tools/postal-code",
         "/tools/invoice"
       ],
       "relatedArticles": [],
       "nextChecklists": [
-        "prep-checklist",
-        "dispatch-check-checklist"
+        "student-first-abroad-packing-prep-checklist",
+        "check-checklist"
       ]
     }
   },
   "faqItems": [
     {
-      "question": "第一次集运最容易出错的地方是什么？",
+      "question": "多伦多租房押金一般多少钱？",
       "answer": "[待 Hermes 生成具体回答]"
     },
     {
-      "question": "集运和普通国际快递有什么区别？",
+      "question": "签合同前需要检查哪些关键点？",
       "answer": "[待 Hermes 生成具体回答]"
     },
     {
-      "question": "怎么知道我的包裹是否超重或超大？",
+      "question": "二房东转租是否合法？",
       "answer": "[待 Hermes 生成具体回答]"
     },
     {
-      "question": "集运运费一般怎么计算？",
+      "question": "遇到房东不退押金怎么办？",
       "answer": "[待 Hermes 生成具体回答]"
     },
     {
-      "question": "包裹丢了怎么办？",
+      "question": "租房需要买租客保险吗？",
       "answer": "[待 Hermes 生成具体回答]"
     }
   ],
   "officialLinks": [
     {
-      "label": "中国海关个人物品邮寄规定",
+      "label": "安大略省租赁法规",
       "url": "",
       "needsReview": true
     },
     {
-      "label": "目的地国海关入境规定",
+      "label": "多伦多租房指导价",
       "url": "",
       "needsReview": true
     },
     {
-      "label": "集运公司服务条款",
+      "label": "安省租客与房东委员会 LTB",
       "url": "",
       "needsReview": true
     }
   ],
-  "_topicPackSource": "first-shipping-checklist.yaml",
-  "_generatedAt": "2026-06-09T15:10:45.374Z",
+  "_topicPackSource": "toronto-rental-viewing-avoid-pitfalls-checklist.yaml",
+  "_generatedAt": "2026-06-09T15:10:50.197Z",
   "publish_mode": "draft",
   "requiresHumanReview": true
 }

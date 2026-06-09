@@ -1,0 +1,384 @@
+{
+  "slug": "toronto-rental-viewing-checklist",
+  "title": "多伦多租房看房避坑清单",
+  "seoTitle": "多伦多租房看房避坑清单（留学生必看）",
+  "seoDescription": "专为留学生和新移民设计，涵盖房源核实、房屋检查、安全安保、合同法律条款和周边环境五大类，含 LTB 法规要点和避坑指南，助你在多伦多找到靠谱房源。",
+  "pageType": "checklist",
+  "status": "draft",
+  "relatedTools": [
+    "address-formatter",
+    "invoice",
+    "shipping-calculator"
+  ],
+  "relatedTopics": [],
+  "relatedArticles": [],
+  "ctaConfig": {
+    "text": "开始使用工具",
+    "url": "/tools"
+  },
+  "heroSection": {
+    "checklistType": "rental",
+    "audience": "留学生 / 新移民 / 海外华人",
+    "region": "北美",
+    "city": "多伦多",
+    "scenario": "在多伦多租房看房时需要检查的事项和避坑指南",
+    "difficulty": "medium",
+    "estimatedTime": "2-3小时",
+    "quickAnswer": "多伦多租房核心原则：签合同前必须看房实物、确认所有费用明细、检查房屋状况、核实房东身份。押金不得超过一个月租金，所有协议必须书面化且符合安大略省 LTB 标准。",
+    "summary": "本清单专为在多伦多租房的留学生和新移民设计，涵盖房源基本信息核实、房屋内部状况检查、安全与安保、合同与法律条款、周边环境与交通五大类共 20 项检查事项。每项标注优先级和注意事项，特别标注 LTB 法规要求。帮助你系统性地完成看房检查，避免常见坑点。",
+    "sections": [
+      {
+        "id": "sec-1",
+        "title": "一、房源基本信息核实",
+        "description": "在联系房东或中介前，先核实房源基本信息的真实性。",
+        "items": [
+          {
+            "id": "sec-1-item-1",
+            "title": "核实房东身份（产权证明或管理权）",
+            "description": "要求查看房东的产权证明或物业管理授权文件。如果是二房东转租，需确认原房东允许转租。",
+            "category": "房源基本信息核实",
+            "required": true,
+            "priority": "high",
+            "timing": "看房前",
+            "warning": "[需人工核验] 安大略省法律规定转租（sublet）和转让（assignment）有不同要求，请以 LTB 官方规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "安省租客与房东委员会 LTB", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-2",
+            "title": "确认租金包含哪些费用",
+            "description": "明确租金是否包含水、电、燃气、网络、暖气等费用。多伦多很多出租单元暖气由租客自付，冬季可能高达 $100-200/月。",
+            "category": "房源基本信息核实",
+            "required": true,
+            "priority": "high",
+            "timing": "看房前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "多伦多租房指导价", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-3",
+            "title": "确认押金金额和支付方式",
+            "description": "安省法律规定押金最多为一个月租金，且只能用于最后一个月的租金（last month's rent）。房东不得额外收取钥匙押金、宠物押金等。",
+            "category": "房源基本信息核实",
+            "required": true,
+            "priority": "high",
+            "timing": "看房前",
+            "warning": "[需人工核验] 具体法规以 Ontario Residential Tenancies Act 最新版本为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "安大略省租赁法规", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-4",
+            "title": "确认租期起止日期",
+            "description": "确认租期是否为 12 个月固定期限或月租（month-to-month）。月租合同在初始 12 个月后可以按月终止。",
+            "category": "房源基本信息核实",
+            "required": true,
+            "priority": "high",
+            "timing": "看房前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-2",
+        "title": "二、房屋内部状况检查",
+        "description": "看房时逐项检查房屋内部状况。",
+        "items": [
+          {
+            "id": "sec-2-item-1",
+            "title": "检查暖气系统类型和工作状态",
+            "description": "确认暖气类型（中央空调、电暖气、燃气暖气等），打开暖气测试是否正常工作。多伦多冬季 -20°C 是常态，暖气故障可能危及安全。",
+            "category": "房屋内部状况检查",
+            "required": true,
+            "priority": "high",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-2",
+            "title": "检查水龙头水压和热水供应",
+            "description": "打开厨房和卫生间所有水龙头，检查水压是否正常、热水是否在合理时间内到达。",
+            "category": "房屋内部状况检查",
+            "required": true,
+            "priority": "high",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-3",
+            "title": "检查虫害和霉菌",
+            "description": "重点检查卫生间天花板、厨房橱柜、窗台角落是否有霉斑、水渍、虫洞。发现后拍照记录并要求房东处理。",
+            "category": "房屋内部状况检查",
+            "required": true,
+            "priority": "high",
+            "timing": "看房时",
+            "warning": "[需人工核验] 多伦多部分老旧公寓存在蟑螂和老鼠问题，建议查看大楼的 pest control 记录。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-4",
+            "title": "检查门窗锁具和密封",
+            "description": "测试所有门窗是否能正常锁闭，窗户密封条是否老化。密封不良会导致冬季漏风和暖气费飙升。",
+            "category": "房屋内部状况检查",
+            "required": true,
+            "priority": "medium",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-3",
+        "title": "三、安全与安保",
+        "description": "确认房屋和周边环境的安全条件。",
+        "items": [
+          {
+            "id": "sec-3-item-1",
+            "title": "检查烟雾报警器和一氧化碳报警器",
+            "description": "安省法律要求房东在每个楼层安装烟雾报警器。测试报警器是否正常工作。",
+            "category": "安全与安保",
+            "required": true,
+            "priority": "high",
+            "timing": "看房时",
+            "warning": "[需人工核验] 以 Ontario Fire Code 最新版本要求为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-2",
+            "title": "检查大门和窗户的安全锁",
+            "description": "确认大门有防盗锁（deadbolt），一楼窗户有安全锁。公寓楼应确认入口门禁和电梯卡系统正常。",
+            "category": "安全与安保",
+            "required": true,
+            "priority": "high",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-3",
+            "title": "了解周边治安情况",
+            "description": "查询该社区 Crime Map（多伦多警局官网提供），了解该区域的盗窃、入室盗窃等犯罪率。",
+            "category": "安全与安保",
+            "required": false,
+            "priority": "medium",
+            "timing": "看房前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-4",
+            "title": "检查洗衣机和烘干机安全",
+            "description": "如果使用独立洗衣机/烘干机，检查管道是否老化、排水管是否畅通。烘干机管道堆积棉絮是火灾风险。",
+            "category": "安全与安保",
+            "required": false,
+            "priority": "medium",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-4",
+        "title": "四、合同与法律条款",
+        "description": "签署合同前必须确认的关键法律事项。",
+        "items": [
+          {
+            "id": "sec-4-item-1",
+            "title": "确认使用安省标准租赁合同",
+            "description": "安省法律要求 2018 年 4 月 30 日后的新租约必须使用标准合同模板（Standard Lease）。房东不得自行起草替代合同。",
+            "category": "合同与法律条款",
+            "required": true,
+            "priority": "high",
+            "timing": "签约前",
+            "warning": "[需人工核验] 标准合同模板可从安省政府官网下载，请以最新版本为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "安大略省租赁法规", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-2",
+            "title": "确认转租和提前解约条款",
+            "description": "留学生可能需要提前回国或换学校，了解转租（sublet）和转让（assignment）的流程和条件。",
+            "category": "合同与法律条款",
+            "required": true,
+            "priority": "high",
+            "timing": "签约前",
+            "warning": "[需人工核验] 安省法律对转租有明确规定，房东不得无理拒绝，但具体操作请以 LTB 官方规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "安省租客与房东委员会 LTB", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-3",
+            "title": "确认维修责任和响应时间",
+            "description": "合同中应明确哪些维修由房东负责（通常为房屋结构性维修），哪些由租客负责。房东维修响应时间通常不超过 24-72 小时。",
+            "category": "合同与法律条款",
+            "required": true,
+            "priority": "high",
+            "timing": "签约前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-4",
+            "title": "入住前拍照记录房屋状况",
+            "description": "入住当天对全屋拍照和录像，记录墙面、地板、家具、家电的现有状况。退租时作为押金退还的依据。",
+            "category": "合同与法律条款",
+            "required": true,
+            "priority": "high",
+            "timing": "入住当天",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-5",
+        "title": "五、周边环境与交通",
+        "description": "房屋周边的生活便利性和通勤条件。",
+        "items": [
+          {
+            "id": "sec-5-item-1",
+            "title": "确认到学校的通勤时间和方式",
+            "description": "使用 Google Maps 或 TTC 官网查询从房屋到学校的公交/地铁路线和通勤时间。多伦多冬季步行不现实，必须有公共交通或驾车方案。",
+            "category": "周边环境与交通",
+            "required": true,
+            "priority": "high",
+            "timing": "看房前",
+            "warning": "",
+            "relatedToolSlug": "address-formatter",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-2",
+            "title": "确认周边超市和便利店",
+            "description": "查找最近的华人超市（大统华、丰泰等）、T&T、No Frills、Shoppers Drug Mart 等。步行距离内最好有 grocery store。",
+            "category": "周边环境与交通",
+            "required": false,
+            "priority": "medium",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-3",
+            "title": "确认夜间照明和人行道状况",
+            "description": "如果可能，傍晚时段再去一次房屋周边，确认街道照明是否充足、人行道是否有积雪清理服务。",
+            "category": "周边环境与交通",
+            "required": false,
+            "priority": "medium",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-4",
+            "title": "确认是否有噪音干扰",
+            "description": "注意周边是否有施工工地、高速公路、铁路、酒吧等噪音源。多伦多部分区域夜间噪音较大，影响学习和睡眠。",
+            "category": "周边环境与交通",
+            "required": false,
+            "priority": "low",
+            "timing": "看房时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      }
+    ],
+    "avoidPitfalls": [
+      "不要签署口头协议或未经审核的租赁合同（必须书面且符合 LTB 标准合同模板）。",
+      "不要支付现金押金（必须通过可追踪方式如支票/e-transfer，押金不得超过一个月租金）。",
+      "不要忽略房屋虫害和霉菌问题（看房时重点检查卫生间天花板、厨房橱柜、窗台角落）。",
+      "不要轻信「包水电」口头承诺（必须在合同中明确写清包含哪些费用，否则默认不包含）。",
+      "不要忽略暖气和热水供应（加拿大冬季可达 -20°C，确认暖气类型、状态和费用承担方）。"
+    ],
+    "nextSteps": [
+      "留学生第一次出国行李准备清单",
+      "海外租房入住检查清单"
+    ],
+    "lastReviewedAt": "2026-06-09",
+    "requiresHumanReview": true,
+    "internalLinks": {
+      "backToTopic": "",
+      "relatedTools": [
+        "/tools/address-formatter",
+        "/tools/invoice",
+        "/tools/shipping-calculator"
+      ],
+      "relatedArticles": [],
+      "nextChecklists": [
+        "student-first-abroad-packing-checklist",
+        "first-use-shipping-tips-checklist"
+      ]
+    }
+  },
+  "faqItems": [
+    {
+      "question": "多伦多租房押金一般多少钱？",
+      "answer": "安大略省法律规定，房东最多只能收取相当于一个月租金的押金，且只能用于最后一个月的租金（Last Month's Rent）。房东不得额外收取钥匙押金、宠物押金、损坏押金等。押金应在签约时支付，通常通过支票或银行转账（不建议现金）。如果房东要求超过一个月租金的押金或额外押金，这违反安省 Residential Tenancies Act，你可以向 LTB 投诉。"
+    },
+    {
+      "question": "签合同前需要检查哪些关键点？",
+      "answer": "签约前必须：1）核实房东身份和产权；2）使用安省标准租赁合同模板；3）确认租金包含的费用明细（水、电、燃气、暖气、网络）；4）检查房屋实际状况（暖气、热水、虫害、霉菌）；5）拍照记录入住前房屋状况；6）确认转租和解约条款；7）了解维修责任分工。所有口头承诺必须写入合同才有效。"
+    },
+    {
+      "question": "二房东转租是否合法？",
+      "answer": "在安大略省，合法转租（sublet）需要满足：1）原租客暂时离开但打算返回；2）转租期限不超过原租约期限；3）必须获得房东书面同意（房东不得无理拒绝）。如果是永久转让（assignment），原租客完全退出，新租客直接和房东签约。二房东如果不经原房东同意擅自转租，属于违法行为，原房东可以驱逐所有居住者。"
+    },
+    {
+      "question": "遇到房东不退押金怎么办？",
+      "answer": "安省押金只能用于最后一个月的租金，房东不得以任何理由扣留。如果房东拒绝退还或乱扣费：1）保留入住时的拍照/录像证据；2）书面要求房东退还；3）向 Landlord and Tenant Board (LTB) 提交 T1 表格（Tenant Application about Rebate/Return of Money）申请退款；4）LTB 听证会通常在 2-4 个月内安排。你也可以联系社区法律诊所（如 Parkdale Community Legal Services）获取免费法律援助。"
+    },
+    {
+      "question": "租房需要买租客保险吗？",
+      "answer": "安省法律不强制要求租客购买保险，但强烈建议购买租客保险（Tenant Insurance / Renter's Insurance）。费用通常每月 $15-30，覆盖：1）个人财产（电脑、衣物、家具等）因火灾、水灾、盗窃等造成的损失；2）个人责任险（如果你的过失导致邻居受损）；3）临时住宿费用（如果房屋无法居住）。很多公寓管理公司也会将租客保险作为入住条件之一。"
+    }
+  ],
+  "officialLinks": [
+    { "label": "安大略省租赁法规", "url": "", "needsReview": true },
+    { "label": "多伦多租房指导价", "url": "", "needsReview": true },
+    { "label": "安省租客与房东委员会 LTB", "url": "", "needsReview": true }
+  ],
+  "_topicPackSource": "toronto-rental-viewing-avoid-pitfalls-checklist.yaml",
+  "_generatedAt": "2026-06-09T15:10:50.197Z",
+  "publish_mode": "draft",
+  "requiresHumanReview": true
+}

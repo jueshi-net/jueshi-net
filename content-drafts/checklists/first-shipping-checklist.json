@@ -1,0 +1,388 @@
+{
+  "slug": "first-shipping-checklist",
+  "title": "第一次使用集运注意事项清单",
+  "seoTitle": "第一次使用集运注意事项清单（新手必看）",
+  "seoDescription": "专为海外华人、跨境电商卖家和SOHO设计，涵盖集运发货前的下单准备、仓库地址填写、包裹申报、运费支付和物流追踪全流程，含海关合规要点和避坑指南。",
+  "pageType": "checklist",
+  "status": "draft",
+  "relatedTools": [
+    "address-formatter",
+    "shipping-calculator",
+    "postal-code",
+    "invoice"
+  ],
+  "relatedTopics": [
+    "cross-border-shipping"
+  ],
+  "relatedArticles": [],
+  "ctaConfig": {
+    "text": "开始使用工具",
+    "url": "/tools"
+  },
+  "heroSection": {
+    "checklistType": "shipping",
+    "audience": "海外华人 / 跨境电商卖家 / SOHO",
+    "region": "通用",
+    "city": "",
+    "scenario": "第一次使用集运服务向海外发货",
+    "difficulty": "medium",
+    "estimatedTime": "1-2小时",
+    "quickAnswer": "集运核心流程：获取海外仓地址 → 国内采购发货至仓库 → 仓库合箱打包 → 选择物流线路支付运费 → 等待签收。新手最容易出错的是仓库地址填写、申报价值和禁运物品确认。",
+    "summary": "本清单专为第一次使用集运服务的用户设计，涵盖下单前准备、仓库地址填写、包裹入库与申报规范、支付与国际运费、物流追踪与签收五大类共 20 项检查事项。每项标注优先级和注意事项，特别标注海关合规要求。帮助你系统性地完成集运发货，避免扣货、罚款、丢包等常见坑点。",
+    "sections": [
+      {
+        "id": "sec-1",
+        "title": "一、下单前准备",
+        "description": "在下单集运前，确认所有前置条件已满足。",
+        "items": [
+          {
+            "id": "sec-1-item-1",
+            "title": "了解目的地国海关政策",
+            "description": "确认目的国对个人物品的免税额度、禁运物品清单、申报要求等。不同国家政策差异很大，如澳洲 $1000 AUD 以下免税，欧盟有增值税新规。",
+            "category": "下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "发货前 1 周",
+            "warning": "[需人工核验] 各国海关政策经常调整，请以目的国海关官网最新规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "中国海关个人物品邮寄规定", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-2",
+            "title": "确认集运公司资质和口碑",
+            "description": "检查集运公司是否有正规营业执照、用户评价、售后服务条款。优先选择有仓库实时拍照、全程追踪服务的公司。",
+            "category": "下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "发货前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "集运公司服务条款", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-3",
+            "title": "对比不同物流线路和运费",
+            "description": "集运公司通常提供多条线路（空运、海运、铁路），价格、时效、限制各不相同。使用运费估算工具计算不同方案的费用。",
+            "category": "下单前准备",
+            "required": true,
+            "priority": "medium",
+            "timing": "发货前",
+            "warning": "",
+            "relatedToolSlug": "shipping-calculator",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-1-item-4",
+            "title": "确认禁运和限制物品清单",
+            "description": "电池、液体、粉末、食品、药品、化妆品等通常需要特殊渠道或禁止寄送。发货前务必确认你的物品是否可寄送。",
+            "category": "下单前准备",
+            "required": true,
+            "priority": "high",
+            "timing": "发货前",
+            "warning": "[需人工核验] 禁运物品清单因集运公司和物流线路而异，请以所选线路的最新规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "目的地国海关入境规定", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-2",
+        "title": "二、仓库地址与收件人填写",
+        "description": "国内电商下单时正确填写集运仓库地址。",
+        "items": [
+          {
+            "id": "sec-2-item-1",
+            "title": "正确复制仓库地址和入库编号",
+            "description": "从集运平台获取仓库地址时，务必完整复制收件人姓名、手机号和入库编号（或识别码）。入库编号是集运公司识别你包裹的唯一标识。",
+            "category": "仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "国内购物下单时",
+            "warning": "",
+            "relatedToolSlug": "address-formatter",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-2",
+            "title": "使用邮编查询工具确认地址准确性",
+            "description": "使用邮编查询工具确认仓库地址的邮编和行政区划是否正确，避免因地址错误导致包裹投递失败。",
+            "category": "仓库地址与收件人填写",
+            "required": true,
+            "priority": "high",
+            "timing": "国内购物下单时",
+            "warning": "",
+            "relatedToolSlug": "postal-code",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-3",
+            "title": "多平台购物统一填写同一仓库地址",
+            "description": "如果在淘宝、京东、拼多多等多平台购物，统一填写同一集运仓库地址和入库编号，确保所有包裹都能正确入库。",
+            "category": "仓库地址与收件人填写",
+            "required": true,
+            "priority": "medium",
+            "timing": "国内购物下单时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-2-item-4",
+            "title": "确认仓库提供免费存储天数",
+            "description": "不同集运公司免费仓储天数不同（通常 30-90 天），超时可能产生仓储费。合理安排购物和发货时间。",
+            "category": "仓库地址与收件人填写",
+            "required": false,
+            "priority": "medium",
+            "timing": "发货前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-3",
+        "title": "三、包裹入库与申报规范",
+        "description": "包裹到达仓库后的申报和合箱流程。",
+        "items": [
+          {
+            "id": "sec-3-item-1",
+            "title": "确认包裹入库信息",
+            "description": "包裹到达仓库后，集运公司会通知你入库信息（重量、尺寸、照片）。确认入库物品是否与你购买的一致。",
+            "category": "包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "包裹到达仓库后",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-2",
+            "title": "如实申报商品价值",
+            "description": "申报价值应如实填写，不要低报。低报可能导致海关扣货、罚款甚至没收。不同国家对申报价值有最低要求。",
+            "category": "包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "发货申报时",
+            "warning": "[需人工核验] 各国海关对申报价值的要求和罚则不同，请以目的国海关最新规定为准。",
+            "relatedToolSlug": "invoice",
+            "officialLink": { "label": "中国海关个人物品邮寄规定", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-3",
+            "title": "准备商业发票/形式发票",
+            "description": "国际包裹通常需要附上发票。使用发票生成工具制作格式正确的商业发票或形式发票，包含商品名称、数量、单价、总价等信息。",
+            "category": "包裹入库与申报规范",
+            "required": true,
+            "priority": "high",
+            "timing": "发货前",
+            "warning": "",
+            "relatedToolSlug": "invoice",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-3-item-4",
+            "title": "确认合箱打包方案",
+            "description": "多个包裹可以合箱打包以减少体积重量。与集运公司确认去外包装、合并打包的方案，减少体积重费用。",
+            "category": "包裹入库与申报规范",
+            "required": false,
+            "priority": "medium",
+            "timing": "发货前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-4",
+        "title": "四、支付与国际运费",
+        "description": "确认运费和完成支付。",
+        "items": [
+          {
+            "id": "sec-4-item-1",
+            "title": "确认运费计算方式",
+            "description": "国际运费通常按实际重量和体积重量取大者计算。体积重量 = 长×宽×高/5000（或6000，取决于线路）。确认你的包裹按哪种方式计费。",
+            "category": "支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "支付前",
+            "warning": "",
+            "relatedToolSlug": "shipping-calculator",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-2",
+            "title": "购买物流保险（高价值物品）",
+            "description": "如果包裹总价值较高（如超过 500 元人民币），建议购买物流保险。保险费用通常为申报价值的 1-3%，丢包或损坏时可获赔偿。",
+            "category": "支付与国际运费",
+            "required": false,
+            "priority": "medium",
+            "timing": "支付前",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-3",
+            "title": "选择安全的支付方式",
+            "description": "优先使用支付宝、微信支付、信用卡等可追踪的支付方式。避免直接银行转账给个人账户。",
+            "category": "支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "支付时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-4-item-4",
+            "title": "保留支付凭证和运单号",
+            "description": "支付后保留截图、收据和运单号。这些是后续追踪、投诉、理赔的重要凭证。",
+            "category": "支付与国际运费",
+            "required": true,
+            "priority": "high",
+            "timing": "支付后",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      },
+      {
+        "id": "sec-5",
+        "title": "五、物流追踪与签收",
+        "description": "发货后的追踪和签收注意事项。",
+        "items": [
+          {
+            "id": "sec-5-item-1",
+            "title": "获取并保存国际运单号",
+            "description": "集运公司发货后会提供国际运单号（如 DHL、FedEx、UPS、EMS 等），保存好运单号用于追踪。",
+            "category": "物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "发货后",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-2",
+            "title": "定期查看物流状态",
+            "description": "通过集运平台或物流公司官网定期查看包裹状态。注意关键节点：已发货、已清关、派送中、已签收。",
+            "category": "物流追踪与签收",
+            "required": true,
+            "priority": "medium",
+            "timing": "发货后",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-3",
+            "title": "关注海关清关状态",
+            "description": "包裹到达目的国后需经过海关清关。如海关要求补充申报或缴纳关税，需及时处理，否则包裹可能被退回或销毁。",
+            "category": "物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "清关期间",
+            "warning": "[需人工核验] 不同国家清关流程和时间不同，请以目的国海关规定为准。",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "目的地国海关入境规定", "url": "" },
+            "completedDefault": false
+          },
+          {
+            "id": "sec-5-item-4",
+            "title": "签收时检查包裹完整性",
+            "description": "签收前检查外包装是否完好、有无破损或受潮。如有异常，拍照取证并联系集运公司或物流公司。签收后发现问题理赔难度会大幅增加。",
+            "category": "物流追踪与签收",
+            "required": true,
+            "priority": "high",
+            "timing": "签收时",
+            "warning": "",
+            "relatedToolSlug": "",
+            "officialLink": { "label": "", "url": "" },
+            "completedDefault": false
+          }
+        ]
+      }
+    ],
+    "avoidPitfalls": [
+      "不要低报商品价值（海关可能扣货、罚款甚至没收，如实申报最安全）。",
+      "不要寄送禁运物品（电池、液体、粉末、食品、药品等需提前确认，不同线路限制不同）。",
+      "不要忘记拍照留底（发货前拍摄包裹内容和外观，签收时如有异常可作为理赔证据）。",
+      "不要忽视保险选项（高价值物品建议购买物流保险，费用通常为申报价值的 1-3%）。",
+      "不要使用不正规的集运渠道（无资质公司可能导致包裹被扣、丢失或无法理赔，优先选择有正规营业执照的公司）。"
+    ],
+    "nextSteps": [
+      "商业发票准备清单",
+      "国际快递发货前检查清单"
+    ],
+    "lastReviewedAt": "2026-06-09",
+    "requiresHumanReview": true,
+    "internalLinks": {
+      "backToTopic": "/topics/cross-border-shipping",
+      "relatedTools": [
+        "/tools/address-formatter",
+        "/tools/shipping-calculator",
+        "/tools/postal-code",
+        "/tools/invoice"
+      ],
+      "relatedArticles": [],
+      "nextChecklists": [
+        "toronto-rental-viewing-checklist",
+        "student-first-abroad-packing-checklist"
+      ]
+    }
+  },
+  "faqItems": [
+    {
+      "question": "第一次集运最容易出错的地方是什么？",
+      "answer": "新手最容易出错的三个地方：1）仓库地址填写错误——漏掉入库编号导致包裹无法识别归属；2）低报商品价值——为了省关税故意低报，被海关查出后可能扣货罚款；3）寄送禁运物品——不清楚哪些物品不能寄，导致包裹被退回或销毁。建议第一次集运前仔细阅读集运公司的禁运清单和填写指南。"
+    },
+    {
+      "question": "集运和普通国际快递有什么区别？",
+      "answer": "主要区别在于：1）价格——集运比直接国际快递便宜很多，因为集运公司批量发货有折扣；2）时效——集运通常比直邮慢几天，因为需要等包裹到仓合箱；3）服务——集运提供免费仓储、合箱打包、去外包装、拍照确认等服务；4）适用场景——集运适合多件物品合并发货（如淘宝购物），直邮适合单件紧急物品。"
+    },
+    {
+      "question": "怎么知道我的包裹是否超重或超大？",
+      "answer": "集运公司包裹入库后会通知你实际重量和尺寸（重量、长宽高）。国际运费按实际重量和体积重量取大者计算，体积重量 = 长×宽×高/5000。如果超出线路限制，集运公司会建议你拆分发货或更换线路。你也可以在发货前使用运费估算工具提前计算，避免到仓后才发现超标。"
+    },
+    {
+      "question": "集运运费一般怎么计算？",
+      "answer": "国际运费按实际重量和体积重量取大者计算。体积重量 = 长(cm) × 宽(cm) × 高(cm) ÷ 5000（空运）或 ÷ 6000（部分海运线路）。比如一个箱子实际重 3kg，但体积重算出来是 8kg，那就按 8kg 收费。这就是为什么集运公司会帮你去外包装、压缩体积来省钱。建议使用运费估算工具提前计算不同方案的费用。"
+    },
+    {
+      "question": "包裹丢了怎么办？",
+      "answer": "1）首先联系集运公司确认包裹状态和物流轨迹；2）如果确认丢包，查看是否购买了物流保险——有保险可向保险公司申请理赔；3）如果没有保险，向集运公司投诉并要求赔偿（正规公司有丢包赔偿政策）；4）保留所有证据：购物凭证、入库通知、运单号、支付记录、沟通记录；5）如集运公司拒绝赔偿，可向消费者协会投诉或在电商平台投诉（如果通过平台下单）。建议高价值物品务必购买物流保险。"
+    }
+  ],
+  "officialLinks": [
+    { "label": "中国海关个人物品邮寄规定", "url": "", "needsReview": true },
+    { "label": "目的地国海关入境规定", "url": "", "needsReview": true },
+    { "label": "集运公司服务条款", "url": "", "needsReview": true }
+  ],
+  "_topicPackSource": "first-shipping-checklist.yaml",
+  "_generatedAt": "2026-06-09T15:10:45.374Z",
+  "publish_mode": "draft",
+  "requiresHumanReview": true
+}
