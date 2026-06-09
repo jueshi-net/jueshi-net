@@ -87,7 +87,37 @@ export default function AdminAdsPage() {
 
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
-  useEffect(() => { fetchData(); }, []);
+  const [totalImpressions, setTotalImpressions] = useState(0);
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [enabledCount, setEnabledCount] = useState(0);
+  const [creativeCounts, setCreativeCounts] = useState<Record<string, number>>({});
+  const [placementKeys, setPlacementKeys] = useState<Set<string>>(new Set());
+
+  const fetchCreatives = async () => {
+    try {
+      const res = await fetch("/api/admin/ad-creatives");
+      if (res.ok) {
+        const creatives = await res.json();
+        const counts: Record<string, number> = {};
+        creatives.forEach((c: any) => {
+          counts[c.campaignId] = (counts[c.campaignId] || 0) + 1;
+        });
+        setCreativeCounts(counts);
+      }
+    } catch {}
+  };
+
+  const fetchPlacements = async () => {
+    try {
+      const res = await fetch("/api/admin/ad-placements");
+      if (res.ok) {
+        const placements = await res.json();
+        setPlacementKeys(new Set(placements.map((p: any) => p.key)));
+      }
+    } catch {}
+  };
+
+  useEffect(() => { fetchData(); fetchCreatives(); fetchPlacements(); }, []);
 
   const fetchData = async () => {
     try {
@@ -597,6 +627,18 @@ export default function AdminAdsPage() {
                     return opt?.label || p;
                   }).join("、")}
                 </p>
+                {ad.placements.some(p => !placementKeys.has(p)) && (
+                  <p className="text-xs text-amber-600 flex items-center gap-1 mb-1">
+                    <AlertTriangle className="w-3 h-3" />
+                    警告：以下投放位置未在广告位注册表中找到：{ad.placements.filter(p => !placementKeys.has(p)).join("、")}
+                  </p>
+                )}
+                {creativeCounts[ad.id] !== undefined && (
+                  <p className="text-xs text-gray-500 mb-1">
+                    关联素材：<span className="font-medium text-teal-600">{creativeCounts[ad.id]}</span> 个
+                    {creativeCounts[ad.id] === 0 && <span className="text-amber-500 ml-1">（暂无素材）</span>}
+                  </p>
+                )}
 
                 {ad.targetCountries.length > 0 && (
                   <p className="text-xs text-gray-500 flex items-center gap-1">

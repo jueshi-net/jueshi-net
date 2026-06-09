@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database,
   ExternalLink, Upload, FolderOpen, Globe, BookOpen, LayoutTemplate, Megaphone,
-  MessageSquare, BarChart3, Award, TrendingUp, FileCheck, Link2,
+  MessageSquare, BarChart3, Award, TrendingUp, FileCheck, Link2, Image as ImageIcon,
 } from "lucide-react";
 
 
@@ -44,6 +44,7 @@ const navSections = [
     items: [
       { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
       { href: "/admin/ad-placements", label: "广告位管理", icon: Megaphone },
+      { href: "/admin/ad-creatives", label: "广告素材", icon: ImageIcon },
       { href: "/admin/analytics", label: "数据分析", icon: BarChart3 },
     ]
   },

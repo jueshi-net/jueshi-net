@@ -354,6 +354,55 @@ model AdCampaign {
   @@map("ad_campaigns")
 }
 
+// ─── v1.20.42.6.16: Ad Creative Library ───
+
+model AdCreative {
+  id           String   @id @default(cuid())
+  campaignId   String   @map("campaign_id")
+  title        String   // 内部备注，如"夏季促销-横幅A"
+  creativeType String   @map("creative_type") // image / html / text / native
+  imageUrl     String?  @map("image_url")
+  targetUrl    String?  @map("target_url")
+  codeSnippet  String?  @map("code_snippet") @db.Text
+  headline     String?  // 文案标题
+  bodyText     String?  @map("body_text") @db.Text
+  ctaText      String?  @map("cta_text") // 按钮文案
+  isActive     Boolean  @default(true) @map("is_active")
+  sortOrder    Int      @default(0) @map("sort_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([campaignId])
+  @@index([isActive])
+  @@map("ad_creatives")
+}
+
+// ─── v1.20.42.6.16: Ad Event Log (impression/click) ───
+
+model AdEvent {
+  id             String   @id @default(cuid())
+  campaignId     String   @map("campaign_id")
+  placementKey   String   @map("placement_key")
+  creativeId     String?  @map("creative_id")
+  eventType      String   @map("event_type") // impression / click
+  pageType       String?  @map("page_type")
+  pagePath       String?  @map("page_path")
+  userId         String?  @map("user_id")
+  sessionId      String?  @map("session_id")
+  country        String?
+  device         String?
+  referrer       String?  @db.Text
+  ipHash         String?  @map("ip_hash") // SHA-256 hash, 不存明文 IP
+  userAgentHash  String?  @map("user_agent_hash") // SHA-256 hash
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@index([campaignId, createdAt])
+  @@index([placementKey, eventType, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("ad_events")
+}
+
 // ─── 邀请码系统 ────────────────────────────────────────────────────────────────
 model InviteCode {
   id        String    @id @default(cuid())
