@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import {
   Megaphone, Plus, Edit2, Trash2, X, Save, ToggleLeft, ToggleRight,
   Loader2, Image as ImageIcon, Code, ChevronDown, AlertCircle, BarChart3,
-  Globe, Link as LinkIcon
+  Globe, Link as LinkIcon, AlertTriangle,
 } from "lucide-react";
 
 interface AdCampaign {
@@ -86,10 +86,6 @@ export default function AdminAdsPage() {
   });
 
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-
-  const [totalImpressions, setTotalImpressions] = useState(0);
-  const [totalClicks, setTotalClicks] = useState(0);
-  const [enabledCount, setEnabledCount] = useState(0);
   const [creativeCounts, setCreativeCounts] = useState<Record<string, number>>({});
   const [placementKeys, setPlacementKeys] = useState<Set<string>>(new Set());
 
@@ -118,6 +114,10 @@ export default function AdminAdsPage() {
   };
 
   useEffect(() => { fetchData(); fetchCreatives(); fetchPlacements(); }, []);
+
+  const totalImpressions = ads.reduce((s, a) => s + a.impressions, 0);
+  const totalClicks = ads.reduce((s, a) => s + a.clicks, 0);
+  const enabledCount = ads.filter(a => a.isActive).length;
 
   const fetchData = async () => {
     try {
@@ -259,10 +259,6 @@ export default function AdminAdsPage() {
         : [...prev.placements, value],
     }));
   };
-
-  const totalImpressions = ads.reduce((s, a) => s + a.impressions, 0);
-  const totalClicks = ads.reduce((s, a) => s + a.clicks, 0);
-  const enabledCount = ads.filter(a => a.isActive).length;
 
   if (loading) return (
     <div className="p-6 text-center text-gray-500 flex items-center justify-center gap-2 min-h-[200px]">
