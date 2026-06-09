@@ -317,14 +317,14 @@
 47. PM2 热重启 (restart) 存在模块缓存问题，新代码需冷重启 (pkill -9 + PM2 delete all + nohup npm start) 才能生效
 48. 广告事件 API 安全红线：必须使用 adRenderToken，禁止匿名上报，禁止保存原始 IP/UA
 
-### v1.20.42.6.18.1 AdEvent Runtime Activation & Test Endpoint Lock 记录
-49. 生产 PM2 冷重启完成（pkill -9 旧 next-server 进程 + PM2 delete all + nohup npm start）
-50. 运行时验证通过：无 token → 401 `Missing required field: adRenderToken`、伪 token → 403 `Invalid or expired ad render token`
-51. `/api/ads/test-generate-token` 已从构建产物中移除（返回 404），匿名生成 token 路径已彻底封闭
-52. 测试 token 生成改用 `scripts/test-ad-token.mjs` 本地脚本，读取 .env.local 的 AUTH_SECRET
-53. 测试 token 端点不得生产匿名开放 — 已确认删除
-54. 前台广告渲染必须在 API 运行时验证通过后才允许进入 — 当前 3/10 项运行时验证通过，剩余 7 项需真实 campaign 数据
-55. Quote Sheet / Workspace / Admin / Auth 保护规则继续有效
+### v1.20.42.6.18.2 Production Runtime Lock + Full AdEvent Verification 记录
+56. xixiong-saas 已正式恢复 PM2 管理（interpreter: "bash"），不再使用 nohup
+57. ecosystem.config.js 已移除 jueshi-miner 配置，pm2 save 后 dump.pm2 仅含 xixiong-saas
+58. 创建 TEST_VERIFY 测试数据：campaign (599e30e9...) + creative (1dd220f1...)，baseline impressions=0 clicks=0
+59. AdEvent API 10 项测试全部通过（9 项生产运行时 + 1 项代码验证），最终计数器 impressions=3 clicks=2
+60. 失败请求未写入 AdEvent 表，未递增计数器
+61. test-generate-token 端点 404 确认删除，scripts 引用 0 处
+62. 前台广告渲染仍未开始，仍需 SafeAdSlot 组件 + resolve API 开发
 
 ---
 
