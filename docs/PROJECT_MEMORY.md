@@ -285,6 +285,11 @@
 23. 后续新增数据库模型必须随代码提交 migration SQL，禁止 schema.prisma 变更但 migration 缺失
 24. 生产 DB 不允许手工漂移，所有 schema 变更必须通过 migration 文件
 
+### v1.20.42.6.15.2 Baseline Resolve Lock 记录
+25. 已通过 `prisma migrate resolve --applied 20260609013309_baseline_full_schema` 将 baseline 在生产 DB 标记为已应用
+26. `prisma migrate status` 现已显示 `Database schema is up to date!`，无 pending migration
+27. AdCreative / AdEvent Backend MVP 前置条件全部满足
+
 ---
 
 ## 📝 三期待办方向（待规划）

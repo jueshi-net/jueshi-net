@@ -15,6 +15,9 @@
 - 临时空数据库验证通过: 20 个 migration 全部应用, 68 表与生产 DB 完全一致
 - **AdCreative / AdEvent 开发前置条件满足**
 
+### v1.20.42.6.15.2 Resolve 状态
+✅ `prisma migrate status` 现已显示 `Database schema is up to date!`，无 pending migration。
+
 ---
 
 ## 1. v1.20.42.6.14 完整性复核结论
