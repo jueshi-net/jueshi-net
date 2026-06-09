@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
+import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
@@ -137,6 +138,14 @@ export default function QRCodePage() {
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* SafeAdSlot: tool.footer_banner */}
+        <SafeAdSlot
+          placementKey="tool.footer_banner"
+          pageType="tool"
+          pagePath="/tools/qrcode"
+          className="mb-8"
+        />
 
         {/* FAQ */}
         <FAQSection title="二维码生成常见问题" items={[

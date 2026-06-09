@@ -274,3 +274,77 @@ interface SafeAdSlotProps {
 
 **文档版本：** v1.20.42.6.17
 **状态：** Planning Complete, Ready for Implementation
+
+---
+
+## 三、v1.20.42.6.19 Safe Ad Rendering Pilot Implementation 结果
+
+**执行时间：** 2026-06-09
+**状态：** ✅ 已完成
+
+### 1. GET /api/ads/resolve 实现
+
+- **路径：** `src/app/api/ads/resolve/route.ts`
+- **功能：** 接收 `placementKey`（必填）+ `pageType` + `pagePath`，返回匹配的活跃广告 + adRenderToken
+- **安全规则：**
+  - placement 必须存在且 isActive
+  - campaign 必须 isActive 且在有效期内
+  - campaign.placements 必须包含 placementKey
+  - creative 必须 isActive 且属于该 campaign
+  - 按 priority 降序选择
+  - 不返回 codeSnippet 到前台
+  - 无广告返回 `{ ad: null }`（200）
+
+### 2. SafeAdSlot 组件实现
+
+- **路径：** `src/components/ads/SafeAdSlot.tsx`
+- **特性：**
+  - "use client" 异步请求 /api/ads/resolve
+  - 无广告 / 加载失败 → 静默隐藏
+  - "推广" 标签默认显示
+  - impression 仅在真实渲染后上报
+  - click 仅在用户点击后上报
+  - 全部携带 adRenderToken
+  - 不渲染 html/codeSnippet 类型
+  - 支持 image + native 类型
+  - 移动端安全（maxHeight 控制）
+
+### 3. 前台接入
+
+- **文章页底部：** `src/app/(public)/guides/[slug]/page.tsx` — placementKey=`article.footer_recommend`
+- **工具页底部：** `src/app/(public)/tools/qrcode/page.tsx` — placementKey=`tool.footer_banner`
+
+### 4. 测试数据
+
+- Campaign: `TEST_SAFE_AD_19_CAMPAIGN` (isActive=true, priority=10)
+- Placements: `article.footer_recommend`, `tool.footer_banner`
+- Creative 1: `TEST_SAFE_AD_19_IMAGE_CREATIVE` (image 类型)
+- Creative 2: `TEST_SAFE_AD_19_NATIVE_CREATIVE` (native 类型)
+
+### 5. 生产运行时验证结果
+
+| 测试项 | 预期 | 结果 | 状态 |
+|---|---|---|---|
+| resolve 有广告 | 返回 ad + token | 返回 ad + adRenderToken | ✅ |
+| resolve 无广告 | {ad: null} | {ad: null} | ✅ |
+| 非法 placement | {ad: null} | {ad: null} | ✅ |
+| 缺失 placementKey | 400 | 400 | ✅ |
+| impression 上报 | 200 | 200 | ✅ |
+| click 上报 | 200 | 200 | ✅ |
+| 无 token | 401 | 401 | ✅ |
+| 假 token | 403 | 403 | ✅ |
+| ipHash 无原始 IP | SHA256 前缀 | 16 字符 hash | ✅ |
+| userAgentHash | 完整 SHA256 | 64 字符 hash | ✅ |
+
+### 6. 前台广告渲染状态
+
+- ✅ 仅在文章页底部 + 工具页底部接入
+- ❌ 未在其他任何区域接入
+- ❌ 未接入 Google AdSense 或第三方脚本
+- ❌ 未在表单/Quote Sheet/Workspace/Admin 插入广告
+
+### 7. PM2 状态
+
+- ✅ xixiong-saas online
+- ✅ 无 jueshi-miner
+- ✅ pm2 save 已保存

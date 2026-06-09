@@ -340,3 +340,13 @@
 ---
 
 *本文档为所有后续操作的潜意识基础。执行任何三期代码前，必须阅读并遵守上述规范。*
+
+## v1.20.42.6.19 Safe Ad Rendering Pilot 规则
+
+- 前台广告必须使用 SafeAdSlot 组件 + /api/ads/resolve API + adRenderToken 强制校验
+- SafeAdSlot 仅在文章页底部(article.footer_recommend)和工具页底部(tool.footer_banner)接入
+- 禁止区域：表单中间、Quote Sheet 编辑区、结果核心区上方、工作台核心区、登录/注册页、弹窗、Admin 后台、公开落地页
+- 测试 token 只能通过本地脚本(scripts/test-ad-token.mjs)或受控后台方式生成
+- 前台广告渲染前必须完成 AdEvent 生产运行时验证(10 项)
+- html/codeSnippet 类型广告禁止前台渲染（安全限制）
+- 新增广告位必须先在 AdPlacement 表中注册，否则 resolve API 返回 null

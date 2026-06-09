@@ -5,6 +5,7 @@ import { CalendarDays, Eye, Clock, ArrowLeft, Wrench, ArrowRight, BookOpen, Home
 import Link from "next/link";
 import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
 import { AdSlot } from "@/components/ad-slot";
+import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { ArticleLayoutClient } from "./article-layout-client";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
@@ -254,6 +255,16 @@ export default async function ArticlePage({ params }: Props) {
             {/* Ad: Article Bottom */}
             <div className="px-6 sm:px-10">
               <AdSlot placement="article-bottom" className="mt-8 mb-8" />
+            </div>
+
+            {/* SafeAdSlot: article.footer_recommend */}
+            <div className="px-6 sm:px-10 mt-4">
+              <SafeAdSlot
+                placementKey="article.footer_recommend"
+                pageType="article"
+                pagePath={`/guides/${slug}`}
+                className="mb-8"
+              />
             </div>
 
             {/* Related Tools */}
