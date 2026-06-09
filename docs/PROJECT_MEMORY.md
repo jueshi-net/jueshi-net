@@ -341,6 +341,17 @@
 
 *本文档为所有后续操作的潜意识基础。执行任何三期代码前，必须阅读并遵守上述规范。*
 
+## v1.20.42.6.19.1 Content IA Long-term Planning
+
+详见 `docs/CONTENT_IA_LONG_TERM.md`：
+
+- 专题（Topic）= 知识地图 / 资源集合 / 主题入口
+- 清单（Checklist）= 行动步骤 / 避坑核对 / 场景任务单
+- 两者不是重复栏目，而是"专题 → 清单 → 工具 → 用户资产 / 任务链"的转化路径
+- 未来专题和清单内容必须使用 AI 友好、搜索友好的结构化发布规范
+- 可规划 Hermes ContentOps Skill，本轮不开发
+- 纯文档规划，零代码/零数据库/零 Admin 变更
+
 ## v1.20.42.6.19 Safe Ad Rendering Pilot 规则
 
 - 前台广告必须使用 SafeAdSlot 组件 + /api/ads/resolve API + adRenderToken 强制校验
