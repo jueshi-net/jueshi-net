@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Search, X, Save, Loader2, Trash2, Eye, EyeOff, ExternalLink, AlertTriangle } from "lucide-react";
+import { Plus, Edit2, Search, X, Save, Loader2, Trash2, Eye, EyeOff, ExternalLink, AlertTriangle, ChevronDown, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 
 const PAGE_TYPES = ["country", "tool", "topic", "guide", "city", "postal", "landing", "checklist"];
 const STATUSES = ["draft", "published", "hidden"];
@@ -26,7 +26,6 @@ interface LandingPage {
   ctaConfig: any;
 }
 
-/** Known tool slugs for validation */
 const KNOWN_TOOLS = [
   "shipping-calculator", "shipping-estimator", "hs-code", "sensitive-goods",
   "postal-code", "address-formatter", "invoice", "commercial-invoice",
@@ -46,6 +45,11 @@ export default function LandingPagesClient() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
 
+  // Structured editing state for checklists
+  const [editMode, setEditMode] = useState<"structured" | "json">("structured");
+  const [checklistForm, setChecklistForm] = useState<any>({});
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+
   const fetchPages = async () => {
     setLoading(true);
     const params = new URLSearchParams();
@@ -60,8 +64,62 @@ export default function LandingPagesClient() {
 
   useEffect(() => { fetchPages(); }, [filters]);
 
+  // Sync checklistForm with heroSection JSON
+  const initChecklistForm = (heroJson: string) => {
+    try {
+      const hs = heroJson ? JSON.parse(heroJson) : {};
+      setChecklistForm({
+        checklistType: hs.checklistType || "",
+        audience: hs.audience || "",
+        region: hs.region || "",
+        city: hs.city || "",
+        scenario: hs.scenario || "",
+        difficulty: hs.difficulty || "medium",
+        estimatedTime: hs.estimatedTime || "",
+        quickAnswer: hs.quickAnswer || "",
+        lastReviewedAt: hs.lastReviewedAt || "",
+        requiresHumanReview: hs.requiresHumanReview ?? true,
+        sections: Array.isArray(hs.sections) ? hs.sections.map((s: any) => ({
+          ...s,
+          items: Array.isArray(s.items) ? s.items : []
+        })) : [],
+        avoidPitfalls: Array.isArray(hs.avoidPitfalls) ? hs.avoidPitfalls : [],
+        nextSteps: Array.isArray(hs.nextSteps) ? hs.nextSteps.map((s: any) => typeof s === "string" ? { title: s, url: "", type: "checklist" as const } : s) : [],
+        officialLinks: Array.isArray(hs.officialLinks) ? hs.officialLinks.map((l: any) => ({ ...l, needsReview: l.needsReview ?? (!l.url || l.url === "") })) : [],
+        internalLinks: hs.internalLinks || { backToTopic: "", relatedTools: [], relatedArticles: [], nextChecklists: [] },
+      });
+    } catch {
+      setChecklistForm({ sections: [], avoidPitfalls: [], nextSteps: [], officialLinks: [], internalLinks: {} });
+    }
+  };
+
+  const syncChecklistToJson = () => {
+    const hs = {
+      checklistType: checklistForm.checklistType,
+      audience: checklistForm.audience,
+      region: checklistForm.region,
+      city: checklistForm.city || "",
+      scenario: checklistForm.scenario,
+      difficulty: checklistForm.difficulty,
+      estimatedTime: checklistForm.estimatedTime,
+      quickAnswer: checklistForm.quickAnswer,
+      lastReviewedAt: checklistForm.lastReviewedAt,
+      requiresHumanReview: checklistForm.requiresHumanReview,
+      sections: checklistForm.sections || [],
+      avoidPitfalls: checklistForm.avoidPitfalls || [],
+      nextSteps: (checklistForm.nextSteps || []).map((s: any) => typeof s === "string" ? s : s.title),
+      officialLinks: (checklistForm.officialLinks || []).map((l: any) => ({ label: l.label, url: l.url || "" })),
+      internalLinks: checklistForm.internalLinks || {},
+    };
+    setForm(f => ({ ...f, heroSectionJson: JSON.stringify(hs, null, 2) }));
+  };
+
   const handleSubmit = async () => {
     setSaving(true);
+    // If in structured mode, sync to JSON first
+    if (form.pageType === "checklist" && editMode === "structured") {
+      syncChecklistToJson();
+    }
     const data: any = {
       slug: form.slug, title: form.title,
       seoTitle: form.seoTitle || null, seoDescription: form.seoDescription || null,
@@ -87,6 +145,7 @@ export default function LandingPagesClient() {
       setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
       setEditing(null);
       setShowForm(false);
+      setEditMode("structured");
       fetchPages();
     } else {
       const err = await res.json();
@@ -97,7 +156,12 @@ export default function LandingPagesClient() {
 
   const handleEdit = (p: LandingPage) => {
     setEditing(p);
-    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", "), heroSectionJson: p.heroSection ? JSON.stringify(p.heroSection, null, 2) : "" });
+    const heroJson = p.heroSection ? JSON.stringify(p.heroSection, null, 2) : "";
+    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", "), heroSectionJson: heroJson });
+    if (p.pageType === "checklist") {
+      initChecklistForm(heroJson);
+      setEditMode("structured");
+    }
     setShowForm(true);
   };
 
@@ -115,16 +179,21 @@ export default function LandingPagesClient() {
   const statusColors: Record<string, string> = { draft: "bg-gray-100 text-gray-600", published: "bg-green-50 text-green-700", hidden: "bg-red-50 text-red-600" };
   const statusLabels: Record<string, string> = { draft: "草稿", published: "已发布", hidden: "已隐藏" };
 
-  /** Count valid/invalid slugs for warnings */
   const getSlugWarnings = (p: LandingPage) => {
     const warnings: string[] = [];
     const invalidTools = (p.relatedTools || []).filter(s => !KNOWN_TOOLS.includes(s));
     if (invalidTools.length > 0) warnings.push(`无效工具 slug: ${invalidTools.join(", ")}`);
     if (p.primaryTool && !KNOWN_TOOLS.includes(p.primaryTool)) warnings.push(`无效主工具 slug: ${p.primaryTool}`);
+    // Internal linking warnings for checklists
+    if (p.pageType === "checklist") {
+      if ((p.relatedTools || []).length < 2) warnings.push(`清单相关工具少于 2 个，建议增加内链`);
+      const hs = p.heroSection || {};
+      if (!(p.relatedTopics || []).length && !hs.internalLinks?.backToTopic) warnings.push(`清单缺少所属专题链接`);
+      if (!hs.nextSteps || hs.nextSteps.length === 0) warnings.push(`清单缺少下一步推荐`);
+    }
     return warnings;
   };
 
-  /** Preview summary text */
   const getPreviewSummary = (p: LandingPage) => {
     const hero = p.heroSection as { title?: string; ctaText?: string } | null;
     const faqs = Array.isArray(p.faqItems) ? p.faqItems.length : 0;
@@ -133,15 +202,201 @@ export default function LandingPagesClient() {
     return `Hero: ${hero?.title || "无"} | 工具: ${(p.relatedTools || []).length}+主 | 专题: ${(p.relatedTopics || []).length} | 文章: ${(p.relatedArticles || []).length} | FAQ: ${faqs} | 外链: ${links} | CTA: ${hasCta ? "有" : "无"}`;
   };
 
+  // ─── Structured Checklist Editor ───
+  const renderChecklistStructured = () => {
+    const cf = checklistForm;
+    const setCF = (field: string, value: any) => {
+      setChecklistForm((prev: any) => ({ ...prev, [field]: value }));
+    };
+
+    const addSection = () => setCF("sections", [...(cf.sections || []), { id: `sec-${Date.now()}`, title: "新分组", description: "", items: [] }]);
+    const removeSection = (idx: number) => setCF("sections", (cf.sections || []).filter((_: any, i: number) => i !== idx));
+    const updateSection = (idx: number, field: string, value: any) => {
+      const sections = [...(cf.sections || [])];
+      sections[idx] = { ...sections[idx], [field]: value };
+      setCF("sections", sections);
+    };
+
+    const addItem = (secIdx: number) => {
+      const sections = [...(cf.sections || [])];
+      sections[secIdx] = { ...sections[secIdx], items: [...(sections[secIdx].items || []), { id: `item-${Date.now()}`, title: "新步骤", description: "", required: true, priority: "medium", timing: "", warning: "", relatedToolSlug: "", officialLink: {}, completedDefault: false }] };
+      setCF("sections", sections);
+    };
+    const removeItem = (secIdx: number, itemIdx: number) => {
+      const sections = [...(cf.sections || [])];
+      sections[secIdx] = { ...sections[secIdx], items: (sections[secIdx].items || []).filter((_: any, i: number) => i !== itemIdx) };
+      setCF("sections", sections);
+    };
+    const updateItem = (secIdx: number, itemIdx: number, field: string, value: any) => {
+      const sections = [...(cf.sections || [])];
+      sections[secIdx] = { ...sections[secIdx], items: [...(sections[secIdx].items || []).map((item: any, i: number) => i === itemIdx ? { ...item, [field]: value } : item)] };
+      setCF("sections", sections);
+    };
+
+    const toggleSection = (idx: number) => {
+      setCollapsedSections(prev => {
+        const next = new Set(prev);
+        const key = `sec-${idx}`;
+        next.has(key) ? next.delete(key) : next.add(key);
+        return next;
+      });
+    };
+
+    const addPitfall = () => setCF("avoidPitfalls", [...(cf.avoidPitfalls || []), ""]);
+    const updatePitfall = (idx: number, v: string) => { const a = [...(cf.avoidPitfalls || [])]; a[idx] = v; setCF("avoidPitfalls", a); };
+    const removePitfall = (idx: number) => setCF("avoidPitfalls", (cf.avoidPitfalls || []).filter((_: any, i: number) => i !== idx));
+
+    const addNextStep = () => setCF("nextSteps", [...(cf.nextSteps || []), { title: "", url: "", type: "checklist" }]);
+    const updateNextStep = (idx: number, field: string, v: string) => { const a = [...(cf.nextSteps || [])]; a[idx] = { ...a[idx], [field]: v }; setCF("nextSteps", a); };
+    const removeNextStep = (idx: number) => setCF("nextSteps", (cf.nextSteps || []).filter((_: any, i: number) => i !== idx));
+
+    const addOfficialLink = () => setCF("officialLinks", [...(cf.officialLinks || []), { label: "", url: "", needsReview: true }]);
+    const updateOfficialLink = (idx: number, field: string, v: string | boolean) => { const a = [...(cf.officialLinks || [])]; a[idx] = { ...a[idx], [field]: v }; setCF("officialLinks", a); };
+    const removeOfficialLink = (idx: number) => setCF("officialLinks", (cf.officialLinks || []).filter((_: any, i: number) => i !== idx));
+
+    const updateInternalLink = (field: string, v: string) => setCF("internalLinks", { ...(cf.internalLinks || {}), [field]: v });
+
+    const inputCls = "w-full px-2.5 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500";
+    const labelCls = "block text-xs font-medium text-gray-500 mb-0.5";
+
+    return (
+      <div className="space-y-6">
+        {/* Mode Toggle */}
+        <div className="flex items-center gap-2 border-b border-gray-200 pb-2">
+          <button onClick={() => setEditMode("structured")} className={`px-3 py-1.5 text-sm font-medium rounded-lg ${editMode === "structured" ? "bg-teal-50 text-teal-700" : "text-gray-500 hover:bg-gray-50"}`}>📝 结构化编辑</button>
+          <button onClick={() => { syncChecklistToJson(); setEditMode("json"); }} className={`px-3 py-1.5 text-sm font-medium rounded-lg ${editMode === "json" ? "bg-teal-50 text-teal-700" : "text-gray-500 hover:bg-gray-50"}`}>{`{ } JSON 高级模式`}</button>
+        </div>
+
+        {/* Basic Fields */}
+        <div className="grid sm:grid-cols-3 gap-3">
+          <div><label className={labelCls}>清单类型</label><select value={cf.checklistType || ""} onChange={e => setCF("checklistType", e.target.value)} className={inputCls}><option value="">选择类型</option><option value="shipping">集运/物流</option><option value="student">留学</option><option value="city">城市生活</option><option value="ecommerce">电商</option><option value="travel">旅行</option><option value="life">生活</option></select></div>
+          <div><label className={labelCls}>适用人群</label><input value={cf.audience || ""} onChange={e => setCF("audience", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>地区</label><input value={cf.region || ""} onChange={e => setCF("region", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>城市</label><input value={cf.city || ""} onChange={e => setCF("city", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>场景</label><input value={cf.scenario || ""} onChange={e => setCF("scenario", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>难度</label><select value={cf.difficulty || "medium"} onChange={e => setCF("difficulty", e.target.value)} className={inputCls}><option value="easy">简单</option><option value="medium">中等</option><option value="hard">困难</option></select></div>
+          <div><label className={labelCls}>预估时间</label><input value={cf.estimatedTime || ""} onChange={e => setCF("estimatedTime", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>最后更新</label><input type="date" value={cf.lastReviewedAt || ""} onChange={e => setCF("lastReviewedAt", e.target.value)} className={inputCls} /></div>
+          <div><label className={labelCls}>需人工核验</label><select value={cf.requiresHumanReview ? "true" : "false"} onChange={e => setCF("requiresHumanReview", e.target.value === "true")} className={inputCls}><option value="true">是</option><option value="false">否</option></select></div>
+        </div>
+        <div><label className={labelCls}>快速答案</label><textarea value={cf.quickAnswer || ""} onChange={e => setCF("quickAnswer", e.target.value)} rows={2} className={`${inputCls} w-full`} /></div>
+
+        {/* Internal Links Hint */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-700">
+          💡 内链建议：清单应至少关联 2 个工具、1 个专题或下一步清单，避免孤岛页面。
+        </div>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div><label className={labelCls}>所属专题 (backToTopic)</label><input value={cf.internalLinks?.backToTopic || ""} onChange={e => updateInternalLink("backToTopic", e.target.value)} placeholder="/topics/xxx" className={inputCls} /></div>
+          <div><label className={labelCls}>内部链接 (JSON)</label><input value={JSON.stringify(cf.internalLinks || {})} onChange={e => { try { setCF("internalLinks", JSON.parse(e.target.value)); } catch {} }} className={`${inputCls} font-mono text-xs`} /></div>
+        </div>
+
+        {/* Sections */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-gray-700">📋 分组与步骤 ({(cf.sections || []).length} 个分组)</h3>
+            <button onClick={addSection} className="text-xs text-teal-600 hover:underline">+ 新增分组</button>
+          </div>
+          <div className="space-y-3">
+            {(cf.sections || []).map((sec: any, si: number) => {
+              const collapsed = collapsedSections.has(`sec-${si}`);
+              return (
+                <div key={sec.id || si} className="border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between bg-gray-50 px-3 py-2">
+                    <button onClick={() => toggleSection(si)} className="flex items-center gap-2 text-sm font-medium text-gray-700 flex-1 text-left">
+                      {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      <span>{sec.title || "未命名分组"}</span>
+                      <span className="text-xs text-gray-400">({(sec.items || []).length} 步)</span>
+                    </button>
+                    <button onClick={() => removeSection(si)} className="p-1 text-red-400 hover:text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </div>
+                  {!collapsed && (
+                    <div className="p-3 space-y-3">
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        <input value={sec.title || ""} onChange={e => updateSection(si, "title", e.target.value)} placeholder="分组标题" className={inputCls} />
+                        <input value={sec.description || ""} onChange={e => updateSection(si, "description", e.target.value)} placeholder="分组说明" className={inputCls} />
+                      </div>
+                      <div className="space-y-2">
+                        {(sec.items || []).map((item: any, ii: number) => (
+                          <div key={item.id || ii} className="bg-gray-50 rounded p-2 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-gray-500">步骤 {ii + 1}</span>
+                              <button onClick={() => removeItem(si, ii)} className="p-0.5 text-red-400 hover:text-red-600"><Trash2 className="w-3 h-3" /></button>
+                            </div>
+                            <div className="grid sm:grid-cols-3 gap-1.5">
+                              <input value={item.title || ""} onChange={e => updateItem(si, ii, "title", e.target.value)} placeholder="标题" className={`${inputCls} text-xs`} />
+                              <input value={item.description || ""} onChange={e => updateItem(si, ii, "description", e.target.value)} placeholder="说明" className={`${inputCls} text-xs`} />
+                              <input value={item.timing || ""} onChange={e => updateItem(si, ii, "timing", e.target.value)} placeholder="时机" className={`${inputCls} text-xs`} />
+                            </div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <label className="flex items-center gap-1 text-xs"><input type="checkbox" checked={item.required} onChange={e => updateItem(si, ii, "required", e.target.checked)} /> 必做</label>
+                              <select value={item.priority || "medium"} onChange={e => updateItem(si, ii, "priority", e.target.value)} className="px-1.5 py-0.5 border text-xs rounded"><option value="high">高优</option><option value="medium">中</option><option value="low">低</option></select>
+                              <input value={item.relatedToolSlug || ""} onChange={e => updateItem(si, ii, "relatedToolSlug", e.target.value)} placeholder="关联工具 slug" className={`${inputCls} text-xs w-32`} />
+                              <input value={item.warning || ""} onChange={e => updateItem(si, ii, "warning", e.target.value)} placeholder="警告" className={`${inputCls} text-xs flex-1`} />
+                            </div>
+                          </div>
+                        ))}
+                        <button onClick={() => addItem(si)} className="text-xs text-teal-600 hover:underline">+ 添加步骤</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pitfalls */}
+        <div>
+          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-gray-700">⚠️ 避坑提醒 ({(cf.avoidPitfalls || []).length})</h3><button onClick={addPitfall} className="text-xs text-teal-600 hover:underline">+ 添加</button></div>
+          <div className="space-y-1">
+            {(cf.avoidPitfalls || []).map((p: string, i: number) => (
+              <div key={i} className="flex items-center gap-2"><input value={p} onChange={e => updatePitfall(i, e.target.value)} className={`${inputCls} flex-1`} /><button onClick={() => removePitfall(i)} className="p-1 text-red-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Next Steps */}
+        <div>
+          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-gray-700">👣 下一步 ({(cf.nextSteps || []).length})</h3><button onClick={addNextStep} className="text-xs text-teal-600 hover:underline">+ 添加</button></div>
+          <div className="space-y-1">
+            {(cf.nextSteps || []).map((s: any, i: number) => (
+              <div key={i} className="flex items-center gap-2">
+                <input value={s.title || ""} onChange={e => updateNextStep(i, "title", e.target.value)} placeholder="标题" className={`${inputCls} flex-1`} />
+                <select value={s.type || "checklist"} onChange={e => updateNextStep(i, "type", e.target.value)} className="px-1.5 py-1.5 border text-xs rounded"><option value="checklist">清单</option><option value="tool">工具</option><option value="guide">指南</option><option value="topic">专题</option></select>
+                <input value={s.url || ""} onChange={e => updateNextStep(i, "url", e.target.value)} placeholder="URL/slug" className={`${inputCls} w-32 text-xs`} />
+                <button onClick={() => removeNextStep(i)} className="p-1 text-red-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Official Links */}
+        <div>
+          <div className="flex items-center justify-between mb-2"><h3 className="text-sm font-bold text-gray-700">🔗 官方链接 ({(cf.officialLinks || []).length})</h3><button onClick={addOfficialLink} className="text-xs text-teal-600 hover:underline">+ 添加</button></div>
+          <div className="space-y-1">
+            {(cf.officialLinks || []).map((l: any, i: number) => (
+              <div key={i} className="flex items-center gap-2">
+                <input value={l.label || ""} onChange={e => updateOfficialLink(i, "label", e.target.value)} placeholder="名称" className={`${inputCls} flex-1`} />
+                <input value={l.url || ""} onChange={e => updateOfficialLink(i, "url", e.target.value)} placeholder="URL (留空需人工填)" className={`${inputCls} flex-1 text-xs font-mono`} />
+                {l.needsReview && <span className="text-xs text-amber-600">待核验</span>}
+                <button onClick={() => removeOfficialLink(i)} className="p-1 text-red-400 hover:text-red-600"><X className="w-3.5 h-3.5" /></button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">落地页管理</h1>
-          <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/[slug]" className="text-teal-600 hover:underline">/lp/[slug]</a></p>
+          <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/[slug]" className="text-teal-600 hover:underline">/lp/[slug]</a> | 清单: <a href="/checklists/[slug]" className="text-purple-600 hover:underline">/checklists/[slug]</a></p>
           <p className="text-xs text-amber-600 mt-1">💡 清单提示：可使用 Hermes ContentOps 生成 checklist draft JSON，人工审核后再发布为 published。</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" }); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
+        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" }); setShowForm(!showForm); setEditMode("structured"); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建落地页
         </button>
       </div>
@@ -216,27 +471,39 @@ export default function LandingPagesClient() {
             </div>
             {form.pageType === "checklist" && (
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-gray-500 mb-1">清单数据结构 (JSON)</label>
-                <textarea value={form.heroSectionJson} onChange={e => setForm(f => ({ ...f, heroSectionJson: e.target.value }))} rows={8} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500" placeholder='{"checklistType": "shipping", "audience": "...", "sections": [...]}' />
-                <p className="text-xs text-gray-400 mt-1">支持 checklistType, audience, region, sections, checklistItems, avoidPitfalls, quickAnswer 等字段</p>
+                {editMode === "structured" ? renderChecklistStructured() : (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">清单数据结构 (JSON 高级模式)</label>
+                    <textarea value={form.heroSectionJson} onChange={e => setForm(f => ({ ...f, heroSectionJson: e.target.value }))} rows={12} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                    <p className="text-xs text-gray-400 mt-1">结构化编辑模式已切换为 JSON 直接编辑。修改后切换回结构化模式将自动解析。</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
             {editing && editing.status === "published" && (
-              <a href={`/lp/${editing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">
+              <a href={editing.pageType === 'checklist' ? `/checklists/${editing.slug}` : `/lp/${editing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100">
                 <ExternalLink className="w-4 h-4" /> 打开公开页
               </a>
             )}
-            <button onClick={() => { setShowForm(false); setEditing(null); }} className="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50 rounded-lg">取消</button>
+            <button onClick={() => { setShowForm(false); setEditing(null); setEditMode("structured"); }} className="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50 rounded-lg">取消</button>
             <button onClick={handleSubmit} disabled={saving || !form.slug || !form.title} className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存
             </button>
           </div>
 
-          {/* Preview Summary */}
+          {/* Warnings & Preview */}
           {editing && (
             <div className="border-t border-gray-100 pt-4 mt-4">
+              {getSlugWarnings(editing).length > 0 && (
+                <div className="mb-3 flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    {getSlugWarnings(editing).map((w, i) => <div key={i}>⚠ {w}</div>)}
+                  </div>
+                </div>
+              )}
               <h3 className="text-xs font-bold text-gray-500 mb-2">📋 预览摘要</h3>
               <div className="bg-gray-50 rounded-lg p-4 text-xs space-y-1 text-gray-600">
                 <p><span className="font-medium">Hero:</span> {(editing.heroSection as any)?.title || "未配置"}</p>
@@ -248,12 +515,6 @@ export default function LandingPagesClient() {
                 <p><span className="font-medium">官方链接:</span> {Array.isArray(editing.officialLinks) ? `${editing.officialLinks.length} 个` : "未配置"}</p>
                 <p><span className="font-medium">CTA:</span> {editing.ctaConfig ? "已配置" : "未配置"}</p>
               </div>
-              {getSlugWarnings(editing).length > 0 && (
-                <div className="mt-2 flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-                  <span>⚠ {getSlugWarnings(editing).join("; ")}</span>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -289,7 +550,7 @@ export default function LandingPagesClient() {
                       <td className="px-4 py-2.5 font-medium text-sm text-gray-900">
                         {p.title}
                         {warnings.length > 0 && (
-                          <div className="text-xs text-amber-600 mt-0.5" title={warnings.join("; ")}>⚠ {warnings.length} 个无效引用</div>
+                          <div className="text-xs text-amber-600 mt-0.5" title={warnings.join("; ")}>⚠ {warnings.length} 个提示</div>
                         )}
                       </td>
                       <td className="px-4 py-2.5 text-xs text-gray-500 hidden lg:table-cell">

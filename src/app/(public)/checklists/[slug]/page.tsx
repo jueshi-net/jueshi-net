@@ -73,6 +73,27 @@ export default async function ChecklistPage({ params }: Props) {
         </section>
       )}
 
+      {/* Back to Topic / 所属专题 */}
+      {(hero.internalLinks?.backToTopic || (page.relatedTopics || []).length > 0) && (
+        <section className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+          <p className="text-sm text-indigo-700">
+            📚 本清单属于
+            {hero.internalLinks?.backToTopic ? (
+              <a href={hero.internalLinks.backToTopic} className="font-medium underline hover:text-indigo-900 mx-1">「{hero.internalLinks.backToTopic.split('/').pop()?.replace(/-/g, ' ')} 专题」</a>
+            ) : (
+              <span className="font-medium mx-1">「{(page.relatedTopics || []).map(s => s.replace(/-/g, ' ')).join(' / ')}」</span>
+            )}
+            {(page.relatedTopics || []).length > 0 && (
+              <span className="ml-2">
+                {(page.relatedTopics || []).map(s => (
+                  <a key={s} href={`/topics/${s}`} className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-xs mr-1 hover:bg-indigo-200">{s.replace(/-/g, ' ')}</a>
+                ))}
+              </span>
+            )}
+          </p>
+        </section>
+      )}
+
       {/* Progress & Sections */}
       <ChecklistClient
         sections={hero.sections || []}
@@ -97,14 +118,27 @@ export default async function ChecklistPage({ params }: Props) {
       {/* Related Tools */}
       {page.relatedTools && page.relatedTools.length > 0 && (
         <section>
-          <h2 className="font-semibold text-gray-900 text-lg mb-4">🛠 相关工具</h2>
+          <h2 className="font-semibold text-gray-900 text-lg mb-4">🛠 本清单用到的工具</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {page.relatedTools.map((slug: string) => (
-              <a key={slug} href={`/tools/${slug}`} className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
-                <span className="font-medium text-teal-700">{slug}</span>
-                <div className="text-xs text-gray-500 mt-1">查看工具详情 →</div>
-              </a>
-            ))}
+            {page.relatedTools.map((toolSlug: string) => {
+              const toolNames: Record<string, string> = {
+                "postal-code": "邮编查询工具",
+                "address-formatter": "地址格式化工具",
+                "shipping-calculator": "运费计算工具",
+                "invoice": "发票生成工具",
+                "commercial-invoice": "商业发票工具",
+                "tracking": "物流追踪工具",
+                "hs-code": "HS 编码查询工具",
+                "quote-sheet": "报价单工具",
+              };
+              const name = toolNames[toolSlug] || `${toolSlug.replace(/-/g, ' ')} 工具`;
+              return (
+                <a key={toolSlug} href={`/tools/${toolSlug}`} className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                  <span className="font-medium text-teal-700">{name}</span>
+                  <div className="text-xs text-gray-500 mt-1">/tools/{toolSlug} →</div>
+                </a>
+              );
+            })}
           </div>
         </section>
       )}
@@ -174,11 +208,21 @@ export default async function ChecklistPage({ params }: Props) {
       {/* Next Steps */}
       {hero.nextSteps && hero.nextSteps.length > 0 && (
         <section>
-          <h2 className="font-semibold text-gray-900 text-lg mb-4">👣 下一步</h2>
+          <h2 className="font-semibold text-gray-900 text-lg mb-4">👣 完成本清单后，建议继续阅读</h2>
           <div className="flex flex-wrap gap-3">
-            {hero.nextSteps.map((step: string, i: number) => (
-              <span key={i} className="px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg">{step}</span>
-            ))}
+            {hero.nextSteps.map((step: any, i: number) => {
+              const stepText = typeof step === "string" ? step : (step.title || step);
+              const stepUrl = typeof step === "object" && step.url ? step.url : null;
+              return (
+                <a
+                  key={i}
+                  href={stepUrl || `/checklists/${stepText.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')}`}
+                  className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200"
+                >
+                  {stepText}
+                </a>
+              );
+            })}
           </div>
         </section>
       )}
