@@ -299,6 +299,14 @@
 33. AdEvent 当前只是日志基础，不代表前台自动埋点
 34. 仍禁止前台广告渲染
 
+### v1.20.42.6.17 Safe Ad Rendering Pilot Planning 记录
+35. 已制定 `docs/SAFE_AD_RENDERING_PILOT_PLAN.md`，规划首批安全广告渲染试点
+36. 首批试点仅限 `article.footer_recommend` 与 `tool.footer_banner`，暂缓 `landing.block_between`
+37. **绝对禁止广告区域**：Quote Sheet 编辑区、工具表单中间、工作台核心区、登录/注册页、Admin 后台、Hero 正下方
+38. 第一批广告渲染必须单独版本执行，未经确认不得提前渲染
+39. AdEvent API 需后续加固 (adRenderToken/nonce)，当前匿名可访问为中风险
+40. SafeAdSlot 组件仅规划，未开发
+
 ---
 
 ## 📝 三期待办方向（待规划）
