@@ -31,7 +31,7 @@ export function RelatedChecklistSection({ checklists, sourcePath }: Props) {
             href={`/checklists/${cl.slug}`}
             className="block p-4 bg-white rounded-lg border border-teal-100 hover:border-teal-300 hover:shadow-sm transition-all"
             onClick={() => {
-              trackEvent.custom("checklist", `click_from_${sourcePath || "tool"}`);
+              trackEvent.checklistInternalLinkClick(sourcePath || "tool", cl.slug);
             }}
           >
             <div className="flex items-start justify-between gap-3">

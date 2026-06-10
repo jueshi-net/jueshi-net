@@ -9,7 +9,7 @@
     "address-formatter",
     "shipping-calculator",
     "postal-code",
-    "invoice"
+    "documents/commercial-invoice"
   ],
   "relatedTopics": [
     "cross-border-shipping"
@@ -480,7 +480,7 @@
         "/tools/address-formatter",
         "/tools/shipping-calculator",
         "/tools/postal-code",
-        "/tools/invoice"
+        "/tools/documents/commercial-invoice"
       ],
       "relatedArticles": [],
       "nextChecklists": []

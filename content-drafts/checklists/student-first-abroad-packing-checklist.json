@@ -7,8 +7,8 @@
   "status": "draft",
   "relatedTools": [
     "address-formatter",
-    "invoice",
-    "shipping-calculator"
+    "shipping-calculator",
+    "documents/commercial-invoice"
   ],
   "relatedTopics": [],
   "relatedArticles": [],

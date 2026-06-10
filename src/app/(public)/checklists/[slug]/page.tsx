@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import ChecklistClient from "./checklist-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ChecklistViewTracker } from "./checklist-view-tracker";
+import { ChecklistToolLink } from "./checklist-tool-link";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -141,10 +142,12 @@ export default async function ChecklistPage({ params }: Props) {
               };
               const name = toolNames[toolSlug] || `${toolSlug.replace(/-/g, ' ')} 工具`;
               return (
-                <a key={toolSlug} href={`/tools/${toolSlug}`} className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
-                  <span className="font-medium text-teal-700">{name}</span>
-                  <div className="text-xs text-gray-500 mt-1">/tools/{toolSlug} →</div>
-                </a>
+                <ChecklistToolLink
+                  key={toolSlug}
+                  slug={page.slug}
+                  toolSlug={toolSlug}
+                  name={name}
+                />
               );
             })}
           </div>
