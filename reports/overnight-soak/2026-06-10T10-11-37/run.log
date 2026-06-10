@@ -1,0 +1,20 @@
+[2026-06-10T10:11:37.232Z] 🚀 Production QA Soak Test
+[2026-06-10T10:11:37.233Z]    Base URL: https://jueshi.net
+[2026-06-10T10:11:37.233Z]    Iterations: 3
+[2026-06-10T10:11:37.233Z]    Interval: 0min
+[2026-06-10T10:11:37.233Z]    Headless: true
+[2026-06-10T10:11:37.233Z]    Report: reports/overnight-soak/2026-06-10T10-11-37
+[2026-06-10T10:11:37.233Z]    Admin: DISABLED
+[2026-06-10T10:11:37.285Z] 
+═══ Iteration 1/3 ═══
+[2026-06-10T10:11:48.590Z]   ✅ Iteration 1 complete: PASS (0 issues, 11304ms)
+[2026-06-10T10:11:48.590Z]   ⏳ Waiting 0.08333333333333333min...
+[2026-06-10T10:11:53.590Z] 
+═══ Iteration 2/3 ═══
+[2026-06-10T10:12:04.675Z]   ✅ Iteration 2 complete: PASS (0 issues, 11082ms)
+[2026-06-10T10:12:04.675Z]   ⏳ Waiting 0.08333333333333333min...
+[2026-06-10T10:12:09.678Z] 
+═══ Iteration 3/3 ═══
+[2026-06-10T10:12:25.203Z]   ✅ Iteration 3 complete: PASS (0 issues, 15525ms)
+[2026-06-10T10:12:25.223Z] 
+🏁 Soak test complete. 3 iterations.

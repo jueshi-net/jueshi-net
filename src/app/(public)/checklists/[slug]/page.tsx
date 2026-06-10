@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ChecklistClient from "./checklist-client";
+import { Breadcrumb } from "@/components/breadcrumb";
+import { ChecklistViewTracker } from "./checklist-view-tracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -48,6 +50,12 @@ export default async function ChecklistPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      {/* Tracking */}
+      <ChecklistViewTracker slug={page.slug} />
+
+      {/* Breadcrumb */}
+      <Breadcrumb />
+
       {/* Hero */}
       <section className="text-center space-y-4">
         <div className="flex items-center justify-center gap-2 flex-wrap text-sm">
@@ -172,20 +180,28 @@ export default async function ChecklistPage({ params }: Props) {
         </section>
       )}
 
-      {/* Official Links */}
-      {page.officialLinks && (page.officialLinks as any[]).length > 0 && (
-        <section>
-          <h2 className="font-semibold text-gray-900 text-lg mb-4">🔗 官方链接</h2>
-          <div className="space-y-2">
-            {(page.officialLinks as any[]).map((link: any, i: number) => (
-              <a key={i} href={link.url} target="_blank" rel="nofollow noopener noreferrer" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <span className="text-gray-700 font-medium">{link.label}</span>
-                <span className="text-xs text-gray-400 truncate flex-1">{link.url}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* Official Links — only show reviewed links with real URLs */}
+      {(() => {
+        const pageLinks = (page.officialLinks as any[]) || [];
+        const heroLinks = hero.officialLinks || [];
+        // Prefer heroSection links (newer), fall back to page-level links
+        const raw = heroLinks.length > 0 ? heroLinks : pageLinks;
+        const links = (raw as any[]).filter((l: any) => l.url && l.url.trim() && !l.needsReview);
+        if (links.length === 0) return null;
+        return (
+          <section>
+            <h2 className="font-semibold text-gray-900 text-lg mb-4">🔗 官方链接</h2>
+            <div className="space-y-2">
+              {links.map((link: any, i: number) => (
+                <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <span className="text-gray-700 font-medium">{link.label}</span>
+                  <span className="text-xs text-gray-400 truncate flex-1">{link.url}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* FAQ */}
       {page.faqItems && (page.faqItems as any[]).length > 0 && (
@@ -205,7 +221,7 @@ export default async function ChecklistPage({ params }: Props) {
         </section>
       )}
 
-      {/* Next Steps */}
+      {/* Next Steps — only link to published checklists */}
       {hero.nextSteps && hero.nextSteps.length > 0 && (
         <section>
           <h2 className="font-semibold text-gray-900 text-lg mb-4">👣 完成本清单后，建议继续阅读</h2>
@@ -213,10 +229,15 @@ export default async function ChecklistPage({ params }: Props) {
             {hero.nextSteps.map((step: any, i: number) => {
               const stepText = typeof step === "string" ? step : (step.title || step);
               const stepUrl = typeof step === "object" && step.url ? step.url : null;
+              const stepSlug = stepUrl
+                ? stepUrl.replace('/checklists/', '')
+                : stepText.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+              // Only render if we have an explicit URL, skip auto-generated draft links
+              if (!stepUrl) return null;
               return (
                 <a
                   key={i}
-                  href={stepUrl || `/checklists/${stepText.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '')}`}
+                  href={stepUrl}
                   className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors border border-indigo-200"
                 >
                   {stepText}

@@ -1,0 +1,163 @@
+{
+  "startTime": "2026-06-09T16:37:35.884Z",
+  "lastUpdated": "2026-06-09T16:38:00.032Z",
+  "totalIterations": 1,
+  "plannedIterations": 1,
+  "passedIterations": 1,
+  "failedIterations": 0,
+  "totalFailures": 0,
+  "topSlowestPages": [
+    {
+      "p": "/",
+      "avg": 2002,
+      "max": 2002
+    },
+    {
+      "p": "/tools/quote-sheet",
+      "avg": 912,
+      "max": 912
+    },
+    {
+      "p": "/admin",
+      "avg": 680,
+      "max": 680
+    },
+    {
+      "p": "/workspace",
+      "avg": 660,
+      "max": 660
+    },
+    {
+      "p": "/sitemap.xml",
+      "avg": 569,
+      "max": 569
+    },
+    {
+      "p": "/checklists/toronto-rental-viewing-checklist",
+      "avg": 491,
+      "max": 491
+    },
+    {
+      "p": "/tools/quote",
+      "avg": 484,
+      "max": 484
+    },
+    {
+      "p": "/tools/documents/quotation",
+      "avg": 401,
+      "max": 401
+    },
+    {
+      "p": "/tools/qrcode",
+      "avg": 366,
+      "max": 366
+    },
+    {
+      "p": "/checklists/first-shipping-checklist",
+      "avg": 332,
+      "max": 332
+    }
+  ],
+  "topConsoleErrorIterations": [
+    [
+      "1",
+      16
+    ]
+  ],
+  "latestRedirectChecks": [
+    {
+      "path": "/",
+      "status": 200,
+      "furl": "https://jueshi.net/",
+      "pass": true
+    },
+    {
+      "path": "/tools",
+      "status": 200,
+      "furl": "https://jueshi.net/tools",
+      "pass": true
+    },
+    {
+      "path": "/tools/qrcode",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/qrcode",
+      "pass": true
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true
+    },
+    {
+      "path": "/tools/quote",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "furl": "https://jueshi.net/login",
+      "pass": true
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "furl": "https://jueshi.net/login",
+      "pass": false
+    },
+    {
+      "path": "/admin",
+      "status": 200,
+      "furl": "https://jueshi.net/login?reason=no-session",
+      "pass": false
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "furl": "https://jueshi.net/robots.txt",
+      "pass": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "furl": "https://jueshi.net/sitemap.xml",
+      "pass": true
+    },
+    {
+      "path": "/checklists/first-shipping-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/first-shipping-checklist",
+      "pass": true
+    },
+    {
+      "path": "/checklists/toronto-rental-viewing-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/toronto-rental-viewing-checklist",
+      "pass": true
+    },
+    {
+      "path": "/checklists/student-first-abroad-packing-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/student-first-abroad-packing-checklist",
+      "pass": true
+    }
+  ],
+  "latestSitemapChecks": [
+    {
+      "pass": false,
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://jueshi.net/sitemap.xml\", waiting until \"domcontentloaded\"\n"
+    }
+  ],
+  "adminTest": {
+    "skipped": true,
+    "reason": "SOAK_ADMIN_EMAIL/SOAK_ADMIN_PASSWORD not set"
+  }
+}

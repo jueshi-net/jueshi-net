@@ -1,0 +1,247 @@
+{
+  "iter": 2,
+  "timestamp": "2026-06-10T10:11:53.591Z",
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 1816,
+      "pass": true,
+      "furl": "https://jueshi.net/"
+    },
+    {
+      "path": "/tools",
+      "status": 200,
+      "title": "工具中心 - 海外百宝箱",
+      "canonical": null,
+      "timing": 340,
+      "pass": true,
+      "furl": "https://jueshi.net/tools"
+    },
+    {
+      "path": "/tools/qrcode",
+      "status": 200,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 228,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/qrcode"
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 303,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/tools/quote",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 542,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 414,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 369,
+      "pass": true,
+      "furl": "https://jueshi.net/login"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 532,
+      "pass": true,
+      "furl": "https://jueshi.net/login"
+    },
+    {
+      "path": "/admin",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 487,
+      "pass": true,
+      "furl": "https://jueshi.net/login?reason=no-session"
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "title": "",
+      "canonical": null,
+      "timing": 344,
+      "pass": true,
+      "furl": "https://jueshi.net/robots.txt"
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "title": "",
+      "canonical": null,
+      "timing": 235,
+      "pass": true,
+      "furl": "https://jueshi.net/sitemap.xml"
+    },
+    {
+      "path": "/checklists/first-shipping-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 378,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/first-shipping-checklist"
+    },
+    {
+      "path": "/checklists/toronto-rental-viewing-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 357,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/toronto-rental-viewing-checklist"
+    },
+    {
+      "path": "/checklists/student-first-abroad-packing-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 302,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/student-first-abroad-packing-checklist"
+    }
+  ],
+  "failures": [],
+  "consoleErrors": [
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "[AdSlot] Fetch failed: TypeError: Failed to fetch\n    at https://jueshi.net/_next/static/chunks/11iq1jb8b.j7d.js:1:8391\n    at https://jueshi.net/_next/static/chunks/11iq1jb8b.j7d.js:1:8536\n    at iv "
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    }
+  ],
+  "httpRedirects": [
+    {
+      "path": "/tools/quote",
+      "httpStatus": 308,
+      "location": "/tools/documents/quotation",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "httpStatus": 308,
+      "location": "/tools/documents/quotation",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/workspace",
+      "httpStatus": 307,
+      "location": "/login",
+      "finalUrl": "https://jueshi.net/login",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/admin",
+      "httpStatus": 307,
+      "location": "/login?reason=no-session",
+      "finalUrl": "https://jueshi.net/login?reason=no-session",
+      "pass": true,
+      "error": null
+    }
+  ],
+  "sitemapChecks": [
+    {
+      "pass": true,
+      "forbiddenFound": [],
+      "draftsFound": [],
+      "hasQuotation": true,
+      "hasNoQuoteSheet": true
+    }
+  ],
+  "adminTest": {
+    "skipped": true,
+    "reason": "SOAK_ADMIN_EMAIL/SOAK_ADMIN_PASSWORD not set"
+  },
+  "duration": 11082,
+  "pass": true
+}

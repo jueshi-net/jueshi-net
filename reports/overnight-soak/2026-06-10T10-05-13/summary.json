@@ -1,0 +1,125 @@
+{
+  "startTime": "2026-06-10T10:05:13.378Z",
+  "lastUpdated": "2026-06-10T10:06:11.631Z",
+  "totalIterations": 3,
+  "plannedIterations": 3,
+  "passedIterations": 0,
+  "failedIterations": 3,
+  "totalFailures": 13,
+  "topSlowestPages": [
+    {
+      "p": "/",
+      "avg": 2575.3333333333335,
+      "max": 2932
+    },
+    {
+      "p": "/admin",
+      "avg": 823.3333333333334,
+      "max": 905
+    },
+    {
+      "p": "/tools/quote",
+      "avg": 658,
+      "max": 736
+    },
+    {
+      "p": "/tools/quote-sheet",
+      "avg": 621.6666666666666,
+      "max": 647
+    },
+    {
+      "p": "/workspace",
+      "avg": 579,
+      "max": 729
+    },
+    {
+      "p": "/tools",
+      "avg": 518.6666666666666,
+      "max": 672
+    },
+    {
+      "p": "/login",
+      "avg": 450.3333333333333,
+      "max": 648
+    },
+    {
+      "p": "/checklists/toronto-rental-viewing-checklist",
+      "avg": 364.3333333333333,
+      "max": 497
+    },
+    {
+      "p": "/tools/documents/quotation",
+      "avg": 351.3333333333333,
+      "max": 366
+    },
+    {
+      "p": "/checklists/student-first-abroad-packing-checklist",
+      "avg": 350.3333333333333,
+      "max": 394
+    }
+  ],
+  "topConsoleErrorIterations": [
+    [
+      "1",
+      21
+    ],
+    [
+      "3",
+      21
+    ],
+    [
+      "2",
+      18
+    ]
+  ],
+  "latestRedirectChecks": [
+    {
+      "path": "/tools/quote",
+      "httpStatus": 200,
+      "location": "",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false,
+      "error": "Expected redirect status 3xx, got 200"
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "httpStatus": 200,
+      "location": "",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false,
+      "error": "Expected redirect status 3xx, got 200"
+    },
+    {
+      "path": "/workspace",
+      "httpStatus": 200,
+      "location": "",
+      "finalUrl": "https://jueshi.net/login",
+      "pass": false,
+      "error": "Expected redirect status 3xx, got 200"
+    },
+    {
+      "path": "/admin",
+      "httpStatus": 200,
+      "location": "",
+      "finalUrl": "https://jueshi.net/login?reason=no-session",
+      "pass": false,
+      "error": "Expected redirect status 3xx, got 200"
+    }
+  ],
+  "latestSitemapChecks": [
+    {
+      "pass": true,
+      "forbiddenFound": [],
+      "draftsFound": [],
+      "hasQuotation": true,
+      "hasNoQuoteSheet": true
+    }
+  ],
+  "adminTest": {
+    "skipped": true,
+    "reason": "SOAK_ADMIN_EMAIL/SOAK_ADMIN_PASSWORD not set"
+  },
+  "aggregate404": [],
+  "aggregateCors": [],
+  "adslotClassified": "known non-blocking (no-fill)"
+}

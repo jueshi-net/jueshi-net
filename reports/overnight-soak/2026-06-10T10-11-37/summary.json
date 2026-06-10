@@ -1,0 +1,130 @@
+{
+  "startTime": "2026-06-10T10:11:37.285Z",
+  "lastUpdated": "2026-06-10T10:12:25.223Z",
+  "totalIterations": 3,
+  "plannedIterations": 3,
+  "passedIterations": 3,
+  "failedIterations": 0,
+  "totalFailures": 0,
+  "topSlowestPages": [
+    {
+      "p": "/",
+      "avg": 1854,
+      "max": 1907
+    },
+    {
+      "p": "/tools/quote-sheet",
+      "avg": 863.6666666666666,
+      "max": 1437
+    },
+    {
+      "p": "/tools/quote",
+      "avg": 672,
+      "max": 954
+    },
+    {
+      "p": "/admin",
+      "avg": 561.3333333333334,
+      "max": 620
+    },
+    {
+      "p": "/workspace",
+      "avg": 528.6666666666666,
+      "max": 569
+    },
+    {
+      "p": "/login",
+      "avg": 370,
+      "max": 387
+    },
+    {
+      "p": "/tools",
+      "avg": 357.3333333333333,
+      "max": 420
+    },
+    {
+      "p": "/robots.txt",
+      "avg": 347,
+      "max": 369
+    },
+    {
+      "p": "/checklists/toronto-rental-viewing-checklist",
+      "avg": 346.3333333333333,
+      "max": 425
+    },
+    {
+      "p": "/sitemap.xml",
+      "avg": 331.3333333333333,
+      "max": 489
+    }
+  ],
+  "topConsoleErrorIterations": [
+    [
+      "1",
+      22
+    ],
+    [
+      "2",
+      21
+    ],
+    [
+      "3",
+      19
+    ]
+  ],
+  "latestRedirectChecks": [
+    {
+      "path": "/tools/quote",
+      "httpStatus": 308,
+      "location": "/tools/documents/quotation",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "httpStatus": 308,
+      "location": "/tools/documents/quotation",
+      "finalUrl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/workspace",
+      "httpStatus": 307,
+      "location": "/login",
+      "finalUrl": "https://jueshi.net/login",
+      "pass": true,
+      "error": null
+    },
+    {
+      "path": "/admin",
+      "httpStatus": 307,
+      "location": "/login?reason=no-session",
+      "finalUrl": "https://jueshi.net/login?reason=no-session",
+      "pass": true,
+      "error": null
+    }
+  ],
+  "latestSitemapChecks": [
+    {
+      "pass": true,
+      "forbiddenFound": [],
+      "draftsFound": [],
+      "hasQuotation": true,
+      "hasNoQuoteSheet": true
+    }
+  ],
+  "adminTest": {
+    "skipped": true,
+    "reason": "SOAK_ADMIN_EMAIL/SOAK_ADMIN_PASSWORD not set"
+  },
+  "aggregate404": [],
+  "aggregateCors": [
+    [
+      "https://bbs.jueshi.net/?_rsc=mb9ys",
+      1
+    ]
+  ],
+  "adslotClassified": "known non-blocking (no-fill)"
+}

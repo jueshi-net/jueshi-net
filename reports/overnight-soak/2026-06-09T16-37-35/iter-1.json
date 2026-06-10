@@ -1,0 +1,281 @@
+{
+  "iter": 1,
+  "timestamp": "2026-06-09T16:37:35.884Z",
+  "pages": [
+    {
+      "path": "/",
+      "status": 200,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 2002,
+      "pass": true,
+      "furl": "https://jueshi.net/"
+    },
+    {
+      "path": "/tools",
+      "status": 200,
+      "title": "工具中心 - 海外百宝箱",
+      "canonical": null,
+      "timing": 331,
+      "pass": true,
+      "furl": "https://jueshi.net/tools"
+    },
+    {
+      "path": "/tools/qrcode",
+      "status": 200,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 366,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/qrcode"
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 401,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/tools/quote",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 484,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "status": 200,
+      "title": "报价单生成器 - 外贸报价单模板 | 海外百宝箱",
+      "canonical": "https://jueshi.net/tools/documents/quotation",
+      "timing": 912,
+      "pass": true,
+      "furl": "https://jueshi.net/tools/documents/quotation"
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 289,
+      "pass": true,
+      "furl": "https://jueshi.net/login"
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 660,
+      "pass": true,
+      "furl": "https://jueshi.net/login"
+    },
+    {
+      "path": "/admin",
+      "status": 200,
+      "title": "登录 | 海外百宝箱",
+      "canonical": "https://jueshi.net/login",
+      "timing": 680,
+      "pass": true,
+      "furl": "https://jueshi.net/login?reason=no-session"
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "title": "",
+      "canonical": null,
+      "timing": 244,
+      "pass": true,
+      "furl": "https://jueshi.net/robots.txt"
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "title": "",
+      "canonical": null,
+      "timing": 569,
+      "pass": true,
+      "furl": "https://jueshi.net/sitemap.xml"
+    },
+    {
+      "path": "/checklists/first-shipping-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 332,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/first-shipping-checklist"
+    },
+    {
+      "path": "/checklists/toronto-rental-viewing-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 491,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/toronto-rental-viewing-checklist"
+    },
+    {
+      "path": "/checklists/student-first-abroad-packing-checklist",
+      "status": 404,
+      "title": "海外百宝箱 — 工具 · AI · 资源",
+      "canonical": null,
+      "timing": 321,
+      "pass": true,
+      "furl": "https://jueshi.net/checklists/student-first-abroad-packing-checklist"
+    }
+  ],
+  "failures": [],
+  "consoleErrors": [
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    },
+    {
+      "message": "o: Failed to fetch. Read more at https://errors.authjs.dev#autherror\n    at i (https://jueshi.net/_next/static/chunks/102modw75ty0j.js:1:15480)\n    at async v (https://jueshi.net/_next/static/chunks/1"
+    },
+    {
+      "message": "Failed to load resource: the server responded with a status of 404 ()"
+    }
+  ],
+  "redirects": [
+    {
+      "path": "/",
+      "status": 200,
+      "furl": "https://jueshi.net/",
+      "pass": true
+    },
+    {
+      "path": "/tools",
+      "status": 200,
+      "furl": "https://jueshi.net/tools",
+      "pass": true
+    },
+    {
+      "path": "/tools/qrcode",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/qrcode",
+      "pass": true
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": true
+    },
+    {
+      "path": "/tools/quote",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false
+    },
+    {
+      "path": "/tools/quote-sheet",
+      "status": 200,
+      "furl": "https://jueshi.net/tools/documents/quotation",
+      "pass": false
+    },
+    {
+      "path": "/login",
+      "status": 200,
+      "furl": "https://jueshi.net/login",
+      "pass": true
+    },
+    {
+      "path": "/workspace",
+      "status": 200,
+      "furl": "https://jueshi.net/login",
+      "pass": false
+    },
+    {
+      "path": "/admin",
+      "status": 200,
+      "furl": "https://jueshi.net/login?reason=no-session",
+      "pass": false
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "furl": "https://jueshi.net/robots.txt",
+      "pass": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "furl": "https://jueshi.net/sitemap.xml",
+      "pass": true
+    },
+    {
+      "path": "/checklists/first-shipping-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/first-shipping-checklist",
+      "pass": true
+    },
+    {
+      "path": "/checklists/toronto-rental-viewing-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/toronto-rental-viewing-checklist",
+      "pass": true
+    },
+    {
+      "path": "/checklists/student-first-abroad-packing-checklist",
+      "status": 404,
+      "furl": "https://jueshi.net/checklists/student-first-abroad-packing-checklist",
+      "pass": true
+    }
+  ],
+  "sitemapChecks": [
+    {
+      "pass": false,
+      "error": "page.goto: Timeout 15000ms exceeded.\nCall log:\n  - navigating to \"https://jueshi.net/sitemap.xml\", waiting until \"domcontentloaded\"\n"
+    }
+  ],
+  "adminTest": {
+    "skipped": true,
+    "reason": "SOAK_ADMIN_EMAIL/SOAK_ADMIN_PASSWORD not set"
+  },
+  "duration": 24126,
+  "pass": true
+}

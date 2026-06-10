@@ -6,6 +6,7 @@ import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface AddressForm {
@@ -341,6 +342,19 @@ export default function AddressFormatterPage() {
         ]} />
 
         <RelatedGuidesSection slugs={["canada-postal-code-format", "what-is-consolidation-shipping"]} />
+
+        {/* Related Checklist */}
+        <RelatedChecklistSection
+          checklists={[
+            {
+              slug: "student-first-abroad-packing-checklist",
+              title: "留学生第一次出国行李准备清单",
+              summary: "涵盖证件、电子产品、生活用品、药品、财务五大类，含避坑指南和FAQ。",
+              icon: "🎒",
+            },
+          ]}
+          sourcePath="address-formatter"
+        />
       </div>
     </div>
   );

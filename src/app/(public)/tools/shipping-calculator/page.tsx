@@ -12,6 +12,7 @@ import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedToolsWidget } from '@/components/related-tools-widget';
+import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { trackEvent } from '@/lib/analytics';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
@@ -691,6 +692,21 @@ export default function ShippingCalculatorPage() {
       {/* Related Tools Widget */}
       <div className="max-w-4xl mx-auto mb-8">
         <RelatedToolsWidget currentTool="shipping-calculator" />
+      </div>
+
+      {/* Related Checklist */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <RelatedChecklistSection
+          checklists={[
+            {
+              slug: "student-first-abroad-packing-checklist",
+              title: "留学生第一次出国行李准备清单",
+              summary: "涵盖证件、电子产品、生活用品、药品、财务五大类，含避坑指南和FAQ。",
+              icon: "🎒",
+            },
+          ]}
+          sourcePath="shipping-calculator"
+        />
       </div>
 
       {/* Tool-specific ads */}

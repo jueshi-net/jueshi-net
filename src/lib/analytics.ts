@@ -149,4 +149,25 @@ export const trackEvent = {
     toolName,
     action,
   }),
+
+  // 清单：页面浏览
+  checklistView: (slug: string) => track({
+    eventType: 'checklist_view',
+    toolName: 'checklist',
+    action: `view_${slug}`,
+  }),
+
+  // 清单：点击工具链接
+  checklistToolClick: (checklistSlug: string, toolSlug: string) => track({
+    eventType: 'checklist_tool_click',
+    toolName: 'checklist',
+    action: `click_tool_${toolSlug}`,
+  }),
+
+  // 清单内链：从工具页/专题页点击进入清单
+  checklistInternalLinkClick: (sourcePath: string, checklistSlug: string) => track({
+    eventType: 'checklist_internal_link_click',
+    toolName: 'checklist',
+    action: `click_from_${sourcePath}`,
+  }),
 };
