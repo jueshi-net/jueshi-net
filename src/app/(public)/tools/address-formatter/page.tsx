@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check, ExternalLink } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { trackEvent } from '@/lib/analytics';
+import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface AddressForm {
@@ -76,6 +78,24 @@ const countryConfig: Record<string, {
   },
 };
 
+// Example addresses for quick fill
+const EXAMPLE_ADDRESSES: Record<string, AddressForm> = {
+  '加拿大': { country: '加拿大', name: 'Zhang San', phone: '+1 416 555 0123', street: '123 Main Street', apt: 'Apt 4B', city: 'Toronto', state: 'ON 安大略', postalCode: 'M5V 2T6' },
+  '美国': { country: '美国', name: 'Li Si', phone: '+1 212 555 0456', street: '456 Broadway', apt: 'Suite 12', city: 'New York', state: 'NY 纽约', postalCode: '10001' },
+  '英国': { country: '英国', name: 'Wang Wu', phone: '+44 20 7946 0958', street: '10 Downing Street', apt: '', city: 'London', state: 'England 英格兰', postalCode: 'SW1A 1AA' },
+  '澳大利亚': { country: '澳大利亚', name: 'Zhao Liu', phone: '+61 2 9876 5432', street: '789 George Street', apt: 'Unit 5', city: 'Sydney', state: 'NSW 新南威尔士', postalCode: '2000' },
+  '新西兰': { country: '新西兰', name: 'Chen Qi', phone: '+64 9 379 1234', street: '100 Queen Street', apt: '', city: 'Auckland', state: 'Auckland 奥克兰', postalCode: '1010' },
+};
+
+const RECENT_ADDRESSES_KEY = 'address-formatter-recent';
+
+interface RecentAddress {
+  country: string;
+  city: string;
+  postalCode: string;
+  timestamp: number;
+}
+
 export default function AddressFormatterPage() {
   const [form, setForm] = useState<AddressForm>({
     country: '加拿大', name: '', phone: '', street: '', apt: '', city: '', state: '', postalCode: '',
@@ -83,6 +103,29 @@ export default function AddressFormatterPage() {
   const [result, setResult] = useState<{ english: string; chinese: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [recentAddresses, setRecentAddresses] = useState<RecentAddress[]>([]);
+
+  // Load recent addresses from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(RECENT_ADDRESSES_KEY);
+      if (saved) setRecentAddresses(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  // Track Tool_View on mount
+  useEffect(() => {
+    trackEvent.custom('address-formatter', 'view');
+  }, []);
+
+  // Fill example address
+  const fillExample = useCallback((country: string) => {
+    const example = EXAMPLE_ADDRESSES[country];
+    if (example) {
+      setForm(example);
+      trackEvent.custom('address-formatter', 'fill_example');
+    }
+  }, []);
 
   const update = (key: keyof AddressForm, value: string) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -158,6 +201,20 @@ export default function AddressFormatterPage() {
     ];
 
     setResult({ english, chinese: chineseLines.join('\n') });
+
+    // Save to recent addresses
+    const recentEntry: RecentAddress = {
+      country: form.country,
+      city: form.city,
+      postalCode: form.postalCode,
+      timestamp: Date.now(),
+    };
+    const updated = [recentEntry, ...recentAddresses.filter(
+      r => !(r.country === recentEntry.country && r.city === recentEntry.city && r.postalCode === recentEntry.postalCode)
+    )].slice(0, 5);
+    setRecentAddresses(updated);
+    try { localStorage.setItem(RECENT_ADDRESSES_KEY, JSON.stringify(updated)); } catch {}
+    trackEvent.custom('address-formatter', 'generate');
   };
 
   const copyResult = () => {
@@ -165,6 +222,7 @@ export default function AddressFormatterPage() {
     navigator.clipboard.writeText(result.english).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      trackEvent.custom('address-formatter', 'copy_result');
     });
   };
 
@@ -206,6 +264,18 @@ export default function AddressFormatterPage() {
                   value={form.country} onChange={e => update('country', e.target.value)}>
                   {Object.keys(countryConfig).map(c => <option key={c}>{c}</option>)}
                 </select>
+                {/* Example fill buttons */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <span className="text-xs text-gray-400">示例：</span>
+                  {Object.keys(EXAMPLE_ADDRESSES).map(c => (
+                    <button key={c} type="button" onClick={() => fillExample(c)}
+                      className={`px-2 py-0.5 text-xs rounded transition-colors ${
+                        form.country === c ? 'bg-indigo-100 text-indigo-700 font-medium' : 'bg-gray-100 text-gray-600 hover:bg-indigo-50 hover:text-indigo-700'
+                      }`}>
+                      {c}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -333,6 +403,109 @@ export default function AddressFormatterPage() {
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-bottom" className="mb-8" />
+
+        {/* Recent Addresses */}
+        {recentAddresses.length > 0 && (
+          <div className={cardStyles.base + " mb-8"}>
+            <div className="p-4 border-b border-gray-100">
+              <h2 className={cardStyles.header}>
+                <MapPin className="w-4 h-4 text-gray-500" />
+                最近使用
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex flex-wrap gap-2">
+                {recentAddresses.map((ra, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      const example = EXAMPLE_ADDRESSES[ra.country];
+                      if (example) fillExample(ra.country);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-indigo-50 hover:text-indigo-700 rounded-lg text-sm text-gray-600 transition-colors border border-gray-200"
+                  >
+                    <span className="text-indigo-600 font-medium">{ra.city}</span>
+                    <span className="text-xs text-gray-400">({ra.country})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Official Postal Links */}
+        <div className={cardStyles.base + " mb-8"}>
+          <div className="p-4 border-b border-gray-100">
+            <h2 className={cardStyles.header}>
+              <ExternalLink className="w-4 h-4 text-green-600" />
+              各国邮政官方入口
+            </h2>
+          </div>
+          <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <a href="https://www.canadapost-postescanada.ca/" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇨🇦 Canada Post
+            </a>
+            <a href="https://tools.usps.com/zip-code-lookup.htm" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇺🇸 USPS
+            </a>
+            <a href="https://www.royalmail.com/find-a-postcode" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇬🇧 Royal Mail
+            </a>
+            <a href="https://auspost.com.au/address-book/postcode-search" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇦🇺 Australia Post
+            </a>
+            <a href="https://www.nzpost.co.nz/tools/postcode-finder" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇳🇿 NZ Post
+            </a>
+            <a href="https://www.singpost.com/" target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-green-50 rounded-lg text-sm text-gray-700 hover:text-green-700 transition-colors">
+              🇸🇬 SingPost
+            </a>
+          </div>
+        </div>
+
+        {/* Related Tools */}
+        <div className={cardStyles.base + " mb-8"}>
+          <div className="p-4 border-b border-gray-100">
+            <h2 className={cardStyles.header}>
+              下一步推荐工具
+            </h2>
+          </div>
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link href="/tools/postal-code"
+              onClick={() => trackEvent.custom('address-formatter', 'click_related_postal-code')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl border border-gray-200 hover:border-indigo-200 transition-all">
+              <span className="text-2xl">📮</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">邮编查询</p>
+                <p className="text-xs text-gray-500">验证邮编格式</p>
+              </div>
+            </Link>
+            <Link href="/tools/shipping-calculator"
+              onClick={() => trackEvent.custom('address-formatter', 'click_related_shipping-calculator')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl border border-gray-200 hover:border-indigo-200 transition-all">
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">运费计算</p>
+                <p className="text-xs text-gray-500">估算集运费用</p>
+              </div>
+            </Link>
+            <Link href="/tools/documents/commercial-invoice"
+              onClick={() => trackEvent.custom('address-formatter', 'click_related_commercial-invoice')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-indigo-50 rounded-xl border border-gray-200 hover:border-indigo-200 transition-all">
+              <span className="text-2xl">📄</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">商业发票</p>
+                <p className="text-xs text-gray-500">生成报关单据</p>
+              </div>
+            </Link>
+          </div>
+        </div>
 
         {/* FAQ */}
         <FAQSection title="地址格式化常见问题" items={[

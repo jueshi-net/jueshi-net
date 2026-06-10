@@ -7,6 +7,7 @@ import { CountryInfoSection } from '@/components/country-info-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 import SmartRelatedLinks from '@/components/smart-related-links';
+import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { trackEvent } from '@/lib/analytics';
 import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import Link from 'next/link';
@@ -71,6 +72,31 @@ function looksLikePostalCode(q: string): boolean {
 }
 
 const STORAGE_KEY = 'postal-code-tool-state';
+const RECENT_QUERIES_KEY = 'postal-code-recent-queries';
+
+interface RecentQuery {
+  query: string;
+  resultSummary: string;
+  timestamp: number;
+  country: string;
+}
+
+function useRecentQueries(key: string, maxItems = 5): [RecentQuery[], (q: RecentQuery) => void] {
+  const [queries, setQueries] = useState<RecentQuery[]>(() => {
+    try {
+      const saved = localStorage.getItem(key);
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const add = useCallback((q: RecentQuery) => {
+    setQueries(prev => {
+      const next = [q, ...prev.filter(x => x.query !== q.query)].slice(0, maxItems);
+      try { localStorage.setItem(key, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, [key, maxItems]);
+  return [queries, add];
+}
 
 interface ValidationDetail {
   valid: boolean;
@@ -127,6 +153,12 @@ export default function PostalCodePage() {
   const [citySearch, setCitySearch] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
+  const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
+
+  // Track Tool_View on mount
+  useEffect(() => {
+    trackEvent.custom('postal-code', 'view');
+  }, []);
 
   // Local time for selected country
   const timezone = COUNTRY_TIMEZONE[selectedCountryCode];
@@ -305,6 +337,13 @@ export default function PostalCodePage() {
         deliverability = 'likely';
       }
       setValidationResult({ valid: true, message: msg, matchedRegion, matchedCity, deliverability });
+      // Save to recent queries
+      addRecentQuery({
+        query: trimmed,
+        resultSummary: msg,
+        timestamp: Date.now(),
+        country: selectedCountryCode,
+      });
     } else {
       setValidationResult({
         valid: false,
@@ -411,6 +450,7 @@ export default function PostalCodePage() {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 1500);
+      trackEvent.custom('postal-code', 'copy_result');
     });
   }, []);
 
@@ -1130,7 +1170,89 @@ export default function PostalCodePage() {
             question: "查询不到怎么办？",
             answer: "可以尝试输入邮编前缀（如只输入前3位）、城市名或省州缩写。数据库仅覆盖主要城市，偏远地区数据可能不完整。建议同时使用上方官方查询入口进行交叉验证。",
           },
+          {
+            question: "邮编和 ZIP Code 是一回事吗？",
+            answer: "本质上都是邮政编码，只是叫法不同。美国叫 ZIP Code，加拿大/英国/澳洲等叫 Postal Code。功能相同，都是帮助邮政系统分拣和投递邮件。",
+          },
+          {
+            question: "邮编错误会影响派送吗？",
+            answer: "会。邮编错误可能导致包裹分拣到错误区域，延误投递甚至退回。填写快递面单时务必核对邮编，尤其是集运仓地址。",
+          },
         ]} />
+
+        {/* Recent Queries */}
+        {recentQueries.length > 0 && (
+          <div className={cardStyles.base + " mt-8"}>
+            <div className="p-4 border-b border-gray-100">
+              <h2 className={cardStyles.header}>
+                <Search className="w-4 h-4 text-gray-500" />
+                最近查询
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex flex-wrap gap-2">
+                {recentQueries.map((rq, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setInputCode(rq.query);
+                      setSelectedCountryCode(rq.country);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-teal-50 hover:text-teal-700 rounded-lg text-sm text-gray-600 transition-colors border border-gray-200"
+                  >
+                    <span className="font-mono text-teal-600">{rq.query}</span>
+                    <span className="text-xs text-gray-400">({rq.country})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Related Tools */}
+        <div className={cardStyles.base + " mt-8"}>
+          <div className="p-4 border-b border-gray-100">
+            <h2 className={cardStyles.header}>
+              <Truck className="w-4 h-4 text-blue-600" />
+              下一步推荐工具
+            </h2>
+          </div>
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link href="/tools/address-formatter"
+              onClick={() => trackEvent.custom('postal-code', 'click_related_address-formatter')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-blue-50 rounded-xl border border-gray-200 hover:border-blue-200 transition-all">
+              <span className="text-2xl">📝</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">地址格式化</p>
+                <p className="text-xs text-gray-500">生成规范英文地址</p>
+              </div>
+            </Link>
+            <Link href="/tools/shipping-calculator"
+              onClick={() => trackEvent.custom('postal-code', 'click_related_shipping-calculator')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-blue-50 rounded-xl border border-gray-200 hover:border-blue-200 transition-all">
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">运费计算</p>
+                <p className="text-xs text-gray-500">估算集运/快递费用</p>
+              </div>
+            </Link>
+            <Link href="/tools/exchange-rate"
+              onClick={() => trackEvent.custom('postal-code', 'click_related_exchange-rate')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-blue-50 rounded-xl border border-gray-200 hover:border-blue-200 transition-all">
+              <span className="text-2xl">💱</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">汇率换算</p>
+                <p className="text-xs text-gray-500">实时货币换算</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Related Checklist */}
+        <RelatedChecklistSection
+          toolSlug="postal-code"
+          sourcePath="postal-code"
+        />
 
         {/* Smart Contextual Interlinking */}
         <div className="mt-8">
