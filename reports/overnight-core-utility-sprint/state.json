@@ -1,0 +1,16 @@
+{
+  "sprint": "v1.20.42.6.38 Overnight Core Utility Humanization Sprint",
+  "currentStage": 2,
+  "completedStages": [1],
+  "stopReason": null,
+  "p0Issues": [
+    "HS编码无复制按钮",
+    "HS编码EventLog未调用",
+    "地址格式化无EventLog",
+    "汇率无复制按钮",
+    "所有工具无最近查询localStorage"
+  ],
+  "commits": [],
+  "deploymentStatus": null,
+  "nextStage": "stage-2-postal-address"
+}
