@@ -1,0 +1,503 @@
+{
+  "timestamp": "2026-06-10T11:19:42.121Z",
+  "checklists": [
+    {
+      "slug": "first-shipping-checklist",
+      "file": "first-shipping-checklist.example.json",
+      "errors": [
+        "sections < 5 (has 3)",
+        "checklistItems < 25 (has 12)",
+        "FAQ < 6 (has 5)",
+        "avoidPitfalls < 6 (has 5)"
+      ],
+      "warnings": [
+        "officialLink \"中国海关总署\" is not needsReview=true",
+        "officialLink \"万国邮联 (UPU) 包裹追踪\" is not needsReview=true"
+      ],
+      "counts": {
+        "sections": 3,
+        "items": 12,
+        "faqs": 5,
+        "pitfalls": 5,
+        "relatedTools": 4,
+        "officialLinks": 2
+      }
+    },
+    {
+      "slug": "first-shipping-checklist",
+      "file": "first-shipping-checklist.json",
+      "errors": [],
+      "warnings": [],
+      "counts": {
+        "sections": 6,
+        "items": 30,
+        "faqs": 7,
+        "pitfalls": 6,
+        "relatedTools": 4,
+        "officialLinks": 3
+      }
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "file": "first-use-shipping-tips-checklist.json",
+      "errors": [
+        "checklistItems < 25 (has 20)",
+        "FAQ < 6 (has 5)",
+        "avoidPitfalls < 6 (has 5)",
+        "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 1 项",
+        "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 2 项",
+        "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 3 项",
+        "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 4 项",
+        "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 1 项",
+        "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 2 项",
+        "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 3 项",
+        "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 4 项",
+        "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 1 项",
+        "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 2 项",
+        "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 3 项",
+        "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 4 项",
+        "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 1 项",
+        "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 2 项",
+        "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 3 项",
+        "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 4 项",
+        "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 1 项",
+        "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 2 项",
+        "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 3 项",
+        "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 4 项"
+      ],
+      "warnings": [],
+      "counts": {
+        "sections": 5,
+        "items": 20,
+        "faqs": 5,
+        "pitfalls": 5,
+        "relatedTools": 4,
+        "officialLinks": 3
+      }
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "file": "pitfalls-checklist.json",
+      "errors": [
+        "checklistItems < 25 (has 20)",
+        "FAQ < 6 (has 5)",
+        "avoidPitfalls < 6 (has 5)",
+        "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 1 项",
+        "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 2 项",
+        "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 3 项",
+        "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 4 项",
+        "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 1 项",
+        "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 2 项",
+        "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 3 项",
+        "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 4 项",
+        "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 1 项",
+        "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 2 项",
+        "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 3 项",
+        "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 4 项",
+        "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 1 项",
+        "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 2 项",
+        "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 3 项",
+        "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 4 项",
+        "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 1 项",
+        "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 2 项",
+        "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 3 项",
+        "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 4 项"
+      ],
+      "warnings": [],
+      "counts": {
+        "sections": 5,
+        "items": 20,
+        "faqs": 5,
+        "pitfalls": 5,
+        "relatedTools": 3,
+        "officialLinks": 3
+      }
+    },
+    {
+      "slug": "student-first-abroad-packing-checklist",
+      "file": "student-first-abroad-packing-checklist.json",
+      "errors": [
+        "checklistItems < 25 (has 20)",
+        "FAQ < 6 (has 5)",
+        "avoidPitfalls < 6 (has 5)"
+      ],
+      "warnings": [],
+      "counts": {
+        "sections": 5,
+        "items": 20,
+        "faqs": 5,
+        "pitfalls": 5,
+        "relatedTools": 3,
+        "officialLinks": 3
+      }
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "file": "student-first-abroad-packing-prep-checklist.json",
+      "errors": [
+        "checklistItems < 25 (has 20)",
+        "FAQ < 6 (has 5)",
+        "avoidPitfalls < 6 (has 5)",
+        "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 1 项",
+        "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 2 项",
+        "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 3 项",
+        "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 4 项",
+        "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 1 项",
+        "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 2 项",
+        "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 3 项",
+        "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 4 项",
+        "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 1 项",
+        "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 2 项",
+        "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 3 项",
+        "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 4 项",
+        "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 1 项",
+        "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 2 项",
+        "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 3 项",
+        "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 4 项",
+        "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 1 项",
+        "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 2 项",
+        "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 3 项",
+        "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 4 项"
+      ],
+      "warnings": [],
+      "counts": {
+        "sections": 5,
+        "items": 20,
+        "faqs": 5,
+        "pitfalls": 5,
+        "relatedTools": 3,
+        "officialLinks": 3
+      }
+    },
+    {
+      "slug": "toronto-rental-viewing-checklist",
+      "file": "toronto-rental-viewing-checklist.json",
+      "errors": [],
+      "warnings": [],
+      "counts": {
+        "sections": 6,
+        "items": 32,
+        "faqs": 7,
+        "pitfalls": 6,
+        "relatedTools": 3,
+        "officialLinks": 4
+      }
+    }
+  ],
+  "errors": [
+    {
+      "slug": "first-shipping-checklist",
+      "error": "sections < 5 (has 3)"
+    },
+    {
+      "slug": "first-shipping-checklist",
+      "error": "checklistItems < 25 (has 12)"
+    },
+    {
+      "slug": "first-shipping-checklist",
+      "error": "FAQ < 6 (has 5)"
+    },
+    {
+      "slug": "first-shipping-checklist",
+      "error": "avoidPitfalls < 6 (has 5)"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "checklistItems < 25 (has 20)"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "FAQ < 6 (has 5)"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "avoidPitfalls < 6 (has 5)"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 1 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 2 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 3 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"一、下单前准备\": [待补充] 一、下单前准备 - 第 4 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 1 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 2 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 3 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"二、仓库地址与收件人填写\": [待补充] 二、仓库地址与收件人填写 - 第 4 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 1 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 2 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 3 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"三、包裹入库与申报规范\": [待补充] 三、包裹入库与申报规范 - 第 4 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 1 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 2 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 3 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"四、支付与国际运费\": [待补充] 四、支付与国际运费 - 第 4 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 1 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 2 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 3 项"
+    },
+    {
+      "slug": "first-use-shipping-tips-checklist",
+      "error": "Item contains TODO in \"五、物流追踪与签收\": [待补充] 五、物流追踪与签收 - 第 4 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "checklistItems < 25 (has 20)"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "FAQ < 6 (has 5)"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "avoidPitfalls < 6 (has 5)"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 1 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 2 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 3 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"一、房源基本信息核实\": [待补充] 一、房源基本信息核实 - 第 4 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 1 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 2 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 3 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"二、房屋内部状况检查\": [待补充] 二、房屋内部状况检查 - 第 4 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 1 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 2 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 3 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"三、安全与安保\": [待补充] 三、安全与安保 - 第 4 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 1 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 2 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 3 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"四、合同与法律条款\": [待补充] 四、合同与法律条款 - 第 4 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 1 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 2 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 3 项"
+    },
+    {
+      "slug": "pitfalls-checklist",
+      "error": "Item contains TODO in \"五、周边环境与交通\": [待补充] 五、周边环境与交通 - 第 4 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-checklist",
+      "error": "checklistItems < 25 (has 20)"
+    },
+    {
+      "slug": "student-first-abroad-packing-checklist",
+      "error": "FAQ < 6 (has 5)"
+    },
+    {
+      "slug": "student-first-abroad-packing-checklist",
+      "error": "avoidPitfalls < 6 (has 5)"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "checklistItems < 25 (has 20)"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "FAQ < 6 (has 5)"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "avoidPitfalls < 6 (has 5)"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 1 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 2 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 3 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"一、证件与文件\": [待补充] 一、证件与文件 - 第 4 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 1 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 2 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 3 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"二、电子产品与充电器\": [待补充] 二、电子产品与充电器 - 第 4 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 1 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 2 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 3 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"三、衣物与生活用品\": [待补充] 三、衣物与生活用品 - 第 4 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 1 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 2 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 3 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"四、药品与健康\": [待补充] 四、药品与健康 - 第 4 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 1 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 2 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 3 项"
+    },
+    {
+      "slug": "student-first-abroad-packing-prep-checklist",
+      "error": "Item contains TODO in \"五、财务与银行卡\": [待补充] 五、财务与银行卡 - 第 4 项"
+    }
+  ],
+  "warnings": [
+    {
+      "slug": "first-shipping-checklist",
+      "warning": "officialLink \"中国海关总署\" is not needsReview=true"
+    },
+    {
+      "slug": "first-shipping-checklist",
+      "warning": "officialLink \"万国邮联 (UPU) 包裹追踪\" is not needsReview=true"
+    }
+  ]
+}

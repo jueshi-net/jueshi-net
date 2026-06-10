@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-10T10:41:40.404Z",
+  "timestamp": "2026-06-10T10:53:31.925Z",
   "checklists": [
     {
       "slug": "first-shipping-checklist",
@@ -55,7 +55,18 @@
   ],
   "pageLinkChecks": {
     "brokenLinks": [],
-    "draftLinks": [],
+    "draftLinks": [
+      {
+        "source": "/tools/address-formatter",
+        "label": "tool: address-formatter",
+        "slug": "student-first-abroad-packing-checklist"
+      },
+      {
+        "source": "/tools/shipping-calculator",
+        "label": "tool: shipping-calculator",
+        "slug": "student-first-abroad-packing-checklist"
+      }
+    ],
     "hiddenLinks": []
   }
 }
