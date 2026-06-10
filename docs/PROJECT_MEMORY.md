@@ -1,10 +1,11 @@
-# PROJECT MEMORY — 海外百宝箱 (xixiong-saas)
+# PROJECT MEMORY — 绝世百宝箱 (xixiong-saas)
 
 > **Generated**: 2026-05-28
 > **Phase**: 三期 — UX 精修与板块联动 [DONE]
 > **Version**: v1.41.0+ (main branch)
 > **Target Users**: 跨境电商/SOHO, 留学生, 数字游民, 出国务工旅行, 海外华人华侨
-> **Positioning**: 全域出国基础设施平台 (NOT just cross-border seller tool)
+> **Positioning**: 海外华人的实用工具箱 (原"全域出国基础设施平台")
+> **主品牌**: 绝世百宝箱 (v1.20.42.6.36 统一)
 
 ## ✅ 三期前端歼灭战完成记录 (2026-05-28)
 

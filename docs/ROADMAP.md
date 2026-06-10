@@ -1,7 +1,7 @@
-# 海外百宝箱 Roadmap
+# 绝世百宝箱 Roadmap
 
-**最后更新：** 2026-06-09
-**当前版本线：** v1.20.42.6.29.2
+**最后更新：** 2026-06-10
+**当前版本线：** v1.20.42.6.36
 
 ---
 
@@ -29,6 +29,9 @@
 | v1.20.42.6.29 | Checklist Batch Draft Trial | ✅ 完成 |
 | v1.20.42.6.29.1 | Checklist Publish State Audit + Review Gate | ✅ 完成 |
 | v1.20.42.6.29.2 | Overnight Production QA Soak Test | 🔄 运行中 |
+| v1.20.42.6.34 | Checklist Publish Pipeline Consolidation | ✅ 完成 |
+| v1.20.42.6.35 | Navigation Repair + Toronto Rental Publish | ✅ 完成 |
+| v1.20.42.6.36 | Brand Naming Polish to 绝世百宝箱 | ✅ 完成 |
 
 ---
 
