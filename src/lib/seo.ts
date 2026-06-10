@@ -1,8 +1,8 @@
-// SEO constants and metadata helpers for 海外百宝箱 (jueshi.net)
+// SEO constants and metadata helpers for 绝世百宝箱 (jueshi.net)
 // Server-safe: no window, no client-only APIs.
 
 export const SITE_URL = "https://jueshi.net";
-export const SITE_NAME = "海外百宝箱";
+export const SITE_NAME = "绝世百宝箱";
 export const SITE_DESCRIPTION =
   "面向海外华人、留学生和出海商家的实用工具与资源平台，提供邮编查询、物流单据、唛头标签、AI 文案、翻译润色、文件摘要、资源导航和积分工作台。";
 

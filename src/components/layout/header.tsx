@@ -67,7 +67,7 @@ export default function Header() {
               <PackageSearch className="w-4 h-4 text-white" />
             </div>
             <span className="text-base font-bold text-gray-900 hidden sm:inline">
-              海外百宝箱
+              绝世百宝箱
             </span>
           </Link>
 

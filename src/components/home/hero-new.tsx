@@ -27,10 +27,10 @@ export default function HeroSection({ stats }: { stats: { tools: number; users: 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div className="text-center lg:text-left">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight leading-tight">
-              海外华人的<span className="text-teal-600"> 数字百宝箱</span>
+              <span className="text-teal-600">绝世百宝箱</span>
             </h1>
             <p className="mt-3 text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              集运、物流、外贸单据、跨境电商、AI工具、海外生活服务<br className="hidden sm:block" />
+              海外华人的实用工具箱
               <span className="text-gray-900 font-semibold">一个账号全部搞定</span>
             </p>
 

@@ -55,10 +55,10 @@ export default function FooterNew() {
               <div className="w-8 h-8 bg-teal-500 rounded-[12px] flex items-center justify-center">
                 <PackageSearch className="w-4 h-4 text-white" />
               </div>
-              <span className="text-base font-bold">海外百宝箱</span>
+              <span className="text-base font-bold">绝世百宝箱</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。从物流追踪到合规运营，一站式解决。
+              绝世百宝箱提供集运、物流、外贸单据、跨境电商、留学生活等实用工具，覆盖跨境电商、SOHO、留学生与数字游民。
             </p>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <Mail className="w-4 h-4" />
@@ -87,7 +87,7 @@ export default function FooterNew() {
 
         {/* Bottom bar */}
         <div className="pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p>© 2026 海外百宝箱 · jueshi.net</p>
+          <p>© 2026 绝世百宝箱 · jueshi.net</p>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:text-teal-400 transition-colors">服务条款</Link>
             <Link href="/privacy" className="hover:text-teal-400 transition-colors">隐私政策</Link>

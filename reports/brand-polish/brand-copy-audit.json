@@ -1,0 +1,876 @@
+{
+  "timestamp": "2026-06-10T14:52:43.572Z",
+  "filesScanned": 555,
+  "totalHits": 144,
+  "summary": {
+    "jueshi.net": 64,
+    "海外百宝箱": 78,
+    "数字百宝箱": 2
+  },
+  "details": [
+    {
+      "file": "src/app/(admin)/admin/notifications/notifications-admin-client.tsx",
+      "line": 343,
+      "term": "jueshi.net",
+      "text": "placeholder=\"/dashboard 或 https://jueshi.net/...\""
+    },
+    {
+      "file": "src/app/(admin)/admin/notifications/notifications-admin-client.tsx",
+      "line": 579,
+      "term": "jueshi.net",
+      "text": "placeholder=\"/dashboard 或 https://jueshi.net/...\""
+    },
+    {
+      "file": "src/app/(public)/ai-tools/page.tsx",
+      "line": 8,
+      "term": "海外百宝箱",
+      "text": "description: \"海外百宝箱 AI 工具集：AI 商品文案生成、多语言翻译润色、文档摘要提取。助力跨境电商、集运用户提升效率。\","
+    },
+    {
+      "file": "src/app/(public)/api-docs/page.tsx",
+      "line": 140,
+      "term": "海外百宝箱",
+      "text": "<p className=\"text-gray-500 dark:text-gray-400\">海外百宝箱 REST API 参考</p>"
+    },
+    {
+      "file": "src/app/(public)/api-docs/page.tsx",
+      "line": 163,
+      "term": "jueshi.net",
+      "text": "<code className=\"text-green-400 text-sm\">Base URL: {process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || \"https:"
+    },
+    {
+      "file": "src/app/(public)/api-docs/page.tsx",
+      "line": 165,
+      "term": "jueshi.net",
+      "text": "onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_APP_URL || \"https://jueshi.net\")}"
+    },
+    {
+      "file": "src/app/(public)/api-docs/page.tsx",
+      "line": 168,
+      "term": "jueshi.net",
+      "text": "{copied === (process.env.NEXT_PUBLIC_APP_URL || \"https://jueshi.net\") ? <Check className=\"w-4 h-4\" /> : <Copy className="
+    },
+    {
+      "file": "src/app/(public)/changelog/page.tsx",
+      "line": 6,
+      "term": "海外百宝箱",
+      "text": "title: \"更新日志 | 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/changelog/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: \"海外百宝箱的版本更新历史记录\","
+    },
+    {
+      "file": "src/app/(public)/checklists/[slug]/page.tsx",
+      "line": 41,
+      "term": "jueshi.net",
+      "text": "alternates: { canonical: `https://jueshi.net/checklists/${page.slug}` },"
+    },
+    {
+      "file": "src/app/(public)/design-system/page.tsx",
+      "line": 17,
+      "term": "海外百宝箱",
+      "text": "<p className=\"text-gray-500\">海外百宝箱 UI 组件库 — 内部验收页面，不导航大面积展示</p>"
+    },
+    {
+      "file": "src/app/(public)/design-system/page.tsx",
+      "line": 279,
+      "term": "海外百宝箱",
+      "text": "<h2 className=\"text-2xl md:text-3xl font-bold\">海外百宝箱</h2>"
+    },
+    {
+      "file": "src/app/(public)/destinations/[slug]/page.tsx",
+      "line": 47,
+      "term": "海外百宝箱",
+      "text": "title: `${cmsCountry.frontmatter.title} — 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/destinations/[slug]/page.tsx",
+      "line": 58,
+      "term": "海外百宝箱",
+      "text": "title: `${cmsCountry.frontmatter.title} — 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/destinations/[slug]/page.tsx",
+      "line": 79,
+      "term": "海外百宝箱",
+      "text": "siteName: \"海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/feedback/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: \"向海外百宝箱提交反馈、问题或合作咨询。\","
+    },
+    {
+      "file": "src/app/(public)/feedback/page.tsx",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "description: \"向海外百宝箱提交反馈、问题或合作咨询。\","
+    },
+    {
+      "file": "src/app/(public)/guides/[slug]/page.tsx",
+      "line": 81,
+      "term": "海外百宝箱",
+      "text": "title: `${article.title} | 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/guides/[slug]/page.tsx",
+      "line": 88,
+      "term": "海外百宝箱",
+      "text": "authors: article.author ? [article.author] : [\"海外百宝箱\"],"
+    },
+    {
+      "file": "src/app/(public)/guides/[slug]/page.tsx",
+      "line": 136,
+      "term": "海外百宝箱",
+      "text": "const authorDisplay = article.author || \"海外百宝箱编辑部\";"
+    },
+    {
+      "file": "src/app/(public)/guides/[slug]/page.tsx",
+      "line": 148,
+      "term": "海外百宝箱",
+      "text": "publisher: { \"@type\": \"Organization\", name: \"海外百宝箱\" },"
+    },
+    {
+      "file": "src/app/(public)/guides/[slug]/page.tsx",
+      "line": 151,
+      "term": "jueshi.net",
+      "text": "mainEntityOfPage: `https://jueshi.net/guides/${slug}`,"
+    },
+    {
+      "file": "src/app/(public)/help/page.tsx",
+      "line": 6,
+      "term": "海外百宝箱",
+      "text": "title: '帮助中心 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/help/page.tsx",
+      "line": 82,
+      "term": "jueshi.net",
+      "text": "<a href=\"mailto:contact@jueshi.net\" className=\"bg-white rounded-xl border p-5 hover:shadow-md transition-all group\">"
+    },
+    {
+      "file": "src/app/(public)/help/page.tsx",
+      "line": 85,
+      "term": "jueshi.net",
+      "text": "<p className=\"text-sm text-gray-500 mt-1\">contact@jueshi.net</p>"
+    },
+    {
+      "file": "src/app/(public)/help/page.tsx",
+      "line": 125,
+      "term": "jueshi.net",
+      "text": "href=\"mailto:contact@jueshi.net\""
+    },
+    {
+      "file": "src/app/(public)/lp/[slug]/page.tsx",
+      "line": 65,
+      "term": "海外百宝箱",
+      "text": "title: page.seoTitle || `${page.title} | 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/lp/[slug]/page.tsx",
+      "line": 71,
+      "term": "jueshi.net",
+      "text": "url: `https://jueshi.net/lp/${page.slug}`,"
+    },
+    {
+      "file": "src/app/(public)/lp/[slug]/page.tsx",
+      "line": 79,
+      "term": "jueshi.net",
+      "text": "canonical: `https://jueshi.net/lp/${page.slug}`,"
+    },
+    {
+      "file": "src/app/(public)/nav/page.tsx",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "title: '网址导航 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/packages/[id]/page.tsx",
+      "line": 70,
+      "term": "海外百宝箱",
+      "text": "title: `${pkg.title} — 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/packages/[id]/page.tsx",
+      "line": 72,
+      "term": "jueshi.net",
+      "text": "alternates: { canonical: `https://jueshi.net/packages/${pkg.id}` },"
+    },
+    {
+      "file": "src/app/(public)/pricing/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: '查看海外百宝箱免费版、积分权益、会员权益和即将开放的升级方案。',"
+    },
+    {
+      "file": "src/app/(public)/pricing/page.tsx",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "description: '查看海外百宝箱免费版、积分权益、会员权益和即将开放的升级方案。',"
+    },
+    {
+      "file": "src/app/(public)/privacy/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: '了解海外百宝箱如何收集、使用和保护您的个人信息。',"
+    },
+    {
+      "file": "src/app/(public)/privacy/page.tsx",
+      "line": 76,
+      "term": "jueshi.net",
+      "text": "<p className=\"mt-2\">如需行使上述权利，请联系 <a href=\"mailto:contact@jueshi.net\" className=\"text-teal-600 hover:underline\">contact@j"
+    },
+    {
+      "file": "src/app/(public)/privacy/page.tsx",
+      "line": 92,
+      "term": "jueshi.net",
+      "text": "<p className=\"mt-2\">📧 邮箱：<a href=\"mailto:contact@jueshi.net\" className=\"text-teal-600 hover:underline\">contact@jueshi.n"
+    },
+    {
+      "file": "src/app/(public)/profile/page.tsx",
+      "line": 10,
+      "term": "海外百宝箱",
+      "text": "title: '个人中心 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/rankings/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "title: \"工具排行榜 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/rankings/page.tsx",
+      "line": 54,
+      "term": "海外百宝箱",
+      "text": "<h1 className=\"text-3xl font-bold\">海外百宝箱工具排行榜</h1>"
+    },
+    {
+      "file": "src/app/(public)/resources/[slug]/page.tsx",
+      "line": 115,
+      "term": "海外百宝箱",
+      "text": "title: `${category.name} - 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/resources/[slug]/page.tsx",
+      "line": 118,
+      "term": "海外百宝箱",
+      "text": "title: `${category.name} - 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/scenario/[role]/page.tsx",
+      "line": 60,
+      "term": "海外百宝箱",
+      "text": "title: `${scenario?.title || '场景专区'} - 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/shipping/page.tsx",
+      "line": 6,
+      "term": "海外百宝箱",
+      "text": "title: '跨境寄送 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/shipping/page.tsx",
+      "line": 82,
+      "term": "海外百宝箱",
+      "text": "海外百宝箱是独立工具与资源平台，不直接承运、不代收包裹、不代表任何物流服务商。"
+    },
+    {
+      "file": "src/app/(public)/starter/apps/page.tsx",
+      "line": 6,
+      "term": "海外百宝箱",
+      "text": "title: \"热门软件与网站推荐 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/starter/page.tsx",
+      "line": 8,
+      "term": "海外百宝箱",
+      "text": "title: \"外网新手资源清单 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/starter/student/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "title: \"留学生集运专区 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/terms/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: '了解使用海外百宝箱服务时需遵守的条款与条件。',"
+    },
+    {
+      "file": "src/app/(public)/terms/page.tsx",
+      "line": 23,
+      "term": "海外百宝箱",
+      "text": "<p>海外百宝箱（jueshi.net）为海外华人、留学生、出海商家提供在线工具、资源和信息服务。我们的服务包括但不限于：邮编查询、单据生成、汇率换算、HS 编码查询、AI 辅助工具、专题指南等。</p>"
+    },
+    {
+      "file": "src/app/(public)/terms/page.tsx",
+      "line": 23,
+      "term": "jueshi.net",
+      "text": "<p>海外百宝箱（jueshi.net）为海外华人、留学生、出海商家提供在线工具、资源和信息服务。我们的服务包括但不限于：邮编查询、单据生成、汇率换算、HS 编码查询、AI 辅助工具、专题指南等。</p>"
+    },
+    {
+      "file": "src/app/(public)/terms/page.tsx",
+      "line": 44,
+      "term": "海外百宝箱",
+      "text": "<p>本站原创内容、设计、代码和工具的知识产权归海外百宝箱所有。未经明确授权，不得复制、分发或用于商业目的。用户通过工具生成的文档归用户所有。</p>"
+    },
+    {
+      "file": "src/app/(public)/terms/page.tsx",
+      "line": 70,
+      "term": "jueshi.net",
+      "text": "<p className=\"mt-2\">📧 邮箱：<a href=\"mailto:contact@jueshi.net\" className=\"text-teal-600 hover:underline\">contact@jueshi.n"
+    },
+    {
+      "file": "src/app/(public)/tools/commercial-invoice/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: '商业发票生成器 - Commercial Invoice 模板 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/commercial-invoice/page.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: \"外贸发票生成器 — Commercial Invoice | 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/tools/documents/page.tsx",
+      "line": 13,
+      "term": "海外百宝箱",
+      "text": "title: \"外贸/国际物流通用单据生成器 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/tools/documents/quotation/page.tsx",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "title: \"报价单生成器 - 外贸报价单模板 | 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/tools/documents/quotation/page.tsx",
+      "line": 14,
+      "term": "jueshi.net",
+      "text": "canonical: \"https://jueshi.net/tools/documents/quotation\","
+    },
+    {
+      "file": "src/app/(public)/tools/exchange-rate/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: '汇率查询 - 实时汇率多币种换算 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/hs-code/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: 'HS编码查询 - 海关商品编码搜索工具 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/page.tsx",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "const title = q ? `搜索 \"${q}\" - 工具中心` : '工具中心 - 海外百宝箱';"
+    },
+    {
+      "file": "src/app/(public)/tools/postal-code/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: '邮编查询 - 全球50+国家邮编数据库 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/receipt/page.tsx",
+      "line": 19,
+      "term": "海外百宝箱",
+      "text": "const [company, setCompany] = useState(\"海外百宝箱\");"
+    },
+    {
+      "file": "src/app/(public)/tools/shipping-calculator/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: '运费计算器 - 体积重/CBM/计费重 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/shipping-label/layout.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: '箱唛标签生成器 - 外箱唛头制作工具 - 海外百宝箱',"
+    },
+    {
+      "file": "src/app/(public)/tools/shipping-label/page.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: \"唛头标签打印 — Shipping Label | 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/tools/video-script-sop/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "title: \"短视频 SOP 脚本生成器 | 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/topics/[slug]/page.tsx",
+      "line": 74,
+      "term": "jueshi.net",
+      "text": "const url = `https://jueshi.net/topics/${topic.slug}`;"
+    },
+    {
+      "file": "src/app/(public)/topics/[slug]/page.tsx",
+      "line": 81,
+      "term": "海外百宝箱",
+      "text": "title: `${title} — 海外百宝箱`,"
+    },
+    {
+      "file": "src/app/(public)/topics/page.tsx",
+      "line": 9,
+      "term": "海外百宝箱",
+      "text": "title: \"专题推荐 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/topics/page.tsx",
+      "line": 11,
+      "term": "jueshi.net",
+      "text": "alternates: { canonical: \"https://jueshi.net/topics\" },"
+    },
+    {
+      "file": "src/app/(public)/topics/page.tsx",
+      "line": 13,
+      "term": "海外百宝箱",
+      "text": "title: \"专题推荐 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(public)/topics/page.tsx",
+      "line": 15,
+      "term": "jueshi.net",
+      "text": "url: \"https://jueshi.net/topics\","
+    },
+    {
+      "file": "src/app/(workspace)/workspace/memos/page.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: \"备忘录 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(workspace)/workspace/notifications/page.tsx",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "title: \"通知中心 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(workspace)/workspace/page.tsx",
+      "line": 10,
+      "term": "海外百宝箱",
+      "text": "title: \"我的工作台 — 海外百宝箱\","
+    },
+    {
+      "file": "src/app/(workspace)/workspace/settings/settings-client.tsx",
+      "line": 87,
+      "term": "jueshi.net",
+      "text": "<span className=\"text-xs text-gray-400\">.jueshi.net</span>"
+    },
+    {
+      "file": "src/app/api/admin/notifications/broadcast/route.ts",
+      "line": 42,
+      "term": "jueshi.net",
+      "text": "// Validate linkUrl: must be empty, relative path, or https://jueshi.net/*"
+    },
+    {
+      "file": "src/app/api/admin/notifications/broadcast/route.ts",
+      "line": 43,
+      "term": "jueshi.net",
+      "text": "if (link && !link.startsWith(\"/\") && !link.startsWith(\"https://jueshi.net/\")) {"
+    },
+    {
+      "file": "src/app/api/admin/notifications/broadcast/route.ts",
+      "line": 45,
+      "term": "jueshi.net",
+      "text": "{ error: \"链接必须是站内路径或 https://jueshi.net/...\" },"
+    },
+    {
+      "file": "src/app/api/admin/notifications/route.ts",
+      "line": 53,
+      "term": "jueshi.net",
+      "text": "// Validate linkUrl: must be relative path or https://jueshi.net/*"
+    },
+    {
+      "file": "src/app/api/admin/notifications/route.ts",
+      "line": 54,
+      "term": "jueshi.net",
+      "text": "if (link && !link.startsWith(\"/\") && !link.startsWith(\"https://jueshi.net/\")) {"
+    },
+    {
+      "file": "src/app/api/admin/notifications/route.ts",
+      "line": 56,
+      "term": "jueshi.net",
+      "text": "{ error: \"链接必须是站内路径或 https://jueshi.net/...\" },"
+    },
+    {
+      "file": "src/app/api/admin/settings/route.ts",
+      "line": 15,
+      "term": "海外百宝箱",
+      "text": "siteName: process.env.SITE_NAME || '海外百宝箱',"
+    },
+    {
+      "file": "src/app/api/auth/[...nextauth]/route.ts",
+      "line": 2,
+      "term": "jueshi.net",
+      "text": "// Fix auth host trust for production domain jueshi.net"
+    },
+    {
+      "file": "src/app/api/auth/sso/route.ts",
+      "line": 13,
+      "term": "jueshi.net",
+      "text": "* 签名验证：HS256，issuer=jueshi.net，audience=Flarum URL"
+    },
+    {
+      "file": "src/app/api/auth/sso/route.ts",
+      "line": 20,
+      "term": "jueshi.net",
+      "text": "const FLARUM_URL = process.env.FLARUM_URL || \"https://bbs.jueshi.net\";"
+    },
+    {
+      "file": "src/app/api/auth/sso/route.ts",
+      "line": 37,
+      "term": "jueshi.net",
+      "text": "const callbackUrl = `${process.env.NEXTAUTH_URL || \"https://jueshi.net\"}/api/auth/sso`;"
+    },
+    {
+      "file": "src/app/api/auth/sso/route.ts",
+      "line": 80,
+      "term": "jueshi.net",
+      "text": ".setIssuer(\"jueshi.net\")"
+    },
+    {
+      "file": "src/app/api/checkout/route.ts",
+      "line": 10,
+      "term": "jueshi.net",
+      "text": "* - Success/Cancel URLs point to jueshi.net (never localhost)"
+    },
+    {
+      "file": "src/app/api/checkout/route.ts",
+      "line": 34,
+      "term": "jueshi.net",
+      "text": "const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://jueshi.net';"
+    },
+    {
+      "file": "src/app/api/newsletter/subscribe/route.ts",
+      "line": 23,
+      "term": "海外百宝箱",
+      "text": "from: \"海外百宝箱 <hello@jueshi.net>\","
+    },
+    {
+      "file": "src/app/api/newsletter/subscribe/route.ts",
+      "line": 23,
+      "term": "jueshi.net",
+      "text": "from: \"海外百宝箱 <hello@jueshi.net>\","
+    },
+    {
+      "file": "src/app/api/resources/[id]/check-link/route.ts",
+      "line": 35,
+      "term": "jueshi.net",
+      "text": "'User-Agent': 'Mozilla/5.0 (compatible; JueshiBot/1.0; +https://jueshi.net)',"
+    },
+    {
+      "file": "src/app/api/resources/[id]/check-link/route.ts",
+      "line": 53,
+      "term": "jueshi.net",
+      "text": "'User-Agent': 'Mozilla/5.0 (compatible; JueshiBot/1.0; +https://jueshi.net)',"
+    },
+    {
+      "file": "src/app/api/share/route.ts",
+      "line": 30,
+      "term": "jueshi.net",
+      "text": "shareUrl: `${process.env.NEXT_PUBLIC_URL || \"https://jueshi.net\"}/share/${link.id}`,"
+    },
+    {
+      "file": "src/app/layout.tsx",
+      "line": 23,
+      "term": "海外百宝箱",
+      "text": "title: \"海外百宝箱 — 工具 · AI · 资源\","
+    },
+    {
+      "file": "src/app/login/login-client.tsx",
+      "line": 100,
+      "term": "海外百宝箱",
+      "text": "登录海外百宝箱"
+    },
+    {
+      "file": "src/app/login/page.tsx",
+      "line": 7,
+      "term": "海外百宝箱",
+      "text": "description: \"登录海外百宝箱，使用工作台、收藏、积分会员和 AI 工具额度。\","
+    },
+    {
+      "file": "src/app/login/page.tsx",
+      "line": 12,
+      "term": "海外百宝箱",
+      "text": "description: \"登录海外百宝箱，使用工作台、收藏、积分会员和 AI 工具额度。\","
+    },
+    {
+      "file": "src/app/robots.ts",
+      "line": 28,
+      "term": "jueshi.net",
+      "text": "sitemap: \"https://jueshi.net/sitemap.xml\","
+    },
+    {
+      "file": "src/app/sitemap.ts",
+      "line": 4,
+      "term": "jueshi.net",
+      "text": "const BASE_URL = \"https://jueshi.net\";"
+    },
+    {
+      "file": "src/components/command-palette.tsx",
+      "line": 93,
+      "term": "jueshi.net",
+      "text": "{ id: \"nav-bbs\", title: \"论坛\", href: \"https://bbs.jueshi.net\", icon: <MessageSquare className=\"w-4 h-4\" />, keywords: [\"b"
+    },
+    {
+      "file": "src/components/command-palette.tsx",
+      "line": 270,
+      "term": "海外百宝箱",
+      "text": "<span className=\"ml-auto\">海外百宝箱 Command Palette</span>"
+    },
+    {
+      "file": "src/components/home/banner-ad.tsx",
+      "line": 8,
+      "term": "jueshi.net",
+      "text": "<span className=\"text-xs text-gray-400\">赞助合作请联系 <span className=\"font-medium text-gray-500\">admin@jueshi.net</span></spa"
+    },
+    {
+      "file": "src/components/home/community-fireworks.tsx",
+      "line": 24,
+      "term": "jueshi.net",
+      "text": "<p className=\"mt-0.5 text-sm text-gray-500\">来自 bbs.jueshi.net 的最新讨论</p>"
+    },
+    {
+      "file": "src/components/home/community-fireworks.tsx",
+      "line": 26,
+      "term": "jueshi.net",
+      "text": "<a href=\"https://bbs.jueshi.net\" target=\"_blank\" rel=\"noopener\" className=\"text-sm font-medium text-teal-600 hover:text-"
+    },
+    {
+      "file": "src/components/home/community-fireworks.tsx",
+      "line": 32,
+      "term": "jueshi.net",
+      "text": "<a key={i} href=\"https://bbs.jueshi.net\" target=\"_blank\" rel=\"noopener\" className=\"flex items-center justify-between p-4"
+    },
+    {
+      "file": "src/components/home/hero-new.tsx",
+      "line": 30,
+      "term": "数字百宝箱",
+      "text": "海外华人的<span className=\"text-teal-600\"> 数字百宝箱</span>"
+    },
+    {
+      "file": "src/components/home/hero-super-search.tsx",
+      "line": 122,
+      "term": "jueshi.net",
+      "text": "window.open(`https://bbs.jueshi.net/search?q=${encodeURIComponent(query)}`, '_blank');"
+    },
+    {
+      "file": "src/components/home/hero-super-search.tsx",
+      "line": 161,
+      "term": "海外百宝箱",
+      "text": "海外百宝箱"
+    },
+    {
+      "file": "src/components/home/mega-footer.tsx",
+      "line": 88,
+      "term": "jueshi.net",
+      "text": "<span className=\"text-[12px] text-white/40 ml-1\">jueshi.net</span>"
+    },
+    {
+      "file": "src/components/home/promo-section.tsx",
+      "line": 17,
+      "term": "海外百宝箱",
+      "text": "<h2 className=\"text-2xl font-bold mb-4\">为什么选择海外百宝箱？</h2>"
+    },
+    {
+      "file": "src/components/layout/footer-new.tsx",
+      "line": 58,
+      "term": "海外百宝箱",
+      "text": "<span className=\"text-base font-bold\">海外百宝箱</span>"
+    },
+    {
+      "file": "src/components/layout/footer-new.tsx",
+      "line": 65,
+      "term": "jueshi.net",
+      "text": "<span>contact@jueshi.net</span>"
+    },
+    {
+      "file": "src/components/layout/footer-new.tsx",
+      "line": 90,
+      "term": "海外百宝箱",
+      "text": "<p>© 2026 海外百宝箱 · jueshi.net</p>"
+    },
+    {
+      "file": "src/components/layout/footer-new.tsx",
+      "line": 90,
+      "term": "jueshi.net",
+      "text": "<p>© 2026 海外百宝箱 · jueshi.net</p>"
+    },
+    {
+      "file": "src/components/layout/footer.tsx",
+      "line": 34,
+      "term": "海外百宝箱",
+      "text": "<span className=\"text-base font-bold text-[#111111]\">海外百宝箱</span>"
+    },
+    {
+      "file": "src/components/layout/footer.tsx",
+      "line": 74,
+      "term": "海外百宝箱",
+      "text": "<p>© {new Date().getFullYear()} 海外百宝箱 · jueshi.net</p>"
+    },
+    {
+      "file": "src/components/layout/footer.tsx",
+      "line": 74,
+      "term": "jueshi.net",
+      "text": "<p>© {new Date().getFullYear()} 海外百宝箱 · jueshi.net</p>"
+    },
+    {
+      "file": "src/components/layout/footer.tsx",
+      "line": 78,
+      "term": "jueshi.net",
+      "text": "<a href=\"mailto:contact@jueshi.net\" className=\"hover:text-[#1966f2]\">联系我们</a>"
+    },
+    {
+      "file": "src/components/layout/header.tsx",
+      "line": 70,
+      "term": "海外百宝箱",
+      "text": "海外百宝箱"
+    },
+    {
+      "file": "src/components/user/UserSidebar.tsx",
+      "line": 75,
+      "term": "海外百宝箱",
+      "text": "<p className=\"text-[10px] text-gray-300 text-center\">海外百宝箱 v1.20.42.6.6</p>"
+    },
+    {
+      "file": "src/lib/auth.ts",
+      "line": 2,
+      "term": "jueshi.net",
+      "text": "// when NEXTAUTH_URL domain doesn't match the actual domain jueshi.net"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 11,
+      "term": "海外百宝箱",
+      "text": "const subject = \"🚀 欢迎订阅出海锦囊 — 海外百宝箱\";"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 41,
+      "term": "海外百宝箱",
+      "text": "<h1>海外百宝箱 | JueShi.net</h1>"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 55,
+      "term": "jueshi.net",
+      "text": "<a href=\"https://jueshi.net\" class=\"btn\">浏览全部工具 →</a>"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 58,
+      "term": "海外百宝箱",
+      "text": "<p>© ${new Date().getFullYear()} 海外百宝箱 jueshi.net</p>"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 58,
+      "term": "jueshi.net",
+      "text": "<p>© ${new Date().getFullYear()} 海外百宝箱 jueshi.net</p>"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 60,
+      "term": "jueshi.net",
+      "text": "<p><a href=\"https://jueshi.net/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}\">取消订阅</a></p>"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 66,
+      "term": "海外百宝箱",
+      "text": "const text = `欢迎订阅出海锦囊 — 海外百宝箱 (JueShi.net)"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 76,
+      "term": "jueshi.net",
+      "text": "浏览全部工具：https://jueshi.net"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 79,
+      "term": "海外百宝箱",
+      "text": "© ${new Date().getFullYear()} 海外百宝箱 jueshi.net"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 79,
+      "term": "jueshi.net",
+      "text": "© ${new Date().getFullYear()} 海外百宝箱 jueshi.net"
+    },
+    {
+      "file": "src/lib/email/templates.ts",
+      "line": 80,
+      "term": "jueshi.net",
+      "text": "取消订阅：https://jueshi.net/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;"
+    },
+    {
+      "file": "src/lib/growth-tasks.ts",
+      "line": 55,
+      "term": "jueshi.net",
+      "text": "targetUrl: \"https://bbs.jueshi.net/new\","
+    },
+    {
+      "file": "src/lib/growth-tasks.ts",
+      "line": 67,
+      "term": "jueshi.net",
+      "text": "targetUrl: \"https://bbs.jueshi.net\","
+    },
+    {
+      "file": "src/lib/growth-tasks.ts",
+      "line": 88,
+      "term": "海外百宝箱",
+      "text": "description: \"恭喜加入海外百宝箱！\","
+    },
+    {
+      "file": "src/lib/notifications.ts",
+      "line": 114,
+      "term": "jueshi.net",
+      "text": "return \"https://bbs.jueshi.net\";"
+    },
+    {
+      "file": "src/lib/seo.ts",
+      "line": 1,
+      "term": "海外百宝箱",
+      "text": "// SEO constants and metadata helpers for 海外百宝箱 (jueshi.net)"
+    },
+    {
+      "file": "src/lib/seo.ts",
+      "line": 1,
+      "term": "jueshi.net",
+      "text": "// SEO constants and metadata helpers for 海外百宝箱 (jueshi.net)"
+    },
+    {
+      "file": "src/lib/seo.ts",
+      "line": 4,
+      "term": "jueshi.net",
+      "text": "export const SITE_URL = \"https://jueshi.net\";"
+    },
+    {
+      "file": "src/lib/seo.ts",
+      "line": 5,
+      "term": "海外百宝箱",
+      "text": "export const SITE_NAME = \"海外百宝箱\";"
+    },
+    {
+      "file": "src/types/homepage.ts",
+      "line": 63,
+      "term": "数字百宝箱",
+      "text": "highlightedText: \"数字百宝箱\","
+    }
+  ]
+}

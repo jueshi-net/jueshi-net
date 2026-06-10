@@ -20,8 +20,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "海外百宝箱 — 工具 · AI · 资源",
-  description: "全域出国基础设施平台，覆盖跨境电商、SOHO、留学生、数字游民与海外华人。",
+  title: "绝世百宝箱 - 海外华人的实用工具箱",
+  description: "绝世百宝箱提供集运、物流、外贸单据、跨境电商、留学生活等实用工具，支持在线生成、保存草稿和工作台管理。",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
