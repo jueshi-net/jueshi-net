@@ -260,8 +260,8 @@
             "priority": "high",
             "timing": "发货申报时",
             "warning": "[需人工核验] 各国海关对申报价值的要求和罚则不同，请以目的国海关最新规定为准。",
-            "relatedToolSlug": "invoice",
-            "officialLink": { "label": "中国海关个人物品邮寄规定", "url": "https://www.customs.gov.cn", "needsReview": true },
+            "relatedToolSlug": "documents/commercial-invoice",
+            "officialLink": { "label": "中国海关个人物品邮寄规定", "url": "https://www.customs.gov.cn" },
             "completedDefault": false
           },
           {
@@ -273,7 +273,7 @@
             "priority": "high",
             "timing": "发货前",
             "warning": "",
-            "relatedToolSlug": "invoice",
+            "relatedToolSlug": "documents/commercial-invoice",
             "officialLink": { "label": "", "url": "" },
             "completedDefault": false
           },
@@ -517,7 +517,7 @@
     }
   ],
   "officialLinks": [
-    { "label": "中国海关个人物品邮寄规定", "url": "https://www.customs.gov.cn", "needsReview": true },
+    { "label": "中国海关个人物品邮寄规定", "url": "https://www.customs.gov.cn", "needsReview": false },
     { "label": "目的地国海关入境规定", "url": "", "needsReview": true },
     { "label": "集运公司服务条款", "url": "", "needsReview": true }
   ],
