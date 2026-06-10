@@ -56,9 +56,9 @@
     },
     {
       "path": "/checklists/toronto-rental-viewing-checklist",
-      "status": 404,
+      "status": 200,
       "expected": 404,
-      "pass": true
+      "pass": false
     },
     {
       "path": "/sitemap.xml",
@@ -97,7 +97,7 @@
     {
       "path": "sitemap",
       "check": "toronto-rental (should be absent)",
-      "pass": true
+      "pass": false
     },
     {
       "path": "sitemap",
@@ -113,8 +113,8 @@
       "path": "tool/address-formatter",
       "firstShipping": true,
       "student": true,
-      "toronto": false,
-      "pass": true
+      "toronto": true,
+      "pass": false
     },
     {
       "path": "tool/shipping-calculator",
@@ -124,6 +124,6 @@
       "pass": true
     }
   ],
-  "passed": 21,
-  "failed": 0
+  "passed": 18,
+  "failed": 3
 }

@@ -1,6 +1,6 @@
 # Soak Test Summary
 
-21/21 passed, 0 failed
+18/21 passed, 3 failed
 
 ## Results
 - /: PASS
@@ -12,15 +12,15 @@
 - /tools/documents/quotation: PASS
 - /checklists/student-first-abroad-packing-checklist: PASS
 - /checklists/first-shipping-checklist: PASS
-- /checklists/toronto-rental-viewing-checklist: PASS
+- /checklists/toronto-rental-viewing-checklist: FAIL
 - /sitemap.xml: PASS
 - /robots.txt: PASS
 - /admin: PASS
 - /workspace: PASS
 - sitemap: PASS
 - sitemap: PASS
+- sitemap: FAIL
 - sitemap: PASS
 - sitemap: PASS
-- sitemap: PASS
-- tool/address-formatter: PASS
+- tool/address-formatter: FAIL
 - tool/shipping-calculator: PASS

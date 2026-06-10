@@ -6,15 +6,24 @@ import { useSession, signOut } from "next-auth/react";
 import {
   PackageSearch, Menu, X, Search, LogIn, Bell,
   Home, Wrench, FileText, Users, BookOpen, Crown, User, LogOut, LayoutDashboard, ShieldCheck,
+  Calculator, MapPin, FileBox, ClipboardList, CreditCard, ListChecks, ChevronDown
 } from "lucide-react";
+
+const TOOL_LINKS = [
+  { href: "/tools", label: "工具中心", icon: Wrench, desc: "全部工具一览" },
+  { href: "/tools/documents/quotation", label: "报价单", icon: FileText, desc: "快速生成" },
+  { href: "/tools/documents/commercial-invoice", label: "商业发票", icon: FileBox, desc: "进出口单据" },
+  { href: "/tools/address-formatter", label: "地址格式化", icon: MapPin, desc: "国际标准" },
+  { href: "/tools/shipping-calculator", label: "运费计算", icon: Calculator, desc: "体积重换算" },
+  { href: "/tools/postal-code", label: "邮编查询", icon: MapPin, desc: "全球邮编" },
+  { href: "/tools/handover-note", label: "交接单", icon: ClipboardList, desc: "物流交接" },
+  { href: "/tools/debit-note", label: "Debit Note", icon: CreditCard, desc: "收款通知" },
+];
 
 const NAV_LINKS = [
   { href: "/", label: "首页", icon: Home },
-  { href: "/tools", label: "工具中心", icon: Wrench },
-  { href: "/tools/documents", label: "单据模板", icon: FileText },
-  { href: "/bbs", label: "社区论坛", icon: Users },
-  { href: "/topics", label: "专题内容", icon: BookOpen },
-  { href: "/pricing", label: "会员中心", icon: Crown },
+  { href: "/checklists", label: "清单", icon: ListChecks },
+  { href: "/bbs", label: "社区", icon: Users },
 ];
 
 export default function Header() {
@@ -27,7 +36,9 @@ export default function Header() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const toolsMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const closeOnResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
@@ -39,6 +50,8 @@ export default function Header() {
     const handler = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
         setUserMenuOpen(false);
+      if (toolsMenuRef.current && !toolsMenuRef.current.contains(e.target as Node))
+        setToolsMenuOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -73,6 +86,36 @@ export default function Header() {
                 </Link>
               );
             })}
+            
+            {/* Tools Dropdown */}
+            <div ref={toolsMenuRef} className="relative">
+              <button 
+                onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+              >
+                <Wrench className="w-3.5 h-3.5" />
+                <span>工具</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${toolsMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {toolsMenuOpen && (
+                <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 grid grid-cols-2 gap-1 p-2">
+                  {TOOL_LINKS.map((tool) => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      onClick={() => setToolsMenuOpen(false)}
+                      className="flex flex-col p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <tool.icon className="w-4 h-4 text-teal-600" />
+                        <span className="text-sm font-medium text-gray-800">{tool.label}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 ml-6">{tool.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Right: Search + Bell + Login */}
@@ -162,6 +205,24 @@ export default function Header() {
                     </Link>
                   );
                 })}
+                
+                {/* Mobile Tools Dropdown */}
+                <details className="group">
+                  <summary className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px] cursor-pointer list-none">
+                    <Wrench className="w-5 h-5 text-gray-500" />
+                    <span className="font-medium">核心工具</span>
+                    <ChevronDown className="w-3 h-3 ml-auto text-gray-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="pl-10 pr-2 pb-2 space-y-0.5">
+                    {TOOL_LINKS.map((tool) => (
+                      <Link key={tool.href} href={tool.href} onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[40px] text-sm">
+                        <tool.icon className="w-4 h-4 text-gray-400" />
+                        <span>{tool.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </details>
               </div>
               <hr className="my-4 border-gray-200 mx-4" />
               {isLoggedIn ? (
