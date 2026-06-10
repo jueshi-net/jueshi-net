@@ -242,8 +242,7 @@ export default function ShippingCalculatorPage() {
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <p className="text-amber-800 text-sm">
-            <strong>本站仅供参考，不构成任何物流服务商的报价或承诺。</strong>实际费用请以承运商报价为准。
-            不同渠道的除数、首重、续重标准可能有所不同，计算结果仅供理解计费逻辑使用。
+            <strong>免责声明：</strong>运费结果仅供估算，最终费用以承运商、集运公司或实际账单为准。不同渠道的除数、首重、续重标准可能有所不同，计算结果仅供理解计费逻辑使用。
           </p>
         </div>
 

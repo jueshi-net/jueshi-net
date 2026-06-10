@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import { softwareApplicationJsonLd, buildCanonical } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: '汇率查询 - 实时汇率多币种换算 - 海外百宝箱',
-  description: '查询全球主要货币实时汇率，支持多币种换算。跨境汇款、外贸结算、留学生换汇必备。',
+  title: '汇率换算 - 绝世百宝箱',
+  description: '快速进行常用币种换算，适合海外生活、跨境购物、集运费用估算和外贸报价参考。',
   alternates: { canonical: buildCanonical('/tools/exchange-rate') },
   openGraph: {
-    title: '汇率查询 - 实时汇率多币种换算',
-    description: '查询全球主要货币实时汇率，支持多币种换算。跨境汇款、外贸结算必备。',
+    title: '汇率换算 - 绝世百宝箱',
+    description: '快速进行常用币种换算，适合海外生活、跨境购物、集运费用估算和外贸报价参考。',
     url: buildCanonical('/tools/exchange-rate'),
     type: 'website',
   },

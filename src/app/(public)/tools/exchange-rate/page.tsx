@@ -278,6 +278,13 @@ export default function ExchangeRatePage() {
           <p className="text-gray-500 mt-2">支持 150+ 全球法币 · 双向转换 · URL 参数直达</p>
         </div>
 
+        {/* Disclaimer */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+          <p className="text-sm text-amber-800">
+            <strong>免责声明：</strong>汇率仅供参考，实际结算以银行、支付平台或交易机构为准。
+          </p>
+        </div>
+
         <div className={cardStyles.base}>
           {/* Data source bar */}
           {rateData && (

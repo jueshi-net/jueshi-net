@@ -1,0 +1,122 @@
+{
+  "timestamp": "2026-06-10T16:22:32.301Z",
+  "toolsPage": {
+    "title": "工具中心 - 绝世百宝箱",
+    "hasResults": true,
+    "status": "pass"
+  },
+  "categoryFilters": [
+    {
+      "category": "logistics",
+      "hasResults": true,
+      "status": "pass"
+    },
+    {
+      "category": "documents",
+      "hasResults": true,
+      "status": "pass"
+    },
+    {
+      "category": "life",
+      "hasResults": true,
+      "status": "pass"
+    },
+    {
+      "category": "ai-content",
+      "hasResults": true,
+      "status": "pass"
+    }
+  ],
+  "searchResults": [
+    {
+      "query": "邮编",
+      "hasResults": true,
+      "hasEmptyState": true,
+      "status": "pass"
+    },
+    {
+      "query": "HS编码",
+      "hasResults": true,
+      "hasEmptyState": true,
+      "status": "pass"
+    },
+    {
+      "query": "汇率",
+      "hasResults": true,
+      "hasEmptyState": true,
+      "status": "pass"
+    },
+    {
+      "query": "报价单",
+      "hasResults": true,
+      "hasEmptyState": false,
+      "status": "pass"
+    },
+    {
+      "query": "invoice",
+      "hasResults": true,
+      "hasEmptyState": false,
+      "status": "pass"
+    }
+  ],
+  "coreTools": [
+    {
+      "path": "/tools/postal-code",
+      "name": "邮编查询",
+      "title": "邮编查询 | 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/hs-code",
+      "name": "HS编码查询",
+      "title": "HS编码查询 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/exchange-rate",
+      "name": "汇率换算",
+      "title": "汇率换算 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/address-formatter",
+      "name": "地址格式化",
+      "title": "地址格式化 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/shipping-calculator",
+      "name": "运费计算器",
+      "title": "运费计算器 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "name": "报价单生成器",
+      "title": "报价单生成器 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    },
+    {
+      "path": "/tools/commercial-invoice",
+      "name": "商业发票生成器",
+      "title": "商业发票生成器 - 绝世百宝箱",
+      "hasH1": true,
+      "hasBrandResidue": false,
+      "status": "pass"
+    }
+  ],
+  "brandResidue": [],
+  "issues": []
+}

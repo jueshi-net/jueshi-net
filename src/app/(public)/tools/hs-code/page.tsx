@@ -73,7 +73,7 @@ export default function HSCodePage() {
         
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
           <p className="text-sm text-amber-800 dark:text-amber-300">
-            本工具提供全量海关数据检索。列出的编码为系统匹配结果，实际归类需结合商品材质、用途、加工工艺等综合判断。
+            <strong>免责声明：</strong>HS 编码结果仅供参考，最终以海关、报关行或官方归类结果为准。本工具提供全量海关数据检索，列出的编码为系统匹配结果，实际归类需结合商品材质、用途、加工工艺等综合判断。
           </p>
         </div>
 

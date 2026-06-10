@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import { softwareApplicationJsonLd, buildCanonical } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: 'HS编码查询 - 海关商品编码搜索工具 - 海外百宝箱',
-  description: '快速查询海关HS编码，支持关键词搜索、分类浏览。外贸、报关、跨境物流必备工具。',
+  title: 'HS编码查询 - 绝世百宝箱',
+  description: '用于辅助查询商品 HS 编码和报关分类信息，适合跨境电商、外贸和集运发货前参考。',
   alternates: { canonical: buildCanonical('/tools/hs-code') },
   openGraph: {
-    title: 'HS编码查询 - 海关商品编码搜索工具',
-    description: '快速查询海关HS编码，支持关键词搜索、分类浏览。外贸、报关必备。',
+    title: 'HS编码查询 - 绝世百宝箱',
+    description: '用于辅助查询商品 HS 编码和报关分类信息，适合跨境电商、外贸和集运发货前参考。',
     url: buildCanonical('/tools/hs-code'),
     type: 'website',
   },
