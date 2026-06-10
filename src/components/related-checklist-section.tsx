@@ -9,6 +9,9 @@ interface RelatedChecklistCard {
   title: string;
   summary?: string;
   icon?: string;
+  estimatedTime?: string;
+  itemCount?: number;
+  publishedAt?: string;
 }
 
 interface Props {
@@ -32,21 +35,14 @@ export function RelatedChecklistSection({ checklists, toolSlug, showAll, sourceP
 
     (async () => {
       try {
-        if (showAll) {
-          const res = await fetch("/api/checklists", { signal: abort.signal });
-          const json = await res.json();
-          setFetched(json.data || []);
-        } else if (toolSlug) {
-          // Fetch all published checklists, then filter client-side
-          const res = await fetch("/api/checklists", { signal: abort.signal });
-          const json = await res.json();
-          const all: RelatedChecklistCard[] = json.data || [];
-          // TODO: Server-side filtering by toolSlug in the future
-          // For now, show all published checklists (draft/hidden are excluded server-side)
-          setFetched(all);
-        }
+        const params = new URLSearchParams();
+        if (toolSlug) params.set("toolSlug", toolSlug);
+        
+        const res = await fetch(`/api/checklists?${params}`, { signal: abort.signal });
+        const json = await res.json();
+        setFetched(json.data || []);
       } catch {
-        // Silently fail — checklist recommendation is non-critical
+        // Silently fail
       } finally {
         if (!abort.signal.aborted) setLoading(false);
       }
@@ -93,10 +89,17 @@ export function RelatedChecklistSection({ checklists, toolSlug, showAll, sourceP
                 <div className="font-medium text-gray-900 flex items-center gap-2">
                   {cl.icon && <span className="text-lg">{cl.icon}</span>}
                   {cl.title}
+                  <span className="text-xs px-1.5 py-0.5 bg-teal-100 text-teal-700 rounded-full font-normal">
+                    Checklist
+                  </span>
                 </div>
                 {cl.summary && (
                   <p className="text-sm text-gray-500 mt-1 line-clamp-2">{cl.summary}</p>
                 )}
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                  {cl.estimatedTime && <span>⏱ {cl.estimatedTime}</span>}
+                  {cl.itemCount !== undefined && <span>📝 {cl.itemCount} items</span>}
+                </div>
               </div>
               <ArrowRight className="w-4 h-4 text-teal-500 flex-shrink-0 mt-1" />
             </div>

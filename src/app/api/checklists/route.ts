@@ -4,57 +4,47 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const slugs = searchParams.get("slugs");
+    const toolSlug = searchParams.get("toolSlug");
 
-    if (slugs) {
-      // Fetch specific checklists by slug
-      const slugList = slugs.split(",");
-      const checklists = await prisma.landingPage.findMany({
-        where: {
-          slug: { in: slugList },
-          pageType: "checklist",
-          status: "published",
-        },
-        select: {
-          slug: true,
-          title: true,
-          seoDescription: true,
-          heroSection: true,
-        },
-      });
-      return NextResponse.json({
-        data: checklists.map((c) => ({
-          slug: c.slug,
-          title: c.title,
-          summary: c.seoDescription || "",
-          icon: (c.heroSection as any)?.icon || "📋",
-        })),
-      });
+    const where: any = {
+      pageType: "checklist",
+      status: "published",
+    };
+
+    // Filter by relatedTools if toolSlug is provided
+    if (toolSlug) {
+      where.relatedTools = { has: toolSlug };
     }
 
-    // Fetch all published checklists
     const checklists = await prisma.landingPage.findMany({
-      where: {
-        pageType: "checklist",
-        status: "published",
-      },
+      where,
       select: {
         slug: true,
         title: true,
         seoDescription: true,
         heroSection: true,
+        publishedAt: true,
       },
-      orderBy: { publishedAt: "desc" },
+      orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }],
     });
 
-    return NextResponse.json({
-      data: checklists.map((c) => ({
+    const data = checklists.map((c) => {
+      const hero = (c.heroSection as any) || {};
+      return {
         slug: c.slug,
         title: c.title,
         summary: c.seoDescription || "",
-        icon: (c.heroSection as any)?.icon || "📋",
-      })),
+        icon: hero.icon || "📋",
+        estimatedTime: hero.estimatedTime || "",
+        itemCount: hero.sections?.reduce(
+          (sum: number, s: any) => sum + (s.items?.length || 0),
+          0
+        ),
+        publishedAt: c.publishedAt,
+      };
     });
+
+    return NextResponse.json({ data });
   } catch (err: any) {
     console.error("[Checklists API] Error:", err.message);
     return NextResponse.json({ error: "Failed to fetch checklists" }, { status: 500 });

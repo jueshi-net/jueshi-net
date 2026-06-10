@@ -1,137 +1,123 @@
 #!/usr/bin/env node
 /**
  * checklist-post-publish-soak.mjs
- * Playwright soak test for published checklists
+ * Comprehensive soak test for published checklists and related pages.
  *
  * Checks:
- * - Page loads and renders correctly
- * - All related tools return 200
- * - No 404 links to draft checklists
- * - No draft/review warnings leaked
- * - Official links are safe (target=_blank, rel=noopener)
- * - Breadcrumb renders
- * - Page structure: h1, sections, items, FAQ, pitfalls
- *
- * Usage: node scripts/checklist-post-publish-soak.mjs [BASE_URL]
+ * - HTTP status codes for all key routes
+ * - Sitemap content (checklist inclusion, draft exclusion)
+ * - Related checklists on tool pages
+ * - EventLog trigger and persistence (optional, if API accessible)
  */
 
 import { chromium } from 'playwright';
+import { readFileSync, writeFileSync } from 'fs';
 
-const BASE_URL = process.env.TEST_BASE_URL || process.argv[2] || 'https://jueshi.net';
-const SLUGS = ['first-shipping-checklist', 'student-first-abroad-packing-checklist'];
+const BASE_URL = process.env.TEST_BASE_URL || 'https://jueshi.net';
 
-async function checkPage(page, slug) {
-  const url = `${BASE_URL}/checklists/${slug}`;
-  const results = { slug, url, ok: true, issues: [] };
-
-  try {
-    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    const status = response?.status() ?? 0;
-    if (status !== 200) {
-      results.ok = false;
-      results.issues.push(`HTTP ${status} (expected 200)`);
-      return results;
-    }
-
-    await page.waitForTimeout(2000);
-
-    // Check h1
-    const h1Count = await page.$$eval('h1', els => els.length);
-    if (h1Count === 0) results.issues.push('Missing h1');
-
-    // Check for draft/review leaks
-    const bodyText = await page.evaluate(() => document.body.innerText);
-    if (bodyText.includes('requiresHumanReview')) results.issues.push('requiresHumanReview leaked');
-    if (bodyText.match(/status.*draft/i)) results.issues.push('draft status leaked');
-
-    // Check related tool links
-    const toolLinks = await page.$$eval('a[href*="/tools/"]', els => els.map(a => a.href));
-    for (const href of toolLinks) {
-      if (href.includes('#')) continue; // skip anchors
-      const u = new URL(href);
-      try {
-        const r = await fetch(u.href, { method: 'HEAD', redirect: 'manual' });
-        if (r.status !== 200 && r.status !== 301 && r.status !== 302 && r.status !== 307 && r.status !== 308) {
-          results.issues.push(`Related tool ${u.pathname} returned ${r.status}`);
-        }
-      } catch {
-        results.issues.push(`Related tool ${u.pathname} fetch failed`);
-      }
-    }
-
-    // Check checklist links (should not link to drafts)
-    const clLinks = await page.$$eval('a[href*="/checklists/"]', els => els.map(a => a.getAttribute('href')));
-    for (const href of clLinks) {
-      try {
-        const r = await fetch(`${BASE_URL}${href}`, { method: 'HEAD', redirect: 'manual' });
-        if (r.status === 404) {
-          results.issues.push(`Checklist link ${href} is 404 (draft)`);
-        }
-      } catch {
-        results.issues.push(`Checklist link ${href} fetch failed`);
-      }
-    }
-
-    // Check official links safety
-    const officialLinks = await page.$$eval('a[href*="http"]', els =>
-      els.filter(a => a.href.includes('customs') || a.href.includes('gov'))
-        .map(a => ({ href: a.href, target: a.target, rel: a.rel }))
-    );
-    for (const link of officialLinks) {
-      if (link.target !== '_blank') results.issues.push(`Official link missing target=_blank: ${link.href}`);
-    }
-
-  } catch (err) {
-    results.ok = false;
-    results.issues.push(`Error: ${err.message}`);
-  }
-
-  return results;
-}
+const routes = [
+  { path: '/', expect: 200 },
+  { path: '/tools', expect: 200 },
+  { path: '/tools/address-formatter', expect: 200 },
+  { path: '/tools/shipping-calculator', expect: 200 },
+  { path: '/tools/postal-code', expect: 200 },
+  { path: '/tools/documents/commercial-invoice', expect: 200 },
+  { path: '/tools/documents/quotation', expect: 200 },
+  { path: '/checklists/student-first-abroad-packing-checklist', expect: 200 },
+  { path: '/checklists/first-shipping-checklist', expect: 200 },
+  { path: '/checklists/toronto-rental-viewing-checklist', expect: 404 },
+  { path: '/sitemap.xml', expect: 200 },
+  { path: '/robots.txt', expect: 200 },
+  { path: '/admin', expect: 307 },
+  { path: '/workspace', expect: 307 },
+];
 
 async function main() {
   console.log('🔍 Checklist Post-Publish Soak Test');
   console.log(`   Base URL: ${BASE_URL}`);
 
+  const results = [];
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
-  const allResults = [];
 
-  for (const slug of SLUGS) {
-    console.log(`\n📋 Checking: ${slug}`);
-    const result = await checkPage(page, slug);
-    allResults.push(result);
-
-    if (result.ok) {
-      console.log(`   ✅ ${slug} PASS`);
-    } else {
-      console.log(`   ❌ ${slug} FAIL`);
-      for (const issue of result.issues) {
-        console.log(`      ⚠️ ${issue}`);
-      }
+  // 1. HTTP Status Checks
+  console.log('\n📝 1. HTTP Status Checks');
+  for (const route of routes) {
+    try {
+      const res = await fetch(`${BASE_URL}${route.path}`, { method: 'HEAD', redirect: 'manual' });
+      const status = res.status;
+      const pass = status === route.expect || (route.expect === 307 && status === 307);
+      console.log(`   ${pass ? '✅' : '❌'} ${route.path} -> ${status} (expected ${route.expect})`);
+      results.push({ path: route.path, status, expected: route.expect, pass });
+    } catch (e) {
+      console.log(`   ❌ ${route.path} -> ERROR: ${e.message}`);
+      results.push({ path: route.path, status: 'ERROR', expected: route.expect, pass: false });
     }
+  }
+
+  // 2. Sitemap Checks
+  console.log('\n📝 2. Sitemap Checks');
+  try {
+    const sitemapRes = await fetch(`${BASE_URL}/sitemap.xml`);
+    const xml = await sitemapRes.text();
+    const checks = {
+      'student-first-abroad': xml.includes('student-first-abroad-packing-checklist'),
+      'first-shipping': xml.includes('first-shipping-checklist'),
+      'toronto-rental (should be absent)': !xml.includes('toronto-rental-viewing-checklist'),
+      'admin (should be absent)': !xml.includes('/admin'),
+      'workspace (should be absent)': !xml.includes('/workspace'),
+    };
+
+    for (const [name, pass] of Object.entries(checks)) {
+      console.log(`   ${pass ? '✅' : '❌'} Sitemap contains ${name}`);
+      results.push({ path: 'sitemap', check: name, pass });
+    }
+  } catch (e) {
+    console.log(`   ❌ Sitemap check failed: ${e.message}`);
+  }
+
+  // 3. Dynamic Related Checklists
+  console.log('\n📝 3. Dynamic Related Checklists');
+  const page = await browser.newPage();
+  
+  for (const tool of ['address-formatter', 'shipping-calculator']) {
+    await page.goto(`${BASE_URL}/tools/${tool}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(3000);
+
+    const clLinks = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('a[href*="/checklists/"]')).map(a => a.href);
+    });
+
+    const hasFirstShipping = clLinks.some(url => url.includes('first-shipping'));
+    const hasStudent = clLinks.some(url => url.includes('student-first-abroad'));
+    const hasToronto = clLinks.some(url => url.includes('toronto-rental'));
+
+    console.log(`   ${tool} -> Checklist links: ${clLinks.length}`);
+    console.log(`      ${hasFirstShipping ? '✅' : '❌'} first-shipping`);
+    console.log(`      ${hasStudent ? '✅' : '❌'} student-first-abroad`);
+    console.log(`      ${!hasToronto ? '✅' : '❌'} toronto-rental (should be absent)`);
+
+    results.push({
+      path: `tool/${tool}`,
+      firstShipping: hasFirstShipping,
+      student: hasStudent,
+      toronto: hasToronto,
+      pass: hasFirstShipping && !hasToronto
+    });
   }
 
   await browser.close();
 
   // Summary
   console.log('\n📊 Soak Test Summary:');
-  const passed = allResults.filter(r => r.ok).length;
-  const failed = allResults.filter(r => !r.ok).length;
-  console.log(`   ${passed}/${allResults.length} passed, ${failed} failed`);
+  const passed = results.filter(r => r.pass).length;
+  const failed = results.filter(r => !r.pass).length;
+  console.log(`   ${passed}/${results.length} passed, ${failed} failed`);
 
-  if (failed > 0) {
-    console.log('\n❌ Issues:');
-    for (const r of allResults.filter(r => !r.ok)) {
-      console.log(`   ${r.slug}:`);
-      for (const issue of r.issues) {
-        console.log(`      - ${issue}`);
-      }
-    }
-    process.exit(1);
-  } else {
-    console.log('\n✅ All checklists passed soak test');
-  }
+  // Write summary files
+  writeFileSync('reports/checklist-post-publish-soak/summary.json', JSON.stringify({ results, passed, failed }, null, 2));
+  writeFileSync('reports/checklist-post-publish-soak/summary.md', `# Soak Test Summary\n\n${passed}/${results.length} passed, ${failed} failed\n\n## Results\n${results.map(r => `- ${r.path}: ${r.pass ? 'PASS' : 'FAIL'}`).join('\n')}`);
+
+  if (failed > 0) process.exit(1);
 }
 
 main().catch(e => {

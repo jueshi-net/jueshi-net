@@ -1,0 +1,129 @@
+{
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools/address-formatter",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools/shipping-calculator",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools/postal-code",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools/documents/commercial-invoice",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/tools/documents/quotation",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/checklists/student-first-abroad-packing-checklist",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/checklists/first-shipping-checklist",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/checklists/toronto-rental-viewing-checklist",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/admin",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/workspace",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "sitemap",
+      "check": "student-first-abroad",
+      "pass": true
+    },
+    {
+      "path": "sitemap",
+      "check": "first-shipping",
+      "pass": true
+    },
+    {
+      "path": "sitemap",
+      "check": "toronto-rental (should be absent)",
+      "pass": true
+    },
+    {
+      "path": "sitemap",
+      "check": "admin (should be absent)",
+      "pass": true
+    },
+    {
+      "path": "sitemap",
+      "check": "workspace (should be absent)",
+      "pass": true
+    },
+    {
+      "path": "tool/address-formatter",
+      "firstShipping": true,
+      "student": true,
+      "toronto": false,
+      "pass": true
+    },
+    {
+      "path": "tool/shipping-calculator",
+      "firstShipping": true,
+      "student": true,
+      "toronto": false,
+      "pass": true
+    }
+  ],
+  "passed": 21,
+  "failed": 0
+}
