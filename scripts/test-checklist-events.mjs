@@ -2,51 +2,49 @@
 /**
  * test-checklist-events.mjs
  * Playwright script to trigger checklist tracking events on production
+ * Events go through to the real server, then we verify DB persistence.
  *
- * Usage: node scripts/test-checklist-events.mjs
+ * Usage: node scripts/test-checklist-events.mjs [BASE_URL]
  */
 
 import { chromium } from 'playwright';
 
-const BASE_URL = process.env.TEST_BASE_URL || 'https://jueshi.net';
+const BASE_URL = process.env.TEST_BASE_URL || process.argv[2] || 'https://jueshi.net';
 
 async function main() {
-  console.log('🔍 Checklist Event Verification via Playwright');
+  console.log('🔍 Checklist Event Persistence Verification via Playwright');
   console.log(`   Base URL: ${BASE_URL}`);
 
   const browser = await chromium.launch({ headless: true });
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
 
-  // Collect API events requests
+  // Log API events but DO NOT intercept — let them reach the real server
   const apiEvents = [];
-  await page.route('**/api/events', async (route, request) => {
-    if (request.method() === 'POST') {
+  page.on('request', (request) => {
+    if (request.url().includes('/api/events') && request.method() === 'POST') {
       try {
-        const body = JSON.parse(request.postData());
+        const body = JSON.parse(request.postData() || '{}');
         apiEvents.push(body);
-        console.log(`   📨 API event captured: ${body.eventType} / ${body.action}`);
+        console.log(`   📨 Event sent: ${body.eventType} / ${body.action}`);
       } catch {}
     }
-    // Fulfill with 200
-    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
   });
 
   // Step 1: Trigger checklist_view
   console.log('\n📝 Step 1: Trigger checklist_view');
   await page.goto(`${BASE_URL}/checklists/student-first-abroad-packing-checklist`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await page.waitForTimeout(3000); // Wait for beacon/fetch to fire
+  await page.waitForTimeout(3000);
   console.log(`   Page loaded: ${page.url()}`);
-  console.log(`   API events captured so far: ${apiEvents.length}`);
+  console.log(`   Events sent so far: ${apiEvents.length}`);
 
-  // Step 2: Trigger checklist_tool_click (click a related tool link)
+  // Step 2: Trigger checklist_tool_click
   console.log('\n📝 Step 2: Trigger checklist_tool_click');
   const toolLinks = await page.$$('a[href*="/tools/"]');
   let clicked = false;
   for (const link of toolLinks) {
     const href = await link.getAttribute('href');
     if (href && href.includes('address-formatter')) {
-      // Open in new tab so we don't leave the checklist page
       const [newPage] = await Promise.all([
         ctx.waitForEvent('page'),
         page.evaluate((href) => {
@@ -66,14 +64,13 @@ async function main() {
   }
   if (!clicked) console.log('   ⚠️ No tool link found to click');
   await page.waitForTimeout(2000);
-  console.log(`   API events captured so far: ${apiEvents.length}`);
+  console.log(`   Events sent so far: ${apiEvents.length}`);
 
   // Step 3: Trigger checklist_internal_link_click
   console.log('\n📝 Step 3: Trigger checklist_internal_link_click');
   await page.goto(`${BASE_URL}/tools/address-formatter`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForTimeout(2000);
 
-  // Click the related checklist link
   const checklistLinks = await page.$$('a[href*="/checklists/"]');
   let clClicked = false;
   for (const link of checklistLinks) {
@@ -87,28 +84,28 @@ async function main() {
     }
   }
   if (!clClicked) console.log('   ⚠️ No checklist link found to click');
-  await page.waitForTimeout(2000);
-  console.log(`   API events captured so far: ${apiEvents.length}`);
+  await page.waitForTimeout(3000);
+  console.log(`   Events sent so far: ${apiEvents.length}`);
 
   await ctx.close();
   await browser.close();
 
-  // Output captured events for DB verification
-  console.log('\n📋 All API events captured during test:');
+  // Summary of what was sent
+  console.log('\n📋 Events sent to server:');
   for (const e of apiEvents) {
     console.log(`  ${JSON.stringify(e)}`);
   }
 
-  // Summary
   const hasView = apiEvents.some(e => e.eventType === 'checklist_view');
   const hasToolClick = apiEvents.some(e => e.eventType === 'checklist_tool_click');
   const hasInternalClick = apiEvents.some(e => e.eventType === 'checklist_internal_link_click');
 
-  console.log('\n✅ API Event Capture Summary:');
-  console.log(`  checklist_view: ${hasView ? '✅ CAPTURED' : '❌ NOT CAPTURED'}`);
-  console.log(`  checklist_tool_click: ${hasToolClick ? '✅ CAPTURED' : '❌ NOT CAPTURED'}`);
-  console.log(`  checklist_internal_link_click: ${hasInternalClick ? '✅ CAPTURED' : '❌ NOT CAPTURED'}`);
-  console.log(`  Total events captured: ${apiEvents.length}`);
+  console.log('\n✅ Events Sent Summary:');
+  console.log(`  checklist_view: ${hasView ? '✅ SENT' : '❌ NOT SENT'}`);
+  console.log(`  checklist_tool_click: ${hasToolClick ? '✅ SENT' : '❌ NOT SENT'}`);
+  console.log(`  checklist_internal_link_click: ${hasInternalClick ? '✅ SENT' : '❌ NOT SENT'}`);
+  console.log(`  Total events sent: ${apiEvents.length}`);
+  console.log('\n📝 DB verification: Run check-eventlog-db.mjs separately on VPS or locally.');
 }
 
 main().catch(e => {

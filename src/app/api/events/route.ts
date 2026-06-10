@@ -24,23 +24,31 @@ const METRIC_MAP: Record<string, string> = {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { event, toolName, path, sessionId, ...rest } = body;
+    const { eventType, action, toolName, path, sessionId, ...rest } = body;
     const toolSlug = extractToolSlug(body);
+
+    // Serialize remaining fields (checklistSlug, toolSlug, sourcePath, etc.) as JSON metadata
+    const metadata = Object.keys(rest).length > 0 ? JSON.stringify(rest) : null;
+    // Combine action + metadata: if both exist, action gets priority and metadata is appended
+    const actionValue = action?.toString() || null;
+    // If there's extra metadata, store it alongside the action for debugging
+    const storedAction = metadata ? `${actionValue || ""} | metadata: ${metadata}` : actionValue;
 
     // 1. 主流程：写入 EventLog (始终尝试)
     await prisma.eventLog.create({
       data: {
-        eventType: event || "unknown",
+        eventType: eventType?.toString() || "unknown",
         toolName: toolName?.toString() || null,
         path: path?.toString() || null,
         sessionId: sessionId?.toString() || null,
-        action: JSON.stringify(rest),
+        action: storedAction,
       },
     });
 
     // 2. 副流程：如果事件属于指标类型且有 toolSlug，upsert ToolMetricDaily
-    if (toolSlug && METRIC_MAP[event]) {
-      const metricField = METRIC_MAP[event];
+    const eventKey = eventType?.toString() || "";
+    if (toolSlug && METRIC_MAP[eventKey]) {
+      const metricField = METRIC_MAP[eventKey];
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
