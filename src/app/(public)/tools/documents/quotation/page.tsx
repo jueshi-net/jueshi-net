@@ -18,8 +18,12 @@ export const metadata: Metadata = {
 
 export default function QuotationPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><span className="text-gray-500">加载中...</span></div>}>
-      <QuotationPageInner />
-    </Suspense>
+    <div className="relative">
+      {/* sr-only h1 for SEO & accessibility — does not affect visual layout */}
+      <h1 className="sr-only">报价单生成器 - 外贸报价单模板</h1>
+      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><span className="text-gray-500">加载中...</span></div>}>
+        <QuotationPageInner />
+      </Suspense>
+    </div>
   );
 }
