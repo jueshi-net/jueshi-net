@@ -1,4 +1,7 @@
-'use client';
+"use client";
+
+import { useEffect } from "react";
+import Link from "next/link";
 
 export default function WorkspaceError({
   error,
@@ -7,17 +10,39 @@ export default function WorkspaceError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Log error for debugging
+    console.error("[Workspace] Loading error:", error);
+  }, [error]);
+
   return (
-    <div className="p-6 bg-red-50 text-red-900 rounded-xl border border-red-200 m-4">
-      <h2 className="text-xl font-bold mb-2">🚨 内容区渲染崩溃</h2>
-      <p className="font-mono text-sm break-all mb-4 text-red-700">{error.message}</p>
-      {error.digest && <p className="font-mono text-xs text-red-500 mb-4">Digest: {error.digest}</p>}
-      <button
-        onClick={() => reset()}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-      >
-        尝试重试
-      </button>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl border border-gray-200 p-8 max-w-md w-full text-center shadow-sm">
+        <div className="text-4xl mb-4">⚠️</div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">页面加载失败</h2>
+        <p className="text-sm text-gray-500 mb-6">
+          工作台暂时无法加载，请稍后重试。
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={reset}
+            className="px-4 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]"
+          >
+            重新加载
+          </button>
+          <Link
+            href="/"
+            className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors min-h-[44px]"
+          >
+            返回首页
+          </Link>
+        </div>
+        {error.digest && (
+          <p className="mt-4 text-[10px] text-gray-400 font-mono">
+            Error ID: {error.digest}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

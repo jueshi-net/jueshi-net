@@ -1,29 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import {
   PackageSearch, Menu, X, Search, LogIn, Bell,
   Home, Wrench, FileText, Users, BookOpen, Crown, User, LogOut, LayoutDashboard, ShieldCheck,
-  Calculator, MapPin, FileBox, ClipboardList, CreditCard, ListChecks, ChevronDown
+  ListChecks, ChevronDown, Sparkles
 } from "lucide-react";
 
-const TOOL_LINKS = [
-  { href: "/tools", label: "工具中心", icon: Wrench, desc: "全部工具一览" },
-  { href: "/tools/documents/quotation", label: "报价单", icon: FileText, desc: "快速生成" },
-  { href: "/tools/documents/commercial-invoice", label: "商业发票", icon: FileBox, desc: "进出口单据" },
-  { href: "/tools/address-formatter", label: "地址格式化", icon: MapPin, desc: "国际标准" },
-  { href: "/tools/shipping-calculator", label: "运费计算", icon: Calculator, desc: "体积重换算" },
-  { href: "/tools/postal-code", label: "邮编查询", icon: MapPin, desc: "全球邮编" },
-  { href: "/tools/handover-note", label: "交接单", icon: ClipboardList, desc: "物流交接" },
-  { href: "/tools/debit-note", label: "Debit Note", icon: CreditCard, desc: "收款通知" },
+const TOOL_CATEGORIES = [
+  { href: "/tools", label: "全部工具", icon: Wrench, desc: "浏览所有工具" },
+  { href: "/tools?cat=logistics", label: "集运物流", icon: PackageSearch, desc: "运费/唛头/追踪" },
+  { href: "/tools?cat=documents", label: "外贸单据", icon: FileText, desc: "发票/报价/合同" },
+  { href: "/tools?cat=life", label: "海外生活", icon: Home, desc: "邮编/地址/生活" },
+  { href: "/tools?cat=ai-content", label: "AI 内容", icon: Sparkles, desc: "文案/翻译/摘要" },
 ];
 
 const NAV_LINKS = [
   { href: "/", label: "首页", icon: Home },
   { href: "/checklists", label: "清单", icon: ListChecks },
-  { href: "/bbs", label: "社区", icon: Users },
+  { href: "/topics", label: "主题", icon: BookOpen },
+];
+
+const EXTERNAL_LINKS = [
+  { href: "https://bbs.jueshi.net", label: "社区", icon: Users, external: true },
 ];
 
 export default function Header() {
@@ -37,6 +38,7 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const userMenuRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
 
@@ -57,18 +59,37 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const handleSearch = useCallback(() => {
+    const q = searchQuery.trim();
+    if (!q) return;
+    window.location.href = `/tools?q=${encodeURIComponent(q)}`;
+  }, [searchQuery]);
+
+  const handleSearchKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
+  }, [handleSearch]);
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 bg-teal-600 rounded-[12px] flex items-center justify-center">
-              <PackageSearch className="w-4 h-4 text-white" />
+          <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="绝世百宝箱 jueshi.net">
+            {/* Logo image container — replace src with real logo when available */}
+            <img
+              src="/brand/jueshi-logo-placeholder.svg"
+              alt="绝世百宝箱 jueshi.net"
+              className="h-10 w-auto hidden sm:block"
+              width={168}
+              height={42}
+            />
+            {/* Mobile fallback: icon + short text */}
+            <div className="flex items-center gap-1.5 sm:hidden">
+              <div className="w-8 h-8 bg-teal-600 rounded-[12px] flex items-center justify-center">
+                <PackageSearch className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-sm font-bold text-gray-900">绝世百宝箱</span>
             </div>
-            <span className="text-base font-bold text-gray-900 hidden sm:inline">
-              绝世百宝箱
-            </span>
           </Link>
 
           {/* Center: Nav */}
@@ -86,6 +107,22 @@ export default function Header() {
                 </Link>
               );
             })}
+            {/* External links (use <a> to avoid Next.js client routing) */}
+            {EXTERNAL_LINKS.map((link) => {
+              const Icon = link.icon;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span>{link.label}</span>
+                </a>
+              );
+            })}
             
             {/* Tools Dropdown */}
             <div ref={toolsMenuRef} className="relative">
@@ -98,19 +135,19 @@ export default function Header() {
                 <ChevronDown className={`w-3 h-3 transition-transform ${toolsMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {toolsMenuOpen && (
-                <div className="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 grid grid-cols-2 gap-1 p-2">
-                  {TOOL_LINKS.map((tool) => (
+                <div className="absolute left-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 p-2">
+                  {TOOL_CATEGORIES.map((tool) => (
                     <Link
                       key={tool.href}
                       href={tool.href}
                       onClick={() => setToolsMenuOpen(false)}
-                      className="flex flex-col p-2 rounded-lg hover:bg-teal-50 transition-colors"
+                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-teal-50 transition-colors"
                     >
-                      <div className="flex items-center gap-2">
-                        <tool.icon className="w-4 h-4 text-teal-600" />
-                        <span className="text-sm font-medium text-gray-800">{tool.label}</span>
+                      <tool.icon className="w-4 h-4 text-teal-600 shrink-0" />
+                      <div>
+                        <div className="text-sm font-medium text-gray-800">{tool.label}</div>
+                        <div className="text-[10px] text-gray-500">{tool.desc}</div>
                       </div>
-                      <span className="text-[10px] text-gray-500 ml-6">{tool.desc}</span>
                     </Link>
                   ))}
                 </div>
@@ -120,20 +157,44 @@ export default function Header() {
 
           {/* Right: Search + Bell + Login */}
           <div className="flex items-center gap-2">
-            <button
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-500 hover:bg-gray-200 transition-colors border border-gray-200 w-44"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span className="flex-1 text-left">搜索工具…</span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 bg-white border border-gray-300 rounded text-[10px] font-mono text-gray-500">
-                ⌘K
-              </kbd>
-            </button>
+            {/* Search bar — functional */}
+            <div className="hidden md:flex items-center relative">
+              <Search className="absolute left-3 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                placeholder="搜索工具…"
+                className="pl-9 pr-14 h-9 w-44 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400"
+              />
+              <button
+                onClick={handleSearch}
+                className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 bg-teal-600 text-white text-[10px] font-medium rounded hover:bg-teal-700 transition-colors min-h-[24px]"
+              >
+                搜索
+              </button>
+            </div>
 
-            <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <Bell className="w-4 h-4 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
+            {/* Notification bell */}
+            {isLoggedIn ? (
+              <Link
+                href="/workspace/notifications"
+                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="通知"
+              >
+                <Bell className="w-4 h-4 text-gray-600" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </Link>
+            ) : (
+              <Link
+                href="/login?callbackUrl=/workspace/notifications"
+                className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="通知（需登录）"
+              >
+                <Bell className="w-4 h-4 text-gray-600" />
+              </Link>
+            )}
 
             {isLoggedIn ? (
               <div ref={userMenuRef} className="relative">
@@ -205,16 +266,27 @@ export default function Header() {
                     </Link>
                   );
                 })}
+                {/* External community link */}
+                {EXTERNAL_LINKS.map((link) => {
+                  const Icon = link.icon;
+                  return (
+                    <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
+                      <Icon className="w-5 h-5 text-gray-500" />
+                      <span className="font-medium">{link.label}</span>
+                    </a>
+                  );
+                })}
                 
                 {/* Mobile Tools Dropdown */}
                 <details className="group">
                   <summary className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px] cursor-pointer list-none">
                     <Wrench className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium">核心工具</span>
+                    <span className="font-medium">工具分类</span>
                     <ChevronDown className="w-3 h-3 ml-auto text-gray-400 group-open:rotate-180 transition-transform" />
                   </summary>
                   <div className="pl-10 pr-2 pb-2 space-y-0.5">
-                    {TOOL_LINKS.map((tool) => (
+                    {TOOL_CATEGORIES.map((tool) => (
                       <Link key={tool.href} href={tool.href} onClick={() => setMobileOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[40px] text-sm">
                         <tool.icon className="w-4 h-4 text-gray-400" />
@@ -223,6 +295,27 @@ export default function Header() {
                     ))}
                   </div>
                 </details>
+
+                {/* Mobile search */}
+                <div className="px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <Search className="w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="搜索工具…"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                      className="flex-1 bg-gray-100 rounded-lg text-sm px-3 py-2 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder:text-gray-400 min-h-[40px]"
+                    />
+                    <button
+                      onClick={() => { handleSearch(); setMobileOpen(false); }}
+                      className="px-3 py-2 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 transition-colors min-h-[40px]"
+                    >
+                      搜索
+                    </button>
+                  </div>
+                </div>
               </div>
               <hr className="my-4 border-gray-200 mx-4" />
               {isLoggedIn ? (
@@ -233,6 +326,9 @@ export default function Header() {
                   </div>
                   <Link href="/workbench" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
                     <LayoutDashboard className="w-5 h-5 text-gray-500" /> <span className="font-medium">工作台</span>
+                  </Link>
+                  <Link href="/workspace/notifications" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
+                    <Bell className="w-5 h-5 text-gray-500" /> <span className="font-medium">通知中心</span>
                   </Link>
                   {isAdmin && (
                     <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
