@@ -12,12 +12,18 @@ async function readSettings() {
     return JSON.parse(raw);
   } catch {
     return {
-      siteName: process.env.SITE_NAME || '海外百宝箱',
-      siteDescription: process.env.SITE_DESCRIPTION || '海外华人的常用工具与资源平台',
+      siteName: process.env.SITE_NAME || '绝世百宝箱',
+      siteDescription: process.env.SITE_DESCRIPTION || '海外华人的实用工具箱',
       allowRegistration: process.env.ALLOW_REGISTRATION !== 'false',
       maintenanceMode: process.env.MAINTENANCE_MODE === 'true',
       maxLinksPerUser: parseInt(process.env.MAX_LINKS_PER_USER || '100'),
       emailEnabled: !!process.env.SMTP_HOST,
+      branding: {
+        logoUrl: '/brand/jueshi-logo-placeholder.svg',
+        logoAlt: '绝世百宝箱 jueshi.net',
+        logoWidth: 168,
+        logoHeight: 42,
+      },
     };
   }
 }

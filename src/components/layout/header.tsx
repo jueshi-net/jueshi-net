@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
   PackageSearch, Menu, X, Search, LogIn, Bell,
   Home, Wrench, FileText, Users, BookOpen, Crown, User, LogOut, LayoutDashboard, ShieldCheck,
-  ListChecks, ChevronDown, Sparkles
+  ListChecks, ChevronDown, Sparkles, Mail, Hash, DollarSign
 } from "lucide-react";
 
 const TOOL_CATEGORIES = [
@@ -19,12 +19,12 @@ const TOOL_CATEGORIES = [
 
 const NAV_LINKS = [
   { href: "/", label: "首页", icon: Home },
+  { href: "/tools/postal-code", label: "邮编", icon: Hash },
+  { href: "/tools/hs-code", label: "HS编码", icon: FileText },
+  { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
   { href: "/checklists", label: "清单", icon: ListChecks },
-  { href: "/topics", label: "主题", icon: BookOpen },
-];
-
-const EXTERNAL_LINKS = [
-  { href: "https://bbs.jueshi.net", label: "社区", icon: Users, external: true },
+  { href: "/topics", label: "专题", icon: BookOpen },
+  { href: "/community", label: "社区", icon: Users },
 ];
 
 export default function Header() {
@@ -39,11 +39,25 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [branding, setBranding] = useState({
+    logoUrl: "/brand/jueshi-logo-placeholder.svg",
+    logoAlt: "绝世百宝箱 jueshi.net",
+    logoWidth: 168,
+    logoHeight: 42,
+  });
   const userMenuRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
 
+  // 读取品牌配置
   useEffect(() => {
-    const closeOnResize = () => { if (window.innerWidth >= 768) setMobileOpen(false); };
+    fetch("/api/branding")
+      .then(res => res.json())
+      .then(setBranding)
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const closeOnResize = () => { if (window.innerWidth >= 1024) setMobileOpen(false); };
     window.addEventListener("resize", closeOnResize);
     return () => window.removeEventListener("resize", closeOnResize);
   }, []);
@@ -74,14 +88,14 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="绝世百宝箱 jueshi.net">
-            {/* Logo image container — replace src with real logo when available */}
+          <Link href="/" className="flex items-center gap-2 shrink-0" aria-label={branding.logoAlt}>
+            {/* Logo image container */}
             <img
-              src="/brand/jueshi-logo-placeholder.svg"
-              alt="绝世百宝箱 jueshi.net"
+              src={branding.logoUrl}
+              alt={branding.logoAlt}
               className="h-10 w-auto hidden sm:block"
-              width={168}
-              height={42}
+              width={branding.logoWidth}
+              height={branding.logoHeight}
             />
             {/* Mobile fallback: icon + short text */}
             <div className="flex items-center gap-1.5 sm:hidden">
@@ -100,27 +114,11 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{link.label}</span>
                 </Link>
-              );
-            })}
-            {/* External links (use <a> to avoid Next.js client routing) */}
-            {EXTERNAL_LINKS.map((link) => {
-              const Icon = link.icon;
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{link.label}</span>
-                </a>
               );
             })}
             
@@ -128,7 +126,7 @@ export default function Header() {
             <div ref={toolsMenuRef} className="relative">
               <button 
                 onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
               >
                 <Wrench className="w-3.5 h-3.5" />
                 <span>工具</span>
@@ -157,7 +155,7 @@ export default function Header() {
 
           {/* Right: Search + Bell + Login */}
           <div className="flex items-center gap-2">
-            {/* Search bar — functional */}
+            {/* Search bar */}
             <div className="hidden md:flex items-center relative">
               <Search className="absolute left-3 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
               <input
@@ -264,17 +262,6 @@ export default function Header() {
                       <Icon className="w-5 h-5 text-gray-500" />
                       <span className="font-medium">{link.label}</span>
                     </Link>
-                  );
-                })}
-                {/* External community link */}
-                {EXTERNAL_LINKS.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
-                      <Icon className="w-5 h-5 text-gray-500" />
-                      <span className="font-medium">{link.label}</span>
-                    </a>
                   );
                 })}
                 
