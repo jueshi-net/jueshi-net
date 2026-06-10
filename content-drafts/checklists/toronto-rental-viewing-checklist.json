@@ -309,7 +309,7 @@
             "priority": "high",
             "timing": "签约时",
             "warning": "",
-            "relatedToolSlug": "invoice",
+            "relatedToolSlug": "documents/commercial-invoice",
             "officialLink": { "label": "", "url": "" },
             "completedDefault": false
           },
@@ -502,7 +502,7 @@
       "relatedTools": [
         "/tools/address-formatter",
         "/tools/postal-code",
-        "/tools/invoice"
+        "/tools/documents/commercial-invoice"
       ],
       "relatedArticles": [],
       "nextChecklists": []

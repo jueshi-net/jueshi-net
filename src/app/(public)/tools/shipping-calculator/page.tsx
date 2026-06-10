@@ -697,14 +697,7 @@ export default function ShippingCalculatorPage() {
       {/* Related Checklist */}
       <div className="max-w-4xl mx-auto mb-8">
         <RelatedChecklistSection
-          checklists={[
-            {
-              slug: "student-first-abroad-packing-checklist",
-              title: "留学生第一次出国行李准备清单",
-              summary: "涵盖证件、电子产品、生活用品、药品、财务五大类，含避坑指南和FAQ。",
-              icon: "🎒",
-            },
-          ]}
+          toolSlug="shipping-calculator"
           sourcePath="shipping-calculator"
         />
       </div>
