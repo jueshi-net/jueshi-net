@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-06-10T15:44:16.461Z",
+  "version": "v1.20.42.6.36.1",
+  "passed": 7,
+  "failed": 1,
+  "total": 8,
+  "results": [
+    {
+      "status": "PASS",
+      "name": "Logo 图片",
+      "detail": "存在, alt=\"绝世百宝箱 jueshi.net\""
+    },
+    {
+      "status": "PASS",
+      "name": "/checklists 状态码",
+      "detail": "200"
+    },
+    {
+      "status": "PASS",
+      "name": "/checklists 卡片数",
+      "detail": "3 张清单卡片"
+    },
+    {
+      "status": "PASS",
+      "name": "清单 student-first-abroad-packing-checklist",
+      "detail": "在列表页中"
+    },
+    {
+      "status": "PASS",
+      "name": "清单 first-shipping-checklist",
+      "detail": "在列表页中"
+    },
+    {
+      "status": "PASS",
+      "name": "清单 toronto-rental-viewing-checklist",
+      "detail": "在列表页中"
+    },
+    {
+      "status": "PASS",
+      "name": "/topics 状态码",
+      "detail": "200"
+    },
+    {
+      "status": "FAIL",
+      "name": "脚本执行",
+      "detail": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://jueshi.net/\", waiting until \"domcontentloaded\"\n"
+    }
+  ]
+}
