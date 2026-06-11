@@ -27,6 +27,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Fire Document_Save EventLog
+    try {
+      await prisma.eventLog.create({
+        data: {
+          eventType: "Document_Save",
+          action: "Document_Save",
+          path: `/tools/documents/${documentType}`,
+          toolName: documentType,
+        },
+      });
+    } catch (eventErr: any) {
+      // EventLog write failure should not block document save
+      console.error("[POST /api/user/documents] EventLog write failed:", eventErr.message);
+    }
+
     return NextResponse.json({ success: true, id: doc.id, createdAt: doc.createdAt });
   } catch (err: any) {
     console.error("[POST /api/user/documents]", err);

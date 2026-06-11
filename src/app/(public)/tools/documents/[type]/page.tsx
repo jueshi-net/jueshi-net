@@ -218,7 +218,12 @@ export default function DocumentEditorPage() {
 
         if (docData.formData) setFormData(docData.formData);
         if (docData.lineItems && docData.lineItems.length > 0) {
-          setLineItems(docData.lineItems);
+          // Normalize remark/remarks field for backward compatibility
+          const normalizedLineItems = docData.lineItems.map((item: any) => ({
+            ...item,
+            remark: item.remark ?? item.remarks ?? '',
+          }));
+          setLineItems(normalizedLineItems);
         }
         if (docData.style) setSelectedStyle(docData.style);
 
