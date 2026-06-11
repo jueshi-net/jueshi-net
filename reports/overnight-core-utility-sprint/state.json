@@ -1,15 +1,19 @@
 {
   "sprint": "v1.20.42.6.38 Overnight Core Utility Humanization Sprint",
   "currentStage": 5,
-  "completedStages": [1, 2, 3, 4],
-  "stopReason": null,
+  "completedStages": [1, 2, 3, 4, 5],
+  "stopReason": "deploy_complete",
   "p0Issues": [],
   "commits": [
     "55bb52f - Stage 1: Core utility humanization audit",
     "1000a85 - Stage 2: Postal/Address humanization",
     "7574b5a - Stage 3: HS Code humanization",
-    "d87ddcc - Stage 4: Exchange rate humanization"
+    "d87ddcc - Stage 4: Exchange rate humanization",
+    "63d0d8d - Stage 5: Final reports + task chain plan"
   ],
-  "deploymentStatus": "pending",
-  "nextStage": "stage-5-final-soak"
+  "deploymentStatus": "deployed",
+  "productionIP": "192.129.155.149",
+  "productionHostname": "racknerd-bb8b78e",
+  "pm2PID": 163304,
+  "nextStage": "v1.20.42.6.39 Cross-Border Shipping Task Chain MVP"
 }
