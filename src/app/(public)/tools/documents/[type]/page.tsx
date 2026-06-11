@@ -575,7 +575,8 @@ export default function DocumentEditorPage() {
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-blue-900">检测到跨境发货任务链数据</p>
+                <p className="text-sm font-semibold text-blue-900">检测到本机暂存的跨境发货任务数据</p>
+                <p className="text-xs text-blue-700 mt-0.5">这些数据来自你在本浏览器中使用过的工具。点击后只会填入空字段，不会自动保存草稿，也不会覆盖已有内容。</p>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {taskChainData.productName && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
@@ -626,7 +627,7 @@ export default function DocumentEditorPage() {
                   onClick={handleTaskChainClear}
                   className="px-3 py-1.5 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg border border-red-200 transition-colors"
                 >
-                  清除任务链数据
+                  清除本机任务
                 </button>
               </div>
             </div>
