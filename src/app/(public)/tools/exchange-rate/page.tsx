@@ -1,14 +1,16 @@
 "use client";
 import { AdSlot } from '@/components/ad-slot';
 import SmartRelatedLinks from '@/components/smart-related-links';
+import { RelatedChecklistSection } from '@/components/related-checklist-section';
 
-import { useState, useEffect, useMemo } from "react";
-import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp, Copy, Check, Clock, Truck } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
+import Link from 'next/link';
 
 interface RateResponse {
   source: string;
@@ -104,6 +106,7 @@ export default function ExchangeRatePage() {
   const [historyData, setHistoryData] = useState<{ date: string; rate: number }[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [showChart, setShowChart] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   // ── Currency search dropdowns ──
   const [fromSearch, setFromSearch] = useState("");
@@ -112,7 +115,43 @@ export default function ExchangeRatePage() {
   const [toDropdownOpen, setToDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // Recent conversions
+  const [recentConversions, setRecentConversions] = useState<{ from: string; to: string; amount: string; result: string; timestamp: number }[]>([]);
+
   useEffect(() => { setMounted(true); }, []);
+
+  // Load recent conversions
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('exchange-rate-recent');
+      if (saved) setRecentConversions(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  // Track Tool_View on mount
+  useEffect(() => {
+    trackEvent.custom('exchange-rate', 'view');
+  }, []);
+
+  // Quick currency buttons
+  const QUICK_CURRENCIES = ['USD', 'CAD', 'CNY', 'EUR', 'GBP', 'JPY', 'AUD', 'HKD'];
+
+  // Scenario quick entries
+  const SCENARIOS = [
+    { from: 'USD', to: 'CAD', label: 'USD→CAD' },
+    { from: 'CAD', to: 'CNY', label: 'CAD→CNY' },
+    { from: 'CNY', to: 'CAD', label: 'CNY→CAD' },
+    { from: 'USD', to: 'CNY', label: 'USD→CNY' },
+    { from: 'GBP', to: 'CNY', label: 'GBP→CNY' },
+  ];
+
+  const copyText = useCallback((text: string, field: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 1500);
+      trackEvent.custom('exchange-rate', 'copy_result');
+    });
+  }, []);
 
   const filteredFromCurrencies = useMemo(() => {
     if (!fromSearch) return CURRENCIES;
@@ -218,6 +257,20 @@ export default function ExchangeRatePage() {
     const converted = inCNY * toRate;
     const rate = toRate / fromRate;
     setResult({ amount: converted, rate });
+
+    // Save to recent conversions
+    const entry = {
+      from: fromCurrency,
+      to: toCurrency,
+      amount: amount,
+      result: `${amount} ${fromCurrency} = ${converted.toFixed(2)} ${toCurrency}`,
+      timestamp: Date.now(),
+    };
+    const updated = [entry, ...recentConversions.filter(
+      r => !(r.from === entry.from && r.to === entry.to && r.amount === entry.amount)
+    )].slice(0, 5);
+    setRecentConversions(updated);
+    try { localStorage.setItem('exchange-rate-recent', JSON.stringify(updated)); } catch {}
   };
 
   const convert = () => {
@@ -283,6 +336,45 @@ export default function ExchangeRatePage() {
           <p className="text-sm text-amber-800">
             <strong>免责声明：</strong>汇率仅供参考，实际结算以银行、支付平台或交易机构为准。
           </p>
+        </div>
+
+        {/* Quick currency buttons */}
+        <div className="mb-4">
+          <p className="text-xs text-gray-500 mb-2">常用币种：</p>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_CURRENCIES.map(code => {
+              const c = CURRENCIES.find(x => x.code === code);
+              return (
+                <button
+                  key={code}
+                  onClick={() => { setFromCurrency(code); trackEvent.custom('exchange-rate', 'quick_currency'); }}
+                  className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                    fromCurrency === code
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white border border-gray-200 text-gray-700 hover:bg-green-50 hover:text-green-700'
+                  }`}
+                >
+                  {c?.flag} {code}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Scenario quick entries */}
+        <div className="mb-6">
+          <p className="text-xs text-gray-500 mb-2">常用场景：</p>
+          <div className="flex flex-wrap gap-2">
+            {SCENARIOS.map(s => (
+              <button
+                key={s.label}
+                onClick={() => { setFromCurrency(s.from); setToCurrency(s.to); trackEvent.custom('exchange-rate', 'scenario_click'); }}
+                className="px-3 py-1.5 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors"
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className={cardStyles.base}>
@@ -438,6 +530,21 @@ export default function ExchangeRatePage() {
                   <p className="text-2xl font-bold text-green-900">= {result.amount.toFixed(2)} {toCurrency}</p>
                 </div>
               </div>
+              {/* Copy buttons */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-green-200">
+                <button
+                  onClick={() => copyText(`${amount} ${fromCurrency} = ${result.amount.toFixed(2)} ${toCurrency}`, 'result')}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-white hover:bg-green-100 text-green-700 rounded-lg transition-colors border border-green-200"
+                >
+                  {copiedField === 'result' ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制结果</>}
+                </button>
+                <button
+                  onClick={() => copyText(`1 ${fromCurrency} = ${result.rate.toFixed(4)} ${toCurrency}`, 'rate')}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 text-xs bg-white hover:bg-green-100 text-green-700 rounded-lg transition-colors border border-green-200"
+                >
+                  {copiedField === 'rate' ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制汇率</>}
+                </button>
+              </div>
             </div>
           )}
 
@@ -560,6 +667,77 @@ export default function ExchangeRatePage() {
         <div className="mt-8">
           <SmartRelatedLinks tool="exchange-rate" country={fromCurrency} type="tool" layout="bottom" />
         </div>
+
+        {/* Recent Conversions */}
+        {recentConversions.length > 0 && (
+          <div className={cardStyles.base + " mt-8"}>
+            <div className="p-4 border-b border-gray-100">
+              <h2 className={cardStyles.header}>
+                <Clock className="w-4 h-4 text-gray-500" />
+                最近换算
+              </h2>
+            </div>
+            <div className="p-4">
+              <div className="flex flex-wrap gap-2">
+                {recentConversions.map((rc, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setFromCurrency(rc.from); setToCurrency(rc.to); setAmount(rc.amount); }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-green-50 hover:text-green-700 rounded-lg text-sm text-gray-600 transition-colors border border-gray-200"
+                  >
+                    <span className="font-medium text-green-600">{rc.from}→{rc.to}</span>
+                    <span className="text-xs text-gray-400">{rc.amount}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Related Tools */}
+        <div className={cardStyles.base + " mt-8"}>
+          <div className="p-4 border-b border-gray-100">
+            <h2 className={cardStyles.header}>
+              <Truck className="w-4 h-4 text-blue-600" />
+              下一步推荐工具
+            </h2>
+          </div>
+          <div className="p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Link href="/tools/documents/quotation"
+              onClick={() => trackEvent.custom('exchange-rate', 'click_related_quotation')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-green-50 rounded-xl border border-gray-200 hover:border-green-200 transition-all">
+              <span className="text-2xl">💰</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">报价单</p>
+                <p className="text-xs text-gray-500">外贸报价参考</p>
+              </div>
+            </Link>
+            <Link href="/tools/documents/commercial-invoice"
+              onClick={() => trackEvent.custom('exchange-rate', 'click_related_commercial-invoice')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-green-50 rounded-xl border border-gray-200 hover:border-green-200 transition-all">
+              <span className="text-2xl">📄</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">商业发票</p>
+                <p className="text-xs text-gray-500">跨境单据生成</p>
+              </div>
+            </Link>
+            <Link href="/tools/shipping-calculator"
+              onClick={() => trackEvent.custom('exchange-rate', 'click_related_shipping-calculator')}
+              className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-green-50 rounded-xl border border-gray-200 hover:border-green-200 transition-all">
+              <span className="text-2xl">📦</span>
+              <div>
+                <p className="font-semibold text-sm text-gray-900">运费计算</p>
+                <p className="text-xs text-gray-500">集运费用估算</p>
+              </div>
+            </Link>
+          </div>
+        </div>
+
+        {/* Related Checklist */}
+        <RelatedChecklistSection
+          toolSlug="exchange-rate"
+          sourcePath="exchange-rate"
+        />
 
         {/* FAQ */}
         <FAQSection title="汇率查询常见问题" items={[
