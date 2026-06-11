@@ -1,16 +1,15 @@
 {
   "sprint": "v1.20.42.6.38 Overnight Core Utility Humanization Sprint",
-  "currentStage": 2,
-  "completedStages": [1],
+  "currentStage": 5,
+  "completedStages": [1, 2, 3, 4],
   "stopReason": null,
-  "p0Issues": [
-    "HS编码无复制按钮",
-    "HS编码EventLog未调用",
-    "地址格式化无EventLog",
-    "汇率无复制按钮",
-    "所有工具无最近查询localStorage"
+  "p0Issues": [],
+  "commits": [
+    "55bb52f - Stage 1: Core utility humanization audit",
+    "1000a85 - Stage 2: Postal/Address humanization",
+    "7574b5a - Stage 3: HS Code humanization",
+    "d87ddcc - Stage 4: Exchange rate humanization"
   ],
-  "commits": [],
-  "deploymentStatus": null,
-  "nextStage": "stage-2-postal-address"
+  "deploymentStatus": "pending",
+  "nextStage": "stage-5-final-soak"
 }
