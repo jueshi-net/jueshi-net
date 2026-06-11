@@ -31,84 +31,154 @@
 
 ---
 
-## 二、TaskChainDraft 初步字段草案
+## 二、TaskChainDraft 字段草案（v6.42.1 优化版）
+
+### 2.1 设计原则
+
+- **MVP 只允许登录用户**（userId 必填，不允许 null）
+- **不修改 ToolDocumentDraft schema**（关联通过 linkedDraftHints JSON 实现）
+- **context 用 JSON 存储**（灵活扩展，避免频繁 migration）
+- **最小字段集**（减少隐私风险和存储成本）
+
+### 2.2 MVP 字段草案
 
 ```prisma
 model TaskChainDraft {
+  // 主键
   id                  String    @id @default(cuid())
-  userId              String?   @map("user_id")           // 可空：支持匿名用户过渡
-  sessionId           String?   @map("session_id")        // 匿名用户标识
+  
+  // 用户归属（MVP 必填，不允许 null）
+  userId              String    @map("user_id")
   
   // 任务链核心数据
   sourceTool          String    @map("source_tool")       // 来源工具标识
   title               String?                             // 自动/手动标题
-  productName         String?   @map("product_name")
-  hsCode              String?   @map("hs_code")
-  productDescription  String?   @map("product_description")
-  declaredValue       String?   @map("declared_value")
-  currency            String?
-  exchangeRate        String?   @map("exchange_rate")
-  convertedValue      String?   @map("converted_value")
-  originCountry       String?   @map("origin_country")
-  destinationCountry  String?   @map("destination_country")
-  postalCode          String?   @map("postal_code")
-  addressText         String?   @map("address_text")
-  shippingEstimate    String?   @map("shipping_estimate")
-  nextStep            String?   @map("next_step")
+  status              String    @default("active")        // active / completed / archived
   
-  // 生命周期
-  status              String    @default("draft")         // draft / active / completed / archived
-  archivedAt          DateTime? @map("archived_at")
-  completedAt         DateTime? @map("completed_at")
+  // 上下文数据（JSON 格式，灵活扩展）
+  context             Json                                // 任务链上下文
+  // context 示例:
+  // {
+  //   "productName": "phone case",
+  //   "hsCode": "3926.90",
+  //   "declaredValue": "100",
+  //   "currency": "USD",
+  //   "destinationCountry": "CA",
+  //   "postalCode": "M5V 3L9",
+  //   "addressText": "123 Main St, Toronto, ON"
+  // }
+  
+  // 关联草稿提示（轻量关联，不修改 ToolDocument schema）
+  linkedDraftHints    Json?     @map("linked_draft_hints")
+  // linkedDraftHints 示例:
+  // [
+  //   { "toolKey": "commercial_invoice", "draftId": "xxx", "createdAt": "..." },
+  //   { "toolKey": "quote_sheet", "draftId": "yyy", "createdAt": "..." }
+  // ]
   
   // 时间戳
   createdAt           DateTime  @default(now()) @map("created_at")
   updatedAt           DateTime  @updatedAt @map("updated_at")
+  completedAt         DateTime? @map("completed_at")
+  archivedAt          DateTime? @map("archived_at")
   
+  // 索引
   @@index([userId])
-  @@index([sessionId])
   @@index([status])
   @@index([createdAt])
   @@map("task_chain_drafts")
 }
 ```
 
-同时需要在 ToolDocumentDraft 中新增可选关联字段：
+### 2.3 字段分类
 
-```prisma
-model ToolDocumentDraft {
-  // ... existing fields ...
-  taskChainId String? @map("task_chain_id")  // 关联任务链（可空）
-  @@index([taskChainId])
-}
-```
+| 字段 | MVP 必需 | 索引 | 隐私风险 | 说明 |
+|---|---|---|---|---|
+| id | ✅ | PK | 无 | 主键 |
+| userId | ✅ | ✅ | 低 | 用户归属（必填） |
+| sourceTool | ✅ | - | 无 | 来源工具 |
+| title | ✅ | - | 无 | 任务标题 |
+| status | ✅ | ✅ | 无 | 生命周期状态 |
+| context | ✅ | - | 🟡 中 | 任务链上下文（可能含地址等） |
+| linkedDraftHints | ✅ | - | 无 | 关联草稿提示 |
+| createdAt | ✅ | ✅ | 无 | 创建时间 |
+| updatedAt | ✅ | - | 无 | 更新时间 |
+| completedAt | ✅ | - | 无 | 完成时间 |
+| archivedAt | ✅ | - | 无 | 归档时间 |
+
+### 2.4 暂缓字段（不在 MVP 中）
+
+| 字段 | 暂缓原因 |
+|---|---|
+| sessionId / anonymousId | MVP 不支持匿名用户 |
+| currentStep | 可从 context 推导 |
+| lastActiveTool | 可从 context 推导 |
+| expiresAt | 后续版本再加 |
+| deletedAt | 使用硬删除 |
+
+### 2.5 隐私风险说明
+
+**context 字段**可能包含：
+- 商品名称（低风险）
+- HS 编码（低风险）
+- 申报价值（中风险）
+- 目的地国家（低风险）
+- 邮编（中风险）
+- 地址文本（🟡 中高风险）
+
+**缓解措施**：
+- 隐私政策明确告知数据存储范围
+- 提供删除功能
+- 管理员查看需审计日志
+- 数据保留策略（90 天未活跃自动归档）
+
+### 2.6 不修改 ToolDocumentDraft Schema
+
+**Phase 2 MVP 不在 ToolDocumentDraft 中新增 taskChainId 字段。**
+
+关联通过 TaskChainDraft.linkedDraftHints JSON 实现，避免修改现有表的 migration 风险。
 
 ---
 
-## 三、是否允许匿名 userId=null
+## 三、匿名保存策略（v6.42.1 明确结论）
 
-### 3.1 允许的理由
+### 3.1 明确结论
 
-- 当前 localStorage 方案支持匿名用户
-- 登录后导入需要过渡期
-- 降低用户使用门槛
+**Phase 2 MVP 不允许匿名用户直接写数据库。**
 
-### 3.2 风险
+- 未登录用户继续使用 localStorage
+- 登录后才允许保存到 TaskChainDraft
+- 登录后提示导入 localStorage 数据
 
-| 风险 | 等级 | 说明 |
-|---|---|---|
-| 数据归属不清 | 🟡 中 | 匿名用户数据无法关联到具体用户 |
-| 存储膨胀 | 🟡 中 | 匿名用户可能创建大量数据 |
-| 隐私合规 | 🟡 中 | 需要明确告知数据存储策略 |
-| 清理困难 | 🟢 低 | 可定时清理过期的匿名数据 |
+### 3.2 理由
 
-### 3.3 推荐方案
+| 理由 | 说明 |
+|---|---|
+| 数据归属清晰 | 所有数据都有明确的 userId |
+| 无清理负担 | 不需要定时清理匿名数据 |
+| 权限控制简单 | 只需考虑登录用户的权限 |
+| 隐私风险低 | 所有数据都关联到具体用户 |
+| 实现成本低 | 不需要处理匿名用户的识别、防刷、清理 |
 
-**允许 `userId=null`，但限制匿名用户数据：**
+### 3.3 原方案（保留供参考）
+
+原方案考虑过允许 `userId=null`，但经复核后决定 MVP 不支持：
 
 - 匿名用户只能创建 1 条任务链（通过 sessionId 标识）
 - 登录后提示导入，导入后清除匿名数据
 - 匿名数据 30 天未登录自动清理
+
+### 3.4 未来扩展
+
+如果未来需要支持匿名用户保存到数据库：
+
+1. 新增 `sessionId` 字段
+2. 限制匿名用户只能创建 1 条任务链
+3. 30 天未登录自动清理
+4. 需要额外的防刷机制
+5. 需要额外的隐私告知
+
+**但这不在 Phase 2 MVP 范围内。**
 
 ---
 
@@ -255,11 +325,56 @@ useEffect(() => {
 
 ---
 
-## 七、如何与 ToolDocument 关联
+## 七、ToolDocument 关联策略（v6.42.1 明确结论）
 
-### 7.1 关联方式
+### 7.1 明确结论
 
-在 ToolDocumentDraft 中新增 `taskChainId` 可选字段：
+**Phase 2 MVP 不修改 ToolDocumentDraft schema。**
+
+- 不在 ToolDocumentDraft 中新增 `taskChainId` 字段
+- 在 TaskChainDraft.linkedDraftHints 中保存轻量关联提示
+- 正式关联放到后续 Phase
+
+### 7.2 理由
+
+| 理由 | 说明 |
+|---|---|
+| 减少 migration 风险 | 不修改现有表 |
+| 降低回归风险 | 不影响 Quote Sheet / Commercial Invoice |
+| 实现成本低 | 只需在 TaskChainDraft 中保存 hints |
+| 灵活性高 | hints 可以包含任意元数据 |
+
+### 7.3 linkedDraftHints 结构
+
+```json
+[
+  {
+    "toolKey": "commercial_invoice",
+    "draftId": "cmq...",
+    "title": "Commercial Invoice - phone case",
+    "createdAt": "2026-06-11T..."
+  },
+  {
+    "toolKey": "quote_sheet",
+    "draftId": "cmr...",
+    "title": "Quotation - phone case",
+    "createdAt": "2026-06-11T..."
+  }
+]
+```
+
+### 7.4 Quote Sheet / Commercial Invoice 关联策略
+
+**Phase 2 MVP 不立即关联 taskChainId。**
+
+- Quote Sheet 保存时不传递 taskChainId
+- Commercial Invoice 保存时不传递 taskChainId
+- 任务链保存时，前端记录 linkedDraftHints
+- Workspace 展示时，从 hints 中读取关联草稿
+
+### 7.5 原方案（保留供参考）
+
+原方案考虑过在 ToolDocumentDraft 中新增 `taskChainId` 字段：
 
 ```prisma
 model ToolDocumentDraft {
@@ -269,49 +384,18 @@ model ToolDocumentDraft {
 }
 ```
 
-### 7.2 关联流程
+但经复核后决定 MVP 不采用此方案，避免修改现有表的 migration 风险。
 
-```
-1. 用户从任务链创建 Commercial Invoice
-2. 前端传递 taskChainId 到保存 API
-3. 后端创建 ToolDocumentDraft 时关联 taskChainId
-4. Workspace 可展示「此发票属于任务 #123」
-```
+### 7.6 未来扩展
 
-### 7.3 API 修改
+如果未来需要正式关联：
 
-```typescript
-// POST /api/me/tool-documents
-export async function POST(req: NextRequest) {
-  // ... existing validation ...
+1. ToolDocumentDraft 新增 `taskChainId` 字段
+2. 新增 migration
+3. 修改保存 API，支持传递 taskChainId
+4. Workspace 展示正式关联关系
 
-  const { toolKey, title, companyProfileId, dataJson, previewJson, taskChainId } = body;
-
-  // 如果提供了 taskChainId，验证归属
-  if (taskChainId) {
-    const tc = await prisma.taskChainDraft.findFirst({
-      where: { id: taskChainId, userId: session.user.id },
-    });
-    if (!tc) {
-      return NextResponse.json({ error: "任务链不存在或无权访问" }, { status: 404 });
-    }
-  }
-
-  const draft = await prisma.toolDocumentDraft.create({
-    data: {
-      userId: session.user.id,
-      toolKey,
-      title,
-      companyProfileId: companyProfileId || null,
-      dataJson,
-      previewJson: previewJson || null,
-      taskChainId: taskChainId || null,  // 新增
-    },
-  });
-
-  // ... existing response ...
-}
-```
+**但这不在 Phase 2 MVP 范围内。**
 
 ---
 
@@ -495,3 +579,150 @@ psql -U test_user -h 127.0.0.1 test_db < /home/deploy/backups/bxb_prod_XXXXXXXX_
 **预计工期 6.5 天。**
 
 **等待用户确认。**
+
+---
+
+## 十五、6.43 实施边界草案（v6.42.1 新增）
+
+### 15.1 6.43 允许范围
+
+如果用户批准 6.43，只允许做：
+
+| 任务 | 说明 |
+|---|---|
+| 新增 TaskChainDraft Prisma model | 按本文档字段草案 |
+| 新增 migration | `prisma migrate dev --name add_task_chain_drafts` |
+| 新增最小 API | POST/GET/DELETE `/api/me/task-chains` |
+| Save-to-Workspace 真实保存 | 从占位变成真实保存 |
+| Workspace 最小任务列表 | 只显示任务标题和状态 |
+
+### 15.2 6.43 禁止范围
+
+| 禁止任务 | 说明 |
+|---|---|
+| 重构 Workspace | 不改变现有 Workspace 结构 |
+| 重构 ToolDocument | 不修改 ToolDocumentDraft schema |
+| 改 Quote Sheet 核心逻辑 | 不修改保存/恢复/导出 |
+| 改 Commercial Invoice 核心逻辑 | 不修改保存/恢复/导出 |
+| 做复杂任务详情页 | 只做最小列表 |
+| 做会员限制 | 只做文案占位，不实际限制 |
+| 批量修改历史数据 | 不迁移现有数据 |
+
+### 15.3 6.43 验收标准
+
+- [ ] Migration 执行成功
+- [ ] API CRUD 正常
+- [ ] Save-to-Workspace 真实保存
+- [ ] Workspace 显示任务列表
+- [ ] 无回归问题
+
+---
+
+## 十六、生产环境备份与回滚方案（v6.42.1 补充）
+
+### 16.1 生产服务器信息
+
+- **服务器**: `deploy@192.129.155.149`
+- **项目目录**: `/home/deploy/xixiong-saas`
+- **数据库**: PostgreSQL (本地 127.0.0.1:5432)
+- **数据库名**: `bxb_prod`
+- **数据库用户**: `bxb_user`
+- **密码**: 存在于 `.env.production` 的 `DATABASE_URL` 中（不在文档中暴露）
+
+### 16.2 备份前检查
+
+```bash
+# 1. SSH 到生产服务器
+ssh deploy@192.129.155.149
+
+# 2. 检查 DATABASE_URL（不显示密码）
+cd /home/deploy/xixiong-saas
+grep DATABASE_URL .env.production | sed 's/\(.*:.*@\).*\(@.*\)/\1***\2/'
+
+# 3. 检查数据库连接
+PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
+  psql -U bxb_user -h 127.0.0.1 -d bxb_prod -c "SELECT version();"
+
+# 4. 检查备份目录
+mkdir -p /home/deploy/backups
+ls -lh /home/deploy/backups/
+```
+
+### 16.3 备份命令
+
+```bash
+# 完整备份（推荐）
+BACKUP_FILE="/home/deploy/backups/bxb_prod_$(date +%Y%m%d_%H%M%S).sql"
+PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
+  pg_dump -U bxb_user -h 127.0.0.1 -d bxb_prod -F c -f "$BACKUP_FILE"
+echo "Backup created: $BACKUP_FILE"
+ls -lh "$BACKUP_FILE"
+```
+
+### 16.4 Migration 执行命令
+
+```bash
+# 1. SSH 到生产服务器
+ssh deploy@192.129.155.149
+
+# 2. 进入项目目录
+cd /home/deploy/xixiong-saas
+
+# 3. 备份数据库（必须）
+# （见 16.3 备份命令）
+
+# 4. 执行 migration
+npx prisma migrate deploy
+
+# 5. 验证 migration
+PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
+  psql -U bxb_user -h 127.0.0.1 -d bxb_prod -c "\d task_chain_drafts"
+
+# 6. 重新构建并部署
+npm run build
+pm2 restart xixiong-saas
+
+# 7. 验证生产环境
+curl -I https://jueshi.net/workspace
+```
+
+### 16.5 回滚步骤
+
+```bash
+# 1. SSH 到生产服务器
+ssh deploy@192.129.155.149
+
+# 2. 进入项目目录
+cd /home/deploy/xixiong-saas
+
+# 3. 停止服务
+pm2 stop xixiong-saas
+
+# 4. 回滚代码
+git revert <migration-commit-hash>
+
+# 5. 手动删除新表
+PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
+  psql -U bxb_user -h 127.0.0.1 -d bxb_prod -c "DROP TABLE IF EXISTS task_chain_drafts;"
+
+# 6. 重新构建并部署
+npm run build
+pm2 start xixiong-saas
+
+# 7. 验证生产环境
+curl -I https://jueshi.net/workspace
+```
+
+### 16.6 回滚判断标准
+
+**必须回滚的情况**：
+- Migration 执行失败
+- 新增表导致现有查询报错
+- 性能严重下降（>50%）
+- 数据丢失或损坏
+
+**必须停止并人工介入的情况**：
+- 数据库连接失败
+- 数据丢失
+- 无法回滚
+- 备份文件损坏
