@@ -3,8 +3,9 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import Link from "next/link";
-import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2, Bell, ArrowUpRight, Sparkles, TrendingUp, DollarSign, Award, ChevronRight, StickyNote, BarChart3, Globe, Briefcase, Megaphone } from "lucide-react";
+import { Heart, FileText, ExternalLink, Clock, RotateCcw, Building2, Bell, ArrowUpRight, Sparkles, TrendingUp, DollarSign, Award, ChevronRight, StickyNote, BarChart3, Globe, Briefcase, Megaphone, Package } from "lucide-react";
 import DeleteDocButton from "@/components/workspace/DeleteDocButton";
+import { TaskChainList } from "@/components/workspace/TaskChainList";
 
 export const metadata: Metadata = {
   title: "我的工作台 — 海外百宝箱",
@@ -268,6 +269,19 @@ export default async function WorkspacePage() {
               </table>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Task Chain Drafts */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-indigo-500" />
+            <h2 className="text-sm font-bold text-gray-900">跨境发货任务</h2>
+          </div>
+        </div>
+        <div className="bg-white border border-gray-100 rounded-xl p-4">
+          <TaskChainList />
         </div>
       </section>
 

@@ -20,7 +20,7 @@ interface TaskChainNextStepProps {
   className?: string;
 }
 
-type ToastType = 'saved' | 'cleared' | 'detected' | null;
+type ToastType = 'saved' | 'cleared' | 'detected' | 'workspace-saved' | 'workspace-error' | 'workspace-limit' | null;
 
 /** Check if user is logged in by calling NextAuth session endpoint.
  *  Note: next-auth session cookie is httpOnly, so document.cookie won't work.
@@ -89,13 +89,48 @@ export function TaskChainNextStep({ sourceTool, steps, className = '' }: TaskCha
     showToast('saved');
   };
 
-  const handleWorkspaceClick = () => {
+  const handleWorkspaceClick = async () => {
     if (!isLoggedIn) {
       setWorkspacePrompt('login');
       trackEvent.custom(sourceTool, 'task_chain_workspace_login_prompt');
-    } else {
-      setWorkspacePrompt('coming-soon');
-      trackEvent.custom(sourceTool, 'task_chain_workspace_click');
+      return;
+    }
+
+    // Logged-in user: actually save to database
+    if (!context) {
+      showToast('workspace-error');
+      trackEvent.custom(sourceTool, 'task_chain_workspace_save_failed');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/me/task-chains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `跨境发货任务 - ${context.productName || context.hsCode || sourceTool}`,
+          sourceTool,
+          lastActiveTool: sourceTool,
+          context: context,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showToast('workspace-saved');
+        trackEvent.custom(sourceTool, 'task_chain_workspace_save_success');
+      } else if (response.status === 403 && data.error?.includes('limit')) {
+        showToast('workspace-limit');
+        trackEvent.custom(sourceTool, 'task_chain_workspace_limit_hit');
+      } else {
+        showToast('workspace-error');
+        trackEvent.custom(sourceTool, 'task_chain_workspace_save_failed');
+      }
+    } catch (error) {
+      console.error('Failed to save task chain:', error);
+      showToast('workspace-error');
+      trackEvent.custom(sourceTool, 'task_chain_workspace_save_failed');
     }
   };
 
@@ -130,11 +165,18 @@ export function TaskChainNextStep({ sourceTool, steps, className = '' }: TaskCha
     <div className={`bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 sm:p-5 ${className}`}>
       {/* Toast notification */}
       {toast && (
-        <div className="mb-3 flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+        <div className={`mb-3 flex items-center gap-2 px-3 py-2 border rounded-lg text-sm ${
+          toast === 'workspace-error' || toast === 'workspace-limit'
+            ? 'bg-red-50 border-red-200 text-red-800'
+            : 'bg-green-50 border-green-200 text-green-800'
+        }`}>
           <Check className="w-4 h-4 shrink-0" />
           {toast === 'saved' && '已继续暂存在本机浏览器'}
           {toast === 'cleared' && '已清除本机暂存数据'}
           {toast === 'detected' && '已检测到本机暂存的任务数据'}
+          {toast === 'workspace-saved' && '已保存到工作台。你可以稍后继续这条跨境发货任务。'}
+          {toast === 'workspace-error' && '保存失败，请稍后重试。'}
+          {toast === 'workspace-limit' && '已达到保存上限，请归档或删除旧任务后再试。'}
         </div>
       )}
 
@@ -245,7 +287,7 @@ export function TaskChainNextStep({ sourceTool, steps, className = '' }: TaskCha
                 <div className="flex items-start gap-2 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                   <CloudOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-800">
-                    登录后，未来可将这条发货任务保存到工作台。当前数据仅暂存在本机浏览器，换设备或清理缓存后可能丢失。
+                    登录后，可将这条发货任务保存到工作台。当前数据仅暂存在本机浏览器，换设备或清理缓存后可能丢失。
                   </p>
                 </div>
                 <Link
@@ -257,23 +299,6 @@ export function TaskChainNextStep({ sourceTool, steps, className = '' }: TaskCha
                   去登录并继续
                 </Link>
                 <p className="text-xs text-gray-400 text-center mt-2">登录后本机暂存数据不会丢失</p>
-              </>
-            )}
-
-            {workspacePrompt === 'coming-soon' && (
-              <>
-                <div className="flex items-start gap-2 mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <CloudOff className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-amber-800">
-                    保存到工作台功能即将开放。当前任务链仍仅暂存在本机浏览器，尚未保存到云端。
-                  </p>
-                </div>
-                <button
-                  onClick={() => setWorkspacePrompt(null)}
-                  className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors"
-                >
-                  知道了
-                </button>
               </>
             )}
           </div>

@@ -60,6 +60,7 @@ model User {
   userOnboardingState    UserOnboardingState?
   userFavorites          UserFavorite[]
   documentHistories      DocumentHistory[]
+  taskChainDrafts        TaskChainDraft[]
 
   @@map("users")
 }
@@ -1354,4 +1355,38 @@ model LandingPage {
   @@index([pageType])
   @@index([slug])
   @@map("landing_pages")
+}
+
+// ─── v1.20.42.6.43: Task Chain Draft (Cross-tool workflow persistence) ───
+
+model TaskChainDraft {
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Core fields
+  title              String
+  status             String    @default("active") // active / completed / archived / deleted
+  sourceTool         String    @map("source_tool") // Tool that initiated the task chain
+  lastActiveTool     String?   @map("last_active_tool") // Last tool user interacted with
+  
+  // Context data (JSON)
+  context            Json      // Task chain context: { productName, hsCode, declaredValue, currency, destinationCountry, postalCode, addressText, ... }
+  linkedDraftHints   Json?     @map("linked_draft_hints") // Lightweight draft associations: [{ toolKey, draftId, createdAt }]
+  
+  // Timestamps
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  
+  // Optional lifecycle fields
+  completedAt        DateTime? @map("completed_at")
+  archivedAt         DateTime? @map("archived_at")
+  expiresAt          DateTime? @map("expires_at")
+  deletedAt          DateTime? @map("deleted_at")
+  
+  @@index([userId])
+  @@index([userId, status])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@map("task_chain_drafts")
 }
