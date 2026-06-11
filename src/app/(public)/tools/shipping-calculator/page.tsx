@@ -13,7 +13,9 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { trackEvent } from '@/lib/analytics';
+import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 // ==================== Types ====================
@@ -128,9 +130,19 @@ export default function ShippingCalculatorPage() {
   const [showFormula, setShowFormula] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(true);
 
-  // Persist to localStorage
+  // Persist to localStorage and save to task chain
   useEffect(() => {
     saveState({ mode, customDivisor, rows });
+    // Save to task chain if there's meaningful data
+    if (rows.length > 0 && rows[0].length && rows[0].width && rows[0].height) {
+      const r = calcResults();
+      if (r.chargeableWeight > 0) {
+        saveTaskChain({
+          sourceTool: 'shipping-calculator',
+          shippingEstimate: `${r.chargeableWeight.toFixed(2)} kg (计费重)`,
+        });
+      }
+    }
   }, [mode, customDivisor, rows]);
 
   // ==================== Calculations ====================
@@ -698,6 +710,14 @@ export default function ShippingCalculatorPage() {
         <RelatedChecklistSection
           toolSlug="shipping-calculator"
           sourcePath="shipping-calculator"
+        />
+      </div>
+
+      {/* Task Chain Next Step */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <TaskChainNextStep
+          sourceTool="shipping-calculator"
+          steps={TASK_CHAIN_STEPS['shipping-calculator']}
         />
       </div>
 

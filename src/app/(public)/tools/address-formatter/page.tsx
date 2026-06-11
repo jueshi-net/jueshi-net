@@ -7,7 +7,9 @@ import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { trackEvent } from '@/lib/analytics';
+import { saveTaskChain } from '@/lib/task-chain';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
@@ -215,6 +217,15 @@ export default function AddressFormatterPage() {
     setRecentAddresses(updated);
     try { localStorage.setItem(RECENT_ADDRESSES_KEY, JSON.stringify(updated)); } catch {}
     trackEvent.custom('address-formatter', 'generate');
+
+    // Save to task chain
+    saveTaskChain({
+      sourceTool: 'address-formatter',
+      addressText: english.slice(0, 100),
+      postalCode: form.postalCode,
+      destinationCountry: form.country,
+    });
+    trackEvent.custom('address-formatter', 'task_chain_save_context');
   };
 
   const copyResult = () => {
@@ -521,6 +532,14 @@ export default function AddressFormatterPage() {
           toolSlug="address-formatter"
           sourcePath="address-formatter"
         />
+
+        {/* Task Chain Next Step */}
+        <div className="mt-8">
+          <TaskChainNextStep
+            sourceTool="address-formatter"
+            steps={TASK_CHAIN_STEPS['address-formatter']}
+          />
+        </div>
       </div>
     </div>
   );

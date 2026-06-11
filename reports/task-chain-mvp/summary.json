@@ -1,0 +1,52 @@
+{
+  "version": "v1.20.42.6.39",
+  "timestamp": "2026-06-11T03:30:00Z",
+  "status": "completed",
+  "files": {
+    "new": [
+      "src/lib/task-chain.ts",
+      "src/components/tools/task-chain-next-step.tsx"
+    ],
+    "modified": [
+      "src/app/(public)/tools/hs-code/page.tsx",
+      "src/app/(public)/tools/exchange-rate/page.tsx",
+      "src/app/(public)/tools/postal-code/postal-code-client.tsx",
+      "src/app/(public)/tools/address-formatter/page.tsx",
+      "src/app/(public)/tools/shipping-calculator/page.tsx",
+      "src/app/(public)/tools/documents/[type]/page.tsx"
+    ]
+  },
+  "taskChainKey": "jueshi.taskChain.shippingMvp",
+  "eventLogEvents": [
+    "task_chain_save_context",
+    "task_chain_next_click",
+    "task_chain_clear",
+    "task_chain_prefill_accept",
+    "task_chain_prefill_reject"
+  ],
+  "deployment": {
+    "server": "192.129.155.149",
+    "pm2Pid": 394160,
+    "pm2Memory": "63.3MB",
+    "buildStatus": "success"
+  },
+  "verification": {
+    "hsCode": 200,
+    "exchangeRate": 200,
+    "postalCode": 200,
+    "addressFormatter": 200,
+    "shippingCalculator": 200,
+    "commercialInvoice": 200,
+    "quotation": 200
+  },
+  "safetyChecks": {
+    "databaseModified": false,
+    "migrationAdded": false,
+    "prismaSchemaModified": false,
+    "authModified": false,
+    "quoteSheetCoreLogicModified": false,
+    "commercialInvoiceCoreLogicModified": false
+  },
+  "readyForNextVersion": true,
+  "nextVersion": "v1.20.42.6.40"
+}

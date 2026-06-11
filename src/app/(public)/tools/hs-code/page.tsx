@@ -7,8 +7,10 @@ import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { inputStyles, cardStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
+import { saveTaskChain } from '@/lib/task-chain';
 import Link from 'next/link';
 
 interface HSCodeItem {
@@ -81,6 +83,8 @@ export default function HSCodePage() {
           try { localStorage.setItem(RECENT_QUERIES_KEY, JSON.stringify(updated)); } catch {}
         }
         trackEvent.custom('hs-code', 'query');
+        // Save to task chain
+        saveTaskChain({ sourceTool: 'hs-code', productName: q });
       }
     } catch (e) {
       console.error(e);
@@ -109,8 +113,15 @@ export default function HSCodePage() {
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 1500);
       trackEvent.custom('hs-code', 'copy_result');
+      // If copying an HS code, save to task chain
+      if (field.startsWith('code-')) {
+        const code = text;
+        const item = results.find(r => r.code === code);
+        saveTaskChain({ hsCode: code, productDescription: item?.descriptionEn || item?.description || '' });
+        trackEvent.custom('hs-code', 'task_chain_save_context');
+      }
     });
-  }, []);
+  }, [results]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -373,6 +384,19 @@ export default function HSCodePage() {
           toolSlug="hs-code"
           sourcePath="hs-code"
         />
+
+        {/* Task Chain Next Step */}
+        <div className="mt-8">
+          <TaskChainNextStep
+            sourceTool="hs-code"
+            steps={TASK_CHAIN_STEPS['hs-code'].map(s => ({
+              ...s,
+              href: s.href.includes('commercial-invoice')
+                ? `/tools/documents/commercial-invoice?from=task-chain&productName=${encodeURIComponent(search)}&hsCode=${encodeURIComponent(results.find(r => r.code === expandedId)?.code || '')}`
+                : s.href
+            }))}
+          />
+        </div>
 
         <AdSlot placement="tool-hs-code-bottom" className="mb-4" />
       </div>

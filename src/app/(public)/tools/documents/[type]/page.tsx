@@ -17,6 +17,8 @@ import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, s
 import { AdSlot } from '@/components/ad-slot';
 import SmartRelatedLinks from '@/components/smart-related-links';
 import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
+import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData } from '@/lib/task-chain';
+import { trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
 
 function getTotalLabel(key: string): string {
@@ -63,6 +65,54 @@ export default function DocumentEditorPage() {
   const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const lastExportRef = useRef<number>(0);
+
+  // ── Task Chain prefill detection ──
+  const [showTaskChainBanner, setShowTaskChainBanner] = useState(false);
+  const [taskChainData, setTaskChainData] = useState<ReturnType<typeof getTaskChain>>(null);
+
+  useEffect(() => {
+    // Check URL params first, then localStorage
+    const urlData = getTaskChainFromURL();
+    const storedData = getTaskChain();
+    const data = urlData || (hasTaskChainData() ? storedData : null);
+    if (data) {
+      setTaskChainData({
+        version: 'v1',
+        updatedAt: new Date().toISOString(),
+        ...data,
+      } as typeof taskChainData);
+      setShowTaskChainBanner(true);
+    }
+  }, []);
+
+  const handleTaskChainAccept = () => {
+    if (!taskChainData) return;
+    // Prefill relevant fields based on document type
+    const updates: Record<string, any> = {};
+    if (taskChainData.productName) {
+      // For line items, set product name
+      setLineItems(prev => [{ ...prev[0], description: taskChainData.productName, hsCode: taskChainData.hsCode || '' }]);
+    }
+    if (taskChainData.hsCode && lineItems[0]) {
+      setLineItems(prev => [{ ...prev[0], hsCode: taskChainData.hsCode }]);
+    }
+    if (taskChainData.declaredValue) {
+      updates.totalAmount = parseFloat(taskChainData.declaredValue) || 0;
+    }
+    if (taskChainData.currency) {
+      updates.currency = taskChainData.currency;
+    }
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+    trackEvent.custom(type, 'task_chain_prefill_accept');
+    setShowTaskChainBanner(false);
+  };
+
+  const handleTaskChainReject = () => {
+    trackEvent.custom(type, 'task_chain_prefill_reject');
+    setShowTaskChainBanner(false);
+  };
 
   // ── Thermal paper size for label types ──
   const isLabelType = type.endsWith('-label') || type === 'shipping-mark';
@@ -497,6 +547,48 @@ export default function DocumentEditorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Task Chain Prefill Banner */}
+      {showTaskChainBanner && taskChainData && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
+          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-blue-900">检测到任务链数据，是否填入？</p>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {taskChainData.productName && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                    商品: {taskChainData.productName}
+                  </span>
+                )}
+                {taskChainData.hsCode && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                    HS编码: {taskChainData.hsCode}
+                  </span>
+                )}
+                {taskChainData.declaredValue && taskChainData.currency && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                    金额: {taskChainData.declaredValue} {taskChainData.currency}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={handleTaskChainAccept}
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                确认填入
+              </button>
+              <button
+                onClick={handleTaskChainReject}
+                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
+              >
+                忽略
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hidden export container for PNG */}
       <div ref={exportContainerRef} className="hidden" aria-hidden="true" />
 

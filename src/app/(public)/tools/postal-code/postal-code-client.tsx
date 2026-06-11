@@ -8,7 +8,9 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
 import SmartRelatedLinks from '@/components/smart-related-links';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { trackEvent } from '@/lib/analytics';
+import { saveTaskChain } from '@/lib/task-chain';
 import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
@@ -344,6 +346,13 @@ export default function PostalCodePage() {
         timestamp: Date.now(),
         country: selectedCountryCode,
       });
+      // Save to task chain
+      saveTaskChain({
+        sourceTool: 'postal-code',
+        postalCode: trimmed,
+        destinationCountry: country.name,
+      });
+      trackEvent.custom('postal-code', 'task_chain_save_context');
     } else {
       setValidationResult({
         valid: false,
@@ -1253,6 +1262,14 @@ export default function PostalCodePage() {
           toolSlug="postal-code"
           sourcePath="postal-code"
         />
+
+        {/* Task Chain Next Step */}
+        <div className="mt-8">
+          <TaskChainNextStep
+            sourceTool="postal-code"
+            steps={TASK_CHAIN_STEPS['postal-code']}
+          />
+        </div>
 
         {/* Smart Contextual Interlinking */}
         <div className="mt-8">

@@ -2,6 +2,7 @@
 import { AdSlot } from '@/components/ad-slot';
 import SmartRelatedLinks from '@/components/smart-related-links';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp, Copy, Check, Clock, Truck } from "lucide-react";
@@ -9,6 +10,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
+import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import Link from 'next/link';
 
@@ -271,6 +273,16 @@ export default function ExchangeRatePage() {
     )].slice(0, 5);
     setRecentConversions(updated);
     try { localStorage.setItem('exchange-rate-recent', JSON.stringify(updated)); } catch {}
+
+    // Save to task chain
+    saveTaskChain({
+      sourceTool: 'exchange-rate',
+      declaredValue: amount,
+      currency: fromCurrency,
+      exchangeRate: rate.toFixed(4),
+      convertedValue: converted.toFixed(2),
+    });
+    trackEvent.custom('exchange-rate', 'task_chain_save_context');
   };
 
   const convert = () => {
@@ -738,6 +750,14 @@ export default function ExchangeRatePage() {
           toolSlug="exchange-rate"
           sourcePath="exchange-rate"
         />
+
+        {/* Task Chain Next Step */}
+        <div className="mt-8">
+          <TaskChainNextStep
+            sourceTool="exchange-rate"
+            steps={TASK_CHAIN_STEPS['exchange-rate']}
+          />
+        </div>
 
         {/* FAQ */}
         <FAQSection title="汇率查询常见问题" items={[
