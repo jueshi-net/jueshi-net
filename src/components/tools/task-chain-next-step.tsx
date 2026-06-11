@@ -22,16 +22,28 @@ interface TaskChainNextStepProps {
 
 type ToastType = 'saved' | 'cleared' | 'detected' | null;
 
-/** Check if user is logged in by inspecting next-auth session cookie */
+/** Check if user is logged in by calling NextAuth session endpoint.
+ *  Note: next-auth session cookie is httpOnly, so document.cookie won't work.
+ *  We use /api/auth/session which returns the session if authenticated. */
 function useIsLoggedIn(): boolean | null {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   useEffect(() => {
-    // next-auth sets 'next-auth.session-token' (or '__Secure-next-auth.session-token' for HTTPS)
-    const hasSession = typeof document !== 'undefined' && (
-      document.cookie.includes('next-auth.session-token') ||
-      document.cookie.includes('__Secure-next-auth.session-token')
-    );
-    setIsLoggedIn(hasSession);
+    let cancelled = false;
+    fetch('/api/auth/session', { credentials: 'include' })
+      .then(res => {
+        if (cancelled) return null;
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(data => {
+        if (cancelled) return;
+        // NextAuth returns { user: {...}, expires: "..." } when logged in, or empty/null when not
+        setIsLoggedIn(!!data?.user);
+      })
+      .catch(() => {
+        if (!cancelled) setIsLoggedIn(false);
+      });
+    return () => { cancelled = true; };
   }, []);
   return isLoggedIn;
 }

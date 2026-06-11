@@ -92,6 +92,8 @@ model TaskChainDraft {
 
 ### 2.3 字段分类
 
+**MVP 必需字段**（6.42.2 修正：completedAt/archivedAt 改为可选）
+
 | 字段 | MVP 必需 | 索引 | 隐私风险 | 说明 |
 |---|---|---|---|---|
 | id | ✅ | PK | 无 | 主键 |
@@ -103,8 +105,14 @@ model TaskChainDraft {
 | linkedDraftHints | ✅ | - | 无 | 关联草稿提示 |
 | createdAt | ✅ | ✅ | 无 | 创建时间 |
 | updatedAt | ✅ | - | 无 | 更新时间 |
-| completedAt | ✅ | - | 无 | 完成时间 |
-| archivedAt | ✅ | - | 无 | 归档时间 |
+
+**MVP 可选字段**（6.42.2 修正：生命周期结束字段不强制）
+
+| 字段 | MVP 可选 | 索引 | 隐私风险 | 说明 |
+|---|---|---|---|---|
+| completedAt | ✅ 可选 | - | 无 | 只有任务完成后才有值 |
+| archivedAt | ✅ 可选 | - | 无 | 只有归档后才有值 |
+| lastActiveTool | ✅ 可选 | - | 无 | 最后活跃工具（可从 context 推导但冗余存储更快） |
 
 ### 2.4 暂缓字段（不在 MVP 中）
 
@@ -112,7 +120,6 @@ model TaskChainDraft {
 |---|---|
 | sessionId / anonymousId | MVP 不支持匿名用户 |
 | currentStep | 可从 context 推导 |
-| lastActiveTool | 可从 context 推导 |
 | expiresAt | 后续版本再加 |
 | deletedAt | 使用硬删除 |
 
@@ -467,31 +474,45 @@ psql -U test_user -h 127.0.0.1 test_db < /home/deploy/backups/bxb_prod_XXXXXXXX_
 
 ---
 
-## 十、哪些内容需要用户确认后才能执行
+## 十、用户确认事项最终清单（v6.42.2 定稿）
 
 ### 10.1 必须确认的事项
 
-| 事项 | 说明 | 风险 |
-|---|---|---|
-| 是否执行 Migration | 新增 TaskChainDraft 表 + 修改 ToolDocumentDraft | 高 |
-| 是否允许匿名 userId=null | 影响数据归属和清理策略 | 中 |
-| 免费用户保存上限 | 5 个活跃任务是否合理 | 低 |
-| 会员用户保存上限 | 50 个活跃任务是否合理 | 低 |
-| 数据保留策略 | 90 天/180 天/365 天是否合理 | 中 |
-| 是否开放管理员查看 | 影响隐私和审计 | 中 |
-| 是否开放导出资料包 | 影响会员权益 | 低 |
+| # | 事项 | 默认值 | 风险 |
+|---|---|---|---|
+| 1 | 是否批准进入 6.43？ | 待确认 | 高 |
+| 2 | 是否批准新增 TaskChainDraft Prisma model？ | 待确认 | 高 |
+| 3 | 是否批准执行 migration？ | 待确认 | 高 |
+| 4 | 是否确认 Phase 2 只允许登录用户保存？ | 是 | 中 |
+| 5 | 是否确认未登录用户继续只用 localStorage？ | 是 | 中 |
+| 6 | 是否确认不修改 ToolDocumentDraft schema？ | 是 | 中 |
+| 7 | 是否确认免费用户任务链保存上限为 5？ | 5 | 低 |
+| 8 | 是否确认会员用户任务链保存上限为 50？ | 50 | 低 |
+| 9 | 是否确认数据保留策略先采用 180 天？ | 180 天 | 中 |
+| 10 | 是否确认 6.43 不做复杂 Workspace 重构？ | 是 | 中 |
+| 11 | 是否确认上线前必须 pg_dump 备份成功？ | 是 | 高 |
+| 12 | 是否确认备份失败则不得执行 migration？ | 是 | 高 |
 
-### 10.2 确认流程
+### 10.2 确认方式
+
+用户需明确回复：
 
 ```
-1. 用户阅读本文档
-2. 用户确认上述事项
-3. 用户明确同意执行 Migration
-4. 执行数据库备份
-5. 执行 Migration
-6. 验证数据完整性
-7. 部署代码
-8. 验证功能正常
+"批准进入 6.43，并批准新增 TaskChainDraft migration。"
+
+确认事项：
+1. 进入 6.43：是
+2. 新增 TaskChainDraft model：是
+3. 执行 migration：是
+4. 只允许登录用户保存：是
+5. 未登录用户只用 localStorage：是
+6. 不修改 ToolDocumentDraft schema：是
+7. 免费用户上限：5
+8. 会员用户上限：50
+9. 数据保留策略：180 天
+10. 不做复杂 Workspace 重构：是
+11. 上线前 pg_dump 备份必须成功：是
+12. 备份失败不得执行 migration：是
 ```
 
 ### 10.3 拒绝确认的处理
@@ -582,7 +603,7 @@ psql -U test_user -h 127.0.0.1 test_db < /home/deploy/backups/bxb_prod_XXXXXXXX_
 
 ---
 
-## 十五、6.43 实施边界草案（v6.42.1 新增）
+## 十五、6.43 实施边界草案（v6.42.2 收紧版）
 
 ### 15.1 6.43 允许范围
 
@@ -590,11 +611,13 @@ psql -U test_user -h 127.0.0.1 test_db < /home/deploy/backups/bxb_prod_XXXXXXXX_
 
 | 任务 | 说明 |
 |---|---|
-| 新增 TaskChainDraft Prisma model | 按本文档字段草案 |
+| 新增 TaskChainDraft Prisma model | 按本文档字段草案（MVP 必需字段） |
 | 新增 migration | `prisma migrate dev --name add_task_chain_drafts` |
-| 新增最小 API | POST/GET/DELETE `/api/me/task-chains` |
-| Save-to-Workspace 真实保存 | 从占位变成真实保存 |
-| Workspace 最小任务列表 | 只显示任务标题和状态 |
+| 新增最小 API | POST `/api/me/task-chains`（保存） |
+| | GET `/api/me/task-chains`（获取我的任务链） |
+| | DELETE 或 PATCH archive `/api/me/task-chains/[id]` |
+| Save-to-Workspace 真实保存 | 从占位变成真实保存（调用新 API） |
+| Workspace 极简入口 | 可以只加一个极简入口或极简列表，但不得重构 |
 
 ### 15.2 6.43 禁止范围
 
@@ -602,19 +625,23 @@ psql -U test_user -h 127.0.0.1 test_db < /home/deploy/backups/bxb_prod_XXXXXXXX_
 |---|---|
 | 重构 Workspace | 不改变现有 Workspace 结构 |
 | 重构 ToolDocument | 不修改 ToolDocumentDraft schema |
-| 改 Quote Sheet 核心逻辑 | 不修改保存/恢复/导出 |
-| 改 Commercial Invoice 核心逻辑 | 不修改保存/恢复/导出 |
-| 做复杂任务详情页 | 只做最小列表 |
-| 做会员限制 | 只做文案占位，不实际限制 |
+| 修改 Quote Sheet 核心保存、恢复、导出逻辑 | 零影响 |
+| 修改 Commercial Invoice 核心保存、恢复、导出逻辑 | 零影响 |
+| 复杂任务详情页 | 只做最小列表 |
+| 多设备实时同步 | 不做 |
+| 会员限制真实拦截 | 除非用户另行批准，否则只做文案占位 |
 | 批量修改历史数据 | 不迁移现有数据 |
+| 匿名用户写数据库 | 不允许，未登录用户继续只用 localStorage |
 
 ### 15.3 6.43 验收标准
 
 - [ ] Migration 执行成功
 - [ ] API CRUD 正常
-- [ ] Save-to-Workspace 真实保存
-- [ ] Workspace 显示任务列表
-- [ ] 无回归问题
+- [ ] Save-to-Workspace 真实保存（写数据库）
+- [ ] Workspace 显示极简任务列表或入口
+- [ ] 无回归问题（Quote Sheet / Commercial Invoice / Workspace 现有功能）
+- [ ] 未登录用户点击"保存到工作台"仍提示登录
+- [ ] 登录用户保存后，数据库有对应记录
 
 ---
 
@@ -650,14 +677,31 @@ ls -lh /home/deploy/backups/
 
 ### 16.3 备份命令
 
+**重要**：`-F c` (custom format) 必须使用 `.dump` 扩展名，`.sql` 仅用于 plain SQL 格式。
+
 ```bash
-# 完整备份（推荐）
-BACKUP_FILE="/home/deploy/backups/bxb_prod_$(date +%Y%m%d_%H%M%S).sql"
-PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
-  pg_dump -U bxb_user -h 127.0.0.1 -d bxb_prod -F c -f "$BACKUP_FILE"
+# 完整备份（推荐，custom format）
+mkdir -p /home/deploy/backups
+BACKUP_FILE="/home/deploy/backups/bxb_prod_$(date +%Y%m%d_%H%M%S).dump"
+pg_dump "$DATABASE_URL" -F c -f "$BACKUP_FILE"
 echo "Backup created: $BACKUP_FILE"
 ls -lh "$BACKUP_FILE"
+
+# 验证备份成功（文件大小应 > 0）
+if [ ! -s "$BACKUP_FILE" ]; then
+  echo "ERROR: Backup file is empty or missing. DO NOT proceed with migration."
+  exit 1
+fi
+
+# 验证备份内容（列出表）
+pg_restore -l "$BACKUP_FILE" | head -20
 ```
+
+**安全规则**：
+- 不得把真实数据库密码写入报告或日志
+- 不得在日志中 echo DATABASE_URL
+- 备份失败（文件大小为 0）时，**不得执行 migration**
+- 必须先 `mkdir -p /home/deploy/backups`
 
 ### 16.4 Migration 执行命令
 
@@ -688,32 +732,57 @@ curl -I https://jueshi.net/workspace
 
 ### 16.5 回滚步骤
 
-```bash
-# 1. SSH 到生产服务器
-ssh deploy@192.129.155.149
+**重要**：VPS 通过 rsync 部署（exclude .git），因此 VPS 上没有 git 历史。回滚必须从本地稳定版本 rsync 回去。
 
-# 2. 进入项目目录
+```bash
+# === 代码回滚（在本地 Mac 执行）===
+
+# 1. 在本地回退到上一个稳定 commit
+cd /Users/chq/xixiong-saas
+git log --oneline -5  # 找到 migration 之前的 commit
+git checkout <stable-commit-hash>  # 或直接 git revert <migration-commit>
+
+# 2. rsync 稳定版本到 VPS
+rsync -az --exclude='node_modules' --exclude='.next' --exclude='.git' \
+  ./ deploy@192.129.155.149:/home/deploy/xixiong-saas/
+
+# === 数据库回滚（在 VPS 执行）===
+
+# 3. SSH 到 VPS
+ssh deploy@192.129.155.149
 cd /home/deploy/xixiong-saas
 
-# 3. 停止服务
+# 4. 停止服务
 pm2 stop xixiong-saas
 
-# 4. 回滚代码
-git revert <migration-commit-hash>
+# 5. 数据库回滚
+# 情况 A：新表无有效用户数据 → 直接 DROP
+psql "$DATABASE_URL" -c "DROP TABLE IF EXISTS \"task_chain_drafts\";"
 
-# 5. 手动删除新表
-PGPASSWORD=$(grep DATABASE_URL .env.production | sed 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/') \
-  psql -U bxb_user -h 127.0.0.1 -d bxb_prod -c "DROP TABLE IF EXISTS task_chain_drafts;"
+# 情况 B：新表已有用户数据 → 先导出再 DROP
+psql "$DATABASE_URL" -c "COPY task_chain_drafts TO '/home/deploy/backups/task_chain_drafts_rollback_$(date +%Y%m%d_%H%M%S).csv' WITH CSV HEADER;"
+psql "$DATABASE_URL" -c "DROP TABLE IF EXISTS \"task_chain_drafts\";"
+
+# 情况 C：如果 Prisma migration 已记录但需要回滚
+# 手动删除 _prisma_migrations 中对应记录
+psql "$DATABASE_URL" -c "DELETE FROM _prisma_migrations WHERE migration_name LIKE '%add_task_chain%';"
 
 # 6. 重新构建并部署
+rm -rf .next
 npm run build
 pm2 start xixiong-saas
+pm2 status
 
 # 7. 验证生产环境
 curl -I https://jueshi.net/workspace
 ```
 
 ### 16.6 回滚判断标准
+
+**可以自动回滚的情况**：
+- Migration 执行成功但功能不符合预期
+- 新增表无用户数据
+- 前端 UI 显示异常但不影响其他功能
 
 **必须回滚的情况**：
 - Migration 执行失败
@@ -723,6 +792,7 @@ curl -I https://jueshi.net/workspace
 
 **必须停止并人工介入的情况**：
 - 数据库连接失败
-- 数据丢失
-- 无法回滚
-- 备份文件损坏
+- 数据丢失且无备份
+- 备份文件损坏无法恢复
+- rsync 回滚后 build 失败
+- 不确定新表是否有有效用户数据
