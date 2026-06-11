@@ -87,20 +87,34 @@ export default function DocumentEditorPage() {
 
   const handleTaskChainAccept = () => {
     if (!taskChainData) return;
-    // Prefill relevant fields based on document type
+    // Only fill empty fields - do NOT overwrite existing data
     const updates: Record<string, any> = {};
-    if (taskChainData.productName) {
-      // For line items, set product name
-      setLineItems(prev => [{ ...prev[0], description: taskChainData.productName, hsCode: taskChainData.hsCode || '' }]);
+    
+    // Line items: only fill if first item is empty
+    if (taskChainData.productName || taskChainData.hsCode) {
+      setLineItems(prev => {
+        const first = prev[0] || {};
+        // Only fill if description is empty
+        const newFirst = { ...first };
+        if (taskChainData.productName && !first.description) {
+          newFirst.description = taskChainData.productName;
+        }
+        if (taskChainData.hsCode && !first.hsCode) {
+          newFirst.hsCode = taskChainData.hsCode;
+        }
+        return [newFirst, ...prev.slice(1)];
+      });
     }
-    if (taskChainData.hsCode && lineItems[0]) {
-      setLineItems(prev => [{ ...prev[0], hsCode: taskChainData.hsCode }]);
-    }
-    if (taskChainData.declaredValue) {
+    
+    // Form data: only fill empty fields
+    if (taskChainData.declaredValue && !formData.totalAmount) {
       updates.totalAmount = parseFloat(taskChainData.declaredValue) || 0;
     }
-    if (taskChainData.currency) {
+    if (taskChainData.currency && !formData.currency) {
       updates.currency = taskChainData.currency;
+    }
+    if (taskChainData.convertedValue && !formData.totalAmount) {
+      updates.totalAmount = parseFloat(taskChainData.convertedValue) || 0;
     }
     if (Object.keys(updates).length > 0) {
       setFormData(prev => ({ ...prev, ...updates }));
@@ -111,6 +125,14 @@ export default function DocumentEditorPage() {
 
   const handleTaskChainReject = () => {
     trackEvent.custom(type, 'task_chain_prefill_reject');
+    setShowTaskChainBanner(false);
+    // Do NOT delete localStorage - just hide banner for this session
+  };
+
+  const handleTaskChainClear = () => {
+    clearTaskChain();
+    trackEvent.custom(type, 'task_chain_clear');
+    setTaskChainData(null);
     setShowTaskChainBanner(false);
   };
 
@@ -550,40 +572,63 @@ export default function DocumentEditorPage() {
       {/* Task Chain Prefill Banner */}
       {showTaskChainBanner && taskChainData && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
-          <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-blue-900">检测到任务链数据，是否填入？</p>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {taskChainData.productName && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
-                    商品: {taskChainData.productName}
-                  </span>
-                )}
-                {taskChainData.hsCode && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
-                    HS编码: {taskChainData.hsCode}
-                  </span>
-                )}
-                {taskChainData.declaredValue && taskChainData.currency && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
-                    金额: {taskChainData.declaredValue} {taskChainData.currency}
-                  </span>
-                )}
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-blue-900">检测到跨境发货任务链数据</p>
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {taskChainData.productName && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      商品: {taskChainData.productName}
+                    </span>
+                  )}
+                  {taskChainData.hsCode && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      HS编码: {taskChainData.hsCode}
+                    </span>
+                  )}
+                  {taskChainData.declaredValue && taskChainData.currency && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      金额: {taskChainData.declaredValue} {taskChainData.currency}
+                    </span>
+                  )}
+                  {taskChainData.convertedValue && taskChainData.currency && !taskChainData.declaredValue && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      金额: {taskChainData.convertedValue} {taskChainData.currency}
+                    </span>
+                  )}
+                  {taskChainData.addressText && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      地址: {taskChainData.addressText.length > 25 ? taskChainData.addressText.slice(0, 25) + '...' : taskChainData.addressText}
+                    </span>
+                  )}
+                  {taskChainData.postalCode && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                      邮编: {taskChainData.postalCode}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button
-                onClick={handleTaskChainAccept}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                确认填入
-              </button>
-              <button
-                onClick={handleTaskChainReject}
-                className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
-              >
-                忽略
-              </button>
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <button
+                  onClick={handleTaskChainAccept}
+                  className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  使用这些数据
+                </button>
+                <button
+                  onClick={handleTaskChainReject}
+                  className="px-3 py-1.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
+                >
+                  暂不使用
+                </button>
+                <button
+                  onClick={handleTaskChainClear}
+                  className="px-3 py-1.5 text-red-600 hover:bg-red-50 text-sm font-medium rounded-lg border border-red-200 transition-colors"
+                >
+                  清除任务链数据
+                </button>
+              </div>
             </div>
           </div>
         </div>
