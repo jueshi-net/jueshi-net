@@ -35,6 +35,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
+      url: `${BASE_URL}/bbs`,
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/community`,
       lastModified: now,
       changeFrequency: "weekly",
@@ -72,6 +78,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let lpPages: MetadataRoute.Sitemap = [];
   let checklistPages: MetadataRoute.Sitemap = [];
   let communityPages: MetadataRoute.Sitemap = [];
+  let forumCategoryPages: MetadataRoute.Sitemap = [];
+  let forumPostPages: MetadataRoute.Sitemap = [];
 
   try {
     // Published Articles
@@ -129,9 +137,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.6,
     }));
+
+    // Active Forum Categories
+    const forumCategories = await prisma.forumCategory.findMany({
+      where: { isActive: true },
+      select: { key: true, updatedAt: true },
+      orderBy: { sortOrder: "asc" },
+    });
+
+    forumCategoryPages = forumCategories.map((cat) => ({
+      url: `${BASE_URL}/bbs/category/${cat.key}`,
+      lastModified: cat.updatedAt,
+      changeFrequency: "daily" as const,
+      priority: 0.7,
+    }));
+
+    // Published Forum Posts (only published, not pending/hidden)
+    const forumPosts = await prisma.forumPost.findMany({
+      where: { status: "published" },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    forumPostPages = forumPosts.map((post) => ({
+      url: `${BASE_URL}/bbs/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
   } catch (e) {
     console.error("[sitemap] DB fetch failed, returning static pages + tools only");
   }
 
-  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages];
+  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages, ...forumCategoryPages, ...forumPostPages];
 }
