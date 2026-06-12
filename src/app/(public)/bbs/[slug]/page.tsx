@@ -217,6 +217,14 @@ export default async function PostDetailPage({
             >
               返回「{post.category.name}」
             </Link>
+            {isLoggedIn && (
+              <Link
+                href={`/bbs/${slug}/edit`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors min-h-[44px]"
+              >
+                编辑帖子
+              </Link>
+            )}
             <Link
               href="/bbs/new"
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors min-h-[44px]"
