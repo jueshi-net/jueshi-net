@@ -56,7 +56,7 @@ export default async function NewPostPage() {
           <p className="text-gray-500 mb-6">请联系管理员启用论坛分类</p>
           <Link
             href="/bbs"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand text-white rounded-xl font-semibold hover:bg-brand-dark"
           >
             返回论坛
           </Link>
@@ -68,17 +68,17 @@ export default async function NewPostPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
+      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-8 md:py-12">
         <div className="max-w-3xl mx-auto px-4">
           <Link
             href="/bbs"
-            className="inline-flex items-center gap-1.5 text-sm text-teal-100 hover:text-white transition-colors mb-4"
+            className="inline-flex items-center gap-1.5 text-sm text-brand-light hover:text-white transition-colors mb-4"
           >
             <ChevronLeft className="w-4 h-4" />
             返回论坛
           </Link>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-teal-100 border border-white/10 mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-brand-light border border-white/10 mb-4">
             <Sparkles className="w-4 h-4" />
             <span>发布新帖</span>
           </div>

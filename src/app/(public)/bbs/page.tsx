@@ -128,26 +128,26 @@ export default async function BBSPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-10 md:py-14">
+      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-10 md:py-14">
         <div className="max-w-6xl mx-auto px-4">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-teal-100 border border-white/10 mb-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-brand-light border border-white/10 mb-5">
               <Sparkles className="w-4 h-4" />
               <span>海外百宝箱社区</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
               社区论坛
             </h1>
-            <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed mb-4">
+            <p className="text-lg text-brand-light/90 max-w-2xl leading-relaxed mb-4">
               交流出海工具、海外生活、物流经验、AI 工具使用心得
             </p>
             {/* Reminders */}
-            <div className="flex flex-wrap gap-2 text-sm text-teal-100/80">
+            <div className="flex flex-wrap gap-2 text-sm text-brand-light/80">
               <span className="inline-flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
                 新帖需审核后展示
               </span>
-              <span className="hidden sm:inline text-teal-300">·</span>
+              <span className="hidden sm:inline text-accent">·</span>
               <span className="inline-flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-300"></span>
                 请勿发布广告、灰产、引战内容
@@ -166,7 +166,7 @@ export default async function BBSPage({
               href="/bbs"
               className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
                 !category
-                  ? "bg-teal-600 text-white"
+                  ? "bg-brand text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
@@ -182,7 +182,7 @@ export default async function BBSPage({
                 }
                 className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
                   category === cat.key
-                    ? "bg-teal-600 text-white"
+                    ? "bg-brand text-white"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
@@ -205,7 +205,7 @@ export default async function BBSPage({
                   name="q"
                   defaultValue={q}
                   placeholder="搜索帖子..."
-                  className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1"
+                  className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-1"
                 />
               </div>
               <button
@@ -219,7 +219,7 @@ export default async function BBSPage({
             {isLoggedIn ? (
               <Link
                 href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors shrink-0 min-h-[40px]"
               >
                 <Plus className="w-4 h-4" />
                 发布帖子
@@ -227,7 +227,7 @@ export default async function BBSPage({
             ) : (
               <Link
                 href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-teal-600 text-teal-600 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-brand text-brand rounded-lg text-sm font-medium hover:bg-accent/10 transition-colors shrink-0 min-h-[40px]"
               >
                 <Plus className="w-4 h-4" />
                 登录后发帖
@@ -240,21 +240,21 @@ export default async function BBSPage({
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <FileText className="w-4 h-4 text-teal-500" />
+              <FileText className="w-4 h-4 text-accent" />
               <span className="text-2xl font-extrabold text-gray-900">{stats.postCount}</span>
             </div>
             <span className="text-xs text-gray-500">已发布帖子</span>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Tag className="w-4 h-4 text-teal-500" />
+              <Tag className="w-4 h-4 text-accent" />
               <span className="text-2xl font-extrabold text-gray-900">{stats.categoryCount}</span>
             </div>
             <span className="text-xs text-gray-500">分类数</span>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Clock className="w-4 h-4 text-teal-500" />
+              <Clock className="w-4 h-4 text-accent" />
               <span className="text-xs font-medium text-gray-700">
                 {stats.latestPostAt ? formatDateTime(stats.latestPostAt) : "暂无"}
               </span>
@@ -307,7 +307,7 @@ export default async function BBSPage({
             ) : isLoggedIn ? (
               <Link
                 href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 发布第一个帖子
@@ -315,7 +315,7 @@ export default async function BBSPage({
             ) : (
               <Link
                 href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
               >
                 登录后发帖
               </Link>
@@ -344,7 +344,7 @@ export default async function BBSPage({
                     href={buildPageUrl("/bbs", p, { q, category })}
                     className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors ${
                       p === page
-                        ? "bg-teal-600 text-white"
+                        ? "bg-brand text-white"
                         : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
                   >
@@ -367,12 +367,12 @@ export default async function BBSPage({
         )}
 
         {/* Related links */}
-        <div className="mt-8 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl border border-teal-100 p-6">
+        <div className="mt-8 bg-gradient-to-br from-brand/5 to-accent/5 rounded-xl border border-accent/20 p-6">
           <h3 className="font-bold text-gray-900 mb-3">还需要什么？</h3>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/tools"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors min-h-[44px]"
             >
               🛠️ 工具中心
             </Link>
@@ -411,10 +411,10 @@ function CategoryCard({ category }: { category: { id: string; key: string; name:
   return (
     <Link
       href={`/bbs/category/${category.key}`}
-      className="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-teal-200 transition-all text-center group min-h-[100px] flex flex-col items-center justify-center"
+      className="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-accent/30 transition-all text-center group min-h-[100px] flex flex-col items-center justify-center"
     >
       {category.iconText && <span className="text-2xl mb-1.5 block">{category.iconText}</span>}
-      <span className="text-sm font-semibold text-gray-900 group-hover:text-teal-600 transition-colors line-clamp-1 break-words">
+      <span className="text-sm font-semibold text-gray-900 group-hover:text-brand transition-colors line-clamp-1 break-words">
         {category.name}
       </span>
       <span className="text-xs text-gray-400 mt-1">

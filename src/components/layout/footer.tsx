@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { PackageSearch } from "lucide-react";
 
 const FOOTER_LINKS = [
   { href: "/tools/postal-code", label: "邮编查询" },
@@ -28,10 +27,13 @@ export default function Footer() {
           {/* Left: Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-[#1966f2] rounded-[8px] flex items-center justify-center">
-                <PackageSearch className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-base font-bold text-[#111111]">海外百宝箱</span>
+              <img
+                src="/brand/logo-horizontal.svg"
+                alt="海外百宝箱 jueshi.net"
+                className="h-10 w-auto"
+                width={240}
+                height={50}
+              />
             </div>
             <p className="text-sm text-[#666666] leading-relaxed">
               全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。从物流追踪到合规运营，一站式解决。

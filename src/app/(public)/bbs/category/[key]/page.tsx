@@ -103,10 +103,10 @@ export default async function CategoryPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
+      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-8 md:py-12">
         <div className="max-w-6xl mx-auto px-4">
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-sm text-teal-100/80 mb-4 flex-wrap">
+          <nav className="flex items-center gap-1.5 text-sm text-brand-light/80 mb-4 flex-wrap">
             <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
               <Home className="w-3.5 h-3.5" /> 首页
             </Link>
@@ -123,7 +123,7 @@ export default async function CategoryPage({
             <h1 className="text-2xl md:text-3xl font-extrabold">{category.name}</h1>
           </div>
           {category.description && (
-            <p className="text-lg text-teal-100/90 max-w-2xl">{category.description}</p>
+            <p className="text-lg text-brand-light/90 max-w-2xl">{category.description}</p>
           )}
         </div>
       </div>
@@ -140,7 +140,7 @@ export default async function CategoryPage({
                   name="q"
                   defaultValue={q}
                   placeholder="搜索此分类..."
-                  className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-1"
+                  className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-1"
                 />
               </div>
               <button
@@ -154,7 +154,7 @@ export default async function CategoryPage({
             {isLoggedIn ? (
               <Link
                 href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors shrink-0 min-h-[40px]"
               >
                 <Plus className="w-4 h-4" />
                 发布帖子
@@ -162,7 +162,7 @@ export default async function CategoryPage({
             ) : (
               <Link
                 href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-teal-600 text-teal-600 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-4 py-2 border border-brand text-brand rounded-lg text-sm font-medium hover:bg-accent/10 transition-colors shrink-0 min-h-[40px]"
               >
                 <Plus className="w-4 h-4" />
                 登录后发帖
@@ -179,7 +179,7 @@ export default async function CategoryPage({
             </span>
             <Link
               href="/bbs"
-              className="inline-flex items-center gap-1 text-teal-600 hover:text-teal-700 transition-colors"
+              className="inline-flex items-center gap-1 text-brand hover:text-brand-dark transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               返回论坛首页
@@ -219,7 +219,7 @@ export default async function CategoryPage({
             ) : isLoggedIn ? (
               <Link
                 href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 发布第一个帖子
@@ -227,7 +227,7 @@ export default async function CategoryPage({
             ) : (
               <Link
                 href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
               >
                 登录后发帖
               </Link>
@@ -255,7 +255,7 @@ export default async function CategoryPage({
                     href={buildPageUrl(`/bbs/category/${key}`, p, { q })}
                     className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors ${
                       p === page
-                        ? "bg-teal-600 text-white"
+                        ? "bg-brand text-white"
                         : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
                   >

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Mark Only: Hexagonal Badge with Cross-border Route Arrow -->
+  
+  <!-- Hexagon Badge -->
+  <path d="M30 5 L52 17 L52 43 L30 55 L8 43 L8 17 Z" 
+        fill="#0F3D5E" 
+        stroke="#14B8A6" 
+        stroke-width="2.5"/>
+  
+  <!-- Inner Tool Symbol (Simplified Wrench/Tool) -->
+  <circle cx="30" cy="24" r="5" fill="#14B8A6"/>
+  <rect x="27.5" y="28" width="5" height="14" rx="1.5" fill="#14B8A6"/>
+  
+  <!-- Cross-border Route Arrow -->
+  <path d="M18 38 Q24 44, 30 42 Q36 40, 42 44" 
+        stroke="#F59E0B" 
+        stroke-width="2" 
+        fill="none" 
+        stroke-linecap="round"/>
+  <path d="M40 42 L42 44 L40 46" 
+        stroke="#F59E0B" 
+        stroke-width="2" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>

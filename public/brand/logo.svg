@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo Mark: Hexagonal Badge with Cross-border Route Arrow -->
+  <g id="logo-mark">
+    <!-- Hexagon Badge -->
+    <path d="M30 8 L48 18 L48 38 L30 48 L12 38 L12 18 Z" 
+          fill="#0F3D5E" 
+          stroke="#14B8A6" 
+          stroke-width="2"/>
+    
+    <!-- Inner Tool Symbol (Simplified Wrench/Tool) -->
+    <circle cx="30" cy="25" r="4" fill="#14B8A6"/>
+    <rect x="28" y="28" width="4" height="10" rx="1" fill="#14B8A6"/>
+    
+    <!-- Cross-border Route Arrow -->
+    <path d="M20 35 Q25 40, 30 38 Q35 36, 40 40" 
+          stroke="#F59E0B" 
+          stroke-width="1.5" 
+          fill="none" 
+          stroke-linecap="round"/>
+    <path d="M38 38 L40 40 L38 42" 
+          stroke="#F59E0B" 
+          stroke-width="1.5" 
+          fill="none" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Logo Text -->
+  <g id="logo-text">
+    <!-- Chinese Name -->
+    <text x="65" y="28" 
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+          font-size="18" 
+          font-weight="700" 
+          fill="#0F3D5E">
+      海外百宝箱
+    </text>
+    
+    <!-- English Domain -->
+    <text x="65" y="45" 
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" 
+          font-size="11" 
+          font-weight="400" 
+          fill="#14B8A6">
+      jueshi.net
+    </text>
+  </g>
+</svg>

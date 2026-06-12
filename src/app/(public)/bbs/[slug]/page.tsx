@@ -122,10 +122,10 @@ export default async function PostDetailPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 text-white py-8 md:py-12">
+      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-8 md:py-12">
         <div className="max-w-4xl mx-auto px-4">
           {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-sm text-teal-100/80 mb-4 flex-wrap">
+          <nav className="flex items-center gap-1.5 text-sm text-brand-light/80 mb-4 flex-wrap">
             <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
               <Home className="w-3.5 h-3.5" /> 首页
             </Link>
@@ -168,7 +168,7 @@ export default async function PostDetailPage({
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
             {/* Author */}
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-sm font-medium text-teal-700">
+              <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-sm font-medium text-brand">
                 {displayName[0].toUpperCase()}
               </div>
               <span className="font-medium text-gray-700">{displayName}</span>
@@ -213,13 +213,13 @@ export default async function PostDetailPage({
             </Link>
             <Link
               href={`/bbs/category/${post.category.key}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-brand rounded-lg text-sm font-medium hover:bg-accent/10 transition-colors min-h-[44px]"
             >
               返回「{post.category.name}」
             </Link>
             <Link
               href="/bbs/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors min-h-[44px]"
             >
               发布新帖
             </Link>
@@ -264,7 +264,7 @@ async function AuthorInfoCard({ post }: { post: any }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mt-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-sm font-bold text-teal-700 shrink-0">
+        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-sm font-bold text-brand shrink-0">
           {displayName[0].toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
