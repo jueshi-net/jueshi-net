@@ -1,0 +1,66 @@
+diff --git a/scripts/storage-state.json b/scripts/storage-state.json
+index beee119..1b0731e 100644
+--- a/scripts/storage-state.json
++++ b/scripts/storage-state.json
+@@ -2,7 +2,7 @@
+   "cookies": [
+     {
+       "name": "__Host-authjs.csrf-token",
+-      "value": "cb945fe4c5bda6c206336c7be2877da2edc2e7e04aa96a2932098b58bc40fbc1%7Cde3d25d3099083ec6e788f7aa29ab18a40e58e89857825a671aa003f7af18aef",
++      "value": "a537f839f18c4350abbcc1440beb27c9728d8ff35abdf369f91194f6c56f113c%7Cabae64bbe95c51de7b63040364d2e19c97e36e362b899a28c24a51e8bd94cdf6",
+       "domain": "jueshi.net",
+       "path": "/",
+       "expires": -1,
+@@ -22,10 +22,10 @@
+     },
+     {
+       "name": "__Secure-authjs.session-token",
+-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..2xSwNDOgnm3-46jcbqcddw.8wbfkzAnWfXDvfVdAp1CZwbtoSKeknCilRzJD0uX-XU4Te-iQS7TzE01-qT59omvV31Iz9LRHTyljS1zaB9wpEki_6pZJ684kDtKKEu5Z8O1G-Tf1a7H19Jykt6I4L93JedB7jaIJ0i1a1ZJeRrs4JWOmymWfdSCUyVROuAOhaPm18rTgjKaVFcJrr4Mz3g_UVBdRXFwGBFMIRi2GF8NP3N2KhDlYqYQWFvAN4IiAcnXPXjUF9zb49EXjri6h3xGcI2b6Kn8JA49AwOx9Z8bvpO0xYD6BFa7mZO5kzDMfeY16oVvswC7nH0OF9JBwWv9.L9yiJClKuHO5wCgmR3ZPTFHD2RVXIwdsYUS3s2FwsNU",
++      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..TN3SBKcj4xtiqQe2VEbjsQ.vWh-traGBIYSe6U301CUAkxvS7SZdIiTz0Azobc6LKAr-J84tSk5irU_PYxqOC8tQsqYgn8HiGFoMMFudqzkFmyznvviYFpLSKv7xoWgjRLe25tg9YAY2CeNMNCx2DYCQrUA1_gQOwY4SmMNr_X0Dr2L7WcvgOg-Q1h46ATwIY-nFXSfpJ7LAZOEYkxY-yM4NqxJsgQYE3sXC3mVGb_9dn8izynVxpwSb9RGFU7wcUf30GL64v1DtN4LUdyqF_udBUPkHkJCWZf3Dlh8FZQmVbRw_0pYI5Ty-wIyKfRaUPkH1QelrOeFh5avKW3E63Tg.sRAG9TN_IZ8pq_G5sPKvW4RtH0ut9XaidhwbPynF_yo",
+       "domain": "jueshi.net",
+       "path": "/",
+-      "expires": 1783778110.246587,
++      "expires": 1783880729.676239,
+       "httpOnly": true,
+       "secure": true,
+       "sameSite": "Lax"
+diff --git a/src/app/api/forum/posts/[slug]/comments/route.ts b/src/app/api/forum/posts/[slug]/comments/route.ts
+index f0cc795..fd1ec68 100644
+--- a/src/app/api/forum/posts/[slug]/comments/route.ts
++++ b/src/app/api/forum/posts/[slug]/comments/route.ts
+@@ -97,6 +97,15 @@ export async function POST(
+       },
+     });
+     if (recentComments >= 3) {
++      // Write EventLog for rate limit hit
++      await prisma.eventLog.create({
++        data: {
++          eventType: "FORUM_RATE_LIMIT_HIT",
++          action: "forum_comment_rate_limit",
++          toolName: slug,
++          path: `/api/forum/posts/${slug}/comments`,
++        },
++      });
+       return NextResponse.json(
+         { error: "评论太频繁，请等待 1 分钟" },
+         { status: 429 }
+diff --git a/src/app/api/forum/posts/route.ts b/src/app/api/forum/posts/route.ts
+index de05579..526054d 100644
+--- a/src/app/api/forum/posts/route.ts
++++ b/src/app/api/forum/posts/route.ts
+@@ -126,6 +126,15 @@ export async function POST(req: Request) {
+       orderBy: { createdAt: "desc" },
+     });
+     if (recentPost) {
++      // Write EventLog for rate limit hit
++      await prisma.eventLog.create({
++        data: {
++          eventType: "FORUM_RATE_LIMIT_HIT",
++          action: "forum_post_rate_limit",
++          toolName: recentPost.slug,
++          path: "/api/forum/posts",
++        },
++      });
+       return NextResponse.json(
+         { error: "发帖太频繁，请等待 1 分钟" },
+         { status: 429 }
