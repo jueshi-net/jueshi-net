@@ -10,7 +10,8 @@
     "deploy": "bash scripts/deploy.sh",
     "postinstall": "prisma generate",
     "crawler:daemon": "npx tsx scripts/advanced-crawler/daemon.ts",
-    "crawler:test": "npx tsx scripts/advanced-crawler/daemon-test.ts"
+    "crawler:test": "npx tsx scripts/advanced-crawler/daemon-test.ts",
+    "verify:runtime-db": "node scripts/verify-runtime-db-env.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

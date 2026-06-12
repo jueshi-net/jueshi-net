@@ -34,6 +34,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.7,
     },
+    {
+      url: `${BASE_URL}/community`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
   ];
 
   // Tools
@@ -65,6 +71,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let articlePages: MetadataRoute.Sitemap = [];
   let lpPages: MetadataRoute.Sitemap = [];
   let checklistPages: MetadataRoute.Sitemap = [];
+  let communityPages: MetadataRoute.Sitemap = [];
 
   try {
     // Published Articles
@@ -108,9 +115,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.6,
     }));
+
+    // Published Topics (for community pages)
+    const topics = await prisma.topic.findMany({
+      where: { status: "published" },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    communityPages = topics.map((t) => ({
+      url: `${BASE_URL}/community/${t.slug}`,
+      lastModified: t.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
   } catch (e) {
     console.error("[sitemap] DB fetch failed, returning static pages + tools only");
   }
 
-  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages];
+  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages];
 }

@@ -1,0 +1,263 @@
+{
+  "version": "1.0",
+  "createdAt": "2026-06-12T01:20:00Z",
+  "description": "首批社区内容种子计划（5-10 篇只读文章）",
+  "articles": [
+    {
+      "slug": "hs-code-lookup-guide",
+      "title": "HS Code 查询完全指南：从入门到精通",
+      "description": "一文搞懂 HS Code 查询，避免报关错误，节省时间和成本",
+      "category": "报关",
+      "tags": ["HS Code", "报关", "海关编码", "关税"],
+      "linkedTool": "/tools/hs-code",
+      "ctaText": "立即查询 HS Code",
+      "targetKeyword": "HS Code 查询",
+      "userIntent": "学习如何查询 HS Code，避免报关错误",
+      "contentOutline": [
+        "什么是 HS Code？",
+        "为什么 HS Code 很重要？",
+        "如何查询 HS Code？",
+        "常见错误和避免方法",
+        "实战案例：3 个典型场景",
+        "工具推荐：绝世百宝箱 HS Code 查询"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "commercial-invoice-template-guide",
+      "title": "Commercial Invoice 模板与填写指南：外贸新手必看",
+      "description": "从零开始学习 Commercial Invoice，包含模板下载和填写示例",
+      "category": "单据",
+      "tags": ["Commercial Invoice", "商业发票", "外贸单据", "模板"],
+      "linkedTool": "/tools/documents/commercial-invoice",
+      "ctaText": "生成 Commercial Invoice",
+      "targetKeyword": "Commercial Invoice 模板",
+      "userIntent": "学习如何填写 Commercial Invoice，获取模板",
+      "contentOutline": [
+        "什么是 Commercial Invoice？",
+        "Commercial Invoice 的必填字段",
+        "常见错误和避免方法",
+        "模板下载和填写示例",
+        "实战案例：电子产品出口",
+        "工具推荐：一键生成 Commercial Invoice"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "quote-sheet-pricing-strategy",
+      "title": "Quote Sheet 定价策略：如何报价才能赢得客户",
+      "description": "学习外贸报价技巧，包含 Quote Sheet 模板和定价公式",
+      "category": "单据",
+      "tags": ["Quote Sheet", "报价单", "定价策略", "外贸"],
+      "linkedTool": "/tools/documents/quotation",
+      "ctaText": "生成 Quote Sheet",
+      "targetKeyword": "Quote Sheet 报价",
+      "userIntent": "学习如何制作专业的报价单，掌握定价策略",
+      "contentOutline": [
+        "什么是 Quote Sheet？",
+        "报价的 5 个关键要素",
+        "定价策略：成本加成 vs 市场定价",
+        "常见报价错误",
+        "实战案例：服装出口报价",
+        "工具推荐：快速生成专业报价单"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "shipping-cost-calculation-guide",
+      "title": "国际运费计算完全指南：海运、空运、快递对比",
+      "description": "一文搞懂国际运费计算，包含海运、空运、快递费用对比和省钱技巧",
+      "category": "物流",
+      "tags": ["运费计算", "国际物流", "海运", "空运", "快递"],
+      "linkedTool": "/tools/shipping-calculator",
+      "ctaText": "计算运费",
+      "targetKeyword": "国际运费计算",
+      "userIntent": "学习如何计算国际运费，选择最经济的物流方式",
+      "contentOutline": [
+        "国际物流的 3 种方式",
+        "海运费用计算",
+        "空运费用计算",
+        "快递费用计算",
+        "如何选择合适的物流方式？",
+        "省钱技巧：5 个实用建议",
+        "工具推荐：一键计算运费"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "postal-code-format-guide",
+      "title": "各国邮编格式大全：避免填写错误导致退件",
+      "description": "全球主要国家邮编格式指南，包含验证工具和常见错误",
+      "category": "地址",
+      "tags": ["邮编", "postal code", "地址格式", "国际邮件"],
+      "linkedTool": "/tools/postal-code",
+      "ctaText": "验证邮编",
+      "targetKeyword": "各国邮编格式",
+      "userIntent": "查询各国邮编格式，避免填写错误",
+      "contentOutline": [
+        "为什么邮编很重要？",
+        "美国邮编格式（ZIP Code）",
+        "英国邮编格式（Postcode）",
+        "加拿大邮编格式",
+        "澳大利亚邮编格式",
+        "中国邮编格式",
+        "常见错误和避免方法",
+        "工具推荐：邮编验证和查询"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "address-formatting-international",
+      "title": "国际地址格式化指南：正确书写各国地址",
+      "description": "学习如何正确书写国际地址，避免邮件和包裹退件",
+      "category": "地址",
+      "tags": ["地址格式", "国际地址", "邮件", "包裹"],
+      "linkedTool": "/tools/address-formatter",
+      "ctaText": "格式化地址",
+      "targetKeyword": "国际地址格式",
+      "userIntent": "学习如何正确书写国际地址",
+      "contentOutline": [
+        "国际地址的基本结构",
+        "美国地址格式",
+        "英国地址格式",
+        "日本地址格式",
+        "常见错误和避免方法",
+        "工具推荐：一键格式化地址"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "exchange-rate-forex-guide",
+      "title": "外贸汇率查询与换汇技巧：避免汇率损失",
+      "description": "实时汇率查询工具使用指南，包含换汇时机选择和风险管理",
+      "category": "金融",
+      "tags": ["汇率", "外汇", "换汇", "风险管理"],
+      "linkedTool": "/tools/exchange-rate",
+      "ctaText": "查询实时汇率",
+      "targetKeyword": "外贸汇率查询",
+      "userIntent": "查询实时汇率，学习换汇技巧",
+      "contentOutline": [
+        "汇率基础知识",
+        "如何查询实时汇率？",
+        "换汇时机选择",
+        "汇率风险管理",
+        "常见换汇错误",
+        "实战案例：美元兑人民币",
+        "工具推荐：实时汇率查询"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "cross-border-shipping-taskchain",
+      "title": "跨境发货任务链：从下单到签收的完整流程",
+      "description": "一文搞懂跨境发货全流程，包含工具推荐和常见坑点",
+      "category": "物流",
+      "tags": ["跨境发货", "物流流程", "任务链", "外贸"],
+      "linkedTool": "/tools/shipping-calculator",
+      "ctaText": "开始发货任务链",
+      "targetKeyword": "跨境发货流程",
+      "userIntent": "了解跨境发货完整流程，学习使用工具",
+      "contentOutline": [
+        "跨境发货的 7 个步骤",
+        "步骤 1：选择物流方式",
+        "步骤 2：计算运费",
+        "步骤 3：准备单据",
+        "步骤 4：填写地址",
+        "步骤 5：报关",
+        "步骤 6：跟踪包裹",
+        "步骤 7：签收确认",
+        "工具推荐：绝世百宝箱任务链"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "hs-code-common-mistakes",
+      "title": "HS Code 查询常见 10 大错误：避免报关延误",
+      "description": "总结 HS Code 查询最常见的 10 个错误，提供解决方案",
+      "category": "报关",
+      "tags": ["HS Code", "报关错误", "海关", "延误"],
+      "linkedTool": "/tools/hs-code",
+      "ctaText": "查询 HS Code",
+      "targetKeyword": "HS Code 错误",
+      "userIntent": "避免 HS Code 查询常见错误",
+      "contentOutline": [
+        "错误 1：使用过期的 HS Code",
+        "错误 2：忽略国家差异",
+        "错误 3：分类不准确",
+        "错误 4：未考虑材质",
+        "错误 5：未考虑用途",
+        "错误 6-10：其他常见错误",
+        "如何避免这些错误？",
+        "工具推荐：智能 HS Code 查询"
+      ],
+      "suitableForSitemap": true
+    },
+    {
+      "slug": "commercial-invoice-vs-proforma",
+      "title": "Commercial Invoice vs Proforma Invoice：区别与使用场景",
+      "description": "一文搞懂 Commercial Invoice 和 Proforma Invoice 的区别",
+      "category": "单据",
+      "tags": ["Commercial Invoice", "Proforma Invoice", "单据区别"],
+      "linkedTool": "/tools/documents/commercial-invoice",
+      "ctaText": "生成 Commercial Invoice",
+      "targetKeyword": "Commercial Invoice Proforma 区别",
+      "userIntent": "了解两种发票的区别和使用场景",
+      "contentOutline": [
+        "什么是 Proforma Invoice？",
+        "什么是 Commercial Invoice？",
+        "两者的主要区别",
+        "使用场景对比",
+        "常见错误：混淆使用",
+        "实战案例：何时用哪种？",
+        "工具推荐：一键生成两种发票"
+      ],
+      "suitableForSitemap": true
+    }
+  ],
+  "categories": [
+    {
+      "name": "报关",
+      "description": "HS Code、报关流程、关税相关",
+      "articleCount": 2
+    },
+    {
+      "name": "单据",
+      "description": "Commercial Invoice、Quote Sheet、外贸单据",
+      "articleCount": 3
+    },
+    {
+      "name": "物流",
+      "description": "运费计算、物流方式、发货流程",
+      "articleCount": 2
+    },
+    {
+      "name": "地址",
+      "description": "邮编、地址格式、国际邮件",
+      "articleCount": 2
+    },
+    {
+      "name": "金融",
+      "description": "汇率、换汇、风险管理",
+      "articleCount": 1
+    }
+  ],
+  "linkedTools": [
+    "/tools/hs-code",
+    "/tools/documents/commercial-invoice",
+    "/tools/documents/quotation",
+    "/tools/shipping-calculator",
+    "/tools/postal-code",
+    "/tools/address-formatter",
+    "/tools/exchange-rate"
+  ],
+  "totalArticles": 10,
+  "estimatedDevelopmentTime": "2-3 天",
+  "priority": "高",
+  "notes": [
+    "所有文章必须关联至少一个工具",
+    "避免空泛内容，必须实用",
+    "每篇文章包含 CTA 按钮",
+    "所有文章加入 sitemap",
+    "使用 EventLog 埋点追踪效果"
+  ]
+}
