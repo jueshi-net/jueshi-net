@@ -116,6 +116,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "分类不存在或已禁用" }, { status: 400 });
     }
 
+    // Rate limit: max 1 post per minute per user
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const recentPost = await prisma.forumPost.findFirst({
+      where: {
+        userId,
+        createdAt: { gte: oneMinuteAgo },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    if (recentPost) {
+      return NextResponse.json(
+        { error: "发帖太频繁，请等待 1 分钟" },
+        { status: 429 }
+      );
+    }
+
+    // Duplicate content check: same title+content in last 24 hours
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const duplicatePost = await prisma.forumPost.findFirst({
+      where: {
+        userId,
+        title,
+        content,
+        createdAt: { gte: oneDayAgo },
+      },
+    });
+    if (duplicatePost) {
+      return NextResponse.json(
+        { error: "检测到重复内容，请勿重复发帖" },
+        { status: 409 }
+      );
+    }
+
     // Daily limit: max 5 posts per user per day
     const today = new Date();
     today.setHours(0, 0, 0, 0);

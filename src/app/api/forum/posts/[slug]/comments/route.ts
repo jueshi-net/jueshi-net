@@ -80,6 +80,45 @@ export async function POST(
         { status: 403 }
       );
     }
+    // Cannot comment on pending/hidden posts
+    if (post.status !== "published") {
+      return NextResponse.json(
+        { error: "该帖未审核或已隐藏，不能评论" },
+        { status: 403 }
+      );
+    }
+
+    // Rate limit: max 3 comments per minute per user
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const recentComments = await prisma.forumComment.count({
+      where: {
+        userId: session.user.id,
+        createdAt: { gte: oneMinuteAgo },
+      },
+    });
+    if (recentComments >= 3) {
+      return NextResponse.json(
+        { error: "评论太频繁，请等待 1 分钟" },
+        { status: 429 }
+      );
+    }
+
+    // Duplicate content check: same content in same post in last 1 hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const duplicateComment = await prisma.forumComment.findFirst({
+      where: {
+        postId: post.id,
+        userId: session.user.id,
+        content,
+        createdAt: { gte: oneHourAgo },
+      },
+    });
+    if (duplicateComment) {
+      return NextResponse.json(
+        { error: "检测到重复评论，请勿重复提交" },
+        { status: 409 }
+      );
+    }
 
     // Daily limit: 20 comments per user
     const todayStart = new Date();
