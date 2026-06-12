@@ -11,17 +11,6 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // ─── Forum redirect ───
-      {
-        source: '/bbs',
-        destination: 'https://bbs.jueshi.net',
-        permanent: true,
-      },
-      {
-        source: '/bbs/:path*',
-        destination: 'https://bbs.jueshi.net/:path*',
-        permanent: true,
-      },
       // ─── 场景与指南合并 (规范3: 入口清洗) ───
       {
         source: '/scenarios',
