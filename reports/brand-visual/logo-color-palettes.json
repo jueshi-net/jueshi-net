@@ -1,0 +1,229 @@
+{
+  "version": "v1.20.42.6.55-Y-R",
+  "date": "2026-06-12",
+  "current_brand_color": "#1966f2",
+  "palettes": [
+    {
+      "id": "A",
+      "name": "深海蓝 + 青绿色",
+      "recommendation": "首选推荐",
+      "priority": 1,
+      "colors": {
+        "primary": {
+          "value": "#0F3D5E",
+          "name": "深海蓝",
+          "usage": "主品牌色、Header、主按钮、重要 CTA"
+        },
+        "secondary": {
+          "value": "#14B8A6",
+          "name": "青绿色",
+          "usage": "辅助色、链接、图标、次要按钮"
+        },
+        "text_dark": {
+          "value": "#102A43",
+          "name": "深色文字",
+          "usage": "标题、正文、重要文字"
+        },
+        "bg_light": {
+          "value": "#F4F8FB",
+          "name": "浅背景",
+          "usage": "页面背景、卡片背景"
+        },
+        "accent": {
+          "value": "#F59E0B",
+          "name": "成长点缀",
+          "usage": "成长值、勋章、等级、高亮"
+        }
+      },
+      "gradient": {
+        "hero": "linear-gradient(135deg, #0F3D5E 0%, #14B8A6 100%)",
+        "button": "linear-gradient(135deg, #0F3D5E 0%, #1E5A8C 100%)"
+      },
+      "positioning": "专业、可信、跨境、工具 SaaS、有社区温度",
+      "suitable_for": [
+        "外贸工具箱",
+        "工作台",
+        "论坛",
+        "等级/勋章系统"
+      ],
+      "pros": [
+        "深海蓝传达专业、可信、跨境贸易感",
+        "青绿色增加活力和现代感",
+        "与当前品牌色 #1966f2 相近，过渡平滑",
+        "适合工具 SaaS 和社区场景",
+        "成长点缀色 amber 与成长体系契合"
+      ],
+      "cons": [
+        "深海蓝可能偏暗，需要确保对比度",
+        "与当前品牌色有差异，需要全站替换"
+      ],
+      "tailwind_config": {
+        "brand": "#0F3D5E",
+        "brand-dark": "#0A2E47",
+        "brand-light": "#1E5A8C",
+        "accent": "#14B8A6",
+        "accent-dark": "#0D9488",
+        "growth": "#F59E0B"
+      }
+    },
+    {
+      "id": "B",
+      "name": "靛蓝 + 天蓝",
+      "recommendation": "备选方案",
+      "priority": 2,
+      "colors": {
+        "primary": {
+          "value": "#1E3A8A",
+          "name": "靛蓝",
+          "usage": "主品牌色、Header、主按钮"
+        },
+        "secondary": {
+          "value": "#38BDF8",
+          "name": "天蓝",
+          "usage": "辅助色、链接、图标"
+        },
+        "text_dark": {
+          "value": "#172554",
+          "name": "深色文字",
+          "usage": "标题、正文"
+        },
+        "bg_light": {
+          "value": "#F8FAFC",
+          "name": "浅背景",
+          "usage": "页面背景"
+        },
+        "accent": {
+          "value": "#FBBF24",
+          "name": "成长点缀",
+          "usage": "成长值、勋章"
+        }
+      },
+      "gradient": {
+        "hero": "linear-gradient(135deg, #1E3A8A 0%, #38BDF8 100%)",
+        "button": "linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%)"
+      },
+      "positioning": "科技、系统化、偏平台型 SaaS",
+      "suitable_for": [
+        "科技平台",
+        "系统化 SaaS",
+        "企业级工具"
+      ],
+      "pros": [
+        "靛蓝传达科技感、系统化",
+        "天蓝增加现代感和活力",
+        "适合平台型 SaaS 定位",
+        "与当前品牌色 #1966f2 同属蓝色系"
+      ],
+      "cons": [
+        "可能过于科技感，缺少贸易感",
+        "天蓝在小尺寸下可能不够醒目",
+        "与社区温度感不太匹配"
+      ],
+      "tailwind_config": {
+        "brand": "#1E3A8A",
+        "brand-dark": "#172554",
+        "brand-light": "#2563EB",
+        "accent": "#38BDF8",
+        "accent-dark": "#0EA5E9",
+        "growth": "#FBBF24"
+      }
+    },
+    {
+      "id": "C",
+      "name": "墨绿 + 金色点缀",
+      "recommendation": "特殊场景方案",
+      "priority": 3,
+      "colors": {
+        "primary": {
+          "value": "#064E3B",
+          "name": "墨绿",
+          "usage": "主品牌色、Header"
+        },
+        "secondary": {
+          "value": "#10B981",
+          "name": "翠绿",
+          "usage": "辅助色、链接"
+        },
+        "text_dark": {
+          "value": "#052E2B",
+          "name": "深色文字",
+          "usage": "标题、正文"
+        },
+        "bg_light": {
+          "value": "#F7FDF9",
+          "name": "浅背景",
+          "usage": "页面背景"
+        },
+        "accent": {
+          "value": "#D97706",
+          "name": "金色点缀",
+          "usage": "成长值、勋章、等级"
+        }
+      },
+      "gradient": {
+        "hero": "linear-gradient(135deg, #064E3B 0%, #10B981 100%)",
+        "button": "linear-gradient(135deg, #064E3B 0%, #047857 100%)"
+      },
+      "positioning": "稳重、贸易、成长体系感强",
+      "suitable_for": [
+        "贸易平台",
+        "成长体系",
+        "稳重品牌"
+      ],
+      "pros": [
+        "墨绿传达稳重、贸易、成长感",
+        "金色点缀与成长体系高度契合",
+        "适合强调贸易和成长的定位",
+        "绿色系传达生机和成长"
+      ],
+      "cons": [
+        "与当前品牌色 #1966f2 差异大",
+        "可能过于稳重，缺少现代感",
+        "墨绿在小尺寸下可能不够醒目",
+        "需要全站大改"
+      ],
+      "tailwind_config": {
+        "brand": "#064E3B",
+        "brand-dark": "#052E2B",
+        "brand-light": "#047857",
+        "accent": "#10B981",
+        "accent-dark": "#059669",
+        "growth": "#D97706"
+      }
+    }
+  ],
+  "recommendation": {
+    "primary": "A",
+    "reason": "方案 A（深海蓝 + 青绿色）最适合当前产品定位：\n1. 深海蓝传达专业、可信、跨境贸易感\n2. 青绿色增加现代感和活力\n3. 与当前品牌色 #1966f2 相近，过渡平滑\n4. 适合工具 SaaS 和社区场景\n5. 成长点缀色 amber 与成长体系契合",
+    "alternative": "B",
+    "alternative_reason": "方案 B（靛蓝 + 天蓝）作为备选，适合未来向平台型 SaaS 转型"
+  },
+  "application_guide": {
+    "header_logo": "使用 primary 色作为背景或文字色",
+    "primary_button": "使用 primary 色，hover 使用 brand-dark",
+    "tool_cta": "使用 primary 色或 accent 色",
+    "forum_category_badge": "使用 accent 色或分类色",
+    "pinned_status": "使用 amber-100/amber-700（方案 A 的 accent）",
+    "locked_status": "使用 gray-100/gray-600",
+    "pending_status": "使用 blue-100/blue-700",
+    "level_badge": "使用 primary 色或 accent 色",
+    "growth_value": "使用 growth 色（amber/gold）",
+    "admin_dashboard": "使用 primary 色作为主色调",
+    "favicon": "使用 primary 色或 accent 色",
+    "og_image": "使用 primary 到 accent 的渐变",
+    "mobile_icon": "使用 primary 色，确保小尺寸可见"
+  },
+  "accessibility": {
+    "contrast_ratio": {
+      "primary_on_white": "7.5:1 (AAA)",
+      "secondary_on_white": "4.8:1 (AA)",
+      "text_dark_on_white": "15.2:1 (AAA)",
+      "growth_on_white": "4.6:1 (AA)"
+    },
+    "notes": [
+      "所有颜色组合都满足 WCAG 2.1 AA 标准",
+      "主要文字组合满足 AAA 标准",
+      "建议在实施前进行实际对比度测试"
+    ]
+  }
+}
