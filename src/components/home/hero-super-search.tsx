@@ -119,7 +119,7 @@ export default function HeroSuperSearch() {
   const handleSearch = () => {
     if (!query.trim()) return;
     if (activeTab === 'community') {
-      window.open(`https://bbs.jueshi.net/search?q=${encodeURIComponent(query)}`, '_blank');
+      window.open(`/bbs?q=${encodeURIComponent(query)}`, '_self');
     } else if (activeTab === 'tracking') {
       window.open(`/tracking?track_no=${encodeURIComponent(query)}`, '_self');
     } else if (activeTab === 'postal') {

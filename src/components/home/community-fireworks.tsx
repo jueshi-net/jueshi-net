@@ -21,15 +21,15 @@ export default function CommunityFireworks() {
             <MessageSquare className="w-5 h-5 text-teal-600" />
             社区烟火气
           </h2>
-          <p className="mt-0.5 text-sm text-gray-500">来自 bbs.jueshi.net 的最新讨论</p>
+          <p className="mt-0.5 text-sm text-gray-500">来自社区论坛的最新讨论</p>
         </div>
-        <a href="https://bbs.jueshi.net" target="_blank" rel="noopener" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center gap-0.5">
+        <a href="/bbs" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center gap-0.5">
           去论坛逛逛 <ExternalLink className="w-4 h-4" />
         </a>
       </div>
       <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm shadow-gray-100/30 divide-y divide-gray-100">
         {MOCK_POSTS.map((p, i) => (
-          <a key={i} href="https://bbs.jueshi.net" target="_blank" rel="noopener" className="flex items-center justify-between p-4 hover:bg-teal-50/50 dark:hover:bg-gray-700/50 transition-colors">
+          <a key={i} href="/bbs" className="flex items-center justify-between p-4 hover:bg-teal-50/50 dark:hover:bg-gray-700/50 transition-colors">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 {p.hot && <Flame className="h-3.5 w-3.5 shrink-0 text-orange-500" />}

@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-guard";
 import { prisma } from "@/lib/prisma";
+import { grantPostReward } from "@/lib/forum-rewards";
 
 export async function PUT(
   req: Request,
@@ -74,6 +75,15 @@ export async function PUT(
       });
     } catch (logError) {
       console.error("[Forum Event Log Error]", logError);
+    }
+
+    // Grant growth reward on approve (non-blocking)
+    if (action === "approve") {
+      try {
+        await grantPostReward(updatedPost.id, updatedPost.userId);
+      } catch (rewardError) {
+        console.error("[Forum Post Reward Error]", rewardError);
+      }
     }
 
     return NextResponse.json({ success: true, post: updatedPost });
