@@ -57,3 +57,21 @@ scripts/forum-anti-spam-verify-657ar.mjs
 create-admin.js
 reset-admin.js
 backups/*.env
+
+# E2E test scripts with hardcoded credentials
+scripts/e2e-login.ts
+scripts/query-eventlog-latest.ts
+scripts/forum-anti-spam-verify-657ar.py
+scripts/forum-e2e-657ar2*.py
+scripts/check-users.ts
+scripts/growth-reward-test-657ar3.py
+scripts/test-ci-save-playwright.mjs
+scripts/reset-test-user.ts
+
+# Database dumps
+backups/*.dump
+
+# Reports with credentials
+reports/v1.20.42.6.46.7-production-verification-lock.md
+reports/v1.20.42.6.46.8-final-verification-report.md
+reports/v1.20.42.6.46.8-e2e-verification-completion.md
