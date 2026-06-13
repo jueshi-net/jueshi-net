@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { getDocumentType, documentStyles } from '@/lib/documents/document-types';
 import { getTemplate } from '@/lib/documents/document-fields';
+import { getDocumentExample } from '@/lib/documents/document-examples';
 import { usePermissions, authorizeExportClient, createPermissionHelpers } from '@/lib/auth/client-permissions';
 import { permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
@@ -258,6 +259,34 @@ export default function DocumentEditorPage() {
   const removeLineItem = useCallback((idx: number) => {
     setLineItems(prev => prev.filter((_, i) => i !== idx).length > 0 ? prev.filter((_, i) => i !== idx) : [{}]);
   }, []);
+
+  const handleFillExample = useCallback(() => {
+    const example = getDocumentExample(type);
+    if (!example) {
+      alert('暂无示例数据');
+      return;
+    }
+    
+    if (Object.keys(formData).length > 0 || lineItems.some(item => Object.keys(item).length > 0)) {
+      if (!confirm('填充示例将覆盖当前表单内容，是否继续？')) {
+        return;
+      }
+    }
+    
+    setFormData(example.formData);
+    setLineItems(example.lineItems);
+    
+    // Fire Example Fill Event
+    fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'Document_Example_Fill',
+        toolSlug: type,
+        source: 'legacy_documents',
+      }),
+    }).catch(() => {});
+  }, [type, formData, lineItems]);
 
   const calculateTotal = useCallback((key: string) => {
     if (!template?.lineItems?.length) return 0;
@@ -696,6 +725,9 @@ export default function DocumentEditorPage() {
                 )}
               </div>
             )}
+            <button onClick={handleFillExample} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors" title="填充示例数据，快速了解单据格式">
+              <span>📋</span> 填充示例
+            </button>
             <button onClick={handleSaveDraft} className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${!perms.authenticated && perms.role === 'guest' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-200' : 'bg-gray-100 hover:bg-gray-200'}`} title={!perms.authenticated && perms.role === 'guest' ? '💡 登录后即可永久保存单据草稿' : '保存草稿'}>
               {!perms.authenticated && perms.role === 'guest' ? <span>🔒</span> : <Save className="w-4 h-4" />} 保存草稿
             </button>

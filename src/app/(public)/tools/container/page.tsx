@@ -23,6 +23,14 @@ export default function ContainerCalculatorPage() {
   const cargoVolume = (cargoL * cargoW * cargoH * quantity) / 1000000; // m³
   const totalWeight = cargoWeight * quantity;
 
+  const handleFillExample = () => {
+    setCargoL(60);
+    setCargoW(40);
+    setCargoH(50);
+    setCargoWeight(15);
+    setQuantity(100);
+  };
+
   const results = containerTypes.map(ct => {
     const fitByVolume = Math.floor(ct.volume / (cargoVolume || 1));
     const fitByWeight = Math.floor(ct.maxWeight / (totalWeight || 1));
@@ -56,7 +64,15 @@ export default function ContainerCalculatorPage() {
 
       {/* Input */}
       <div className={cardStyles.base + " mb-6"}>
-        <h3 className={cardStyles.header}>货物尺寸 (cm)</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className={cardStyles.header.replace("mb-4", "")}>货物尺寸 (cm)</h3>
+          <button 
+            onClick={handleFillExample}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200 rounded-lg transition-colors"
+          >
+            <span>📋</span> 填充示例
+          </button>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div>
             <label className={labelStyles.field}>长 (cm)</label>
@@ -83,9 +99,19 @@ export default function ContainerCalculatorPage() {
         {/* Summary */}
         {cargoL && cargoW && cargoH && (
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+            <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
               <Info className="w-4 h-4" />
               <span>单件体积: {(cargoL * cargoW * cargoH / 1000000).toFixed(4)} m³ | 总体积: {cargoVolume.toFixed(4)} m³ | 总重量: {totalWeight.toFixed(1)} kg</span>
+            </div>
+            <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+              <p className="font-medium mb-1">💡 结果解释：</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>单箱 CBM = 长 × 宽 × 高 ÷ 1,000,000（cm³ 转 m³）</li>
+                <li>总体积 = 单箱 CBM × 数量</li>
+                <li>可装件数 = min(柜容积 ÷ 总体积, 柜限重 ÷ 总重量)</li>
+                <li>体积利用率 = 总体积 ÷ 柜容积 × 100%</li>
+                <li>实际装柜受重量、托盘、装载方式、货物形状影响，建议预留 10-15% 余量</li>
+              </ul>
             </div>
           </div>
         )}

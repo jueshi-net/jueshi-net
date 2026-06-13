@@ -73,6 +73,24 @@ export const proformaInvoice: DocumentTemplate = {
       { key: "tradeTerms", label: "贸易条款", labelEn: "Trade Terms", type: "select", options: ["FOB", "CIF", "CFR", "EXW", "DDP", "DAP", "FCA"] },
       { key: "currency", label: "币种", labelEn: "Currency", type: "select", options: ["USD", "EUR", "CNY", "GBP", "CAD", "AUD", "JPY", "HKD"] },
     ]},
+    { id: "additional", title: "费用明细", fields: [
+      { key: "subtotal", label: "小计", labelEn: "Subtotal", type: "number", placeholder: "商品小计金额" },
+      { key: "freight", label: "运费", labelEn: "Freight", type: "number", placeholder: "国际运费" },
+      { key: "insurance", label: "保险费", labelEn: "Insurance", type: "number", placeholder: "运输保险费" },
+      { key: "discount", label: "折扣", labelEn: "Discount", type: "number", placeholder: "折扣金额" },
+      { key: "otherCharges", label: "其他费用", labelEn: "Other Charges", type: "number", placeholder: "其他杂费" },
+    ]},
+    { id: "bank", title: "银行信息", fields: [
+      { key: "bankName", label: "银行名称", labelEn: "Bank Name", type: "text", placeholder: "开户银行全称" },
+      { key: "bankAddress", label: "银行地址", labelEn: "Bank Address", type: "textarea", placeholder: "银行地址" },
+      { key: "accountName", label: "账户名称", labelEn: "Account Name", type: "text", placeholder: "账户持有人名称" },
+      { key: "accountNumber", label: "账号", labelEn: "Account Number", type: "text", placeholder: "银行账号" },
+      { key: "swiftCode", label: "SWIFT Code", labelEn: "SWIFT Code", type: "text", placeholder: "银行国际代码" },
+      { key: "iban", label: "IBAN", labelEn: "IBAN", type: "text", placeholder: "国际银行账户号码（欧洲）" },
+    ]},
+    { id: "remarks", title: "备注", fields: [
+      { key: "remarks", label: "备注", labelEn: "Remarks", type: "textarea", placeholder: "其他需要说明的事项", colspan: 2 },
+    ]},
   ],
   lineItems: [
     { key: "description", label: "品名", width: "30%" },
@@ -129,13 +147,20 @@ export const packingList: DocumentTemplate = {
   sections: [
     { id: "header", title: "单据信息", fields: [
       ...docHeaderFields("PL"),
+      { key: "invoiceNo", label: "关联发票号", labelEn: "Invoice No.", type: "text", placeholder: "如 CI-2024-001" },
+      { key: "referenceNo", label: "参考号", labelEn: "Reference No.", type: "text", placeholder: "订单号或合同号" },
     ]},
     { id: "parties", title: "收发方信息", fields: [
-      { key: "shipper", label: "发货人", labelEn: "Shipper", type: "textarea", required: true, colspan: 2 },
-      { key: "consignee", label: "收货人", labelEn: "Consignee", type: "textarea", required: true, colspan: 2 },
+      { key: "shipper", label: "发货人", labelEn: "Shipper / Exporter", type: "textarea", required: true, placeholder: "发货人名称及地址", colspan: 2 },
+      { key: "consignee", label: "收货人", labelEn: "Consignee", type: "textarea", required: true, placeholder: "收货人名称及地址", colspan: 2 },
     ]},
     { id: "shipping", title: "运输信息", fields: [
-      { key: "marks", label: "唛头", labelEn: "Marks", type: "textarea", colspan: 2 },
+      { key: "portOfLoading", label: "起运港", labelEn: "Port of Loading", type: "text" },
+      { key: "portOfDestination", label: "目的港", labelEn: "Port of Destination", type: "text" },
+      { key: "marks", label: "唛头", labelEn: "Shipping Marks", type: "textarea", placeholder: "外箱标识、唛头信息", colspan: 2 },
+    ]},
+    { id: "remarks", title: "备注", fields: [
+      { key: "remarks", label: "备注", labelEn: "Remarks", type: "textarea", placeholder: "其他需要说明的事项", colspan: 2 },
     ]},
   ],
   lineItems: [
