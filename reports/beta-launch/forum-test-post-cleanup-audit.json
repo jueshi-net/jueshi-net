@@ -1,0 +1,139 @@
+{
+  "cleanupTime": "2026-06-13T14:30:00+08:00",
+  "reason": "Pre-Beta cleanup of E2E/verify test data",
+  "testPosts": [
+    {
+      "id": "cmqaosiz6000ark5pv5gqqu28",
+      "slug": "forum-657ar2-daily-1781253973-1-1ia53y",
+      "title": "FORUM_657AR2_DAILY_1781253973_1",
+      "status": "published",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "author_name": "Verify User 657AR",
+      "created_at": "2026-06-12T08:50:54.354Z",
+      "comment_count": 0,
+      "test_marker": "FORUM_657AR2 in title, verify test account"
+    },
+    {
+      "id": "cmqaor3nk0009rk5p57ivzk9k",
+      "slug": "forum-657ar2-daily-1781253973-0-kjktr9",
+      "title": "FORUM_657AR2_DAILY_1781253973_0",
+      "status": "pending",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "author_name": "Verify User 657AR",
+      "created_at": "2026-06-12T08:49:47.840Z",
+      "comment_count": 0,
+      "test_marker": "FORUM_657AR2 in title, verify test account"
+    },
+    {
+      "id": "cmqaoo8wh0008rk5pmmj7aoap",
+      "slug": "forum-657ar2-dup-post-1781253973-1mh46y",
+      "title": "FORUM_657AR2_DUP_POST_1781253973",
+      "status": "pending",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "author_name": "Verify User 657AR",
+      "created_at": "2026-06-12T08:47:34.673Z",
+      "comment_count": 0,
+      "test_marker": "FORUM_657AR2 DUP in title, verify test account"
+    },
+    {
+      "id": "cmqaomjdx0001rk5pjbh7erde",
+      "slug": "forum-657ar2-test-post-1781253973-f7w9z3",
+      "title": "FORUM_657AR2_TEST_POST_1781253973",
+      "status": "published",
+      "is_pinned": true,
+      "author_email": "verify-user-657ar@jueshi.net",
+      "author_name": "Verify User 657AR",
+      "created_at": "2026-06-12T08:46:14.949Z",
+      "comment_count": 7,
+      "test_marker": "TEST_POST in title, verify test account"
+    },
+    {
+      "id": "cmqantmf40000rk5p0ojd3574",
+      "slug": "rate-test-1781252624-37h1gz",
+      "title": "RATE_TEST_1781252624",
+      "status": "published",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "author_name": "Verify User 657AR",
+      "created_at": "2026-06-12T08:23:45.856Z",
+      "comment_count": 0,
+      "test_marker": "RATE_TEST in title, verify test account"
+    },
+    {
+      "id": "cmqad50us00007m5ppk6x08kv",
+      "slug": "e2e-forum-post-653w-1781234681987",
+      "title": "E2E Forum Post v1.20.42.6.53-W",
+      "status": "published",
+      "is_pinned": true,
+      "is_locked": true,
+      "author_email": "e2e-user@jueshi.net",
+      "author_name": "E2E Test User",
+      "created_at": "2026-06-12T03:24:42.004Z",
+      "comment_count": 0,
+      "test_marker": "E2E in title, e2e test account"
+    },
+    {
+      "id": "cmqad45go0000zc5prcmr5mau",
+      "slug": "e2e-forum-post-653w-1781234641301",
+      "title": "E2E Forum Post v1.20.42.6.53-W [EDITED] [EDITED]",
+      "status": "pending",
+      "author_email": "e2e-user@jueshi.net",
+      "author_name": "E2E Test User",
+      "created_at": "2026-06-12T03:24:01.321Z",
+      "comment_count": 0,
+      "test_marker": "E2E in title, e2e test account"
+    }
+  ],
+  "testComments": [
+    {
+      "id": "cmqaommfv0004rk5pyom44chy",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "FORUM_COMMENT_657AR2_1781253973_2",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T08:46:18.907Z"
+    },
+    {
+      "id": "cmqaomnf20005rk5pu9d5mcwz",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "FORUM_COMMENT_657AR2_1781253973_3",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T08:46:20.175Z"
+    },
+    {
+      "id": "cmqaowrlo000crk5pl02h0971",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "FORUM_COMMENT_657AR2_DUP_SUPPLEMENT_1781254450",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T08:54:12.157Z"
+    },
+    {
+      "id": "cmqaomldv0003rk5p3noujyrs",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "FORUM_COMMENT_657AR2_1781253973_1",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T08:46:17.539Z"
+    },
+    {
+      "id": "cmqar0tlt0008sm5pjuofjp4i",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "REGRESSION_TEST_1781257999263_0",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T09:53:20.609Z"
+    },
+    {
+      "id": "cmqar0uon0009sm5pot197kcs",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "REGRESSION_TEST_1781258000756_1",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T09:53:22.007Z"
+    },
+    {
+      "id": "cmqar0vr1000asm5pp40uln64",
+      "post_id": "cmqaomjdx0001rk5pjbh7erde",
+      "content": "REGRESSION_TEST_1781258002087_2",
+      "author_email": "verify-user-657ar@jueshi.net",
+      "created_at": "2026-06-12T09:53:23.389Z"
+    }
+  ],
+  "cleanupAction": "physical_delete",
+  "justification": "All posts/comments are from known test accounts (verify-user-657ar, e2e-user-001) with explicit test markers in titles/content. No real user content affected."
+}
