@@ -35,7 +35,7 @@ export default function ContainerCalculatorPage() {
     const fitByVolume = Math.floor(ct.volume / (cargoVolume || 1));
     const fitByWeight = Math.floor(ct.maxWeight / (totalWeight || 1));
     const fitCount = Math.min(fitByVolume, fitByWeight);
-    const utilization = cargoVolume > 0 ? ((cargoVolume * quantity) / ct.volume * 100).toFixed(1) : "0";
+    const utilization = cargoVolume > 0 ? (cargoVolume / ct.volume * 100).toFixed(1) : "0";
 
     return {
       ...ct,
