@@ -53,8 +53,8 @@ export async function generateStaticParams() {
   return Object.keys(SCENARIOS).map((role) => ({ role }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ role: string }> | { role: string } }): Promise<Metadata> {
-  const resolvedParams = params instanceof Promise ? await params : params;
+export async function generateMetadata({ params }: { params: Promise<{ role: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
   const scenario = SCENARIOS[resolvedParams.role as keyof typeof SCENARIOS];
   return {
     title: `${scenario?.title || '场景专区'} - 海外百宝箱`,
@@ -62,8 +62,8 @@ export async function generateMetadata({ params }: { params: Promise<{ role: str
   };
 }
 
-export default async function ScenarioPage({ params }: { params: Promise<{ role: string }> | { role: string } }) {
-  const resolvedParams = params instanceof Promise ? await params : params;
+export default async function ScenarioPage({ params }: { params: Promise<{ role: string }> }) {
+  const resolvedParams = await params;
   const scenario = SCENARIOS[resolvedParams.role as keyof typeof SCENARIOS] || SCENARIOS.student;
 
   return (

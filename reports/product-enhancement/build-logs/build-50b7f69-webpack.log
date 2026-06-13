@@ -1,0 +1,17 @@
+⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+▲ Next.js 16.2.4 (webpack)
+- Environments: .env.local, .env.production
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 15.5s
+  Running TypeScript ...
+Failed to type check.
+
+src/app/(public)/scenario/[role]/page.tsx
+Type error: Type '{ params: Promise<{ role: string; }> | { role: string; }; }' does not satisfy the constraint 'PageProps'.
+  Types of property 'params' are incompatible.
+    Type 'Promise<{ role: string; }> | { role: string; }' is not assignable to type 'Promise<any> | undefined'.
+      Type '{ role: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+
+Next.js build worker exited with code: 1 and signal: null
