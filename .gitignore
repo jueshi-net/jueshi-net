@@ -50,3 +50,10 @@ next-env.d.ts
 
 # Local database
 prisma/dev.db
+
+# Sensitive scripts with hardcoded credentials
+scripts/check-users-pg.js
+scripts/forum-anti-spam-verify-657ar.mjs
+create-admin.js
+reset-admin.js
+backups/*.env
