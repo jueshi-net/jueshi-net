@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
   { href: "/checklists", label: "清单", icon: ListChecks },
   { href: "/topics", label: "专题", icon: BookOpen },
-  { href: "/community", label: "社区", icon: Users },
+  { href: "/bbs", label: "社区", icon: Users },
 ];
 
 export default function Header() {
