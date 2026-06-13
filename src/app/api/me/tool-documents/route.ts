@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { normalizeDocumentType, documentTypeToHyphen } from "@/lib/documents/document-type-utils";
 
 /** GET — list tool document drafts for current user, optionally filtered by toolKey */
 export async function GET(req: NextRequest) {
@@ -13,13 +14,62 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const toolKey = searchParams.get("toolKey") || undefined;
 
+  // Query ToolDocumentDraft table
   const drafts = await prisma.toolDocumentDraft.findMany({
     where: { userId, ...(toolKey ? { toolKey } : {}) },
     orderBy: { updatedAt: "desc" },
     take: 50,
   });
 
-  return NextResponse.json({ success: true, data: drafts });
+  // Also query DocumentHistory table and merge results
+  // Normalize toolKey for DocumentHistory query (support both hyphen and underscore)
+  let historyDocs: any[] = [];
+  if (toolKey) {
+    const normalizedType = normalizeDocumentType(toolKey);
+    const hyphenType = documentTypeToHyphen(toolKey);
+    historyDocs = await prisma.documentHistory.findMany({
+      where: { 
+        userId, 
+        documentType: { in: [normalizedType, hyphenType] }
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  } else {
+    // If no toolKey filter, get all DocumentHistory records
+    historyDocs = await prisma.documentHistory.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+  }
+
+  // Convert DocumentHistory records to match ToolDocumentDraft format
+  const historyAsDrafts = historyDocs.map(doc => ({
+    id: doc.id,
+    userId: doc.userId,
+    toolKey: normalizeDocumentType(doc.documentType), // Normalize to underscore
+    title: doc.documentNo || `${doc.documentType} - ${new Date(doc.createdAt).toLocaleDateString()}`,
+    companyProfileId: null,
+    dataJson: doc.documentData,
+    previewJson: null,
+    createdAt: doc.createdAt,
+    updatedAt: doc.createdAt, // DocumentHistory doesn't have updatedAt
+  }));
+
+  // Merge and deduplicate by id (prefer ToolDocumentDraft if duplicate)
+  const mergedDrafts = [...drafts];
+  const draftIds = new Set(drafts.map(d => d.id));
+  for (const h of historyAsDrafts) {
+    if (!draftIds.has(h.id)) {
+      mergedDrafts.push(h);
+    }
+  }
+
+  // Sort by updatedAt desc
+  mergedDrafts.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+  return NextResponse.json({ success: true, data: mergedDrafts });
 }
 
 /** POST — create or update tool document draft */

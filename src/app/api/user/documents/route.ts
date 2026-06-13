@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { normalizeDocumentType } from "@/lib/documents/document-type-utils";
 
 // ─── POST: Save document to workspace ───
 // Body: { documentType, documentNo?, documentData: { formData, lineItems } }
@@ -18,10 +19,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "缺少必要参数: documentType, documentData" }, { status: 400 });
     }
 
+    // Normalize document type to use underscores (canonical format)
+    const normalizedType = normalizeDocumentType(documentType);
+
     const doc = await prisma.documentHistory.create({
       data: {
         userId: session.user.id,
-        documentType,
+        documentType: normalizedType,
         documentNo: documentNo || null,
         documentData: typeof documentData === "string" ? documentData : JSON.stringify(documentData),
       },
@@ -62,7 +66,12 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     const where: any = { userId: session.user.id };
-    if (type) where.documentType = type;
+    if (type) {
+      // Support both hyphen and underscore formats for backward compatibility
+      const normalizedType = normalizeDocumentType(type);
+      const hyphenType = type.replace(/_/g, '-');
+      where.documentType = { in: [normalizedType, hyphenType] };
+    }
 
     const docs = await prisma.documentHistory.findMany({
       where,
