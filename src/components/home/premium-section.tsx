@@ -58,12 +58,10 @@ export default function PremiumSection() {
 
           {/* CTA */}
           <div className="p-6 bg-teal-50 border-t border-teal-100 text-center">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-teal-600 text-white text-sm font-bold rounded-2xl hover:bg-teal-700 transition-all shadow-lg hover:shadow-xl"
-            >
-              立即升级会员 <Crown className="w-4 h-4" />
-            </Link>
+            <div className="inline-flex items-center gap-2 px-8 py-3 bg-gray-400 text-white text-sm font-bold rounded-2xl cursor-not-allowed">
+              即将开放 <Crown className="w-4 h-4" />
+            </div>
+            <p className="mt-2 text-xs text-gray-500">会员功能正在开发中，敬请期待</p>
           </div>
         </div>
       </div>
