@@ -14,8 +14,10 @@ const TOOL_RELATIONSHIPS: Record<string, RelatedTool[]> = {
     { name: 'HS编码', href: '/tools/hs-code', emoji: '🔍', desc: '查询海关商品编码' },
   ],
   'shipping-calculator': [
-    { name: '物流追踪', href: '/tracking', emoji: '📦', desc: '批量查询物流单号' },
-    { name: '敏感货参考', href: '/tools/sensitive-goods', emoji: '⚠️', desc: '查询物品是否敏感货' },
+    { name: '集装箱计算', href: '/tools/container', emoji: '📦', desc: '计算 CBM 和装柜方案' },
+    { name: '商业发票', href: '/tools/commercial-invoice', emoji: '🧾', desc: '生成出口商业发票' },
+    { name: '装箱单', href: '/tools/documents/packing-list', emoji: '📋', desc: '生成 Packing List' },
+    { name: 'HS编码', href: '/tools/hs-code', emoji: '🔍', desc: '查询海关商品编码' },
   ],
   'hs-code': [
     { name: '发票生成', href: '/tools/invoice', emoji: '🧾', desc: '生成商业发票和装箱单' },
@@ -52,6 +54,16 @@ const TOOL_RELATIONSHIPS: Record<string, RelatedTool[]> = {
   documents: [
     { name: '发票生成', href: '/tools/invoice', emoji: '🧾', desc: '快速生成发票' },
     { name: '唛头面单', href: '/tools/documents/shipping-label', emoji: '🏷️', desc: '生成外箱标签' },
+  ],
+  'packing-list': [
+    { name: '商业发票', href: '/tools/commercial-invoice', emoji: '🧾', desc: '生成配套商业发票' },
+    { name: '唛头标签', href: '/tools/documents/shipping-label', emoji: '🏷️', desc: '生成外箱唛头' },
+    { name: '运费计算', href: '/tools/shipping-calculator', emoji: '📐', desc: '估算运费参考' },
+  ],
+  'proforma-invoice': [
+    { name: '报价单', href: '/tools/documents/quotation', emoji: '📝', desc: '生成正式报价单' },
+    { name: '商业发票', href: '/tools/commercial-invoice', emoji: '🧾', desc: '转为正式发票' },
+    { name: '汇率换算', href: '/tools/exchange-rate', emoji: '💱', desc: '查询实时汇率' },
   ],
 };
 
