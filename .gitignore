@@ -75,3 +75,8 @@ backups/*.dump
 reports/v1.20.42.6.46.7-production-verification-lock.md
 reports/v1.20.42.6.46.8-final-verification-report.md
 reports/v1.20.42.6.46.8-e2e-verification-completion.md
+
+# Reports with credentials
+DASHBOARD_ACCEPTANCE_CHECKLIST.md
+reports/forum-enhancement/v1.20.42.6.58-b-forum-safe-feature-enhancement-phase-1.md
+reports/forum-recovery/v1.20.42.6.52-v-forum-e2e-testing-flarum-decommission-preflight.md
