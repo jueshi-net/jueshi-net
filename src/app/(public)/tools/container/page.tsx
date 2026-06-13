@@ -140,6 +140,41 @@ export default function ContainerCalculatorPage() {
         {/* Tool-specific ads */}
         <AdSlot placement="tool-bottom" className="mb-8" />
 
+        {/* Next Steps - Cross Recommendations */}
+        <div className="col-span-full mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-xl border border-teal-200">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">📋 下一步推荐</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a href="/tools/shipping-calculator" className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
+              <span className="text-2xl">🚢</span>
+              <div>
+                <div className="text-sm font-semibold text-gray-900">运费计算</div>
+                <div className="text-xs text-gray-500">估算物流费用</div>
+              </div>
+            </a>
+            <a href="/tools/commercial-invoice" className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
+              <span className="text-2xl">🧾</span>
+              <div>
+                <div className="text-sm font-semibold text-gray-900">商业发票</div>
+                <div className="text-xs text-gray-500">生成出口单据</div>
+              </div>
+            </a>
+            <a href="/tools/documents/packing-list" className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
+              <span className="text-2xl">📦</span>
+              <div>
+                <div className="text-sm font-semibold text-gray-900">装箱单</div>
+                <div className="text-xs text-gray-500">Packing List</div>
+              </div>
+            </a>
+            <a href="/tools/documents/container-loading-list" className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
+              <span className="text-2xl">📋</span>
+              <div>
+                <div className="text-sm font-semibold text-gray-900">装柜明细</div>
+                <div className="text-xs text-gray-500">Container Loading List</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
         {/* FAQ */}
         <FAQSection title="集装箱计算常见问题" items={[
           { question: "什么是 CBM？", answer: "CBM（Cubic Meter）是立方米，国际物流中常用的体积单位。1 CBM = 1 立方米。集装箱的载货容积通常以 CBM 表示。" },

@@ -61,10 +61,13 @@ export default function HeroSection({ stats }: { stats: { tools: number; users: 
 
             <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-3">
               <Link href="/tools" className="inline-flex items-center gap-2 px-6 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-2xl hover:bg-teal-700 transition-all shadow-md hover:shadow-lg">
-                立即开始 <ArrowRight className="w-4 h-4" />
+                开始使用工具 <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/register" className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-2xl border border-gray-300 hover:bg-gray-50 transition-all">
-                免费注册
+              <Link href="/tools/commercial-invoice" className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-teal-700 text-sm font-semibold rounded-2xl border border-teal-200 hover:bg-teal-50 transition-all">
+                生成商业发票
+              </Link>
+              <Link href="/tools/hs-code" className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-2xl border border-gray-300 hover:bg-gray-50 transition-all">
+                查询 HS 编码
               </Link>
             </div>
           </div>

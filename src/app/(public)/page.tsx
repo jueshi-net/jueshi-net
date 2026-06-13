@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import HeroSection from "@/components/home/hero-new";
-import CategoryCards from "@/components/home/category-cards";
-import PlatformStats from "@/components/home/platform-stats";
-import PopularToolsDynamic from "@/components/home/popular-tools-dynamic";
+import QuickToolsGrid from "@/components/home/quick-tools-grid";
+import WorkflowPath from "@/components/home/workflow-path";
 import HomeAd from "@/components/home/home-ad";
 import DocumentToolsSection from "@/components/home/document-tools-section";
-import TopicsDynamic from "@/components/home/topics-dynamic";
 import CommunitySection from "@/components/home/community-section";
 import PremiumSection from "@/components/home/premium-section";
 import SEOSection from "@/components/home/seo-section";
@@ -35,14 +33,9 @@ export default async function HomePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <HomeAd slot={AD_SLOTS.HOME_HERO} />
       </div>
-      <CategoryCards />
-      <PlatformStats stats={stats} />
-      <PopularToolsDynamic />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <HomeAd slot={AD_SLOTS.HOME_POPULAR} />
-      </div>
+      <QuickToolsGrid />
+      <WorkflowPath />
       <DocumentToolsSection />
-      <TopicsDynamic />
       <CommunitySection />
       <PremiumSection />
       <SEOSection />

@@ -23,7 +23,15 @@ export interface DocumentTool {
   category: "trade" | "logistics" | "customs" | "consolidation" | "finance" | "label";
   /** 是否在线可用 */
   isOnline: boolean;
+  /** 成熟度：stable=正式可用, beta=Beta测试中 */
+  maturity?: "stable" | "beta";
 }
+
+/** 核心稳定工具 — 经过充分测试的主工具 */
+export const STABLE_TOOLS = new Set([
+  "commercial-invoice",
+  "quotation",
+]);
 
 /**
  * Lucide icon 映射 — 按 key 查找

@@ -2,12 +2,18 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, FileText, Crown, AlertTriangle, Clock, Tag, Receipt, Plane, Shield, Sparkles } from "lucide-react";
 import { Metadata } from "next";
 import { auth } from "@/lib/auth";
-import { documentTools, getToolHref, getToolIcon, getToolEmoji, getToolColor, onlineToolCount } from "@/lib/document-tools-config";
+import { documentTools, getToolHref, getToolIcon, getToolEmoji, getToolColor, onlineToolCount, STABLE_TOOLS } from "@/lib/document-tools-config";
 import { AdSlot } from "@/components/ad-slot";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { FAQSection } from "@/components/faq-section";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
 import ToolReviewServer from "@/components/tools/tool-review-server";
+
+/** Get tool maturity status */
+function getToolMaturity(key: string): "stable" | "beta" {
+  if (STABLE_TOOLS.has(key)) return "stable";
+  return "beta";
+}
 
 export const metadata: Metadata = {
   title: "外贸/国际物流通用单据生成器 — 海外百宝箱",
@@ -196,6 +202,7 @@ export default async function DocumentsHubPage() {
           {onlineTools.map(doc => {
             const Icon = getToolIcon(doc);
             const emoji = getToolEmoji(doc);
+            const maturity = getToolMaturity(doc.key);
             return (
               <Link
                 key={doc.key}
@@ -209,13 +216,20 @@ export default async function DocumentsHubPage() {
                 <p className="text-xs text-gray-400 mb-2">{doc.titleEn}</p>
                 <p className="text-xs text-gray-500 mb-3 line-clamp-2">{doc.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">免费</span>
+                  {maturity === "stable" ? (
+                    <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full border border-green-200">已开放</span>
+                  ) : (
+                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-200">Beta</span>
+                  )}
                   <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 transition-colors" />
                 </div>
               </Link>
             );
           })}
         </div>
+        <p className="mt-4 text-xs text-gray-400">
+          💡 <strong>已开放</strong> = 经过充分测试的核心工具 · <strong>Beta</strong> = 可用但仍在优化中
+        </p>
       </div>
 
       {/* Shipping Label CTA (integrated) */}
