@@ -30,8 +30,7 @@ export default function HeroSection({ stats }: { stats: { tools: number; users: 
               <span className="text-teal-600">绝世百宝箱</span>
             </h1>
             <p className="mt-3 text-base sm:text-lg text-gray-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              海外华人的实用工具箱
-              <span className="text-gray-900 font-semibold">一个账号全部搞定</span>
+              外贸单据、跨境物流、邮编汇率、HS 编码，<span className="text-gray-900 font-semibold">一站式实用工具箱</span>
             </p>
 
             <div className="mt-5 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-500">

@@ -41,8 +41,9 @@ export default function ToolCard({ tool }: ToolCardProps) {
       {/* Header */}
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
-           {/* Simple icon fallback or dynamic import if needed, for now generic icon based on category */}
-           {tool.category === 'documents' ? <FileCheck className="w-5 h-5" /> : 
+           {tool.icon ? (
+             <span className="text-xl">{tool.icon}</span>
+           ) : tool.category === 'documents' ? <FileCheck className="w-5 h-5" /> : 
             tool.category === 'ai-content' ? <Sparkles className="w-5 h-5" /> : 
             <span className="text-lg font-bold">{tool.name.charAt(0)}</span>}
         </div>

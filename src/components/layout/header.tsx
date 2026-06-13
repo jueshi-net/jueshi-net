@@ -11,15 +11,16 @@ import {
 
 const TOOL_CATEGORIES = [
   { href: "/tools", label: "全部工具", icon: Wrench, desc: "浏览所有工具" },
-  { href: "/tools?cat=logistics", label: "集运物流", icon: PackageSearch, desc: "运费/唛头/追踪" },
   { href: "/tools?cat=documents", label: "外贸单据", icon: FileText, desc: "发票/报价/合同" },
-  { href: "/tools?cat=life", label: "海外生活", icon: Home, desc: "邮编/地址/生活" },
+  { href: "/tools?cat=logistics", label: "物流工具", icon: PackageSearch, desc: "运费/唛头/追踪" },
+  { href: "/tools?cat=general", label: "编码查询", icon: Hash, desc: "邮编/HS编码" },
+  { href: "/tools?cat=exchange", label: "汇率金融", icon: DollarSign, desc: "汇率换算" },
   { href: "/tools?cat=ai-content", label: "AI 内容", icon: Sparkles, desc: "文案/翻译/摘要" },
 ];
 
 const NAV_LINKS = [
   { href: "/", label: "首页", icon: Home },
-  { href: "/tools/postal-code", label: "邮编", icon: Hash },
+  { href: "/tools/documents", label: "单据", icon: FileText },
   { href: "/tools/hs-code", label: "HS编码", icon: FileText },
   { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
   { href: "/checklists", label: "清单", icon: ListChecks },

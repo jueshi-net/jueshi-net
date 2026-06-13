@@ -9,9 +9,11 @@ interface ToolFilterBarProps {
   currentQuery?: string;
   currentCategory?: string;
   currentSort?: string;
+  /** If provided, only show these category keys (hides empty categories) */
+  presentCategories?: string[];
 }
 
-export default function ToolFilterBar({ currentQuery, currentCategory, currentSort }: ToolFilterBarProps) {
+export default function ToolFilterBar({ currentQuery, currentCategory, currentSort, presentCategories }: ToolFilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,7 +47,12 @@ export default function ToolFilterBar({ currentQuery, currentCategory, currentSo
   };
 
   // Generate categories dynamically based on map + "all"
-  const categories = [{ key: "all", label: "全部" }, ...Object.entries(CATEGORY_MAP).map(([k, v]) => ({ key: k, label: v }))];
+  // If presentCategories is provided, only show categories that have tools
+  const allCategories = Object.entries(CATEGORY_MAP).map(([k, v]) => ({ key: k, label: v }));
+  const filteredCategories = presentCategories
+    ? allCategories.filter(c => presentCategories.includes(c.key))
+    : allCategories;
+  const categories = [{ key: "all", label: "全部" }, ...filteredCategories];
 
   return (
     <div className="bg-white border-b sticky top-[57px] z-30 shadow-sm">

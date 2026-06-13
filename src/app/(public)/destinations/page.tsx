@@ -1,25 +1,28 @@
 import Link from "next/link";
-import { ArrowRight, Globe, FileText, Package, MapPin, DollarSign, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowRight, Globe, FileText, Package, MapPin, DollarSign, Sparkles, ChevronRight, Calculator, Hash, Search } from "lucide-react";
 import { REGION_GROUPS, getAllDestinationsActive } from "@/lib/destinations-db";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: buildTitle("全球目的地全景向导"),
-  description: "按国家或地区，探索专属于您的政策指南、实用工具与服务 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
+  title: buildTitle("全球目的地工具导航"),
+  description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，邮编查询、地址格式化、运费计算、商业发票、HS编码，一站式出海解决方案。",
   alternates: { canonical: buildCanonical("/destinations") },
   openGraph: {
-    title: buildTitle("全球目的地全景向导"),
-    description: "按国家或地区，探索专属于您的政策指南、实用工具与服务 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
+    title: buildTitle("全球目的地工具导航"),
+    description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
     url: buildCanonical("/destinations"),
   },
 };
 
-const TOP_TOOLS = [
-  { key: "commercial-invoice", titleZh: "商业发票", emoji: "🧾", href: "/tools/documents/commercial-invoice", Icon: FileText, color: "text-teal-600 bg-teal-50" as const },
-  { key: "packing-list", titleZh: "装箱单", emoji: "📦", href: "/tools/documents/packing-list", Icon: Package, color: "text-blue-600 bg-blue-50" as const },
-  { key: "shipping-label", titleZh: "唛头标签", emoji: "📌", href: "/tools/documents/shipping-label", Icon: MapPin, color: "text-amber-600 bg-amber-50" as const },
-  { key: "exchange-rate", titleZh: "汇率换算", emoji: "💱", href: "/tools/exchange-rate", Icon: DollarSign, color: "text-orange-600 bg-orange-50" as const },
+/** Each region gets recommended tool CTAs */
+const REGION_TOOL_CTAS = [
+  { label: "邮编查询", href: "/tools/postal-code", icon: Hash },
+  { label: "地址格式化", href: "/tools/address-formatter", icon: MapPin },
+  { label: "运费计算", href: "/tools/shipping-calculator", icon: Calculator },
+  { label: "商业发票", href: "/tools/documents/commercial-invoice", icon: FileText },
+  { label: "HS 编码", href: "/tools/hs-code", icon: Search },
+  { label: "汇率换算", href: "/tools/exchange-rate", icon: DollarSign },
 ];
 
 export default async function DestinationsIndexPage() {
@@ -30,7 +33,6 @@ export default async function DestinationsIndexPage() {
     // DB unreachable during build — render with empty state
   }
   const destMap = new Map(destinations.map(d => [d.slug, d]));
-  const totalCountries = destinations.length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,11 +51,11 @@ export default async function DestinationsIndexPage() {
           </div>
 
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-            🌍 全球目的地全景向导
+            🌍 全球目的地工具导航
           </h1>
 
           <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed">
-            按地区浏览专题与工具 — 覆盖 {totalCountries} 个国家/地区，{REGION_GROUPS.length} 大出海区域
+            按地区查找出海常用工具 — 邮编查询、地址格式化、运费计算、商业发票、HS 编码，一站式解决。
           </p>
         </div>
       </div>
@@ -65,8 +67,6 @@ export default async function DestinationsIndexPage() {
             const availableCountries = group.slugs
               .map(slug => destMap.get(slug))
               .filter(Boolean);
-            const count = availableCountries.length;
-            const firstTwo = availableCountries.slice(0, 3);
 
             return (
               <div
@@ -82,37 +82,43 @@ export default async function DestinationsIndexPage() {
                   <p className="text-xs text-gray-400">{group.description}</p>
                 </div>
 
-                {/* Countries list */}
-                <div className="p-3 pt-2">
-                  {firstTwo.length > 0 ? (
-                    <div className="space-y-1.5">
-                      {firstTwo.map(dest => (
+                {/* Countries list (if any) */}
+                {availableCountries.length > 0 && (
+                  <div className="px-3 pt-2">
+                    <div className="space-y-1">
+                      {availableCountries.slice(0, 3).map(dest => (
                         <Link
                           key={dest!.slug}
                           href={`/destinations/${dest!.slug}`}
-                          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group min-h-[44px]"
+                          className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors group min-h-[36px]"
                         >
-                          <span className="text-base">{dest!.emoji}</span>
+                          <span className="text-sm">{dest!.emoji}</span>
                           <span className="text-xs font-medium text-gray-700 group-hover:text-purple-700 transition-colors">{dest!.name}</span>
                           <ChevronRight className="w-3 h-3 text-gray-300 group-hover:text-purple-500 transition-colors ml-auto" />
                         </Link>
                       ))}
-                      {count > 3 && (
-                        <div className="text-[10px] text-gray-300 px-2 py-1 text-center">
-                          +{count - 3} 个国家即将上线
-                        </div>
-                      )}
                     </div>
-                  ) : (
-                    <div className="text-[10px] text-gray-300 px-2 py-1 text-center">
-                      即将上线
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {/* Footer */}
-                <div className="px-3 pb-2 pt-0.5">
-                  <span className="text-[10px] text-gray-300">{count} 个专题</span>
+                {/* Tool CTAs — always present */}
+                <div className="p-3 pt-2">
+                  <p className="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wide font-medium">常用工具</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {REGION_TOOL_CTAS.slice(0, 4).map(cta => {
+                      const Icon = cta.icon;
+                      return (
+                        <Link
+                          key={cta.href}
+                          href={cta.href}
+                          className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-purple-600 bg-purple-50 rounded-md hover:bg-purple-100 transition-colors"
+                        >
+                          <Icon className="w-3 h-3" />
+                          {cta.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );
@@ -120,29 +126,63 @@ export default async function DestinationsIndexPage() {
         </div>
       </div>
 
-      {/* ===== TOP TOOLS ===== */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="w-5 h-5 text-purple-600" />
-          <h2 className="text-xl font-bold text-gray-900">常用工具箱</h2>
-        </div>
-        <p className="text-sm text-gray-500 mb-5">精选最高频的出海工具，即点即用</p>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {TOP_TOOLS.map(tool => (
-            <Link
-              key={tool.key}
-              href={tool.href}
-              className="group bg-white rounded-xl border border-gray-100/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md hover:border-gray-200 transition-all p-4 flex flex-col items-center text-center gap-2"
-            >
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${tool.color}`}>
-                {tool.emoji}
+      {/* ===== COMMON SCENARIOS ===== */}
+      <div className="max-w-6xl mx-auto px-4 pb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">常见出海场景</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { title: "发货到海外", desc: "运费计算、集装箱装柜、物流追踪", tools: [
+              { label: "运费计算", href: "/tools/shipping-calculator" },
+              { label: "集装箱计算", href: "/tools/container" },
+              { label: "物流追踪", href: "/tracking" },
+            ]},
+            { title: "清关报关", desc: "商业发票、装箱单、HS编码", tools: [
+              { label: "商业发票", href: "/tools/documents/commercial-invoice" },
+              { label: "装箱单", href: "/tools/documents/packing-list" },
+              { label: "HS编码", href: "/tools/hs-code" },
+            ]},
+            { title: "地址填写", desc: "邮编查询、地址格式化、唛头模板", tools: [
+              { label: "邮编查询", href: "/tools/postal-code" },
+              { label: "地址格式化", href: "/tools/address-formatter" },
+              { label: "唛头模板", href: "/tools/documents/shipping-mark" },
+            ]},
+            { title: "收款结汇", desc: "汇率换算、报价单、形式发票", tools: [
+              { label: "汇率换算", href: "/tools/exchange-rate" },
+              { label: "报价单", href: "/tools/documents/quotation" },
+              { label: "形式发票", href: "/tools/documents/proforma-invoice" },
+            ]},
+          ].map(scenario => (
+            <div key={scenario.title} className="bg-white rounded-xl border border-gray-100 p-5">
+              <h3 className="font-bold text-gray-900 mb-1">{scenario.title}</h3>
+              <p className="text-xs text-gray-500 mb-3">{scenario.desc}</p>
+              <div className="space-y-1.5">
+                {scenario.tools.map(tool => (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 hover:underline min-h-[32px]"
+                  >
+                    <ArrowRight className="w-3 h-3" />
+                    {tool.label}
+                  </Link>
+                ))}
               </div>
-              <span className="text-sm font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">{tool.titleZh}</span>
-              <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-purple-500 transition-colors" />
-            </Link>
+            </div>
           ))}
         </div>
+      </div>
+
+      {/* ===== ALL TOOLS CTA ===== */}
+      <div className="max-w-6xl mx-auto px-4 pb-16">
+        <Link href="/tools" className="block bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold mb-1">🔧 浏览全部工具</h3>
+              <p className="text-teal-100 text-sm">邮编、HS编码、汇率、运费、单据模板，一个站搞定</p>
+            </div>
+            <ArrowRight className="w-6 h-6 flex-shrink-0" />
+          </div>
+        </Link>
       </div>
     </div>
   );

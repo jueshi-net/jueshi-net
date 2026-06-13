@@ -1,20 +1,21 @@
 import Link from "next/link";
 
 const FOOTER_LINKS = [
+  { href: "/tools/documents", label: "单据中心" },
   { href: "/tools/postal-code", label: "邮编查询" },
   { href: "/tools/hs-code", label: "HS编码" },
-  { href: "/tools/documents", label: "单据中心" },
   { href: "/tools/shipping-calculator", label: "运费计算" },
   { href: "/tools/exchange-rate", label: "汇率换算" },
-  { href: "/tools/container", label: "集装箱" },
+  { href: "/tools/container", label: "集装箱计算" },
+  { href: "/tools", label: "工具中心" },
   { href: "/tracking", label: "物流追踪" },
   { href: "/ai-tools", label: "AI工具" },
   { href: "/resources", label: "资源导航" },
   { href: "/topics", label: "专题库" },
   { href: "/destinations", label: "目的地" },
+  { href: "/bbs", label: "社区论坛" },
   { href: "/guides", label: "指南" },
   { href: "/starter", label: "新手入门" },
-  { href: "/pricing", label: "价格方案" },
   { href: "/help", label: "帮助中心" },
   { href: "/login", label: "登录" },
 ];
@@ -46,11 +47,11 @@ export default function Footer() {
             <div className="grid grid-cols-2 gap-2">
               {[
                 { href: "/", label: "首页" },
-                { href: "/resources", label: "资源导航" },
-                { href: "/topics", label: "专题库" },
-                { href: "/ai-tools", label: "AI工具" },
+                { href: "/tools/documents", label: "单据模板" },
+                { href: "/tools", label: "工具中心" },
+                { href: "/bbs", label: "社区论坛" },
                 { href: "/destinations", label: "目的地" },
-                { href: "/guides", label: "指南" },
+                { href: "/topics", label: "专题库" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} className="text-sm text-[#666666] hover:text-[#1966f2] transition-colors">
                   {l.label}

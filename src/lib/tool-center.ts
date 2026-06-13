@@ -118,14 +118,127 @@ export async function getToolsData(query?: string, category?: string, sort?: str
     return b.sortOrder - a.sortOrder;
   });
 
-  return enrichedTools;
+  // Merge standalone tools (not in DB but have real pages)
+  const dbSlugs = new Set(enrichedTools.map(t => t.slug));
+  const standaloneMatches = STANDALONE_TOOLS
+    .filter(t => !dbSlugs.has(t.slug))
+    .filter(t => {
+      if (!query) return true;
+      const q = query.toLowerCase().trim();
+      return t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.slug.toLowerCase().includes(q) ||
+        matchesAlias(t.slug, q);
+    });
+
+  const allTools = [...enrichedTools, ...standaloneMatches];
+
+  // Re-sort after merge
+  allTools.sort((a, b) => {
+    if (sort === "latest") return b.updatedAt.getTime() - a.updatedAt.getTime();
+    if (sort === "saves") return b.metrics.saves - a.metrics.saves;
+    if (sort === "favorites") return b.favorites - a.favorites;
+    if (b.score !== a.score) return b.score - a.score;
+    return b.sortOrder - a.sortOrder;
+  });
+
+  return allTools;
 }
 
 export const CATEGORY_MAP: Record<string, string> = {
-  documents: "单据工具",
-  "ai-content": "AI 内容",
+  documents: "外贸单据",
   logistics: "物流工具",
+  general: "编码查询",
+  exchange: "汇率金融",
   business: "经营工具",
-  life: "生活工具",
-  general: "通用工具",
+  "ai-content": "AI 内容",
 };
+
+/** Standalone tools that live as dedicated pages but should appear in /tools */
+export const STANDALONE_TOOLS = [
+  {
+    id: "standalone-postal-code",
+    name: "邮编查询",
+    slug: "postal-code",
+    description: "全球邮编查询，支持美国 ZIP、英国 postcode、中国邮政编码等",
+    category: "general",
+    route: "/tools/postal-code",
+    icon: "📮",
+    popularityTag: "HOT",
+    updatedAt: new Date("2026-06-10"),
+    sortOrder: 100,
+    isNew: false,
+    score: 0,
+    metrics: { views: 0, clicks: 0, saves: 0, favorites: 0 },
+    favorites: 0,
+    review: { avg: 0, count: 0 },
+  },
+  {
+    id: "standalone-hs-code",
+    name: "HS 编码查询",
+    slug: "hs-code",
+    description: "海关编码查询，支持中国、美国、欧盟等主要贸易国 HS Code 检索",
+    category: "general",
+    route: "/tools/hs-code",
+    icon: "🔍",
+    popularityTag: "HOT",
+    updatedAt: new Date("2026-06-10"),
+    sortOrder: 99,
+    isNew: false,
+    score: 0,
+    metrics: { views: 0, clicks: 0, saves: 0, favorites: 0 },
+    favorites: 0,
+    review: { avg: 0, count: 0 },
+  },
+  {
+    id: "standalone-exchange-rate",
+    name: "汇率换算",
+    slug: "exchange-rate",
+    description: "实时汇率查询与换算，支持美元、欧元、英镑、日元等主流货币",
+    category: "exchange",
+    route: "/tools/exchange-rate",
+    icon: "💱",
+    popularityTag: "HOT",
+    updatedAt: new Date("2026-06-10"),
+    sortOrder: 98,
+    isNew: false,
+    score: 0,
+    metrics: { views: 0, clicks: 0, saves: 0, favorites: 0 },
+    favorites: 0,
+    review: { avg: 0, count: 0 },
+  },
+  {
+    id: "standalone-shipping-calculator",
+    name: "运费计算器",
+    slug: "shipping-calculator",
+    description: "国际快递与海运运费估算，支持 DHL、UPS、FedEx 等主流渠道",
+    category: "logistics",
+    route: "/tools/shipping-calculator",
+    icon: "🚢",
+    popularityTag: "HOT",
+    updatedAt: new Date("2026-06-10"),
+    sortOrder: 97,
+    isNew: false,
+    score: 0,
+    metrics: { views: 0, clicks: 0, saves: 0, favorites: 0 },
+    favorites: 0,
+    review: { avg: 0, count: 0 },
+  },
+  {
+    id: "standalone-container",
+    name: "集装箱计算器",
+    slug: "container",
+    description: "集装箱装柜计算，支持 20GP/40GP/40HQ 柜型，计算 CBM 和空间利用率",
+    category: "logistics",
+    route: "/tools/container",
+    icon: "📦",
+    popularityTag: null,
+    updatedAt: new Date("2026-06-10"),
+    sortOrder: 96,
+    isNew: false,
+    score: 0,
+    metrics: { views: 0, clicks: 0, saves: 0, favorites: 0 },
+    favorites: 0,
+    review: { avg: 0, count: 0 },
+  },
+];

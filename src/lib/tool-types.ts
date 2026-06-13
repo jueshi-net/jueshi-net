@@ -25,10 +25,10 @@ export interface ToolCenterItem {
 }
 
 export const CATEGORY_MAP: Record<string, string> = {
-  documents: "单据工具",
-  "ai-content": "AI 内容",
+  documents: "外贸单据",
   logistics: "物流工具",
+  general: "编码查询",
+  exchange: "汇率金融",
   business: "经营工具",
-  life: "生活工具",
-  general: "通用工具",
+  "ai-content": "AI 内容",
 };
