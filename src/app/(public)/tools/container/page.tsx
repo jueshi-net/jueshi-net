@@ -20,7 +20,11 @@ export default function ContainerCalculatorPage() {
   const [cargoWeight, setCargoWeight] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  const cargoVolume = (cargoL * cargoW * cargoH * quantity) / 1000000; // m³
+  // 单件体积 (m³)
+  const singleVolume = (cargoL * cargoW * cargoH) / 1000000;
+  // 当前批次总体积 (m³)
+  const totalVolume = singleVolume * quantity;
+  // 当前批次总重量 (kg)
   const totalWeight = cargoWeight * quantity;
 
   const handleFillExample = () => {
@@ -32,17 +36,34 @@ export default function ContainerCalculatorPage() {
   };
 
   const results = containerTypes.map(ct => {
-    const fitByVolume = Math.floor(ct.volume / (cargoVolume || 1));
-    const fitByWeight = Math.floor(ct.maxWeight / (totalWeight || 1));
-    const fitCount = Math.min(fitByVolume, fitByWeight);
-    const utilization = cargoVolume > 0 ? (cargoVolume / ct.volume * 100).toFixed(1) : "0";
+    // 当前批次占柜容体积比例
+    const batchVolumeUtil = totalVolume > 0 ? (totalVolume / ct.volume * 100) : 0;
+    // 当前批次占柜限重比例
+    const batchWeightUtil = totalWeight > 0 ? (totalWeight / ct.maxWeight * 100) : 0;
+    
+    // 理论可装件数（按体积，单件）
+    const maxItemsByVolume = singleVolume > 0 ? Math.floor(ct.volume / singleVolume) : 0;
+    // 理论可装件数（按重量，单件）
+    const maxItemsByWeight = cargoWeight > 0 ? Math.floor(ct.maxWeight / cargoWeight) : 0;
+    // 实际可装件数（取较小值）
+    const maxItems = Math.min(maxItemsByVolume, maxItemsByWeight);
+    
+    // 当前批次可装几批（按体积）
+    const batchesByVolume = totalVolume > 0 ? Math.floor(ct.volume / totalVolume) : 0;
+    // 当前批次可装几批（按重量）
+    const batchesByWeight = totalWeight > 0 ? Math.floor(ct.maxWeight / totalWeight) : 0;
+    // 实际可装批次数（取较小值）
+    const batches = Math.min(batchesByVolume, batchesByWeight);
 
     return {
       ...ct,
-      canFit: fitCount,
-      volumeUtilization: utilization,
-      weightUtilization: totalWeight > 0 ? ((totalWeight) / ct.maxWeight * 100).toFixed(1) : "0",
-      recommended: fitCount > 0 && parseFloat(utilization) > 50 && parseFloat(utilization) < 95
+      batchVolumeUtil: batchVolumeUtil.toFixed(1),
+      batchWeightUtil: batchWeightUtil.toFixed(1),
+      maxItemsByVolume,
+      maxItemsByWeight,
+      maxItems,
+      batches,
+      recommended: batchVolumeUtil > 50 && batchVolumeUtil < 95
     };
   });
 
@@ -101,16 +122,17 @@ export default function ContainerCalculatorPage() {
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
               <Info className="w-4 h-4" />
-              <span>单件体积: {(cargoL * cargoW * cargoH / 1000000).toFixed(4)} m³ | 总体积: {cargoVolume.toFixed(4)} m³ | 总重量: {totalWeight.toFixed(1)} kg</span>
+              <span>当前货物：{quantity} 件，共 {totalVolume.toFixed(4)} CBM，约 {totalWeight.toFixed(1)} kg</span>
             </div>
             <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-              <p className="font-medium mb-1">💡 结果解释：</p>
+              <p className="font-medium mb-1">💡 计算说明：</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>单箱 CBM = 长 × 宽 × 高 ÷ 1,000,000（cm³ 转 m³）</li>
-                <li>总体积 = 单箱 CBM × 数量</li>
-                <li>可装件数 = min(柜容积 ÷ 总体积, 柜限重 ÷ 总重量)</li>
-                <li>体积利用率 = 总体积 ÷ 柜容积 × 100%</li>
-                <li>实际装柜受重量、托盘、装载方式、货物形状影响，建议预留 10-15% 余量</li>
+                <li>单件体积 = 长 × 宽 × 高 ÷ 1,000,000 = {singleVolume.toFixed(4)} m³</li>
+                <li>当前批次总体积 = 单件体积 × 数量 = {totalVolume.toFixed(4)} m³</li>
+                <li>当前批次总重量 = 单件重量 × 数量 = {totalWeight.toFixed(1)} kg</li>
+                <li>理论可装件数 = min(柜容积 ÷ 单件体积, 柜限重 ÷ 单件重量)</li>
+                <li>可装批次数 = 理论可装件数 ÷ 当前数量</li>
+                <li className="text-orange-600 dark:text-orange-400 font-medium">⚠️ 以上仅为体积/重量粗算，实际装柜受托盘、包装、货物形状、堆叠方式和限重影响</li>
               </ul>
             </div>
           </div>
@@ -148,17 +170,27 @@ export default function ContainerCalculatorPage() {
               </div>
               <hr className="dark:border-gray-700" />
               <div className="flex justify-between">
-                <span className="text-gray-500">可装</span>
-                <span className="text-lg font-bold text-blue-600">{ct.canFit} 件</span>
+                <span className="text-gray-500">当前批次占体积</span>
+                <span className="font-medium text-blue-600">{ct.batchVolumeUtil}%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">体积利用率</span>
-                <span className="font-medium">{ct.volumeUtilization}%</span>
+                <span className="text-gray-500">当前批次占重量</span>
+                <span className="font-medium">{ct.batchWeightUtil}%</span>
               </div>
+              <hr className="dark:border-gray-700" />
               <div className="flex justify-between">
-                <span className="text-gray-500">重量利用率</span>
-                <span className="font-medium">{ct.weightUtilization}%</span>
+                <span className="text-gray-500">理论可装</span>
+                <span className="text-lg font-bold text-green-600">{ct.maxItems} 件</span>
               </div>
+              <div className="text-xs text-gray-500 mt-1">
+                按体积: {ct.maxItemsByVolume} 件 | 按重量: {ct.maxItemsByWeight} 件
+              </div>
+              {quantity > 0 && (
+                <div className="flex justify-between mt-1">
+                  <span className="text-gray-500">可装同等批次</span>
+                  <span className="font-medium text-orange-600">{ct.batches} 批</span>
+                </div>
+              )}
             </div>
           </div>
         ))}

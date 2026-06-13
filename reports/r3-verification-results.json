@@ -1,0 +1,91 @@
+{
+  "login": {
+    "success": false,
+    "method": ""
+  },
+  "packingList": {
+    "page200": true,
+    "fillExample": true,
+    "fieldsEditable": true,
+    "preview": false,
+    "saveDraft": {
+      "success": false,
+      "draftId": null,
+      "apiResponse": null
+    },
+    "restore": {
+      "success": false,
+      "path": ""
+    },
+    "workspaceVisible": false,
+    "pngExport": {
+      "clicked": true,
+      "error": null,
+      "filename": "PL_PL-2024-001_2026-06-13.png"
+    },
+    "wordExport": {
+      "clicked": true,
+      "error": null
+    },
+    "printButton": true,
+    "companyProfile": {
+      "reused": false,
+      "note": "Company profile section not found in current view"
+    },
+    "mobile375": {
+      "pass": true,
+      "issues": []
+    }
+  },
+  "proformaInvoice": {
+    "page200": true,
+    "fillExample": true,
+    "fieldsEditable": true,
+    "preview": false,
+    "subtotalLogic": false,
+    "bankInfo": true,
+    "saveDraft": {
+      "success": false,
+      "draftId": null,
+      "apiResponse": null
+    },
+    "restore": {
+      "success": false,
+      "path": ""
+    },
+    "workspaceVisible": false,
+    "pngExport": {
+      "clicked": true,
+      "error": null
+    },
+    "wordExport": {
+      "clicked": true,
+      "error": null
+    },
+    "printButton": true,
+    "companyProfile": {
+      "reused": false,
+      "note": "Company profile section not found in current view"
+    },
+    "mobile375": {
+      "pass": true,
+      "issues": []
+    }
+  },
+  "container": {
+    "page200": true,
+    "fillExample": true,
+    "singleCBM": null,
+    "totalCBM": 12,
+    "totalWeight": 1500,
+    "batchVolumeUtil20GP": 36.1,
+    "batchWeightUtil20GP": 6.9,
+    "maxItems20GP": 276,
+    "batches20GP": 2,
+    "misleadingText": false,
+    "mobile375": {
+      "pass": true,
+      "issues": []
+    }
+  }
+}
