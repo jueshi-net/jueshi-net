@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Check, LogOut } from 'lucide-react';
+import { Settings, Check, LogOut, Lock, Eye, EyeOff, Shield } from 'lucide-react';
 import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
 import Link from 'next/link';
 
@@ -21,6 +21,17 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   const [localWbTitle, setLocalWbTitle] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [changingPw, setChangingPw] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState<string | null>(null);
 
   // Hydrate form defaults from localStorage / props
   useEffect(() => {
@@ -57,6 +68,46 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
     setWorkspaceTitle(localWbTitle);
     setTimeout(() => { setSaving(false); setToast('✅ 工作台设置已保存'); }, 300);
   }, [localWbTitle, setWorkspaceTitle]);
+
+  const handleChangePassword = useCallback(async () => {
+    setPwError(null);
+    setPwSuccess(null);
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPwError('请填写所有字段');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPwError('新密码至少6位');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError('两次输入的新密码不一致');
+      return;
+    }
+
+    setChangingPw(true);
+    try {
+      const res = await fetch('/api/me/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPwSuccess('密码修改成功，下次登录请使用新密码');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPwError(data.error || '修改失败，请稍后重试');
+      }
+    } catch {
+      setPwError('网络错误，请稍后重试');
+    } finally {
+      setChangingPw(false);
+    }
+  }, [currentPassword, newPassword, confirmPassword]);
 
   const inputCls = `w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 ${theme.ring} transition-all`;
   const btnCls = `px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors ${theme.btnBg} ${theme.btnHover}`;
@@ -130,6 +181,89 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
             </div>
             <button onClick={saveWorkspace} disabled={saving} className={btnCls}>
               {saving ? '保存中...' : '保存'}
+            </button>
+          </div>
+        </div>
+
+        {/* Account Security - Password Change */}
+        <div className="p-5">
+          <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-gray-500" /> 账号安全
+          </h2>
+          <div className="space-y-3">
+            <div>
+              <label className="text-[11px] font-medium text-gray-500 mb-1 block">当前密码</label>
+              <div className="relative">
+                <input
+                  type={showCurrentPw ? 'text' : 'password'}
+                  value={currentPassword}
+                  onChange={(e) => { setCurrentPassword(e.target.value); setPwError(null); setPwSuccess(null); }}
+                  className={inputCls}
+                  placeholder="输入当前密码"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPw(!showCurrentPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-gray-500 mb-1 block">新密码</label>
+              <div className="relative">
+                <input
+                  type={showNewPw ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => { setNewPassword(e.target.value); setPwError(null); setPwSuccess(null); }}
+                  className={inputCls}
+                  placeholder="至少6位"
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPw(!showNewPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-gray-500 mb-1 block">确认新密码</label>
+              <div className="relative">
+                <input
+                  type={showConfirmPw ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setPwError(null); setPwSuccess(null); }}
+                  className={inputCls}
+                  placeholder="再次输入新密码"
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPw(!showConfirmPw)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            {pwError && (
+              <div className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{pwError}</div>
+            )}
+            {pwSuccess && (
+              <div className="text-xs text-green-700 bg-green-50 px-3 py-2 rounded-lg">{pwSuccess}</div>
+            )}
+            <button
+              onClick={handleChangePassword}
+              disabled={changingPw}
+              className="inline-flex items-center gap-2 px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors bg-gray-700 hover:bg-gray-800 disabled:opacity-50"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              {changingPw ? '修改中...' : '修改密码'}
             </button>
           </div>
         </div>
