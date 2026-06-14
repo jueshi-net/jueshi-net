@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check, ExternalLink } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check, ExternalLink, ClipboardPaste, Truck, Sparkles } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
@@ -12,6 +13,8 @@ import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
+import { parseAddress, formatEnglishAddress, formatChineseAddress, formatLineByLineAddress, type ParsedAddress } from '@/lib/address-parser';
+import { saveAddressToShipping } from '@/lib/address-shipping-transfer';
 
 interface AddressForm {
   country: string;
@@ -99,6 +102,7 @@ interface RecentAddress {
 }
 
 export default function AddressFormatterPage() {
+  const router = useRouter();
   const [form, setForm] = useState<AddressForm>({
     country: '加拿大', name: '', phone: '', street: '', apt: '', city: '', state: '', postalCode: '',
   });
@@ -106,6 +110,85 @@ export default function AddressFormatterPage() {
   const [copied, setCopied] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [recentAddresses, setRecentAddresses] = useState<RecentAddress[]>([]);
+
+  // Address Parser state
+  const [rawAddressInput, setRawAddressInput] = useState('');
+  const [parsedAddress, setParsedAddress] = useState<ParsedAddress | null>(null);
+  const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
+  const [showParsedFields, setShowParsedFields] = useState(false);
+
+  // Handle address parsing
+  const handleParseAddress = useCallback(() => {
+    if (!rawAddressInput.trim()) return;
+    const parsed = parseAddress(rawAddressInput);
+    setParsedAddress(parsed);
+    setShowParsedFields(true);
+    trackEvent.custom('address-formatter', 'parse_address');
+  }, [rawAddressInput]);
+
+  // Copy parsed address in different formats
+  const copyParsedFormat = useCallback((format: 'english' | 'chinese' | 'lineByLine') => {
+    if (!parsedAddress) return;
+    let text = '';
+    switch (format) {
+      case 'english': text = formatEnglishAddress(parsedAddress); break;
+      case 'chinese': text = formatChineseAddress(parsedAddress); break;
+      case 'lineByLine': text = formatLineByLineAddress(parsedAddress); break;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedFormat(format);
+      setTimeout(() => setCopiedFormat(null), 2000);
+      trackEvent.custom('address-formatter', `copy_parsed_${format}`);
+    });
+  }, [parsedAddress]);
+
+  // Fill parsed data into the manual form
+  const fillFormFromParsed = useCallback(() => {
+    if (!parsedAddress) return;
+    
+    // Map country
+    let country = '加拿大';
+    if (parsedAddress.country === 'United States') country = '美国';
+    else if (parsedAddress.country === 'United Kingdom') country = '英国';
+    else if (parsedAddress.country === 'Australia') country = '澳大利亚';
+    else if (parsedAddress.country === 'New Zealand') country = '新西兰';
+    
+    setForm({
+      country,
+      name: parsedAddress.recipient,
+      phone: parsedAddress.phone,
+      street: parsedAddress.addressLine1,
+      apt: parsedAddress.addressLine2,
+      city: parsedAddress.city,
+      state: parsedAddress.province,
+      postalCode: parsedAddress.postalCode,
+    });
+    
+    setShowParsedFields(false);
+    trackEvent.custom('address-formatter', 'fill_form_from_parsed');
+  }, [parsedAddress]);
+
+  // Continue to Shipping Calculator with address data
+  const handleContinueToShipping = useCallback(() => {
+    if (!parsedAddress) return;
+    
+    const addressSummary = [parsedAddress.addressLine1, parsedAddress.addressLine2, parsedAddress.city, parsedAddress.province, parsedAddress.postalCode].filter(f => f).join(', ');
+    
+    const success = saveAddressToShipping({
+      country: parsedAddress.country,
+      province: parsedAddress.province,
+      city: parsedAddress.city,
+      postalCode: parsedAddress.postalCode,
+      addressSummary,
+    });
+    
+    if (success) {
+      router.push('/tools/shipping-calculator');
+      trackEvent.custom('address-formatter', 'continue_to_shipping');
+    } else {
+      alert('无法保存数据，请检查浏览器设置');
+    }
+  }, [parsedAddress, router]);
 
   // Load recent addresses from localStorage
   useEffect(() => {
@@ -261,6 +344,164 @@ export default function AddressFormatterPage() {
             <strong>地址格式仅供整理参考，最终以当地邮政/快递/服务商要求为准。</strong>
             不同承运商对地址格式可能有额外要求，请在寄送前向服务商确认。
           </p>
+        </div>
+
+        {/* ==================== Address Parser Section ==================== */}
+        <div className={cardStyles.base + " p-4 md:p-8 mb-8"}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <ClipboardPaste className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">粘贴地址自动解析</h2>
+              <p className="text-xs text-gray-500">粘贴客户提供的完整收货地址，系统自动拆分字段</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {/* Input textarea */}
+            <div>
+              <textarea
+                className={inputStyles + " min-h-[120px] font-mono text-sm"}
+                placeholder={"粘贴客户提供的完整收货地址，例如：\n\nJohn Smith\n+1 650-555-0198\n1600 Amphitheatre Parkway\nMountain View, CA 94043\nUnited States"}
+                value={rawAddressInput}
+                onChange={e => setRawAddressInput(e.target.value)}
+              />
+            </div>
+
+            {/* Parse button */}
+            <button
+              onClick={handleParseAddress}
+              disabled={!rawAddressInput.trim()}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-300 disabled:to-gray-400 text-white font-medium rounded-lg shadow-sm transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              解析地址
+            </button>
+
+            {/* Parsed results */}
+            {parsedAddress && showParsedFields && (
+              <div className="space-y-4">
+                {/* Confidence indicator */}
+                <div className={`flex items-center gap-2 p-3 rounded-lg ${
+                  parsedAddress.confidence === 'high' ? 'bg-green-50 border border-green-200' :
+                  parsedAddress.confidence === 'medium' ? 'bg-yellow-50 border border-yellow-200' :
+                  'bg-orange-50 border border-orange-200'
+                }`}>
+                  {parsedAddress.confidence === 'high' ? <CheckCircle className="w-4 h-4 text-green-600" /> :
+                   parsedAddress.confidence === 'medium' ? <AlertCircle className="w-4 h-4 text-yellow-600" /> :
+                   <AlertCircle className="w-4 h-4 text-orange-600" />}
+                  <span className={`text-sm font-medium ${
+                    parsedAddress.confidence === 'high' ? 'text-green-800' :
+                    parsedAddress.confidence === 'medium' ? 'text-yellow-800' :
+                    'text-orange-800'
+                  }`}>
+                    {parsedAddress.confidence === 'high' ? '解析置信度高' :
+                     parsedAddress.confidence === 'medium' ? '解析置信度中等' :
+                     '解析置信度低'}
+                  </span>
+                  <span className="text-xs text-gray-500 ml-auto">解析结果仅供参考，请在发货前人工确认。</span>
+                </div>
+
+                {/* Warnings */}
+                {parsedAddress.warnings.length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="text-xs font-medium text-amber-800 mb-1">⚠️ 提示：</p>
+                    <ul className="text-xs text-amber-700 space-y-0.5">
+                      {parsedAddress.warnings.map((w, i) => (
+                        <li key={i}>• {w}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Parsed fields (editable summary) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">收件人</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.recipient || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">电话</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.phone || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">国家</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.country || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">省/州</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.province || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">城市</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.city || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-xs text-gray-500 block">邮编</span>
+                    <span className="text-sm font-medium text-gray-900">{parsedAddress.postalCode || '—'}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 sm:col-span-2">
+                    <span className="text-xs text-gray-500 block">地址行</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {parsedAddress.addressLine1 || '—'}
+                      {parsedAddress.addressLine2 ? `, ${parsedAddress.addressLine2}` : ''}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Copy buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => copyParsedFormat('english')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 rounded-lg text-sm text-gray-700 transition-all"
+                  >
+                    {copiedFormat === 'english' ? <><Check className="w-3.5 h-3.5 text-green-600" /> 已复制</> : <><Copy className="w-3.5 h-3.5" /> 复制英文地址</>}
+                  </button>
+                  <button
+                    onClick={() => copyParsedFormat('chinese')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 rounded-lg text-sm text-gray-700 transition-all"
+                  >
+                    {copiedFormat === 'chinese' ? <><Check className="w-3.5 h-3.5 text-green-600" /> 已复制</> : <><Copy className="w-3.5 h-3.5" /> 复制中文地址</>}
+                  </button>
+                  <button
+                    onClick={() => copyParsedFormat('lineByLine')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 rounded-lg text-sm text-gray-700 transition-all"
+                  >
+                    {copiedFormat === 'lineByLine' ? <><Check className="w-3.5 h-3.5 text-green-600" /> 已复制</> : <><Copy className="w-3.5 h-3.5" /> 复制分行格式</>}
+                  </button>
+                </div>
+
+                {/* Action buttons */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    onClick={fillFormFromParsed}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    填入手动编辑表单
+                  </button>
+                  <button
+                    onClick={handleContinueToShipping}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-medium rounded-lg shadow-sm transition-all"
+                  >
+                    <Truck className="w-4 h-4" />
+                    继续计算运费
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 text-center">
+                  将国家、城市、邮编等目的地信息带入运费计算器，便于继续估算运输成本。
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+          <span className="text-sm text-gray-400">或手动填写地址信息</span>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
         </div>
 
         <div className={cardStyles.base + " p-4 md:p-8"}>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Calculator, Package, Plane, Ship, Truck,
+  Calculator, Package, Plane, Ship, Truck, MapPin,
   Plus, Trash2, RotateCcw, Info, AlertTriangle,
   ChevronDown, ChevronUp, Clipboard, X, CheckCircle2,
   ArrowLeftRight, Scale, Box
@@ -18,6 +18,7 @@ import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { loadContainerToShipping, markContainerToShippingConsumed, clearContainerToShipping, ContainerToShippingData } from '@/lib/container-shipping-transfer';
+import { loadAddressFromShipping, markAddressFromShippingConsumed, clearAddressFromShipping, AddressToShippingData } from '@/lib/address-shipping-transfer';
 
 // ==================== Types ====================
 interface CalcRow {
@@ -136,6 +137,11 @@ export default function ShippingCalculatorPage() {
   const [showTransferConfirm, setShowTransferConfirm] = useState(false);
   const [transferApplied, setTransferApplied] = useState(false);
 
+  // Address to shipping transfer
+  const [addressTransfer, setAddressTransfer] = useState<AddressToShippingData | null>(null);
+  const [showAddressTransferConfirm, setShowAddressTransferConfirm] = useState(false);
+  const [addressTransferApplied, setAddressTransferApplied] = useState(false);
+
   // Persist to localStorage and save to task chain
   useEffect(() => {
     saveState({ mode, customDivisor, rows });
@@ -157,6 +163,15 @@ export default function ShippingCalculatorPage() {
     if (transferData && !transferData.consumed) {
       setContainerTransfer(transferData);
       setShowTransferConfirm(true);
+    }
+  }, []);
+
+  // Check for address transfer data on mount
+  useEffect(() => {
+    const addrData = loadAddressFromShipping();
+    if (addrData && !addrData.consumed) {
+      setAddressTransfer(addrData);
+      setShowAddressTransferConfirm(true);
     }
   }, []);
 
@@ -196,6 +211,29 @@ export default function ShippingCalculatorPage() {
     clearContainerToShipping();
     setShowTransferConfirm(false);
     setContainerTransfer(null);
+  };
+
+  // Handle address transfer confirmation
+  const handleApplyAddressTransfer = () => {
+    if (!addressTransfer) return;
+    
+    // Mark as consumed
+    markAddressFromShippingConsumed();
+    
+    // Update UI state - address data is shown as destination reference info
+    setShowAddressTransferConfirm(false);
+    setAddressTransferApplied(true);
+    setAddressTransfer(null);
+    
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => setAddressTransferApplied(false), 5000);
+  };
+
+  const handleDismissAddressTransfer = () => {
+    // Clear transfer data
+    clearAddressFromShipping();
+    setShowAddressTransferConfirm(false);
+    setAddressTransfer(null);
   };
 
   // ==================== Calculations ====================
@@ -377,6 +415,80 @@ export default function ShippingCalculatorPage() {
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <p className="text-green-800 text-sm">
               <strong>已从集装箱计算器带入尺寸、重量和数量。</strong>尺寸单位：cm，重量单位：kg。请确认运输方式、目的地和计费规则。
+            </p>
+          </div>
+        )}
+
+        {/* Address Transfer Confirmation */}
+        {showAddressTransferConfirm && addressTransfer && (
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-xl p-5 shadow-sm">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <MapPin className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900 mb-1">
+                  已检测到来自地址格式化助手的目的地信息
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  是否将目的地信息带入运费计算参考？
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  {addressTransfer.payload.country && (
+                    <div className="bg-white rounded-lg p-2 border border-gray-200">
+                      <div className="text-gray-500 text-xs">国家</div>
+                      <div className="font-semibold text-gray-900">{addressTransfer.payload.country}</div>
+                    </div>
+                  )}
+                  {addressTransfer.payload.province && (
+                    <div className="bg-white rounded-lg p-2 border border-gray-200">
+                      <div className="text-gray-500 text-xs">省/州</div>
+                      <div className="font-semibold text-gray-900">{addressTransfer.payload.province}</div>
+                    </div>
+                  )}
+                  {addressTransfer.payload.city && (
+                    <div className="bg-white rounded-lg p-2 border border-gray-200">
+                      <div className="text-gray-500 text-xs">城市</div>
+                      <div className="font-semibold text-gray-900">{addressTransfer.payload.city}</div>
+                    </div>
+                  )}
+                  {addressTransfer.payload.postalCode && (
+                    <div className="bg-white rounded-lg p-2 border border-gray-200">
+                      <div className="text-gray-500 text-xs">邮编</div>
+                      <div className="font-semibold text-gray-900">{addressTransfer.payload.postalCode}</div>
+                    </div>
+                  )}
+                </div>
+                {addressTransfer.payload.addressSummary && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    地址摘要：{addressTransfer.payload.addressSummary}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleApplyAddressTransfer}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-medium rounded-lg shadow-sm transition-all"
+              >
+                ✓ 使用地址信息
+              </button>
+              <button
+                onClick={handleDismissAddressTransfer}
+                className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition-all"
+              >
+                保留当前输入
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Address Transfer Applied Success Message */}
+        {addressTransferApplied && (
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-indigo-600 shrink-0" />
+            <p className="text-indigo-800 text-sm">
+              <strong>已带入目的地信息。</strong>请继续确认运输方式、重量、体积和计费规则。
             </p>
           </div>
         )}
