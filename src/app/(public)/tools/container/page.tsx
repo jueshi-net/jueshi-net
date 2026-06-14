@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Container, Info } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
+import { saveContainerToShipping } from "@/lib/container-shipping-transfer";
 
 const containerTypes = [
   { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770 },
@@ -14,6 +16,7 @@ const containerTypes = [
 ];
 
 export default function ContainerCalculatorPage() {
+  const router = useRouter();
   const [cargoL, setCargoL] = useState(0);
   const [cargoW, setCargoW] = useState(0);
   const [cargoH, setCargoH] = useState(0);
@@ -33,6 +36,37 @@ export default function ContainerCalculatorPage() {
     setCargoH(50);
     setCargoWeight(15);
     setQuantity(100);
+  };
+
+  // 处理"带入运费计算"按钮点击
+  const handleTransferToShipping = () => {
+    // 找到推荐的集装箱类型（如果有）
+    const recommended = results.find(ct => ct.recommended);
+    const suggestedContainer = recommended?.name || '20GP';
+    const utilizationRate = recommended ? parseFloat(recommended.batchVolumeUtil) : 0;
+    const maxUnits = recommended?.maxItems || 0;
+    const batchCount = recommended?.batches || 0;
+
+    const payload = {
+      quantity,
+      unitLengthCm: cargoL,
+      unitWidthCm: cargoW,
+      unitHeightCm: cargoH,
+      unitWeightKg: cargoWeight,
+      totalCbm: totalVolume,
+      totalWeightKg: totalWeight,
+      suggestedContainer,
+      utilizationRate,
+      maxUnits,
+      batchCount,
+    };
+
+    const success = saveContainerToShipping(payload);
+    if (success) {
+      router.push('/tools/shipping-calculator');
+    } else {
+      alert('无法保存数据，请检查浏览器设置');
+    }
   };
 
   const results = containerTypes.map(ct => {
@@ -135,6 +169,22 @@ export default function ContainerCalculatorPage() {
                 <li className="text-orange-600 dark:text-orange-400 font-medium">⚠️ 以上仅为体积/重量粗算，实际装柜受托盘、包装、货物形状、堆叠方式和限重影响</li>
               </ul>
             </div>
+            
+            {/* 带入运费计算按钮 */}
+            {totalVolume > 0 && totalWeight > 0 && (
+              <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+                <button
+                  onClick={handleTransferToShipping}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-medium rounded-lg shadow-sm transition-all"
+                >
+                  <span className="text-xl">🚢</span>
+                  <span>带入运费计算</span>
+                </button>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 text-center">
+                  将当前体积、重量和件数带入运费计算器，便于继续估算运输成本。
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -17,6 +17,7 @@ import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-cha
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
+import { loadContainerToShipping, markContainerToShippingConsumed, clearContainerToShipping, ContainerToShippingData } from '@/lib/container-shipping-transfer';
 
 // ==================== Types ====================
 interface CalcRow {
@@ -130,6 +131,11 @@ export default function ShippingCalculatorPage() {
   const [showFormula, setShowFormula] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(true);
 
+  // Container to shipping transfer
+  const [containerTransfer, setContainerTransfer] = useState<ContainerToShippingData | null>(null);
+  const [showTransferConfirm, setShowTransferConfirm] = useState(false);
+  const [transferApplied, setTransferApplied] = useState(false);
+
   // Persist to localStorage and save to task chain
   useEffect(() => {
     saveState({ mode, customDivisor, rows });
@@ -144,6 +150,53 @@ export default function ShippingCalculatorPage() {
       }
     }
   }, [mode, customDivisor, rows]);
+
+  // Check for container transfer data on mount
+  useEffect(() => {
+    const transferData = loadContainerToShipping();
+    if (transferData && !transferData.consumed) {
+      setContainerTransfer(transferData);
+      setShowTransferConfirm(true);
+    }
+  }, []);
+
+  // Handle container transfer confirmation
+  const handleApplyTransfer = () => {
+    if (!containerTransfer) return;
+    
+    const { payload } = containerTransfer;
+    
+    // Create a new row with container data
+    const newRow: CalcRow = {
+      id: genId(),
+      length: payload.unitLengthCm.toString(),
+      width: payload.unitWidthCm.toString(),
+      height: payload.unitHeightCm.toString(),
+      quantity: payload.quantity.toString(),
+      actualWeight: payload.unitWeightKg.toString(),
+    };
+    
+    // Replace existing rows with the new row
+    setRows([newRow]);
+    
+    // Mark as consumed
+    markContainerToShippingConsumed();
+    
+    // Update UI state
+    setShowTransferConfirm(false);
+    setTransferApplied(true);
+    setContainerTransfer(null);
+    
+    // Auto-hide success message after 5 seconds
+    setTimeout(() => setTransferApplied(false), 5000);
+  };
+
+  const handleDismissTransfer = () => {
+    // Clear transfer data
+    clearContainerToShipping();
+    setShowTransferConfirm(false);
+    setContainerTransfer(null);
+  };
 
   // ==================== Calculations ====================
   const divisor = modeDivisor(mode, customDivisor);
@@ -257,6 +310,75 @@ export default function ShippingCalculatorPage() {
             <strong>免责声明：</strong>运费结果仅供估算，最终费用以承运商、集运公司或实际账单为准。不同渠道的除数、首重、续重标准可能有所不同，计算结果仅供理解计费逻辑使用。
           </p>
         </div>
+
+        {/* Container Transfer Confirmation */}
+        {showTransferConfirm && containerTransfer && (
+          <div className="bg-gradient-to-r from-teal-50 to-blue-50 border-2 border-teal-300 rounded-xl p-5 shadow-sm">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 bg-teal-100 rounded-lg">
+                <Box className="w-5 h-5 text-teal-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-gray-900 mb-1">
+                  已检测到来自集装箱计算器的数据
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  是否将以下数据带入运费计算？
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <div className="text-gray-500 text-xs">单件尺寸</div>
+                    <div className="font-semibold text-gray-900">
+                      {containerTransfer.payload.unitLengthCm} × {containerTransfer.payload.unitWidthCm} × {containerTransfer.payload.unitHeightCm} cm
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <div className="text-gray-500 text-xs">单件重量</div>
+                    <div className="font-semibold text-gray-900">
+                      {containerTransfer.payload.unitWeightKg} kg
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <div className="text-gray-500 text-xs">数量</div>
+                    <div className="font-semibold text-gray-900">
+                      {containerTransfer.payload.quantity} 件
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-2 border border-gray-200">
+                    <div className="text-gray-500 text-xs">总体积</div>
+                    <div className="font-semibold text-gray-900">
+                      {containerTransfer.payload.totalCbm.toFixed(4)} CBM
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleApplyTransfer}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white font-medium rounded-lg shadow-sm transition-all"
+              >
+                ✓ 使用集装箱数据
+              </button>
+              <button
+                onClick={handleDismissTransfer}
+                className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition-all"
+              >
+                保留当前输入
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Transfer Applied Success Message */}
+        {transferApplied && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+            <p className="text-green-800 text-sm">
+              <strong>已从集装箱计算器带入数据。</strong>请确认运输方式、目的地和计费规则。
+            </p>
+          </div>
+        )}
 
         {/* Mode Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
