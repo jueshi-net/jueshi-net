@@ -12,6 +12,7 @@ import {
 } from '@/lib/document-tools-config';
 
 const TOOL_KEY_LABELS: Record<string, string> = {
+  // Underscore format (canonical)
   commercial_invoice: '外贸发票',
   shipping_label: '唛头标签',
   quote_sheet: '供应链报价单',
@@ -39,9 +40,14 @@ const TOOL_KEY_LABELS: Record<string, string> = {
   fumigation_certificate_template: '熏蒸证明模板',
   letter_of_credit_info_sheet: '信用证资料单',
   label_maker: '唛头/标签生成器',
+  // Hyphen format (legacy/alternative)
+  'quote-sheet': '供应链报价单',
+  'handover-note': '出货交接单',
+  'debit-note': 'Debit Note',
 };
 
 const TOOL_KEY_HREFS: Record<string, string> = {
+  // Underscore format (canonical)
   commercial_invoice: '/tools/commercial-invoice',
   shipping_label: '/tools/documents/shipping-label',
   quote_sheet: '/tools/documents/quotation',
@@ -69,6 +75,10 @@ const TOOL_KEY_HREFS: Record<string, string> = {
   fumigation_certificate_template: '/tools/documents/fumigation-certificate-template',
   letter_of_credit_info_sheet: '/tools/documents/letter-of-credit-info-sheet',
   label_maker: '/tools/documents/shipping-label',
+  // Hyphen format (legacy/alternative)
+  'quote-sheet': '/tools/documents/quotation',
+  'handover-note': '/tools/handover-note',
+  'debit-note': '/tools/debit-note',
 };
 
 interface Draft {

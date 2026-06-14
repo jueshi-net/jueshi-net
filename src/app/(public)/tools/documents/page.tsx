@@ -50,7 +50,7 @@ export default async function DocumentsHubPage() {
   // 常用 7 个（featured cards）
   const featuredKeys = [
     "commercial-invoice", "proforma-invoice", "packing-list",
-    "sales-contract", "booking-instruction", "customs-declaration-authorization", "label-maker",
+    "sales-contract", "booking-instruction", "customs-declaration-authorization", "quotation", "label-maker",
   ];
   const featuredTools = featuredKeys
     .map(k => onlineTools.find(t => t.key === k))
