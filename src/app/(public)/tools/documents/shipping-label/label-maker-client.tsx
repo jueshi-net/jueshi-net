@@ -521,7 +521,7 @@ export default function LabelMakerPage() {
           ]} />
 
           {/* Tool Reviews */}
-          <ToolReviewPanel toolKey="label-maker" isLoggedIn={typeof window !== 'undefined' && (document.cookie.includes('next-auth.session-token') || document.cookie.includes('__Secure-next-auth.session-token'))} />
+          <ToolReviewPanel toolKey="label-maker" isLoggedIn={typeof window !== 'undefined' && (document.cookie.includes('next-auth.session-token') || document.cookie.includes('__Secure-next-auth.session-token') || document.cookie.includes('authjs.session-token') || document.cookie.includes('__Secure-authjs.session-token'))} />
         </div>
       </div>
     </>

@@ -187,7 +187,9 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     if (typeof document === "undefined") return false;
     return (
       document.cookie.includes("next-auth.session-token") ||
-      document.cookie.includes("__Secure-next-auth.session-token")
+      document.cookie.includes("__Secure-next-auth.session-token") ||
+      document.cookie.includes("authjs.session-token") ||
+      document.cookie.includes("__Secure-authjs.session-token")
     );
   };
 

@@ -353,7 +353,7 @@ export default function DocumentSummaryPage() {
         </div>
 
         {/* Tool Reviews */}
-        <ToolReviewPanel toolKey="document-summary" isLoggedIn={typeof window !== 'undefined' && (document.cookie.includes('next-auth.session-token') || document.cookie.includes('__Secure-next-auth.session-token'))} />
+        <ToolReviewPanel toolKey="document-summary" isLoggedIn={typeof window !== 'undefined' && (document.cookie.includes('next-auth.session-token') || document.cookie.includes('__Secure-next-auth.session-token') || document.cookie.includes('authjs.session-token') || document.cookie.includes('__Secure-authjs.session-token'))} />
 
         <AdSlot placement="tool-bottom" className="mt-8" variant="card" />
       </div>
