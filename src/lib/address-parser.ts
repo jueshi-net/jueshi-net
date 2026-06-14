@@ -18,15 +18,15 @@ export interface ParsedAddress {
   warnings: string[];
 }
 
-// Country detection patterns
-const COUNTRY_PATTERNS: Record<string, string[]> = {
-  'United States': ['usa', 'us', 'united states', 'america', '美国', '美利坚'],
-  'Canada': ['canada', 'ca', '加拿大'],
-  'United Kingdom': ['uk', 'united kingdom', 'britain', 'england', 'scotland', 'wales', '英国', '英格兰'],
-  'Australia': ['australia', 'au', '澳洲', '澳大利亚'],
-  'New Zealand': ['new zealand', 'nz', '新西兰'],
-  'China': ['china', 'prc', '中国', '中华人民共和国'],
-};
+// Country detection patterns (ordered by specificity - more specific first)
+const COUNTRY_PATTERNS: Array<[string, string[]]> = [
+  ['New Zealand', ['new zealand', 'nz', '新西兰']],
+  ['United Kingdom', ['united kingdom', 'uk', 'britain', 'england', 'scotland', 'wales', '英国', '英格兰']],
+  ['United States', ['united states', 'usa', 'america', '美国', '美利坚']],
+  ['Australia', ['australia', '澳洲', '澳大利亚']],
+  ['Canada', ['canada', '加拿大']],
+  ['China', ['china', 'prc', '中国', '中华人民共和国']],
+];
 
 // Postal code patterns by country
 const POSTAL_PATTERNS: Record<string, RegExp> = {
@@ -66,10 +66,19 @@ const CN_PROVINCES = ['北京','天津','上海','重庆','河北','山西','辽
 function detectCountry(text: string): string {
   const lowerText = text.toLowerCase();
   
-  for (const [country, patterns] of Object.entries(COUNTRY_PATTERNS)) {
+  for (const [country, patterns] of COUNTRY_PATTERNS) {
     for (const pattern of patterns) {
-      if (lowerText.includes(pattern.toLowerCase())) {
-        return country;
+      const patternLower = pattern.toLowerCase();
+      // Use word boundary for short patterns to avoid false matches
+      if (patternLower.length <= 3) {
+        const regex = new RegExp(`\\b${patternLower}\\b`, 'i');
+        if (regex.test(lowerText)) {
+          return country;
+        }
+      } else {
+        if (lowerText.includes(patternLower)) {
+          return country;
+        }
       }
     }
   }
@@ -81,18 +90,32 @@ function detectCountry(text: string): string {
  * Extract phone number from text
  */
 function extractPhone(text: string, country: string): { phone: string; remaining: string } {
-  // Common phone patterns
-  const phonePatterns = [
-    /\+?\d{1,3}[\s\-()]?\d{2,4}[\s\-()]?\d{3,4}[\s\-()]?\d{4}/g,
-    /Tel:?\s*([+\d\s\-()]+)/gi,
-    /Phone:?\s*([+\d\s\-()]+)/gi,
-    /电话:?\s*([+\d\s\-()]+)/g,
+  // Try country-specific phone patterns first
+  if (country && PHONE_PATTERNS[country]) {
+    const pattern = PHONE_PATTERNS[country];
+    const match = text.match(pattern);
+    if (match) {
+      const phone = match[0].trim();
+      const remaining = text.replace(phone, '').trim();
+      return { phone, remaining };
+    }
+  }
+  
+  // Generic phone patterns (ordered by specificity)
+  const genericPatterns = [
+    /\+\d{1,3}[\s\-()]?\d{1,4}[\s\-()]?\d{3,4}[\s\-()]?\d{4}/, // International: +86 138 0013 8000
+    /\+\d{1,3}[\s\-()]?\d{2,4}[\s\-()]?\d{4}/, // Shorter international
+    /Tel:?\s*([+\d\s\-()]+)/i, // Tel: prefix
+    /Phone:?\s*([+\d\s\-()]+)/i, // Phone: prefix
+    /电话:?\s*([+\d\s\-()]+)/, // 电话: prefix
   ];
   
-  for (const pattern of phonePatterns) {
+  for (const pattern of genericPatterns) {
     const match = text.match(pattern);
-    if (match && match.length > 0) {
-      const phone = match[0].replace(/^(Tel:|Phone:|电话:)\s*/i, '').trim();
+    if (match) {
+      let phone = match[0].replace(/^(Tel:|Phone:|电话:)\s*/i, '').trim();
+      // Clean up phone number
+      phone = phone.replace(/\s+/g, ' ').trim();
       const remaining = text.replace(match[0], '').trim();
       return { phone, remaining };
     }
@@ -116,16 +139,16 @@ function extractPostalCode(text: string, country: string): { postalCode: string;
     }
   }
   
-  // Generic postal patterns
+  // Generic postal patterns (ordered by specificity)
   const genericPatterns = [
-    /\b[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d\b/, // Canada
-    /\b\d{5}(-\d{4})?\b/, // US
-    /\b[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}\b/, // UK
-    /\b\d{4}\b/, // AU/NZ
-    /\b\d{6}\b/, // China
+    { pattern: /\b[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d\b/, country: 'Canada' }, // Canada: A1A 1A1
+    { pattern: /\b[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}\b/, country: 'UK' }, // UK: SW1A 1AA
+    { pattern: /\b\d{5}(-\d{4})?\b/, country: 'US' }, // US: 12345 or 12345-6789
+    { pattern: /\b\d{6}\b/, country: 'China' }, // China: 123456
+    { pattern: /\b\d{4}\b/, country: 'AU/NZ' }, // AU/NZ: 1234
   ];
   
-  for (const pattern of genericPatterns) {
+  for (const { pattern } of genericPatterns) {
     const match = text.match(pattern);
     if (match) {
       const postalCode = match[0];
@@ -233,17 +256,35 @@ export function parseAddress(input: string): ParsedAddress {
   
   // Try to extract city (usually before state/postal)
   let city = '';
-  const cityPatterns = [
-    /([A-Za-z\s]+),?\s+[A-Z]{2}\s+\d/, // US: City, ST 12345
-    /([A-Za-z\s]+)\s+[A-Z]\d[A-Z]\s?\d[A-Z]\d/, // Canada: City A1A 1A1
-    /([A-Za-z\s]+)\s+[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/, // UK
-  ];
   
-  for (const pattern of cityPatterns) {
-    const match = remaining.match(pattern);
-    if (match && match[1]) {
-      city = match[1].trim().replace(/,$/, '');
-      break;
+  // US/Canada pattern: "City, ST 12345" or "City ST 12345"
+  const usCaCityMatch = remaining.match(/([A-Za-z\s]+?)[,\s]+([A-Z]{2})\s+\d/);
+  if (usCaCityMatch && usCaCityMatch[1]) {
+    city = usCaCityMatch[1].trim();
+  }
+  
+  // Australia/NZ pattern: "City ST 1234" or "City 1234"
+  if (!city) {
+    const auNzCityMatch = remaining.match(/([A-Za-z\s]+?)\s+([A-Z]{2,3})?\s*\d{4}/);
+    if (auNzCityMatch && auNzCityMatch[1]) {
+      city = auNzCityMatch[1].trim();
+    }
+  }
+  
+  // UK pattern: "City PostalCode" (e.g., "London SW1A 1AA")
+  if (!city) {
+    const ukCityMatch = remaining.match(/([A-Za-z\s]+?)\s+[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/);
+    if (ukCityMatch && ukCityMatch[1]) {
+      city = ukCityMatch[1].trim();
+    }
+  }
+  
+  // China pattern: extract city from Chinese address
+  if (country === 'China' && !city) {
+    // Look for city pattern like "深圳市" or "深圳"
+    const cnCityMatch = remaining.match(/([\u4e00-\u9fa5]+?市)/);
+    if (cnCityMatch) {
+      city = cnCityMatch[1].replace(/市/g, '');
     }
   }
   
@@ -281,16 +322,22 @@ export function parseAddress(input: string): ParsedAddress {
   if (!postalCode) warnings.push('未识别到邮编');
   if (!city && country !== 'China') warnings.push('未识别到城市');
   
+  // Map country to display name
+  let displayCountry = country;
+  if (country === 'China') {
+    displayCountry = '中国';
+  }
+  
   // Determine confidence
   let confidence: 'high' | 'medium' | 'low' = 'low';
-  const filledFields = [recipient, phone, country, postalCode, city, addressLine1].filter(f => f).length;
+  const filledFields = [recipient, phone, displayCountry, postalCode, city, addressLine1].filter(f => f).length;
   if (filledFields >= 5) confidence = 'high';
   else if (filledFields >= 3) confidence = 'medium';
   
   return {
     recipient,
     phone,
-    country,
+    country: displayCountry,
     province: state,
     city,
     addressLine1,
