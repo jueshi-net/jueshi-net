@@ -242,26 +242,28 @@
 
 ## 九、下一步建议
 
-### 当前建议
+### 当前阶段：等待用户手测确认
 
-1. **人工验证核心功能**（需用户手动执行）
-   - 游客本地保存
-   - 登录用户 Workspace 保存
+**主要工具实质增强尚未正式开始。**  
+v1.20.42.6.74 系列完成的是基础设施稳定（Git/安全/build/部署/Container 修复/HS Code 修复/游客保存修复/Workspace 回归）。
+
+### 下一步优先级（由用户明确选择）
+
+1. **用户完成核心功能手测**（前置条件，必须先完成）
+   - 游客本地保存（commercial-invoice / quote-sheet）
+   - 登录用户 Workspace 保存/恢复
    - Container 计算
-   - HS Code 查询
+   - HS Code 中英文查询
+   - Packing List / Proforma Invoice 基础使用
 
-2. **解决 Beta 缺口**（S7）
-   - Packing List 公司资料复用 UI
-   - Proforma Invoice 公司资料复用 UI
-
-3. **进入 S1**（用户批准后）
-   - Container + Shipping 联动
-   - Quote → Proforma 导入
+2. **手测通过后，用户选择方向**：
+   - **选项 A**：先解决 Beta 缺口（S7：PL/PI 公司资料复用选择器 UI）→ 然后恢复 Beta
+   - **选项 B**：先做 S1（Container + Shipping 联动）→ 然后解决 Beta 缺口 → 恢复 Beta
 
 ### 不建议
 
 - ❌ 恢复 Beta（Beta 缺口未解决）
-- ❌ 进入 S1（需先解决 Beta 缺口）
+- ❌ 进入 S1（需先完成手测确认）
 - ❌ 公开推广（核心功能未稳）
 
 ---

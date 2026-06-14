@@ -88,6 +88,7 @@
 | 理论可装件数 | ✅ | | 计算正确 |
 | 可装批次 | ✅ | | 计算正确 |
 | 导出到 Packing List | | ❌ | S1 |
+| 导出到 Shipping Calculator | | ❌ | S1 |
 
 ### HS Code
 
@@ -115,6 +116,7 @@
 |---|---|---|---|
 | 基础计算 | ✅ | | 可计算 |
 | Container 联动 | | ❌ | S1 |
+| 推荐最优箱型 | | ❌ | S1 |
 
 ### Exchange Rate
 
@@ -215,6 +217,19 @@
 | S5 | URL Navigation polish | ❌ 未开始 |
 | S6 | URL Navigation migration | ❌ 未开始 |
 | S7 | PL/PI Beta+ 收口 | ❌ 未开始 |
+
+---
+
+## 九、长期方向（尚未开始）
+
+| 功能 | 已实现 | 未实现 | 说明 |
+|---|---|---|---|
+| Shipment Case / Export Order 工作流 | | ❌ | 长期规划 |
+| Product Library（产品库） | | ❌ | 长期规划 |
+| Document Tool Engine（统一文档引擎） | | ❌ | 长期规划 |
+| Tool-to-Tool data handoff | | ❌ | 长期规划 |
+| Company Profile 可复用选择器 | | ❌ | Beta 缺口，S7 优先 |
+| 会员转化流程 | | ❌ | 工具价值稳定后 |
 
 ---
 
