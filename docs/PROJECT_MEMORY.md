@@ -1,11 +1,12 @@
 # Project Memory: 绝世百宝箱 / jueshi.net / xixiong-saas
 
 > **最后更新**: 2026-06-14  
-> **当前生产版本**: v1.20.42.6.74.11 (9527790)  
+> **当前生产版本**: v1.20.42.6.76 (f300843)  
 > **版本链**:  
 > - v1.20.42.6.74.6 (16306cb): 主部署版本  
 > - 6c23998: HS Code 英文查询 hotfix  
 > - 9527790: Guest Local Save / Auth Boundary hotfix  
+> - f300843: HS Code Loading State 竞态条件修复 (AbortController + requestSeqRef)  
 > **生产状态**: 已部署，运行稳定  
 > **本文档用途**: 每轮开发前必须读取的单一事实源
 
