@@ -245,6 +245,187 @@ export default function ContainerCalculatorPage() {
           </div>
         ))}
 
+        {/* ==================== 集装箱知识区 ==================== */}
+        <div className="col-span-full mt-8">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-teal-600 px-6 py-4">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <span>📦</span> 集装箱知识
+              </h2>
+              <p className="text-blue-100 text-sm mt-1">常见集装箱类型、规格、用途和术语一览</p>
+            </div>
+
+            <div className="p-6 space-y-8">
+              {/* 1. 集装箱分类 */}
+              <section>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">🏷️</span>
+                  集装箱分类
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {[
+                    { icon: '📦', name: '干货集装箱 (GP)', desc: '最常见的标准集装箱，适用于一般件杂货' },
+                    { icon: '❄️', name: '冷藏集装箱 (RF)', desc: '带有制冷设备，适用于食品、药品等温控货物' },
+                    { icon: '🔝', name: '开顶集装箱 (OT)', desc: '无刚性箱顶，适用于超高货物或吊装货物' },
+                    { icon: '🏗️', name: '框架集装箱 (FR)', desc: '无箱壁和箱顶，适用于超大、超重、异形货物' },
+                    { icon: '🛢️', name: '罐式集装箱 (TK)', desc: '专用罐体，适用于液体、化工品、食品液体' },
+                    { icon: '🌬️', name: '通风集装箱', desc: '设有通风口，适用于需要空气流通的货物' },
+                    { icon: '🧊', name: '隔热集装箱', desc: '具有隔热层，适用于保温类货物' },
+                    { icon: '🚪', name: '双开门集装箱', desc: '两端均有门，方便装卸和分区装载' },
+                    { icon: '👗', name: '服装挂衣集装箱', desc: '内设挂衣杆，适用于服装等高附加值货物' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <span className="text-2xl shrink-0">{item.icon}</span>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{item.name}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* 2. 常见规格 */}
+              <section>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center text-sm">📐</span>
+                  常见规格
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="text-left px-4 py-2 font-semibold text-gray-700">类型</th>
+                        <th className="text-left px-4 py-2 font-semibold text-gray-700">内尺寸 (m)</th>
+                        <th className="text-left px-4 py-2 font-semibold text-gray-700">容积 (m³)</th>
+                        <th className="text-left px-4 py-2 font-semibold text-gray-700">限重 (吨)</th>
+                        <th className="text-left px-4 py-2 font-semibold text-gray-700">适用货物</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-gray-100">
+                        <td className="px-4 py-2.5 font-semibold text-blue-600">20GP</td>
+                        <td className="px-4 py-2.5 text-gray-600">5.90 × 2.35 × 2.39</td>
+                        <td className="px-4 py-2.5 text-gray-600">33.2</td>
+                        <td className="px-4 py-2.5 text-gray-600">21.8</td>
+                        <td className="px-4 py-2.5 text-gray-600">普通普货、小批量</td>
+                      </tr>
+                      <tr className="border-b border-gray-100">
+                        <td className="px-4 py-2.5 font-semibold text-blue-600">40GP</td>
+                        <td className="px-4 py-2.5 text-gray-600">12.03 × 2.35 × 2.39</td>
+                        <td className="px-4 py-2.5 text-gray-600">67.7</td>
+                        <td className="px-4 py-2.5 text-gray-600">26.7</td>
+                        <td className="px-4 py-2.5 text-gray-600">普通普货、大批量</td>
+                      </tr>
+                      <tr className="border-b border-gray-100">
+                        <td className="px-4 py-2.5 font-semibold text-teal-600">40HC</td>
+                        <td className="px-4 py-2.5 text-gray-600">12.03 × 2.35 × 2.69</td>
+                        <td className="px-4 py-2.5 text-gray-600">76.3</td>
+                        <td className="px-4 py-2.5 text-gray-600">26.5</td>
+                        <td className="px-4 py-2.5 text-gray-600">高货、轻泡货</td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-2.5 font-semibold text-teal-600">45HC</td>
+                        <td className="px-4 py-2.5 text-gray-600">13.56 × 2.35 × 2.69</td>
+                        <td className="px-4 py-2.5 text-gray-600">86.1</td>
+                        <td className="px-4 py-2.5 text-gray-600">27.7</td>
+                        <td className="px-4 py-2.5 text-gray-600">超高货、超大容积需求</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                {/* 图片占位区 - 集装箱规格对比图 */}
+                <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
+                  <div className="text-gray-400 text-sm">
+                    <span className="text-3xl block mb-2">📊</span>
+                    <p className="font-medium text-gray-500">集装箱规格对比图</p>
+                    <p className="text-xs mt-1">推荐尺寸：1400 × 1800 px（3:4 比例）</p>
+                    <p className="text-xs">格式：webp 或 png · 适合手机阅读 · 中文清晰可读</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* 3. 用途说明 */}
+              <section>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-7 h-7 bg-orange-100 rounded-lg flex items-center justify-center text-sm">🎯</span>
+                  选柜指南
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { icon: '📦', title: '普通普货', desc: '20GP 或 40GP，适用于电子产品、日用品、纺织品等标准货物', color: 'bg-blue-50 border-blue-100' },
+                    { icon: '📏', title: '高货 / 超高货', desc: '40HC 或 45HC，内部高度多出 30cm，适合家具、大型设备等', color: 'bg-teal-50 border-teal-100' },
+                    { icon: '⚖️', title: '重货 / 异形货', desc: '框架柜 (FR) 或开顶柜 (OT)，适合超重、超宽、超高货物', color: 'bg-orange-50 border-orange-100' },
+                    { icon: '🧊', title: '食品 / 温控货', desc: '冷藏柜 (RF)，可设定温度范围，适合生鲜、药品、巧克力等', color: 'bg-purple-50 border-purple-100' },
+                    { icon: '🛢️', title: '液体 / 化工品', desc: '罐式集装箱 (TK)，符合危险品运输标准，适合液体化学品', color: 'bg-red-50 border-red-100' },
+                    { icon: '🏭', title: '大批量出口', desc: '40GP 或 40HC，单位成本最低，适合大批量标准货物', color: 'bg-green-50 border-green-100' },
+                  ].map((item, i) => (
+                    <div key={i} className={`flex items-start gap-3 p-4 rounded-lg border ${item.color}`}>
+                      <span className="text-2xl shrink-0">{item.icon}</span>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{item.title}</div>
+                        <div className="text-xs text-gray-600 mt-0.5">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* 图片占位区 - 类型与用途说明图 */}
+                <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
+                  <div className="text-gray-400 text-sm">
+                    <span className="text-3xl block mb-2">🗺️</span>
+                    <p className="font-medium text-gray-500">集装箱分类与用途说明图</p>
+                    <p className="text-xs mt-1">推荐尺寸：1200 × 1800 px（3:4 比例）</p>
+                    <p className="text-xs">格式：webp 或 png · 适合手机阅读 · 中文清晰可读</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* 4. 术语说明 */}
+              <section>
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="w-7 h-7 bg-purple-100 rounded-lg flex items-center justify-center text-sm">📖</span>
+                  常用术语
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {[
+                    { abbr: 'FCL', full: 'Full Container Load', zh: '整柜', desc: '整个集装箱只装一个货主的货物' },
+                    { abbr: 'LCL', full: 'Less than Container Load', zh: '拼箱', desc: '多个货主共用一个集装箱' },
+                    { abbr: 'GP', full: 'General Purpose', zh: '普通柜', desc: '标准干货集装箱' },
+                    { abbr: 'HC / HQ', full: 'High Cube', zh: '高柜', desc: '比标准柜高约 30cm' },
+                    { abbr: 'OT', full: 'Open Top', zh: '开顶柜', desc: '无刚性箱顶，方便吊装' },
+                    { abbr: 'FR', full: 'Flat Rack', zh: '框架柜', desc: '无箱壁箱顶，适合超大货物' },
+                    { abbr: 'RF', full: 'Reefer', zh: '冷藏柜', desc: '带制冷设备的温控集装箱' },
+                    { abbr: 'TK', full: 'Tank', zh: '罐式柜', desc: '用于液体、化工品运输' },
+                    { abbr: 'CBM', full: 'Cubic Meter', zh: '立方米', desc: '国际物流中常用的体积单位' },
+                    { abbr: 'TEU', full: 'Twenty-foot Equivalent Unit', zh: '标准箱', desc: '以 20GP 为标准的计量单位' },
+                    { abbr: 'TARE', full: 'Tare Weight', zh: '皮重', desc: '集装箱自身的空重' },
+                    { abbr: 'MAX GW', full: 'Maximum Gross Weight', zh: '最大总重', desc: '集装箱允许的最大载货重量' },
+                  ].map((item, i) => (
+                    <div key={i} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-bold text-blue-600">{item.abbr}</span>
+                        <span className="text-xs font-medium text-gray-700">{item.zh}</span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">{item.full}</div>
+                      <div className="text-xs text-gray-600 mt-1">{item.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                {/* 图片占位区 - 集装箱分类图 */}
+                <div className="mt-4 border-2 border-dashed border-gray-200 rounded-xl p-8 text-center bg-gray-50">
+                  <div className="text-gray-400 text-sm">
+                    <span className="text-3xl block mb-2">🏷️</span>
+                    <p className="font-medium text-gray-500">集装箱分类示意图</p>
+                    <p className="text-xs mt-1">推荐尺寸：1200 × 1800 px（3:4 比例）</p>
+                    <p className="text-xs">格式：webp 或 png · 适合手机阅读 · 中文清晰可读</p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
         {/* Tool-specific ads */}
         <AdSlot placement="tool-bottom" className="mb-8" />
 

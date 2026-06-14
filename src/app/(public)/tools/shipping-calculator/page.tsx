@@ -200,7 +200,8 @@ export default function ShippingCalculatorPage() {
 
   // ==================== Calculations ====================
   const divisor = modeDivisor(mode, customDivisor);
-  const useMeters = mode === 'sea';
+  // All modes now use cm input consistently (sea mode no longer uses meters)
+  const useMeters = false;
 
   const calcResults = useCallback(() => {
     let totalCtns = 0;
@@ -375,7 +376,7 @@ export default function ShippingCalculatorPage() {
           <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <p className="text-green-800 text-sm">
-              <strong>已从集装箱计算器带入数据。</strong>请确认运输方式、目的地和计费规则。
+              <strong>已从集装箱计算器带入尺寸、重量和数量。</strong>尺寸单位：cm，重量单位：kg。请确认运输方式、目的地和计费规则。
             </p>
           </div>
         )}
