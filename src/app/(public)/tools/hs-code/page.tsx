@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Package, ExternalLink, ChevronDown, ChevronUp, Loader2, Copy, Check, Clock, Truck } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
@@ -50,7 +50,13 @@ export default function HSCodePage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [recentQueries, setRecentQueries] = useState<RecentQuery[]>([]);
-
+  const [activeQuery, setActiveQuery] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  
+  // Request sequence guard + AbortController
+  const requestSeqRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  
   // Load recent queries
   useEffect(() => {
     try {
@@ -67,31 +73,68 @@ export default function HSCodePage() {
   const fetchCodes = useCallback(async (q: string) => {
     if (!q.trim()) {
       setResults([]);
+      setActiveQuery('');
+      setError(null);
+      setLoading(false);
       return;
     }
+    
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Increment sequence and create new AbortController
+    const currentSeq = ++requestSeqRef.current;
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    
+    // Set loading state and clear stale results
+    setActiveQuery(q);
     setLoading(true);
+    setError(null);
+    setResults([]);
+    
     try {
-      const res = await fetch(`/api/tools/hs-code?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/tools/hs-code?q=${encodeURIComponent(q)}`, {
+        signal: controller.signal,
+      });
       const json = await res.json();
+      
+      // Only update if this is still the latest request
+      if (currentSeq !== requestSeqRef.current) return;
+      
       if (json.success) {
         setResults(json.data);
         // Save to recent queries
         if (json.data.length > 0) {
           const entry: RecentQuery = { query: q, resultCount: json.data.length, timestamp: Date.now() };
-          const updated = [entry, ...recentQueries.filter(r => r.query !== q)].slice(0, 5);
-          setRecentQueries(updated);
-          try { localStorage.setItem(RECENT_QUERIES_KEY, JSON.stringify(updated)); } catch {}
+          setRecentQueries(prev => {
+            const updated = [entry, ...prev.filter(r => r.query !== q)].slice(0, 5);
+            try { localStorage.setItem(RECENT_QUERIES_KEY, JSON.stringify(updated)); } catch {}
+            return updated;
+          });
         }
         trackEvent.custom('hs-code', 'query');
         // Save to task chain
         saveTaskChain({ sourceTool: 'hs-code', productName: q });
+      } else {
+        setError('查询失败，请稍后重试');
       }
-    } catch (e) {
+    } catch (e: any) {
+      // Ignore abort errors
+      if (e?.name === 'AbortError') return;
+      // Only update if this is still the latest request
+      if (currentSeq !== requestSeqRef.current) return;
       console.error(e);
+      setError('网络错误，请检查连接后重试');
     } finally {
-      setLoading(false);
+      // Only clear loading if this is still the latest request
+      if (currentSeq === requestSeqRef.current) {
+        setLoading(false);
+      }
     }
-  }, [recentQueries]);
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -189,6 +232,14 @@ export default function HSCodePage() {
         </div>
 
         {/* Results */}
+        {results.length > 0 && activeQuery && (
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              当前查询：<span className="font-medium text-teal-700 dark:text-teal-400">&quot;{activeQuery}&quot;</span>
+              <span className="ml-2 text-gray-400">({results.length} 条结果)</span>
+            </p>
+          </div>
+        )}
         <div className="space-y-3">
           {results.map((item) => {
             const isExpanded = expandedId === item.code;
@@ -276,12 +327,29 @@ export default function HSCodePage() {
           })}
         </div>
 
-        {results.length === 0 && !loading && (
+        {/* Loading indicator in results area */}
+        {loading && (
+          <div className="text-center py-16">
+            <Loader2 className="w-10 h-10 text-teal-500 animate-spin mx-auto mb-4" />
+            <p className="text-gray-500">正在查询 &quot;{activeQuery}&quot;...</p>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && !loading && (
+          <div className="text-center py-16">
+            <Package className="w-16 h-16 text-red-300 mx-auto mb-4" />
+            <p className="text-red-500 mb-2">{error}</p>
+            <p className="text-sm text-gray-400">请检查网络连接后重试</p>
+          </div>
+        )}
+
+        {results.length === 0 && !loading && !error && (
           <div className="text-center py-16">
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            {search ? (
+            {activeQuery ? (
               <>
-                <p className="text-gray-500 mb-2">未找到匹配 &quot;{search}&quot; 的海关数据</p>
+                <p className="text-gray-500 mb-2">未找到匹配 &quot;{activeQuery}&quot; 的海关数据</p>
                 <p className="text-sm text-gray-400">你可以试试：</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-3">
                   {EXAMPLE_PRODUCTS.slice(0, 5).map(p => (
