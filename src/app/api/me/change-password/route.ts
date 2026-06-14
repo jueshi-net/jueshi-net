@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Validate new password length
-    if (newPassword.length < 6) {
+    // Validate new password length (minimum 12 characters for security)
+    if (newPassword.length < 12) {
       return NextResponse.json(
-        { success: false, error: "新密码至少6位" },
+        { success: false, error: "新密码至少12位" },
         { status: 400 }
       );
     }

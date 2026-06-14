@@ -77,8 +77,8 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
       setPwError('请填写所有字段');
       return;
     }
-    if (newPassword.length < 6) {
-      setPwError('新密码至少6位');
+    if (newPassword.length < 12) {
+      setPwError('新密码至少12位，建议包含大小写字母、数字和符号');
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -219,7 +219,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
                   value={newPassword}
                   onChange={(e) => { setNewPassword(e.target.value); setPwError(null); setPwSuccess(null); }}
                   className={inputCls}
-                  placeholder="至少6位"
+                  placeholder="至少12位，建议包含大小写字母、数字和符号"
                   autoComplete="new-password"
                 />
                 <button
