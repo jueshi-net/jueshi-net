@@ -1,0 +1,652 @@
+
+> kuajing-baoxian@1.36.0 build
+> next build
+
+▲ Next.js 16.2.4 (Turbopack)
+- Environments: .env.production
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 6.4s
+  Running TypeScript ...
+  Finished TypeScript in 8.1s ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/274) ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 9 workers (68/274) 
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 9 workers (136/274) 
+Failed to load tracking data
+prisma:error 
+Invalid `prisma.destination.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.userLevel.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.userBadge.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+  Generating static pages using 9 workers (205/274) 
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+Admin stats load error: Error [PrismaClientKnownRequestError]: 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+    at <unknown> (Can't reach database server at 127.0.0.1:5432)
+    at async f (.next/server/chunks/ssr/[root-of-the-server]__0mv.0v3._.js:1:1396)
+    at async h (.next/server/chunks/ssr/[root-of-the-server]__0mv.0v3._.js:1:6041) {
+  code: 'P1001',
+  meta: {
+    modelName: 'ToolReview',
+    driverAdapterError: Error [DriverAdapterError]: DatabaseNotReachable
+        at F.onError (.next/server/chunks/ssr/_03ktbbq._.js:1:11647)
+        at F.performIO (.next/server/chunks/ssr/_03ktbbq._.js:1:11588)
+        at async F.queryRaw (.next/server/chunks/ssr/_03ktbbq._.js:1:8174) {
+      [cause]: [Object]
+    }
+  },
+  clientVersion: '7.8.0'
+}
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.notification.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.growthLog.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.notification.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.growthLog.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.growthLog.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.groupBy()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolReview.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.notification.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.notification.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.notification.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.article.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.article.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.article.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.article.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.resource.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.resource.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.resource.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.resource.groupBy()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.adCampaign.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.adCampaign.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.adCampaign.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.documentHistory.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.documentHistory.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.documentHistory.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.pointLedger.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.pointLedger.aggregate()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.pointLedger.aggregate()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.tool.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.user.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.toolDocumentDraft.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.topic.count()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.homepageConfig.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.adCampaign.findFirst()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+prisma:error 
+Invalid `prisma.tool.findMany()` invocation:
+
+
+Can't reach database server at 127.0.0.1:5432
+Failed to load notes from localStorage
+✓ Generating static pages using 9 workers (274/274) in 566ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /(public)api/guides
+├ ƒ /admin
+├ ƒ /admin/ad-creatives
+├ ƒ /admin/ad-placements
+├ ƒ /admin/ads
+├ ƒ /admin/analytics
+├ ƒ /admin/analytics/task-chains
+├ ƒ /admin/audit
+├ ƒ /admin/backup
+├ ƒ /admin/categories
+├ ƒ /admin/cms
+├ ƒ /admin/destinations
+├ ƒ /admin/destinations/[slug]/edit
+├ ƒ /admin/feedback
+├ ƒ /admin/forum
+├ ƒ /admin/growth-logs
+├ ƒ /admin/health
+├ ƒ /admin/import
+├ ƒ /admin/import-bookmarks
+├ ƒ /admin/invites
+├ ƒ /admin/landing-pages
+├ ƒ /admin/levels
+├ ƒ /admin/link-health
+├ ƒ /admin/links
+├ ƒ /admin/newsletter
+├ ƒ /admin/notifications
+├ ƒ /admin/resources
+├ ƒ /admin/resources/import
+├ ƒ /admin/settings
+├ ƒ /admin/short-links
+├ ƒ /admin/tags
+├ ƒ /admin/tool-reviews
+├ ƒ /admin/topics
+├ ƒ /admin/topics/[id]/edit
+├ ƒ /admin/users
+├ ƒ /admin/webhooks
+├ ○ /ai-learning
+├ ○ /ai-tools
+├ ○ /ai-tools/document-summary
+├ ○ /ai-tools/product-copy
+├ ○ /ai-tools/translate-polish
+├ ○ /analytics
+├ ○ /api-docs
+├ ƒ /api/admin/ad-creatives
+├ ƒ /api/admin/ad-creatives/[id]
+├ ƒ /api/admin/ad-placements
+├ ƒ /api/admin/ad-placements/[id]
+├ ƒ /api/admin/ads
+├ ƒ /api/admin/ads/[id]
+├ ƒ /api/admin/analytics
+├ ƒ /api/admin/analytics/home
+├ ƒ /api/admin/analytics/task-chains
+├ ƒ /api/admin/analytics/task-chains.csv
+├ ƒ /api/admin/audit
+├ ƒ /api/admin/backup/export
+├ ƒ /api/admin/badges
+├ ƒ /api/admin/badges/[id]
+├ ƒ /api/admin/cms/import
+├ ƒ /api/admin/destinations
+├ ƒ /api/admin/destinations/generate
+├ ƒ /api/admin/elevate
+├ ƒ /api/admin/forum/comments/[id]
+├ ƒ /api/admin/forum/posts/[slug]
+├ ƒ /api/admin/forum/stats
+├ ƒ /api/admin/growth-logs
+├ ƒ /api/admin/homepage/config
+├ ƒ /api/admin/import/bookmarks
+├ ƒ /api/admin/import/csv
+├ ƒ /api/admin/invites
+├ ƒ /api/admin/invites/[id]
+├ ƒ /api/admin/landing-pages
+├ ƒ /api/admin/landing-pages/[id]
+├ ƒ /api/admin/levels
+├ ƒ /api/admin/levels/[id]
+├ ƒ /api/admin/link-checker
+├ ƒ /api/admin/link-health
+├ ƒ /api/admin/newsletter
+├ ƒ /api/admin/notifications
+├ ƒ /api/admin/notifications/broadcast
+├ ƒ /api/admin/overview
+├ ƒ /api/admin/resources/import
+├ ƒ /api/admin/settings
+├ ƒ /api/admin/tool-reviews
+├ ƒ /api/admin/tool-reviews/[id]
+├ ƒ /api/admin/topics
+├ ƒ /api/admin/topics/[id]
+├ ƒ /api/admin/topics/[id]/items
+├ ƒ /api/admin/topics/[id]/items/[itemId]
+├ ƒ /api/admin/topics/[id]/sections
+├ ƒ /api/admin/topics/[id]/sections/[sectionId]
+├ ƒ /api/admin/users
+├ ƒ /api/admin/users/[id]
+├ ƒ /api/admin/users/[id]/badges
+├ ƒ /api/admin/users/[id]/badges/[awardId]
+├ ƒ /api/admin/users/[id]/growth-badges
+├ ƒ /api/admin/users/[id]/growth-logs
+├ ƒ /api/admin/users/[id]/rewards
+├ ƒ /api/ads/[id]/click
+├ ƒ /api/ads/dispatch
+├ ƒ /api/ads/events
+├ ƒ /api/ads/resolve
+├ ƒ /api/ai/generate
+├ ƒ /api/articles
+├ ƒ /api/articles/[slug]
+├ ƒ /api/audit
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/auth/register
+├ ƒ /api/backup
+├ ƒ /api/branding
+├ ƒ /api/calculations
+├ ƒ /api/categories
+├ ƒ /api/categories/[id]
+├ ƒ /api/checkin
+├ ƒ /api/checklists
+├ ƒ /api/checkout
+├ ƒ /api/dashboard/summary
+├ ƒ /api/events
+├ ƒ /api/events/stats
+├ ƒ /api/exchange-rate
+├ ƒ /api/exchange-rate/history
+├ ƒ /api/export
+├ ƒ /api/export/authorize
+├ ƒ /api/favicon
+├ ƒ /api/favorites
+├ ƒ /api/feedback
+├ ƒ /api/forum/categories
+├ ƒ /api/forum/posts
+├ ƒ /api/forum/posts/[slug]
+├ ƒ /api/forum/posts/[slug]/comments
+├ ƒ /api/growth-tasks/dashboard-visit
+├ ƒ /api/growth-tasks/summary
+├ ƒ /api/guides
+├ ƒ /api/health
+├ ƒ /api/homepage/config
+├ ƒ /api/hs-codes
+├ ƒ /api/invoices
+├ ƒ /api/links
+├ ƒ /api/links/[id]
+├ ƒ /api/links/[id]/click
+├ ƒ /api/links/batch
+├ ƒ /api/links/bulk
+├ ƒ /api/links/export
+├ ƒ /api/links/health
+├ ƒ /api/links/import
+├ ƒ /api/links/preview
+├ ƒ /api/me/company-profiles
+├ ƒ /api/me/company-profiles/[id]
+├ ƒ /api/me/company-profiles/[id]/history
+├ ƒ /api/me/company-profiles/[id]/restore
+├ ƒ /api/me/growth-logs
+├ ƒ /api/me/membership
+├ ƒ /api/me/notifications
+├ ƒ /api/me/notifications/[id]
+├ ƒ /api/me/notifications/mark-all-read
+├ ƒ /api/me/notifications/unread-count
+├ ƒ /api/me/permissions
+├ ƒ /api/me/task-chains
+├ ƒ /api/me/task-chains/[id]
+├ ƒ /api/me/tool-documents
+├ ƒ /api/me/tool-documents/[id]
+├ ƒ /api/me/tool-documents/[id]/history
+├ ƒ /api/me/tool-documents/[id]/restore
+├ ƒ /api/memos
+├ ƒ /api/memos/[id]
+├ ƒ /api/newsletter/subscribe
+├ ƒ /api/notifications
+├ ƒ /api/notifications/mark-read
+├ ƒ /api/plans
+├ ƒ /api/points/logs
+├ ƒ /api/postal-codes
+├ ƒ /api/preferences
+├ ƒ /api/resources
+├ ƒ /api/resources/[id]/check-link
+├ ƒ /api/rewards
+├ ƒ /api/rewards/my
+├ ƒ /api/rewards/redeem
+├ ƒ /api/search
+├ ƒ /api/share
+├ ƒ /api/short-links
+├ ƒ /api/sse
+├ ƒ /api/stats
+├ ƒ /api/stats/clicks
+├ ƒ /api/stats/trends
+├ ƒ /api/subscribe
+├ ƒ /api/subscription/check
+├ ƒ /api/subscriptions
+├ ƒ /api/tags
+├ ƒ /api/tasks
+├ ƒ /api/tasks/[id]
+├ ƒ /api/tools/hs-code
+├ ƒ /api/tools/rankings
+├ ƒ /api/tools/reviews
+├ ƒ /api/tools/reviews/[id]
+├ ƒ /api/topics
+├ ƒ /api/tracking
+├ ƒ /api/user/documents
+├ ƒ /api/user/favorites
+├ ƒ /api/users
+├ ƒ /api/users/[id]
+├ ƒ /api/webhooks
+├ ƒ /api/webhooks/stripe
+├ ƒ /api/workbench/favorites
+├ ƒ /api/workbench/favorites/[toolKey]
+├ ƒ /api/workbench/links
+├ ƒ /api/workbench/links/[id]
+├ ƒ /api/workbench/profile
+├ ƒ /api/workbench/summary
+├ ƒ /api/workspace/memos
+├ ƒ /api/workspace/memos/[id]
+├ ƒ /bbs
+├ ƒ /bbs/[slug]
+├ ƒ /bbs/[slug]/edit
+├ ƒ /bbs/category/[key]
+├ ƒ /bbs/new
+├ ○ /blog
+├ ƒ /blog/[slug]
+├ ○ /business
+├ ○ /changelog
+├ ƒ /checklists
+├ ƒ /checklists/[slug]
+├ ƒ /community
+├ ƒ /community/[slug]
+├ ƒ /dashboard
+├ ƒ /dashboard/documents
+├ ƒ /dashboard/notifications
+├ ƒ /dashboard/points
+├ ƒ /dashboard/stats
+├ ƒ /dashboard/tasks
+├ ○ /design-system
+├ ○ /destinations
+├ ƒ /destinations/[slug]
+├ ○ /export
+├ ○ /favorites
+├ ○ /feedback
+├ ○ /forgot-password
+├ ƒ /guides
+├ ƒ /guides/[slug]
+├ ○ /help
+├ ƒ /login
+├ ○ /logistics
+├ ƒ /lp/[slug]
+├ ƒ /my-links
+├ ƒ /nav
+├ ○ /notifications
+├ ● /packages/[id]
+│ ├ /packages/shopify-starter
+│ ├ /packages/student-shipping
+│ ├ /packages/ai-copy-suite
+│ └ [+2 more paths]
+├ ○ /payment/success
+├ ○ /preferences
+├ ○ /pricing
+├ ○ /privacy
+├ ƒ /profile
+├ ƒ /rankings
+├ ƒ /resources
+├ ƒ /resources/[slug]
+├ ○ /robots.txt
+├ ● /scenario/[role]
+│ ├ /scenario/student
+│ ├ /scenario/merchant
+│ ├ /scenario/traveler
+│ └ /scenario/nomad
+├ ○ /search
+├ ƒ /share/[id]
+├ ○ /shipping
+├ ƒ /sitemap.xml
+├ ○ /starter
+├ ● /starter/[slug]
+│ ├ /starter/shopify-starter
+│ ├ /starter/student-shipping
+│ ├ /starter/ai-copy-suite
+│ └ [+2 more paths]
+├ ○ /starter/apps
+├ ○ /starter/student
+├ ○ /subscribe/confirm
+├ ○ /terms
+├ ƒ /tools
+├ ○ /tools/address-formatter
+├ ○ /tools/calculator
+├ ƒ /tools/commercial-invoice
+├ ○ /tools/container
+├ ○ /tools/customs-generator
+├ ○ /tools/debit-note
+├ ○ /tools/document-tools
+├ ƒ /tools/documents
+├ ƒ /tools/documents/[type]
+├ ○ /tools/documents/drafts
+├ ○ /tools/documents/quotation
+├ ○ /tools/documents/settings/role-switcher
+├ ○ /tools/documents/shipping-label
+├ ○ /tools/exchange-rate
+├ ○ /tools/handover-note
+├ ○ /tools/hs-code
+├ ○ /tools/inbound
+├ ○ /tools/inbound-receipt
+├ ○ /tools/invoice
+├ ○ /tools/memo
+├ ƒ /tools/postal-code
+├ ○ /tools/qrcode
+├ ○ /tools/quote
+├ ○ /tools/quote-sheet
+├ ○ /tools/receipt
+├ ○ /tools/sensitive-goods
+├ ○ /tools/shipping-calculator
+├ ○ /tools/shipping-estimator
+├ ƒ /tools/shipping-label
+├ ○ /tools/shipping-mark
+├ ○ /tools/video-script-sop
+├ ○ /tools/zip
+├ ƒ /topics
+├ ● /topics/[slug]
+├ ○ /tracking
+├ ƒ /workbench
+├ ƒ /workspace
+├ ƒ /workspace/company-profiles
+├ ƒ /workspace/documents
+├ ƒ /workspace/favorites
+├ ƒ /workspace/member
+├ ƒ /workspace/memos
+├ ƒ /workspace/notifications
+├ ƒ /workspace/settings
+└ ƒ /workspace/tasks
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

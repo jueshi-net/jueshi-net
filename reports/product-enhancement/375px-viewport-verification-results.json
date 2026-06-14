@@ -1,0 +1,32 @@
+{
+  "viewport": {
+    "width": 375,
+    "height": 812
+  },
+  "pages": {
+    "packing-list": {
+      "viewport": "375x812",
+      "body.scrollWidth": 375,
+      "documentElement.clientWidth": 375,
+      "horizontal_overflow": false,
+      "console_errors": 2,
+      "screenshot": "reports/product-enhancement/pl-375px-viewport.png"
+    },
+    "proforma-invoice": {
+      "viewport": "375x812",
+      "body.scrollWidth": 375,
+      "documentElement.clientWidth": 375,
+      "horizontal_overflow": false,
+      "console_errors": 2,
+      "screenshot": "reports/product-enhancement/pi-375px-viewport.png"
+    },
+    "container": {
+      "viewport": "375x812",
+      "body.scrollWidth": 375,
+      "documentElement.clientWidth": 375,
+      "horizontal_overflow": false,
+      "console_errors": 1,
+      "screenshot": "reports/product-enhancement/container-375px-viewport.png"
+    }
+  }
+}
