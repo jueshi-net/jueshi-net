@@ -401,11 +401,25 @@ npm run build
 
 ### 问题背景
 
-生产环境采用 rsync 部署，生产目录的 `.git HEAD` 不代表实际部署版本。需要可靠的部署来源追踪机制。
+生产环境采用 rsync 部署，生产目录的 `.git HEAD` 不代表实际部署版本（因为 `.git` 目录不会被 rsync 同步）。需要可靠的部署来源追踪机制。
+
+### 关键原则
+
+**⚠️ 生产目录的 `.git HEAD` 不可信！**
+
+- rsync 部署不会同步 `.git` 目录
+- 生产目录的 `.git HEAD` 可能是几个月前的旧 commit
+- **必须以 `.deploy-meta.json` 为准**
 
 ### 解决方案
 
-新增 `scripts/generate-deploy-meta.mjs` 脚本，生成 `.deploy-meta.json` 文件。
+`scripts/generate-deploy-meta.mjs` 脚本生成 `.deploy-meta.json` 文件。
+
+**环境变量优先级**（高于 git HEAD）：
+- `DEPLOY_COMMIT` - 实际部署的 commit（rsync 部署时必须传入）
+- `DEPLOY_BRANCH` - 部署的分支（默认从 git 读取）
+- `DEPLOY_TAG` - 部署的 tag（如有）
+- `DEPLOY_METHOD` - 部署方式（默认 rsync）
 
 **字段说明**：
 ```json
@@ -428,20 +442,54 @@ npm run build
 - ✅ 不得包含密码
 
 **使用方式**：
+
 ```bash
-# Build 后生成元信息
-npm run build
+# 本地开发（使用 git HEAD）
 node scripts/generate-deploy-meta.mjs
 
-# 部署时包含 .deploy-meta.json
+# 生产 rsync 部署（必须传入源 commit）
+DEPLOY_COMMIT=$(git rev-parse HEAD) DEPLOY_BRANCH=main DEPLOY_METHOD=rsync \
+  node scripts/generate-deploy-meta.mjs
+```
+
+**完整部署流程**：
+```bash
+# 1. 本地 build
+npm run build
+
+# 2. 本地生成元信息（记录源 commit）
+DEPLOY_COMMIT=$(git rev-parse HEAD) DEPLOY_BRANCH=main DEPLOY_METHOD=rsync \
+  node scripts/generate-deploy-meta.mjs
+
+# 3. rsync 部署（包含 .deploy-meta.json）
 rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.git' . deploy@vps:/path/to/project/
+
+# 4. 生产 build
+ssh deploy@vps
+cd /path/to/project
+npm run build
+
+# 5. 验证
+cat .deploy-meta.json  # 确认 commit 正确
+cat .next/BUILD_ID     # 确认 build ID
 ```
 
 **验证部署版本**：
 ```bash
 # 在生产目录查看
 cat /home/deploy/xixiong-saas/.deploy-meta.json
+
+# 必须确认：
+# - commit 与部署源一致
+# - buildId 与 .next/BUILD_ID 一致
+# - deployedAt 是最新时间
 ```
+
+**部署后验证清单**：
+- [ ] `.deploy-meta.json` commit 与源一致
+- [ ] `.next/BUILD_ID` 与 meta 一致
+- [ ] PM2 uptime 正常
+- [ ] Smoke test 通过
 
 ---
 

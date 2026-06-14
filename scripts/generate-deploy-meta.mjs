@@ -7,7 +7,19 @@
  * This is critical for rsync-based deployments where .git HEAD
  * in the production directory does not reflect the actual deployed version.
  * 
- * Usage: node scripts/generate-deploy-meta.mjs
+ * Usage:
+ *   # Local development (uses git HEAD)
+ *   node scripts/generate-deploy-meta.mjs
+ * 
+ *   # Production rsync deployment (pass source commit explicitly)
+ *   DEPLOY_COMMIT=$(git rev-parse HEAD) DEPLOY_BRANCH=main DEPLOY_METHOD=rsync \
+ *     node scripts/generate-deploy-meta.mjs
+ * 
+ * Environment Variables (priority over git HEAD):
+ *   DEPLOY_COMMIT  - The actual commit being deployed (required for rsync)
+ *   DEPLOY_BRANCH  - The branch being deployed (default: git branch)
+ *   DEPLOY_TAG     - The tag being deployed (if any)
+ *   DEPLOY_METHOD  - Deployment method (default: rsync)
  * 
  * Output: .deploy-meta.json in project root
  */
@@ -30,9 +42,12 @@ const exec = (cmd) => {
 };
 
 const getGitInfo = () => {
-  const commit = exec('git rev-parse HEAD');
-  const branch = exec('git rev-parse --abbrev-ref HEAD');
-  const tag = exec('git describe --tags --exact-match 2>/dev/null');
+  // Priority: environment variables > git HEAD
+  // For rsync deployments, production .git HEAD is stale and unreliable.
+  // Always pass DEPLOY_COMMIT from the deployment source.
+  const commit = process.env.DEPLOY_COMMIT || exec('git rev-parse HEAD');
+  const branch = process.env.DEPLOY_BRANCH || exec('git rev-parse --abbrev-ref HEAD');
+  const tag = process.env.DEPLOY_TAG || exec('git describe --tags --exact-match 2>/dev/null');
   
   return { commit, branch, tag };
 };
@@ -63,7 +78,7 @@ const generateMeta = () => {
     tag: gitInfo.tag,
     buildId: buildId,
     deployedAt: new Date().toISOString(),
-    deployMethod: 'rsync',
+    deployMethod: process.env.DEPLOY_METHOD || 'rsync',
     nodeVersion: nodeInfo.nodeVersion,
     npmVersion: nodeInfo.npmVersion,
     // Explicitly exclude secrets, DATABASE_URL, tokens
