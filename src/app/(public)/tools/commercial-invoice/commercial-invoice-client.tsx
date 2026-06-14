@@ -63,8 +63,17 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   const [saveMsg, setSaveMsg] = useState("");
   const [currentDocId, setCurrentDocId] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<CompanyProfile | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // ── Check authentication status on mount ──
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then(res => res.json())
+      .then(data => setIsLoggedIn(!!data?.user))
+      .catch(() => setIsLoggedIn(false));
+  }, []);
 
   // ── Freemium Gate ──
   const freemium = useFreemiumGate({
@@ -183,15 +192,7 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   };
 
   // ── Check if user is authenticated ──
-  const isAuthenticated = () => {
-    if (typeof document === "undefined") return false;
-    return (
-      document.cookie.includes("next-auth.session-token") ||
-      document.cookie.includes("__Secure-next-auth.session-token") ||
-      document.cookie.includes("authjs.session-token") ||
-      document.cookie.includes("__Secure-authjs.session-token")
-    );
-  };
+  const isAuthenticated = () => isLoggedIn;
 
   // ── Save ──
   const handleSave = async () => {
