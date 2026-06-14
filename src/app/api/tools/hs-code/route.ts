@@ -48,10 +48,16 @@ export async function GET(req: NextRequest) {
       }
     }
   } else {
-    // Priority 2: Fuzzy match on nameCn (description)
+    // Priority 2: Fuzzy match on nameCn (description) OR nameEn (descriptionEn)
+    const queryLower = query.toLowerCase();
     results = await prisma.hSCode.findMany({
       where: {
-        description: { contains: query }
+        OR: [
+          { description: { contains: query } },
+          { description: { contains: queryLower } },
+          { descriptionEn: { contains: query } },
+          { descriptionEn: { contains: queryLower } },
+        ]
       },
       take: 50,
       orderBy: { description: "asc" } // Alphabetical order
