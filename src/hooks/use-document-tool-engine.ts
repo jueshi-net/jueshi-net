@@ -14,6 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDraftLoader } from '@/lib/use-draft-loader';
 import { trackEvent } from '@/lib/tracking';
+import { usePermissions } from '@/lib/auth/client-permissions';
 import { 
   DocumentToolEngineOptions, 
   DocumentToolEngineResult,
@@ -32,6 +33,7 @@ export function useDocumentToolEngine<T extends object>({
 }: DocumentToolEngineOptions<T>): DocumentToolEngineResult<T> {
   const searchParams = useSearchParams();
   const draftId = searchParams?.get('draftId') ?? null;
+  const perms = usePermissions();
 
   const [data, setData] = useState<T>(defaultData);
   const [currentDocId, setCurrentDocId] = useState<string | null>(draftId);
@@ -91,6 +93,40 @@ export function useDocumentToolEngine<T extends object>({
     savingRef.current = true;
     setError(null);
     setSaved(false);
+
+    // Guest mode: save to localStorage
+    if (!perms.authenticated && perms.role === 'guest') {
+      try {
+        const serializedData = serialize(data);
+        const storageKey = `${toolKey}-draft`;
+        localStorage.setItem(storageKey, JSON.stringify({
+          data: serializedData,
+          updatedAt: new Date().toISOString(),
+        }));
+        
+        setSaved(true);
+        setSaveMsg('💡 草稿已保存到本地浏览器');
+        setTimeout(() => {
+          setSaved(false);
+          setSaveMsg(null);
+        }, 3000);
+        
+        trackEvent('Document_Save', {
+          toolSlug: toolKey,
+          source: 'document_tool_engine',
+          saveMode: 'localStorage',
+        });
+        
+        alert('💡 草稿已保存到本地浏览器\n\n未登录时，草稿只会保存在当前浏览器。\n登录后即可永久保存，并跨设备同步。');
+      } catch (e) {
+        console.error('[useDocumentToolEngine] Failed to save to localStorage:', e);
+        setError('本地保存失败');
+      } finally {
+        setSaving(false);
+        savingRef.current = false;
+      }
+      return;
+    }
 
     // Snapshot the docId at call time to avoid stale closure
     const docId = currentDocIdRef.current;
@@ -153,7 +189,7 @@ export function useDocumentToolEngine<T extends object>({
       } else {
         const errData = await res.json().catch(() => ({}));
         if (res.status === 401) {
-          window.location.href = '/login';
+          setError('请先登录后再保存到工作台');
           return;
         }
         throw new Error(errData.error || '保存失败');
@@ -164,7 +200,7 @@ export function useDocumentToolEngine<T extends object>({
       setSaving(false);
       savingRef.current = false;
     }
-  }, [data, toolKey, serialize, validate, onAfterSave]);
+  }, [data, toolKey, serialize, validate, onAfterSave, perms.authenticated, perms.role]);
 
   // Restore handler (called from ToolHistoryPanel)
   const handleRestore = useCallback((dataJson: string) => {
