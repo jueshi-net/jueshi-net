@@ -243,14 +243,17 @@ export function parseAddress(input: string): ParsedAddress {
   let recipient = '';
   let addressLines: string[] = [];
   
-  if (lines.length > 0) {
-    const firstLine = lines[0];
+  // Re-split remaining (after phone, postal, state extraction) to get clean address lines
+  const cleanLines = remaining.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
+  
+  if (cleanLines.length > 0) {
+    const firstLine = cleanLines[0];
     // If first line doesn't contain numbers and is short, likely a name
     if (firstLine.length < 50 && !/\d/.test(firstLine) && !firstLine.match(/street|road|ave|blvd|dr|ln|ct/i)) {
       recipient = firstLine;
-      addressLines = lines.slice(1);
+      addressLines = cleanLines.slice(1);
     } else {
-      addressLines = lines;
+      addressLines = cleanLines;
     }
   }
   
