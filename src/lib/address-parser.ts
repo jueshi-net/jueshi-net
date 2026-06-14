@@ -258,15 +258,15 @@ export function parseAddress(input: string): ParsedAddress {
   let city = '';
   const addressText = addressLines.join(' ');
   
-  // US/Canada pattern: "City, ST 12345" - look for comma before state
-  const usCaCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]\s*([A-Z]{2})\s+\d/);
+  // US/Canada pattern: "City, ST 12345" - look for city before state code
+  const usCaCityMatch = addressText.match(/([A-Za-z][A-Za-z\s]*?)\s*[,]\s*([A-Z]{2})\s+\d/);
   if (usCaCityMatch && usCaCityMatch[1]) {
     city = usCaCityMatch[1].trim();
   }
   
   // Australia/NZ pattern: "City ST 1234" - look for city before state code
   if (!city) {
-    const auNzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s+([A-Z]{2,3})\s+\d{4}/);
+    const auNzCityMatch = addressText.match(/([A-Za-z][A-Za-z\s]*?)\s+([A-Z]{2,3})\s+\d{4}/);
     if (auNzCityMatch && auNzCityMatch[1]) {
       city = auNzCityMatch[1].trim();
     }
@@ -274,7 +274,7 @@ export function parseAddress(input: string): ParsedAddress {
   
   // UK pattern: "City PostalCode" (e.g., "London SW1A 1AA") - look for city before postal
   if (!city) {
-    const ukCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s+[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/);
+    const ukCityMatch = addressText.match(/([A-Za-z][A-Za-z\s]*?)\s+[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/);
     if (ukCityMatch && ukCityMatch[1]) {
       city = ukCityMatch[1].trim();
     }
