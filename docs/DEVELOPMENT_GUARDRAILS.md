@@ -363,4 +363,86 @@ curl -s -o /dev/null -w "HTTP %{http_code}" https://jueshi.net
 
 ---
 
+## Build 环境护栏
+
+### NODE_ENV 污染问题
+
+**问题背景**：当 `NODE_ENV=development` 时执行 `npm run build`，Next.js 会以开发模式构建，导致静态预渲染 "use client" 页面时 React hooks 初始化失败，报错 `TypeError: Cannot read properties of null (reading 'useState')`。
+
+**根因**：`.env.local` 中设置了 `NODE_ENV=development`，污染了 build 环境。
+
+**解决方案**：
+1. 已从 `.env.local` 中删除 `NODE_ENV=development`
+2. 新增 `scripts/check-build-env.mjs` 检查脚本
+3. `package.json` 的 `build` 命令已更新为 `node scripts/check-build-env.mjs && next build`
+
+**标准 build 流程**：
+```bash
+# 1. 确保 NODE_ENV 未设置或为 production
+unset NODE_ENV
+
+# 2. 清理缓存
+rm -rf .next
+
+# 3. 安装依赖
+npm ci
+
+# 4. 构建
+npm run build
+```
+
+**检查脚本行为**：
+- 如果 `NODE_ENV=development`，立即失败并给出明确错误提示
+- 如果 `NODE_ENV` 未设置或为 `production`，允许继续
+
+---
+
+## 部署元信息机制
+
+### 问题背景
+
+生产环境采用 rsync 部署，生产目录的 `.git HEAD` 不代表实际部署版本。需要可靠的部署来源追踪机制。
+
+### 解决方案
+
+新增 `scripts/generate-deploy-meta.mjs` 脚本，生成 `.deploy-meta.json` 文件。
+
+**字段说明**：
+```json
+{
+  "commit": "完整 git commit hash",
+  "branch": "部署时的分支",
+  "tag": "部署时的 tag（如有）",
+  "buildId": "Next.js BUILD_ID",
+  "deployedAt": "ISO 时间戳",
+  "deployMethod": "rsync",
+  "nodeVersion": "Node.js 版本",
+  "npmVersion": "npm 版本"
+}
+```
+
+**安全约束**：
+- ✅ 不得包含 secrets
+- ✅ 不得包含 DATABASE_URL
+- ✅ 不得包含 token
+- ✅ 不得包含密码
+
+**使用方式**：
+```bash
+# Build 后生成元信息
+npm run build
+node scripts/generate-deploy-meta.mjs
+
+# 部署时包含 .deploy-meta.json
+rsync -avz --exclude='node_modules' --exclude='.next' --exclude='.git' . deploy@vps:/path/to/project/
+```
+
+**验证部署版本**：
+```bash
+# 在生产目录查看
+cat /home/deploy/xixiong-saas/.deploy-meta.json
+```
+
+---
+
 **本文档是开发护栏，每轮开发前必须读取。**

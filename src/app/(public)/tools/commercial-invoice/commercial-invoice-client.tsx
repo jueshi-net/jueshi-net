@@ -113,12 +113,16 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     const saved = localStorage.getItem("invoice-draft");
     if (saved) {
       try {
-        const d = JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Support both old format (direct data) and new format ({ data, updatedAt })
+        const d = parsed.data || parsed;
         if (d.companyName) setCompanyName(d.companyName);
         if (d.companyAddress) setCompanyAddress(d.companyAddress);
+        if (d.companyLogo) setCompanyLogo(d.companyLogo);
         if (d.clientName) setClientName(d.clientName);
         if (d.clientAddress) setClientAddress(d.clientAddress);
         if (d.invoiceNo) setInvoiceNo(d.invoiceNo);
+        if (d.invoiceDate) setInvoiceDate(d.invoiceDate);
         if (d.lineItems) setLineItems(d.lineItems);
         if (d.freight !== undefined) setFreight(d.freight);
         if (d.insurance !== undefined) setInsurance(d.insurance);
@@ -178,16 +182,49 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     setLineItems(lineItems.map((l) => (l.id === id ? { ...l, [field]: value } : l)));
   };
 
+  // ── Check if user is authenticated ──
+  const isAuthenticated = () => {
+    if (typeof document === "undefined") return false;
+    return (
+      document.cookie.includes("next-auth.session-token") ||
+      document.cookie.includes("__Secure-next-auth.session-token")
+    );
+  };
+
   // ── Save ──
   const handleSave = async () => {
     setSaving(true);
     setSaved(false);
+    
+    const data = {
+      companyName, companyAddress, companyLogo, clientName, clientAddress,
+      invoiceNo, invoiceDate, lineItems, freight, insurance,
+      paymentTerms, defaultTerms, remarks, bankDetails,
+    };
+
+    // Guest mode: save to localStorage
+    if (!isAuthenticated()) {
+      try {
+        localStorage.setItem("invoice-draft", JSON.stringify({
+          data,
+          updatedAt: new Date().toISOString(),
+        }));
+        
+        setSaved(true);
+        setSaveMsg("💡 草稿已保存到本地浏览器");
+        setTimeout(() => setSaved(false), 3000);
+        
+        alert("💡 草稿已保存到本地浏览器\n\n未登录时，草稿只会保存在当前浏览器。\n登录后即可永久保存，并跨设备同步。");
+      } catch (e) {
+        console.error("Failed to save to localStorage:", e);
+        alert("本地保存失败");
+      }
+      setSaving(false);
+      return;
+    }
+
+    // Logged in: save to workspace API
     try {
-      const data = {
-        companyName, companyAddress, companyLogo, clientName, clientAddress,
-        invoiceNo, invoiceDate, lineItems, freight, insurance,
-        paymentTerms, defaultTerms, remarks, bankDetails,
-      };
       const method = currentDocId ? "PUT" : "POST";
       const url = currentDocId ? `/api/me/tool-documents/${currentDocId}` : "/api/me/tool-documents";
       const res = await fetch(url, {

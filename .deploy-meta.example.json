@@ -1,0 +1,11 @@
+{
+  "commit": "full-git-commit-hash",
+  "branch": "main",
+  "tag": "v1.20.42.6.x-beta-ready or null",
+  "buildId": "nextjs-build-id",
+  "deployedAt": "2026-06-14T11:30:03.096Z",
+  "deployMethod": "rsync",
+  "nodeVersion": "v22.22.2",
+  "npmVersion": "10.9.7",
+  "_security": "This file must NOT contain secrets, DATABASE_URL, or tokens"
+}

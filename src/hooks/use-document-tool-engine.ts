@@ -71,6 +71,26 @@ export function useDocumentToolEngine<T extends object>({
     }
   }, [draftError]);
 
+  // Restore from localStorage for guest users (only if no draftId)
+  useEffect(() => {
+    if (draftId || perms.authenticated) return;
+    
+    try {
+      const storageKey = `${toolKey}-draft`;
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.data) {
+          const restoredData = deserialize(parsed.data);
+          setData((prev) => ({ ...prev, ...restoredData } as T));
+          console.log(`[useDocumentToolEngine] Restored from localStorage: ${storageKey}`);
+        }
+      }
+    } catch (e) {
+      console.error('[useDocumentToolEngine] Failed to restore from localStorage:', e);
+    }
+  }, [toolKey, draftId, perms.authenticated, deserialize]);
+
   // Save handler
   const handleSave = useCallback(async () => {
     if (savingRef.current) {
