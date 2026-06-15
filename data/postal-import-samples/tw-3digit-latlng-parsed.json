@@ -1,0 +1,681 @@
+[
+  {
+    "city": "臺北市",
+    "district": "中正區",
+    "postalCode": "100",
+    "latitude": 25.03240487,
+    "longitude": 121.5198839
+  },
+  {
+    "city": "臺北市",
+    "district": "大同區",
+    "postalCode": "103",
+    "latitude": 25.06342433,
+    "longitude": 121.5130417
+  },
+  {
+    "city": "臺北市",
+    "district": "中山區",
+    "postalCode": "104",
+    "latitude": 25.06969917,
+    "longitude": 121.5381597
+  },
+  {
+    "city": "臺北市",
+    "district": "松山區",
+    "postalCode": "105",
+    "latitude": 25.05999101,
+    "longitude": 121.5575876
+  },
+  {
+    "city": "臺北市",
+    "district": "大安區",
+    "postalCode": "106",
+    "latitude": 25.02677012,
+    "longitude": 121.5434446
+  },
+  {
+    "city": "臺北市",
+    "district": "萬華區",
+    "postalCode": "108",
+    "latitude": 25.0285899,
+    "longitude": 121.4979858
+  },
+  {
+    "city": "臺北市",
+    "district": "信義區",
+    "postalCode": "110",
+    "latitude": 25.03062083,
+    "longitude": 121.5716697
+  },
+  {
+    "city": "臺北市",
+    "district": "士林區",
+    "postalCode": "111",
+    "latitude": 25.12546704,
+    "longitude": 121.5508473
+  },
+  {
+    "city": "臺北市",
+    "district": "北投區",
+    "postalCode": "112",
+    "latitude": 25.1480682,
+    "longitude": 121.5177992
+  },
+  {
+    "city": "臺北市",
+    "district": "內湖區",
+    "postalCode": "114",
+    "latitude": 25.08370623,
+    "longitude": 121.5923828
+  },
+  {
+    "city": "臺北市",
+    "district": "南港區",
+    "postalCode": "115",
+    "latitude": 25.03600934,
+    "longitude": 121.6097573
+  },
+  {
+    "city": "臺北市",
+    "district": "文山區",
+    "postalCode": "116",
+    "latitude": 24.98857934,
+    "longitude": 121.5736082
+  },
+  {
+    "city": "宜蘭市",
+    "district": "釣魚臺列嶼",
+    "postalCode": "290",
+    "latitude": 25.746396,
+    "longitude": 123.475482
+  },
+  {
+    "city": "臺中市",
+    "district": "中區",
+    "postalCode": "400",
+    "latitude": 24.14168566,
+    "longitude": 120.680598
+  },
+  {
+    "city": "臺中市",
+    "district": "東區",
+    "postalCode": "401",
+    "latitude": 24.13733209,
+    "longitude": 120.6970865
+  },
+  {
+    "city": "臺中市",
+    "district": "南區",
+    "postalCode": "402",
+    "latitude": 24.12114107,
+    "longitude": 120.6646178
+  },
+  {
+    "city": "臺中市",
+    "district": "西區",
+    "postalCode": "403",
+    "latitude": 24.14391082,
+    "longitude": 120.6647579
+  },
+  {
+    "city": "臺中市",
+    "district": "北區",
+    "postalCode": "404",
+    "latitude": 24.15863985,
+    "longitude": 120.6809521
+  },
+  {
+    "city": "臺中市",
+    "district": "北屯區",
+    "postalCode": "406",
+    "latitude": 24.18400298,
+    "longitude": 120.7362319
+  },
+  {
+    "city": "臺中市",
+    "district": "西屯區",
+    "postalCode": "407",
+    "latitude": 24.18308895,
+    "longitude": 120.6270131
+  },
+  {
+    "city": "臺中市",
+    "district": "南屯區",
+    "postalCode": "408",
+    "latitude": 24.14165524,
+    "longitude": 120.6177379
+  },
+  {
+    "city": "臺中市",
+    "district": "太平區",
+    "postalCode": "411",
+    "latitude": 24.11477375,
+    "longitude": 120.7734217
+  },
+  {
+    "city": "臺中市",
+    "district": "大里區",
+    "postalCode": "412",
+    "latitude": 24.09575742,
+    "longitude": 120.6926261
+  },
+  {
+    "city": "臺中市",
+    "district": "霧峰區",
+    "postalCode": "413",
+    "latitude": 24.04332785,
+    "longitude": 120.7201989
+  },
+  {
+    "city": "臺中市",
+    "district": "烏日區",
+    "postalCode": "414",
+    "latitude": 24.0839271,
+    "longitude": 120.6293305
+  },
+  {
+    "city": "臺中市",
+    "district": "豐原區",
+    "postalCode": "420",
+    "latitude": 24.24990298,
+    "longitude": 120.7375715
+  },
+  {
+    "city": "臺中市",
+    "district": "后里區",
+    "postalCode": "421",
+    "latitude": 24.30962483,
+    "longitude": 120.7146127
+  },
+  {
+    "city": "臺中市",
+    "district": "石岡區",
+    "postalCode": "422",
+    "latitude": 24.26493299,
+    "longitude": 120.7903822
+  },
+  {
+    "city": "臺中市",
+    "district": "東勢區",
+    "postalCode": "423",
+    "latitude": 24.24952637,
+    "longitude": 120.8401401
+  },
+  {
+    "city": "臺中市",
+    "district": "和平區",
+    "postalCode": "424",
+    "latitude": 24.27620277,
+    "longitude": 121.140185
+  },
+  {
+    "city": "臺中市",
+    "district": "新社區",
+    "postalCode": "426",
+    "latitude": 24.17769289,
+    "longitude": 120.8313228
+  },
+  {
+    "city": "臺中市",
+    "district": "潭子區",
+    "postalCode": "427",
+    "latitude": 24.21171121,
+    "longitude": 120.710997
+  },
+  {
+    "city": "臺中市",
+    "district": "大雅區",
+    "postalCode": "428",
+    "latitude": 24.22704181,
+    "longitude": 120.6411818
+  },
+  {
+    "city": "臺中市",
+    "district": "神岡區",
+    "postalCode": "429",
+    "latitude": 24.26568008,
+    "longitude": 120.6733321
+  },
+  {
+    "city": "臺中市",
+    "district": "大肚區",
+    "postalCode": "432",
+    "latitude": 24.14467504,
+    "longitude": 120.5543243
+  },
+  {
+    "city": "臺中市",
+    "district": "沙鹿區",
+    "postalCode": "433",
+    "latitude": 24.23425212,
+    "longitude": 120.5838628
+  },
+  {
+    "city": "臺中市",
+    "district": "龍井區",
+    "postalCode": "434",
+    "latitude": 24.20062892,
+    "longitude": 120.5283728
+  },
+  {
+    "city": "臺中市",
+    "district": "梧棲區",
+    "postalCode": "435",
+    "latitude": 24.24552431,
+    "longitude": 120.5301259
+  },
+  {
+    "city": "臺中市",
+    "district": "清水區",
+    "postalCode": "436",
+    "latitude": 24.29205743,
+    "longitude": 120.5809094
+  },
+  {
+    "city": "臺中市",
+    "district": "大甲區",
+    "postalCode": "437",
+    "latitude": 24.37827161,
+    "longitude": 120.6357901
+  },
+  {
+    "city": "臺中市",
+    "district": "外埔區",
+    "postalCode": "438",
+    "latitude": 24.33551071,
+    "longitude": 120.6650639
+  },
+  {
+    "city": "臺中市",
+    "district": "大安區",
+    "postalCode": "439",
+    "latitude": 24.36509555,
+    "longitude": 120.5914407
+  },
+  {
+    "city": "雲林市",
+    "district": "臺西鄉",
+    "postalCode": "636",
+    "latitude": 23.71600815,
+    "longitude": 120.2054952
+  },
+  {
+    "city": "臺南市",
+    "district": "中西區",
+    "postalCode": "700",
+    "latitude": 22.99594458,
+    "longitude": 120.192874
+  },
+  {
+    "city": "臺南市",
+    "district": "東區",
+    "postalCode": "701",
+    "latitude": 22.98178202,
+    "longitude": 120.2281858
+  },
+  {
+    "city": "臺南市",
+    "district": "南區",
+    "postalCode": "702",
+    "latitude": 22.95561863,
+    "longitude": 120.1903743
+  },
+  {
+    "city": "臺南市",
+    "district": "北區",
+    "postalCode": "704",
+    "latitude": 23.01012179,
+    "longitude": 120.2068735
+  },
+  {
+    "city": "臺南市",
+    "district": "安平區",
+    "postalCode": "708",
+    "latitude": 22.99008437,
+    "longitude": 120.1649949
+  },
+  {
+    "city": "臺南市",
+    "district": "安南區",
+    "postalCode": "709",
+    "latitude": 23.04869681,
+    "longitude": 120.1526189
+  },
+  {
+    "city": "臺南市",
+    "district": "永康區",
+    "postalCode": "710",
+    "latitude": 23.02729532,
+    "longitude": 120.2542795
+  },
+  {
+    "city": "臺南市",
+    "district": "歸仁區",
+    "postalCode": "711",
+    "latitude": 22.94679469,
+    "longitude": 120.2930627
+  },
+  {
+    "city": "臺南市",
+    "district": "新化區",
+    "postalCode": "712",
+    "latitude": 23.03394545,
+    "longitude": 120.3357964
+  },
+  {
+    "city": "臺南市",
+    "district": "左鎮區",
+    "postalCode": "713",
+    "latitude": 23.02604611,
+    "longitude": 120.4123917
+  },
+  {
+    "city": "臺南市",
+    "district": "玉井區",
+    "postalCode": "714",
+    "latitude": 23.11480926,
+    "longitude": 120.4609622
+  },
+  {
+    "city": "臺南市",
+    "district": "楠西區",
+    "postalCode": "715",
+    "latitude": 23.17885854,
+    "longitude": 120.5170304
+  },
+  {
+    "city": "臺南市",
+    "district": "南化區",
+    "postalCode": "716",
+    "latitude": 23.1151111,
+    "longitude": 120.5441223
+  },
+  {
+    "city": "臺南市",
+    "district": "仁德區",
+    "postalCode": "717",
+    "latitude": 22.94130931,
+    "longitude": 120.2418788
+  },
+  {
+    "city": "臺南市",
+    "district": "關廟區",
+    "postalCode": "718",
+    "latitude": 22.95577909,
+    "longitude": 120.3342821
+  },
+  {
+    "city": "臺南市",
+    "district": "龍崎區",
+    "postalCode": "719",
+    "latitude": 22.95482276,
+    "longitude": 120.3869373
+  },
+  {
+    "city": "臺南市",
+    "district": "官田區",
+    "postalCode": "720",
+    "latitude": 23.19098548,
+    "longitude": 120.3479918
+  },
+  {
+    "city": "臺南市",
+    "district": "麻豆區",
+    "postalCode": "721",
+    "latitude": 23.18248033,
+    "longitude": 120.241308
+  },
+  {
+    "city": "臺南市",
+    "district": "佳里區",
+    "postalCode": "722",
+    "latitude": 23.1669941,
+    "longitude": 120.178593
+  },
+  {
+    "city": "臺南市",
+    "district": "西港區",
+    "postalCode": "723",
+    "latitude": 23.12491893,
+    "longitude": 120.2002309
+  },
+  {
+    "city": "臺南市",
+    "district": "七股區",
+    "postalCode": "724",
+    "latitude": 23.12326578,
+    "longitude": 120.1005854
+  },
+  {
+    "city": "臺南市",
+    "district": "將軍區",
+    "postalCode": "725",
+    "latitude": 23.20834413,
+    "longitude": 120.1276958
+  },
+  {
+    "city": "臺南市",
+    "district": "學甲區",
+    "postalCode": "726",
+    "latitude": 23.25219805,
+    "longitude": 120.1841865
+  },
+  {
+    "city": "臺南市",
+    "district": "北門區",
+    "postalCode": "727",
+    "latitude": 23.2777708,
+    "longitude": 120.1262357
+  },
+  {
+    "city": "臺南市",
+    "district": "新營區",
+    "postalCode": "730",
+    "latitude": 23.30152488,
+    "longitude": 120.2954067
+  },
+  {
+    "city": "臺南市",
+    "district": "後壁區",
+    "postalCode": "731",
+    "latitude": 23.36201478,
+    "longitude": 120.3485081
+  },
+  {
+    "city": "臺南市",
+    "district": "白河區",
+    "postalCode": "732",
+    "latitude": 23.35132068,
+    "longitude": 120.4578565
+  },
+  {
+    "city": "臺南市",
+    "district": "東山區",
+    "postalCode": "733",
+    "latitude": 23.2783187,
+    "longitude": 120.4441211
+  },
+  {
+    "city": "臺南市",
+    "district": "六甲區",
+    "postalCode": "734",
+    "latitude": 23.2272672,
+    "longitude": 120.3800259
+  },
+  {
+    "city": "臺南市",
+    "district": "下營區",
+    "postalCode": "735",
+    "latitude": 23.23103978,
+    "longitude": 120.26484
+  },
+  {
+    "city": "臺南市",
+    "district": "柳營區",
+    "postalCode": "736",
+    "latitude": 23.26887001,
+    "longitude": 120.3549205
+  },
+  {
+    "city": "臺南市",
+    "district": "鹽水區",
+    "postalCode": "737",
+    "latitude": 23.29798622,
+    "longitude": 120.2482977
+  },
+  {
+    "city": "臺南市",
+    "district": "善化區",
+    "postalCode": "741",
+    "latitude": 23.14031072,
+    "longitude": 120.2988274
+  },
+  {
+    "city": "臺南市",
+    "district": "大內區",
+    "postalCode": "742",
+    "latitude": 23.14482152,
+    "longitude": 120.3988147
+  },
+  {
+    "city": "臺南市",
+    "district": "山上區",
+    "postalCode": "743",
+    "latitude": 23.09689329,
+    "longitude": 120.370977
+  },
+  {
+    "city": "臺南市",
+    "district": "新市區",
+    "postalCode": "744",
+    "latitude": 23.08319496,
+    "longitude": 120.2923941
+  },
+  {
+    "city": "臺南市",
+    "district": "安定區",
+    "postalCode": "745",
+    "latitude": 23.09974927,
+    "longitude": 120.2296235
+  },
+  {
+    "city": "屏東市",
+    "district": "霧臺鄉",
+    "postalCode": "902",
+    "latitude": 22.75990478,
+    "longitude": 120.8008099
+  },
+  {
+    "city": "臺東市",
+    "district": "臺東市",
+    "postalCode": "950",
+    "latitude": 22.75165721,
+    "longitude": 121.1103647
+  },
+  {
+    "city": "臺東市",
+    "district": "綠島鄉",
+    "postalCode": "951",
+    "latitude": 22.66017537,
+    "longitude": 121.4901951
+  },
+  {
+    "city": "臺東市",
+    "district": "蘭嶼鄉",
+    "postalCode": "952",
+    "latitude": 22.04616835,
+    "longitude": 121.5508328
+  },
+  {
+    "city": "臺東市",
+    "district": "延平鄉",
+    "postalCode": "953",
+    "latitude": 22.90343174,
+    "longitude": 120.9831902
+  },
+  {
+    "city": "臺東市",
+    "district": "卑南鄉",
+    "postalCode": "954",
+    "latitude": 22.76494453,
+    "longitude": 121.0015521
+  },
+  {
+    "city": "臺東市",
+    "district": "鹿野鄉",
+    "postalCode": "955",
+    "latitude": 22.95125666,
+    "longitude": 121.1560376
+  },
+  {
+    "city": "臺東市",
+    "district": "關山鎮",
+    "postalCode": "956",
+    "latitude": 23.03780684,
+    "longitude": 121.1766197
+  },
+  {
+    "city": "臺東市",
+    "district": "海端鄉",
+    "postalCode": "957",
+    "latitude": 23.11478528,
+    "longitude": 121.0175672
+  },
+  {
+    "city": "臺東市",
+    "district": "池上鄉",
+    "postalCode": "958",
+    "latitude": 23.09248714,
+    "longitude": 121.2184501
+  },
+  {
+    "city": "臺東市",
+    "district": "東河鄉",
+    "postalCode": "959",
+    "latitude": 22.98006921,
+    "longitude": 121.2517917
+  },
+  {
+    "city": "臺東市",
+    "district": "成功鎮",
+    "postalCode": "961",
+    "latitude": 23.12663716,
+    "longitude": 121.3537983
+  },
+  {
+    "city": "臺東市",
+    "district": "長濱鄉",
+    "postalCode": "962",
+    "latitude": 23.33476899,
+    "longitude": 121.4261725
+  },
+  {
+    "city": "臺東市",
+    "district": "太麻里鄉",
+    "postalCode": "963",
+    "latitude": 22.59098082,
+    "longitude": 120.9797643
+  },
+  {
+    "city": "臺東市",
+    "district": "金峰鄉",
+    "postalCode": "964",
+    "latitude": 22.58161687,
+    "longitude": 120.8570384
+  },
+  {
+    "city": "臺東市",
+    "district": "大武鄉",
+    "postalCode": "965",
+    "latitude": 22.38359522,
+    "longitude": 120.8991703
+  },
+  {
+    "city": "臺東市",
+    "district": "達仁鄉",
+    "postalCode": "966",
+    "latitude": 22.38430718,
+    "longitude": 120.8355239
+  }
+]
