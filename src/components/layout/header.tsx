@@ -41,9 +41,9 @@ export default function Header() {
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [branding, setBranding] = useState({
-    logoUrl: "/brand/jueshi-logo.png",
-    logoAlt: "海外百宝箱 jueshi.net",
-    logoWidth: 88,
+    logoUrl: "/brand/jueshi-logo-header.png",
+    logoAlt: "绝世百宝箱 jueshi.net",
+    logoWidth: 105,
     logoHeight: 40,
   });
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -94,16 +94,19 @@ export default function Header() {
             <img
               src={branding.logoUrl}
               alt={branding.logoAlt}
-              className="h-10 w-auto hidden sm:block"
+              className="h-10 w-auto object-contain hidden sm:block"
               width={branding.logoWidth}
               height={branding.logoHeight}
             />
             {/* Mobile fallback: icon + short text */}
             <div className="flex items-center gap-1.5 sm:hidden">
-              <div className="w-8 h-8 bg-teal-600 rounded-[12px] flex items-center justify-center">
-                <PackageSearch className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-sm font-bold text-gray-900">绝世百宝箱</span>
+              <img
+                src={branding.logoUrl}
+                alt={branding.logoAlt}
+                className="h-8 w-auto object-contain"
+                width={84}
+                height={32}
+              />
             </div>
           </Link>
 

@@ -29,10 +29,10 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <img
-                src="/brand/jueshi-logo.png"
-                alt="海外百宝箱 jueshi.net"
-                className="h-10 w-auto"
-                width={88}
+                src="/brand/jueshi-logo-header.png"
+                alt="绝世百宝箱 jueshi.net"
+                className="h-10 w-auto object-contain"
+                width={105}
                 height={40}
               />
             </div>
