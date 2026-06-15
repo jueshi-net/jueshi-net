@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ExternalLink, Globe, Search, Sparkles, Tag } from 'lucide-react';
+import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 
 interface Resource {
@@ -34,7 +34,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
 
 const categoryLabels: Record<string, string> = {
   life: '海外生活',
-  logistics: '跨境物流',
+  logistics: '物流追踪',
   business: '出海经营',
   tools: '实用工具',
   templates: '模板资源',
@@ -116,12 +116,17 @@ function ResourceCard({ resource }: { resource: Resource }) {
         </p>
       )}
 
-      {/* 底部：分类 + 外链图标 */}
+      {/* 底部：分类 + 外部网站标识 */}
       <div className="mt-auto flex items-center justify-between">
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${categoryColors[resource.category] || 'bg-gray-50 text-gray-500 border-gray-200'}`}>
           {categoryLabels[resource.category] || resource.category}
         </span>
-        <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-purple-500 transition-colors" />
+        {resource.url.startsWith('http') && (
+          <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
+            <ExternalLink className="w-3 h-3" />
+            外部网站
+          </span>
+        )}
       </div>
     </a>
   );
@@ -183,6 +188,9 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             精选 {resources.length} 个优质海外工具、平台与服务，助您畅行全球。
+          </p>
+          <p className="text-xs text-gray-400 mt-2">
+            以下均为外部网站链接，点击后将跳转至第三方平台。本站不提供这些网站的内容或服务，实际结果请以第三方平台为准。
           </p>
         </div>
 
@@ -327,6 +335,73 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
               </div>
             )}
           </main>
+        </div>
+
+        {/* 相关工具推荐 */}
+        <div className="mt-8 bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-purple-600" />
+            相关站内工具
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            除了外部网站，本站还提供以下免费工具，助您高效完成跨境业务：
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <a href="/tracking" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                <Globe className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">物流追踪查询入口</h3>
+                <p className="text-xs text-gray-500">前往 17TRACK 查询全球包裹轨迹</p>
+              </div>
+            </a>
+            <a href="/tools/exchange-rate" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">汇率换算</h3>
+                <p className="text-xs text-gray-500">实时汇率查询与历史走势</p>
+              </div>
+            </a>
+            <a href="/tools/hs-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <Hash className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">HS Code 查询</h3>
+                <p className="text-xs text-gray-500">商品编码查询与归类辅助</p>
+              </div>
+            </a>
+            <a href="/tools/postal-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                <Hash className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">全球邮编查询</h3>
+                <p className="text-xs text-gray-500">各国邮政编码与地址解析</p>
+              </div>
+            </a>
+            <a href="/tools/documents" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-pink-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">外贸单据生成</h3>
+                <p className="text-xs text-gray-500">Commercial Invoice、Packing List 等</p>
+              </div>
+            </a>
+            <a href="/checklists" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all">
+              <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
+                <ListChecks className="w-5 h-5 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">跨境清单</h3>
+                <p className="text-xs text-gray-500">开店、发货、合规全流程清单</p>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>

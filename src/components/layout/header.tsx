@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
   PackageSearch, Menu, X, Search, LogIn, Bell,
   Home, Wrench, FileText, Users, BookOpen, Crown, User, LogOut, LayoutDashboard, ShieldCheck,
-  ListChecks, ChevronDown, Sparkles, Mail, Hash, DollarSign
+  ListChecks, ChevronDown, Sparkles, Mail, Hash, DollarSign, Truck
 } from "lucide-react";
 
 const TOOL_CATEGORIES = [
@@ -23,6 +23,8 @@ const NAV_LINKS = [
   { href: "/tools/documents", label: "单据", icon: FileText },
   { href: "/tools/hs-code", label: "HS编码", icon: FileText },
   { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
+  { href: "/tracking", label: "物流追踪", icon: Truck },
+  { href: "/resources", label: "网址导航", icon: BookOpen },
   { href: "/checklists", label: "清单", icon: ListChecks },
   { href: "/topics", label: "专题", icon: BookOpen },
   { href: "/bbs", label: "社区", icon: Users },
