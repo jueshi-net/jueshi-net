@@ -3,7 +3,7 @@
  * 基于 v1.20.42.6.84 审计结果
  */
 
-export type CoverageStatus = 'full' | 'partial' | 'minimal' | 'none';
+export type CoverageStatus = 'full' | 'partial' | 'minimal' | 'none' | 'special';
 
 export interface CountryCoverage {
   code: string;
@@ -67,7 +67,7 @@ export const COVERAGE_STATUS: Record<string, CountryCoverage> = {
   KE: { code: 'KE', status: 'partial', recordCount: 877, notes: 'Limited coverage' },
   
   // Grade D - Almost unusable
-  HK: { code: 'HK', status: 'minimal', recordCount: 1, notes: 'Only 1 record, needs fix' },
+  HK: { code: 'HK', status: 'special', recordCount: 1, notes: 'Hong Kong does not use postal codes for domestic mail. Hongkong Post advises leaving postcode field blank or using "HKG".' },
   
   // Missing - No data
   VN: { code: 'VN', status: 'none', notes: 'Data gap - user requested' },
@@ -100,6 +100,7 @@ export function getCoverageIcon(status: CoverageStatus): string {
     case 'partial': return '🟡';
     case 'minimal': return '🔴';
     case 'none': return '⚫';
+    case 'special': return 'ℹ️';
     default: return '⚪';
   }
 }
@@ -113,6 +114,7 @@ export function getCoverageLabel(status: CoverageStatus): string {
     case 'partial': return '部分覆盖';
     case 'minimal': return '极少数据';
     case 'none': return '暂未覆盖';
+    case 'special': return '特殊地区';
     default: return '未知';
   }
 }
