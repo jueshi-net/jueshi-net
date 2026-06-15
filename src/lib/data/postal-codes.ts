@@ -382,7 +382,7 @@ export const SUPPORTED_COUNTRIES = [
   { code: 'ID', name: '印度尼西亚', nameEn: 'Indonesia', flag: '🇮🇩' },
   { code: 'IN', name: '印度', nameEn: 'India', flag: '🇮🇳' },
   { code: 'HK', name: '香港', nameEn: 'Hong Kong', flag: '🇭🇰' },
-  { code: 'TW', name: '台湾', nameEn: 'Taiwan', flag: '🇹🇼' },
+  { code: 'TW', name: '中国台湾', nameEn: 'Taiwan, China', flag: '🇨🇳' },
   // Middle East
   { code: 'AE', name: '阿联酋', nameEn: 'United Arab Emirates', flag: '🇦🇪' },
   { code: 'SA', name: '沙特阿拉伯', nameEn: 'Saudi Arabia', flag: '🇸🇦' },
