@@ -737,6 +737,13 @@ export default function PostalCodePage() {
                       <button onClick={() => { setInputCode('06236'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">06236</button>
                     </>
                   )}
+                  {selectedCountryCode === 'MY' && (
+                    <>
+                      <button onClick={() => { setInputCode('50450'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">50450</button>
+                      <button onClick={() => { setInputCode('40000'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md font-mono transition-colors">40000</button>
+                      <button onClick={() => { setInputCode('Kuala Lumpur'); }} className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md transition-colors">Kuala Lumpur</button>
+                    </>
+                  )}
                   {!['CA', 'US', 'JP', 'DE', 'GB', 'FR', 'AU', 'SG', 'KR'].includes(selectedCountryCode) && (
                     <span className="text-xs text-gray-300">请在下方输入邮编进行校验</span>
                   )}
@@ -833,7 +840,7 @@ export default function PostalCodePage() {
                                   {matchLabel}
                                 </span>
                                 <button
-                                  onClick={() => copyText(`${r.postalCode}\n${r.city}${r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}\n${r.adminName1 || ''}${r.adminName2 ? ` · ${r.adminName2}` : ''}\n${r.country}${r.latitude != null && r.longitude != null ? `\n📍 ${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}` : ''}`, `all-${r.id}`)}
+                                  onClick={() => copyText(`${r.postalCode}\n${r.city}${r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}\n${r.province || r.adminName1 || ''}${r.adminCode1 ? ` (${r.adminCode1})` : ''}\n${r.country}${r.latitude != null && r.longitude != null ? `\n📍 ${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)}` : ''}`, `all-${r.id}`)}
                                   className="p-1.5 text-gray-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
                                   title="复制全部地址信息">
                                   {copiedField === `all-${r.id}` ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -842,7 +849,7 @@ export default function PostalCodePage() {
                             </div>
                             <div className="grid grid-cols-2 gap-1 text-sm">
                               <div><span className="text-gray-400 text-xs">城市</span><div className="font-semibold text-gray-900">{r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}</div></div>
-                              <div><span className="text-gray-400 text-xs">省/州</span><div className="text-gray-700">{r.adminName1 || '—'}{r.adminCode1 ? ` (${r.adminCode1})` : ''}</div></div>
+                              <div><span className="text-gray-400 text-xs">省/州</span><div className="text-gray-700">{r.province || r.adminName1 || '—'}{r.adminCode1 ? ` (${r.adminCode1})` : ''}</div></div>
                               <div><span className="text-gray-400 text-xs">国家</span><div className="text-gray-700">🌍 {r.country}</div></div>
                               {r.latitude != null && r.longitude != null && (
                                 <div><span className="text-gray-400 text-xs">经纬度</span><div className="text-gray-500 text-xs">📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}{r.accuracy != null && <span className="ml-1">{'⭐'.repeat(Math.min(r.accuracy, 5))}</span>}</div></div>
@@ -873,6 +880,11 @@ export default function PostalCodePage() {
                     <Database className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                     <p className="text-base font-medium text-gray-600 mb-1">没有找到完全匹配</p>
                     <p className="text-sm text-gray-400 mb-4">可以尝试输入邮编前缀、城市名或省州名</p>
+                    {['VN', 'PH', 'TH', 'ID', 'HK', 'TW', 'SA', 'IL', 'TR', 'AR', 'CL', 'EG', 'NG', 'KE'].includes(selectedCountryCode) && (
+                      <p className="text-sm text-amber-600 mb-4 px-4">
+                        当前数据源暂未覆盖该国家。请尝试城市名、邮编前缀或更换国家查询。
+                      </p>
+                    )}
                     {country.officialLookupUrl && (
                       <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
