@@ -29,11 +29,11 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <img
-                src="/brand/logo-horizontal.svg"
+                src="/brand/jueshi-logo.png"
                 alt="海外百宝箱 jueshi.net"
                 className="h-10 w-auto"
-                width={240}
-                height={50}
+                width={88}
+                height={40}
               />
             </div>
             <p className="text-sm text-[#666666] leading-relaxed">

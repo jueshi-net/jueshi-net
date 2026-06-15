@@ -41,10 +41,10 @@ export default function Header() {
   const [toolsMenuOpen, setToolsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [branding, setBranding] = useState({
-    logoUrl: "/brand/logo-horizontal.svg",
+    logoUrl: "/brand/jueshi-logo.png",
     logoAlt: "海外百宝箱 jueshi.net",
-    logoWidth: 240,
-    logoHeight: 50,
+    logoWidth: 88,
+    logoHeight: 40,
   });
   const userMenuRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
