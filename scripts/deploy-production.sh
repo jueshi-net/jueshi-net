@@ -81,14 +81,18 @@ echo ""
 echo -e "${BLUE}Step 4: Install dependencies and build${NC}"
 ssh $VPS_USER@$VPS_HOST << EOF
 cd $PROJECT_DIR
+echo "Setting production environment..."
+export NODE_ENV=production
+
 echo "Installing dependencies..."
-npm ci --production=false
+npm ci --omit=dev
 if [ \$? -ne 0 ]; then
     echo "npm ci failed"
     exit 1
 fi
 
 echo "Generating Prisma client..."
+source .env.production
 npx prisma generate
 if [ \$? -ne 0 ]; then
     echo "Prisma generate failed"
