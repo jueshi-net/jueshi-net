@@ -43,7 +43,7 @@ export default function Header() {
   const [branding, setBranding] = useState({
     logoUrl: "/brand/jueshi-logo-header.png",
     logoAlt: "绝世百宝箱 jueshi.net",
-    logoWidth: 105,
+    logoWidth: 97,
     logoHeight: 40,
   });
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -104,7 +104,7 @@ export default function Header() {
                 src={branding.logoUrl}
                 alt={branding.logoAlt}
                 className="h-8 w-auto object-contain"
-                width={84}
+                width={78}
                 height={32}
               />
             </div>

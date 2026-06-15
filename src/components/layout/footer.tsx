@@ -32,7 +32,7 @@ export default function Footer() {
                 src="/brand/jueshi-logo-header.png"
                 alt="绝世百宝箱 jueshi.net"
                 className="h-10 w-auto object-contain"
-                width={105}
+                width={97}
                 height={40}
               />
             </div>

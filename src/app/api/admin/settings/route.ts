@@ -21,7 +21,7 @@ async function readSettings() {
       branding: {
         logoUrl: '/brand/jueshi-logo-header.png',
         logoAlt: '绝世百宝箱 jueshi.net',
-        logoWidth: 105,
+        logoWidth: 97,
         logoHeight: 40,
       },
     };

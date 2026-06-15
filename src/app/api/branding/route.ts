@@ -7,7 +7,7 @@ const SETTINGS_FILE = path.join(process.cwd(), 'data', 'system-settings.json');
 const DEFAULT_BRANDING = {
   logoUrl: '/brand/jueshi-logo-header.png',
   logoAlt: '绝世百宝箱 jueshi.net',
-  logoWidth: 105,
+  logoWidth: 97,
   logoHeight: 40,
 };
 
