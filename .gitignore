@@ -28,6 +28,12 @@
 reports/browser-qa/
 test-results/
 screenshots/
+
+# Environment variables (secrets)
+.env
+.env.*
+!.env.example
+!.env.production.example
 playwright-report/
 
 # debug

@@ -1,0 +1,77 @@
+# Rsync exclude list for production deployment
+# This file prevents sensitive and unnecessary files from being synced to production
+
+# Environment variables (secrets) - CRITICAL
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Dependencies
+node_modules
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Build artifacts (will be rebuilt on production)
+.next
+out
+build
+
+# Git
+.git
+.gitignore
+
+# Testing
+coverage
+reports/browser-qa
+test-results
+screenshots
+playwright-report
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp
+temp
+*.tmp
+*.bak
+*.swp
+
+# Backup files (production only)
+backups
+
+# Deployment metadata (will be regenerated)
+.deploy-meta.json
+
+# Documentation (optional, can be excluded to save space)
+# *.md
+# docs/
+
+# Development files
+*.test.js
+*.test.ts
+*.test.mjs
+*.spec.js
+*.spec.ts
+*.spec.mjs

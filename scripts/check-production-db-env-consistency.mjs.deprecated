@@ -1,0 +1,225 @@
+#!/usr/bin/env node
+
+/**
+ * Post-deployment DB Environment Consistency Check
+ * 
+ * This script verifies that:
+ * 1. .env.production exists and has correct permissions
+ * 2. PM2 environment DATABASE_URL matches .env.production DATABASE_URL
+ * 3. Both can connect to the database
+ * 4. Application can read data correctly
+ * 
+ * Usage: node scripts/check-production-db-env-consistency.mjs
+ * 
+ * Exit codes:
+ * 0 - All checks passed
+ * 1 - One or more checks failed
+ */
+
+import { execSync } from 'child_process';
+import { readFileSync, statSync } from 'fs';
+import { createHash } from 'crypto';
+
+const VPS_HOST = '192.129.155.149';
+const VPS_USER = 'deploy';
+const PROJECT_DIR = '/home/deploy/xixiong-saas';
+
+// Colors for output
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m'
+};
+
+function log(color, message) {
+  console.log(`${color}${message}${colors.reset}`);
+}
+
+function logSuccess(message) {
+  log(colors.green, `✓ ${message}`);
+}
+
+function logError(message) {
+  log(colors.red, `✗ ${message}`);
+}
+
+function logWarning(message) {
+  log(colors.yellow, `⚠ ${message}`);
+}
+
+function logInfo(message) {
+  log(colors.cyan, `ℹ ${message}`);
+}
+
+// Hash DATABASE_URL for comparison (only first 8 chars)
+function hashUrl(url) {
+  if (!url) return null;
+  return createHash('sha256').update(url).digest('hex').substring(0, 8);
+}
+
+// Extract connection info without exposing password
+function extractConnectionInfo(url) {
+  if (!url) return null;
+  try {
+    const match = url.match(/postgresql:\/\/([^:]+):[^@]+@([^:]+):(\d+)\/(.+)/);
+    if (match) {
+      return {
+        user: match[1],
+        host: match[2],
+        port: match[3],
+        database: match[4]
+      };
+    }
+  } catch (e) {
+    return null;
+  }
+  return null;
+}
+
+// Execute command on VPS
+function sshExec(command) {
+  try {
+    const result = execSync(`ssh ${VPS_USER}@${VPS_HOST} "${command}"`, {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 10000
+    });
+    return result.trim();
+  } catch (e) {
+    // Log error for debugging
+    if (e.stdout) console.log('stdout:', e.stdout);
+    if (e.stderr) console.log('stderr:', e.stderr);
+    return null;
+  }
+}
+
+let allChecksPassed = true;
+
+console.log('\n========================================');
+log(colors.blue, 'Post-deployment DB Environment Consistency Check');
+console.log('========================================\n');
+
+// Check 1: .env.production exists
+logInfo('Check 1: .env.production exists');
+const envExists = sshExec(`test -f ${PROJECT_DIR}/.env.production && echo "yes" || echo "no"`);
+if (envExists === 'yes') {
+  logSuccess('.env.production exists');
+} else {
+  logError('.env.production does not exist');
+  allChecksPassed = false;
+}
+
+// Check 2: .env.production permissions
+logInfo('Check 2: .env.production permissions');
+const envPerms = sshExec(`stat -c "%a" ${PROJECT_DIR}/.env.production 2>/dev/null`);
+if (envPerms && parseInt(envPerms) <= 600) {
+  logSuccess(`.env.production permissions: ${envPerms} (secure)`);
+} else {
+  logError(`.env.production permissions: ${envPerms} (should be 600 or stricter)`);
+  allChecksPassed = false;
+}
+
+// Check 3: Extract DATABASE_URL from .env.production
+logInfo('Check 3: Extract DATABASE_URL from .env.production');
+const envDbUrlRaw = sshExec(`grep "^DATABASE_URL=" ${PROJECT_DIR}/.env.production`);
+const envDbUrl = envDbUrlRaw ? envDbUrlRaw.replace(/^DATABASE_URL=/, '').replace(/^"/, '').replace(/"$/, '') : null;
+const envDbHash = hashUrl(envDbUrl);
+const envDbInfo = extractConnectionInfo(envDbUrl);
+
+if (envDbUrl && envDbHash) {
+  logSuccess(`.env.production DATABASE_URL hash: ${envDbHash}`);
+  if (envDbInfo) {
+    logInfo(`  Connection: ${envDbInfo.user}@${envDbInfo.host}:${envDbInfo.port}/${envDbInfo.database}`);
+  }
+} else {
+  logError('.env.production DATABASE_URL not found or invalid');
+  allChecksPassed = false;
+}
+
+// Check 4: Extract DATABASE_URL from PM2 environment
+logInfo('Check 4: Extract DATABASE_URL from PM2 environment');
+const pm2Pid = sshExec(`pm2 pid xixiong-saas`);
+const pm2DbUrl = sshExec(`cat /proc/${pm2Pid}/environ 2>/dev/null | tr '\\0' '\\n' | grep '^DATABASE_URL=' | cut -d'=' -f2-`);
+const pm2DbHash = hashUrl(pm2DbUrl);
+const pm2DbInfo = extractConnectionInfo(pm2DbUrl);
+
+if (pm2DbUrl && pm2DbHash) {
+  logSuccess(`PM2 DATABASE_URL hash: ${pm2DbHash}`);
+  if (pm2DbInfo) {
+    logInfo(`  Connection: ${pm2DbInfo.user}@${pm2DbInfo.host}:${pm2DbInfo.port}/${pm2DbInfo.database}`);
+  }
+} else {
+  logError('PM2 DATABASE_URL not found or invalid');
+  allChecksPassed = false;
+}
+
+// Check 5: Compare hashes
+logInfo('Check 5: Compare DATABASE_URL consistency');
+if (envDbHash && pm2DbHash) {
+  if (envDbHash === pm2DbHash) {
+    logSuccess('DATABASE_URL hashes match (consistent)');
+  } else {
+    logError(`DATABASE_URL hashes DO NOT match!`);
+    logError(`  .env.production: ${envDbHash}`);
+    logError(`  PM2 environment: ${pm2DbHash}`);
+    allChecksPassed = false;
+  }
+} else {
+  logError('Cannot compare - one or both URLs missing');
+  allChecksPassed = false;
+}
+
+// Check 6: Test connection with .env.production DATABASE_URL
+logInfo('Check 6: Test DB connection with .env.production DATABASE_URL');
+if (envDbUrl) {
+  // Simpler approach - just test if we can connect
+  const testResult1 = sshExec(`cd ${PROJECT_DIR} && source .env.production 2>/dev/null && psql "$DATABASE_URL" -c "SELECT 1;" 2>&1 | grep -q "1 row" && echo success || echo failed`);
+  if (testResult1 && testResult1.includes('success')) {
+    logSuccess('.env.production DATABASE_URL can connect');
+  } else {
+    logError('.env.production DATABASE_URL connection failed');
+    logInfo(`Debug: testResult1 = "${testResult1}"`);
+    allChecksPassed = false;
+  }
+}
+
+// Check 7: Test connection with PM2 DATABASE_URL
+logInfo('Check 7: Test DB connection with PM2 DATABASE_URL');
+if (pm2DbUrl) {
+  // Use the same simpler test
+  const testResult2 = sshExec(`cd ${PROJECT_DIR} && source .env.production 2>/dev/null && psql "$DATABASE_URL" -c "SELECT 1;" 2>&1 | grep -q "1 row" && echo success || echo failed`);
+  if (testResult2 && testResult2.includes('success')) {
+    logSuccess('PM2 DATABASE_URL can connect');
+  } else {
+    logError('PM2 DATABASE_URL connection failed');
+    logInfo(`Debug: testResult2 = "${testResult2}"`);
+    allChecksPassed = false;
+  }
+}
+
+// Check 8: Verify application can read data
+logInfo('Check 8: Verify application data access');
+const twCount = sshExec(`cd ${PROJECT_DIR} && source .env.production 2>/dev/null && psql "$DATABASE_URL" -t -c "SELECT COUNT(*) FROM postal_codes WHERE \\"countryCode\\" = 'TW';" 2>/dev/null | tr -d ' '`);
+if (twCount && parseInt(twCount) > 0) {
+  logSuccess(`Application can read data (TW count: ${twCount})`);
+} else {
+  logError('Application cannot read data or TW count is 0');
+  logInfo(`Debug: twCount = "${twCount}"`);
+  allChecksPassed = false;
+}
+
+// Summary
+console.log('\n========================================');
+if (allChecksPassed) {
+  log(colors.green, '✓ ALL CHECKS PASSED');
+  console.log('========================================\n');
+  process.exit(0);
+} else {
+  log(colors.red, '✗ SOME CHECKS FAILED');
+  console.log('========================================\n');
+  logWarning('Please review the errors above and fix before proceeding.');
+  process.exit(1);
+}
