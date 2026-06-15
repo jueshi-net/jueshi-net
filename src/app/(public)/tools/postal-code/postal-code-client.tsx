@@ -12,6 +12,8 @@ import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-cha
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
+import { getCoverageStatus, getCoverageIcon, getCoverageLabel, type CoverageStatus } from '@/lib/postal-code-coverage-status';
+import { getOfficialLink, getPhoneCode, getTimezone, getPostalFormat, getExamplePostal } from '@/lib/postal-code-official-links';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
@@ -156,6 +158,7 @@ export default function PostalCodePage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
   const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
+  const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('postal');
 
   // Track Tool_View on mount
   useEffect(() => {
@@ -510,11 +513,24 @@ export default function PostalCodePage() {
             </div>
 
             <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              {country.flag} {country.name}邮编查询
+              {country.flag} 国际地址与邮编助手
             </h1>
             <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
-              输入邮编，快速识别城市、省份/州、国家信息。适合集运、清关、地址核对使用。
+              查询海外城市邮编、省州地区、地址格式和寄件填写参考。适用于跨境电商、国际物流、留学、海外生活等场景。
             </p>
+            {/* Coverage status badge */}
+            {(() => {
+              const coverage = getCoverageStatus(selectedCountryCode);
+              const icon = getCoverageIcon(coverage.status);
+              const label = getCoverageLabel(coverage.status);
+              return (
+                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
+                  <span>{icon}</span>
+                  <span className="text-teal-100">{country.name}：{label}</span>
+                  {coverage.recordCount && <span className="text-teal-200/70 text-xs">({coverage.recordCount.toLocaleString()} 条记录)</span>}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -524,9 +540,67 @@ export default function PostalCodePage() {
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-800">
-            <strong>免责声明：</strong>本站提供的邮编信息仅供参考，不构成完整投递地址验证。实际投递以当地邮政官方为准。
+            <strong>免责声明：</strong>数据来源于公开邮编数据源，结果仅供参考。正式发货前请以当地邮政或物流服务商信息为准。
           </div>
         </div>
+
+        {/* ===== QUERY MODE TABS ===== */}
+        <div className="flex gap-2 mb-6">
+          <button onClick={() => setQueryMode('postal')}
+            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
+              queryMode === 'postal' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
+            }`}>
+            <Search className="w-4 h-4 inline mr-1.5" />查邮编
+          </button>
+          <button onClick={() => setQueryMode('region')}
+            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
+              queryMode === 'region' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
+            }`}>
+            <MapPin className="w-4 h-4 inline mr-1.5" />查地区
+          </button>
+          <button onClick={() => setQueryMode('format')}
+            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
+              queryMode === 'format' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
+            }`}>
+            <Info className="w-4 h-4 inline mr-1.5" />查地址格式
+          </button>
+        </div>
+
+        {/* ===== FORMAT MODE PANEL ===== */}
+        {queryMode === 'format' && (
+          <div className={cardStyles.base + ' mb-6'}>
+            <div className="p-5">
+              <h2 className="text-lg font-bold text-gray-900 mb-3">{country.flag} {country.name}地址格式</h2>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div><span className="font-medium text-gray-500">邮编格式：</span>{getPostalFormat(selectedCountryCode) || country.format || '请查询官方邮政网站'}</div>
+                {getExamplePostal(selectedCountryCode) && (
+                  <div><span className="font-medium text-gray-500">示例邮编：</span><code className="px-2 py-0.5 bg-gray-100 rounded font-mono text-teal-700">{getExamplePostal(selectedCountryCode)}</code></div>
+                )}
+                {getPhoneCode(selectedCountryCode) && (
+                  <div><span className="font-medium text-gray-500">电话区号：</span>{getPhoneCode(selectedCountryCode)}</div>
+                )}
+                {getTimezone(selectedCountryCode) && (
+                  <div><span className="font-medium text-gray-500">时区：</span>{getTimezone(selectedCountryCode)}</div>
+                )}
+                {getOfficialLink(selectedCountryCode) && (
+                  <div className="pt-2 border-t border-gray-100">
+                    <a href={getOfficialLink(selectedCountryCode)!.lookupUrl || getOfficialLink(selectedCountryCode)!.officialUrl}
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                      <ExternalLink className="w-4 h-4" /> 打开 {getOfficialLink(selectedCountryCode)!.nameEn} 官方查询
+                    </a>
+                  </div>
+                )}
+                <div className="pt-2 border-t border-gray-100">
+                  <Link href="/tools/address-formatter"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <ExternalLink className="w-4 h-4" /> 使用地址格式化工具
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ===== COUNTRY SELECTOR ===== */}
         <div className={cardStyles.base}>
@@ -850,13 +924,35 @@ export default function PostalCodePage() {
                             <div className="grid grid-cols-2 gap-1 text-sm">
                               <div><span className="text-gray-400 text-xs">城市</span><div className="font-semibold text-gray-900">{r.city}{r.areaName && r.areaName !== r.city ? ` (${r.areaName})` : ''}</div></div>
                               <div><span className="text-gray-400 text-xs">省/州</span><div className="text-gray-700">{r.province || r.adminName1 || '—'}{r.adminCode1 ? ` (${r.adminCode1})` : ''}</div></div>
+                              {r.district && <div><span className="text-gray-400 text-xs">区域</span><div className="text-gray-700">{r.district}</div></div>}
                               <div><span className="text-gray-400 text-xs">国家</span><div className="text-gray-700">🌍 {r.country}</div></div>
+                              {getPhoneCode(r.countryCode) && <div><span className="text-gray-400 text-xs">电话区号</span><div className="text-gray-700">{getPhoneCode(r.countryCode)}</div></div>}
+                              {r.source && <div><span className="text-gray-400 text-xs">数据源</span><div className="text-gray-500 text-xs">{r.source}</div></div>}
                               {r.latitude != null && r.longitude != null && (
-                                <div><span className="text-gray-400 text-xs">经纬度</span><div className="text-gray-500 text-xs">📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}{r.accuracy != null && <span className="ml-1">{'⭐'.repeat(Math.min(r.accuracy, 5))}</span>}</div></div>
+                                <div><span className="text-gray-400 text-xs">经纬度</span><div className="text-gray-500 text-xs">📍 {r.latitude.toFixed(4)}, {r.longitude.toFixed(4)}</div></div>
                               )}
                             </div>
-                            <div className="text-xs text-gray-400 border-t border-gray-200 pt-2 mt-1">
-                              {formatOk ? '✅ 格式有效' : '📋 数据库存在'} · 以当地邮政官方为准
+                            {/* Action buttons */}
+                            <div className="flex flex-wrap gap-1.5 border-t border-gray-200 pt-2 mt-1">
+                              <button onClick={() => copyText(r.postalCode, `postal-${r.id}`)}
+                                className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
+                                {copiedField === `postal-${r.id}` ? '✅ 已复制' : '复制邮编'}
+                              </button>
+                              <button onClick={() => copyText(`${r.city}, ${r.province || r.adminName1 || ''} ${r.postalCode}`.trim(), `city-${r.id}`)}
+                                className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
+                                {copiedField === `city-${r.id}` ? '✅ 已复制' : '复制城市+省+邮编'}
+                              </button>
+                              {getOfficialLink(r.countryCode) && (
+                                <a href={getOfficialLink(r.countryCode)!.lookupUrl || getOfficialLink(r.countryCode)!.officialUrl}
+                                  target="_blank" rel="noopener noreferrer"
+                                  className="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors inline-flex items-center gap-1">
+                                  <ExternalLink className="w-3 h-3" /> 官方查询
+                                </a>
+                              )}
+                              <a href={`mailto:support@jueshi.net?subject=邮编数据报告&body=国家: ${r.country}%0A邮编: ${r.postalCode}%0A城市: ${r.city}%0A问题描述: `}
+                                className="px-2 py-1 text-xs bg-gray-100 hover:bg-orange-50 hover:text-orange-700 rounded transition-colors">
+                                报告错误
+                              </a>
                             </div>
                           </div>
                         );
@@ -879,18 +975,39 @@ export default function PostalCodePage() {
                   <div className="text-center py-10 bg-gray-50 rounded-lg">
                     <Database className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                     <p className="text-base font-medium text-gray-600 mb-1">没有找到完全匹配</p>
-                    <p className="text-sm text-gray-400 mb-4">可以尝试输入邮编前缀、城市名或省州名</p>
-                    {['VN', 'PH', 'TH', 'ID', 'HK', 'TW', 'SA', 'IL', 'TR', 'AR', 'CL', 'EG', 'NG', 'KE'].includes(selectedCountryCode) && (
-                      <p className="text-sm text-amber-600 mb-4 px-4">
-                        当前数据源暂未覆盖该国家。请尝试城市名、邮编前缀或更换国家查询。
-                      </p>
+                    <div className="text-sm text-gray-400 mb-4 space-y-1">
+                      <p>可以尝试：</p>
+                      <ul className="text-left inline-block">
+                        <li>• 输入城市英文名（如 Tokyo、Seoul）</li>
+                        <li>• 输入邮编前缀</li>
+                        <li>• 切换其他国家</li>
+                      </ul>
+                    </div>
+                    {getCoverageStatus(selectedCountryCode).status === 'none' && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 mx-4">
+                        <p className="text-sm text-amber-700 font-medium">⚫ 当前数据源暂未覆盖 {country.name}</p>
+                        <p className="text-xs text-amber-600 mt-1">后续将根据优先级补充数据。请先使用官方邮政网站查询。</p>
+                      </div>
                     )}
-                    {country.officialLookupUrl && (
-                      <a href={country.officialLookupUrl} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
-                        <ExternalLink className="w-4 h-4" /> 前往 {country.officialName} 官方查询
+                    {getCoverageStatus(selectedCountryCode).status === 'minimal' && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 mx-4">
+                        <p className="text-sm text-red-700 font-medium">🔴 {country.name} 数据极少，可能无法查到结果</p>
+                        <p className="text-xs text-red-600 mt-1">建议使用官方邮政网站获取更完整的信息。</p>
+                      </div>
+                    )}
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {getOfficialLink(selectedCountryCode) && (
+                        <a href={getOfficialLink(selectedCountryCode)!.lookupUrl || getOfficialLink(selectedCountryCode)!.officialUrl}
+                          target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                          <ExternalLink className="w-4 h-4" /> 打开 {getOfficialLink(selectedCountryCode)!.nameEn} 官方查询
+                        </a>
+                      )}
+                      <a href={`mailto:support@jueshi.net?subject=邮编数据缺失报告&body=国家: ${country.name} (${selectedCountryCode})%0A查询: ${dbQuery}%0A问题: 查不到结果`}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors">
+                        报告缺失数据
                       </a>
-                    )}
+                    </div>
                   </div>
                 )}
 
@@ -963,32 +1080,41 @@ export default function PostalCodePage() {
             {/* Usage scenarios */}
             <div>
               <h2 className="text-base font-bold text-gray-900 mb-4">使用场景</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center flex-shrink-0">
                     <Truck className="w-5 h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm text-gray-900">集运收货地址核对</h3>
-                    <p className="text-xs text-gray-500 mt-1">确认收货地址邮编格式是否正确，避免包裹投递失败</p>
+                    <h3 className="font-semibold text-sm text-gray-900">跨境电商</h3>
+                    <p className="text-xs text-gray-500 mt-1">买家地址完整性检查、地址格式参考。适用于 Amazon / Shopify / eBay 等平台卖家。</p>
                   </div>
                 </div>
                 <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Calculator className="w-5 h-5 text-blue-600" />
+                    <Shield className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm text-gray-900">运费估算前置检查</h3>
-                    <p className="text-xs text-gray-500 mt-1">邮编决定配送区域和运费，先核实再估算更准确</p>
+                    <h3 className="font-semibold text-sm text-gray-900">国际物流</h3>
+                    <p className="text-xs text-gray-500 mt-1">邮编有效性验证、地址格式确认。DHL / FedEx / USPS 等物流商均依赖准确邮编。</p>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+                    <Calculator className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm text-gray-900">留学 / 海外生活</h3>
+                    <p className="text-xs text-gray-500 mt-1">学校、租房、银行地址填写参考。确保地址格式符合当地标准。</p>
                   </div>
                 </div>
                 <div className="bg-white rounded-xl border p-4 flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-amber-600" />
+                    <Home className="w-5 h-5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm text-gray-900">清关/派送区域确认</h3>
-                    <p className="text-xs text-gray-500 mt-1">确认邮编对应的省份/州，了解是否属于偏远地区</p>
+                    <h3 className="font-semibold text-sm text-gray-900">海外华人生活</h3>
+                    <p className="text-xs text-gray-500 mt-1">网购、寄件、回国寄件地址格式参考。集运收货地址核对。</p>
                   </div>
                 </div>
               </div>
