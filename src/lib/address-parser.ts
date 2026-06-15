@@ -262,26 +262,26 @@ export function parseAddress(input: string): ParsedAddress {
   const addressText = addressLines.join(' ');
   
   // US/Canada pattern: "City, ST 12345" - look for city before state code
-  // Match pattern like "Mountain View, CA 94043" - city is before comma and state
-  // Use non-greedy match and ensure city doesn't contain numbers (to avoid matching street)
-  const usCaCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]\s*([A-Z]{2})\s+\d/);
+  // After state extraction, address might be like "Mountain View, ," or "Mountain View, 94043"
+  // Match pattern like "Mountain View," - city is before comma
+  const usCaCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
   if (usCaCityMatch && usCaCityMatch[1]) {
     city = usCaCityMatch[1].trim();
   }
   
   // Australia/NZ pattern: "City ST 1234" - look for city before state code
-  // Match pattern like "Sydney NSW 2000" - city is before state and postal
+  // After state extraction, address might be like "Sydney, 2000" or "Sydney,"
   if (!city) {
-    const auNzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s+([A-Z]{2,3})\s+\d{4}/);
+    const auNzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
     if (auNzCityMatch && auNzCityMatch[1]) {
       city = auNzCityMatch[1].trim();
     }
   }
   
   // UK pattern: "City PostalCode" (e.g., "London SW1A 1AA") - look for city before postal
-  // Match pattern like "London SW1A 1AA" - city is before postal code
+  // After postal extraction, address might be like "London,"
   if (!city) {
-    const ukCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s+[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}/);
+    const ukCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
     if (ukCityMatch && ukCityMatch[1]) {
       city = ukCityMatch[1].trim();
     }
@@ -289,7 +289,7 @@ export function parseAddress(input: string): ParsedAddress {
   
   // NZ pattern without state: "City 1234" (e.g., "Auckland 1010")
   if (!city && country === 'New Zealand') {
-    const nzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s+\d{4}/);
+    const nzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
     if (nzCityMatch && nzCityMatch[1]) {
       city = nzCityMatch[1].trim();
     }
