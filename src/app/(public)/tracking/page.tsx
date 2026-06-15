@@ -316,9 +316,12 @@ export default function TrackingPage() {
           <div className="flex items-center gap-3 mb-4">
             <TruckIcon className="w-7 h-7 text-emerald-600" />
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">快递物流一键查询</h1>
-              <p className="text-sm text-gray-500 mt-0.5">输入单号，立即跳转查询结果页</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">物流追踪查询入口</h1>
+              <p className="text-sm text-gray-500 mt-0.5">前往 17TRACK 查询全球包裹物流轨迹</p>
             </div>
+            <span className="ml-auto px-3 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full border border-orange-200">
+              外部网站
+            </span>
           </div>
 
           {/* Hero input + button */}
@@ -334,7 +337,7 @@ export default function TrackingPage() {
                     handleHeroQuery();
                   }
                 }}
-                placeholder="输入快递单号，一键查询物流轨迹&#10;支持多个单号，用换行、逗号或空格分隔"
+                placeholder="输入快递单号，前往 17TRACK 查询&#10;支持多个单号，用换行、逗号或空格分隔"
                 rows={2}
                 className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none bg-white"
               />
@@ -343,13 +346,13 @@ export default function TrackingPage() {
               onClick={handleHeroQuery}
               className="sm:self-stretch px-8 py-4 bg-emerald-600 text-white rounded-xl font-semibold text-lg hover:bg-emerald-700 active:bg-emerald-800 flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all whitespace-nowrap"
             >
-              <ArrowRight className="w-5 h-5" />
-              立即查询物流
+              <ExternalLink className="w-5 h-5" />
+              前往 17TRACK 查询
             </button>
           </div>
 
           <p className="text-xs text-gray-400 mt-3">
-            输入单号，一键跳转 17TRACK 查询结果页。本站不提供物流轨迹查询，实际物流信息请以承运商官网或 17TRACK 等第三方平台为准。
+            本站暂不提供实时物流轨迹数据，点击上方按钮将前往 17TRACK 查询页面。实际物流信息请以承运商官网或 17TRACK 等第三方平台为准。
           </p>
         </div>
       </section>
@@ -449,12 +452,12 @@ export default function TrackingPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h3 className="font-medium text-blue-900">输入你的单号，直接跳转到 17TRACK 查询结果页</h3>
-            <p className="text-sm text-blue-700 mt-0.5">使用上方查询框输入单号后点击「立即查询物流」即可</p>
+            <p className="text-sm text-blue-700 mt-0.5">使用上方查询框输入单号后点击「前往 17TRACK 查询」即可</p>
           </div>
           <a
             href="https://www.17track.net/zh-cn"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             onClick={() => trackEvent.trackingClick17track()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 text-sm shrink-0"
           >
