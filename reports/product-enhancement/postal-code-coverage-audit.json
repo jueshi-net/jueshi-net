@@ -1,0 +1,2637 @@
+{
+  "totalRecords": 3794541,
+  "dbCountries": 116,
+  "byCountry": [
+    {
+      "countryCode": "GB",
+      "country": "United Kingdom",
+      "cnt": 1817768
+    },
+    {
+      "countryCode": "CA",
+      "country": "Canada",
+      "cnt": 899779
+    },
+    {
+      "countryCode": "PT",
+      "country": "PT",
+      "cnt": 197772
+    },
+    {
+      "countryCode": "AE",
+      "country": "AE",
+      "cnt": 178171
+    },
+    {
+      "countryCode": "JP",
+      "country": "JP",
+      "cnt": 142577
+    },
+    {
+      "countryCode": "SG",
+      "country": "SG",
+      "cnt": 121135
+    },
+    {
+      "countryCode": "RU",
+      "country": "RU",
+      "cnt": 43538
+    },
+    {
+      "countryCode": "US",
+      "country": "United States",
+      "cnt": 41488
+    },
+    {
+      "countryCode": "RO",
+      "country": "RO",
+      "cnt": 37914
+    },
+    {
+      "countryCode": "KR",
+      "country": "KR",
+      "cnt": 34249
+    },
+    {
+      "countryCode": "MX",
+      "country": "MX",
+      "cnt": 32448
+    },
+    {
+      "countryCode": "UA",
+      "country": "UA",
+      "cnt": 26579
+    },
+    {
+      "countryCode": "FR",
+      "country": "FR",
+      "cnt": 20418
+    },
+    {
+      "countryCode": "PL",
+      "country": "PL",
+      "cnt": 20299
+    },
+    {
+      "countryCode": "IN",
+      "country": "IN",
+      "cnt": 19238
+    },
+    {
+      "countryCode": "SE",
+      "country": "SE",
+      "cnt": 18870
+    },
+    {
+      "countryCode": "ES",
+      "country": "ES",
+      "cnt": 11150
+    },
+    {
+      "countryCode": "DE",
+      "country": "DE",
+      "cnt": 10813
+    },
+    {
+      "countryCode": "ID",
+      "country": "ID",
+      "cnt": 8266
+    },
+    {
+      "countryCode": "BR",
+      "country": "BR",
+      "cnt": 5525
+    },
+    {
+      "countryCode": "EE",
+      "country": "EE",
+      "cnt": 5293
+    },
+    {
+      "countryCode": "NO",
+      "country": "NO",
+      "cnt": 5132
+    },
+    {
+      "countryCode": "IT",
+      "country": "IT",
+      "cnt": 4735
+    },
+    {
+      "countryCode": "BG",
+      "country": "BG",
+      "cnt": 4359
+    },
+    {
+      "countryCode": "LU",
+      "country": "LU",
+      "cnt": 4330
+    },
+    {
+      "countryCode": "NL",
+      "country": "NL",
+      "cnt": 4086
+    },
+    {
+      "countryCode": "CO",
+      "country": "CO",
+      "cnt": 3681
+    },
+    {
+      "countryCode": "FI",
+      "country": "FI",
+      "cnt": 3576
+    },
+    {
+      "countryCode": "SK",
+      "country": "SK",
+      "cnt": 3480
+    },
+    {
+      "countryCode": "CH",
+      "country": "CH",
+      "cnt": 3362
+    },
+    {
+      "countryCode": "AU",
+      "country": "Australia",
+      "cnt": 3171
+    },
+    {
+      "countryCode": "DZ",
+      "country": "DZ",
+      "cnt": 3162
+    },
+    {
+      "countryCode": "BY",
+      "country": "BY",
+      "cnt": 3123
+    },
+    {
+      "countryCode": "HU",
+      "country": "HU",
+      "cnt": 3046
+    },
+    {
+      "countryCode": "GB",
+      "country": "GB",
+      "cnt": 3002
+    },
+    {
+      "countryCode": "TR",
+      "country": "TR",
+      "cnt": 2953
+    },
+    {
+      "countryCode": "MY",
+      "country": "MY",
+      "cnt": 2757
+    },
+    {
+      "countryCode": "CZ",
+      "country": "CZ",
+      "cnt": 2694
+    },
+    {
+      "countryCode": "PE",
+      "country": "PE",
+      "cnt": 2669
+    },
+    {
+      "countryCode": "PK",
+      "country": "PK",
+      "cnt": 2560
+    },
+    {
+      "countryCode": "CN",
+      "country": "CN",
+      "cnt": 2349
+    },
+    {
+      "countryCode": "AT",
+      "country": "AT",
+      "cnt": 2217
+    },
+    {
+      "countryCode": "PH",
+      "country": "PH",
+      "cnt": 2190
+    },
+    {
+      "countryCode": "LT",
+      "country": "LT",
+      "cnt": 2023
+    },
+    {
+      "countryCode": "AR",
+      "country": "AR",
+      "cnt": 1976
+    },
+    {
+      "countryCode": "LK",
+      "country": "LK",
+      "cnt": 1833
+    },
+    {
+      "countryCode": "NZ",
+      "country": "New Zealand",
+      "cnt": 1737
+    },
+    {
+      "countryCode": "CA",
+      "country": "CA",
+      "cnt": 1653
+    },
+    {
+      "countryCode": "BD",
+      "country": "BD",
+      "cnt": 1349
+    },
+    {
+      "countryCode": "MA",
+      "country": "MA",
+      "cnt": 1325
+    },
+    {
+      "countryCode": "EC",
+      "country": "EC",
+      "cnt": 1225
+    },
+    {
+      "countryCode": "MD",
+      "country": "MD",
+      "cnt": 1215
+    },
+    {
+      "countryCode": "AZ",
+      "country": "AZ",
+      "cnt": 1186
+    },
+    {
+      "countryCode": "DK",
+      "country": "DK",
+      "cnt": 1159
+    },
+    {
+      "countryCode": "RS",
+      "country": "RS",
+      "cnt": 1149
+    },
+    {
+      "countryCode": "BE",
+      "country": "BE",
+      "cnt": 1146
+    },
+    {
+      "countryCode": "CY",
+      "country": "CY",
+      "cnt": 1125
+    },
+    {
+      "countryCode": "KE",
+      "country": "KE",
+      "cnt": 877
+    },
+    {
+      "countryCode": "TH",
+      "country": "TH",
+      "cnt": 771
+    },
+    {
+      "countryCode": "PA",
+      "country": "PA",
+      "cnt": 729
+    },
+    {
+      "countryCode": "LV",
+      "country": "LV",
+      "cnt": 697
+    },
+    {
+      "countryCode": "SI",
+      "country": "SI",
+      "cnt": 556
+    },
+    {
+      "countryCode": "GT",
+      "country": "GT",
+      "cnt": 548
+    },
+    {
+      "countryCode": "MW",
+      "country": "MW",
+      "cnt": 491
+    },
+    {
+      "countryCode": "AL",
+      "country": "AL",
+      "cnt": 489
+    },
+    {
+      "countryCode": "CR",
+      "country": "CR",
+      "cnt": 473
+    },
+    {
+      "countryCode": "CL",
+      "country": "CL",
+      "cnt": 346
+    },
+    {
+      "countryCode": "HR",
+      "country": "HR",
+      "cnt": 309
+    },
+    {
+      "countryCode": "HT",
+      "country": "HT",
+      "cnt": 230
+    },
+    {
+      "countryCode": "MK",
+      "country": "MK",
+      "cnt": 220
+    },
+    {
+      "countryCode": "DO",
+      "country": "DO",
+      "cnt": 207
+    },
+    {
+      "countryCode": "IS",
+      "country": "IS",
+      "cnt": 195
+    },
+    {
+      "countryCode": "PR",
+      "country": "PR",
+      "cnt": 177
+    },
+    {
+      "countryCode": "RE",
+      "country": "RE",
+      "cnt": 151
+    },
+    {
+      "countryCode": "IE",
+      "country": "IE",
+      "cnt": 139
+    },
+    {
+      "countryCode": "FO",
+      "country": "FO",
+      "cnt": 130
+    },
+    {
+      "countryCode": "GP",
+      "country": "GP",
+      "cnt": 105
+    },
+    {
+      "countryCode": "MQ",
+      "country": "MQ",
+      "cnt": 95
+    },
+    {
+      "countryCode": "PF",
+      "country": "PF",
+      "cnt": 83
+    },
+    {
+      "countryCode": "BM",
+      "country": "BM",
+      "cnt": 81
+    },
+    {
+      "countryCode": "GF",
+      "country": "GF",
+      "cnt": 77
+    },
+    {
+      "countryCode": "MT",
+      "country": "MT",
+      "cnt": 73
+    },
+    {
+      "countryCode": "NC",
+      "country": "NC",
+      "cnt": 50
+    },
+    {
+      "countryCode": "HN",
+      "country": "HN",
+      "cnt": 37
+    },
+    {
+      "countryCode": "AX",
+      "country": "AX",
+      "cnt": 37
+    },
+    {
+      "countryCode": "GL",
+      "country": "GL",
+      "cnt": 33
+    },
+    {
+      "countryCode": "GU",
+      "country": "GU",
+      "cnt": 21
+    },
+    {
+      "countryCode": "LI",
+      "country": "LI",
+      "cnt": 13
+    },
+    {
+      "countryCode": "GG",
+      "country": "GG",
+      "cnt": 10
+    },
+    {
+      "countryCode": "SM",
+      "country": "SM",
+      "cnt": 10
+    },
+    {
+      "countryCode": "IM",
+      "country": "IM",
+      "cnt": 9
+    },
+    {
+      "countryCode": "SJ",
+      "country": "SJ",
+      "cnt": 8
+    },
+    {
+      "countryCode": "AD",
+      "country": "AD",
+      "cnt": 7
+    },
+    {
+      "countryCode": "JE",
+      "country": "JE",
+      "cnt": 4
+    },
+    {
+      "countryCode": "FM",
+      "country": "FM",
+      "cnt": 4
+    },
+    {
+      "countryCode": "MP",
+      "country": "MP",
+      "cnt": 3
+    },
+    {
+      "countryCode": "MH",
+      "country": "MH",
+      "cnt": 2
+    },
+    {
+      "countryCode": "PN",
+      "country": "PN",
+      "cnt": 1
+    },
+    {
+      "countryCode": "PM",
+      "country": "PM",
+      "cnt": 1
+    },
+    {
+      "countryCode": "GI",
+      "country": "GI",
+      "cnt": 1
+    },
+    {
+      "countryCode": "PW",
+      "country": "PW",
+      "cnt": 1
+    },
+    {
+      "countryCode": "GS",
+      "country": "GS",
+      "cnt": 1
+    },
+    {
+      "countryCode": "HK",
+      "country": "HK",
+      "cnt": 1
+    },
+    {
+      "countryCode": "HM",
+      "country": "HM",
+      "cnt": 1
+    },
+    {
+      "countryCode": "NU",
+      "country": "NU",
+      "cnt": 1
+    },
+    {
+      "countryCode": "NR",
+      "country": "NR",
+      "cnt": 1
+    },
+    {
+      "countryCode": "FK",
+      "country": "FK",
+      "cnt": 1
+    },
+    {
+      "countryCode": "CX",
+      "country": "CX",
+      "cnt": 1
+    },
+    {
+      "countryCode": "NF",
+      "country": "NF",
+      "cnt": 1
+    },
+    {
+      "countryCode": "CC",
+      "country": "CC",
+      "cnt": 1
+    },
+    {
+      "countryCode": "IO",
+      "country": "IO",
+      "cnt": 1
+    },
+    {
+      "countryCode": "TC",
+      "country": "TC",
+      "cnt": 1
+    },
+    {
+      "countryCode": "MO",
+      "country": "MO",
+      "cnt": 1
+    },
+    {
+      "countryCode": "MC",
+      "country": "MC",
+      "cnt": 1
+    },
+    {
+      "countryCode": "AS",
+      "country": "AS",
+      "cnt": 1
+    },
+    {
+      "countryCode": "AI",
+      "country": "AI",
+      "cnt": 1
+    }
+  ],
+  "completeness": [
+    {
+      "countryCode": "GB",
+      "total": 1820770,
+      "has_postal": 1820770,
+      "has_city": 1820770,
+      "has_province": 1810795,
+      "has_admin1": 1807815,
+      "has_district": 1761805,
+      "has_area": 1817768,
+      "has_lat": 1820770,
+      "has_lon": 1820769,
+      "has_source": 1820770,
+      "earliest": "2026-05-14 15:44:42.399",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "CA",
+      "total": 901432,
+      "has_postal": 901432,
+      "has_city": 901432,
+      "has_province": 901432,
+      "has_admin1": 899779,
+      "has_district": 1653,
+      "has_area": 899779,
+      "has_lat": 901432,
+      "has_lon": 901431,
+      "has_source": 901432,
+      "earliest": "2026-05-14 15:47:27.955",
+      "latest": "2026-05-20 06:39:01.024"
+    },
+    {
+      "countryCode": "PT",
+      "total": 197772,
+      "has_postal": 197772,
+      "has_city": 197772,
+      "has_province": 197772,
+      "has_admin1": 0,
+      "has_district": 197772,
+      "has_area": 0,
+      "has_lat": 197772,
+      "has_lon": 197772,
+      "has_source": 197772,
+      "earliest": "2026-05-20 06:41:25.385",
+      "latest": "2026-05-20 06:42:11.425"
+    },
+    {
+      "countryCode": "AE",
+      "total": 178171,
+      "has_postal": 178171,
+      "has_city": 178171,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 178171,
+      "has_area": 0,
+      "has_lat": 178171,
+      "has_lon": 178171,
+      "has_source": 178171,
+      "earliest": "2026-05-20 06:38:04.012",
+      "latest": "2026-05-20 06:38:50.157"
+    },
+    {
+      "countryCode": "JP",
+      "total": 142577,
+      "has_postal": 142577,
+      "has_city": 142577,
+      "has_province": 142577,
+      "has_admin1": 0,
+      "has_district": 142577,
+      "has_area": 0,
+      "has_lat": 142577,
+      "has_lon": 142577,
+      "has_source": 142577,
+      "earliest": "2026-05-20 06:40:01.068",
+      "latest": "2026-05-20 06:40:31.669"
+    },
+    {
+      "countryCode": "SG",
+      "total": 121135,
+      "has_postal": 121135,
+      "has_city": 121135,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 121135,
+      "has_lon": 121135,
+      "has_source": 121135,
+      "earliest": "2026-05-20 06:42:34.059",
+      "latest": "2026-05-20 06:43:00.036"
+    },
+    {
+      "countryCode": "RU",
+      "total": 43538,
+      "has_postal": 43538,
+      "has_city": 43538,
+      "has_province": 43397,
+      "has_admin1": 0,
+      "has_district": 42961,
+      "has_area": 0,
+      "has_lat": 43538,
+      "has_lon": 43538,
+      "has_source": 43538,
+      "earliest": "2026-05-20 06:42:19.587",
+      "latest": "2026-05-20 06:42:29.659"
+    },
+    {
+      "countryCode": "US",
+      "total": 41488,
+      "has_postal": 41488,
+      "has_city": 41488,
+      "has_province": 40977,
+      "has_admin1": 40977,
+      "has_district": 40977,
+      "has_area": 41488,
+      "has_lat": 41488,
+      "has_lon": 41488,
+      "has_source": 41488,
+      "earliest": "2026-05-14 15:51:47.479",
+      "latest": "2026-05-14 15:51:47.479"
+    },
+    {
+      "countryCode": "RO",
+      "total": 37914,
+      "has_postal": 37914,
+      "has_city": 37914,
+      "has_province": 37914,
+      "has_admin1": 0,
+      "has_district": 37914,
+      "has_area": 0,
+      "has_lat": 37914,
+      "has_lon": 37914,
+      "has_source": 37914,
+      "earliest": "2026-05-20 06:42:11.425",
+      "latest": "2026-05-20 06:42:19.12"
+    },
+    {
+      "countryCode": "KR",
+      "total": 34249,
+      "has_postal": 34249,
+      "has_city": 34249,
+      "has_province": 34249,
+      "has_admin1": 0,
+      "has_district": 34249,
+      "has_area": 0,
+      "has_lat": 34249,
+      "has_lon": 34249,
+      "has_source": 34249,
+      "earliest": "2026-05-20 06:40:31.867",
+      "latest": "2026-05-20 06:40:42.209"
+    },
+    {
+      "countryCode": "MX",
+      "total": 32448,
+      "has_postal": 32448,
+      "has_city": 32448,
+      "has_province": 32448,
+      "has_admin1": 0,
+      "has_district": 32448,
+      "has_area": 0,
+      "has_lat": 32448,
+      "has_lon": 32448,
+      "has_source": 32448,
+      "earliest": "2026-05-20 06:40:47.404",
+      "latest": "2026-05-20 06:41:04.234"
+    },
+    {
+      "countryCode": "UA",
+      "total": 26579,
+      "has_postal": 26579,
+      "has_city": 26579,
+      "has_province": 26579,
+      "has_admin1": 0,
+      "has_district": 26579,
+      "has_area": 0,
+      "has_lat": 26579,
+      "has_lon": 26579,
+      "has_source": 26579,
+      "earliest": "2026-05-20 06:43:05.856",
+      "latest": "2026-05-20 06:43:12.347"
+    },
+    {
+      "countryCode": "FR",
+      "total": 20418,
+      "has_postal": 20418,
+      "has_city": 20418,
+      "has_province": 20417,
+      "has_admin1": 0,
+      "has_district": 20417,
+      "has_area": 0,
+      "has_lat": 20418,
+      "has_lon": 20417,
+      "has_source": 20418,
+      "earliest": "2026-05-20 06:39:18.569",
+      "latest": "2026-05-20 06:39:26.202"
+    },
+    {
+      "countryCode": "PL",
+      "total": 20299,
+      "has_postal": 20299,
+      "has_city": 20299,
+      "has_province": 20299,
+      "has_admin1": 0,
+      "has_district": 20299,
+      "has_area": 0,
+      "has_lat": 20299,
+      "has_lon": 20299,
+      "has_source": 20299,
+      "earliest": "2026-05-20 06:41:16.081",
+      "latest": "2026-05-20 06:41:25.385"
+    },
+    {
+      "countryCode": "IN",
+      "total": 19238,
+      "has_postal": 19238,
+      "has_city": 19238,
+      "has_province": 19238,
+      "has_admin1": 0,
+      "has_district": 19238,
+      "has_area": 0,
+      "has_lat": 19238,
+      "has_lon": 19238,
+      "has_source": 19238,
+      "earliest": "2026-05-20 06:39:42.602",
+      "latest": "2026-05-20 06:39:58.652"
+    },
+    {
+      "countryCode": "SE",
+      "total": 18870,
+      "has_postal": 18870,
+      "has_city": 18870,
+      "has_province": 18853,
+      "has_admin1": 0,
+      "has_district": 18853,
+      "has_area": 0,
+      "has_lat": 18870,
+      "has_lon": 18870,
+      "has_source": 18870,
+      "earliest": "2026-05-20 06:42:29.659",
+      "latest": "2026-05-20 06:42:34.059"
+    },
+    {
+      "countryCode": "ES",
+      "total": 11150,
+      "has_postal": 11150,
+      "has_city": 11150,
+      "has_province": 11150,
+      "has_admin1": 0,
+      "has_district": 11150,
+      "has_area": 0,
+      "has_lat": 11150,
+      "has_lon": 11150,
+      "has_source": 11150,
+      "earliest": "2026-05-20 06:39:12.938",
+      "latest": "2026-05-20 06:39:17.697"
+    },
+    {
+      "countryCode": "DE",
+      "total": 10813,
+      "has_postal": 10813,
+      "has_city": 10813,
+      "has_province": 10812,
+      "has_admin1": 0,
+      "has_district": 10812,
+      "has_area": 0,
+      "has_lat": 10813,
+      "has_lon": 10813,
+      "has_source": 10813,
+      "earliest": "2026-05-20 06:39:05.884",
+      "latest": "2026-05-20 06:39:09.51"
+    },
+    {
+      "countryCode": "ID",
+      "total": 8266,
+      "has_postal": 8266,
+      "has_city": 8266,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 8266,
+      "has_area": 0,
+      "has_lat": 8265,
+      "has_lon": 8266,
+      "has_source": 8266,
+      "earliest": "2026-05-20 06:39:34.539",
+      "latest": "2026-05-20 06:39:42.602"
+    },
+    {
+      "countryCode": "BR",
+      "total": 5525,
+      "has_postal": 5525,
+      "has_city": 5525,
+      "has_province": 5525,
+      "has_admin1": 0,
+      "has_district": 5525,
+      "has_area": 0,
+      "has_lat": 5525,
+      "has_lon": 5525,
+      "has_source": 5525,
+      "earliest": "2026-05-20 06:38:57.667",
+      "latest": "2026-05-20 06:38:58.768"
+    },
+    {
+      "countryCode": "EE",
+      "total": 5293,
+      "has_postal": 5293,
+      "has_city": 5293,
+      "has_province": 5293,
+      "has_admin1": 0,
+      "has_district": 5293,
+      "has_area": 0,
+      "has_lat": 5293,
+      "has_lon": 5293,
+      "has_source": 5293,
+      "earliest": "2026-05-20 06:39:11.774",
+      "latest": "2026-05-20 06:39:12.938"
+    },
+    {
+      "countryCode": "NO",
+      "total": 5132,
+      "has_postal": 5132,
+      "has_city": 5132,
+      "has_province": 5132,
+      "has_admin1": 0,
+      "has_district": 5132,
+      "has_area": 0,
+      "has_lat": 5132,
+      "has_lon": 5132,
+      "has_source": 5132,
+      "earliest": "2026-05-20 06:41:05.66",
+      "latest": "2026-05-20 06:41:06.585"
+    },
+    {
+      "countryCode": "IT",
+      "total": 4735,
+      "has_postal": 4735,
+      "has_city": 4735,
+      "has_province": 4735,
+      "has_admin1": 0,
+      "has_district": 4735,
+      "has_area": 0,
+      "has_lat": 4735,
+      "has_lon": 4735,
+      "has_source": 4735,
+      "earliest": "2026-05-20 06:39:58.76",
+      "latest": "2026-05-20 06:40:01.068"
+    },
+    {
+      "countryCode": "BG",
+      "total": 4359,
+      "has_postal": 4359,
+      "has_city": 4359,
+      "has_province": 4359,
+      "has_admin1": 0,
+      "has_district": 4359,
+      "has_area": 0,
+      "has_lat": 4359,
+      "has_lon": 4359,
+      "has_source": 4359,
+      "earliest": "2026-05-20 06:38:56.558",
+      "latest": "2026-05-20 06:38:57.667"
+    },
+    {
+      "countryCode": "LU",
+      "total": 4330,
+      "has_postal": 4330,
+      "has_city": 4330,
+      "has_province": 4330,
+      "has_admin1": 0,
+      "has_district": 4330,
+      "has_area": 0,
+      "has_lat": 4330,
+      "has_lon": 4330,
+      "has_source": 4330,
+      "earliest": "2026-05-20 06:40:44.841",
+      "latest": "2026-05-20 06:40:45.89"
+    },
+    {
+      "countryCode": "NL",
+      "total": 4086,
+      "has_postal": 4086,
+      "has_city": 4086,
+      "has_province": 4086,
+      "has_admin1": 0,
+      "has_district": 4086,
+      "has_area": 0,
+      "has_lat": 4086,
+      "has_lon": 4086,
+      "has_source": 4086,
+      "earliest": "2026-05-20 06:41:04.715",
+      "latest": "2026-05-20 06:41:05.66"
+    },
+    {
+      "countryCode": "CO",
+      "total": 3681,
+      "has_postal": 3681,
+      "has_city": 3681,
+      "has_province": 3681,
+      "has_admin1": 0,
+      "has_district": 3681,
+      "has_area": 0,
+      "has_lat": 3681,
+      "has_lon": 3681,
+      "has_source": 3681,
+      "earliest": "2026-05-20 06:39:02.968",
+      "latest": "2026-05-20 06:39:03.769"
+    },
+    {
+      "countryCode": "FI",
+      "total": 3576,
+      "has_postal": 3576,
+      "has_city": 3576,
+      "has_province": 3576,
+      "has_admin1": 0,
+      "has_district": 3576,
+      "has_area": 0,
+      "has_lat": 3576,
+      "has_lon": 3576,
+      "has_source": 3576,
+      "earliest": "2026-05-20 06:39:17.697",
+      "latest": "2026-05-20 06:39:18.569"
+    },
+    {
+      "countryCode": "SK",
+      "total": 3480,
+      "has_postal": 3480,
+      "has_city": 3480,
+      "has_province": 3480,
+      "has_admin1": 0,
+      "has_district": 3480,
+      "has_area": 0,
+      "has_lat": 3480,
+      "has_lon": 3480,
+      "has_source": 3480,
+      "earliest": "2026-05-20 06:43:00.302",
+      "latest": "2026-05-20 06:43:01.315"
+    },
+    {
+      "countryCode": "CH",
+      "total": 3362,
+      "has_postal": 3362,
+      "has_city": 3362,
+      "has_province": 3362,
+      "has_admin1": 0,
+      "has_district": 3362,
+      "has_area": 0,
+      "has_lat": 3362,
+      "has_lon": 3362,
+      "has_source": 3362,
+      "earliest": "2026-05-20 06:39:01.024",
+      "latest": "2026-05-20 06:39:02.55"
+    },
+    {
+      "countryCode": "AU",
+      "total": 3171,
+      "has_postal": 3171,
+      "has_city": 3171,
+      "has_province": 3171,
+      "has_admin1": 3171,
+      "has_district": 3154,
+      "has_area": 3171,
+      "has_lat": 3171,
+      "has_lon": 3171,
+      "has_source": 3171,
+      "earliest": "2026-05-14 15:51:52.323",
+      "latest": "2026-05-14 15:51:52.323"
+    },
+    {
+      "countryCode": "DZ",
+      "total": 3162,
+      "has_postal": 3162,
+      "has_city": 3162,
+      "has_province": 3162,
+      "has_admin1": 0,
+      "has_district": 3162,
+      "has_area": 0,
+      "has_lat": 3162,
+      "has_lon": 3162,
+      "has_source": 3162,
+      "earliest": "2026-05-20 06:39:09.802",
+      "latest": "2026-05-20 06:39:11.614"
+    },
+    {
+      "countryCode": "BY",
+      "total": 3123,
+      "has_postal": 3123,
+      "has_city": 3123,
+      "has_province": 3122,
+      "has_admin1": 0,
+      "has_district": 3122,
+      "has_area": 0,
+      "has_lat": 3123,
+      "has_lon": 3123,
+      "has_source": 3123,
+      "earliest": "2026-05-20 06:38:58.768",
+      "latest": "2026-05-20 06:38:59.413"
+    },
+    {
+      "countryCode": "HU",
+      "total": 3046,
+      "has_postal": 3046,
+      "has_city": 3046,
+      "has_province": 3046,
+      "has_admin1": 0,
+      "has_district": 3046,
+      "has_area": 0,
+      "has_lat": 3046,
+      "has_lon": 3046,
+      "has_source": 3046,
+      "earliest": "2026-05-20 06:39:33.772",
+      "latest": "2026-05-20 06:39:34.539"
+    },
+    {
+      "countryCode": "TR",
+      "total": 2953,
+      "has_postal": 2953,
+      "has_city": 2953,
+      "has_province": 2953,
+      "has_admin1": 0,
+      "has_district": 2896,
+      "has_area": 0,
+      "has_lat": 2953,
+      "has_lon": 2953,
+      "has_source": 2953,
+      "earliest": "2026-05-20 06:43:01.526",
+      "latest": "2026-05-20 06:43:05.856"
+    },
+    {
+      "countryCode": "MY",
+      "total": 2757,
+      "has_postal": 2757,
+      "has_city": 2757,
+      "has_province": 2757,
+      "has_admin1": 0,
+      "has_district": 2757,
+      "has_area": 0,
+      "has_lat": 2757,
+      "has_lon": 2757,
+      "has_source": 2757,
+      "earliest": "2026-05-20 06:41:04.234",
+      "latest": "2026-05-20 06:41:04.715"
+    },
+    {
+      "countryCode": "CZ",
+      "total": 2694,
+      "has_postal": 2694,
+      "has_city": 2694,
+      "has_province": 2694,
+      "has_admin1": 0,
+      "has_district": 2694,
+      "has_area": 0,
+      "has_lat": 2694,
+      "has_lon": 2694,
+      "has_source": 2694,
+      "earliest": "2026-05-20 06:39:03.945",
+      "latest": "2026-05-20 06:39:05.884"
+    },
+    {
+      "countryCode": "PE",
+      "total": 2669,
+      "has_postal": 2669,
+      "has_city": 2669,
+      "has_province": 2669,
+      "has_admin1": 0,
+      "has_district": 2669,
+      "has_area": 0,
+      "has_lat": 2669,
+      "has_lon": 2669,
+      "has_source": 2669,
+      "earliest": "2026-05-20 06:41:06.809",
+      "latest": "2026-05-20 06:41:15.215"
+    },
+    {
+      "countryCode": "PK",
+      "total": 2560,
+      "has_postal": 2560,
+      "has_city": 2560,
+      "has_province": 2560,
+      "has_admin1": 0,
+      "has_district": 2560,
+      "has_area": 0,
+      "has_lat": 2560,
+      "has_lon": 2560,
+      "has_source": 2560,
+      "earliest": "2026-05-20 06:41:15.684",
+      "latest": "2026-05-20 06:41:16.081"
+    },
+    {
+      "countryCode": "CN",
+      "total": 2349,
+      "has_postal": 2349,
+      "has_city": 2349,
+      "has_province": 2349,
+      "has_admin1": 0,
+      "has_district": 2349,
+      "has_area": 0,
+      "has_lat": 2349,
+      "has_lon": 2349,
+      "has_source": 2349,
+      "earliest": "2026-05-20 06:39:02.55",
+      "latest": "2026-05-20 06:39:02.968"
+    },
+    {
+      "countryCode": "AT",
+      "total": 2217,
+      "has_postal": 2217,
+      "has_city": 2217,
+      "has_province": 2217,
+      "has_admin1": 0,
+      "has_district": 2217,
+      "has_area": 0,
+      "has_lat": 2217,
+      "has_lon": 2217,
+      "has_source": 2217,
+      "earliest": "2026-05-20 06:38:52.148",
+      "latest": "2026-05-20 06:38:53.995"
+    },
+    {
+      "countryCode": "PH",
+      "total": 2190,
+      "has_postal": 2190,
+      "has_city": 2190,
+      "has_province": 1911,
+      "has_admin1": 0,
+      "has_district": 1911,
+      "has_area": 0,
+      "has_lat": 2190,
+      "has_lon": 2190,
+      "has_source": 2190,
+      "earliest": "2026-05-20 06:41:15.215",
+      "latest": "2026-05-20 06:41:15.684"
+    },
+    {
+      "countryCode": "LT",
+      "total": 2023,
+      "has_postal": 2023,
+      "has_city": 2023,
+      "has_province": 2023,
+      "has_admin1": 0,
+      "has_district": 2023,
+      "has_area": 0,
+      "has_lat": 2023,
+      "has_lon": 2023,
+      "has_source": 2023,
+      "earliest": "2026-05-20 06:40:42.659",
+      "latest": "2026-05-20 06:40:44.841"
+    },
+    {
+      "countryCode": "AR",
+      "total": 1976,
+      "has_postal": 1976,
+      "has_city": 1976,
+      "has_province": 1976,
+      "has_admin1": 0,
+      "has_district": 1976,
+      "has_area": 0,
+      "has_lat": 1976,
+      "has_lon": 1976,
+      "has_source": 1976,
+      "earliest": "2026-05-20 06:38:50.157",
+      "latest": "2026-05-20 06:38:52.148"
+    },
+    {
+      "countryCode": "LK",
+      "total": 1833,
+      "has_postal": 1833,
+      "has_city": 1833,
+      "has_province": 1833,
+      "has_admin1": 0,
+      "has_district": 1833,
+      "has_area": 0,
+      "has_lat": 1833,
+      "has_lon": 1833,
+      "has_source": 1833,
+      "earliest": "2026-05-20 06:40:42.209",
+      "latest": "2026-05-20 06:40:42.659"
+    },
+    {
+      "countryCode": "NZ",
+      "total": 1737,
+      "has_postal": 1737,
+      "has_city": 1737,
+      "has_province": 1710,
+      "has_admin1": 1710,
+      "has_district": 0,
+      "has_area": 1737,
+      "has_lat": 1737,
+      "has_lon": 1737,
+      "has_source": 1737,
+      "earliest": "2026-05-14 15:51:53.402",
+      "latest": "2026-05-14 15:51:53.402"
+    },
+    {
+      "countryCode": "BD",
+      "total": 1349,
+      "has_postal": 1349,
+      "has_city": 1349,
+      "has_province": 1349,
+      "has_admin1": 0,
+      "has_district": 1349,
+      "has_area": 0,
+      "has_lat": 1349,
+      "has_lon": 1349,
+      "has_source": 1349,
+      "earliest": "2026-05-20 06:38:55.873",
+      "latest": "2026-05-20 06:38:56.092"
+    },
+    {
+      "countryCode": "MA",
+      "total": 1325,
+      "has_postal": 1325,
+      "has_city": 1325,
+      "has_province": 1325,
+      "has_admin1": 0,
+      "has_district": 1325,
+      "has_area": 0,
+      "has_lat": 1325,
+      "has_lon": 1325,
+      "has_source": 1325,
+      "earliest": "2026-05-20 06:40:46.572",
+      "latest": "2026-05-20 06:40:46.794"
+    },
+    {
+      "countryCode": "EC",
+      "total": 1225,
+      "has_postal": 1225,
+      "has_city": 1225,
+      "has_province": 1221,
+      "has_admin1": 0,
+      "has_district": 1221,
+      "has_area": 0,
+      "has_lat": 1225,
+      "has_lon": 1225,
+      "has_source": 1225,
+      "earliest": "2026-05-20 06:39:11.614",
+      "latest": "2026-05-20 06:39:11.774"
+    },
+    {
+      "countryCode": "MD",
+      "total": 1215,
+      "has_postal": 1215,
+      "has_city": 1215,
+      "has_province": 1215,
+      "has_admin1": 0,
+      "has_district": 983,
+      "has_area": 0,
+      "has_lat": 1215,
+      "has_lon": 1215,
+      "has_source": 1215,
+      "earliest": "2026-05-20 06:40:46.794",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "AZ",
+      "total": 1186,
+      "has_postal": 1186,
+      "has_city": 1186,
+      "has_province": 1186,
+      "has_admin1": 0,
+      "has_district": 1186,
+      "has_area": 0,
+      "has_lat": 1186,
+      "has_lon": 1186,
+      "has_source": 1186,
+      "earliest": "2026-05-20 06:38:55.707",
+      "latest": "2026-05-20 06:38:55.873"
+    },
+    {
+      "countryCode": "DK",
+      "total": 1159,
+      "has_postal": 1159,
+      "has_city": 1159,
+      "has_province": 1159,
+      "has_admin1": 0,
+      "has_district": 1159,
+      "has_area": 0,
+      "has_lat": 1159,
+      "has_lon": 1159,
+      "has_source": 1159,
+      "earliest": "2026-05-20 06:39:09.51",
+      "latest": "2026-05-20 06:39:09.623"
+    },
+    {
+      "countryCode": "RS",
+      "total": 1149,
+      "has_postal": 1149,
+      "has_city": 1149,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1149,
+      "has_lon": 1149,
+      "has_source": 1149,
+      "earliest": "2026-05-20 06:42:19.12",
+      "latest": "2026-05-20 06:42:19.587"
+    },
+    {
+      "countryCode": "BE",
+      "total": 1146,
+      "has_postal": 1146,
+      "has_city": 1146,
+      "has_province": 1146,
+      "has_admin1": 0,
+      "has_district": 1146,
+      "has_area": 0,
+      "has_lat": 1146,
+      "has_lon": 1146,
+      "has_source": 1146,
+      "earliest": "2026-05-20 06:38:56.092",
+      "latest": "2026-05-20 06:38:56.558"
+    },
+    {
+      "countryCode": "CY",
+      "total": 1125,
+      "has_postal": 1125,
+      "has_city": 1125,
+      "has_province": 1125,
+      "has_admin1": 0,
+      "has_district": 1125,
+      "has_area": 0,
+      "has_lat": 1125,
+      "has_lon": 1125,
+      "has_source": 1125,
+      "earliest": "2026-05-20 06:39:03.769",
+      "latest": "2026-05-20 06:39:03.945"
+    },
+    {
+      "countryCode": "KE",
+      "total": 877,
+      "has_postal": 877,
+      "has_city": 877,
+      "has_province": 877,
+      "has_admin1": 0,
+      "has_district": 877,
+      "has_area": 0,
+      "has_lat": 877,
+      "has_lon": 877,
+      "has_source": 877,
+      "earliest": "2026-05-20 06:40:31.669",
+      "latest": "2026-05-20 06:40:31.867"
+    },
+    {
+      "countryCode": "TH",
+      "total": 771,
+      "has_postal": 771,
+      "has_city": 771,
+      "has_province": 771,
+      "has_admin1": 0,
+      "has_district": 771,
+      "has_area": 0,
+      "has_lat": 771,
+      "has_lon": 771,
+      "has_source": 771,
+      "earliest": "2026-05-20 06:43:01.315",
+      "latest": "2026-05-20 06:43:01.526"
+    },
+    {
+      "countryCode": "PA",
+      "total": 729,
+      "has_postal": 729,
+      "has_city": 729,
+      "has_province": 729,
+      "has_admin1": 0,
+      "has_district": 699,
+      "has_area": 0,
+      "has_lat": 729,
+      "has_lon": 729,
+      "has_source": 729,
+      "earliest": "2026-05-20 06:41:06.809",
+      "latest": "2026-05-20 06:41:06.809"
+    },
+    {
+      "countryCode": "LV",
+      "total": 697,
+      "has_postal": 697,
+      "has_city": 697,
+      "has_province": 697,
+      "has_admin1": 0,
+      "has_district": 697,
+      "has_area": 0,
+      "has_lat": 697,
+      "has_lon": 697,
+      "has_source": 697,
+      "earliest": "2026-05-20 06:40:45.89",
+      "latest": "2026-05-20 06:40:46.572"
+    },
+    {
+      "countryCode": "SI",
+      "total": 556,
+      "has_postal": 556,
+      "has_city": 556,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 556,
+      "has_lon": 556,
+      "has_source": 556,
+      "earliest": "2026-05-20 06:43:00.036",
+      "latest": "2026-05-20 06:43:00.302"
+    },
+    {
+      "countryCode": "GT",
+      "total": 548,
+      "has_postal": 548,
+      "has_city": 548,
+      "has_province": 548,
+      "has_admin1": 0,
+      "has_district": 548,
+      "has_area": 0,
+      "has_lat": 548,
+      "has_lon": 548,
+      "has_source": 548,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:33.094"
+    },
+    {
+      "countryCode": "MW",
+      "total": 491,
+      "has_postal": 491,
+      "has_city": 491,
+      "has_province": 491,
+      "has_admin1": 0,
+      "has_district": 491,
+      "has_area": 0,
+      "has_lat": 491,
+      "has_lon": 491,
+      "has_source": 491,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.404"
+    },
+    {
+      "countryCode": "AL",
+      "total": 489,
+      "has_postal": 489,
+      "has_city": 489,
+      "has_province": 489,
+      "has_admin1": 0,
+      "has_district": 489,
+      "has_area": 0,
+      "has_lat": 489,
+      "has_lon": 489,
+      "has_source": 489,
+      "earliest": "2026-05-20 06:38:50.157",
+      "latest": "2026-05-20 06:38:50.157"
+    },
+    {
+      "countryCode": "CR",
+      "total": 473,
+      "has_postal": 473,
+      "has_city": 473,
+      "has_province": 473,
+      "has_admin1": 0,
+      "has_district": 473,
+      "has_area": 0,
+      "has_lat": 473,
+      "has_lon": 473,
+      "has_source": 473,
+      "earliest": "2026-05-20 06:39:03.769",
+      "latest": "2026-05-20 06:39:03.769"
+    },
+    {
+      "countryCode": "CL",
+      "total": 346,
+      "has_postal": 346,
+      "has_city": 346,
+      "has_province": 346,
+      "has_admin1": 0,
+      "has_district": 346,
+      "has_area": 0,
+      "has_lat": 346,
+      "has_lon": 346,
+      "has_source": 346,
+      "earliest": "2026-05-20 06:39:02.55",
+      "latest": "2026-05-20 06:39:02.55"
+    },
+    {
+      "countryCode": "HR",
+      "total": 309,
+      "has_postal": 309,
+      "has_city": 309,
+      "has_province": 309,
+      "has_admin1": 0,
+      "has_district": 309,
+      "has_area": 0,
+      "has_lat": 309,
+      "has_lon": 309,
+      "has_source": 309,
+      "earliest": "2026-05-20 06:39:33.094",
+      "latest": "2026-05-20 06:39:33.772"
+    },
+    {
+      "countryCode": "HT",
+      "total": 230,
+      "has_postal": 230,
+      "has_city": 230,
+      "has_province": 230,
+      "has_admin1": 0,
+      "has_district": 230,
+      "has_area": 0,
+      "has_lat": 230,
+      "has_lon": 230,
+      "has_source": 230,
+      "earliest": "2026-05-20 06:39:33.772",
+      "latest": "2026-05-20 06:39:33.772"
+    },
+    {
+      "countryCode": "MK",
+      "total": 220,
+      "has_postal": 220,
+      "has_city": 220,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 220,
+      "has_lon": 220,
+      "has_source": 220,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "DO",
+      "total": 207,
+      "has_postal": 207,
+      "has_city": 207,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 207,
+      "has_lon": 207,
+      "has_source": 207,
+      "earliest": "2026-05-20 06:39:09.623",
+      "latest": "2026-05-20 06:39:09.802"
+    },
+    {
+      "countryCode": "IS",
+      "total": 195,
+      "has_postal": 195,
+      "has_city": 195,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 195,
+      "has_lon": 195,
+      "has_source": 195,
+      "earliest": "2026-05-20 06:39:58.652",
+      "latest": "2026-05-20 06:39:58.76"
+    },
+    {
+      "countryCode": "PR",
+      "total": 177,
+      "has_postal": 177,
+      "has_city": 177,
+      "has_province": 177,
+      "has_admin1": 0,
+      "has_district": 177,
+      "has_area": 0,
+      "has_lat": 177,
+      "has_lon": 177,
+      "has_source": 177,
+      "earliest": "2026-05-20 06:41:25.385",
+      "latest": "2026-05-20 06:41:25.385"
+    },
+    {
+      "countryCode": "RE",
+      "total": 151,
+      "has_postal": 151,
+      "has_city": 151,
+      "has_province": 151,
+      "has_admin1": 0,
+      "has_district": 151,
+      "has_area": 0,
+      "has_lat": 151,
+      "has_lon": 151,
+      "has_source": 151,
+      "earliest": "2026-05-20 06:42:11.425",
+      "latest": "2026-05-20 06:42:11.425"
+    },
+    {
+      "countryCode": "IE",
+      "total": 139,
+      "has_postal": 139,
+      "has_city": 139,
+      "has_province": 139,
+      "has_admin1": 0,
+      "has_district": 139,
+      "has_area": 0,
+      "has_lat": 139,
+      "has_lon": 139,
+      "has_source": 139,
+      "earliest": "2026-05-20 06:39:42.602",
+      "latest": "2026-05-20 06:39:42.602"
+    },
+    {
+      "countryCode": "FO",
+      "total": 130,
+      "has_postal": 130,
+      "has_city": 130,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 130,
+      "has_lon": 130,
+      "has_source": 130,
+      "earliest": "2026-05-20 06:39:18.569",
+      "latest": "2026-05-20 06:39:18.569"
+    },
+    {
+      "countryCode": "GP",
+      "total": 105,
+      "has_postal": 105,
+      "has_city": 105,
+      "has_province": 105,
+      "has_admin1": 0,
+      "has_district": 105,
+      "has_area": 0,
+      "has_lat": 105,
+      "has_lon": 105,
+      "has_source": 105,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "MQ",
+      "total": 95,
+      "has_postal": 95,
+      "has_city": 95,
+      "has_province": 95,
+      "has_admin1": 0,
+      "has_district": 95,
+      "has_area": 0,
+      "has_lat": 95,
+      "has_lon": 95,
+      "has_source": 95,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "PF",
+      "total": 83,
+      "has_postal": 83,
+      "has_city": 83,
+      "has_province": 83,
+      "has_admin1": 0,
+      "has_district": 83,
+      "has_area": 0,
+      "has_lat": 83,
+      "has_lon": 83,
+      "has_source": 83,
+      "earliest": "2026-05-20 06:41:15.215",
+      "latest": "2026-05-20 06:41:15.215"
+    },
+    {
+      "countryCode": "BM",
+      "total": 81,
+      "has_postal": 81,
+      "has_city": 81,
+      "has_province": 81,
+      "has_admin1": 0,
+      "has_district": 81,
+      "has_area": 0,
+      "has_lat": 81,
+      "has_lon": 81,
+      "has_source": 81,
+      "earliest": "2026-05-20 06:38:57.667",
+      "latest": "2026-05-20 06:38:57.667"
+    },
+    {
+      "countryCode": "GF",
+      "total": 77,
+      "has_postal": 77,
+      "has_city": 77,
+      "has_province": 77,
+      "has_admin1": 0,
+      "has_district": 77,
+      "has_area": 0,
+      "has_lat": 77,
+      "has_lon": 77,
+      "has_source": 77,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "MT",
+      "total": 73,
+      "has_postal": 73,
+      "has_city": 73,
+      "has_province": 73,
+      "has_admin1": 0,
+      "has_district": 73,
+      "has_area": 0,
+      "has_lat": 73,
+      "has_lon": 73,
+      "has_source": 73,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "NC",
+      "total": 50,
+      "has_postal": 50,
+      "has_city": 50,
+      "has_province": 50,
+      "has_admin1": 0,
+      "has_district": 50,
+      "has_area": 0,
+      "has_lat": 50,
+      "has_lon": 50,
+      "has_source": 50,
+      "earliest": "2026-05-20 06:41:04.715",
+      "latest": "2026-05-20 06:41:04.715"
+    },
+    {
+      "countryCode": "HN",
+      "total": 37,
+      "has_postal": 37,
+      "has_city": 37,
+      "has_province": 37,
+      "has_admin1": 0,
+      "has_district": 37,
+      "has_area": 0,
+      "has_lat": 37,
+      "has_lon": 37,
+      "has_source": 37,
+      "earliest": "2026-05-20 06:39:33.094",
+      "latest": "2026-05-20 06:39:33.094"
+    },
+    {
+      "countryCode": "AX",
+      "total": 37,
+      "has_postal": 37,
+      "has_city": 37,
+      "has_province": 37,
+      "has_admin1": 0,
+      "has_district": 37,
+      "has_area": 0,
+      "has_lat": 37,
+      "has_lon": 37,
+      "has_source": 37,
+      "earliest": "2026-05-20 06:38:55.707",
+      "latest": "2026-05-20 06:38:55.707"
+    },
+    {
+      "countryCode": "GL",
+      "total": 33,
+      "has_postal": 33,
+      "has_city": 33,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 33,
+      "has_lon": 32,
+      "has_source": 33,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "GU",
+      "total": 21,
+      "has_postal": 21,
+      "has_city": 21,
+      "has_province": 21,
+      "has_admin1": 0,
+      "has_district": 21,
+      "has_area": 0,
+      "has_lat": 21,
+      "has_lon": 21,
+      "has_source": 21,
+      "earliest": "2026-05-20 06:39:33.094",
+      "latest": "2026-05-20 06:39:33.094"
+    },
+    {
+      "countryCode": "LI",
+      "total": 13,
+      "has_postal": 13,
+      "has_city": 13,
+      "has_province": 13,
+      "has_admin1": 0,
+      "has_district": 13,
+      "has_area": 0,
+      "has_lat": 13,
+      "has_lon": 13,
+      "has_source": 13,
+      "earliest": "2026-05-20 06:40:42.209",
+      "latest": "2026-05-20 06:40:42.209"
+    },
+    {
+      "countryCode": "GG",
+      "total": 10,
+      "has_postal": 10,
+      "has_city": 10,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 10,
+      "has_lon": 10,
+      "has_source": 10,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "SM",
+      "total": 10,
+      "has_postal": 10,
+      "has_city": 10,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 10,
+      "has_lon": 10,
+      "has_source": 10,
+      "earliest": "2026-05-20 06:43:01.315",
+      "latest": "2026-05-20 06:43:01.315"
+    },
+    {
+      "countryCode": "IM",
+      "total": 9,
+      "has_postal": 9,
+      "has_city": 9,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 9,
+      "has_lon": 9,
+      "has_source": 9,
+      "earliest": "2026-05-20 06:39:42.602",
+      "latest": "2026-05-20 06:39:42.602"
+    },
+    {
+      "countryCode": "SJ",
+      "total": 8,
+      "has_postal": 8,
+      "has_city": 8,
+      "has_province": 8,
+      "has_admin1": 0,
+      "has_district": 8,
+      "has_area": 0,
+      "has_lat": 8,
+      "has_lon": 8,
+      "has_source": 8,
+      "earliest": "2026-05-20 06:43:00.302",
+      "latest": "2026-05-20 06:43:00.302"
+    },
+    {
+      "countryCode": "AD",
+      "total": 7,
+      "has_postal": 7,
+      "has_city": 7,
+      "has_province": 7,
+      "has_admin1": 0,
+      "has_district": 7,
+      "has_area": 0,
+      "has_lat": 7,
+      "has_lon": 7,
+      "has_source": 7,
+      "earliest": "2026-05-20 06:38:04.012",
+      "latest": "2026-05-20 06:38:04.012"
+    },
+    {
+      "countryCode": "JE",
+      "total": 4,
+      "has_postal": 4,
+      "has_city": 4,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 4,
+      "has_lon": 4,
+      "has_source": 4,
+      "earliest": "2026-05-20 06:40:01.068",
+      "latest": "2026-05-20 06:40:01.068"
+    },
+    {
+      "countryCode": "FM",
+      "total": 4,
+      "has_postal": 4,
+      "has_city": 4,
+      "has_province": 4,
+      "has_admin1": 0,
+      "has_district": 4,
+      "has_area": 0,
+      "has_lat": 4,
+      "has_lon": 4,
+      "has_source": 4,
+      "earliest": "2026-05-20 06:39:18.569",
+      "latest": "2026-05-20 06:39:18.569"
+    },
+    {
+      "countryCode": "MP",
+      "total": 3,
+      "has_postal": 3,
+      "has_city": 3,
+      "has_province": 3,
+      "has_admin1": 0,
+      "has_district": 3,
+      "has_area": 0,
+      "has_lat": 3,
+      "has_lon": 3,
+      "has_source": 3,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "MH",
+      "total": 2,
+      "has_postal": 2,
+      "has_city": 2,
+      "has_province": 2,
+      "has_admin1": 0,
+      "has_district": 2,
+      "has_area": 0,
+      "has_lat": 2,
+      "has_lon": 2,
+      "has_source": 2,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "PN",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:41:25.385",
+      "latest": "2026-05-20 06:41:25.385"
+    },
+    {
+      "countryCode": "PM",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 1,
+      "has_admin1": 0,
+      "has_district": 1,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:41:25.385",
+      "latest": "2026-05-20 06:41:25.385"
+    },
+    {
+      "countryCode": "GI",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "PW",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:42:11.425",
+      "latest": "2026-05-20 06:42:11.425"
+    },
+    {
+      "countryCode": "GS",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:32.846",
+      "latest": "2026-05-20 06:39:32.846"
+    },
+    {
+      "countryCode": "HK",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:33.094",
+      "latest": "2026-05-20 06:39:33.094"
+    },
+    {
+      "countryCode": "HM",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:33.094",
+      "latest": "2026-05-20 06:39:33.094"
+    },
+    {
+      "countryCode": "NU",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:41:06.585",
+      "latest": "2026-05-20 06:41:06.585"
+    },
+    {
+      "countryCode": "NR",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:41:06.585",
+      "latest": "2026-05-20 06:41:06.585"
+    },
+    {
+      "countryCode": "FK",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:18.569",
+      "latest": "2026-05-20 06:39:18.569"
+    },
+    {
+      "countryCode": "CX",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:03.769",
+      "latest": "2026-05-20 06:39:03.769"
+    },
+    {
+      "countryCode": "NF",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:41:04.715",
+      "latest": "2026-05-20 06:41:04.715"
+    },
+    {
+      "countryCode": "CC",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:01.024",
+      "latest": "2026-05-20 06:39:01.024"
+    },
+    {
+      "countryCode": "IO",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:39:58.652",
+      "latest": "2026-05-20 06:39:58.652"
+    },
+    {
+      "countryCode": "TC",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:43:01.315",
+      "latest": "2026-05-20 06:43:01.315"
+    },
+    {
+      "countryCode": "MO",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:40:47.187",
+      "latest": "2026-05-20 06:40:47.187"
+    },
+    {
+      "countryCode": "MC",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 1,
+      "has_admin1": 0,
+      "has_district": 1,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:40:46.794",
+      "latest": "2026-05-20 06:40:46.794"
+    },
+    {
+      "countryCode": "AS",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 1,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:38:52.148",
+      "latest": "2026-05-20 06:38:52.148"
+    },
+    {
+      "countryCode": "AI",
+      "total": 1,
+      "has_postal": 1,
+      "has_city": 1,
+      "has_province": 0,
+      "has_admin1": 0,
+      "has_district": 0,
+      "has_area": 0,
+      "has_lat": 1,
+      "has_lon": 1,
+      "has_source": 1,
+      "earliest": "2026-05-20 06:38:50.157",
+      "latest": "2026-05-20 06:38:50.157"
+    }
+  ],
+  "sources": [
+    {
+      "source": "GeoNames",
+      "cnt": 3794541
+    }
+  ],
+  "asianSamples": {
+    "VN": [],
+    "TH": [
+      {
+        "postalCode": "47170",
+        "city": "Akat Amnuai",
+        "province": "Sakon Nakhon",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "47",
+        "latitude": 17.434,
+        "longitude": 103.6615,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "75110",
+        "city": "Amphawa",
+        "province": "Samut Songkhram",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "75",
+        "latitude": 13.4167,
+        "longitude": 99.95,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "81110",
+        "city": "Ao Luk",
+        "province": "Krabi",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "81",
+        "latitude": 8.3833,
+        "longitude": 98.7167,
+        "source": "GeoNames"
+      }
+    ],
+    "PH": [
+      {
+        "postalCode": "1405",
+        "city": "1st Ave. to 7th Ave. - West",
+        "province": "Metro Manila",
+        "adminName1": null,
+        "adminCode1": "City of Caloocan",
+        "district": "NCR",
+        "latitude": 14.6645,
+        "longitude": 120.9773,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "2133",
+        "city": "3 Santa Cruz",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "",
+        "latitude": 14.6577,
+        "longitude": 120.5132,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "5302",
+        "city": "Aborlan",
+        "province": "Mimaropa",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "41",
+        "latitude": 9.4336,
+        "longitude": 118.5488,
+        "source": "GeoNames"
+      }
+    ],
+    "ID": [
+      {
+        "postalCode": "30111",
+        "city": "10 Ilir",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "16",
+        "latitude": -4.4653,
+        "longitude": 104.1918,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "30112",
+        "city": "11 Ilir",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "16",
+        "latitude": -4.4653,
+        "longitude": 104.1918,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "30262",
+        "city": "12 Ulu",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "16",
+        "latitude": -4.7671,
+        "longitude": 103.9644,
+        "source": "GeoNames"
+      }
+    ],
+    "HK": [
+      {
+        "postalCode": "999077",
+        "city": "Hong Kong Special Administrative Region",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "",
+        "latitude": 22.25,
+        "longitude": 114.1667,
+        "source": "GeoNames"
+      }
+    ],
+    "TW": [],
+    "SG": [
+      {
+        "postalCode": "499931",
+        "city": "Abingdon Road",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "",
+        "latitude": 1.3689,
+        "longitude": 103.9788,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "499932",
+        "city": "Abingdon Road",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "",
+        "latitude": 1.3692,
+        "longitude": 103.9793,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "499933",
+        "city": "Abingdon Road",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "",
+        "latitude": 1.3679,
+        "longitude": 103.9796,
+        "source": "GeoNames"
+      }
+    ],
+    "KR": [
+      {
+        "postalCode": "57515",
+        "city": "겸면",
+        "province": "전라남도",
+        "adminName1": null,
+        "adminCode1": "겸면",
+        "district": "16",
+        "latitude": 35.2543,
+        "longitude": 127.1962,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "57516",
+        "city": "겸면",
+        "province": "전라남도",
+        "adminName1": null,
+        "adminCode1": "겸면",
+        "district": "16",
+        "latitude": 35.2577,
+        "longitude": 127.1623,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "57520",
+        "city": "겸면",
+        "province": "전라남도",
+        "adminName1": null,
+        "adminCode1": "겸면",
+        "district": "16",
+        "latitude": 35.2357,
+        "longitude": 127.1831,
+        "source": "GeoNames"
+      }
+    ],
+    "IN": [
+      {
+        "postalCode": "335040",
+        "city": "13ff",
+        "province": "Rajasthan",
+        "adminName1": null,
+        "adminCode1": "Padampur",
+        "district": "24",
+        "latitude": 29.3955,
+        "longitude": 73.5632,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "282001",
+        "city": "15 Btn PAC Agra",
+        "province": "Uttar Pradesh",
+        "adminName1": null,
+        "adminCode1": "NA",
+        "district": "36",
+        "latitude": 27.0374,
+        "longitude": 78.0809,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "334023",
+        "city": "17 K.Y.D.",
+        "province": "Rajasthan",
+        "adminName1": null,
+        "adminCode1": "Bikaner",
+        "district": "24",
+        "latitude": 28.7063,
+        "longitude": 72.5924,
+        "source": "GeoNames"
+      }
+    ],
+    "MY": [
+      {
+        "postalCode": "75450",
+        "city": "Air Keroh",
+        "province": "Melaka",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "MLK",
+        "latitude": 2.3053,
+        "longitude": 102.3346,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "21800",
+        "city": "Ajil",
+        "province": "Terengganu",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "TRG",
+        "latitude": 5.0619,
+        "longitude": 103.0496,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "21810",
+        "city": "Ajil",
+        "province": "Terengganu",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "TRG",
+        "latitude": 5.0178,
+        "longitude": 103.1339,
+        "source": "GeoNames"
+      }
+    ],
+    "JP": [
+      {
+        "postalCode": "683-0813",
+        "city": "Asahimachi",
+        "province": "Tottori Ken",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "41",
+        "latitude": 35.4322,
+        "longitude": 133.3309,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "683-0814",
+        "city": "Odakamachi",
+        "province": "Tottori Ken",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "41",
+        "latitude": 35.4325,
+        "longitude": 133.3296,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "490-1401",
+        "city": "Rokujocho",
+        "province": "Aichi Ken",
+        "adminName1": null,
+        "adminCode1": "",
+        "district": "01",
+        "latitude": 35.1053,
+        "longitude": 136.7507,
+        "source": "GeoNames"
+      }
+    ],
+    "AE": [
+      {
+        "postalCode": "28119 95762",
+        "city": "Al Ras",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "Al Ras",
+        "district": "03",
+        "latitude": 25.2684,
+        "longitude": 55.2931,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "28120 95556",
+        "city": "Al Ras",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "Al Ras",
+        "district": "03",
+        "latitude": 25.2666,
+        "longitude": 55.2932,
+        "source": "GeoNames"
+      },
+      {
+        "postalCode": "28145 95641",
+        "city": "Al Ras",
+        "province": "",
+        "adminName1": null,
+        "adminCode1": "Al Ras",
+        "district": "03",
+        "latitude": 25.2673,
+        "longitude": 55.2934,
+        "source": "GeoNames"
+      }
+    ],
+    "SA": []
+  }
+}
