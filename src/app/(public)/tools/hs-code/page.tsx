@@ -11,6 +11,7 @@ import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-cha
 import { inputStyles, cardStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
+import { getAliases } from '@/lib/hs-code-query-aliases';
 import Link from 'next/link';
 
 interface HSCodeItem {
@@ -27,22 +28,27 @@ interface HSCodeItem {
 const SENSITIVE_KEYWORDS_EN = ['battery', 'batteries', 'liquid', 'powder', 'food', 'medicine', 'medicinal', 'cosmetic', 'chemical', 'aerosol', 'flammable', 'lithium'];
 const SENSITIVE_KEYWORDS_CN = ['电池', '液体', '粉末', '食品', '药品', '药物', '化妆品', '化学品', '喷雾', '易燃', '锂电'];
 
-// Example products for quick search - enhanced with more English examples
+// Example products for quick search - all verified to have results in production
+// 所有默认示例都已验证在生产环境有结果
 const EXAMPLE_PRODUCTS = [
-  { label: '保温杯', query: '保温杯' },
-  { label: '棉T恤', query: '棉T恤' },
-  { label: '手机壳', query: '手机壳' },
-  { label: 'LED灯', query: 'LED灯' },
-  { label: '陶瓷杯', query: '陶瓷杯' },
-  { label: '双肩包', query: '双肩包' },
   { label: '玩具', query: '玩具' },
-  { label: '塑料杯', query: '塑料杯' },
-  { label: '衣服', query: '衣服' },
   { label: 'toys', query: 'toys' },
-  { label: 'plastic cup', query: 'plastic cup' },
-  { label: 'stainless steel bottle', query: 'stainless steel' },
-  { label: 'phone case', query: 'phone case' },
-  { label: 'cotton shirt', query: 'cotton shirt' },
+  { label: '衣服', query: '衣服' },
+  { label: 'shirt', query: 'shirt' },
+  { label: '保温', query: '保温' },
+  { label: 'vacuum', query: 'vacuum' },
+  { label: '手机', query: '手机' },
+  { label: 'phone', query: 'phone' },
+  { label: '塑料', query: '塑料' },
+  { label: 'plastic', query: 'plastic' },
+  { label: '灯', query: '灯' },
+  { label: 'light', query: 'light' },
+  { label: '陶瓷', query: '陶瓷' },
+  { label: 'ceramic', query: 'ceramic' },
+  { label: '书包', query: '书包' },
+  { label: 'bag', query: 'bag' },
+  { label: 'stainless steel', query: 'stainless steel' },
+  { label: '9503', query: '9503' },
 ];
 
 const RECENT_QUERIES_KEY = 'hs-code-recent-queries';
@@ -109,6 +115,43 @@ function getMatchReason(item: HSCodeItem, query: string): string {
   return '关键词匹配';
 }
 
+// Get suggested queries based on the current query
+function getSuggestedQueries(query: string): string[] {
+  const q = query.toLowerCase().trim();
+  
+  // Common product categories and their suggested alternatives
+  const suggestions: Record<string, string[]> = {
+    '保温杯': ['保温', '真空', 'vacuum', 'flask'],
+    'thermos': ['vacuum', 'flask', 'insulated'],
+    '手机壳': ['手机', 'phone', 'case', 'cover'],
+    'phone case': ['phone', 'case', 'cover', 'mobile'],
+    '塑料杯': ['塑料', '杯子', 'plastic', 'cup'],
+    'plastic cup': ['plastic', 'cup', '塑料', '杯子'],
+    '棉t恤': ['t恤', '衬衫', 'shirt', 'cotton'],
+    'cotton shirt': ['shirt', 'cotton', 't-shirt'],
+    'led灯': ['灯', 'led', 'light', 'lamp'],
+    'led light': ['light', 'led', 'lamp', '灯'],
+    '陶瓷杯': ['陶瓷', '杯子', 'ceramic', 'cup'],
+    'ceramic cup': ['ceramic', 'cup', '陶瓷', '杯子'],
+    '双肩包': ['包', '书包', 'bag', 'backpack'],
+    'backpack': ['bag', 'pack', '书包', '包'],
+  };
+  
+  // Direct match
+  if (suggestions[q]) {
+    return suggestions[q];
+  }
+  
+  // Partial match
+  for (const [key, value] of Object.entries(suggestions)) {
+    if (q.includes(key) || key.includes(q)) {
+      return value;
+    }
+  }
+  
+  return [];
+}
+
 export default function HSCodePage() {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<HSCodeItem[]>([]);
@@ -120,6 +163,7 @@ export default function HSCodePage() {
   const [activeQuery, setActiveQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [savedProduct, setSavedProduct] = useState<string | null>(null);
+  const [aliasUsed, setAliasUsed] = useState<string | null>(null); // Track if alias was used
   
   // Request sequence guard + AbortController
   const requestSeqRef = useRef(0);
@@ -148,6 +192,7 @@ export default function HSCodePage() {
       setActiveQuery('');
       setError(null);
       setLoading(false);
+      setAliasUsed(null);
       return;
     }
     
@@ -166,8 +211,10 @@ export default function HSCodePage() {
     setLoading(true);
     setError(null);
     setResults([]);
+    setAliasUsed(null);
     
     try {
+      // Try original query first
       const res = await fetch(`/api/tools/hs-code?q=${encodeURIComponent(q)}`, {
         signal: controller.signal,
       });
@@ -177,19 +224,61 @@ export default function HSCodePage() {
       if (currentSeq !== requestSeqRef.current) return;
       
       if (json.success) {
-        setResults(json.data);
-        trackEvent.custom('hs-code', json.data.length > 0 ? 'search_success' : 'search_no_result');
-        // Save to recent queries
+        // If original query has results, use them
         if (json.data.length > 0) {
+          setResults(json.data);
+          trackEvent.custom('hs-code', 'search_success');
+          // Save to recent queries
           const entry: RecentQuery = { query: q, resultCount: json.data.length, timestamp: Date.now() };
           setRecentQueries(prev => {
             const updated = [entry, ...prev.filter(r => r.query !== q)].slice(0, 10);
             try { localStorage.setItem(RECENT_QUERIES_KEY, JSON.stringify(updated)); } catch { /* empty */ }
             return updated;
           });
+          // Save to task chain
+          saveTaskChain({ sourceTool: 'hs-code', productName: q });
+        } else {
+          // No results from original query, try aliases
+          const aliases = getAliases(q);
+          let foundWithAlias = false;
+          
+          for (const alias of aliases) {
+            // Check if request was cancelled
+            if (currentSeq !== requestSeqRef.current) return;
+            
+            try {
+              const aliasRes = await fetch(`/api/tools/hs-code?q=${encodeURIComponent(alias)}`, {
+                signal: controller.signal,
+              });
+              const aliasJson = await aliasRes.json();
+              
+              if (currentSeq !== requestSeqRef.current) return;
+              
+              if (aliasJson.success && aliasJson.data.length > 0) {
+                setResults(aliasJson.data);
+                setAliasUsed(alias);
+                trackEvent.custom('hs-code', 'search_alias_fallback');
+                // Save to recent queries with original query
+                const entry: RecentQuery = { query: q, resultCount: aliasJson.data.length, timestamp: Date.now() };
+                setRecentQueries(prev => {
+                  const updated = [entry, ...prev.filter(r => r.query !== q)].slice(0, 10);
+                  try { localStorage.setItem(RECENT_QUERIES_KEY, JSON.stringify(updated)); } catch { /* empty */ }
+                  return updated;
+                });
+                saveTaskChain({ sourceTool: 'hs-code', productName: q });
+                foundWithAlias = true;
+                break;
+              }
+            } catch (aliasErr) {
+              // Continue to next alias
+              continue;
+            }
+          }
+          
+          if (!foundWithAlias) {
+            trackEvent.custom('hs-code', 'search_no_result');
+          }
         }
-        // Save to task chain
-        saveTaskChain({ sourceTool: 'hs-code', productName: q });
       } else {
         setError('查询失败，请稍后重试');
       }
@@ -442,11 +531,20 @@ export default function HSCodePage() {
 
         {/* Results */}
         {results.length > 0 && activeQuery && (
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              当前查询：<span className="font-medium text-teal-700 dark:text-teal-400">&quot;{activeQuery}&quot;</span>
-              <span className="ml-2 text-gray-400">({results.length} 条结果)</span>
-            </p>
+          <div className="mb-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                当前查询：<span className="font-medium text-teal-700 dark:text-teal-400">&quot;{activeQuery}&quot;</span>
+                <span className="ml-2 text-gray-400">({results.length} 条结果)</span>
+              </p>
+            </div>
+            {aliasUsed && (
+              <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  💡 未找到 &quot;{activeQuery}&quot; 的直接匹配，已使用同义词 &quot;<span className="font-medium">{aliasUsed}</span>&quot; 搜索。结果仅供参考，请以实际商品属性为准。
+                </p>
+              </div>
+            )}
           </div>
         )}
         <div className="space-y-3">
@@ -645,7 +743,26 @@ export default function HSCodePage() {
                   <li>• 使用不同的关键词（中文或英文）</li>
                   <li>• 使用 HS 编码前缀查询（如 9503、8471）</li>
                   <li>• 简化搜索词（如 &quot;杯&quot; 而非 &quot;不锈钢保温杯&quot;）</li>
+                  <li>• 使用材质或用途描述（如 &quot;塑料&quot;、&quot;陶瓷&quot;）</li>
                 </ul>
+                {/* Contextual suggestions based on query */}
+                {getSuggestedQueries(activeQuery).length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-xs text-gray-500 mb-2">针对 &quot;{activeQuery}&quot; 的建议查询：</p>
+                    <div className="flex flex-wrap justify-center gap-2 mb-4">
+                      {getSuggestedQueries(activeQuery).map(suggestion => (
+                        <button 
+                          key={suggestion} 
+                          onClick={() => setSearch(suggestion)}
+                          className="px-3 py-1.5 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors border border-blue-200"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-gray-400 mb-3">或尝试以下热门查询：</p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {EXAMPLE_PRODUCTS.slice(0, 6).map(p => (
                     <button key={p.query + p.label} onClick={() => setSearch(p.query)}
