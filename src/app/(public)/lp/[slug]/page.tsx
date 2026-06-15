@@ -113,13 +113,19 @@ export default async function LandingPagePublic({ params }: Props) {
     notFound();
   }
 
-  const hero = page.heroSection as Record<string, string> | null;
+  const hero = page.heroSection as Record<string, any> | null;
   const faqItems = (page.faqItems as { question: string; answer: string }[] | null) || [];
   const officialLinks = (page.officialLinks as { label: string; url: string; icon?: string }[] | null) || [];
-  const ctaConfig = page.ctaConfig as { text?: string; url?: string; style?: string } | null;
+  const ctaConfig = page.ctaConfig as { text?: string; url?: string; style?: string; relatedChecklists?: string[] } | null;
   const relatedTools = (page.relatedTools as string[] | null) || [];
   const relatedTopics = (page.relatedTopics as string[] | null) || [];
   const relatedArticles = (page.relatedArticles as string[] | null) || [];
+  
+  // Extract hotCities from heroSection (country page feature)
+  const hotCities = (hero?.hotCities as string[] | null) || [];
+  
+  // Extract relatedChecklists from ctaConfig (temporary storage)
+  const relatedChecklistSlugs = ctaConfig?.relatedChecklists || [];
 
   // Fetch matching tools
   const tools = relatedTools.map(getToolInfo).filter(Boolean);
@@ -143,6 +149,14 @@ export default async function LandingPagePublic({ params }: Props) {
     ? await prisma.topic.findMany({
         where: { slug: { in: relatedTopics }, status: "published" },
         select: { title: true, slug: true, summary: true },
+      }).catch(() => [])
+    : [];
+
+  // Fetch related checklists (from ctaConfig.relatedChecklists)
+  const checklists = relatedChecklistSlugs.length > 0
+    ? await prisma.landingPage.findMany({
+        where: { slug: { in: relatedChecklistSlugs }, pageType: "checklist", status: "published" },
+        select: { title: true, slug: true, seoDescription: true },
       }).catch(() => [])
     : [];
 
@@ -192,6 +206,26 @@ export default async function LandingPagePublic({ params }: Props) {
                 </Link>
               );
             })()}
+          </div>
+        </section>
+      )}
+
+      {/* Hot Cities / Regions (Country Page Feature) */}
+      {hotCities.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-12">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <span className="text-teal-600">🏙️</span>
+            热门城市与地区
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            {hotCities.map((city) => (
+              <span
+                key={city}
+                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-teal-300 hover:text-teal-700 transition-colors cursor-default"
+              >
+                {city}
+              </span>
+            ))}
           </div>
         </section>
       )}
@@ -280,6 +314,30 @@ export default async function LandingPagePublic({ params }: Props) {
         </section>
       )}
 
+      {/* Related Checklists (Country Page Feature) */}
+      {checklists.length > 0 && (
+        <section className="max-w-5xl mx-auto px-4 py-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <span className="text-teal-600">✅</span>
+            相关清单
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {checklists.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/lp/${c.slug}`}
+                className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+              >
+                <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-2">{c.title}</h3>
+                {c.seoDescription && (
+                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{c.seoDescription}</p>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* FAQ */}
       {faqItems.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 py-8">
@@ -331,6 +389,13 @@ export default async function LandingPagePublic({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* Last Updated */}
+      <section className="max-w-5xl mx-auto px-4 py-6">
+        <p className="text-center text-sm text-gray-400">
+          最后更新：{new Date(page.updatedAt).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+      </section>
 
       {/* Bottom padding */}
       <div className="h-16" />

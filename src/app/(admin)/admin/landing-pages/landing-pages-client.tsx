@@ -19,6 +19,7 @@ interface LandingPage {
   relatedTopics: string[];
   relatedArticles: string[];
   createdAt: string;
+  updatedAt: string;
   publishedAt: string | null;
   heroSection: any;
   faqItems: any;
@@ -660,13 +661,16 @@ export default function LandingPagesClient() {
               <h3 className="text-xs font-bold text-gray-500 mb-2">📋 预览摘要</h3>
               <div className="bg-gray-50 rounded-lg p-4 text-xs space-y-1 text-gray-600">
                 <p><span className="font-medium">Hero:</span> {(editing.heroSection as any)?.title || "未配置"}</p>
+                <p><span className="font-medium">热门城市:</span> {Array.isArray((editing.heroSection as any)?.hotCities) ? (editing.heroSection as any).hotCities.join(", ") : "未配置"}</p>
                 <p><span className="font-medium">主工具:</span> {editing.primaryTool || "未配置"}</p>
                 <p><span className="font-medium">相关工具:</span> {(editing.relatedTools || []).length > 0 ? (editing.relatedTools || []).join(", ") : "无"}</p>
                 <p><span className="font-medium">相关专题:</span> {(editing.relatedTopics || []).length > 0 ? (editing.relatedTopics || []).join(", ") : "无"}</p>
                 <p><span className="font-medium">相关文章:</span> {(editing.relatedArticles || []).length > 0 ? (editing.relatedArticles || []).join(", ") : "无"}</p>
+                <p><span className="font-medium">相关清单:</span> {Array.isArray((editing.ctaConfig as any)?.relatedChecklists) ? (editing.ctaConfig as any).relatedChecklists.join(", ") : "未配置"}</p>
                 <p><span className="font-medium">FAQ:</span> {Array.isArray(editing.faqItems) ? `${editing.faqItems.length} 个问答` : "未配置"}</p>
                 <p><span className="font-medium">官方链接:</span> {Array.isArray(editing.officialLinks) ? `${editing.officialLinks.length} 个` : "未配置"}</p>
                 <p><span className="font-medium">CTA:</span> {editing.ctaConfig ? "已配置" : "未配置"}</p>
+                <p><span className="font-medium">最后更新:</span> {new Date(editing.updatedAt).toLocaleDateString('zh-CN')}</p>
               </div>
             </div>
           )}
