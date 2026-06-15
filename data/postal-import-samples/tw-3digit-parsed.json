@@ -1,0 +1,2650 @@
+[
+  {
+    "city": "臺北市",
+    "district": "中正區",
+    "postalCode": "100",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "新興區",
+    "postalCode": "800",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "大同區",
+    "postalCode": "103",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "竹北",
+    "postalCode": "302",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "前金區",
+    "postalCode": "801",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "中山區",
+    "postalCode": "104",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "湖口",
+    "postalCode": "303",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "苓雅區",
+    "postalCode": "802",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "松山區",
+    "postalCode": "105",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "新豐",
+    "postalCode": "304",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "鹽埕區",
+    "postalCode": "803",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "大安區",
+    "postalCode": "106",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "新埔",
+    "postalCode": "305",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "鼓山區",
+    "postalCode": "804",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "萬華區",
+    "postalCode": "108",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "關西",
+    "postalCode": "306",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "旗津區",
+    "postalCode": "805",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "信義區",
+    "postalCode": "110",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "芎林",
+    "postalCode": "307",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "前鎮區",
+    "postalCode": "806",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "士林區",
+    "postalCode": "111",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "寶山",
+    "postalCode": "308",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "斗南",
+    "postalCode": "630",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "三民區",
+    "postalCode": "807",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "北投區",
+    "postalCode": "112",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "竹東",
+    "postalCode": "310",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "大埤",
+    "postalCode": "631",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "楠梓區",
+    "postalCode": "811",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "內湖區",
+    "postalCode": "114",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "五峰",
+    "postalCode": "311",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "虎尾",
+    "postalCode": "632",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "小港區",
+    "postalCode": "812",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "南港區",
+    "postalCode": "115",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "橫山",
+    "postalCode": "312",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "土庫",
+    "postalCode": "633",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "左營區",
+    "postalCode": "813",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺北市",
+    "district": "文山區",
+    "postalCode": "116",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "尖石",
+    "postalCode": "313",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "褒忠",
+    "postalCode": "634",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "仁武區",
+    "postalCode": "814",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "北埔",
+    "postalCode": "314",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "彰化",
+    "postalCode": "500",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "東勢",
+    "postalCode": "635",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "大社區",
+    "postalCode": "815",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "仁愛區",
+    "postalCode": "200",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新竹縣",
+    "district": "峨眉",
+    "postalCode": "315",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "芬園",
+    "postalCode": "502",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "臺西",
+    "postalCode": "636",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "岡山區",
+    "postalCode": "820",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "信義區",
+    "postalCode": "201",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "花壇",
+    "postalCode": "503",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "崙背",
+    "postalCode": "637",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "路竹區",
+    "postalCode": "821",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "中正區",
+    "postalCode": "202",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "中壢區",
+    "postalCode": "320",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "秀水",
+    "postalCode": "504",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "麥寮",
+    "postalCode": "638",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "阿蓮區",
+    "postalCode": "822",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "中山區",
+    "postalCode": "203",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "平鎮區",
+    "postalCode": "324",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "鹿港",
+    "postalCode": "505",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "斗六",
+    "postalCode": "640",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "田寮區",
+    "postalCode": "823",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "安樂區",
+    "postalCode": "204",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "龍潭區",
+    "postalCode": "325",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "福興",
+    "postalCode": "506",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "林內",
+    "postalCode": "643",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "燕巢區",
+    "postalCode": "824",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "臺東",
+    "postalCode": "950",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "暖暖區",
+    "postalCode": "205",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "楊梅區",
+    "postalCode": "326",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "線西",
+    "postalCode": "507",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "古坑",
+    "postalCode": "646",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "橋頭區",
+    "postalCode": "825",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "綠島",
+    "postalCode": "951",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "基隆市",
+    "district": "七堵區",
+    "postalCode": "206",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "新屋區",
+    "postalCode": "327",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "和美",
+    "postalCode": "508",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "莿桐",
+    "postalCode": "647",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "梓官區",
+    "postalCode": "826",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "蘭嶼",
+    "postalCode": "952",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "觀音區",
+    "postalCode": "328",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "伸港",
+    "postalCode": "509",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "西螺",
+    "postalCode": "648",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "彌陀區",
+    "postalCode": "827",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "延平",
+    "postalCode": "953",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "萬里區",
+    "postalCode": "207",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "桃園區",
+    "postalCode": "330",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "員林",
+    "postalCode": "510",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "二崙",
+    "postalCode": "649",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "永安區",
+    "postalCode": "828",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "卑南",
+    "postalCode": "954",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "金山區",
+    "postalCode": "208",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "龜山區",
+    "postalCode": "333",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "社頭",
+    "postalCode": "511",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "北港",
+    "postalCode": "651",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "湖內區",
+    "postalCode": "829",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "鹿野",
+    "postalCode": "955",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "板橋區",
+    "postalCode": "220",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "八德區",
+    "postalCode": "334",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "永靖",
+    "postalCode": "512",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "水林",
+    "postalCode": "652",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "鳳山區",
+    "postalCode": "830",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "關山",
+    "postalCode": "956",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "汐止區",
+    "postalCode": "221",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "大溪區",
+    "postalCode": "335",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "埔心",
+    "postalCode": "513",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "口湖",
+    "postalCode": "653",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "大寮區",
+    "postalCode": "831",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "海端",
+    "postalCode": "957",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "深坑區",
+    "postalCode": "222",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "復興區",
+    "postalCode": "336",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "溪湖",
+    "postalCode": "514",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "四湖",
+    "postalCode": "654",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "林園區",
+    "postalCode": "832",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "池上",
+    "postalCode": "958",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "石碇區",
+    "postalCode": "223",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "大園區",
+    "postalCode": "337",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "大村",
+    "postalCode": "515",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "雲林縣",
+    "district": "元長",
+    "postalCode": "655",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "鳥松區",
+    "postalCode": "833",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "東河",
+    "postalCode": "959",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "瑞芳區",
+    "postalCode": "224",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "桃園市",
+    "district": "蘆竹區",
+    "postalCode": "338",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "埔鹽",
+    "postalCode": "516",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "大樹區",
+    "postalCode": "840",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "成功",
+    "postalCode": "961",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "平溪區",
+    "postalCode": "226",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "田中",
+    "postalCode": "520",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "中西區",
+    "postalCode": "700",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "旗山區",
+    "postalCode": "842",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "長濱",
+    "postalCode": "962",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "雙溪區",
+    "postalCode": "227",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "竹南",
+    "postalCode": "350",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "北斗",
+    "postalCode": "521",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "東區",
+    "postalCode": "701",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "美濃區",
+    "postalCode": "843",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "太麻里",
+    "postalCode": "963",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "貢寮區",
+    "postalCode": "228",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "頭份",
+    "postalCode": "351",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "田尾",
+    "postalCode": "522",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "南區",
+    "postalCode": "702",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "六龜區",
+    "postalCode": "844",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "金峰",
+    "postalCode": "964",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "新店區",
+    "postalCode": "231",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "三灣",
+    "postalCode": "352",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "埤頭",
+    "postalCode": "523",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "北區",
+    "postalCode": "704",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "內門區",
+    "postalCode": "845",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "大武",
+    "postalCode": "965",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "坪林區",
+    "postalCode": "232",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "南庄",
+    "postalCode": "353",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "溪州",
+    "postalCode": "524",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "安平區",
+    "postalCode": "708",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "杉林區",
+    "postalCode": "846",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺東縣",
+    "district": "達仁",
+    "postalCode": "966",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "烏來區",
+    "postalCode": "233",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "獅潭",
+    "postalCode": "354",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "竹塘",
+    "postalCode": "525",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "安南區",
+    "postalCode": "709",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "甲仙區",
+    "postalCode": "847",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "永和區",
+    "postalCode": "234",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "後龍",
+    "postalCode": "356",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "二林",
+    "postalCode": "526",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "永康區",
+    "postalCode": "710",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "桃源區",
+    "postalCode": "848",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "花蓮",
+    "postalCode": "970",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "中和區",
+    "postalCode": "235",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "通霄",
+    "postalCode": "357",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "大城",
+    "postalCode": "527",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "歸仁區",
+    "postalCode": "711",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "那瑪夏區",
+    "postalCode": "849",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "新城",
+    "postalCode": "971",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "土城區",
+    "postalCode": "236",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "苑裡",
+    "postalCode": "358",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "芳苑",
+    "postalCode": "528",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "新化區",
+    "postalCode": "712",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "茂林區",
+    "postalCode": "851",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "秀林",
+    "postalCode": "972",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "三峽區",
+    "postalCode": "237",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "苗栗",
+    "postalCode": "360",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "彰化縣",
+    "district": "二水",
+    "postalCode": "530",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "左鎮區",
+    "postalCode": "713",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "高雄市",
+    "district": "茄萣區",
+    "postalCode": "852",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "吉安",
+    "postalCode": "973",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "樹林區",
+    "postalCode": "238",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "造橋",
+    "postalCode": "361",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "玉井區",
+    "postalCode": "714",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "壽豐",
+    "postalCode": "974",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "鶯歌區",
+    "postalCode": "239",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "頭屋",
+    "postalCode": "362",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "南投",
+    "postalCode": "540",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "楠西區",
+    "postalCode": "715",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南海諸島",
+    "district": "東沙",
+    "postalCode": "817",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "鳳林",
+    "postalCode": "975",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "三重區",
+    "postalCode": "241",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "公館",
+    "postalCode": "363",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "中寮",
+    "postalCode": "541",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "南化區",
+    "postalCode": "716",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南海諸島",
+    "district": "南沙",
+    "postalCode": "819",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "光復",
+    "postalCode": "976",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "新莊區",
+    "postalCode": "242",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "大湖",
+    "postalCode": "364",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "草屯",
+    "postalCode": "542",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "仁德區",
+    "postalCode": "717",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "豐濱",
+    "postalCode": "977",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "泰山區",
+    "postalCode": "243",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "泰安",
+    "postalCode": "365",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "國姓",
+    "postalCode": "544",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "關廟區",
+    "postalCode": "718",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "馬公",
+    "postalCode": "880",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "瑞穗",
+    "postalCode": "978",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "林口區",
+    "postalCode": "244",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "銅鑼",
+    "postalCode": "366",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "埔里",
+    "postalCode": "545",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "龍崎區",
+    "postalCode": "719",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "西嶼",
+    "postalCode": "881",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "萬榮",
+    "postalCode": "979",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "蘆洲區",
+    "postalCode": "247",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "三義",
+    "postalCode": "367",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "仁愛",
+    "postalCode": "546",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "官田區",
+    "postalCode": "720",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "望安",
+    "postalCode": "882",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "玉里",
+    "postalCode": "981",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "五股區",
+    "postalCode": "248",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "西湖",
+    "postalCode": "368",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "名間",
+    "postalCode": "551",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "麻豆區",
+    "postalCode": "721",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "七美",
+    "postalCode": "883",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "卓溪",
+    "postalCode": "982",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "八里區",
+    "postalCode": "249",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "苗栗縣",
+    "district": "卓蘭",
+    "postalCode": "369",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "集集",
+    "postalCode": "552",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "佳里區",
+    "postalCode": "722",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "白沙",
+    "postalCode": "884",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "花蓮縣",
+    "district": "富里",
+    "postalCode": "983",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "淡水區",
+    "postalCode": "251",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "水里",
+    "postalCode": "553",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "西港區",
+    "postalCode": "723",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "澎湖縣",
+    "district": "湖西",
+    "postalCode": "885",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "三芝區",
+    "postalCode": "252",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "中區",
+    "postalCode": "400",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "魚池",
+    "postalCode": "555",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "七股區",
+    "postalCode": "724",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "金沙",
+    "postalCode": "890",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "新北市",
+    "district": "石門區",
+    "postalCode": "253",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "東區",
+    "postalCode": "401",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "信義",
+    "postalCode": "556",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "將軍區",
+    "postalCode": "725",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "屏東",
+    "postalCode": "900",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "金湖",
+    "postalCode": "891",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "南區",
+    "postalCode": "402",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "竹山",
+    "postalCode": "557",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "學甲區",
+    "postalCode": "726",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "三地門",
+    "postalCode": "901",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "金寧",
+    "postalCode": "892",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "宜蘭",
+    "postalCode": "260",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "西區",
+    "postalCode": "403",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "鹿谷",
+    "postalCode": "558",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "北門區",
+    "postalCode": "727",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "霧臺",
+    "postalCode": "902",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "金城",
+    "postalCode": "893",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "頭城",
+    "postalCode": "261",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "北區",
+    "postalCode": "404",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "南投縣",
+    "district": "嘉義市",
+    "postalCode": "600",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "新營區",
+    "postalCode": "730",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "瑪家",
+    "postalCode": "903",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "烈嶼",
+    "postalCode": "894",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "礁溪",
+    "postalCode": "262",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "北屯區",
+    "postalCode": "406",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "後壁區",
+    "postalCode": "731",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "九如",
+    "postalCode": "904",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "金門縣",
+    "district": "烏坵",
+    "postalCode": "896",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "壯圍",
+    "postalCode": "263",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "西屯區",
+    "postalCode": "407",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "番路",
+    "postalCode": "602",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "白河區",
+    "postalCode": "732",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "里港",
+    "postalCode": "905",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "員山",
+    "postalCode": "264",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "南屯區",
+    "postalCode": "408",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "梅山",
+    "postalCode": "603",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "東山區",
+    "postalCode": "733",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "高樹",
+    "postalCode": "906",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "連江縣",
+    "district": "南竿",
+    "postalCode": "209",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "羅東",
+    "postalCode": "265",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "太平區",
+    "postalCode": "411",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "竹崎",
+    "postalCode": "604",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "六甲區",
+    "postalCode": "734",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "鹽埔",
+    "postalCode": "907",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "連江縣",
+    "district": "北竿",
+    "postalCode": "210",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "三星",
+    "postalCode": "266",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "大里區",
+    "postalCode": "412",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "阿里山",
+    "postalCode": "605",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "下營區",
+    "postalCode": "735",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "長治",
+    "postalCode": "908",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "連江縣",
+    "district": "莒光",
+    "postalCode": "211",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "大同",
+    "postalCode": "267",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "霧峰區",
+    "postalCode": "413",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "中埔",
+    "postalCode": "606",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "柳營區",
+    "postalCode": "736",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "麟洛",
+    "postalCode": "909",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "連江縣",
+    "district": "東引",
+    "postalCode": "212",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "五結",
+    "postalCode": "268",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "烏日區",
+    "postalCode": "414",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "大埔",
+    "postalCode": "607",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "鹽水區",
+    "postalCode": "737",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "竹田",
+    "postalCode": "911",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "冬山",
+    "postalCode": "269",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "豐原區",
+    "postalCode": "420",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "水上",
+    "postalCode": "608",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "善化區",
+    "postalCode": "741",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "內埔",
+    "postalCode": "912",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "蘇澳",
+    "postalCode": "270",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "后里區",
+    "postalCode": "421",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "鹿草",
+    "postalCode": "611",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "大內區",
+    "postalCode": "742",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "萬丹",
+    "postalCode": "913",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "南澳",
+    "postalCode": "272",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "石岡區",
+    "postalCode": "422",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "太保",
+    "postalCode": "612",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "山上區",
+    "postalCode": "743",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "潮州",
+    "postalCode": "920",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "宜蘭縣",
+    "district": "釣魚臺列嶼",
+    "postalCode": "290",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "東勢區",
+    "postalCode": "423",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "朴子",
+    "postalCode": "613",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "新市區",
+    "postalCode": "744",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "泰武",
+    "postalCode": "921",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺中市",
+    "district": "和平區",
+    "postalCode": "424",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "嘉義縣",
+    "district": "東石",
+    "postalCode": "614",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "臺南市",
+    "district": "安定區",
+    "postalCode": "745",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  },
+  {
+    "city": "屏東縣",
+    "district": "來義",
+    "postalCode": "922",
+    "countryCode": "TW",
+    "country": "中国台湾",
+    "countryEn": "Taiwan, China"
+  }
+]
