@@ -1,8 +1,10 @@
 # Project Memory: 绝世百宝箱 / jueshi.net / xixiong-saas
 
-> **最后更新**: 2026-06-14  
-> **当前生产版本**: v1.20.42.6.76 (f300843)  
+> **最后更新**: 2026-06-15  
+> **当前生产版本**: v1.20.42.6.89.1 (fc39903)  
 > **版本链**:  
+> - v1.20.42.6.89 (fc39903): Country Page Backend-Configurable Landing Template MVP  
+> - v1.20.42.6.88.3 (f2cde77): HS Code Default Query Coverage & Synonym Search Fix  
 > - v1.20.42.6.74.6 (16306cb): 主部署版本  
 > - 6c23998: HS Code 英文查询 hotfix  
 > - 9527790: Guest Local Save / Auth Boundary hotfix  
@@ -107,6 +109,121 @@
 3. **无 DB 变更时仍需代码备份和回滚方案**
 4. **rsync 必须排除 `.env*`**
 5. **PM2 restart 前必须确认 build exit 0**
+
+---
+
+## 四点五、后台可配置落地页架构原则
+
+### 适用范围
+
+以下页面都应优先采用后台可配置落地页架构（基于 LandingPage 模型）：
+
+- 国家页（/lp/canada, /lp/usa, /lp/uk 等）
+- 城市页（/lp/toronto, /lp/new-york 等）
+- 邮编页（/lp/postal-code-us, /lp/postal-code-uk 等）
+- 地址格式页（/lp/address-format-us 等）
+- 工具落地页（/lp/shipping-calculator, /lp/hs-code 等）
+- 指南文章页（/guides/[slug]）
+- 专题页（/topics/[slug]）
+- 清单页（/lp/[slug] pageType=checklist）
+- 任务链页（未来扩展）
+- 黄页分类页（未来扩展）
+- 商家详情页（未来扩展）
+
+### 标准模块
+
+每个落地页应支持以下标准模块（通过 LandingPage 模型字段配置）：
+
+1. **SEO 配置**
+   - seoTitle
+   - seoDescription
+   - canonical URL
+   - index / noindex 控制（通过 status 字段：published = index, draft/hidden = noindex）
+
+2. **Hero 区域**
+   - heroSection.title
+   - heroSection.subtitle
+   - heroSection.ctaText
+   - heroSection.ctaUrl
+   - heroSection.hotCities（国家页/城市页专用，JSON 数组）
+
+3. **主工具入口**
+   - primaryTool（Tool slug）
+
+4. **相关工具**
+   - relatedTools（Tool slug 数组）
+
+5. **相关专题**
+   - relatedTopics（Topic slug 数组）
+
+6. **相关文章**
+   - relatedArticles（Article slug 数组）
+
+7. **相关清单**
+   - ctaConfig.relatedChecklists（LandingPage slug 数组，pageType=checklist）
+
+8. **FAQ**
+   - faqItems（JSON 数组：[{question, answer}]）
+
+9. **官方链接**
+   - officialLinks（JSON 数组：[{label, url, icon}]）
+   - 外链必须使用 nofollow noopener noreferrer
+
+10. **广告位**
+    - adPlacements（JSON：{placementKey, enabled, campaignIds}）
+    - 广告必须标注"广告"或"Sponsored"
+    - 广告可关闭（enabled = false）
+    - 广告不得干扰核心工具使用
+    - 无广告时页面正常显示
+
+11. **CTA（Call to Action）**
+    - ctaConfig.text
+    - ctaConfig.url
+    - ctaConfig.relatedChecklists（临时存储相关清单）
+
+12. **任务链入口**
+    - 未来扩展，可通过 heroSection 或 ctaConfig 配置
+
+13. **更新时间**
+    - updatedAt（自动更新）
+    - 页面显示"最后更新：YYYY年MM月DD日"
+
+14. **区块可见性 / 区块排序**
+    - blockVisibility / blockOrder（未来增强，当前列为 backlog）
+
+### 核心原则
+
+1. **后台可配置** - 所有页面内容通过 Admin 配置，不写死在代码中
+2. **不写死页面内容** - 使用 JSON 字段存储灵活配置
+3. **广告可关闭** - 通过 enabled 字段控制
+4. **广告必须标注** - 明确标识广告内容
+5. **广告不得干扰核心工具** - 广告位不得影响工具操作
+6. **draft / hidden 不进 sitemap** - 只有 published 状态才允许被搜索引擎索引
+7. **published 才允许 index** - 其他状态返回 404 或 noindex
+8. **先做样板页，再批量扩展** - 每个新页面类型先做一个样板验证，再批量生成
+
+### 当前实现状态
+
+- ✅ LandingPage 模型已存在（支持 country / checklist / landing 等 pageType）
+- ✅ /lp/[slug] 路由已实现（通用落地页模板）
+- ✅ 支持 hotCities（从 heroSection.hotCities 读取）
+- ✅ 支持 relatedChecklists（从 ctaConfig.relatedChecklists 读取）
+- ✅ 支持所有标准模块（Hero、Primary Tool、Related Tools、FAQ、Official Links、CTA、Ad Placement）
+- ✅ Admin 编辑入口已存在（/admin/landing-pages）
+- ✅ 样板数据：Canada（slug: canada, status: hidden, pageType: country）
+
+### 样板数据示例
+
+**Canada 国家页**（scripts/seed-canada-country-page.sql）：
+- slug: canada
+- pageType: country
+- status: hidden（初期不公开）
+- primaryTool: postal-code
+- relatedTools: [postal-code, address-formatter, exchange-rate, hs-code, shipping-calculator]
+- hotCities: [Toronto, Vancouver, Montreal, Calgary, Ottawa, Edmonton]
+- faqItems: 3 条加拿大相关 FAQ
+- officialLinks: 加拿大邮政官网、加拿大边境服务署
+- relatedChecklists: [first-shipping-checklist]
 
 ---
 
