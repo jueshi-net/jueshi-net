@@ -543,6 +543,21 @@ export default function PostalCodePage() {
             <strong>免责声明：</strong>数据来源于公开邮编数据源，结果仅供参考。正式发货前请以当地邮政或物流服务商信息为准。
           </div>
         </div>
+        {/* TW Attribution - 中华邮政官方数据来源声明 */}
+        {selectedCountryCode === 'TW' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <div className="text-sm text-blue-800">
+              <p className="font-medium mb-1">🟡 中国台湾 — 基础区级 3 码邮递区号参考</p>
+              <p className="text-xs text-blue-700 leading-relaxed">
+                当前提供区级 3 码邮递区号参考，详细投递前请以官方邮政资料为准。
+              </p>
+              <p className="text-xs text-blue-600 mt-2 leading-relaxed border-t border-blue-200 pt-2">
+                <strong>资料来源：</strong>中华邮政股份有限公司《臺灣地區郵遞區號前3碼一覽表》。本开放资料依政府資料開放授權條款第 1 版提供。查询结果仅供参考，正式投递前请以中华邮政官方资料为准。
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ===== QUERY MODE TABS ===== */}
         <div className="flex gap-2 mb-6">
@@ -993,6 +1008,12 @@ export default function PostalCodePage() {
                       <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 mx-4">
                         <p className="text-sm text-red-700 font-medium">🔴 {country.name} 数据极少，可能无法查到结果</p>
                         <p className="text-xs text-red-600 mt-1">建议使用官方邮政网站获取更完整的信息。</p>
+                      </div>
+                    )}
+                    {selectedCountryCode === 'TW' && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 mx-4">
+                        <p className="text-sm text-blue-700 font-medium">🟡 中国台湾 — 区级 3 码邮递区号参考</p>
+                        <p className="text-xs text-blue-600 mt-1">当前数据为区级（乡镇市区级）3 码前缀，共 331 条。如需完整 3+3 码投递信息，请使用下方中华邮政官方查询。</p>
                       </div>
                     )}
                     <div className="flex flex-wrap justify-center gap-2">

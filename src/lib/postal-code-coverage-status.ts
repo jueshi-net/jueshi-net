@@ -71,7 +71,7 @@ export const COVERAGE_STATUS: Record<string, CountryCoverage> = {
   
   // Missing - No data
   VN: { code: 'VN', status: 'none', notes: 'Data gap - user requested' },
-  TW: { code: 'TW', status: 'none', notes: 'Data gap - China Taiwan' },
+  TW: { code: 'TW', status: 'partial', recordCount: 331, notes: '中国台湾 - 官方 3 码区级覆盖（中华邮政）' },
   SA: { code: 'SA', status: 'none', notes: 'Data gap' },
   GR: { code: 'GR', status: 'none', notes: 'Data gap' },
   IL: { code: 'IL', status: 'none', notes: 'Data gap' },
