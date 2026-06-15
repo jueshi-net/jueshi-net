@@ -19,10 +19,10 @@ async function readSettings() {
       maxLinksPerUser: parseInt(process.env.MAX_LINKS_PER_USER || '100'),
       emailEnabled: !!process.env.SMTP_HOST,
       branding: {
-        logoUrl: '/brand/jueshi-logo-placeholder.svg',
+        logoUrl: '/brand/jueshi-logo-header.png',
         logoAlt: '绝世百宝箱 jueshi.net',
-        logoWidth: 168,
-        logoHeight: 42,
+        logoWidth: 105,
+        logoHeight: 40,
       },
     };
   }
