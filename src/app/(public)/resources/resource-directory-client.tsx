@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks } from 'lucide-react';
+import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { CATEGORY_CONFIG, PAGE_FEATURED_TOOLS, getCategoryInfo } from '@/lib/resources/category-config';
 
 interface Resource {
   id: string;
@@ -22,23 +23,20 @@ interface Resource {
   updatedAt: Date;
 }
 
-// 分类图标映射
-const categoryIcons: Record<string, React.ReactNode> = {
-  life: <Globe className="w-4 h-4" />,
-  logistics: <Globe className="w-4 h-4" />,
-  business: <Globe className="w-4 h-4" />,
-  tools: <Globe className="w-4 h-4" />,
-  templates: <Globe className="w-4 h-4" />,
-  education: <Globe className="w-4 h-4" />,
-};
-
-const categoryLabels: Record<string, string> = {
-  life: '海外生活',
-  logistics: '物流追踪',
-  business: '出海经营',
-  tools: '实用工具',
-  templates: '模板资源',
-  education: '教育学习',
+// Icon mapping for dynamic rendering
+const iconMap: Record<string, React.ReactNode> = {
+  Globe: <Globe className="w-5 h-5" />,
+  Wrench: <Wrench className="w-5 h-5" />,
+  DollarSign: <DollarSign className="w-5 h-5" />,
+  Hash: <Hash className="w-5 h-5" />,
+  FileText: <FileText className="w-5 h-5" />,
+  Truck: <Truck className="w-5 h-5" />,
+  Briefcase: <Briefcase className="w-5 h-5" />,
+  Home: <Home className="w-5 h-5" />,
+  GraduationCap: <GraduationCap className="w-5 h-5" />,
+  MapPin: <MapPin className="w-5 h-5" />,
+  Calculator: <Calculator className="w-5 h-5" />,
+  ListChecks: <ListChecks className="w-5 h-5" />,
 };
 
 const categoryColors: Record<string, string> = {
@@ -50,78 +48,28 @@ const categoryColors: Record<string, string> = {
   education: 'bg-teal-50 text-teal-600 border-teal-200',
 };
 
-// 提取内容区域为独立组件，避免桌面端/移动端重复渲染逻辑
-function ContentArea({ adResources, normalResources }: { adResources: Resource[]; normalResources: Resource[] }) {
-  return (
-    <>
-      {/* 广告横幅区域 */}
-      {adResources.length > 0 && (
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Tag className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-semibold text-amber-600">赞助推荐</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {adResources.map((r) => (
-              <a
-                key={r.id}
-                href={r.url}
-                target={r.url.startsWith('http') ? '_blank' : undefined}
-                rel="noopener noreferrer"
-                className="group relative bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 hover:shadow-lg hover:border-amber-300 transition-all overflow-hidden min-w-0"
-              >
-                {/* 广告背景装饰 */}
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-amber-200/30 rounded-full blur-xl" />
+const categoryBgColors: Record<string, string> = {
+  life: 'bg-blue-100',
+  logistics: 'bg-orange-100',
+  business: 'bg-green-100',
+  tools: 'bg-purple-100',
+  templates: 'bg-pink-100',
+  education: 'bg-teal-100',
+};
 
-                <div className="flex items-start gap-3 relative min-w-0">
-                  <div className="shrink-0 w-10 h-10 rounded-xl bg-white border border-amber-200 flex items-center justify-center overflow-hidden">
-                    {r.iconUrl || r.favicon ? (
-                      <img
-                        src={r.iconUrl || r.favicon || ''}
-                        alt={r.name}
-                        className="w-6 h-6 object-contain"
-                      />
-                    ) : (
-                      <span className="text-sm font-bold text-amber-600">{r.name.charAt(0)}</span>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold text-gray-900 truncate">{r.name}</h3>
-                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded font-bold">广告</span>
-                    </div>
-                    {r.description && (
-                      <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{r.description}</p>
-                    )}
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 常规卡片网格 */}
-      {normalResources.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {normalResources.map((r) => (
-            <ResourceCard key={r.id} resource={r} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <Search className="w-12 h-12 mb-3 text-gray-300" />
-          <p className="text-lg font-medium text-gray-500 mb-1">未找到匹配的网址</p>
-          <p className="text-sm">尝试更换关键词或切换分类</p>
-        </div>
-      )}
-    </>
-  );
-}
+const categoryTextColors: Record<string, string> = {
+  life: 'text-blue-600',
+  logistics: 'text-orange-600',
+  business: 'text-green-600',
+  tools: 'text-purple-600',
+  templates: 'text-pink-600',
+  education: 'text-teal-600',
+};
 
 function ResourceCard({ resource }: { resource: Resource }) {
   const logoSrc = resource.iconUrl || resource.favicon || null;
   const initial = resource.name.charAt(0).toUpperCase();
+  const catInfo = getCategoryInfo(resource.category);
 
   return (
     <a
@@ -188,7 +136,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
       {/* 底部：分类 + 外部网站标识 */}
       <div className="mt-auto flex items-center justify-between">
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${categoryColors[resource.category] || 'bg-gray-50 text-gray-500 border-gray-200'}`}>
-          {categoryLabels[resource.category] || resource.category}
+          {catInfo.label}
         </span>
         {resource.url.startsWith('http') && (
           <span className="inline-flex items-center gap-1 text-[10px] text-gray-400">
@@ -201,21 +149,160 @@ function ResourceCard({ resource }: { resource: Resource }) {
   );
 }
 
+// 提取内容区域为独立组件
+function ContentArea({ adResources, normalResources }: { adResources: Resource[]; normalResources: Resource[] }) {
+  return (
+    <>
+      {/* 广告横幅区域 */}
+      {adResources.length > 0 && (
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Tag className="w-4 h-4 text-amber-500" />
+            <span className="text-sm font-semibold text-amber-600">赞助推荐</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {adResources.map((r) => (
+              <a
+                key={r.id}
+                href={r.url}
+                target={r.url.startsWith('http') ? '_blank' : undefined}
+                rel="noopener noreferrer"
+                className="group relative bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 hover:shadow-lg hover:border-amber-300 transition-all overflow-hidden min-w-0"
+              >
+                <div className="absolute -top-4 -right-4 w-20 h-20 bg-amber-200/30 rounded-full blur-xl" />
+                <div className="flex items-start gap-3 relative min-w-0">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-white border border-amber-200 flex items-center justify-center overflow-hidden">
+                    {r.iconUrl || r.favicon ? (
+                      <img src={r.iconUrl || r.favicon || ''} alt={r.name} className="w-6 h-6 object-contain" />
+                    ) : (
+                      <span className="text-sm font-bold text-amber-600">{r.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900 truncate">{r.name}</h3>
+                      <span className="shrink-0 text-[10px] px-1.5 py-0.5 bg-amber-200 text-amber-800 rounded font-bold">广告</span>
+                    </div>
+                    {r.description && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{r.description}</p>}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 常规卡片网格 */}
+      {normalResources.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {normalResources.map((r) => (
+            <ResourceCard key={r.id} resource={r} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <Search className="w-12 h-12 mb-3 text-gray-300" />
+          <p className="text-lg font-medium text-gray-500 mb-1">未找到匹配的网址</p>
+          <p className="text-sm">尝试更换关键词或切换分类</p>
+        </div>
+      )}
+    </>
+  );
+}
+
+// 分类说明 + 相关工具组件
+function CategoryContext({ categoryKey, resourceCount }: { categoryKey: string; resourceCount: number }) {
+  const catInfo = getCategoryInfo(categoryKey);
+  const IconComponent = iconMap[catInfo.icon] || <Globe className="w-5 h-5" />;
+
+  return (
+    <div className="mb-5 bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-sm min-w-0">
+      <div className="flex items-start gap-3 mb-3">
+        <div className={`shrink-0 w-10 h-10 rounded-xl ${categoryBgColors[categoryKey] || 'bg-gray-100'} flex items-center justify-center`}>
+          <span className={categoryTextColors[categoryKey] || 'text-gray-600'}>{IconComponent}</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="text-lg font-bold text-gray-900">{catInfo.label}</h2>
+            <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">{resourceCount} 个资源</span>
+          </div>
+          {catInfo.description && (
+            <p className="text-sm text-gray-500 mt-1">{catInfo.description}</p>
+          )}
+        </div>
+      </div>
+
+      {/* 相关站内工具 */}
+      {catInfo.relatedTools.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">相关站内工具</p>
+          <div className="flex flex-wrap gap-2">
+            {catInfo.relatedTools.map((tool) => {
+              const toolIcon = iconMap[tool.icon] || <Wrench className="w-3.5 h-3.5" />;
+              return (
+                <a
+                  key={tool.href}
+                  href={tool.href}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-full hover:bg-purple-100 transition-colors"
+                  title={tool.description}
+                >
+                  {toolIcon}
+                  {tool.name}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 页面顶部精选工具
+function FeaturedTools() {
+  return (
+    <div className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-100 p-4 sm:p-5 min-w-0">
+      <div className="flex items-center gap-2 mb-3">
+        <Sparkles className="w-5 h-5 text-purple-600" />
+        <h2 className="text-base font-bold text-gray-900">常用站内工具</h2>
+        <span className="text-xs text-gray-400 ml-auto">免费使用</span>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        {PAGE_FEATURED_TOOLS.map((tool) => {
+          const toolIcon = iconMap[tool.icon] || <Wrench className="w-4 h-4" />;
+          return (
+            <a
+              key={tool.href}
+              href={tool.href}
+              className="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-sm transition-all text-center min-w-0"
+            >
+              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+                <span className="text-purple-600 scale-75">{toolIcon}</span>
+              </div>
+              <span className="text-xs font-medium text-gray-900 truncate w-full">{tool.name}</span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function ResourceDirectoryClient({ resources }: { resources: Resource[] }) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [search, setSearch] = useState('');
 
-  // 动态分类
+  // 动态分类（按资源数量排序）
   const dynamicCategories = useMemo(() => {
     const catMap = new Map<string, number>();
     for (const r of resources) {
-      if (r.isAd) continue; // 广告不参与分类计数
+      if (r.isAd) continue;
       catMap.set(r.category, (catMap.get(r.category) || 0) + 1);
     }
     return Array.from(catMap.entries())
       .map(([id, count]) => ({
         id,
-        label: categoryLabels[id] || id,
+        label: getCategoryInfo(id).label,
         count,
       }))
       .sort((a, b) => b.count - a.count);
@@ -244,6 +331,11 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
   const adResources = filtered.filter((r) => r.isAd);
   const normalResources = filtered.filter((r) => !r.isAd);
 
+  // 当前分类的资源数量
+  const currentCategoryCount = activeCategory === 'all' 
+    ? resources.filter(r => !r.isAd).length 
+    : resources.filter(r => r.category === activeCategory && !r.isAd).length;
+
   return (
     <div className="min-h-[calc(100dvh-3.5rem)] bg-gray-50/50 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 py-6 min-w-0">
@@ -263,6 +355,9 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
           </p>
         </div>
 
+        {/* 页面顶部精选工具 */}
+        {activeCategory === 'all' && !search.trim() && <FeaturedTools />}
+
         {/* 搜索 */}
         <div className="mb-5 relative min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -274,7 +369,12 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
           />
         </div>
 
-        {/* 移动端分类 Tab — 必须在 flex 容器外面，避免横向溢出 */}
+        {/* 分类说明（选择分类后显示） */}
+        {activeCategory !== 'all' && (
+          <CategoryContext categoryKey={activeCategory} resourceCount={currentCategoryCount} />
+        )}
+
+        {/* 移动端分类 Tab */}
         <div className="lg:hidden mb-4 -mx-4 px-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <button
@@ -305,7 +405,6 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
 
         {/* 桌面端：左侧分类 + 右侧内容 */}
         <div className="hidden lg:flex gap-6">
-          {/* 左侧分类菜单（仅桌面端） */}
           <aside className="w-52 shrink-0">
             <div className="sticky top-6 bg-white rounded-2xl border border-gray-100 p-3 shadow-sm">
               <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">
@@ -321,7 +420,7 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
                   }`}
                 >
                   <span>全部网址</span>
-                  <span className="text-xs text-gray-400">{resources.length - adResources.length}</span>
+                  <span className="text-xs text-gray-400">{resources.filter(r => !r.isAd).length}</span>
                 </button>
                 {dynamicCategories.map((cat) => (
                   <button
@@ -341,89 +440,84 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
             </div>
           </aside>
 
-          {/* 右侧内容区（仅桌面端 flex 内） */}
           <main className="flex-1 min-w-0">
-            <ContentArea
-              adResources={adResources}
-              normalResources={normalResources}
-            />
+            <ContentArea adResources={adResources} normalResources={normalResources} />
           </main>
         </div>
 
-        {/* 移动端：全宽内容区（不在 flex 容器内） */}
+        {/* 移动端：全宽内容区 */}
         <div className="lg:hidden min-w-0">
-          <ContentArea
-            adResources={adResources}
-            normalResources={normalResources}
-          />
+          <ContentArea adResources={adResources} normalResources={normalResources} />
         </div>
 
-        {/* 相关工具推荐 */}
-        <div className="mt-8 bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm min-w-0">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-purple-600" />
-            相关站内工具
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">
-            除了外部网站，本站还提供以下免费工具，助您高效完成跨境业务：
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <a href="/tracking" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
-                <Globe className="w-5 h-5 text-orange-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">物流追踪查询入口</h3>
-                <p className="text-xs text-gray-500">前往 17TRACK 查询全球包裹轨迹</p>
-              </div>
-            </a>
-            <a href="/tools/exchange-rate" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
-                <DollarSign className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">汇率换算</h3>
-                <p className="text-xs text-gray-500">实时汇率查询与历史走势</p>
-              </div>
-            </a>
-            <a href="/tools/hs-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                <Hash className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">HS Code 查询</h3>
-                <p className="text-xs text-gray-500">商品编码查询与归类辅助</p>
-              </div>
-            </a>
-            <a href="/tools/postal-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
-                <Hash className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">全球邮编查询</h3>
-                <p className="text-xs text-gray-500">各国邮政编码与地址解析</p>
-              </div>
-            </a>
-            <a href="/tools/documents" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center shrink-0">
-                <FileText className="w-5 h-5 text-pink-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">外贸单据生成</h3>
-                <p className="text-xs text-gray-500">Commercial Invoice、Packing List 等</p>
-              </div>
-            </a>
-            <a href="/checklists" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
-              <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center shrink-0">
-                <ListChecks className="w-5 h-5 text-teal-600" />
-              </div>
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-gray-900">跨境清单</h3>
-                <p className="text-xs text-gray-500">开店、发货、合规全流程清单</p>
-              </div>
-            </a>
+        {/* 底部相关站内工具推荐（当选择分类时不重复显示） */}
+        {activeCategory === 'all' && (
+          <div className="mt-8 bg-white rounded-2xl border border-gray-100 p-4 sm:p-6 shadow-sm min-w-0">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Wrench className="w-5 h-5 text-purple-600" />
+              更多站内工具
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              除了外部网站，本站还提供以下免费工具，助您高效完成跨境业务：
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <a href="/tools/exchange-rate" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                  <DollarSign className="w-5 h-5 text-green-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">汇率换算</h3>
+                  <p className="text-xs text-gray-500">实时汇率查询与历史走势</p>
+                </div>
+              </a>
+              <a href="/tools/hs-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                  <Hash className="w-5 h-5 text-blue-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">HS Code 查询</h3>
+                  <p className="text-xs text-gray-500">商品编码查询与归类辅助</p>
+                </div>
+              </a>
+              <a href="/tools/postal-code" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
+                  <Hash className="w-5 h-5 text-purple-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">全球邮编查询</h3>
+                  <p className="text-xs text-gray-500">各国邮政编码与地址解析</p>
+                </div>
+              </a>
+              <a href="/tools/commercial-invoice" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-pink-100 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-pink-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">商业发票</h3>
+                  <p className="text-xs text-gray-500">生成国际贸易商业发票</p>
+                </div>
+              </a>
+              <a href="/tools/quote-sheet" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-teal-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">报价单</h3>
+                  <p className="text-xs text-gray-500">快速生成专业报价单</p>
+                </div>
+              </a>
+              <a href="/checklists" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+                <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
+                  <ListChecks className="w-5 h-5 text-orange-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-gray-900">跨境清单</h3>
+                  <p className="text-xs text-gray-500">开店、发货、合规全流程清单</p>
+                </div>
+              </a>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
