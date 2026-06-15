@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const category = searchParams.get("category") || undefined;
     const search = searchParams.get("search") || undefined;
+    const sourceType = searchParams.get("sourceType") || undefined;
+    const isAd = searchParams.get("isAd");
+    const sortBy = searchParams.get("sortBy") || "updatedAt";
 
     // Check if user is admin
     const session = await auth();
@@ -16,6 +19,10 @@ export async function GET(req: NextRequest) {
 
     const where: any = {};
     if (category) where.category = category;
+    if (sourceType) where.sourceType = sourceType;
+    if (isAd !== null && isAd !== undefined && isAd !== "") {
+      where.isAd = isAd === "true";
+    }
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
@@ -29,10 +36,31 @@ export async function GET(req: NextRequest) {
       where.isActive = true;
     }
 
+    // Build orderBy based on sortBy parameter
+    let orderBy: any;
+    switch (sortBy) {
+      case "createdAt":
+        orderBy = { createdAt: "desc" };
+        break;
+      case "sortOrder":
+        orderBy = [{ sortOrder: "asc" }, { createdAt: "desc" }];
+        break;
+      case "qualityScore":
+        orderBy = { qualityScore: "desc" };
+        break;
+      case "name":
+        orderBy = { name: "asc" };
+        break;
+      case "updatedAt":
+      default:
+        orderBy = { updatedAt: "desc" };
+        break;
+    }
+
     const [resources, total] = await Promise.all([
       prisma.resource.findMany({
         where,
-        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        orderBy,
         skip: (page - 1) * limit,
         take: limit,
       }),

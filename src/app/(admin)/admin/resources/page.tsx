@@ -29,6 +29,9 @@ export default function AdminResourcesPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [sourceTypeFilter, setSourceTypeFilter] = useState('');
+  const [isAdFilter, setIsAdFilter] = useState('');
+  const [sortBy, setSortBy] = useState('updatedAt');
 
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -63,6 +66,9 @@ export default function AdminResourcesPage() {
     const params = new URLSearchParams({ page: String(page), limit: '50' });
     if (search) params.set('search', search);
     if (categoryFilter) params.set('category', categoryFilter);
+    if (sourceTypeFilter) params.set('sourceType', sourceTypeFilter);
+    if (isAdFilter) params.set('isAd', isAdFilter);
+    if (sortBy) params.set('sortBy', sortBy);
 
     try {
       const res = await fetch(`/api/resources?${params}`);
@@ -73,7 +79,7 @@ export default function AdminResourcesPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchResources(); }, [page, search, categoryFilter]);
+  useEffect(() => { fetchResources(); }, [page, search, categoryFilter, sourceTypeFilter, isAdFilter, sortBy]);
 
   const openCreate = () => {
     setEditingId(null);
@@ -213,6 +219,7 @@ export default function AdminResourcesPage() {
 
   const activeCount = resources.filter(r => r.isActive).length;
   const inactiveCount = resources.filter(r => !r.isActive).length;
+  const adCount = resources.filter(r => r.isAd).length;
   const categoryCount = new Set(resources.map(r => r.category)).size;
   const deadLinkCount = Object.values(linkResults).filter(r => !r.ok).length;
 
@@ -260,7 +267,7 @@ export default function AdminResourcesPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <div className="bg-white border rounded-xl p-4 text-center">
           <div className="text-2xl font-extrabold text-gray-900">{total}</div>
           <div className="text-xs text-gray-500">总网址</div>
@@ -272,6 +279,10 @@ export default function AdminResourcesPage() {
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
           <div className="text-2xl font-extrabold text-gray-500">{inactiveCount}</div>
           <div className="text-xs text-gray-400">已隐藏</div>
+        </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+          <div className="text-2xl font-extrabold text-amber-700">{adCount}</div>
+          <div className="text-xs text-amber-600">广告/赞助</div>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
           <div className="text-2xl font-extrabold text-blue-700">{categoryCount}</div>
@@ -289,10 +300,28 @@ export default function AdminResourcesPage() {
 
       {/* Filters */}
       <div className="flex gap-3 flex-wrap">
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="搜索名称/描述/URL..." className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
+        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="搜索名称/描述/URL..." className="flex-1 min-w-[200px] px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
         <select value={categoryFilter} onChange={e => { setCategoryFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
           <option value="">全部分类</option>
           {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <select value={sourceTypeFilter} onChange={e => { setSourceTypeFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
+          <option value="">全部来源</option>
+          <option value="official">🏛️ 官方</option>
+          <option value="third-party">🔗 第三方</option>
+          <option value="internal">🔒 内部</option>
+        </select>
+        <select value={isAdFilter} onChange={e => { setIsAdFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
+          <option value="">全部类型</option>
+          <option value="true">⭐ 广告/赞助</option>
+          <option value="false">普通资源</option>
+        </select>
+        <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
+          <option value="updatedAt">最近更新</option>
+          <option value="createdAt">创建时间</option>
+          <option value="sortOrder">排序权重</option>
+          <option value="qualityScore">质量评分</option>
+          <option value="name">名称</option>
         </select>
       </div>
 
@@ -318,6 +347,7 @@ export default function AdminResourcesPage() {
                   <th className="px-4 py-3 text-left">名称</th>
                   <th className="px-4 py-3 text-left hidden sm:table-cell">分类</th>
                   <th className="px-4 py-3 text-left hidden md:table-cell">来源</th>
+                  <th className="px-4 py-3 text-left hidden lg:table-cell">质量</th>
                   <th className="px-4 py-3 text-left">状态</th>
                   <th className="px-4 py-3 text-left hidden lg:table-cell">链接健康</th>
                   <th className="px-4 py-3 text-left hidden lg:table-cell">更新时间</th>
@@ -328,14 +358,22 @@ export default function AdminResourcesPage() {
                 {resources.map(r => {
                   const linkResult = linkResults[r.id];
                   return (
-                    <tr key={r.id} className={`border-b hover:bg-gray-50 ${linkResult && !linkResult.ok ? 'bg-red-50' : ''}`}>
+                    <tr key={r.id} className={`border-b hover:bg-gray-50 ${linkResult && !linkResult.ok ? 'bg-red-50' : ''} ${r.isAd ? 'bg-amber-50/30' : ''}`}>
                       <td className="px-4 py-3"><input type="checkbox" checked={selected.includes(r.id)} onChange={e => setSelected(e.target.checked ? [...selected, r.id] : selected.filter(id => id !== r.id))} /></td>
                       <td className="px-4 py-3">
-                        <div className="font-medium max-w-[180px] truncate">{r.name}</div>
+                        <div className="font-medium max-w-[180px] truncate flex items-center gap-1">
+                          {r.isAd && <span className="text-amber-500 text-xs" title="广告/赞助">⭐</span>}
+                          {r.name}
+                        </div>
                         <div className="text-xs text-gray-400 truncate max-w-xs">{r.url}</div>
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell"><span className={`px-2 py-0.5 rounded text-xs ${catColor(r.category)}`}>{catLabel(r.category)}</span></td>
                       <td className="px-4 py-3 hidden md:table-cell"><span className="text-xs">{r.sourceType === 'official' ? '🏛️ 官方' : r.sourceType === 'third-party' ? '🔗 第三方' : '🔒 内部'}</span></td>
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <span className={`text-xs font-medium ${r.qualityScore >= 80 ? 'text-green-600' : r.qualityScore >= 50 ? 'text-amber-600' : 'text-gray-400'}`}>
+                          {r.qualityScore || 0}
+                        </span>
+                      </td>
                       <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs ${r.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{r.isActive ? '启用' : '隐藏'}</span></td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {linkResult ? (
