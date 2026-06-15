@@ -84,8 +84,8 @@ cd $PROJECT_DIR
 echo "Setting production environment..."
 export NODE_ENV=production
 
-echo "Installing dependencies..."
-npm ci --omit=dev
+echo "Installing dependencies (including dev for build)..."
+npm ci
 if [ \$? -ne 0 ]; then
     echo "npm ci failed"
     exit 1
