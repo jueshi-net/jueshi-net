@@ -134,22 +134,19 @@ echo ""
 
 # Step 7: Generate deploy metadata
 echo -e "${BLUE}Step 7: Generate deploy metadata${NC}"
-ssh $VPS_USER@$VPS_HOST << EOF
-cd $PROJECT_DIR
-COMMIT_HASH=\$(git rev-parse HEAD)
-BUILD_ID=\$(node -e "console.log(require('./.next/BUILD_ID'))" 2>/dev/null || echo "unknown")
-cat > .deploy-meta.json << METAEOF
+# Use LOCAL commit hash (source of truth), not VPS git HEAD (rsync may not update it)
+LOCAL_COMMIT=$(git rev-parse HEAD)
+ssh $VPS_USER@$VPS_HOST "cd $PROJECT_DIR && BUILD_ID=\$(cat .next/BUILD_ID 2>/dev/null || echo 'unknown') && cat > .deploy-meta.json << METAEOF
 {
-  "commit": "\$COMMIT_HASH",
-  "buildId": "\$BUILD_ID",
-  "deployedAt": "\$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "deployedBy": "\$(whoami)",
-  "environment": "production"
+  \"commit\": \"${LOCAL_COMMIT}\",
+  \"buildId\": \"\$BUILD_ID\",
+  \"deployedAt\": \"\$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+  \"deployedBy\": \"\$(whoami)\",
+  \"environment\": \"production\"
 }
 METAEOF
-echo "Deploy metadata generated:"
-cat .deploy-meta.json
-EOF
+echo 'Deploy metadata generated:'
+cat .deploy-meta.json"
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Deploy metadata generated${NC}"
