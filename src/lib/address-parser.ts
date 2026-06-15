@@ -1,7 +1,10 @@
 /**
- * Address Parser - Pure frontend address parsing
+ * Address Parser v3 — Line-based parsing with country-specific rules
  * Supports: US, Canada, UK, Australia, New Zealand, China
  * No external API calls, no database, no server storage
+ * 
+ * Key design: identify the "city line" (the line containing postal code + state)
+ * and extract city from that same line.
  */
 
 export interface ParsedAddress {
@@ -18,378 +21,378 @@ export interface ParsedAddress {
   warnings: string[];
 }
 
-// Country detection patterns (ordered by specificity - more specific first)
-const COUNTRY_PATTERNS: Array<[string, string[]]> = [
-  ['New Zealand', ['new zealand', 'nz', '新西兰']],
-  ['United Kingdom', ['united kingdom', 'uk', 'britain', 'england', 'scotland', 'wales', '英国', '英格兰']],
-  ['United States', ['united states', 'usa', 'america', '美国', '美利坚']],
-  ['Australia', ['australia', '澳洲', '澳大利亚']],
-  ['Canada', ['canada', '加拿大']],
-  ['China', ['china', 'prc', '中国', '中华人民共和国']],
+// ─── Country detection ───────────────────────────────────────────────
+
+const COUNTRY_ALIASES: Array<{ canonical: string; display: string; patterns: RegExp[] }> = [
+  {
+    canonical: 'New Zealand', display: 'New Zealand',
+    patterns: [/\bnew\s*zealand\b/i, /\bNZ\b/i, /新西兰/],
+  },
+  {
+    canonical: 'United Kingdom', display: 'United Kingdom',
+    patterns: [/\bunited\s*kingdom\b/i, /\bUK\b/i, /\bbritain\b/i, /\bengland\b/i, /\bscotland\b/i, /\bwales\b/i, /英国/, /英格兰/],
+  },
+  {
+    canonical: 'United States', display: 'United States',
+    patterns: [/\bunited\s*states\b/i, /\bUSA\b/i, /\bUS\b(?!\s*\d)/i, /美国/, /美利坚/],
+  },
+  {
+    canonical: 'Australia', display: 'Australia',
+    patterns: [/\baustralia\b/i, /澳洲/, /澳大利亚/],
+  },
+  {
+    canonical: 'Canada', display: 'Canada',
+    patterns: [/\bcanada\b/i, /加拿大/],
+  },
+  {
+    canonical: 'China', display: '中国',
+    patterns: [/\bchina\b/i, /\bPRC\b/i, /中国/, /中华人民共和国/],
+  },
 ];
 
-// Postal code patterns by country
+function detectCountry(lines: string[]): { canonical: string; display: string } | null {
+  const fullText = lines.join('\n');
+  for (const c of COUNTRY_ALIASES) {
+    for (const p of c.patterns) {
+      if (p.test(fullText)) return { canonical: c.canonical, display: c.display };
+    }
+  }
+  return null;
+}
+
+// ─── Phone extraction ────────────────────────────────────────────────
+
+const PHONE_REGEX = /\+?\d{1,3}[\s\-()]?\d{1,4}[\s\-()]?\d{3,4}[\s\-()]?\d{3,5}/;
+
+function extractPhone(lines: string[]): { phone: string; cleanedLines: string[] } {
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(PHONE_REGEX);
+    if (m) {
+      const phone = m[0].replace(/\s+/g, ' ').trim();
+      const digitCount = (phone.match(/\d/g) || []).length;
+      if (digitCount >= 8) {
+        const cleaned = lines[i].replace(m[0], '').trim();
+        const cleanedLines = [...lines];
+        if (cleaned.length > 0) {
+          cleanedLines[i] = cleaned;
+        } else {
+          cleanedLines[i] = '';
+        }
+        return { phone, cleanedLines: cleanedLines.filter(l => l.length > 0) };
+      }
+    }
+  }
+  return { phone: '', cleanedLines: lines };
+}
+
+// ─── Postal code patterns ────────────────────────────────────────────
+
 const POSTAL_PATTERNS: Record<string, RegExp> = {
-  'United States': /^\d{5}(-\d{4})?$/,
-  'Canada': /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/,
-  'United Kingdom': /^[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}$/,
-  'Australia': /^\d{4}$/,
-  'New Zealand': /^\d{4}$/,
-  'China': /^\d{6}$/,
+  'United States': /\b(\d{5}(?:-\d{4})?)\b/,
+  'Canada': /\b([A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d)\b/,
+  'United Kingdom': /\b([A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2})\b/,
+  'Australia': /\b(\d{4})\b/,
+  'New Zealand': /\b(\d{4})\b/,
+  'China': /\b(\d{6})\b/,
 };
 
-// Phone patterns
-const PHONE_PATTERNS: Record<string, RegExp> = {
-  'United States': /^\+?1[\s\-()]?\d{3}[\s\-()]?\d{4}$/,
-  'Canada': /^\+?1[\s\-()]?\d{3}[\s\-()]?\d{4}$/,
-  'United Kingdom': /^\+?44[\s\-()]?\d{2,4}[\s\-()]?\d{4,6}$/,
-  'Australia': /^\+?61[\s\-()]?\d{1}[\s\-()]?\d{4}[\s\-()]?\d{4}$/,
-  'New Zealand': /^\+?64[\s\-()]?\d{1,2}[\s\-()]?\d{3,4}[\s\-()]?\d{4}$/,
-  'China': /^\+?86[\s\-()]?\d{3}[\s\-()]?\d{4}[\s\-()]?\d{4}$/,
-};
+// ─── State/Province codes ────────────────────────────────────────────
 
-// US State abbreviations
-const US_STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
+const US_STATES = new Set(['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC']);
+const CA_PROVINICES = new Set(['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT']);
+const AU_STATES = new Set(['NSW','VIC','QLD','SA','WA','TAS','NT','ACT']);
 
-// Canadian Province abbreviations
-const CA_PROVINCES = ['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'];
+const CN_PROVINCE_LIST = [
+  '北京','天津','上海','重庆',
+  '河北','山西','辽宁','吉林','黑龙江',
+  '江苏','浙江','安徽','福建','江西','山东',
+  '河南','湖北','湖南','广东','海南',
+  '四川','贵州','云南','陕西','甘肃','青海',
+  '台湾','内蒙古','广西','西藏','宁夏','新疆',
+  '香港','澳门',
+];
 
-// Australian State abbreviations
-const AU_STATES = ['NSW','VIC','QLD','SA','WA','TAS','NT','ACT'];
+// ─── Main parse function ─────────────────────────────────────────────
 
-// Chinese provinces
-const CN_PROVINCES = ['北京','天津','上海','重庆','河北','山西','辽宁','吉林','黑龙江','江苏','浙江','安徽','福建','江西','山东','河南','湖北','湖南','广东','海南','四川','贵州','云南','陕西','甘肃','青海','台湾','内蒙古','广西','西藏','宁夏','新疆'];
-
-/**
- * Detect country from address text
- */
-function detectCountry(text: string): string {
-  const lowerText = text.toLowerCase();
-  
-  for (const [country, patterns] of COUNTRY_PATTERNS) {
-    for (const pattern of patterns) {
-      const patternLower = pattern.toLowerCase();
-      // Use word boundary for short patterns to avoid false matches
-      if (patternLower.length <= 3) {
-        const regex = new RegExp(`\\b${patternLower}\\b`, 'i');
-        if (regex.test(lowerText)) {
-          return country;
-        }
-      } else {
-        if (lowerText.includes(patternLower)) {
-          return country;
-        }
-      }
-    }
-  }
-  
-  return '';
-}
-
-/**
- * Extract phone number from text
- */
-function extractPhone(text: string, country: string): { phone: string; remaining: string } {
-  // Try country-specific phone patterns first
-  if (country && PHONE_PATTERNS[country]) {
-    const pattern = PHONE_PATTERNS[country];
-    const match = text.match(pattern);
-    if (match) {
-      const phone = match[0].trim();
-      const remaining = text.replace(phone, '').trim();
-      return { phone, remaining };
-    }
-  }
-  
-  // Generic phone patterns (ordered by specificity)
-  const genericPatterns = [
-    /\+\d{1,3}[\s\-()]?\d{1,4}[\s\-()]?\d{3,4}[\s\-()]?\d{4}/, // International: +86 138 0013 8000
-    /\+\d{1,3}[\s\-()]?\d{2,4}[\s\-()]?\d{4}/, // Shorter international
-    /Tel:?\s*([+\d\s\-()]+)/i, // Tel: prefix
-    /Phone:?\s*([+\d\s\-()]+)/i, // Phone: prefix
-    /电话:?\s*([+\d\s\-()]+)/, // 电话: prefix
-  ];
-  
-  for (const pattern of genericPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      let phone = match[0].replace(/^(Tel:|Phone:|电话:)\s*/i, '').trim();
-      // Clean up phone number
-      phone = phone.replace(/\s+/g, ' ').trim();
-      const remaining = text.replace(match[0], '').trim();
-      return { phone, remaining };
-    }
-  }
-  
-  return { phone: '', remaining: text };
-}
-
-/**
- * Extract postal code from text
- */
-function extractPostalCode(text: string, country: string): { postalCode: string; remaining: string } {
-  // Try country-specific pattern first
-  if (country && POSTAL_PATTERNS[country]) {
-    const pattern = POSTAL_PATTERNS[country];
-    const match = text.match(pattern);
-    if (match) {
-      const postalCode = match[0];
-      const remaining = text.replace(postalCode, '').trim();
-      return { postalCode, remaining };
-    }
-  }
-  
-  // Generic postal patterns (ordered by specificity)
-  const genericPatterns = [
-    { pattern: /\b[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d\b/, country: 'Canada' }, // Canada: A1A 1A1
-    { pattern: /\b[A-Za-z]{1,2}\d[A-Za-z\d]?\s?\d[A-Za-z]{2}\b/, country: 'UK' }, // UK: SW1A 1AA
-    { pattern: /\b\d{5}(-\d{4})?\b/, country: 'US' }, // US: 12345 or 12345-6789
-    { pattern: /\b\d{6}\b/, country: 'China' }, // China: 123456
-    { pattern: /\b\d{4}\b/, country: 'AU/NZ' }, // AU/NZ: 1234
-  ];
-  
-  for (const { pattern } of genericPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      const postalCode = match[0];
-      const remaining = text.replace(postalCode, '').trim();
-      return { postalCode, remaining };
-    }
-  }
-  
-  return { postalCode: '', remaining: text };
-}
-
-/**
- * Extract state/province from text
- */
-function extractState(text: string, country: string): { state: string; remaining: string } {
-  const upperText = text.toUpperCase();
-  
-  // US states
-  if (country === 'United States' || country === '') {
-    for (const state of US_STATES) {
-      if (upperText.includes(` ${state} `) || upperText.endsWith(` ${state}`) || upperText.startsWith(`${state} `)) {
-        const remaining = text.replace(new RegExp(`\\b${state}\\b`, 'i'), '').trim();
-        return { state, remaining };
-      }
-    }
-  }
-  
-  // Canadian provinces
-  if (country === 'Canada' || country === '') {
-    for (const province of CA_PROVINCES) {
-      if (upperText.includes(` ${province} `) || upperText.endsWith(` ${province}`) || upperText.startsWith(`${province} `)) {
-        const remaining = text.replace(new RegExp(`\\b${province}\\b`, 'i'), '').trim();
-        return { state: province, remaining };
-      }
-    }
-  }
-  
-  // Australian states
-  if (country === 'Australia' || country === '') {
-    for (const state of AU_STATES) {
-      if (upperText.includes(` ${state} `) || upperText.endsWith(` ${state}`) || upperText.startsWith(`${state} `)) {
-        const remaining = text.replace(new RegExp(`\\b${state}\\b`, 'i'), '').trim();
-        return { state, remaining };
-      }
-    }
-  }
-  
-  // Chinese provinces
-  if (country === 'China' || country === '') {
-    for (const province of CN_PROVINCES) {
-      if (text.includes(province)) {
-        const remaining = text.replace(province, '').trim();
-        return { state: province, remaining };
-      }
-    }
-  }
-  
-  return { state: '', remaining: text };
-}
-
-/**
- * Parse address text into structured fields
- */
 export function parseAddress(input: string): ParsedAddress {
   const warnings: string[] = [];
-  let remaining = input.trim();
   
-  // Split into lines
-  const lines = remaining.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
+  // Step 1: Normalize
+  let lines = input.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
   
-  // Try to detect country from full text
-  let country = detectCountry(remaining);
-  
-  // Extract phone
-  const { phone, remaining: afterPhone } = extractPhone(remaining, country);
-  remaining = afterPhone;
-  
-  // Extract postal code
-  const { postalCode, remaining: afterPostal } = extractPostalCode(remaining, country);
-  remaining = afterPostal;
-  
-  // Re-detect country if not found
-  if (!country) {
-    country = detectCountry(remaining);
+  if (lines.length === 0) {
+    return emptyResult(input);
   }
   
-  // Extract state
-  const { state, remaining: afterState } = extractState(remaining, country);
-  remaining = afterState;
+  // Step 2: Detect country
+  const countryResult = detectCountry(lines);
+  const country = countryResult?.canonical || '';
+  const displayCountry = countryResult?.display || '';
   
-  // Try to extract recipient (first line if it looks like a name)
-  let recipient = '';
-  let addressLines: string[] = [];
+  // Step 3: Remove country-only lines
+  lines = lines.filter(l => {
+    const lower = l.toLowerCase().trim();
+    return !/^(united states|usa|us|america|canada|united kingdom|uk|britain|england|australia|au|new zealand|nz|china|prc|中国|美国|加拿大|英国|澳大利亚|新西兰|中华人民共和国)$/.test(lower);
+  });
   
-  // Re-split remaining (after phone, postal, state extraction) to get clean address lines
-  const cleanLines = remaining.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
+  // Step 4: Extract phone
+  const { phone, cleanedLines: afterPhone } = extractPhone(lines);
+  lines = afterPhone;
   
-  if (cleanLines.length > 0) {
-    const firstLine = cleanLines[0];
-    // If first line doesn't contain numbers and is short, likely a name
-    if (firstLine.length < 50 && !/\d/.test(firstLine) && !firstLine.match(/street|road|ave|blvd|dr|ln|ct/i)) {
-      recipient = firstLine;
-      addressLines = cleanLines.slice(1);
-    } else {
-      addressLines = cleanLines;
-    }
-  }
-  
-  // Try to extract city from address lines (not from remaining which includes recipient)
-  let city = '';
-  const addressText = addressLines.join(' ');
-  
-  // US/Canada pattern: "City, ST 12345" - look for city before state code
-  // After state extraction, address might be like "Mountain View, ," or "Mountain View, 94043"
-  // Match pattern like "Mountain View," - city is before comma
-  const usCaCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
-  if (usCaCityMatch && usCaCityMatch[1]) {
-    city = usCaCityMatch[1].trim();
-  }
-  
-  // Australia/NZ pattern: "City ST 1234" - look for city before state code
-  // After state extraction, address might be like "Sydney, 2000" or "Sydney,"
-  if (!city) {
-    const auNzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
-    if (auNzCityMatch && auNzCityMatch[1]) {
-      city = auNzCityMatch[1].trim();
-    }
-  }
-  
-  // UK pattern: "City PostalCode" (e.g., "London SW1A 1AA") - look for city before postal
-  // After postal extraction, address might be like "London,"
-  if (!city) {
-    const ukCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
-    if (ukCityMatch && ukCityMatch[1]) {
-      city = ukCityMatch[1].trim();
-    }
-  }
-  
-  // NZ pattern without state: "City 1234" (e.g., "Auckland 1010")
-  if (!city && country === 'New Zealand') {
-    const nzCityMatch = addressText.match(/,\s*([A-Za-z][A-Za-z\s]*?)\s*[,]/);
-    if (nzCityMatch && nzCityMatch[1]) {
-      city = nzCityMatch[1].trim();
-    }
-  }
-  
-  // China pattern: extract city from Chinese address
-  if (country === 'China' && !city) {
-    // Look for city pattern like "深圳市" or "深圳"
-    const cnCityMatch = addressText.match(/([\u4e00-\u9fa5]{2,4}市)/);
-    if (cnCityMatch) {
-      city = cnCityMatch[1].replace(/市/g, '');
-    }
-  }
-  
-  // Chinese address parsing
+  // Step 5: Country-specific parsing
   if (country === 'China') {
-    // Try to parse Chinese address structure
-    const cnPatterns = [
-      /(.+省)?(.+市)?(.+区)?(.+)?/,
-      /(.+自治区)?(.+市)?(.+区)?(.+)?/,
-    ];
-    
-    for (const pattern of cnPatterns) {
-      const match = remaining.match(pattern);
-      if (match) {
-        if (match[1]) city = match[1].replace(/省|自治区/g, '');
-        if (match[2]) {
-          if (!city) city = match[2].replace(/市/g, '');
-          else addressLines.push(match[2]);
+    return parseChineseAddress(lines, displayCountry, phone, warnings, input);
+  } else {
+    return parseWesternAddress(lines, country, displayCountry, phone, warnings, input);
+  }
+}
+
+// ─── Western address parser (US, CA, UK, AU, NZ) ────────────────────
+
+function parseWesternAddress(
+  lines: string[],
+  country: string,
+  displayCountry: string,
+  phone: string,
+  warnings: string[],
+  input: string
+): ParsedAddress {
+  const postalPattern = POSTAL_PATTERNS[country];
+  const stateCodes = country === 'United States' ? US_STATES
+    : country === 'Canada' ? CA_PROVINICES
+    : country === 'Australia' ? AU_STATES
+    : null;
+  
+  let postalCode = '';
+  let state = '';
+  let city = '';
+  let cityLineIndex = -1;
+  
+  // Find the "city line" — the line containing the postal code
+  for (let i = 0; i < lines.length; i++) {
+    if (postalPattern) {
+      const postalMatch = lines[i].match(postalPattern);
+      if (postalMatch) {
+        postalCode = postalMatch[1];
+        cityLineIndex = i;
+        
+        // Remove postal code from the line
+        let line = lines[i].replace(postalMatch[0], '').replace(/,\s*$/, '').trim();
+        
+        // Extract state from the same line
+        if (stateCodes) {
+          const stateMatch = line.match(/\b([A-Z]{2,3})\b/);
+          if (stateMatch && stateCodes.has(stateMatch[1])) {
+            state = stateMatch[1];
+            line = line.replace(new RegExp(`\\b${stateMatch[1]}\\b`), '').replace(/,\s*$/, '').replace(/^\s*,?\s*/, '').trim();
+          }
         }
-        if (match[3]) addressLines.push(match[3]);
-        if (match[4]) addressLines.push(match[4]);
+        
+        // Remaining text on this line is the city
+        // For US/CA: "Mountain View" or "Mountain View,"
+        // For UK: "London" or "London,"
+        // For AU/NZ: "Sydney" or "Sydney,"
+        city = line.replace(/,\s*$/, '').replace(/^\s*,?\s*/, '').trim();
+        
         break;
       }
     }
   }
   
-  // Build address lines
-  const addressLine1 = addressLines.length > 0 ? addressLines[0] : '';
-  const addressLine2 = addressLines.length > 1 ? addressLines.slice(1).join(', ') : '';
-  
-  // Generate warnings
-  if (!recipient) warnings.push('未识别到收件人姓名');
-  if (!phone) warnings.push('未识别到电话号码');
-  if (!country) warnings.push('未识别到国家');
-  if (!postalCode) warnings.push('未识别到邮编');
-  if (!city && country !== 'China') warnings.push('未识别到城市');
-  
-  // Map country to display name
-  let displayCountry = country;
-  if (country === 'China') {
-    displayCountry = '中国';
+  // If no postal code found, try to find state code on any line
+  if (!postalCode && stateCodes) {
+    for (let i = 0; i < lines.length; i++) {
+      const stateMatch = lines[i].match(/\b([A-Z]{2,3})\b/);
+      if (stateMatch && stateCodes.has(stateMatch[1])) {
+        state = stateMatch[1];
+        cityLineIndex = i;
+        let line = lines[i].replace(new RegExp(`\\b${stateMatch[1]}\\b`), '').replace(/,\s*$/, '').trim();
+        city = line.replace(/,\s*$/, '').trim();
+        break;
+      }
+    }
   }
   
-  // Determine confidence
-  let confidence: 'high' | 'medium' | 'low' = 'low';
+  // Now determine recipient and street address
+  // The city line is usually the second-to-last line
+  // Recipient is the first line (if it looks like a name)
+  // Street address is between recipient and city line
+  
+  let recipient = '';
+  let addressLines: string[] = [];
+  
+  // Check if first line is a name
+  if (lines.length > 0 && isLikelyName(lines[0], country)) {
+    recipient = lines[0].trim();
+    // Everything between first line and city line is street address
+    for (let i = 1; i < lines.length; i++) {
+      if (i === cityLineIndex) continue; // Skip city line (already processed)
+      addressLines.push(lines[i]);
+    }
+  } else {
+    // No recipient found, all non-city lines are address
+    for (let i = 0; i < lines.length; i++) {
+      if (i === cityLineIndex) continue;
+      addressLines.push(lines[i]);
+    }
+  }
+  
+  const addressLine1 = addressLines.length > 0 ? addressLines[0].replace(/^,\s*/, '').trim() : '';
+  const addressLine2 = addressLines.length > 1 ? addressLines.slice(1).map(l => l.replace(/^,\s*/, '').trim()).filter(l => l).join(', ') : '';
+  
+  // Warnings
+  if (!recipient) warnings.push('未识别到收件人姓名');
+  if (!phone) warnings.push('未识别到电话号码');
+  if (!displayCountry) warnings.push('未识别到国家');
+  if (!postalCode) warnings.push('未识别到邮编');
+  if (!city) warnings.push('未识别到城市');
+  
   const filledFields = [recipient, phone, displayCountry, postalCode, city, addressLine1].filter(f => f).length;
+  let confidence: 'high' | 'medium' | 'low' = 'low';
   if (filledFields >= 5) confidence = 'high';
   else if (filledFields >= 3) confidence = 'medium';
   
   return {
-    recipient,
-    phone,
-    country: displayCountry,
-    province: state,
-    city,
-    addressLine1,
-    addressLine2,
-    postalCode,
-    rawInput: input.slice(0, 200),
-    confidence,
-    warnings,
+    recipient, phone, country: displayCountry, province: state, city,
+    addressLine1, addressLine2, postalCode,
+    rawInput: input.slice(0, 200), confidence, warnings,
   };
 }
 
-/**
- * Format parsed address for international shipping
- */
+// ─── Chinese address parser ──────────────────────────────────────────
+
+function parseChineseAddress(
+  lines: string[],
+  displayCountry: string,
+  phone: string,
+  warnings: string[],
+  input: string
+): ParsedAddress {
+  let province = '';
+  let city = '';
+  let postalCode = '';
+  let recipient = '';
+  
+  // Find the line containing province
+  let provinceLineIndex = -1;
+  for (let i = 0; i < lines.length; i++) {
+    for (const prov of CN_PROVINCE_LIST) {
+      const provRegex = new RegExp(`(${prov}(?:省|自治区|壮族自治区|回族自治区|维吾尔自治区)?)`);
+      const m = lines[i].match(provRegex);
+      if (m) {
+        province = m[1];
+        provinceLineIndex = i;
+        // Remove province from the line
+        lines[i] = lines[i].replace(m[1], '').replace(/^\s*,?\s*/, '').trim();
+        break;
+      }
+    }
+    if (province) break;
+  }
+  
+  // Find city (X市) — usually on the same line as province or next line
+  for (let i = 0; i < lines.length; i++) {
+    const cityMatch = lines[i].match(/([\u4e00-\u9fa5]{2,4}市)/);
+    if (cityMatch) {
+      city = cityMatch[1];
+      lines[i] = lines[i].replace(cityMatch[1], '').replace(/^\s*,?\s*/, '').trim();
+      break;
+    }
+  }
+  
+  // Find postal code (6 digits)
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const postalMatch = lines[i].match(/\b(\d{6})\b/);
+    if (postalMatch) {
+      postalCode = postalMatch[1];
+      lines[i] = lines[i].replace(postalMatch[0], '').replace(/^\s*,?\s*/, '').trim();
+      break;
+    }
+  }
+  
+  // Find recipient (first line that looks like a Chinese name: 2-4 chars)
+  if (lines.length > 0 && /^[\u4e00-\u9fa5]{2,4}$/.test(lines[0].trim())) {
+    recipient = lines[0].trim();
+    lines = lines.slice(1);
+  }
+  
+  // Remove empty lines and country remnants
+  lines = lines.filter(l => {
+    const trimmed = l.trim();
+    if (!trimmed) return false;
+    // Remove lines that are just the country name
+    if (/^(中国|中华人民共和国|China|PRC)$/i.test(trimmed)) return false;
+    return true;
+  });
+  
+  // Remaining lines are street address
+  const addressLine1 = lines.length > 0 ? lines[0].trim() : '';
+  const addressLine2 = lines.length > 1 ? lines.slice(1).map(l => l.trim()).filter(l => l).join(', ') : '';
+  
+  // Warnings
+  if (!recipient) warnings.push('未识别到收件人姓名');
+  if (!phone) warnings.push('未识别到电话号码');
+  if (!displayCountry) warnings.push('未识别到国家');
+  if (!postalCode) warnings.push('未识别到邮编');
+  if (!city) warnings.push('未识别到城市');
+  
+  const filledFields = [recipient, phone, displayCountry, postalCode, city, addressLine1].filter(f => f).length;
+  let confidence: 'high' | 'medium' | 'low' = 'low';
+  if (filledFields >= 5) confidence = 'high';
+  else if (filledFields >= 3) confidence = 'medium';
+  
+  return {
+    recipient, phone, country: displayCountry, province, city,
+    addressLine1, addressLine2, postalCode,
+    rawInput: input.slice(0, 200), confidence, warnings,
+  };
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────
+
+function isLikelyName(line: string, country: string): boolean {
+  if (!line || line.length > 60) return false;
+  const trimmed = line.trim();
+  
+  if (country === 'China') {
+    return /^[\u4e00-\u9fa5]{2,4}$/.test(trimmed);
+  }
+  
+  if (/\d/.test(trimmed)) return false;
+  if (/street|road|ave|blvd|dr|ln|ct|hwy|apt|suite|unit|floor|parkway/i.test(trimmed)) return false;
+  if (/phone|tel|fax|email|www|http/i.test(trimmed)) return false;
+  
+  const words = trimmed.split(/\s+/);
+  if (words.length < 1 || words.length > 5) return false;
+  
+  return words.every(w => /^[A-Z][a-zA-Z'.-]*$/.test(w));
+}
+
+function emptyResult(input: string): ParsedAddress {
+  return {
+    recipient: '', phone: '', country: '', province: '', city: '',
+    addressLine1: '', addressLine2: '', postalCode: '',
+    rawInput: input.slice(0, 200), confidence: 'low',
+    warnings: ['地址为空'],
+  };
+}
+
+// ─── Format helpers ──────────────────────────────────────────────────
+
 export function formatEnglishAddress(parsed: ParsedAddress): string {
   const lines: string[] = [];
-  
   if (parsed.recipient) lines.push(parsed.recipient);
   if (parsed.addressLine1) lines.push(parsed.addressLine1);
   if (parsed.addressLine2) lines.push(parsed.addressLine2);
-  
   const cityLine = [parsed.city, parsed.province, parsed.postalCode].filter(f => f).join(', ');
   if (cityLine) lines.push(cityLine);
-  
   if (parsed.country) lines.push(parsed.country.toUpperCase());
   if (parsed.phone) lines.push(`Tel: ${parsed.phone}`);
-  
   return lines.join('\n');
 }
 
-/**
- * Format parsed address in Chinese
- */
 export function formatChineseAddress(parsed: ParsedAddress): string {
   const lines: string[] = [];
-  
   if (parsed.recipient) lines.push(`收件人：${parsed.recipient}`);
   if (parsed.phone) lines.push(`电话：${parsed.phone}`);
   if (parsed.country) lines.push(`国家：${parsed.country}`);
@@ -398,16 +401,11 @@ export function formatChineseAddress(parsed: ParsedAddress): string {
   if (parsed.addressLine1) lines.push(`地址：${parsed.addressLine1}`);
   if (parsed.addressLine2) lines.push(`    ${parsed.addressLine2}`);
   if (parsed.postalCode) lines.push(`邮编：${parsed.postalCode}`);
-  
   return lines.join('\n');
 }
 
-/**
- * Format parsed address for line-by-line printing
- */
 export function formatLineByLineAddress(parsed: ParsedAddress): string {
   const lines: string[] = [];
-  
   if (parsed.recipient) lines.push(`Recipient: ${parsed.recipient}`);
   if (parsed.phone) lines.push(`Phone: ${parsed.phone}`);
   if (parsed.addressLine1) lines.push(`Address Line 1: ${parsed.addressLine1}`);
@@ -416,6 +414,5 @@ export function formatLineByLineAddress(parsed: ParsedAddress): string {
   if (parsed.province) lines.push(`State/Province: ${parsed.province}`);
   if (parsed.postalCode) lines.push(`Postal Code: ${parsed.postalCode}`);
   if (parsed.country) lines.push(`Country: ${parsed.country}`);
-  
   return lines.join('\n');
 }
