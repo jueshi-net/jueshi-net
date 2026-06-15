@@ -74,6 +74,39 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Body scroll lock and Escape key for mobile menu
+  useEffect(() => {
+    if (mobileOpen) {
+      // Lock body scroll
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.overflow = 'hidden';
+      
+      // Handle Escape key
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setMobileOpen(false);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+      
+      return () => {
+        // Restore body scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, scrollY);
+        
+        document.removeEventListener('keydown', handleEscape);
+      };
+    }
+  }, [mobileOpen]);
+
   const handleSearch = useCallback(() => {
     const q = searchQuery.trim();
     if (!q) return;
@@ -245,99 +278,152 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu drawer */}
       {mobileOpen && (
         <>
-          <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />
-          <div className="fixed top-0 right-0 h-full w-72 bg-white shadow-xl z-50 lg:hidden">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
-              <span className="font-bold text-gray-900">菜单</span>
-              <button onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-gray-100 min-h-[40px] min-w-[40px]">
-                <X className="w-5 h-5" />
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-[60] lg:hidden transition-opacity"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+          
+          {/* Drawer panel */}
+          <div className="fixed top-0 right-0 h-dvh w-[86vw] max-w-[360px] bg-white shadow-2xl z-[70] lg:hidden flex flex-col">
+            {/* Drawer header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
+              <span className="font-bold text-gray-900 text-lg">菜单</span>
+              <button 
+                onClick={() => setMobileOpen(false)} 
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                aria-label="关闭菜单"
+              >
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
-            <div className="overflow-y-auto py-4">
-              <div className="px-4 space-y-0.5">
-                {NAV_LINKS.map((link) => {
-                  const Icon = link.icon;
-                  return (
-                    <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
-                      <Icon className="w-5 h-5 text-gray-500" />
-                      <span className="font-medium">{link.label}</span>
-                    </Link>
-                  );
-                })}
-                
-                {/* Mobile Tools Dropdown */}
-                <details className="group">
-                  <summary className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px] cursor-pointer list-none">
-                    <Wrench className="w-5 h-5 text-gray-500" />
-                    <span className="font-medium">工具分类</span>
-                    <ChevronDown className="w-3 h-3 ml-auto text-gray-400 group-open:rotate-180 transition-transform" />
-                  </summary>
-                  <div className="pl-10 pr-2 pb-2 space-y-0.5">
-                    {TOOL_CATEGORIES.map((tool) => (
-                      <Link key={tool.href} href={tool.href} onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 min-h-[40px] text-sm">
-                        <tool.icon className="w-4 h-4 text-gray-400" />
-                        <span>{tool.label}</span>
+            
+            {/* Drawer content - scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+              <div className="py-4">
+                {/* Navigation links */}
+                <div className="px-4 space-y-1 mb-4">
+                  {NAV_LINKS.map((link) => {
+                    const Icon = link.icon;
+                    return (
+                      <Link 
+                        key={link.href} 
+                        href={link.href} 
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                      >
+                        <Icon className="w-5 h-5 text-gray-500 shrink-0" />
+                        <span className="font-medium">{link.label}</span>
                       </Link>
-                    ))}
-                  </div>
-                </details>
+                    );
+                  })}
+                </div>
+                
+                {/* Tool categories accordion */}
+                <div className="px-4 mb-4">
+                  <details className="group">
+                    <summary className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px] cursor-pointer list-none">
+                      <Wrench className="w-5 h-5 text-gray-500 shrink-0" />
+                      <span className="font-medium">工具分类</span>
+                      <ChevronDown className="w-4 h-4 ml-auto text-gray-400 group-open:rotate-180 transition-transform" />
+                    </summary>
+                    <div className="pl-11 pr-2 pb-2 pt-1 space-y-0.5">
+                      {TOOL_CATEGORIES.map((tool) => (
+                        <Link 
+                          key={tool.href} 
+                          href={tool.href} 
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors min-h-[44px] text-sm"
+                        >
+                          <tool.icon className="w-4 h-4 text-gray-400 shrink-0" />
+                          <span>{tool.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </details>
+                </div>
 
-                {/* Mobile search */}
-                <div className="px-3 py-2">
+                {/* Search */}
+                <div className="px-4 mb-4">
                   <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-400" />
+                    <Search className="w-4 h-4 text-gray-400 shrink-0" />
                     <input
                       type="text"
                       placeholder="搜索工具…"
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
-                      className="flex-1 bg-gray-100 rounded-lg text-sm px-3 py-2 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 placeholder:text-gray-400 min-h-[40px]"
+                      className="flex-1 bg-gray-100 rounded-lg text-sm px-3 py-2.5 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400 min-h-[44px]"
                     />
                     <button
                       onClick={() => { handleSearch(); setMobileOpen(false); }}
-                      className="px-3 py-2 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700 transition-colors min-h-[40px]"
+                      className="px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors min-h-[44px] shrink-0"
                     >
                       搜索
                     </button>
                   </div>
                 </div>
-              </div>
-              <hr className="my-4 border-gray-200 mx-4" />
-              {isLoggedIn ? (
-                <>
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                    <p className="text-xs text-gray-500">{isAdmin ? '管理员' : '注册用户'}</p>
-                  </div>
-                  <Link href="/workbench" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
-                    <LayoutDashboard className="w-5 h-5 text-gray-500" /> <span className="font-medium">工作台</span>
-                  </Link>
-                  <Link href="/workspace/notifications" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
-                    <Bell className="w-5 h-5 text-gray-500" /> <span className="font-medium">通知中心</span>
-                  </Link>
-                  {isAdmin && (
-                    <Link href="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-900 hover:bg-gray-50 min-h-[44px]">
-                      <ShieldCheck className="w-5 h-5 text-gray-500" /> <span className="font-medium">管理后台</span>
+
+                <hr className="my-4 border-gray-200 mx-4" />
+
+                {/* User section */}
+                {isLoggedIn ? (
+                  <div className="px-4 space-y-1">
+                    <div className="px-3 py-3 border-b border-gray-100 mb-2">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{isAdmin ? '管理员' : '注册用户'}</p>
+                    </div>
+                    <Link 
+                      href="/workbench" 
+                      onClick={() => setMobileOpen(false)} 
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                    >
+                      <LayoutDashboard className="w-5 h-5 text-gray-500 shrink-0" /> 
+                      <span className="font-medium">工作台</span>
                     </Link>
-                  )}
-                  <button onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false); }} className="flex w-full items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 min-h-[44px]">
-                    <LogOut className="w-5 h-5" /> <span className="font-medium">退出登录</span>
-                  </button>
-                </>
-              ) : (
-                <div className="px-4">
-                  <Link href="/login" onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 text-white rounded-lg font-medium min-h-[48px]">
-                    <LogIn className="w-5 h-5" /> 登录 / 免费注册
-                  </Link>
-                </div>
-              )}
+                    <Link 
+                      href="/workspace/notifications" 
+                      onClick={() => setMobileOpen(false)} 
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                    >
+                      <Bell className="w-5 h-5 text-gray-500 shrink-0" /> 
+                      <span className="font-medium">通知中心</span>
+                    </Link>
+                    {isAdmin && (
+                      <Link 
+                        href="/admin" 
+                        onClick={() => setMobileOpen(false)} 
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                      >
+                        <ShieldCheck className="w-5 h-5 text-gray-500 shrink-0" /> 
+                        <span className="font-medium">管理后台</span>
+                      </Link>
+                    )}
+                    <button 
+                      onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false); }} 
+                      className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors min-h-[48px]"
+                    >
+                      <LogOut className="w-5 h-5 shrink-0" /> 
+                      <span className="font-medium">退出登录</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="px-4">
+                    <Link 
+                      href="/login" 
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center gap-2 px-4 py-3 bg-teal-600 text-white rounded-lg font-medium min-h-[48px] hover:bg-teal-700 transition-colors"
+                    >
+                      <LogIn className="w-5 h-5" /> 
+                      <span>登录 / 免费注册</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </>
