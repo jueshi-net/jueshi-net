@@ -573,7 +573,7 @@ ${'─'.repeat(30)}
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <div className="mb-4">
           <Breadcrumb />

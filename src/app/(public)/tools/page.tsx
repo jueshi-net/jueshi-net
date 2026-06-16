@@ -70,7 +70,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
       />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 pt-6">
+      <div className="max-w-7xl mx-auto px-4 pt-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {query ? `搜索结果: "${query}"` : '工具中心'}

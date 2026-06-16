@@ -435,7 +435,7 @@ export default function HSCodePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="bg-gradient-to-r from-teal-500 to-blue-600 text-white py-12 md:py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-bold mb-3">HS Code 商品归类辅助查询助手</h1>
           <p className="text-sm md:text-base text-teal-100 mb-2">HS Code Classification Assistant</p>
           <p className="text-sm text-teal-100/80 max-w-2xl mx-auto">
@@ -444,7 +444,7 @@ export default function HSCodePage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16">
+      <div className="max-w-7xl mx-auto px-4 -mt-6 pb-16">
         <div className="mb-4"><Breadcrumb /></div>
         
         {/* Primary Disclaimer */}

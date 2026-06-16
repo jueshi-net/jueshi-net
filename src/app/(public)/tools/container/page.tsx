@@ -102,7 +102,7 @@ export default function ContainerCalculatorPage() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4">
+    <div className="max-w-7xl mx-auto py-8 px-4">
       {/* Breadcrumb */}
       <div className="mb-4">
         <Breadcrumb />
