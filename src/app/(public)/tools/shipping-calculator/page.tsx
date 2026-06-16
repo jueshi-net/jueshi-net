@@ -27,7 +27,8 @@ interface CalcRow {
   width: string;
   height: string;
   quantity: string;
-  actualWeight: string;
+  unitWeight: string;
+  actualWeight: string; // backward compat, computed from unitWeight × quantity
 }
 
 type ShippingMode = 'express' | 'air' | 'sea' | 'custom';
@@ -51,7 +52,7 @@ const STORAGE_KEY = 'shipping-calculator-v1';
 const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const defaultRow = (): CalcRow => ({
-  id: genId(), length: '', width: '', height: '', quantity: '1', actualWeight: '',
+  id: genId(), length: '', width: '', height: '', quantity: '1', unitWeight: '', actualWeight: '',
 });
 
 const modeDivisor = (mode: ShippingMode, custom: string): number => {
@@ -109,7 +110,8 @@ const parseBatchText = (text: string): { rows: CalcRow[]; errors: string[] } => 
         width: parts[1],
         height: parts[2],
         quantity: parts[3] || '1',
-        actualWeight: parts[4] || '',
+        unitWeight: parts[4] || '',
+        actualWeight: '',
       });
     } else {
       errors.push(`第${idx + 1}行: "${line}" — 至少需要长、宽、高3个数值`);
@@ -196,14 +198,15 @@ export default function ShippingCalculatorPage() {
     
     const { payload } = containerTransfer;
     
-    // Create a new row with container data
+    // Create a new row with container data (v1.20.42.7.06: use unitWeight)
     const newRow: CalcRow = {
       id: genId(),
       length: payload.unitLengthCm.toString(),
       width: payload.unitWidthCm.toString(),
       height: payload.unitHeightCm.toString(),
       quantity: payload.quantity.toString(),
-      actualWeight: (payload.unitWeightKg * payload.quantity).toString(),
+      unitWeight: payload.unitWeightKg.toString(),
+      actualWeight: '',
     };
     
     // Replace existing rows with the new row
@@ -263,7 +266,7 @@ export default function ShippingCalculatorPage() {
     let totalCBM = 0;
     const perRow: {
       vw: number; cbm: number; gw: number; ctns: number;
-      l: number; w: number; h: number; q: number;
+      l: number; w: number; h: number; q: number; unitW: number;
     }[] = [];
 
     rows.forEach(row => {
@@ -271,7 +274,9 @@ export default function ShippingCalculatorPage() {
       const w = parseFloat(row.width) || 0;
       const h = parseFloat(row.height) || 0;
       const q = parseInt(row.quantity) || 0;
-      const gw = parseFloat(row.actualWeight) || 0;
+      // v1.20.42.7.06: 实重合计 = 单件重量 × 件数 (auto-computed)
+      const unitW = parseFloat(row.unitWeight) || 0;
+      const gw = unitW > 0 ? unitW * q : (parseFloat(row.actualWeight) || 0); // backward compat
 
       // CBM calculation: cm to m³ conversion
       // Single piece CBM = L_cm × W_cm × H_cm / 1,000,000
@@ -289,7 +294,7 @@ export default function ShippingCalculatorPage() {
       totalVW += vw;
       totalCBM += cbm;
 
-      perRow.push({ vw, cbm, gw, ctns: q, l, w, h, q });
+      perRow.push({ vw, cbm, gw, ctns: q, l, w, h, q, unitW: parseFloat(row.unitWeight) || 0 });
     });
 
     const chargeableWeight = Math.max(totalGW, totalVW);
@@ -602,7 +607,8 @@ export default function ShippingCalculatorPage() {
             <span className="col-span-2">宽 ({unitLabel})</span>
             <span className="col-span-2">高 ({unitLabel})</span>
             <span className="col-span-1">件数</span>
-            <span className="col-span-2">实重合计 (kg)</span>
+            <span className="col-span-1">单件重量 (kg)</span>
+            <span className="col-span-1">实重合计</span>
             <span className="col-span-1">操作</span>
             <span className="col-span-1">体积重</span>
           </div>
@@ -644,11 +650,16 @@ export default function ShippingCalculatorPage() {
                       onChange={e => updateRow(row.id, 'quantity', e.target.value)}
                       className={`${inputStyles} text-center`} />
                   </div>
-                  <div className="md:col-span-2">
-                    <label className="md:hidden text-[10px] text-gray-400">实重</label>
-                    <input type="number" step="0.1" placeholder="kg" value={row.actualWeight}
-                      onChange={e => updateRow(row.id, 'actualWeight', e.target.value)}
+                  <div className="md:col-span-1">
+                    <label className="md:hidden text-[10px] text-gray-400">单件重量</label>
+                    <input type="number" step="0.01" placeholder="kg" value={row.unitWeight}
+                      onChange={e => updateRow(row.id, 'unitWeight', e.target.value)}
                       className={`${inputStyles} text-center`} />
+                  </div>
+                  <div className="md:col-span-1 flex items-center justify-center text-xs text-gray-600 font-medium bg-gray-100 rounded px-1">
+                    {(parseFloat(row.unitWeight) || 0) * q > 0
+                      ? `${((parseFloat(row.unitWeight) || 0) * q).toFixed(1)} kg`
+                      : '—'}
                   </div>
                   <div className="md:col-span-1 flex items-center justify-center">
                     <button onClick={() => removeRow(row.id)} disabled={rows.length === 1}
@@ -763,7 +774,7 @@ export default function ShippingCalculatorPage() {
             {/* Weight Comparison */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-lg border border-gray-200 p-3">
-                <p className="text-[11px] text-gray-400 mb-1">总实重</p>
+                <p className="text-[11px] text-gray-400 mb-1">总实重 <span className="text-[9px] text-blue-400">(单件重量×件数)</span></p>
                 <p className="text-lg font-bold text-gray-900">
                   {results.totalGW > 0 ? results.totalGW.toFixed(1) : '—'}
                   <span className="text-xs font-normal text-gray-400 ml-1">kg</span>
@@ -918,7 +929,7 @@ export default function ShippingCalculatorPage() {
               <div className="px-4 pb-4 space-y-2">
                 <div className="hidden md:grid grid-cols-8 gap-2 text-[10px] font-medium text-gray-400 py-1 px-2 bg-gray-50 rounded">
                   <span>#</span><span>尺寸</span><span>体积(cm³)</span><span>件数</span>
-                  <span>体积重</span><span>单件实重</span><span>总实重</span><span>计费重</span>
+                  <span>体积重</span><span>单件重量</span><span>实重合计</span><span>计费重</span>
                 </div>
                 {results.perRow.map((r, idx) => {
                   const cw = Math.max(r.gw, r.vw);
@@ -929,7 +940,7 @@ export default function ShippingCalculatorPage() {
                       <div className="md:col-span-1 font-mono">{(r.l * r.w * r.h * r.q * (useMeters ? 1000000 : 1)).toLocaleString()} cm³</div>
                       <div className="md:col-span-1">{r.ctns} 件</div>
                       <div className="md:col-span-1 font-mono text-blue-600">{r.vw.toFixed(1)} kg</div>
-                      <div className="md:col-span-1">{r.gw > 0 ? `${(r.gw / r.ctns).toFixed(1)} kg` : '—'}</div>
+                      <div className="md:col-span-1">{r.unitW > 0 ? `${r.unitW} kg` : '—'}</div>
                       <div className="md:col-span-1">{r.gw > 0 ? `${r.gw.toFixed(1)} kg` : '—'}</div>
                       <div className="md:col-span-1 font-bold text-orange-600">{cw.toFixed(1)} kg</div>
                     </div>
@@ -1072,20 +1083,23 @@ export default function ShippingCalculatorPage() {
               <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm font-medium text-blue-800 mb-1">📋 支持以下格式（自动识别）：</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-blue-700 font-mono">
-                  <p>• 50*40*30*5*10</p>
-                  <p>• 50×40×30×5×10kg</p>
-                  <p>• 50,40,30,5,10</p>
-                  <p>• 50x40x30 5箱 10kg</p>
-                  <p>• 50 40 30 5 10</p>
+                  <p>• 50*40*30*5*8</p>
+                  <p>• 50×40×30×5×8kg</p>
+                  <p>• 50,40,30,5,8</p>
+                  <p>• 50x40x30 5箱 8kg</p>
+                  <p>• 50 40 30 5 8</p>
                   <p>• 每行一条，支持换行/逗号/分号分隔</p>
                 </div>
                 <p className="text-xs text-blue-600 mt-2">
-                  顺序：长({unitLabel}) 宽({unitLabel}) 高({unitLabel}) [件数] [单件实重kg]
+                  顺序：长({unitLabel}) 宽({unitLabel}) 高({unitLabel}) [件数] [单件重量kg]
+                </p>
+                <p className="text-xs text-blue-500 mt-1">
+                  💡 实重合计 = 单件重量 × 件数，系统自动计算
                 </p>
               </div>
 
               <textarea value={batchText} onChange={e => handleBatchParse(e.target.value)}
-                placeholder={'粘贴数据，例如：\n50*40*30*5*10\n60×50×40×2×15kg\n70,45,35,3,8'}
+                placeholder={'粘贴数据，例如：\n50*40*30*5*8\n60×50×40×2×15kg\n70,45,35,3,20\n\n顺序：长 宽 高 件数 单件重量'}
                 rows={6}
                 className={`${inputStyles} resize-none font-mono`} />
 
@@ -1103,21 +1117,28 @@ export default function ShippingCalculatorPage() {
                           <th className="py-1.5 px-2 text-gray-500">长</th>
                           <th className="py-1.5 px-2 text-gray-500">宽</th>
                           <th className="py-1.5 px-2 text-gray-500">高</th>
-                          <th className="py-1.5 px-2 text-gray-500">数量</th>
-                          <th className="py-1.5 px-2 text-gray-500">实重</th>
+                          <th className="py-1.5 px-2 text-gray-500">件数</th>
+                          <th className="py-1.5 px-2 text-gray-500">单件重量</th>
+                          <th className="py-1.5 px-2 text-gray-500">实重合计</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {parsedRows.map((row, idx) => (
+                        {parsedRows.map((row, idx) => {
+                          const uw = parseFloat(row.unitWeight) || 0;
+                          const q = parseInt(row.quantity) || 0;
+                          const rowGw = uw * q;
+                          return (
                           <tr key={row.id} className="border-t border-gray-100">
                             <td className="py-1.5 px-2 text-gray-400">{idx + 1}</td>
                             <td className="py-1.5 px-2">{row.length}</td>
                             <td className="py-1.5 px-2">{row.width}</td>
                             <td className="py-1.5 px-2">{row.height}</td>
                             <td className="py-1.5 px-2">{row.quantity}</td>
-                            <td className="py-1.5 px-2">{row.actualWeight || '—'}</td>
+                            <td className="py-1.5 px-2">{row.unitWeight || '—'}</td>
+                            <td className="py-1.5 px-2 text-blue-600 font-medium">{rowGw > 0 ? `${rowGw.toFixed(1)} kg` : '—'}</td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

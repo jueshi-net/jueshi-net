@@ -15,6 +15,53 @@ const containerTypes = [
   { name: "45HC", length: 13.56, width: 2.35, height: 2.69, volume: 86.1, maxWeight: 27700, useCase: "超大容积需求、超高货物、大批量出口", icon: "🏗️", color: "orange" },
 ];
 
+// v1.20.42.7.06: Bulk import cargo row type
+interface BulkCargoRow {
+  id: string;
+  length: number;
+  width: number;
+  height: number;
+  quantity: number;
+  weight: number;
+}
+
+const genBulkId = () => `bulk-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+// v1.20.42.7.06: Parse bulk import text
+const parseBulkCargo = (text: string): { rows: BulkCargoRow[]; errors: string[] } => {
+  const lines = text.trim().split(/[\n;；]+/).map(l => l.trim()).filter(l => l.length > 0);
+  const results: BulkCargoRow[] = [];
+  const errors: string[] = [];
+
+  lines.forEach((line, idx) => {
+    let cleaned = line.trim()
+      .replace(/cm|mm|kg|箱|件|个/gi, ' ')
+      .replace(/[xX×✕*]/g, '|')
+      .replace(/[，,]/g, '|')
+      .replace(/\s+/g, '|')
+      .replace(/\|+/g, '|')
+      .replace(/^\||\|$/g, '')
+      .trim();
+
+    const parts = cleaned.split('|').map(p => p.trim()).filter(p => p && !isNaN(parseFloat(p)));
+
+    if (parts.length >= 3) {
+      results.push({
+        id: genBulkId(),
+        length: parseFloat(parts[0]) || 0,
+        width: parseFloat(parts[1]) || 0,
+        height: parseFloat(parts[2]) || 0,
+        quantity: parseInt(parts[3]) || 1,
+        weight: parseFloat(parts[4]) || 0,
+      });
+    } else {
+      errors.push(`第${idx + 1}行: "${line}" — 至少需要长、宽、高3个数值`);
+    }
+  });
+
+  return { rows: results, errors };
+};
+
 export default function ContainerCalculatorPage() {
   const router = useRouter();
   const [cargoL, setCargoL] = useState(0);
@@ -24,6 +71,13 @@ export default function ContainerCalculatorPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedContainer, setSelectedContainer] = useState<string | null>(null);
 
+  // v1.20.42.7.06: Bulk import state
+  const [showBulkImport, setShowBulkImport] = useState(false);
+  const [bulkText, setBulkText] = useState('');
+  const [bulkRows, setBulkRows] = useState<BulkCargoRow[]>([]);
+  const [bulkErrors, setBulkErrors] = useState<string[]>([]);
+  const [bulkImportApplied, setBulkImportApplied] = useState(false);
+
   // 单件体积 (m³)
   const singleVolume = (cargoL * cargoW * cargoH) / 1000000;
   // 当前批次总体积 (m³)
@@ -31,12 +85,43 @@ export default function ContainerCalculatorPage() {
   // 当前批次总重量 (kg)
   const totalWeight = cargoWeight * quantity;
 
+  // v1.20.42.7.06: Bulk import totals
+  const bulkTotalVolume = bulkRows.reduce((sum, r) => sum + (r.length * r.width * r.height / 1000000) * r.quantity, 0);
+  const bulkTotalWeight = bulkRows.reduce((sum, r) => sum + r.weight * r.quantity, 0);
+  const bulkTotalQuantity = bulkRows.reduce((sum, r) => sum + r.quantity, 0);
+  
+  // Overall totals including bulk import
+  // v1.20.42.7.06 fix: only include primary quantity when primary input has dimensions
+  const hasPrimaryInput = cargoL > 0 && cargoW > 0 && cargoH > 0;
+  const overallVolume = totalVolume + bulkTotalVolume;
+  const overallWeight = totalWeight + bulkTotalWeight;
+  const overallQuantity = (hasPrimaryInput ? quantity : 0) + bulkTotalQuantity;
+
   const handleFillExample = () => {
     setCargoL(60);
     setCargoW(40);
     setCargoH(50);
     setCargoWeight(15);
     setQuantity(100);
+    // Clear bulk import when filling example
+    setBulkRows([]);
+    setBulkText('');
+    setBulkErrors([]);
+  };
+
+  // v1.20.42.7.06: Handle bulk import
+  const handleBulkParse = (text: string) => {
+    setBulkText(text);
+    const { rows, errors } = parseBulkCargo(text);
+    setBulkRows(rows);
+    setBulkErrors(errors);
+  };
+
+  const handleBulkImportClear = () => {
+    setBulkRows([]);
+    setBulkText('');
+    setBulkErrors([]);
+    setBulkImportApplied(false);
   };
 
   // 处理"带入运费计算"按钮点击
@@ -48,14 +133,15 @@ export default function ContainerCalculatorPage() {
     const maxUnits = recommended?.maxItems || 0;
     const batchCount = recommended?.batches || 0;
 
+    // v1.20.42.7.06: Include bulk import data in transfer
     const payload = {
-      quantity,
+      quantity: overallQuantity,
       unitLengthCm: cargoL,
       unitWidthCm: cargoW,
       unitHeightCm: cargoH,
       unitWeightKg: cargoWeight,
-      totalCbm: totalVolume,
-      totalWeightKg: totalWeight,
+      totalCbm: overallVolume,
+      totalWeightKg: overallWeight,
       suggestedContainer,
       utilizationRate,
       maxUnits,
@@ -71,10 +157,11 @@ export default function ContainerCalculatorPage() {
   };
 
   const results = containerTypes.map(ct => {
+    // v1.20.42.7.06: Use overall totals including bulk import
     // 当前批次占柜容体积比例
-    const batchVolumeUtil = totalVolume > 0 ? (totalVolume / ct.volume * 100) : 0;
+    const batchVolumeUtil = overallVolume > 0 ? (overallVolume / ct.volume * 100) : 0;
     // 当前批次占柜限重比例
-    const batchWeightUtil = totalWeight > 0 ? (totalWeight / ct.maxWeight * 100) : 0;
+    const batchWeightUtil = overallWeight > 0 ? (overallWeight / ct.maxWeight * 100) : 0;
     
     // 理论可装件数（按体积，单件）
     const maxItemsByVolume = singleVolume > 0 ? Math.floor(ct.volume / singleVolume) : 0;
@@ -83,10 +170,10 @@ export default function ContainerCalculatorPage() {
     // 实际可装件数（取较小值）
     const maxItems = Math.min(maxItemsByVolume, maxItemsByWeight);
     
-    // 当前批次可装几批（按体积）
-    const batchesByVolume = totalVolume > 0 ? Math.floor(ct.volume / totalVolume) : 0;
-    // 当前批次可装几批（按重量）
-    const batchesByWeight = totalWeight > 0 ? Math.floor(ct.maxWeight / totalWeight) : 0;
+    // 当前批次可装几批（按体积）- v1.20.42.7.06: use overallVolume
+    const batchesByVolume = overallVolume > 0 ? Math.floor(ct.volume / overallVolume) : 0;
+    // 当前批次可装几批（按重量）- v1.20.42.7.06: use overallWeight
+    const batchesByWeight = overallWeight > 0 ? Math.floor(ct.maxWeight / overallWeight) : 0;
     // 实际可装批次数（取较小值）
     const batches = Math.min(batchesByVolume, batchesByWeight);
 
@@ -153,11 +240,15 @@ export default function ContainerCalculatorPage() {
         </div>
 
         {/* Summary */}
-        {cargoL && cargoW && cargoH && (
+        {(cargoL && cargoW && cargoH || bulkRows.length > 0) && (
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 mb-2">
               <Info className="w-4 h-4" />
-              <span>当前货物：{quantity} 件，共 {totalVolume.toFixed(4)} CBM，约 {totalWeight.toFixed(1)} kg</span>
+              <span>
+                {bulkRows.length > 0 
+                  ? `合计：${overallQuantity} 件，共 ${overallVolume.toFixed(4)} CBM，约 ${overallWeight.toFixed(1)} kg`
+                  : `当前货物：${quantity} 件，共 ${totalVolume.toFixed(4)} CBM，约 ${totalWeight.toFixed(1)} kg`}
+              </span>
             </div>
             <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
               <p className="font-medium mb-1">💡 计算说明：</p>
@@ -165,6 +256,12 @@ export default function ContainerCalculatorPage() {
                 <li>单件体积 = 长 × 宽 × 高 ÷ 1,000,000 = {singleVolume.toFixed(4)} m³</li>
                 <li>当前批次总体积 = 单件体积 × 数量 = {totalVolume.toFixed(4)} m³</li>
                 <li>当前批次总重量 = 单件重量 × 数量 = {totalWeight.toFixed(1)} kg</li>
+                {bulkRows.length > 0 && (
+                  <>
+                    <li className="text-teal-600 font-medium">批量导入：{bulkRows.length} 种规格，{bulkTotalQuantity} 件，{bulkTotalVolume.toFixed(4)} m³，{bulkTotalWeight.toFixed(1)} kg</li>
+                    <li className="text-blue-700 font-medium">合计：{overallQuantity} 件，{overallVolume.toFixed(4)} m³，{overallWeight.toFixed(1)} kg</li>
+                  </>
+                )}
                 <li>理论可装件数 = min(柜容积 ÷ 单件体积, 柜限重 ÷ 单件重量)</li>
                 <li>可装批次数 = 理论可装件数 ÷ 当前数量</li>
                 <li className="text-orange-600 dark:text-orange-400 font-medium">⚠️ 以上仅为体积/重量粗算，实际装柜受托盘、包装、货物形状、堆叠方式和限重影响</li>
@@ -172,7 +269,7 @@ export default function ContainerCalculatorPage() {
             </div>
             
             {/* 带入运费计算按钮 */}
-            {totalVolume > 0 && totalWeight > 0 && (
+            {(totalVolume > 0 || bulkTotalVolume > 0) && (totalWeight > 0 || bulkTotalWeight > 0) && (
               <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
                 <button
                   onClick={handleTransferToShipping}
@@ -183,6 +280,129 @@ export default function ContainerCalculatorPage() {
                 </button>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 text-center">
                   将当前体积、重量和件数带入运费计算器，便于继续估算运输成本。
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* v1.20.42.7.06: Bulk Import Section */}
+      <div className={cardStyles.base + " mb-6"}>
+        <button
+          onClick={() => setShowBulkImport(!showBulkImport)}
+          className="w-full flex items-center justify-between mb-0"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-lg">📋</span>
+            <h3 className={cardStyles.header.replace("mb-4", "")}>批量导入货物规格</h3>
+            {bulkRows.length > 0 && (
+              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                已导入 {bulkRows.length} 行
+              </span>
+            )}
+          </div>
+          <svg className={`w-5 h-5 text-gray-400 transition-transform ${showBulkImport ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {showBulkImport && (
+          <div className="mt-4 space-y-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm font-medium text-blue-800 mb-1">📋 支持以下格式（自动识别）：</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-xs text-blue-700 font-mono">
+                <p>• 50,40,30,10,8</p>
+                <p>• 50*40*30*10*8</p>
+                <p>• 50×40×30×10×8kg</p>
+                <p>• 50 40 30 10 8</p>
+                <p>• 每行一条规格</p>
+                <p>• Tab 分隔也可以</p>
+              </div>
+              <p className="text-xs text-blue-600 mt-2">
+                顺序：长(cm) 宽(cm) 高(cm) [件数] [单件重量kg]
+              </p>
+              <p className="text-xs text-blue-500 mt-1">
+                💡 件数和重量可选，未提供时件数默认为1，重量为0
+              </p>
+            </div>
+
+            <textarea
+              value={bulkText}
+              onChange={e => handleBulkParse(e.target.value)}
+              placeholder={'粘贴数据，例如：\n50,40,30,10,8\n100,50,40,2,20'}
+              rows={5}
+              className={`${inputStyles} resize-none font-mono`}
+            />
+
+            {bulkErrors.length > 0 && bulkRows.length === 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-600 whitespace-pre-line">
+                ⚠️ {bulkErrors.join('\n')}
+              </div>
+            )}
+
+            {bulkRows.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-900">
+                    ✅ 识别到 {bulkRows.length} 条货物规格
+                  </p>
+                  <button
+                    onClick={handleBulkImportClear}
+                    className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
+                  >
+                    <span>✕</span> 清空导入
+                  </button>
+                </div>
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50 sticky top-0">
+                      <tr>
+                        <th className="py-1.5 px-2 text-left text-gray-500">#</th>
+                        <th className="py-1.5 px-2 text-gray-500">长(cm)</th>
+                        <th className="py-1.5 px-2 text-gray-500">宽(cm)</th>
+                        <th className="py-1.5 px-2 text-gray-500">高(cm)</th>
+                        <th className="py-1.5 px-2 text-gray-500">件数</th>
+                        <th className="py-1.5 px-2 text-gray-500">单件重量</th>
+                        <th className="py-1.5 px-2 text-gray-500">单件体积</th>
+                        <th className="py-1.5 px-2 text-gray-500">总体积</th>
+                        <th className="py-1.5 px-2 text-gray-500">总重量</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bulkRows.map((row, idx) => {
+                        const singleVol = (row.length * row.width * row.height) / 1000000;
+                        const totalVol = singleVol * row.quantity;
+                        const totalW = row.weight * row.quantity;
+                        return (
+                          <tr key={row.id} className="border-t border-gray-100">
+                            <td className="py-1.5 px-2 text-gray-400">{idx + 1}</td>
+                            <td className="py-1.5 px-2">{row.length}</td>
+                            <td className="py-1.5 px-2">{row.width}</td>
+                            <td className="py-1.5 px-2">{row.height}</td>
+                            <td className="py-1.5 px-2">{row.quantity}</td>
+                            <td className="py-1.5 px-2">{row.weight > 0 ? `${row.weight} kg` : '—'}</td>
+                            <td className="py-1.5 px-2 font-mono text-blue-600">{singleVol.toFixed(4)} m³</td>
+                            <td className="py-1.5 px-2 font-mono text-blue-600">{totalVol.toFixed(4)} m³</td>
+                            <td className="py-1.5 px-2 font-mono text-green-600">{totalW > 0 ? `${totalW.toFixed(1)} kg` : '—'}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot className="bg-gray-50 border-t border-gray-200">
+                      <tr>
+                        <td colSpan={4} className="py-1.5 px-2 font-semibold text-gray-700">合计</td>
+                        <td className="py-1.5 px-2 font-semibold text-gray-700">{bulkTotalQuantity}</td>
+                        <td className="py-1.5 px-2">—</td>
+                        <td className="py-1.5 px-2">—</td>
+                        <td className="py-1.5 px-2 font-mono font-bold text-blue-700">{bulkTotalVolume.toFixed(4)} m³</td>
+                        <td className="py-1.5 px-2 font-mono font-bold text-green-700">{bulkTotalWeight > 0 ? `${bulkTotalWeight.toFixed(1)} kg` : '—'}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 导入后可继续手动编辑上方货物尺寸，两者数据会合并计算。
                 </p>
               </div>
             )}
@@ -252,7 +472,7 @@ export default function ContainerCalculatorPage() {
                 </div>
 
                 {/* Calculation Results (shown when cargo is entered) */}
-                {(cargoL && cargoW && cargoH) && (
+                {(cargoL && cargoW && cargoH || bulkRows.length > 0) && (
                   <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-400">可装</span>
@@ -262,7 +482,7 @@ export default function ContainerCalculatorPage() {
                       <span className="text-xs text-gray-400">体积占用</span>
                       <span className="text-xs font-medium text-blue-600">{ct.batchVolumeUtil}%</span>
                     </div>
-                    {quantity > 0 && (
+                    {overallQuantity > 0 && (
                       <div className="flex justify-between items-center mt-1">
                         <span className="text-xs text-gray-400">可装批次</span>
                         <span className="text-xs font-medium text-orange-600">{ct.batches} 批</span>
@@ -277,7 +497,7 @@ export default function ContainerCalculatorPage() {
       </div>
 
       {/* Detailed Results (shown when a container is selected or cargo entered) */}
-      {cargoL && cargoW && cargoH && (
+      {(cargoL && cargoW && cargoH || bulkRows.length > 0) && (
         <div className={cardStyles.base + " mb-6"}>
           <h3 className={cardStyles.header.replace("mb-4", "")}>📊 各柜型详细对比</h3>
           <div className="overflow-x-auto">
