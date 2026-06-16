@@ -273,11 +273,15 @@ export default function ShippingCalculatorPage() {
       const q = parseInt(row.quantity) || 0;
       const gw = parseFloat(row.actualWeight) || 0;
 
-      const cbm = l * w * h * q;
-      // Volume in cm³ for VW calc (if meters, convert to cm)
-      const volCm3 = useMeters
-        ? (l * 100) * (w * 100) * (h * 100) * q
-        : l * w * h * q;
+      // CBM calculation: cm to m³ conversion
+      // Single piece CBM = L_cm × W_cm × H_cm / 1,000,000
+      // Total CBM = Single CBM × quantity
+      const singleCbm = (l * w * h) / 1000000;
+      const cbm = singleCbm * q;
+      
+      // Volume weight calculation: cm³ to kg
+      // VW = L_cm × W_cm × H_cm × quantity / divisor
+      const volCm3 = l * w * h * q;
       const vw = volCm3 / divisor;
 
       totalCtns += q;
