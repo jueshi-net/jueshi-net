@@ -1,120 +1,206 @@
 #!/bin/bash
-# Health check script for jueshi.net
+# Health check script for jueshi.net with alerting and dedup
 # Usage: bash scripts/health-check.sh
+
+# Load environment
+if [ -f /home/deploy/xixiong-saas/.env.production ]; then
+    set -a
+    source /home/deploy/xixiong-saas/.env.production
+    set +a
+fi
 
 LOG_DIR="/home/deploy/xixiong-saas/logs"
 LOG_FILE="$LOG_DIR/health-check.log"
-ALERT_FILE="$LOG_DIR/health-alerts.log"
+STATE_FILE="$LOG_DIR/health-check-state.json"
+ALERT_LOG="$LOG_DIR/health-alerts.log"
 
 mkdir -p "$LOG_DIR"
 
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+HOSTNAME=$(hostname)
 ALERTS=()
+ALERT_DETAILS=()
+
+# Initialize state file if not exists
+if [ ! -f "$STATE_FILE" ]; then
+    echo '{}' > "$STATE_FILE"
+fi
+
+# Read previous state
+PREV_STATE=$(cat "$STATE_FILE")
 
 echo "=== Health Check: $TIMESTAMP ===" >> "$LOG_FILE"
 
+# Helper function to check and record
+check_and_record() {
+    local name="$1"
+    local status="$2"  # ok, warning, critical
+    local message="$3"
+    
+    echo "[$status] $name: $message" >> "$LOG_FILE"
+    
+    if [ "$status" != "ok" ]; then
+        ALERTS+=("$name")
+        ALERT_DETAILS+=("$name: $message")
+    fi
+    
+    # Update state
+    PREV_STATE=$(echo "$PREV_STATE" | jq --arg name "$name" --arg status "$status" --arg msg "$message" '.[$name] = {"status": $status, "message": $msg, "time": now | todate}')
+}
+
 # 1. Check HTTPS homepage
-echo -n "Checking https://jueshi.net... " >> "$LOG_FILE"
-HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net)
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net 2>/dev/null || echo "000")
 if [ "$HTTP_CODE" = "200" ]; then
-    echo "OK (200)" >> "$LOG_FILE"
+    check_and_record "homepage" "ok" "HTTP 200"
 else
-    echo "FAIL ($HTTP_CODE)" >> "$LOG_FILE"
-    ALERTS+=("Homepage returned $HTTP_CODE")
+    check_and_record "homepage" "critical" "HTTP $HTTP_CODE"
 fi
 
 # 2. Check /resources
-echo -n "Checking https://jueshi.net/resources... " >> "$LOG_FILE"
-HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net/resources)
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net/resources 2>/dev/null || echo "000")
 if [ "$HTTP_CODE" = "200" ]; then
-    echo "OK (200)" >> "$LOG_FILE"
+    check_and_record "resources" "ok" "HTTP 200"
 else
-    echo "FAIL ($HTTP_CODE)" >> "$LOG_FILE"
-    ALERTS+=("/resources returned $HTTP_CODE")
+    check_and_record "resources" "critical" "HTTP $HTTP_CODE"
 fi
 
 # 3. Check /tracking
-echo -n "Checking https://jueshi.net/tracking... " >> "$LOG_FILE"
-HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net/tracking)
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://jueshi.net/tracking 2>/dev/null || echo "000")
 if [ "$HTTP_CODE" = "200" ]; then
-    echo "OK (200)" >> "$LOG_FILE"
+    check_and_record "tracking" "ok" "HTTP 200"
 else
-    echo "FAIL ($HTTP_CODE)" >> "$LOG_FILE"
-    ALERTS+=("/tracking returned $HTTP_CODE")
+    check_and_record "tracking" "critical" "HTTP $HTTP_CODE"
 fi
 
 # 4. Check PM2 status
-echo -n "Checking PM2 xixiong-saas... " >> "$LOG_FILE"
-PM2_STATUS=$(pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="xixiong-saas") | .pm2_env.status')
+cd /home/deploy/xixiong-saas
+PM2_STATUS=$(pm2 jlist 2>/dev/null | jq -r '.[] | select(.name=="xixiong-saas") | .pm2_env.status' 2>/dev/null || echo "unknown")
 if [ "$PM2_STATUS" = "online" ]; then
-    echo "OK (online)" >> "$LOG_FILE"
+    check_and_record "pm2" "ok" "online"
 else
-    echo "FAIL ($PM2_STATUS)" >> "$LOG_FILE"
-    ALERTS+=("PM2 status: $PM2_STATUS")
+    check_and_record "pm2" "critical" "status: $PM2_STATUS"
 fi
 
 # 5. Check PostgreSQL connection
-echo -n "Checking PostgreSQL... " >> "$LOG_FILE"
-cd /home/deploy/xixiong-saas
-source .env.production 2>/dev/null
 if psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-    echo "OK" >> "$LOG_FILE"
+    check_and_record "postgresql" "ok" "connection successful"
 else
-    echo "FAIL" >> "$LOG_FILE"
-    ALERTS+=("PostgreSQL connection failed")
+    check_and_record "postgresql" "critical" "connection failed"
 fi
 
 # 6. Check disk usage
-echo -n "Checking disk usage... " >> "$LOG_FILE"
 DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
-if [ "$DISK_USAGE" -lt 85 ]; then
-    echo "OK (${DISK_USAGE}%)" >> "$LOG_FILE"
+if [ "$DISK_USAGE" -lt 80 ]; then
+    check_and_record "disk" "ok" "${DISK_USAGE}% used"
+elif [ "$DISK_USAGE" -lt 90 ]; then
+    check_and_record "disk" "warning" "${DISK_USAGE}% used (threshold: 80%)"
 else
-    echo "WARNING (${DISK_USAGE}%)" >> "$LOG_FILE"
-    ALERTS+=("Disk usage: ${DISK_USAGE}%")
+    check_and_record "disk" "critical" "${DISK_USAGE}% used (threshold: 90%)"
 fi
 
 # 7. Check SSL certificate expiry
-echo -n "Checking SSL certificate... " >> "$LOG_FILE"
-EXPIRY_DATE=$(echo | openssl s_client -servername jueshi.net -connect jueshi.net:443 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2)
+EXPIRY_DATE=$(echo | openssl s_client -servername jueshi.net -connect jueshi.net:443 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null | cut -d= -f2 || echo "")
 if [ -n "$EXPIRY_DATE" ]; then
-    EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s 2>/dev/null)
+    EXPIRY_EPOCH=$(date -d "$EXPIRY_DATE" +%s 2>/dev/null || echo "0")
     CURRENT_EPOCH=$(date +%s)
     DAYS_LEFT=$(( (EXPIRY_EPOCH - CURRENT_EPOCH) / 86400 ))
     if [ "$DAYS_LEFT" -gt 14 ]; then
-        echo "OK (${DAYS_LEFT} days)" >> "$LOG_FILE"
+        check_and_record "ssl" "ok" "${DAYS_LEFT} days remaining"
+    elif [ "$DAYS_LEFT" -gt 7 ]; then
+        check_and_record "ssl" "warning" "${DAYS_LEFT} days remaining (threshold: 14 days)"
     else
-        echo "WARNING (${DAYS_LEFT} days)" >> "$LOG_FILE"
-        ALERTS+=("SSL expires in ${DAYS_LEFT} days")
+        check_and_record "ssl" "critical" "${DAYS_LEFT} days remaining (threshold: 7 days)"
     fi
 else
-    echo "FAIL (cannot read)" >> "$LOG_FILE"
-    ALERTS+=("Cannot read SSL certificate")
+    check_and_record "ssl" "critical" "cannot read certificate"
 fi
 
 # 8. Check Nginx 5xx errors (last 5 minutes)
-echo -n "Checking Nginx 5xx errors... " >> "$LOG_FILE"
-ERROR_COUNT=$(sudo tail -1000 /var/log/nginx/access.log 2>/dev/null | grep -E ' HTTP/1\.[01]" 5[0-9]{2} ' | wc -l)
-if [ "$ERROR_COUNT" -lt 10 ]; then
-    echo "OK ($ERROR_COUNT errors)" >> "$LOG_FILE"
+ERROR_COUNT=$(sudo tail -1000 /var/log/nginx/access.log 2>/dev/null | grep -E ' HTTP/1\.[01]" 5[0-9]{2} ' 2>/dev/null | wc -l | tr -d ' ')
+ERROR_COUNT=${ERROR_COUNT:-0}
+if [ "$ERROR_COUNT" -lt 5 ] 2>/dev/null; then
+    check_and_record "nginx_5xx" "ok" "$ERROR_COUNT errors in last 1000 requests"
+elif [ "$ERROR_COUNT" -lt 20 ] 2>/dev/null; then
+    check_and_record "nginx_5xx" "warning" "$ERROR_COUNT errors in last 1000 requests"
 else
-    echo "WARNING ($ERROR_COUNT errors)" >> "$LOG_FILE"
-    ALERTS+=("Nginx 5xx errors: $ERROR_COUNT")
+    check_and_record "nginx_5xx" "critical" "$ERROR_COUNT errors in last 1000 requests"
 fi
 
-# Send alerts if any
+# Save current state
+echo "$PREV_STATE" | jq '.' > "$STATE_FILE"
+
+# Check for state changes and send alerts
 if [ ${#ALERTS[@]} -gt 0 ]; then
-    echo "🚨 ALERTS DETECTED:" >> "$ALERT_FILE"
-    echo "Time: $TIMESTAMP" >> "$ALERT_FILE"
-    for alert in "${ALERTS[@]}"; do
-        echo "  - $alert" >> "$ALERT_FILE"
+    echo "🚨 ALERTS DETECTED at $TIMESTAMP on $HOSTNAME" >> "$ALERT_LOG"
+    for detail in "${ALERT_DETAILS[@]}"; do
+        echo "  - $detail" >> "$ALERT_LOG"
     done
-    echo "" >> "$ALERT_FILE"
+    echo "" >> "$ALERT_LOG"
     
-    # TODO: Add alert notification here (Telegram/Email/Webhook)
-    # Example: curl -X POST "https://api.telegram.org/bot<TOKEN>/sendMessage" \
-    #   -d "chat_id=<CHAT_ID>&text=Health check alerts: ${ALERTS[*]}"
+    # Send alert via configured channel
+    ALERT_TEXT="🚨 jueshi.net Health Check Alerts\nHost: $HOSTNAME\nTime: $TIMESTAMP\n\nFailures:\n"
+    for detail in "${ALERT_DETAILS[@]}"; do
+        ALERT_TEXT+="  • $detail\n"
+    done
+    ALERT_TEXT+="\nDisk: ${DISK_USAGE}%\nPM2: $PM2_STATUS"
+    
+    # Telegram alert (if configured)
+    if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=${ALERT_TEXT}" \
+            -d "parse_mode=HTML" > /dev/null 2>&1 || true
+    fi
+    
+    # Discord webhook (if configured)
+    if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
+        curl -s -X POST "${DISCORD_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"$(echo -e "$ALERT_TEXT")\"}" > /dev/null 2>&1 || true
+    fi
+    
+    # Generic webhook (if configured)
+    if [ -n "${ALERT_WEBHOOK_URL:-}" ]; then
+        curl -s -X POST "${ALERT_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"$(echo -e "$ALERT_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"alerts\": $(printf '%s\n' "${ALERT_DETAILS[@]}" | jq -R . | jq -s .)}" > /dev/null 2>&1 || true
+    fi
+    
+    echo "Sent ${#ALERTS[@]} alerts" >> "$LOG_FILE"
+else
+    echo "✅ All checks passed" >> "$LOG_FILE"
+    
+    # Check for recovery (previous failures now OK)
+    PREV_FAILURES=$(echo "$PREV_STATE" | jq -r 'to_entries[] | select(.value.status != "ok") | .key' 2>/dev/null || echo "")
+    if [ -n "$PREV_FAILURES" ]; then
+        RECOVERY_TEXT="✅ jueshi.net Health Check Recovery\nHost: $HOSTNAME\nTime: $TIMESTAMP\n\nRecovered:\n"
+        for item in $PREV_FAILURES; do
+            RECOVERY_TEXT+="  • $item\n"
+        done
+        
+        # Send recovery notification
+        if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                -d "chat_id=${TELEGRAM_CHAT_ID}" \
+                -d "text=${RECOVERY_TEXT}" \
+                -d "parse_mode=HTML" > /dev/null 2>&1 || true
+        fi
+        
+        if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
+            curl -s -X POST "${DISCORD_WEBHOOK_URL}" \
+                -H "Content-Type: application/json" \
+                -d "{\"content\": \"$(echo -e "$RECOVERY_TEXT")\"}" > /dev/null 2>&1 || true
+        fi
+        
+        if [ -n "${ALERT_WEBHOOK_URL:-}" ]; then
+            curl -s -X POST "${ALERT_WEBHOOK_URL}" \
+                -H "Content-Type: application/json" \
+                -d "{\"text\": \"$(echo -e "$RECOVERY_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"type\": \"recovery\"}" > /dev/null 2>&1 || true
+        fi
+        
+        echo "Sent recovery notification for: $PREV_FAILURES" >> "$LOG_FILE"
+    fi
 fi
 
-echo "Health check completed. Alerts: ${#ALERTS[@]}" >> "$LOG_FILE"
 echo "---" >> "$LOG_FILE"
+exit 0
