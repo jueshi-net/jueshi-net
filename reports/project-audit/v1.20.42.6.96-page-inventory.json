@@ -1,0 +1,759 @@
+{
+  "version": "v1.20.42.6.96",
+  "date": "2026-06-16",
+  "totalPages": 104,
+  "categories": {
+    "public": {
+      "count": 60,
+      "pages": [
+        {
+          "name": "首页",
+          "path": "/",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "平台入口，展示核心工具和资源"
+        },
+        {
+          "name": "工具中心",
+          "path": "/tools",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "所有工具的分类列表"
+        },
+        {
+          "name": "网址导航",
+          "path": "/resources",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "900+ 外部网站分类导航"
+        },
+        {
+          "name": "资源详情",
+          "path": "/resources/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个资源详情页"
+        },
+        {
+          "name": "搜索",
+          "path": "/search",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "全站搜索"
+        },
+        {
+          "name": "汇率助手",
+          "path": "/tools/exchange-rate",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "实时汇率查询与换算"
+        },
+        {
+          "name": "HS Code 查询",
+          "path": "/tools/hs-code",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "商品编码查询与归类辅助"
+        },
+        {
+          "name": "全球邮编查询",
+          "path": "/tools/postal-code",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "各国邮政编码查询"
+        },
+        {
+          "name": "地址格式化",
+          "path": "/tools/address-formatter",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "国际标准地址格式转换"
+        },
+        {
+          "name": "运费估算",
+          "path": "/tools/shipping-calculator",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "国际快递运费计算"
+        },
+        {
+          "name": "装柜计算",
+          "path": "/tools/container",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "集装箱装柜方案计算"
+        },
+        {
+          "name": "物流追踪",
+          "path": "/tracking",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "17TRACK 外部查询入口"
+        },
+        {
+          "name": "单据工具集",
+          "path": "/tools/documents",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "外贸单据工具入口"
+        },
+        {
+          "name": "商业发票",
+          "path": "/tools/commercial-invoice",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "Commercial Invoice 生成"
+        },
+        {
+          "name": "报价单",
+          "path": "/tools/quote-sheet",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "Quote Sheet 生成"
+        },
+        {
+          "name": "装箱单",
+          "path": "/tools/documents/packing-list",
+          "status": "partial",
+          "requiresAuth": false,
+          "description": "Packing List，公司资料复用未实现"
+        },
+        {
+          "name": "形式发票",
+          "path": "/tools/documents/proforma-invoice",
+          "status": "partial",
+          "requiresAuth": false,
+          "description": "Proforma Invoice，公司资料复用未实现"
+        },
+        {
+          "name": "单据草稿",
+          "path": "/tools/documents/drafts",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "历史草稿管理"
+        },
+        {
+          "name": "单位换算",
+          "path": "/tools/calculator",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "长度、重量、体积单位转换"
+        },
+        {
+          "name": "唛头生成",
+          "path": "/tools/shipping-mark",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "运输标志生成"
+        },
+        {
+          "name": "敏感货物",
+          "path": "/tools/sensitive-goods",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "敏感货物查询"
+        },
+        {
+          "name": "报关单",
+          "path": "/tools/customs-generator",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "报关单生成"
+        },
+        {
+          "name": "借记单",
+          "path": "/tools/debit-note",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "Debit Note 生成"
+        },
+        {
+          "name": "交接单",
+          "path": "/tools/handover-note",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "货物交接单"
+        },
+        {
+          "name": "入库单",
+          "path": "/tools/inbound",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "入库单生成"
+        },
+        {
+          "name": "入库收据",
+          "path": "/tools/inbound-receipt",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "入库收据生成"
+        },
+        {
+          "name": "发票",
+          "path": "/tools/invoice",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "通用发票"
+        },
+        {
+          "name": "报价",
+          "path": "/tools/quote",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "通用报价"
+        },
+        {
+          "name": "收据",
+          "path": "/tools/receipt",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "通用收据"
+        },
+        {
+          "name": "运费标签",
+          "path": "/tools/shipping-label",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "运费标签生成"
+        },
+        {
+          "name": "运费估算器",
+          "path": "/tools/shipping-estimator",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "运费快速估算"
+        },
+        {
+          "name": "二维码",
+          "path": "/tools/qrcode",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "二维码生成"
+        },
+        {
+          "name": "压缩工具",
+          "path": "/tools/zip",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "文件压缩"
+        },
+        {
+          "name": "备忘录",
+          "path": "/tools/memo",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "文本备忘录"
+        },
+        {
+          "name": "视频脚本",
+          "path": "/tools/video-script-sop",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "视频脚本 SOP"
+        },
+        {
+          "name": "专题列表",
+          "path": "/topics",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "专题文章列表"
+        },
+        {
+          "name": "专题详情",
+          "path": "/topics/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个专题详情"
+        },
+        {
+          "name": "清单列表",
+          "path": "/checklists",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "跨境清单列表"
+        },
+        {
+          "name": "清单详情",
+          "path": "/checklists/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个清单详情"
+        },
+        {
+          "name": "指南列表",
+          "path": "/guides",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "指南文章列表"
+        },
+        {
+          "name": "指南详情",
+          "path": "/guides/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个指南详情"
+        },
+        {
+          "name": "博客列表",
+          "path": "/blog",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "博客文章列表"
+        },
+        {
+          "name": "博客详情",
+          "path": "/blog/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单篇博客详情"
+        },
+        {
+          "name": "社区/BBS",
+          "path": "/bbs",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "社区论坛"
+        },
+        {
+          "name": "社区帖子",
+          "path": "/bbs/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个帖子详情"
+        },
+        {
+          "name": "通用落地页",
+          "path": "/lp/[slug]",
+          "status": "partial",
+          "requiresAuth": false,
+          "description": "可配置落地页模板"
+        },
+        {
+          "name": "目的地列表",
+          "path": "/destinations",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "国家/城市目的地"
+        },
+        {
+          "name": "目的地详情",
+          "path": "/destinations/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个目的地详情"
+        },
+        {
+          "name": "场景页",
+          "path": "/scenario/[role]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "按角色场景推荐"
+        },
+        {
+          "name": "新手启动",
+          "path": "/starter",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "新手启动指南"
+        },
+        {
+          "name": "新手启动详情",
+          "path": "/starter/[slug]",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "单个启动指南"
+        },
+        {
+          "name": "定价",
+          "path": "/pricing",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "会员定价"
+        },
+        {
+          "name": "隐私政策",
+          "path": "/privacy",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "隐私政策"
+        },
+        {
+          "name": "服务条款",
+          "path": "/terms",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "服务条款"
+        },
+        {
+          "name": "更新日志",
+          "path": "/changelog",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "版本更新日志"
+        },
+        {
+          "name": "帮助",
+          "path": "/help",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "帮助中心"
+        },
+        {
+          "name": "反馈",
+          "path": "/feedback",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "用户反馈"
+        }
+      ]
+    },
+    "workspace": {
+      "count": 9,
+      "pages": [
+        {
+          "name": "工作台",
+          "path": "/workspace",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "用户工作台首页"
+        },
+        {
+          "name": "我的文档",
+          "path": "/workspace/documents",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "保存的文档列表"
+        },
+        {
+          "name": "公司资料",
+          "path": "/workspace/company-profiles",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "公司资料管理"
+        },
+        {
+          "name": "收藏夹",
+          "path": "/workspace/favorites",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "收藏的工具和资源"
+        },
+        {
+          "name": "备忘录",
+          "path": "/workspace/memos",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "用户备忘录"
+        },
+        {
+          "name": "通知",
+          "path": "/workspace/notifications",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "用户通知"
+        },
+        {
+          "name": "任务",
+          "path": "/workspace/tasks",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "用户任务列表"
+        },
+        {
+          "name": "设置",
+          "path": "/workspace/settings",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "用户设置"
+        },
+        {
+          "name": "会员",
+          "path": "/workspace/member",
+          "status": "active",
+          "requiresAuth": true,
+          "description": "会员信息"
+        }
+      ]
+    },
+    "admin": {
+      "count": 33,
+      "pages": [
+        {
+          "name": "后台首页",
+          "path": "/admin",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "后台概览"
+        },
+        {
+          "name": "资源管理",
+          "path": "/admin/resources",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "900+ 网址资源管理"
+        },
+        {
+          "name": "资源导入",
+          "path": "/admin/resources/import",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "批量导入资源"
+        },
+        {
+          "name": "落地页管理",
+          "path": "/admin/landing-pages",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "落地页配置"
+        },
+        {
+          "name": "专题管理",
+          "path": "/admin/topics",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "专题文章管理"
+        },
+        {
+          "name": "用户管理",
+          "path": "/admin/users",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "用户列表与管理"
+        },
+        {
+          "name": "分析统计",
+          "path": "/admin/analytics",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "访问统计"
+        },
+        {
+          "name": "任务链分析",
+          "path": "/admin/analytics/task-chains",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "任务链使用分析"
+        },
+        {
+          "name": "广告管理",
+          "path": "/admin/ads",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "广告位管理"
+        },
+        {
+          "name": "广告创意",
+          "path": "/admin/ad-creatives",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "广告创意管理"
+        },
+        {
+          "name": "广告投放",
+          "path": "/admin/ad-placements",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "广告投放配置"
+        },
+        {
+          "name": "分类管理",
+          "path": "/admin/categories",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "分类管理"
+        },
+        {
+          "name": "标签管理",
+          "path": "/admin/tags",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "标签管理"
+        },
+        {
+          "name": "链接健康",
+          "path": "/admin/link-health",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "死链检测"
+        },
+        {
+          "name": "短链接",
+          "path": "/admin/short-links",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "短链接管理"
+        },
+        {
+          "name": "系统设置",
+          "path": "/admin/settings",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "系统配置"
+        },
+        {
+          "name": "备份",
+          "path": "/admin/backup",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "数据备份"
+        },
+        {
+          "name": "审计日志",
+          "path": "/admin/audit",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "操作审计"
+        },
+        {
+          "name": "健康检查",
+          "path": "/admin/health",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "系统健康状态"
+        },
+        {
+          "name": "反馈管理",
+          "path": "/admin/feedback",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "用户反馈管理"
+        },
+        {
+          "name": "论坛管理",
+          "path": "/admin/forum",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "论坛管理"
+        },
+        {
+          "name": "增长日志",
+          "path": "/admin/growth-logs",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "增长日志"
+        },
+        {
+          "name": "邀请管理",
+          "path": "/admin/invites",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "邀请码管理"
+        },
+        {
+          "name": "等级管理",
+          "path": "/admin/levels",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "用户等级管理"
+        },
+        {
+          "name": "导入",
+          "path": "/admin/import",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "数据导入"
+        },
+        {
+          "name": "导入书签",
+          "path": "/admin/import-bookmarks",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "书签导入"
+        },
+        {
+          "name": "通讯",
+          "path": "/admin/newsletter",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "邮件通讯"
+        },
+        {
+          "name": "通知管理",
+          "path": "/admin/notifications",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "系统通知"
+        },
+        {
+          "name": "工具评测",
+          "path": "/admin/tool-reviews",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "工具评测管理"
+        },
+        {
+          "name": "Webhooks",
+          "path": "/admin/webhooks",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "Webhook 管理"
+        },
+        {
+          "name": "CMS",
+          "path": "/admin/cms",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "内容管理"
+        },
+        {
+          "name": "目的地管理",
+          "path": "/admin/destinations",
+          "status": "active",
+          "requiresAuth": true,
+          "requiresAdmin": true,
+          "description": "目的地管理"
+        }
+      ]
+    },
+    "auth": {
+      "count": 2,
+      "pages": [
+        {
+          "name": "登录",
+          "path": "/login",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "用户登录"
+        },
+        {
+          "name": "忘记密码",
+          "path": "/forgot-password",
+          "status": "active",
+          "requiresAuth": false,
+          "description": "密码重置"
+        }
+      ]
+    }
+  }
+}
