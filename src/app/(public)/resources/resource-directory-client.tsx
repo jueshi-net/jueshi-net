@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
-import { CATEGORY_CONFIG, getCategoryInfo } from '@/lib/resources/category-config';
+import { getCategoryInfo } from '@/lib/resources/category-config';
 
 interface Resource {
   id: string;
@@ -101,6 +102,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
       <div className="flex items-start gap-3 mb-3">
         <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-100 flex items-center justify-center overflow-hidden group-hover:from-purple-50 group-hover:to-purple-100 group-hover:border-purple-200 transition-all">
           {logoSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoSrc}
               alt={resource.name}
@@ -182,6 +184,7 @@ function ContentArea({ adResources, normalResources }: { adResources: Resource[]
                 <div className="flex items-start gap-3 relative min-w-0">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-white border border-amber-200 flex items-center justify-center overflow-hidden">
                     {r.iconUrl || r.favicon ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={r.iconUrl || r.favicon || ''} alt={r.name} className="w-6 h-6 object-contain" />
                     ) : (
                       <span className="text-sm font-bold text-amber-600">{r.name.charAt(0)}</span>
@@ -292,6 +295,7 @@ function FeaturedTools({ featuredResources }: { featuredResources: Resource[] })
             >
               <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 overflow-hidden">
                 {logoSrc ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={logoSrc} alt={r.name} className="w-6 h-6 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 ) : (
                   <span className="text-xs font-bold text-purple-600">{initial}</span>
@@ -528,7 +532,7 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
                   <p className="text-xs text-gray-500">快速生成专业报价单</p>
                 </div>
               </a>
-              <a href="/checklists" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
+              <Link href="/checklists" className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-purple-200 hover:bg-purple-50/50 transition-all min-w-0">
                 <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
                   <ListChecks className="w-5 h-5 text-orange-600" />
                 </div>
@@ -536,7 +540,7 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
                   <h3 className="text-sm font-semibold text-gray-900">跨境清单</h3>
                   <p className="text-xs text-gray-500">开店、发货、合规全流程清单</p>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
         )}

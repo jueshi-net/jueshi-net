@@ -1,7 +1,26 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Shield, Globe } from 'lucide-react';
+import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe } from 'lucide-react';
+
+interface ResourceItem {
+  id: string;
+  name: string;
+  url: string;
+  description: string | null;
+  category: string;
+  tags: string[];
+  sourceType: string;
+  usage: string | null;
+  disclaimer: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  iconUrl: string | null;
+  isAd: boolean;
+  qualityScore: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // ─── 分类管理 ──────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
@@ -23,7 +42,7 @@ const SOURCE_TYPES = [
 ];
 
 export default function AdminResourcesPage() {
-  const [resources, setResources] = useState<any[]>([]);
+  const [resources, setResources] = useState<ResourceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
   const [action, setAction] = useState<'delete' | 'category' | 'status' | null>(null);
@@ -55,7 +74,6 @@ export default function AdminResourcesPage() {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [newCatValue, setNewCatValue] = useState('');
   const [newCatLabel, setNewCatLabel] = useState('');
-  const [editingCat, setEditingCat] = useState<string | null>(null);
 
   // ─── 死链检测状态 ─────────────────────────────────────────────────────
   const [checkingLinks, setCheckingLinks] = useState(false);
@@ -82,6 +100,7 @@ export default function AdminResourcesPage() {
     finally { setLoading(false); }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
   useEffect(() => { fetchResources(); }, [page, search, categoryFilter, sourceTypeFilter, isAdFilter, sortBy]);
 
   const openCreate = () => {
@@ -90,7 +109,7 @@ export default function AdminResourcesPage() {
     setShowModal(true);
   };
 
-  const openEdit = (r: any) => {
+  const openEdit = (r: ResourceItem) => {
     setEditingId(r.id);
     setFormData({
       name: r.name || '', url: r.url || '', description: r.description || '',
@@ -183,16 +202,18 @@ export default function AdminResourcesPage() {
             body: JSON.stringify({ isActive: false })
           });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : '超时';
         setLinkResults(prev => ({
           ...prev,
-          [r.id]: { status: null, ok: false, error: err.message || '超时' }
+          [r.id]: { status: null, ok: false, error: errorMessage }
         }));
       }
       await new Promise(r => setTimeout(r, 200));
     }
     setCheckingLinks(false);
     fetchResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resources]);
 
   const stopCheck = () => { abortRef.current = true; setCheckingLinks(false); };
@@ -373,7 +394,7 @@ export default function AdminResourcesPage() {
                       <td className="px-4 py-3 hidden sm:table-cell"><span className={`px-2 py-0.5 rounded text-xs ${catColor(r.category)}`}>{catLabel(r.category)}</span></td>
                       <td className="px-4 py-3 hidden md:table-cell"><span className="text-xs">{r.sourceType === 'official' ? '🏛️ 官方' : r.sourceType === 'third-party' ? '🔗 第三方' : '🔒 内部'}</span></td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className={`text-xs font-medium ${r.qualityScore >= 80 ? 'text-green-600' : r.qualityScore >= 50 ? 'text-amber-600' : 'text-gray-400'}`}>
+                        <span className={`text-xs font-medium ${(r.qualityScore ?? 0) >= 80 ? 'text-green-600' : (r.qualityScore ?? 0) >= 50 ? 'text-amber-600' : 'text-gray-400'}`}>
                           {r.qualityScore || 0}
                         </span>
                       </td>
@@ -464,6 +485,7 @@ export default function AdminResourcesPage() {
                   />
                   {formData.iconUrl && (
                     <div className="w-10 h-10 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={formData.iconUrl} alt="Logo" className="w-7 h-7 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                   )}
