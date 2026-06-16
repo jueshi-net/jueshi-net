@@ -358,7 +358,11 @@ export default function ShippingCalculatorPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* ===== Dual-column workbench layout (desktop) ===== */}
+        <div className="lg:grid lg:grid-cols-[1fr_420px] lg:gap-6 items-start">
+        {/* ===== LEFT COLUMN: Inputs ===== */}
+        <div className="space-y-6 min-w-0">
         {/* Breadcrumb */}
         <div className="mb-4">
           <Breadcrumb />
@@ -721,6 +725,10 @@ export default function ShippingCalculatorPage() {
             </div>
           </div>
         </div>
+        </div>{/* End LEFT COLUMN */}
+
+        {/* ===== RIGHT COLUMN: Results ===== */}
+        <div className="space-y-6 mt-6 lg:mt-0 lg:sticky lg:top-4">
 
         {/* ==================== Results Card ==================== */}
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-xl overflow-hidden shadow-xl">
@@ -922,6 +930,8 @@ export default function ShippingCalculatorPage() {
             </div>
           </div>
         </div>
+        </div>{/* End RIGHT COLUMN */}
+        </div>{/* End dual-column grid */}
 
         {/* Related Guides */}
         <RelatedGuidesSection slugs={['volumetric-weight-explained', 'cbm-shipping-volume-calculator']} />

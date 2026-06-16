@@ -31,7 +31,7 @@ export default function PremiumSection() {
         </div>
 
         {/* Comparison Table */}
-        <div className="max-w-2xl mx-auto bg-white rounded-[20px] shadow-2xl overflow-hidden">
+        <div className="max-w-4xl mx-auto bg-white rounded-[20px] shadow-2xl overflow-hidden">
           {/* Table header */}
           <div className="grid grid-cols-3 bg-gray-50 border-b border-gray-200">
             <div className="p-4 text-sm font-semibold text-gray-500 text-center">功能</div>
