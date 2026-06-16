@@ -105,22 +105,41 @@ export const CATEGORY_CONFIG: Record<string, CategoryInfo> = {
       { name: 'HS Code 查询', href: '/tools/hs-code', description: '商品编码查询与归类辅助', icon: 'Hash' },
     ],
   },
+  official: {
+    key: 'official',
+    label: '官方机构',
+    description: '政府、海关、邮政、税务和公共机构官方网站入口。',
+    icon: 'Shield',
+    color: 'red',
+    relatedTools: [
+      { name: 'HS Code 查询', href: '/tools/hs-code', description: '商品编码查询与归类辅助', icon: 'Hash' },
+      { name: '全球邮编查询', href: '/tools/postal-code', description: '各国邮政编码与地址解析', icon: 'Hash' },
+    ],
+  },
+  payment: {
+    key: 'payment',
+    label: '支付收款',
+    description: '跨境收款、支付、汇率结算和金融服务相关平台入口。',
+    icon: 'CreditCard',
+    color: 'emerald',
+    relatedTools: [
+      { name: '汇率换算', href: '/tools/exchange-rate', description: '实时汇率查询与历史走势', icon: 'DollarSign' },
+      { name: '报价单', href: '/tools/quote-sheet', description: '快速生成专业报价单', icon: 'FileText' },
+    ],
+  },
+  ecommerce: {
+    key: 'ecommerce',
+    label: '跨境电商',
+    description: '主流电商平台、独立站工具和跨境电商服务资源。',
+    icon: 'ShoppingCart',
+    color: 'indigo',
+    relatedTools: [
+      { name: '报价单', href: '/tools/quote-sheet', description: '快速生成专业报价单', icon: 'FileText' },
+      { name: '商业发票', href: '/tools/commercial-invoice', description: '生成国际贸易商业发票', icon: 'FileText' },
+      { name: '汇率换算', href: '/tools/exchange-rate', description: '实时汇率查询与历史走势', icon: 'DollarSign' },
+    ],
+  },
 };
-
-/**
- * Page-level featured slots - shown at top of page.
- * Balanced across categories, not logistics-heavy.
- * 
- * 页面顶部精选推荐位 - 跨分类平衡，不偏重物流。
- */
-export const PAGE_FEATURED_TOOLS = [
-  { name: '汇率换算', href: '/tools/exchange-rate', description: '实时汇率查询与历史走势', icon: 'DollarSign', category: 'tools' },
-  { name: 'HS Code 查询', href: '/tools/hs-code', description: '商品编码查询与归类辅助', icon: 'Hash', category: 'business' },
-  { name: '全球邮编查询', href: '/tools/postal-code', description: '各国邮政编码与地址解析', icon: 'MapPin', category: 'tools' },
-  { name: '商业发票', href: '/tools/commercial-invoice', description: '生成国际贸易商业发票', icon: 'FileText', category: 'templates' },
-  { name: '报价单', href: '/tools/quote-sheet', description: '快速生成专业报价单', icon: 'FileText', category: 'business' },
-  { name: '物流追踪查询入口', href: '/tracking', description: '前往 17TRACK 查询全球包裹轨迹', icon: 'Globe', category: 'logistics' },
-];
 
 /**
  * Get category info with fallback for unknown categories.

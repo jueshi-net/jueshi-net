@@ -5,11 +5,14 @@ import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, D
 
 // ─── 分类管理 ──────────────────────────────────────────────────────────────
 const DEFAULT_CATEGORIES = [
-  { value: 'life', label: '海外生活', color: 'bg-blue-100 text-blue-700' },
-  { value: 'logistics', label: '跨境物流', color: 'bg-orange-100 text-orange-700' },
-  { value: 'business', label: '出海经营', color: 'bg-green-100 text-green-700' },
   { value: 'tools', label: '实用工具', color: 'bg-purple-100 text-purple-700' },
-  { value: 'templates', label: '模板资源', color: 'bg-pink-100 text-pink-700' },
+  { value: 'business', label: '出海经营', color: 'bg-green-100 text-green-700' },
+  { value: 'ecommerce', label: '跨境电商', color: 'bg-indigo-100 text-indigo-700' },
+  { value: 'life', label: '海外生活', color: 'bg-blue-100 text-blue-700' },
+  { value: 'logistics', label: '物流追踪', color: 'bg-orange-100 text-orange-700' },
+  { value: 'payment', label: '支付收款', color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'templates', label: '外贸单据', color: 'bg-pink-100 text-pink-700' },
+  { value: 'official', label: '官方机构', color: 'bg-red-100 text-red-700' },
   { value: 'education', label: '教育学习', color: 'bg-teal-100 text-teal-700' },
 ];
 

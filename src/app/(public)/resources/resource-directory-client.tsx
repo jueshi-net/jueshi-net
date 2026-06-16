@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
-import { CATEGORY_CONFIG, PAGE_FEATURED_TOOLS, getCategoryInfo } from '@/lib/resources/category-config';
+import { CATEGORY_CONFIG, getCategoryInfo } from '@/lib/resources/category-config';
 
 interface Resource {
   id: string;
@@ -46,6 +46,9 @@ const categoryColors: Record<string, string> = {
   tools: 'bg-purple-50 text-purple-600 border-purple-200',
   templates: 'bg-pink-50 text-pink-600 border-pink-200',
   education: 'bg-teal-50 text-teal-600 border-teal-200',
+  official: 'bg-red-50 text-red-600 border-red-200',
+  payment: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  ecommerce: 'bg-indigo-50 text-indigo-600 border-indigo-200',
 };
 
 const categoryBgColors: Record<string, string> = {
@@ -55,6 +58,9 @@ const categoryBgColors: Record<string, string> = {
   tools: 'bg-purple-100',
   templates: 'bg-pink-100',
   education: 'bg-teal-100',
+  official: 'bg-red-100',
+  payment: 'bg-emerald-100',
+  ecommerce: 'bg-indigo-100',
 };
 
 const categoryTextColors: Record<string, string> = {
@@ -64,6 +70,9 @@ const categoryTextColors: Record<string, string> = {
   tools: 'text-purple-600',
   templates: 'text-pink-600',
   education: 'text-teal-600',
+  official: 'text-red-600',
+  payment: 'text-emerald-600',
+  ecommerce: 'text-indigo-600',
 };
 
 function ResourceCard({ resource }: { resource: Resource }) {
@@ -258,28 +267,41 @@ function CategoryContext({ categoryKey, resourceCount }: { categoryKey: string; 
   );
 }
 
-// 页面顶部精选工具
-function FeaturedTools() {
+// 页面顶部精选工具 — 数据来自 DB（sortOrder < 0）或 fallback
+function FeaturedTools({ featuredResources }: { featuredResources: Resource[] }) {
+  if (!featuredResources || featuredResources.length === 0) return null;
+
   return (
     <div className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-100 p-4 sm:p-5 min-w-0">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-5 h-5 text-purple-600" />
-        <h2 className="text-base font-bold text-gray-900">常用站内工具</h2>
-        <span className="text-xs text-gray-400 ml-auto">免费使用</span>
+        <h2 className="text-base font-bold text-gray-900">精选推荐</h2>
+        <span className="text-xs text-gray-400 ml-auto">编辑后台 sortOrder &lt; 0 可管理</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-        {PAGE_FEATURED_TOOLS.map((tool) => {
-          const toolIcon = iconMap[tool.icon] || <Wrench className="w-4 h-4" />;
+        {featuredResources.map((r) => {
+          const logoSrc = r.iconUrl || r.favicon || null;
+          const initial = r.name.charAt(0).toUpperCase();
           return (
             <a
-              key={tool.href}
-              href={tool.href}
-              className="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-sm transition-all text-center min-w-0"
+              key={r.id}
+              href={r.url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-sm transition-all text-center min-w-0 group"
             >
-              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0">
-                <span className="text-purple-600 scale-75">{toolIcon}</span>
+              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 overflow-hidden">
+                {logoSrc ? (
+                  <img src={logoSrc} alt={r.name} className="w-6 h-6 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                ) : (
+                  <span className="text-xs font-bold text-purple-600">{initial}</span>
+                )}
               </div>
-              <span className="text-xs font-medium text-gray-900 truncate w-full">{tool.name}</span>
+              <span className="text-xs font-medium text-gray-900 truncate w-full group-hover:text-purple-700 transition-colors">{r.name}</span>
+              <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+                <ExternalLink className="w-2.5 h-2.5" />
+                外部网站
+              </span>
             </a>
           );
         })}
@@ -288,7 +310,7 @@ function FeaturedTools() {
   );
 }
 
-export default function ResourceDirectoryClient({ resources }: { resources: Resource[] }) {
+export default function ResourceDirectoryClient({ resources, featuredResources }: { resources: Resource[]; featuredResources: Resource[] }) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [search, setSearch] = useState('');
 
@@ -356,7 +378,7 @@ export default function ResourceDirectoryClient({ resources }: { resources: Reso
         </div>
 
         {/* 页面顶部精选工具 */}
-        {activeCategory === 'all' && !search.trim() && <FeaturedTools />}
+        {activeCategory === 'all' && !search.trim() && <FeaturedTools featuredResources={featuredResources} />}
 
         {/* 搜索 */}
         <div className="mb-5 relative min-w-0">
