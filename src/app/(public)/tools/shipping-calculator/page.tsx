@@ -203,7 +203,7 @@ export default function ShippingCalculatorPage() {
       width: payload.unitWidthCm.toString(),
       height: payload.unitHeightCm.toString(),
       quantity: payload.quantity.toString(),
-      actualWeight: payload.unitWeightKg.toString(),
+      actualWeight: (payload.unitWeightKg * payload.quantity).toString(),
     };
     
     // Replace existing rows with the new row
@@ -281,11 +281,11 @@ export default function ShippingCalculatorPage() {
       const vw = volCm3 / divisor;
 
       totalCtns += q;
-      totalGW += gw * q;
+      totalGW += gw;
       totalVW += vw;
       totalCBM += cbm;
 
-      perRow.push({ vw, cbm, gw: gw * q, ctns: q, l, w, h, q });
+      perRow.push({ vw, cbm, gw, ctns: q, l, w, h, q });
     });
 
     const chargeableWeight = Math.max(totalGW, totalVW);
@@ -594,7 +594,7 @@ export default function ShippingCalculatorPage() {
             <span className="col-span-2">宽 ({unitLabel})</span>
             <span className="col-span-2">高 ({unitLabel})</span>
             <span className="col-span-1">件数</span>
-            <span className="col-span-2">单件实重 (kg)</span>
+            <span className="col-span-2">实重合计 (kg)</span>
             <span className="col-span-1">操作</span>
             <span className="col-span-1">体积重</span>
           </div>

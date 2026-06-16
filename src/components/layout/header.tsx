@@ -6,7 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import {
   PackageSearch, Menu, X, Search, LogIn, Bell,
   Home, Wrench, FileText, Users, BookOpen, Crown, User, LogOut, LayoutDashboard, ShieldCheck,
-  ListChecks, ChevronDown, Sparkles, Mail, Hash, DollarSign, Truck, MapPin
+  ListChecks, ChevronDown, Sparkles, Mail, Hash, DollarSign, MapPin
 } from "lucide-react";
 
 const TOOL_CATEGORIES = [
