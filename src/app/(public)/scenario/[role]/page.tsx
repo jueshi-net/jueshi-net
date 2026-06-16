@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ role: str
   const resolvedParams = await params;
   const scenario = SCENARIOS[resolvedParams.role as keyof typeof SCENARIOS];
   return {
-    title: `${scenario?.title || '场景专区'} - 海外百宝箱`,
+    title: `${scenario?.title || '场景专区'} - 绝世百宝箱`,
     description: scenario?.description || '场景专区',
   };
 }

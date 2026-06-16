@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: buildTitle("AI 工具集"),
-  description: "海外百宝箱 AI 工具集：AI 商品文案生成、多语言翻译润色、文档摘要提取。助力跨境电商、集运用户提升效率。",
+  description: "绝世百宝箱 AI 工具集：AI 商品文案生成、多语言翻译润色、文档摘要提取。助力跨境电商、集运用户提升效率。",
   alternates: { canonical: buildCanonical("/ai-tools") },
   openGraph: {
     title: buildTitle("AI 工具集"),

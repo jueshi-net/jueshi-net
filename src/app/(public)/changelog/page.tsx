@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Calendar, Tag } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "更新日志 | 海外百宝箱",
-  description: "海外百宝箱的版本更新历史记录",
+  title: "更新日志 | 绝世百宝箱",
+  description: "绝世百宝箱的版本更新历史记录",
 };
 
 const changelogs = [

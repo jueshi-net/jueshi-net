@@ -78,7 +78,7 @@ export async function generateMetadata({
     : undefined;
 
   const meta: Metadata = {
-    title: `${title} — 海外百宝箱`,
+    title: `${title} — 绝世百宝箱`,
     description,
     alternates: { canonical: url },
     openGraph: {

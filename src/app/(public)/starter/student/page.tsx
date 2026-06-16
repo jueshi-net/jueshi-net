@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import NewsletterForm from "@/components/ui/newsletter-form";
 
 export const metadata: Metadata = {
-  title: "留学生集运专区 — 海外百宝箱",
+  title: "留学生集运专区 — 绝世百宝箱",
   description: "专为海外留学生打造的集运与生活工具大全：运费计算、包裹追踪、敏感货查询、邮编校验、地址格式化一站式服务。",
 };
 

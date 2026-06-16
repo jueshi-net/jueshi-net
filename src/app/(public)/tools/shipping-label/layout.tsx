@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { softwareApplicationJsonLd, buildCanonical } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: '箱唛标签生成器 - 外箱唛头制作工具 - 海外百宝箱',
+  title: '箱唛标签生成器 - 外箱唛头制作工具 - 绝世百宝箱',
   description: '在线生成外箱唛头标签，支持自定义内容、尺寸、格式。适用于仓储、物流、出口包装。',
   alternates: { canonical: buildCanonical('/tools/shipping-label') },
   openGraph: {

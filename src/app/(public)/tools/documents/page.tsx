@@ -16,7 +16,7 @@ function getToolMaturity(key: string): "stable" | "beta" {
 }
 
 export const metadata: Metadata = {
-  title: "外贸/国际物流通用单据生成器 — 海外百宝箱",
+  title: "外贸/国际物流通用单据生成器 — 绝世百宝箱",
   description: "形式发票、商业发票、装箱单、销售合同、订舱委托书等常用单据模板，在线填写，自动排版，支持 PDF / Word / 图片导出。",
 };
 

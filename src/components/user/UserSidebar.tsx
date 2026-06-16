@@ -72,7 +72,7 @@ export function UserNavSidebar({ className }: { className?: string }) {
         </nav>
 
         <div className="mt-auto pt-4 border-t border-gray-100">
-          <p className="text-[10px] text-gray-300 text-center">海外百宝箱 v1.20.42.6.6</p>
+          <p className="text-[10px] text-gray-300 text-center">绝世百宝箱 v1.20.42.6.6</p>
         </div>
       </aside>
 

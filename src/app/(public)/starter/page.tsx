@@ -5,7 +5,7 @@ import { starterResources, starterCategories } from "@/lib/data/starter-resource
 import { ScenarioCardGrid } from "@/components/starter/scenario-card-grid";
 
 export const metadata: Metadata = {
-  title: "外网新手资源清单 — 海外百宝箱",
+  title: "外网新手资源清单 — 绝世百宝箱",
   description: "公开网站、软件、工具和学习平台的整理导航。浏览器、翻译、AI工具、密码管理、在线课程等，一次整理清楚。",
 };
 

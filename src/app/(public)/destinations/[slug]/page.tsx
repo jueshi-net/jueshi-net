@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const cmsCountry = getCountryBySlug(slug);
     if (cmsCountry) {
       return {
-        title: `${cmsCountry.frontmatter.title} — 海外百宝箱`,
+        title: `${cmsCountry.frontmatter.title} — 绝世百宝箱`,
         description: cmsCountry.frontmatter.subtitle || `${cmsCountry.frontmatter.flag} ${cmsCountry.frontmatter.title}出海指南`,
       };
     }
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const cmsCountry = getCountryBySlug(slug);
     if (cmsCountry) {
       return {
-        title: `${cmsCountry.frontmatter.title} — 海外百宝箱`,
+        title: `${cmsCountry.frontmatter.title} — 绝世百宝箱`,
         description: cmsCountry.frontmatter.subtitle || undefined,
       };
     }
@@ -76,7 +76,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: canonical,
       locale: "zh_CN",
       type: "website",
-      siteName: "海外百宝箱",
+      siteName: "绝世百宝箱",
       images: [
         {
           url: `${SITE_URL}/og-image.png`,

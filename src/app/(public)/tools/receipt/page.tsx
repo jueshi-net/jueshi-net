@@ -16,7 +16,7 @@ interface ReceiptItem {
 }
 
 export default function ReceiptPage() {
-  const [company, setCompany] = useState("海外百宝箱");
+  const [company, setCompany] = useState("绝世百宝箱");
   const [receiptNo, setReceiptNo] = useState(`RCP-${Date.now().toString().slice(-6)}`);
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [payer, setPayer] = useState("");

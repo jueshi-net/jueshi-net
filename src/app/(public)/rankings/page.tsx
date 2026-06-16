@@ -4,7 +4,7 @@ import { Metadata } from "next";
 import { SCENARIO_PACKAGES } from "@/data/scenario-packages";
 
 export const metadata: Metadata = {
-  title: "工具排行榜 — 海外百宝箱",
+  title: "工具排行榜 — 绝世百宝箱",
   description: "根据评分、收藏和短评热度综合排序的工具排行榜",
 };
 
@@ -51,7 +51,7 @@ export default async function RankingsPage() {
           </Link>
           <div className="flex items-center gap-3 mb-3">
             <TrendingUp className="w-8 h-8" />
-            <h1 className="text-3xl font-bold">海外百宝箱工具排行榜</h1>
+            <h1 className="text-3xl font-bold">绝世百宝箱工具排行榜</h1>
           </div>
           <p className="text-white/80">根据评分、收藏和短评热度综合排序</p>
         </div>

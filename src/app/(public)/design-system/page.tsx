@@ -14,7 +14,7 @@ export default function DesignSystemPage() {
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">设计系统 v1.0</h1>
-        <p className="text-gray-500">海外百宝箱 UI 组件库 — 内部验收页面，不导航大面积展示</p>
+        <p className="text-gray-500">绝世百宝箱 UI 组件库 — 内部验收页面，不导航大面积展示</p>
         <div className="flex gap-2 mt-3">
           <BaseBadge variant="info">v1.20.0</BaseBadge>
           <BaseBadge variant="neutral">Teal 主题</BaseBadge>
@@ -276,7 +276,7 @@ export default function DesignSystemPage() {
         <div className="bg-gradient-to-r from-teal-500 via-teal-600 to-teal-700 text-white rounded-xl p-8 md:p-12 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Package className="w-8 h-8" />
-            <h2 className="text-2xl md:text-3xl font-bold">海外百宝箱</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">绝世百宝箱</h2>
           </div>
           <p className="text-teal-100 text-base md:text-lg max-w-xl mx-auto mb-6">
             跨境寄送、海外生活、出海经营的实用工具一站整理

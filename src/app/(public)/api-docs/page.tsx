@@ -137,7 +137,7 @@ export default function ApiDocsPage() {
         <Book className="w-8 h-8 text-blue-600" />
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">API 文档</h1>
-          <p className="text-gray-500 dark:text-gray-400">海外百宝箱 REST API 参考</p>
+          <p className="text-gray-500 dark:text-gray-400">绝世百宝箱 REST API 参考</p>
         </div>
       </div>
 

@@ -67,7 +67,7 @@ export async function generateMetadata({
   const pkg = findPackage(id);
   if (!pkg) return { title: "场景包不存在" };
   return {
-    title: `${pkg.title} — 海外百宝箱`,
+    title: `${pkg.title} — 绝世百宝箱`,
     description: pkg.description,
     alternates: { canonical: `https://jueshi.net/packages/${pkg.id}` },
     openGraph: {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { softwareApplicationJsonLd, buildCanonical } from '@/lib/seo';
 
 export const metadata: Metadata = {
-  title: '邮编查询 - 全球50+国家邮编数据库 - 海外百宝箱',
+  title: '邮编查询 - 全球50+国家邮编数据库 - 绝世百宝箱',
   description: '支持加拿大、美国、英国、日本、德国等50+国家邮编查询。格式校验、城市匹配、DB实时搜索。集运、清关、地址核对必备工具。',
   alternates: { canonical: buildCanonical('/tools/postal-code') },
   openGraph: {

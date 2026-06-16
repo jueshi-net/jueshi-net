@@ -267,7 +267,7 @@ export default function CommandPalette() {
             ESC
           </kbd>
           <span>关闭</span>
-          <span className="ml-auto">海外百宝箱 Command Palette</span>
+          <span className="ml-auto">绝世百宝箱 Command Palette</span>
         </div>
       </div>
     </CommandDialog>

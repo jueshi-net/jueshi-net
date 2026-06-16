@@ -8,7 +8,7 @@ import ScrollToTop from '@/components/navigation/scroll-to-top';
 import { FolderOpen, Link2, TrendingUp, AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '网址导航 - 海外百宝箱',
+  title: '网址导航 - 绝世百宝箱',
   description: '海外华人常用网站分类收录：物流快递、生活资源、电商经营、工具服务',
 };
 

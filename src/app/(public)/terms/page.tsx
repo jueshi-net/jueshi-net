@@ -4,7 +4,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
   title: buildTitle('服务条款'),
-  description: '了解使用海外百宝箱服务时需遵守的条款与条件。',
+  description: '了解使用绝世百宝箱服务时需遵守的条款与条件。',
   alternates: { canonical: buildCanonical('/terms') },
 };
 
@@ -20,7 +20,7 @@ export default function TermsPage() {
           <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300">
             <section>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">1. 服务说明</h2>
-              <p>海外百宝箱（jueshi.net）为海外华人、留学生、出海商家提供在线工具、资源和信息服务。我们的服务包括但不限于：邮编查询、单据生成、汇率换算、HS 编码查询、AI 辅助工具、专题指南等。</p>
+              <p>绝世百宝箱（jueshi.net）为海外华人、留学生、出海商家提供在线工具、资源和信息服务。我们的服务包括但不限于：邮编查询、单据生成、汇率换算、HS 编码查询、AI 辅助工具、专题指南等。</p>
             </section>
 
             <section>
@@ -41,7 +41,7 @@ export default function TermsPage() {
 
             <section>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">4. 知识产权</h2>
-              <p>本站原创内容、设计、代码和工具的知识产权归海外百宝箱所有。未经明确授权，不得复制、分发或用于商业目的。用户通过工具生成的文档归用户所有。</p>
+              <p>本站原创内容、设计、代码和工具的知识产权归绝世百宝箱所有。未经明确授权，不得复制、分发或用于商业目的。用户通过工具生成的文档归用户所有。</p>
             </section>
 
             <section>

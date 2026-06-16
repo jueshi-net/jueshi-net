@@ -158,7 +158,7 @@ export default function HeroSuperSearch() {
 
         {/* Title — 全域化定位 */}
         <h1 className="mb-2 text-center text-3xl font-extrabold leading-tight tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
-          海外百宝箱
+          绝世百宝箱
           <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent"> · </span>
           全域出国基础设施
         </h1>

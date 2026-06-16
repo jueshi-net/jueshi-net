@@ -97,7 +97,7 @@ export default function LoginPage({ defaultMode = "login" }: { defaultMode?: "lo
                 安全可靠的个人工作台
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-3">
-                登录海外百宝箱
+                登录绝世百宝箱
               </h1>
               <p className="text-teal-100 text-lg leading-relaxed max-w-md">
                 继续使用你的工作台、积分、AI 工具额度和收藏资源。

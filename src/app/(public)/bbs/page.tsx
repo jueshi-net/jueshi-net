@@ -133,7 +133,7 @@ export default async function BBSPage({
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-brand-light border border-white/10 mb-5">
               <Sparkles className="w-4 h-4" />
-              <span>海外百宝箱社区</span>
+              <span>绝世百宝箱社区</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
               社区论坛

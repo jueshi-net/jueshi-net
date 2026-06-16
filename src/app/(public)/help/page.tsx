@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { HelpCircle, ChevronDown, Search, ArrowRight, Book, MessageSquare, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '帮助中心 - 海外百宝箱',
+  title: '帮助中心 - 绝世百宝箱',
   description: '查找问题的答案，了解平台功能和使用方法',
 };
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileText, Hash, DollarSign, Calculator, Package, Container } from "lucide-react";
+import { ArrowRight, FileText, Hash, DollarSign, Calculator, Package, Container, Truck } from "lucide-react";
 
 const QUICK_TOOLS = [
   {
@@ -56,6 +56,14 @@ const QUICK_TOOLS = [
     title: "报价单",
     desc: "Quote Sheet",
     color: "from-rose-500 to-pink-600",
+    status: "已开放",
+  },
+  {
+    href: "/tracking",
+    icon: Truck,
+    title: "物流追踪",
+    desc: "17TRACK 全球查询",
+    color: "from-amber-500 to-orange-600",
     status: "已开放",
   },
 ];

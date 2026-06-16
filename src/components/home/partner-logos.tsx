@@ -1,6 +1,6 @@
 export default function PartnerLogos() {
   const partners = [
-    "集运巴巴", "海外手机卡", "Wise", "Payoneer", "Shopify", "TikTok Shop",
+    "Wise", "海外手机卡", "Wise", "Payoneer", "Shopify", "TikTok Shop",
   ];
 
   return (

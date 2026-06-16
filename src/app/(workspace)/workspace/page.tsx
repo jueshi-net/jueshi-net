@@ -8,7 +8,7 @@ import DeleteDocButton from "@/components/workspace/DeleteDocButton";
 import { TaskChainList } from "@/components/workspace/TaskChainList";
 
 export const metadata: Metadata = {
-  title: "我的工作台 — 海外百宝箱",
+  title: "我的工作台 — 绝世百宝箱",
   description: "管理你的收藏工具、单据历史和个性化设置",
 };
 

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { isAdminRole } from '@/lib/auth/permissions';
 
 export const metadata: Metadata = {
-  title: '个人中心 - 海外百宝箱',
+  title: '个人中心 - 绝世百宝箱',
   description: '管理您的账户信息、收藏和使用记录',
 };
 

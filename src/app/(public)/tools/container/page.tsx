@@ -102,7 +102,7 @@ export default function ContainerCalculatorPage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
+    <div className="max-w-6xl mx-auto py-8 px-4">
       {/* Breadcrumb */}
       <div className="mb-4">
         <Breadcrumb />
@@ -194,7 +194,7 @@ export default function ContainerCalculatorPage() {
         {results.map(ct => (
           <div
             key={ct.name}
-            className={`${cardStyles.base.replace("p-5", "")} border-2 transition-all 
+            className={`${cardStyles.base.replace("p-5", "")} border-2 transition-all ${
               ct.recommended ? "border-green-500 shadow-lg" : "border-gray-100 dark:border-gray-700"
             }`}
           >

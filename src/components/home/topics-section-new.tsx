@@ -6,7 +6,7 @@ const TOPICS = [
   { href: "/topics/sea-cross-border", title: "东南亚跨境电商实战", desc: "Shopee/Lazada/TikTok 全链路运营", image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=800&auto=format&fit=crop", tag: "东南亚" },
   { href: "/topics/uk-compliance", title: "英国本土店合规运营", desc: "VAT 注册·产品认证·平台规则·税务申报", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=800&auto=format&fit=crop", tag: "欧洲合规" },
   // 4th position: Ad card
-  { href: null, isAd: true, title: "集运巴巴", desc: "中美/中欧专线集运，首重低至 ¥28/kg", tag: "赞助" },
+  { href: null, isAd: true, title: "国际集运指南", desc: "中美/中欧专线集运，首重低至 ¥28/kg", tag: "赞助" },
   { href: "/topics/ai-automation", title: "AI 自动化应用工具", desc: "跨境卖家如何用 AI 提升效率", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop", tag: "AI 工具" },
   { href: "/topics/digital-nomad", title: "数字游民签证合集", desc: "热门国家长居/工作签证指南", image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800&auto=format&fit=crop", tag: "签证" },
 ];

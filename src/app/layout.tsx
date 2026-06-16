@@ -20,8 +20,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "海外百宝箱 - 海外华人的实用工具箱",
-  description: "海外百宝箱提供集运、物流、外贸单据、跨境电商、留学生活等实用工具，支持在线生成、保存草稿和工作台管理。",
+  title: "绝世百宝箱 - 海外华人的实用工具箱",
+  description: "绝世百宝箱提供集运、物流、外贸单据、跨境电商、留学生活等实用工具，支持在线生成、保存草稿和工作台管理。",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -35,21 +35,21 @@ export const metadata: Metadata = {
     type: "website",
     locale: "zh_CN",
     url: "https://jueshi.net",
-    siteName: "海外百宝箱",
-    title: "海外百宝箱 - 海外华人的实用工具箱",
+    siteName: "绝世百宝箱",
+    title: "绝世百宝箱 - 海外华人的实用工具箱",
     description: "全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。",
     images: [
       {
         url: "/og/default-og.png",
         width: 1200,
         height: 630,
-        alt: "海外百宝箱",
+        alt: "绝世百宝箱",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "海外百宝箱 - 海外华人的实用工具箱",
+    title: "绝世百宝箱 - 海外华人的实用工具箱",
     description: "全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。",
     images: ["/og/default-og.png"],
   },

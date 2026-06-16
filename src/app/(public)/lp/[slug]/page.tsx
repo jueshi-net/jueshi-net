@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: page.seoTitle || `${page.title} | 海外百宝箱`,
+    title: page.seoTitle || `${page.title} | 绝世百宝箱`,
     description: page.seoDescription || undefined,
     openGraph: {
       title: page.seoTitle || page.title,

@@ -20,7 +20,7 @@ async function sendWelcomeEmail(email: string) {
     const { subject, html, text } = generateNewsletterWelcomeEmail(email);
 
     const result = await resend.emails.send({
-      from: "海外百宝箱 <hello@jueshi.net>",
+      from: "绝世百宝箱 <hello@jueshi.net>",
       to: [email],
       subject,
       html,

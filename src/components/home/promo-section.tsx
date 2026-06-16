@@ -10,11 +10,11 @@ export default function PromoSection() {
 
   return (
     <section className="w-full bg-gradient-to-r from-[#0077e8] to-[#2090ff]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Left */}
           <div className="text-white">
-            <h2 className="text-2xl font-bold mb-4">为什么选择海外百宝箱？</h2>
+            <h2 className="text-2xl font-bold mb-4">为什么选择绝世百宝箱？</h2>
             <div className="space-y-3 mb-6">
               {features.map((f) => (
                 <div key={f} className="flex items-center gap-2">

@@ -314,7 +314,7 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
                 )}
               </div>
 
-              <div><label className="text-xs text-gray-500">资料名称</label><input value={formName} onChange={e => setFormName(e.target.value)} placeholder="如：西雄供应链默认" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
+              <div><label className="text-xs text-gray-500">资料名称</label><input value={formName} onChange={e => setFormName(e.target.value)} placeholder="如：默认公司" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
               <div><label className="text-xs text-gray-500">公司名称 *</label><input value={formCompany} onChange={e => setFormCompany(e.target.value)} placeholder="必填" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
               <div><label className="text-xs text-gray-500">英文名</label><input value={formCompanyEn} onChange={e => setFormCompanyEn(e.target.value)} placeholder="Company Name EN" className="w-full px-3 py-2 border rounded-lg text-sm min-h-[44px] text-gray-900 bg-white placeholder:text-gray-400" /></div>
               <div className="grid grid-cols-2 gap-3">

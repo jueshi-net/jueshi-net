@@ -3,7 +3,7 @@ import { ArrowLeft, ExternalLink, AlertTriangle, Download } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "热门软件与网站推荐 — 海外百宝箱",
+  title: "热门软件与网站推荐 — 绝世百宝箱",
   description: "外网最常用的社交、视频、资讯平台与工具，一键直达。Telegram、YouTube、X、Instagram、Facebook 等。",
 };
 

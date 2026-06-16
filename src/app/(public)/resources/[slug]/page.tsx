@@ -112,10 +112,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "资源未找到" };
   }
   return {
-    title: `${category.name} - 海外百宝箱`,
+    title: `${category.name} - 绝世百宝箱`,
     description: category.desc,
     openGraph: {
-      title: `${category.name} - 海外百宝箱`,
+      title: `${category.name} - 绝世百宝箱`,
       description: category.desc,
       type: "website",
     },

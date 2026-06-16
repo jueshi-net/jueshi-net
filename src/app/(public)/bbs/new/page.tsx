@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: buildTitle("发布帖子"),
-  description: "在海外百宝箱社区发布新帖子",
+  description: "在绝世百宝箱社区发布新帖子",
   alternates: { canonical: buildCanonical("/bbs/new") },
   robots: {
     index: false,

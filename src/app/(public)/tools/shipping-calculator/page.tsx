@@ -31,11 +31,18 @@ interface CalcRow {
 }
 
 type ShippingMode = 'express' | 'air' | 'sea' | 'custom';
+type BillingMode = 'weight' | 'volume' | 'higher' | 'cbm';
 
 interface PersistedState {
   mode: ShippingMode;
   customDivisor: string;
   rows: CalcRow[];
+  pricePerKg: string;
+  pricePerCbm: string;
+  billingMode: BillingMode;
+  currency: string;
+  exchangeRate: string;
+  targetCurrency: string;
 }
 
 const STORAGE_KEY = 'shipping-calculator-v1';
@@ -142,9 +149,17 @@ export default function ShippingCalculatorPage() {
   const [showAddressTransferConfirm, setShowAddressTransferConfirm] = useState(false);
   const [addressTransferApplied, setAddressTransferApplied] = useState(false);
 
+  // Fee calculation
+  const [pricePerKg, setPricePerKg] = useState(saved?.pricePerKg || '');
+  const [pricePerCbm, setPricePerCbm] = useState(saved?.pricePerCbm || '');
+  const [billingMode, setBillingMode] = useState<BillingMode>(saved?.billingMode || 'higher');
+  const [currency, setCurrency] = useState(saved?.currency || 'CNY');
+  const [exchangeRate, setExchangeRate] = useState(saved?.exchangeRate || '1');
+  const [targetCurrency, setTargetCurrency] = useState(saved?.targetCurrency || 'CNY');
+
   // Persist to localStorage and save to task chain
   useEffect(() => {
-    saveState({ mode, customDivisor, rows });
+    saveState({ mode, customDivisor, rows, pricePerKg, pricePerCbm, billingMode, currency, exchangeRate, targetCurrency });
     // Save to task chain if there's meaningful data
     if (rows.length > 0 && rows[0].length && rows[0].width && rows[0].height) {
       const r = calcResults();
@@ -155,7 +170,7 @@ export default function ShippingCalculatorPage() {
         });
       }
     }
-  }, [mode, customDivisor, rows]);
+  }, [mode, customDivisor, rows, pricePerKg, pricePerCbm, billingMode, currency, exchangeRate, targetCurrency]);
 
   // Check for container transfer data on mount
   useEffect(() => {
@@ -292,6 +307,12 @@ export default function ShippingCalculatorPage() {
     setRows([defaultRow()]);
     setMode('express');
     setCustomDivisor('5000');
+    setPricePerKg('');
+    setPricePerCbm('');
+    setBillingMode('higher');
+    setCurrency('CNY');
+    setExchangeRate('1');
+    setTargetCurrency('CNY');
   };
 
   const handleBatchParse = (text: string) => {
@@ -318,7 +339,7 @@ export default function ShippingCalculatorPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-5">
+        <div className="max-w-7xl mx-auto mt-8">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-100 rounded-xl">
@@ -648,6 +669,59 @@ export default function ShippingCalculatorPage() {
           </div>
         </div>
 
+        {/* ==================== Fee Settings ==================== */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+            <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <span>💰</span> 运费费率设置 <span className="text-xs text-gray-400 font-normal">（选填，用于估算运费金额）</span>
+            </h3>
+          </div>
+          <div className="p-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+            <div>
+              <label className={labelStyles.field}>计费方式</label>
+              <select value={billingMode} onChange={e => setBillingMode(e.target.value as BillingMode)} className={inputStyles}>
+                <option value="higher">实重/体积重取高</option>
+                <option value="weight">按实际重量</option>
+                <option value="volume">按体积重量</option>
+                <option value="cbm">按立方 (CBM)</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelStyles.field}>公斤单价</label>
+              <input type="number" step="0.01" placeholder="如 25" value={pricePerKg} onChange={e => setPricePerKg(e.target.value)} className={inputStyles} />
+            </div>
+            <div>
+              <label className={labelStyles.field}>立方单价</label>
+              <input type="number" step="0.01" placeholder="如 600" value={pricePerCbm} onChange={e => setPricePerCbm(e.target.value)} className={inputStyles} />
+            </div>
+            <div>
+              <label className={labelStyles.field}>源币种</label>
+              <select value={currency} onChange={e => setCurrency(e.target.value)} className={inputStyles}>
+                <option value="CNY">CNY 人民币</option>
+                <option value="USD">USD 美元</option>
+                <option value="EUR">EUR 欧元</option>
+                <option value="GBP">GBP 英镑</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelStyles.field}>汇率</label>
+              <input type="number" step="0.0001" placeholder="1" value={exchangeRate} onChange={e => setExchangeRate(e.target.value)} className={inputStyles} />
+            </div>
+            <div>
+              <label className={labelStyles.field}>目标币种</label>
+              <select value={targetCurrency} onChange={e => setTargetCurrency(e.target.value)} className={inputStyles}>
+                <option value="CNY">CNY 人民币</option>
+                <option value="USD">USD 美元</option>
+                <option value="EUR">EUR 欧元</option>
+                <option value="GBP">GBP 英镑</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <p className="text-[10px] text-gray-400 leading-tight">费率与汇率均为手动输入，结果仅供估算参考</p>
+            </div>
+          </div>
+        </div>
+
         {/* ==================== Results Card ==================== */}
         <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-xl overflow-hidden shadow-xl">
           <div className="px-6 py-5">
@@ -690,6 +764,39 @@ export default function ShippingCalculatorPage() {
                 <p className="text-green-300">✅ 实重大于体积重 — 此票为重货，将按实重计费</p>
               )}
             </div>
+            {/* Fee estimation */}
+            {(pricePerKg || pricePerCbm) && (() => {
+              const ppk = parseFloat(pricePerKg) || 0;
+              const ppcb = parseFloat(pricePerCbm) || 0;
+              const rate = parseFloat(exchangeRate) || 1;
+              let billableKg = 0;
+              let billableCbm = 0;
+              let feeSource = '';
+              const totalCbmM3 = useMeters ? results.totalCBM : results.totalCBM / 1000000;
+              switch (billingMode) {
+                case 'weight': billableKg = results.totalGW; feeSource = `按实重 ${results.totalGW.toFixed(1)} kg`; break;
+                case 'volume': billableKg = results.totalVW; feeSource = `按体积重 ${results.totalVW.toFixed(1)} kg`; break;
+                case 'higher': billableKg = results.chargeableWeight; feeSource = `取高 ${results.chargeableWeight.toFixed(1)} kg`; break;
+                case 'cbm': billableCbm = totalCbmM3; feeSource = `按立方 ${totalCbmM3.toFixed(3)} m³`; break;
+              }
+              const feeByKg = billableKg * ppk;
+              const feeByCbm = billableCbm * ppcb;
+              const totalFee = feeByKg + feeByCbm;
+              const convertedFee = totalFee * rate;
+              if (totalFee <= 0) return null;
+              return (
+                <div className="mt-4 pt-4 border-t border-blue-700">
+                  <p className="text-xs text-blue-300 mb-2">💰 运费估算（{feeSource}）</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {ppk > 0 && <div><p className="text-[10px] text-blue-400">按重量</p><p className="text-lg font-bold text-green-400">{feeByKg.toFixed(2)} {currency}</p></div>}
+                    {ppcb > 0 && <div><p className="text-[10px] text-blue-400">按立方</p><p className="text-lg font-bold text-green-400">{feeByCbm.toFixed(2)} {currency}</p></div>}
+                    <div><p className="text-[10px] text-blue-400">合计</p><p className="text-xl font-black text-green-400">{totalFee.toFixed(2)} {currency}</p></div>
+                    {rate !== 1 && currency !== targetCurrency && <div><p className="text-[10px] text-blue-400">折合</p><p className="text-xl font-black text-teal-400">{convertedFee.toFixed(2)} {targetCurrency}</p></div>}
+                  </div>
+                  <p className="text-[10px] text-blue-400 mt-2">⚠️ 估算结果仅供参考，实际费用以承运商/货代报价为准</p>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
@@ -936,12 +1043,12 @@ export default function ShippingCalculatorPage() {
       )}
 
       {/* Related Tools Widget */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mt-8">
         <RelatedToolsWidget currentTool="shipping-calculator" />
       </div>
 
       {/* Related Checklist */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mt-8">
         <RelatedChecklistSection
           toolSlug="shipping-calculator"
           sourcePath="shipping-calculator"
@@ -949,7 +1056,7 @@ export default function ShippingCalculatorPage() {
       </div>
 
       {/* Task Chain Next Step */}
-      <div className="max-w-4xl mx-auto mb-8">
+      <div className="max-w-7xl mx-auto mt-8">
         <TaskChainNextStep
           sourceTool="shipping-calculator"
           steps={TASK_CHAIN_STEPS['shipping-calculator']}

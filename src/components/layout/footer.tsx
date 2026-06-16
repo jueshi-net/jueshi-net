@@ -23,7 +23,7 @@ const FOOTER_LINKS = [
 export default function Footer() {
   return (
     <footer className="w-full bg-[#f8fafc] border-t border-[#e5e7eb]">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Left: Brand */}
           <div>
@@ -74,7 +74,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-[#e5e7eb] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#666666]">
-          <p>© {new Date().getFullYear()} 海外百宝箱 · jueshi.net</p>
+          <p>© {new Date().getFullYear()} 绝世百宝箱 · jueshi.net</p>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:text-[#1966f2]">服务条款</Link>
             <Link href="/privacy" className="hover:text-[#1966f2]">隐私政策</Link>

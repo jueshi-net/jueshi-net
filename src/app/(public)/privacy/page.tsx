@@ -4,7 +4,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 
 export const metadata: Metadata = {
   title: buildTitle('隐私政策'),
-  description: '了解海外百宝箱如何收集、使用和保护您的个人信息。',
+  description: '了解绝世百宝箱如何收集、使用和保护您的个人信息。',
   alternates: { canonical: buildCanonical('/privacy') },
 };
 

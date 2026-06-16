@@ -8,7 +8,7 @@ export function generateNewsletterWelcomeEmail(email: string): {
   html: string;
   text: string;
 } {
-  const subject = "🚀 欢迎订阅出海锦囊 — 海外百宝箱";
+  const subject = "🚀 欢迎订阅出海锦囊 — 绝世百宝箱";
 
   const html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -38,7 +38,7 @@ export function generateNewsletterWelcomeEmail(email: string): {
 <body>
   <div class="container">
     <div class="header">
-      <h1>海外百宝箱 | JueShi.net</h1>
+      <h1>绝世百宝箱 | JueShi.net</h1>
       <p>为出海人群打造的瑞士军刀</p>
     </div>
     <div class="body">
@@ -55,7 +55,7 @@ export function generateNewsletterWelcomeEmail(email: string): {
       <a href="https://jueshi.net" class="btn">浏览全部工具 →</a>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} 海外百宝箱 jueshi.net</p>
+      <p>© ${new Date().getFullYear()} 绝世百宝箱 jueshi.net</p>
       <p>此邮件由系统自动发送，请勿直接回复。</p>
       <p><a href="https://jueshi.net/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}">取消订阅</a></p>
     </div>
@@ -63,7 +63,7 @@ export function generateNewsletterWelcomeEmail(email: string): {
 </body>
 </html>`;
 
-  const text = `欢迎订阅出海锦囊 — 海外百宝箱 (JueShi.net)
+  const text = `欢迎订阅出海锦囊 — 绝世百宝箱 (JueShi.net)
 
 感谢您订阅出海锦囊。
 
@@ -76,7 +76,7 @@ export function generateNewsletterWelcomeEmail(email: string): {
 浏览全部工具：https://jueshi.net
 
 ---
-© ${new Date().getFullYear()} 海外百宝箱 jueshi.net
+© ${new Date().getFullYear()} 绝世百宝箱 jueshi.net
 取消订阅：https://jueshi.net/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
 
   return { subject, html, text };

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Package, Truck, MapPin, Calculator, FileText, AlertCircle, Globe, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: '跨境寄送 - 海外百宝箱',
+  title: '跨境寄送 - 绝世百宝箱',
   description: '包裹追踪、运费估算、地址格式、敏感货参考 — 跨境寄送全流程工具与资源',
 };
 
@@ -79,7 +79,7 @@ export default function ShippingPage() {
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-8 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <p className="text-amber-800 dark:text-amber-300 text-sm">
-            海外百宝箱是独立工具与资源平台，不直接承运、不代收包裹、不代表任何物流服务商。
+            绝世百宝箱是独立工具与资源平台，不直接承运、不代收包裹、不代表任何物流服务商。
             本页工具与资料仅供参考，相关价格、时效和规则请以实际服务商为准。
           </p>
         </div>

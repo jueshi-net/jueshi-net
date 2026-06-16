@@ -85,7 +85,7 @@ export const GROWTH_TASKS: GrowthTask[] = [
     id: "task-first-login",
     key: "first_login_badge",
     title: "首次访问站点",
-    description: "恭喜加入海外百宝箱！",
+    description: "恭喜加入绝世百宝箱！",
     rewardGrowth: 0,
     actionType: "member_visit",
     targetUrl: "/dashboard/points",

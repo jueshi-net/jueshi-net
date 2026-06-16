@@ -78,14 +78,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const desc = article.seoDescription || article.excerpt || article.content.replace(/<[^>]*>/g, "").slice(0, 150);
 
   return {
-    title: `${article.title} | 海外百宝箱`,
+    title: `${article.title} | 绝世百宝箱`,
     description: desc,
     openGraph: {
       title: article.title,
       description: desc,
       type: "article",
       publishedTime: article.publishedAt?.toISOString(),
-      authors: article.author ? [article.author] : ["海外百宝箱"],
+      authors: article.author ? [article.author] : ["绝世百宝箱"],
       images: article.coverImage ? [{ url: article.coverImage }] : [],
     },
     twitter: {
@@ -133,7 +133,7 @@ export default async function ArticlePage({ params }: Props) {
   const publishDate = article.publishedAt || article.createdAt;
   const updateDate = article.updatedAt;
   const categoryLabel = article.category ? (CATEGORY_LABELS[article.category] || article.category) : "实用指南";
-  const authorDisplay = article.author || "海外百宝箱编辑部";
+  const authorDisplay = article.author || "绝世百宝箱编辑部";
 
   // Process content: add heading IDs and extract TOC
   const { html: processedContent, toc } = addHeadingIds(article.content);
@@ -145,7 +145,7 @@ export default async function ArticlePage({ params }: Props) {
     headline: article.title,
     description: article.excerpt || article.content.replace(/<[^>]*>/g, "").slice(0, 200),
     author: { "@type": "Organization", name: authorDisplay },
-    publisher: { "@type": "Organization", name: "海外百宝箱" },
+    publisher: { "@type": "Organization", name: "绝世百宝箱" },
     datePublished: publishDate.toISOString(),
     dateModified: updateDate.toISOString(),
     mainEntityOfPage: `https://jueshi.net/guides/${slug}`,

@@ -4,11 +4,11 @@ import FeedbackClient from "./feedback-client";
 
 export const metadata: Metadata = {
   title: buildTitle("反馈与联系"),
-  description: "向海外百宝箱提交反馈、问题或合作咨询。",
+  description: "向绝世百宝箱提交反馈、问题或合作咨询。",
   alternates: { canonical: buildCanonical("/feedback") },
   openGraph: {
     title: buildTitle("反馈与联系"),
-    description: "向海外百宝箱提交反馈、问题或合作咨询。",
+    description: "向绝世百宝箱提交反馈、问题或合作咨询。",
     url: buildCanonical("/feedback"),
   },
 };
