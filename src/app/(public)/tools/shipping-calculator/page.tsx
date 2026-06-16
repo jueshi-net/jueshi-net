@@ -806,7 +806,7 @@ export default function ShippingCalculatorPage() {
           const ppk = parseFloat(pricePerKg) || 0;
           const ppcb = parseFloat(pricePerCbm) || 0;
           const rate = parseFloat(exchangeRate) || 1;
-          const totalCbmM3 = results.totalCBM / 1000000;
+          const totalCbmM3 = results.totalCBM; // Already in m³ from calcResults
 
           // Calculate fees based on billing mode
           let mainFee = 0;
