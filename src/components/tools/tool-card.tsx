@@ -2,9 +2,20 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Star, Eye, Heart, FileCheck, Sparkles, ArrowRight } from "lucide-react";
+import { Star, Eye, Heart, FileCheck, Sparkles, ArrowRight, FileText, Package, Tag, Receipt, Truck, Shield, Send, Calculator, CreditCard, Clipboard, Hash, DollarSign, Container, MapPin, QrCode, Video, Image as ImageIcon, Type, Languages, Palette, Music, Camera, Globe, Phone, Mail, Clock, Calendar, TrendingUp, BarChart3, PieChart, Activity, Zap, Target, Award, BookOpen, GraduationCap, Briefcase, ShoppingBag, Store, Landmark, Scale, Wrench, Settings, Filter, Search, Download, Upload, Share2, Link2, Copy, Scissors, Archive, FolderOpen, FileIcon, Files, FileSpreadsheet, FileBarChart, FilePieChart, FileLineChart } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { ToolCenterItem } from "@/lib/tool-center";
+
+// Icon mapping: Lucide icon name → component
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  FileText, Package, Tag, Receipt, Truck, Shield, Send, Calculator, CreditCard, Clipboard,
+  Hash, DollarSign, Container, MapPin, QrCode, Video, ImageIcon, Type, Languages,
+  Palette, Music, Camera, Globe, Phone, Mail, Clock, Calendar, TrendingUp, BarChart3,
+  PieChart, Activity, Zap, Target, Award, BookOpen, GraduationCap, Briefcase,
+  ShoppingBag, Store, Landmark, Scale, Wrench, Settings, Filter, Search, Download,
+  Upload, Share2, Link2, Copy, Scissors, Archive, FolderOpen, FileIcon, Files,
+  FileSpreadsheet, FileBarChart, FilePieChart, FileLineChart, Sparkles, FileCheck,
+};
 
 interface ToolCardProps {
   tool: ToolCenterItem;
@@ -33,19 +44,39 @@ export default function ToolCard({ tool }: ToolCardProps) {
   // Determine tags
   const isNew = tool.isNew;
   const isHot = score > 50;
-  // Removed "isSaved = favorites > 0" because favorites > 0 means *someone* favorited it, not the current user.
-  // Without user context, we cannot show "已收藏".
+
+  // Render icon: handle both emoji strings and Lucide icon names
+  const renderIcon = () => {
+    if (!tool.icon) {
+      // Fallback based on category
+      if (tool.category === 'documents') return <FileCheck className="w-5 h-5" />;
+      if (tool.category === 'ai_content') return <Sparkles className="w-5 h-5" />;
+      return <span className="text-lg font-bold">{tool.name.charAt(0)}</span>;
+    }
+
+    // Check if it's an emoji (single character or contains emoji patterns)
+    const isEmoji = tool.icon.length <= 4 && /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(tool.icon);
+    
+    if (isEmoji) {
+      return <span className="text-xl">{tool.icon}</span>;
+    }
+
+    // Try to map Lucide icon name
+    const IconComponent = iconMap[tool.icon];
+    if (IconComponent) {
+      return <IconComponent className="w-5 h-5" />;
+    }
+
+    // Fallback: show first letter
+    return <span className="text-lg font-bold">{tool.name.charAt(0)}</span>;
+  };
 
   return (
     <div className="group flex flex-col p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md hover:border-blue-300 transition-all duration-200 h-full">
       {/* Header */}
       <div className="flex items-start gap-3 mb-3">
         <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
-           {tool.icon ? (
-             <span className="text-xl">{tool.icon}</span>
-           ) : tool.category === 'documents' ? <FileCheck className="w-5 h-5" /> : 
-            tool.category === 'ai-content' ? <Sparkles className="w-5 h-5" /> : 
-            <span className="text-lg font-bold">{tool.name.charAt(0)}</span>}
+          {renderIcon()}
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
@@ -61,7 +92,6 @@ export default function ToolCard({ tool }: ToolCardProps) {
       <div className="flex flex-wrap gap-1 mb-3">
         {isNew && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium">已上线</span>}
         {isHot && <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded font-medium">热门</span>}
-        {/* Removed "已收藏" tag. It incorrectly showed when ANY user favorited the tool. */}
       </div>
 
       {/* Metrics */}

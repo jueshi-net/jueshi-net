@@ -9,10 +9,10 @@ import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-s
 import { saveContainerToShipping } from "@/lib/container-shipping-transfer";
 
 const containerTypes = [
-  { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770 },
-  { name: "40GP", length: 12.03, width: 2.35, height: 2.39, volume: 67.7, maxWeight: 26680 },
-  { name: "40HC", length: 12.03, width: 2.35, height: 2.69, volume: 76.3, maxWeight: 26480 },
-  { name: "45HC", length: 13.56, width: 2.35, height: 2.69, volume: 86.1, maxWeight: 27700 },
+  { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770, useCase: "小批量普货、样品单、个人物品", icon: "📦", color: "blue" },
+  { name: "40GP", length: 12.03, width: 2.35, height: 2.39, volume: 67.7, maxWeight: 26680, useCase: "大批量标准货物、电子产品、纺织品", icon: "🚛", color: "teal" },
+  { name: "40HC", length: 12.03, width: 2.35, height: 2.69, volume: 76.3, maxWeight: 26480, useCase: "高货、轻泡货、家具、大型设备", icon: "📏", color: "purple" },
+  { name: "45HC", length: 13.56, width: 2.35, height: 2.69, volume: 86.1, maxWeight: 27700, useCase: "超大容积需求、超高货物、大批量出口", icon: "🏗️", color: "orange" },
 ];
 
 export default function ContainerCalculatorPage() {
@@ -22,6 +22,7 @@ export default function ContainerCalculatorPage() {
   const [cargoH, setCargoH] = useState(0);
   const [cargoWeight, setCargoWeight] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedContainer, setSelectedContainer] = useState<string | null>(null);
 
   // 单件体积 (m³)
   const singleVolume = (cargoL * cargoW * cargoH) / 1000000;
@@ -189,64 +190,132 @@ export default function ContainerCalculatorPage() {
         )}
       </div>
 
-      {/* Results */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {results.map(ct => (
-          <div
-            key={ct.name}
-            className={`${cardStyles.base.replace("p-5", "")} border-2 transition-all ${
-              ct.recommended ? "border-green-500 shadow-lg" : "border-gray-100 dark:border-gray-700"
-            }`}
-          >
-            {ct.recommended && (
-              <div className="mb-2 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded text-xs font-medium inline-block">
-                推荐
-              </div>
-            )}
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{ct.name}</h3>
-
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">内尺寸</span>
-                <span className="text-gray-900 dark:text-gray-100">{ct.length}×{ct.width}×{ct.height}m</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">容积</span>
-                <span className="text-gray-900 dark:text-gray-100">{ct.volume} m³</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">限重</span>
-                <span className="text-gray-900 dark:text-gray-100">{(ct.maxWeight / 1000).toFixed(1)} 吨</span>
-              </div>
-              <hr className="dark:border-gray-700" />
-              <div className="flex justify-between">
-                <span className="text-gray-500">当前批次占体积</span>
-                <span className="font-medium text-blue-600">{ct.batchVolumeUtil}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">当前批次占重量</span>
-                <span className="font-medium">{ct.batchWeightUtil}%</span>
-              </div>
-              <hr className="dark:border-gray-700" />
-              <div className="flex justify-between">
-                <span className="text-gray-500">理论可装</span>
-                <span className="text-lg font-bold text-green-600">{ct.maxItems} 件</span>
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                按体积: {ct.maxItemsByVolume} 件 | 按重量: {ct.maxItemsByWeight} 件
-              </div>
-              {quantity > 0 && (
-                <div className="flex justify-between mt-1">
-                  <span className="text-gray-500">可装同等批次</span>
-                  <span className="font-medium text-orange-600">{ct.batches} 批</span>
+      {/* Container Type Selector */}
+      <div className="mb-6">
+        <h3 className={cardStyles.header}>选择集装箱类型</h3>
+        <p className="text-sm text-gray-500 mb-4">点击选择柜型，查看装柜计算结果</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {results.map(ct => {
+            const isSelected = selectedContainer === ct.name;
+            const isRecommended = ct.recommended;
+            return (
+              <button
+                key={ct.name}
+                onClick={() => setSelectedContainer(isSelected ? null : ct.name)}
+                className={`relative text-left rounded-xl border-2 p-4 transition-all duration-200 ${
+                  isSelected
+                    ? "border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md ring-2 ring-green-500/20"
+                    : isRecommended
+                    ? "border-green-300 bg-green-50/50 dark:bg-green-900/10 hover:border-green-400 hover:shadow-sm"
+                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm"
+                }`}
+              >
+                {/* Badges */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl">{ct.icon}</span>
+                  <div className="flex gap-1">
+                    {isRecommended && (
+                      <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 rounded text-[10px] font-bold">
+                        推荐
+                      </span>
+                    )}
+                    {isSelected && (
+                      <span className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* Type Name */}
+                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{ct.name}</h4>
+
+                {/* Use Case */}
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 leading-tight line-clamp-2">{ct.useCase}</p>
+
+                {/* Specs */}
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">内尺寸</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{ct.length}×{ct.width}×{ct.height}m</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">容积</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{ct.volume} m³</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">载重</span>
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{(ct.maxWeight / 1000).toFixed(1)} 吨</span>
+                  </div>
+                </div>
+
+                {/* Calculation Results (shown when cargo is entered) */}
+                {(cargoL && cargoW && cargoH) && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-400">可装</span>
+                      <span className="text-sm font-bold text-green-600">{ct.maxItems} 件</span>
+                    </div>
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-xs text-gray-400">体积占用</span>
+                      <span className="text-xs font-medium text-blue-600">{ct.batchVolumeUtil}%</span>
+                    </div>
+                    {quantity > 0 && (
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-xs text-gray-400">可装批次</span>
+                        <span className="text-xs font-medium text-orange-600">{ct.batches} 批</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Detailed Results (shown when a container is selected or cargo entered) */}
+      {cargoL && cargoW && cargoH && (
+        <div className={cardStyles.base + " mb-6"}>
+          <h3 className={cardStyles.header.replace("mb-4", "")}>📊 各柜型详细对比</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm mt-3">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-2 px-2 font-semibold text-gray-600 dark:text-gray-400">柜型</th>
+                  <th className="text-center py-2 px-2 font-semibold text-gray-600 dark:text-gray-400">理论可装</th>
+                  <th className="text-center py-2 px-2 font-semibold text-gray-600 dark:text-gray-400">体积占用</th>
+                  <th className="text-center py-2 px-2 font-semibold text-gray-600 dark:text-gray-400">重量占用</th>
+                  <th className="text-center py-2 px-2 font-semibold text-gray-600 dark:text-gray-400">可装批次</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map(ct => (
+                  <tr key={ct.name} className={`border-b border-gray-50 dark:border-gray-800 ${selectedContainer === ct.name ? "bg-green-50 dark:bg-green-900/10" : ""} ${ct.recommended ? "bg-green-50/50 dark:bg-green-900/5" : ""}`}>
+                    <td className="py-2 px-2">
+                      <div className="flex items-center gap-2">
+                        <span>{ct.icon}</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{ct.name}</span>
+                        {ct.recommended && <span className="text-[10px] px-1 py-0.5 bg-green-100 text-green-700 rounded font-bold">推荐</span>}
+                      </div>
+                    </td>
+                    <td className="text-center py-2 px-2 font-bold text-green-600">{ct.maxItems} 件</td>
+                    <td className="text-center py-2 px-2 text-blue-600 font-medium">{ct.batchVolumeUtil}%</td>
+                    <td className="text-center py-2 px-2 font-medium">{ct.batchWeightUtil}%</td>
+                    <td className="text-center py-2 px-2 text-orange-600 font-medium">{ct.batches} 批</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
+          <p className="text-xs text-gray-400 mt-2">按体积: 可装件数 = 柜容积 ÷ 单件体积 | 按重量: 可装件数 = 柜限重 ÷ 单件重量</p>
+        </div>
+      )}
 
         {/* ==================== 集装箱知识区 ==================== */}
-        <div className="col-span-full mt-8">
+        <div className="mt-8">
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-teal-600 px-6 py-4">
@@ -430,7 +499,7 @@ export default function ContainerCalculatorPage() {
         <AdSlot placement="tool-bottom" className="mb-8" />
 
         {/* Next Steps - Cross Recommendations */}
-        <div className="col-span-full mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-xl border border-teal-200">
+        <div className="mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 rounded-xl border border-teal-200">
           <h3 className="text-lg font-bold text-gray-900 mb-4">📋 下一步推荐</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <a href="/tools/shipping-calculator" className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:shadow-sm transition-all">
@@ -470,7 +539,6 @@ export default function ContainerCalculatorPage() {
           { question: "20GP、40GP、40HQ 有什么区别？", answer: "20GP 是 20 英尺标准柜（约 33 CBM），40GP 是 40 英尺标准柜（约 67 CBM），40HQ 是 40 英尺高柜（约 76 CBM）。" },
           { question: "为什么实际装货量通常低于理论容积？", answer: "因为货物包装不规则、间隙、托盘占用空间等原因，实际装货量通常为理论容积的 80-90%。建议预留 10-15% 的空间余量。" },
         ]} />
-      </div>
     </div>
   );
 }

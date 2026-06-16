@@ -28,17 +28,17 @@ const COLUMNS = [
       { label: "集装箱规格", href: "/tools/container" },
       { label: "敏感货指南", href: "/tools/sensitive-goods" },
       { label: "AI 工具集", href: "/ai-tools" },
-      { label: "网址导航", href: "/resources" },
+      { label: "报价单", href: "/tools/documents/quotation" },
     ],
   },
   {
     title: "专题资源",
     links: [
-      { label: "跨境电商指南", href: "/topics" },
+      { label: "指南", href: "/guides" },
       { label: "出海博客", href: "/blog" },
       { label: "数据看板", href: "/analytics" },
       { label: "行业排行", href: "/rankings" },
-      { label: "入门教程", href: "/guides" },
+      { label: "网址导航", href: "/resources" },
     ],
   },
   {

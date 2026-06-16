@@ -728,85 +728,176 @@ export default function ShippingCalculatorPage() {
         </div>{/* End LEFT COLUMN */}
 
         {/* ===== RIGHT COLUMN: Results ===== */}
-        <div className="space-y-6 mt-6 lg:mt-0 lg:sticky lg:top-4">
+        <div className="space-y-4 mt-6 lg:mt-0 lg:sticky lg:top-4">
 
-        {/* ==================== Results Card ==================== */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white rounded-xl overflow-hidden shadow-xl">
-          <div className="px-6 py-5">
-            <h2 className="text-sm font-medium text-blue-200 mb-4 flex items-center gap-2">
-              <Scale className="w-4 h-4" />计算结果
+        {/* ==================== Volume & Weight Card ==================== */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-5 py-3 bg-gray-50 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <Box className="w-4 h-4 text-blue-500" />体积与重量
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-              <div>
-                <p className="text-xs text-blue-300">总件数</p>
-                <p className="text-2xl font-bold">{results.totalCtns}</p>
+          </div>
+          <div className="p-5 space-y-4">
+            {/* CBM Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <p className="text-[11px] text-blue-500 font-medium mb-1">单件 CBM</p>
+                <p className="text-xl font-bold text-blue-900">
+                  {results.totalCtns > 0 ? (results.totalCBM / results.totalCtns).toFixed(4) : '0.0000'}
+                  <span className="text-xs font-normal text-blue-400 ml-1">m³</span>
+                </p>
               </div>
-              <div>
-                <p className="text-xs text-blue-300">总实重</p>
-                <p className="text-2xl font-bold">{results.totalGW > 0 ? `${results.totalGW.toFixed(1)} kg` : '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-blue-300">总体积重</p>
-                <p className="text-2xl font-bold text-orange-400">{results.totalVW.toFixed(1)} kg</p>
-              </div>
-              {useMeters && (
-                <div>
-                  <p className="text-xs text-blue-300">总体积 (CBM)</p>
-                  <p className="text-2xl font-bold text-teal-400">{results.totalCBM.toFixed(3)} m³</p>
-                </div>
-              )}
-              <div className={useMeters ? '' : 'md:col-span-2'}>
-                <p className="text-xs text-orange-300">计费重（取较大者）</p>
-                <p className="text-3xl font-black text-orange-400">{results.chargeableWeight.toFixed(1)} kg</p>
+              <div className="bg-blue-50 rounded-lg p-3">
+                <p className="text-[11px] text-blue-500 font-medium mb-1">总方数 / 总 CBM</p>
+                <p className="text-xl font-bold text-blue-900">
+                  {results.totalCBM.toFixed(4)}
+                  <span className="text-xs font-normal text-blue-400 ml-1">m³</span>
+                </p>
               </div>
             </div>
-            <div className="text-xs text-blue-300 space-y-1">
-              <p>
-                计费规则：实重 {results.totalGW.toFixed(1)} kg 与体积重 {results.totalVW.toFixed(1)} kg 取大者
-                → <strong className="text-orange-400">{results.chargeableWeight.toFixed(1)} kg</strong>
+
+            {/* Weight Comparison */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-gray-200 p-3">
+                <p className="text-[11px] text-gray-400 mb-1">总实重</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {results.totalGW > 0 ? results.totalGW.toFixed(1) : '—'}
+                  <span className="text-xs font-normal text-gray-400 ml-1">kg</span>
+                </p>
+              </div>
+              <div className="rounded-lg border border-gray-200 p-3">
+                <p className="text-[11px] text-gray-400 mb-1">总体积重</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {results.totalVW.toFixed(1)}
+                  <span className="text-xs font-normal text-gray-400 ml-1">kg</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Chargeable Weight - Highlighted */}
+            <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 text-center">
+              <p className="text-xs text-orange-500 font-medium mb-1">计费重量</p>
+              <p className="text-3xl font-black text-orange-600">
+                {results.chargeableWeight.toFixed(1)}
+                <span className="text-sm font-normal text-orange-400 ml-1">kg</span>
               </p>
-              {results.totalVW > results.totalGW && results.totalGW > 0 && (
-                <p className="text-orange-300">⚠️ 体积重大于实重 — 此票为泡货，将按体积重计费</p>
-              )}
-              {results.totalGW > results.totalVW && results.totalVW > 0 && (
-                <p className="text-green-300">✅ 实重大于体积重 — 此票为重货，将按实重计费</p>
-              )}
+              <p className="text-[11px] text-orange-400 mt-1">
+                {results.totalVW > results.totalGW && results.totalGW > 0
+                  ? '⚠️ 泡货 — 按体积重计费'
+                  : results.totalGW > results.totalVW && results.totalVW > 0
+                    ? '✅ 重货 — 按实重计费'
+                    : '取实重与体积重较大者'}
+              </p>
             </div>
-            {/* Fee estimation */}
-            {(pricePerKg || pricePerCbm) && (() => {
-              const ppk = parseFloat(pricePerKg) || 0;
-              const ppcb = parseFloat(pricePerCbm) || 0;
-              const rate = parseFloat(exchangeRate) || 1;
-              let billableKg = 0;
-              let billableCbm = 0;
-              let feeSource = '';
-              const totalCbmM3 = useMeters ? results.totalCBM : results.totalCBM / 1000000;
-              switch (billingMode) {
-                case 'weight': billableKg = results.totalGW; feeSource = `按实重 ${results.totalGW.toFixed(1)} kg`; break;
-                case 'volume': billableKg = results.totalVW; feeSource = `按体积重 ${results.totalVW.toFixed(1)} kg`; break;
-                case 'higher': billableKg = results.chargeableWeight; feeSource = `取高 ${results.chargeableWeight.toFixed(1)} kg`; break;
-                case 'cbm': billableCbm = totalCbmM3; feeSource = `按立方 ${totalCbmM3.toFixed(3)} m³`; break;
-              }
-              const feeByKg = billableKg * ppk;
-              const feeByCbm = billableCbm * ppcb;
-              const totalFee = feeByKg + feeByCbm;
-              const convertedFee = totalFee * rate;
-              if (totalFee <= 0) return null;
-              return (
-                <div className="mt-4 pt-4 border-t border-blue-700">
-                  <p className="text-xs text-blue-300 mb-2">💰 运费估算（{feeSource}）</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {ppk > 0 && <div><p className="text-[10px] text-blue-400">按重量</p><p className="text-lg font-bold text-green-400">{feeByKg.toFixed(2)} {currency}</p></div>}
-                    {ppcb > 0 && <div><p className="text-[10px] text-blue-400">按立方</p><p className="text-lg font-bold text-green-400">{feeByCbm.toFixed(2)} {currency}</p></div>}
-                    <div><p className="text-[10px] text-blue-400">合计</p><p className="text-xl font-black text-green-400">{totalFee.toFixed(2)} {currency}</p></div>
-                    {rate !== 1 && currency !== targetCurrency && <div><p className="text-[10px] text-blue-400">折合</p><p className="text-xl font-black text-teal-400">{convertedFee.toFixed(2)} {targetCurrency}</p></div>}
-                  </div>
-                  <p className="text-[10px] text-blue-400 mt-2">⚠️ 估算结果仅供参考，实际费用以承运商/货代报价为准</p>
-                </div>
-              );
-            })()}
+
+            {/* Total pieces */}
+            <div className="text-center text-xs text-gray-400">
+              总件数：<span className="font-semibold text-gray-600">{results.totalCtns}</span> 件
+            </div>
           </div>
         </div>
+
+        {/* ==================== Main Fee Card ==================== */}
+        {(pricePerKg || pricePerCbm) && (() => {
+          const ppk = parseFloat(pricePerKg) || 0;
+          const ppcb = parseFloat(pricePerCbm) || 0;
+          const rate = parseFloat(exchangeRate) || 1;
+          const totalCbmM3 = results.totalCBM / 1000000;
+
+          // Calculate fees based on billing mode
+          let mainFee = 0;
+          let mainFeeLabel = '';
+          let mainFeeDetail = '';
+
+          switch (billingMode) {
+            case 'weight':
+              mainFee = results.totalGW * ppk;
+              mainFeeLabel = '按实重计费';
+              mainFeeDetail = `${results.totalGW.toFixed(1)} kg × ${ppk} ${currency}/kg`;
+              break;
+            case 'volume':
+              mainFee = results.totalVW * ppk;
+              mainFeeLabel = '按体积重计费';
+              mainFeeDetail = `${results.totalVW.toFixed(1)} kg × ${ppk} ${currency}/kg`;
+              break;
+            case 'higher':
+              mainFee = results.chargeableWeight * ppk;
+              mainFeeLabel = '二者取高计费';
+              mainFeeDetail = `${results.chargeableWeight.toFixed(1)} kg × ${ppk} ${currency}/kg`;
+              break;
+            case 'cbm':
+              mainFee = totalCbmM3 * ppcb;
+              mainFeeLabel = '按立方计费';
+              mainFeeDetail = `${totalCbmM3.toFixed(4)} m³ × ${ppcb} ${currency}/m³`;
+              break;
+          }
+
+          const convertedFee = mainFee * rate;
+          if (mainFee <= 0) return null;
+
+          return (
+            <div className="bg-gradient-to-br from-green-600 to-emerald-700 text-white rounded-xl shadow-lg overflow-hidden">
+              <div className="px-5 py-3 bg-green-700/50 border-b border-green-500/30">
+                <h2 className="text-sm font-semibold text-green-100 flex items-center gap-2">
+                  <span>💰</span> 主运费估算
+                </h2>
+              </div>
+              <div className="p-5 space-y-4">
+                {/* Billing mode badge */}
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 bg-white/20 rounded text-xs font-medium">{mainFeeLabel}</span>
+                  <span className="text-xs text-green-200">{mainFeeDetail}</span>
+                </div>
+
+                {/* Main fee amount */}
+                <div className="text-center py-3">
+                  <p className="text-xs text-green-200 mb-1">运费金额</p>
+                  <p className="text-4xl font-black">
+                    {mainFee.toFixed(2)}
+                    <span className="text-lg font-normal text-green-200 ml-2">{currency}</span>
+                  </p>
+                </div>
+
+                {/* Currency conversion */}
+                {rate !== 1 && currency !== targetCurrency && (
+                  <div className="bg-white/10 rounded-lg p-3 text-center">
+                    <p className="text-xs text-green-200 mb-1">折合 {targetCurrency}</p>
+                    <p className="text-2xl font-bold text-teal-300">
+                      {convertedFee.toFixed(2)}
+                      <span className="text-sm font-normal text-green-200 ml-1">{targetCurrency}</span>
+                    </p>
+                    <p className="text-[10px] text-green-300 mt-1">汇率：1 {currency} = {rate} {targetCurrency}</p>
+                  </div>
+                )}
+
+                {/* Auxiliary fees */}
+                {billingMode === 'cbm' && ppk > 0 && (
+                  <div className="border-t border-green-500/30 pt-3">
+                    <p className="text-[11px] text-green-200 mb-1">按公斤参考</p>
+                    <p className="text-sm font-medium">
+                      {(results.chargeableWeight * ppk).toFixed(2)} {currency}
+                      <span className="text-green-300 text-xs ml-1">（{results.chargeableWeight.toFixed(1)} kg × {ppk}）</span>
+                    </p>
+                  </div>
+                )}
+                {billingMode !== 'cbm' && ppcb > 0 && (
+                  <div className="border-t border-green-500/30 pt-3">
+                    <p className="text-[11px] text-green-200 mb-1">按立方参考</p>
+                    <p className="text-sm font-medium">
+                      {(totalCbmM3 * ppcb).toFixed(2)} {currency}
+                      <span className="text-green-300 text-xs ml-1">（{totalCbmM3.toFixed(4)} m³ × {ppcb}）</span>
+                    </p>
+                  </div>
+                )}
+
+                {/* Disclaimer */}
+                <p className="text-[10px] text-green-300 text-center">⚠️ 估算仅供参考，以承运商/货代实际报价为准</p>
+              </div>
+            </div>
+          );
+        })()}
+        </div>{/* End RIGHT COLUMN */}
+        </div>{/* End dual-column grid */}
 
         {/* ==================== Breakdown ==================== */}
         {rows.length > 1 && showBreakdown && (
@@ -930,8 +1021,6 @@ export default function ShippingCalculatorPage() {
             </div>
           </div>
         </div>
-        </div>{/* End RIGHT COLUMN */}
-        </div>{/* End dual-column grid */}
 
         {/* Related Guides */}
         <RelatedGuidesSection slugs={['volumetric-weight-explained', 'cbm-shipping-volume-calculator']} />
