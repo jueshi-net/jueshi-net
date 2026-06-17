@@ -191,6 +191,13 @@ export default function LoginPage({ defaultMode = "login" }: { defaultMode?: "lo
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
+                    {isLogin && (
+                      <div className="text-right mt-1">
+                        <Link href="/forgot-password" className="text-xs text-teal-600 hover:text-teal-700">
+                          忘记密码？
+                        </Link>
+                      </div>
+                    )}
                   </div>
 
                   {!isLogin && (
