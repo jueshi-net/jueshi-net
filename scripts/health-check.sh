@@ -26,8 +26,9 @@ if [ ! -f "$STATE_FILE" ]; then
     echo '{}' > "$STATE_FILE"
 fi
 
-# Read previous state
-PREV_STATE=$(cat "$STATE_FILE")
+# Read previous state (before any updates)
+ORIGINAL_PREV_STATE=$(cat "$STATE_FILE")
+CURRENT_STATE="{}"
 
 echo "=== Health Check: $TIMESTAMP ===" >> "$LOG_FILE"
 
@@ -44,8 +45,8 @@ check_and_record() {
         ALERT_DETAILS+=("$name: $message")
     fi
     
-    # Update state
-    PREV_STATE=$(echo "$PREV_STATE" | jq --arg name "$name" --arg status "$status" --arg msg "$message" '.[$name] = {"status": $status, "message": $msg, "time": now | todate}')
+    # Update current state
+    CURRENT_STATE=$(echo "$CURRENT_STATE" | jq --arg name "$name" --arg status "$status" --arg msg "$message" '.[$name] = {"status": $status, "message": $msg, "time": now | todate}')
 }
 
 # 1. Check HTTPS homepage
@@ -127,9 +128,9 @@ else
 fi
 
 # Save current state
-echo "$PREV_STATE" | jq '.' > "$STATE_FILE"
+echo "$CURRENT_STATE" | jq '.' > "$STATE_FILE"
 
-# Check for state changes and send alerts
+# === Send alerts for current failures ===
 if [ ${#ALERTS[@]} -gt 0 ]; then
     echo "🚨 ALERTS DETECTED at $TIMESTAMP on $HOSTNAME" >> "$ALERT_LOG"
     for detail in "${ALERT_DETAILS[@]}"; do
@@ -137,69 +138,79 @@ if [ ${#ALERTS[@]} -gt 0 ]; then
     done
     echo "" >> "$ALERT_LOG"
     
-    # Send alert via configured channel
+    # Build alert text
     ALERT_TEXT="🚨 jueshi.net Health Check Alerts\nHost: $HOSTNAME\nTime: $TIMESTAMP\n\nFailures:\n"
     for detail in "${ALERT_DETAILS[@]}"; do
         ALERT_TEXT+="  • $detail\n"
     done
     ALERT_TEXT+="\nDisk: ${DISK_USAGE}%\nPM2: $PM2_STATUS"
     
-    # Telegram alert (if configured)
+    # Telegram alert
     if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
         curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=${ALERT_TEXT}" \
-            -d "parse_mode=HTML" > /dev/null 2>&1 || true
+            -d "text=${ALERT_TEXT}" > /dev/null 2>&1
     fi
     
-    # Discord webhook (if configured)
+    # Discord webhook
     if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
         curl -s -X POST "${DISCORD_WEBHOOK_URL}" \
             -H "Content-Type: application/json" \
-            -d "{\"content\": \"$(echo -e "$ALERT_TEXT")\"}" > /dev/null 2>&1 || true
+            -d "{\"content\": \"$(echo -e "$ALERT_TEXT")\"}" > /dev/null 2>&1
     fi
     
-    # Generic webhook (if configured)
+    # Generic webhook
     if [ -n "${ALERT_WEBHOOK_URL:-}" ]; then
         curl -s -X POST "${ALERT_WEBHOOK_URL}" \
             -H "Content-Type: application/json" \
-            -d "{\"text\": \"$(echo -e "$ALERT_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"alerts\": $(printf '%s\n' "${ALERT_DETAILS[@]}" | jq -R . | jq -s .)}" > /dev/null 2>&1 || true
+            -d "{\"text\": \"$(echo -e "$ALERT_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"alerts\": $(printf '%s\n' "${ALERT_DETAILS[@]}" | jq -R . | jq -s .)}" > /dev/null 2>&1
     fi
     
     echo "Sent ${#ALERTS[@]} alerts" >> "$LOG_FILE"
 else
     echo "✅ All checks passed" >> "$LOG_FILE"
-    
-    # Check for recovery (previous failures now OK)
-    PREV_FAILURES=$(echo "$PREV_STATE" | jq -r 'to_entries[] | select(.value.status != "ok") | .key' 2>/dev/null || echo "")
-    if [ -n "$PREV_FAILURES" ]; then
-        RECOVERY_TEXT="✅ jueshi.net Health Check Recovery\nHost: $HOSTNAME\nTime: $TIMESTAMP\n\nRecovered:\n"
-        for item in $PREV_FAILURES; do
-            RECOVERY_TEXT+="  • $item\n"
-        done
-        
-        # Send recovery notification
-        if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
-            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                -d "chat_id=${TELEGRAM_CHAT_ID}" \
-                -d "text=${RECOVERY_TEXT}" \
-                -d "parse_mode=HTML" > /dev/null 2>&1 || true
-        fi
-        
-        if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
-            curl -s -X POST "${DISCORD_WEBHOOK_URL}" \
-                -H "Content-Type: application/json" \
-                -d "{\"content\": \"$(echo -e "$RECOVERY_TEXT")\"}" > /dev/null 2>&1 || true
-        fi
-        
-        if [ -n "${ALERT_WEBHOOK_URL:-}" ]; then
-            curl -s -X POST "${ALERT_WEBHOOK_URL}" \
-                -H "Content-Type: application/json" \
-                -d "{\"text\": \"$(echo -e "$RECOVERY_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"type\": \"recovery\"}" > /dev/null 2>&1 || true
-        fi
-        
-        echo "Sent recovery notification for: $PREV_FAILURES" >> "$LOG_FILE"
+fi
+
+# === Check for recovery (items that were failing but are now OK) ===
+# This runs regardless of whether there are current alerts
+RECOVERED_ITEMS=()
+for item in $(echo "$ORIGINAL_PREV_STATE" | jq -r 'to_entries[] | select(.value.status != "ok") | .key' 2>/dev/null); do
+    CURRENT_STATUS=$(echo "$CURRENT_STATE" | jq -r --arg item "$item" '.[$item].status // "unknown"')
+    if [ "$CURRENT_STATUS" = "ok" ]; then
+        RECOVERED_ITEMS+=("$item")
     fi
+done
+
+if [ ${#RECOVERED_ITEMS[@]} -gt 0 ]; then
+    RECOVERY_TEXT="✅ jueshi.net Health Check Recovery\nHost: $HOSTNAME\nTime: $TIMESTAMP\n\nRecovered:\n"
+    for item in "${RECOVERED_ITEMS[@]}"; do
+        RECOVERY_TEXT+="  • $item\n"
+    done
+    
+    echo "✅ RECOVERY at $TIMESTAMP: ${RECOVERED_ITEMS[*]}" >> "$ALERT_LOG"
+    
+    # Telegram recovery notification
+    if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${TELEGRAM_CHAT_ID}" \
+            -d "text=${RECOVERY_TEXT}" > /dev/null 2>&1
+    fi
+    
+    # Discord recovery
+    if [ -n "${DISCORD_WEBHOOK_URL:-}" ]; then
+        curl -s -X POST "${DISCORD_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"$(echo -e "$RECOVERY_TEXT")\"}" > /dev/null 2>&1
+    fi
+    
+    # Generic webhook recovery
+    if [ -n "${ALERT_WEBHOOK_URL:-}" ]; then
+        curl -s -X POST "${ALERT_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"$(echo -e "$RECOVERY_TEXT")\", \"host\": \"$HOSTNAME\", \"timestamp\": \"$TIMESTAMP\", \"type\": \"recovery\"}" > /dev/null 2>&1
+    fi
+    
+    echo "Sent recovery notification for: ${RECOVERED_ITEMS[*]}" >> "$LOG_FILE"
 fi
 
 echo "---" >> "$LOG_FILE"
