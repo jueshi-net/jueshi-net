@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     description: "全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。",
     images: [
       {
-        url: "/og/default-og.png",
+        url: `${process.env.NEXT_PUBLIC_APP_URL || "https://jueshi.net"}/og/default-og.png`,
         width: 1200,
         height: 630,
         alt: "绝世百宝箱",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "绝世百宝箱 - 海外华人的实用工具箱",
     description: "全域出国基础设施平台，覆盖跨境电商、SOHO、留学生与数字游民。",
-    images: ["/og/default-og.png"],
+    images: [`${process.env.NEXT_PUBLIC_APP_URL || "https://jueshi.net"}/og/default-og.png`],
   },
 };
 
