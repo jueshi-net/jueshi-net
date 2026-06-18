@@ -353,8 +353,8 @@ export default function WorkbenchClient() {
           {/* Divider */}
           <div className="mt-3 mb-2.5 border-t border-gray-50" />
 
-          {/* Lower layer: 4-Grid Stats */}
-          <div className="grid grid-cols-4 gap-2">
+          {/* Lower layer: 4-Grid Stats - Mobile: 2x2, Desktop: 4 columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <button
               onClick={handleCheckIn}
               disabled={checkedIn}

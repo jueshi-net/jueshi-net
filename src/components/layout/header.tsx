@@ -23,7 +23,7 @@ const NAV_LINKS = [
   { href: "/tools/documents", label: "单据", icon: FileText },
   { href: "/tools/hs-code", label: "HS编码", icon: FileText },
   { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
-  { href: "/tools/postal-code", label: "邮编查询", icon: MapPin },
+  { href: "/tools/postal-code", label: "邮编", icon: MapPin },
   { href: "/resources", label: "网址导航", icon: BookOpen },
   { href: "/checklists", label: "清单", icon: ListChecks },
   { href: "/topics", label: "专题", icon: BookOpen },
@@ -146,14 +146,14 @@ export default function Header() {
           </Link>
 
           {/* Center: Nav */}
-          <nav className="hidden lg:flex items-center gap-0.5">
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg whitespace-nowrap"
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{link.label}</span>
@@ -203,7 +203,7 @@ export default function Header() {
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="搜索工具…"
-                className="pl-9 pr-14 h-9 w-44 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400"
+                className="pl-9 pr-14 h-9 w-32 lg:w-44 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400"
               />
               <button
                 onClick={handleSearch}

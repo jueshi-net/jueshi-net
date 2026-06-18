@@ -614,7 +614,7 @@ export default function ShippingCalculatorPage() {
           </div>
 
           {/* Rows */}
-          <div className="p-4 space-y-2">
+          <div className="p-4 space-y-3">
             {rows.map((row, idx) => {
               const l = parseFloat(row.length) || 0;
               const w = parseFloat(row.width) || 0;
@@ -624,51 +624,70 @@ export default function ShippingCalculatorPage() {
               const vw = volCm3 / divisor;
 
               return (
-                <div key={row.id} className="grid md:grid-cols-12 grid-cols-2 gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="md:col-span-1 flex items-center justify-center text-sm text-gray-400">{idx + 1}</div>
-                  <div className="md:col-span-2">
-                    <label className="md:hidden text-[10px] text-gray-400">长</label>
-                    <input type="number" step={useMeters ? '0.01' : '1'} placeholder="长" value={row.length}
-                      onChange={e => updateRow(row.id, 'length', e.target.value)}
-                      className={`${inputStyles} text-center`} />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="md:hidden text-[10px] text-gray-400">宽</label>
-                    <input type="number" step={useMeters ? '0.01' : '1'} placeholder="宽" value={row.width}
-                      onChange={e => updateRow(row.id, 'width', e.target.value)}
-                      className={`${inputStyles} text-center`} />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="md:hidden text-[10px] text-gray-400">高</label>
-                    <input type="number" step={useMeters ? '0.01' : '1'} placeholder="高" value={row.height}
-                      onChange={e => updateRow(row.id, 'height', e.target.value)}
-                      className={`${inputStyles} text-center`} />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="md:hidden text-[10px] text-gray-400">件数</label>
-                    <input type="number" min="1" placeholder="件数" value={row.quantity}
-                      onChange={e => updateRow(row.id, 'quantity', e.target.value)}
-                      className={`${inputStyles} text-center`} />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="md:hidden text-[10px] text-gray-400">单件重量</label>
-                    <input type="number" step="0.01" placeholder="kg" value={row.unitWeight}
-                      onChange={e => updateRow(row.id, 'unitWeight', e.target.value)}
-                      className={`${inputStyles} text-center`} />
-                  </div>
-                  <div className="md:col-span-1 flex items-center justify-center text-xs text-gray-600 font-medium bg-gray-100 rounded px-1">
-                    {(parseFloat(row.unitWeight) || 0) * q > 0
-                      ? `${((parseFloat(row.unitWeight) || 0) * q).toFixed(1)} kg`
-                      : '—'}
-                  </div>
-                  <div className="md:col-span-1 flex items-center justify-center">
+                <div key={row.id} className="bg-gray-50 rounded-lg p-3 space-y-3">
+                  {/* Row header */}
+                  <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+                    <span className="text-sm font-medium text-gray-700">规格 {idx + 1}</span>
                     <button onClick={() => removeRow(row.id)} disabled={rows.length === 1}
-                      className="p-1 text-red-400 hover:text-red-600 disabled:opacity-30">
+                      className="p-1.5 text-red-400 hover:text-red-600 disabled:opacity-30 hover:bg-red-50 rounded">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="md:col-span-1 flex items-center justify-center text-xs text-gray-500 font-medium">
-                    {vw > 0 ? `${vw.toFixed(1)} kg` : '—'}
+
+                  {/* Dimensions - Mobile: stacked, Desktop: grid */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">长 ({unitLabel})</label>
+                      <input type="number" step={useMeters ? '0.01' : '1'} placeholder="长" value={row.length}
+                        onChange={e => updateRow(row.id, 'length', e.target.value)}
+                        className={`${inputStyles} text-center`} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">宽 ({unitLabel})</label>
+                      <input type="number" step={useMeters ? '0.01' : '1'} placeholder="宽" value={row.width}
+                        onChange={e => updateRow(row.id, 'width', e.target.value)}
+                        className={`${inputStyles} text-center`} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">高 ({unitLabel})</label>
+                      <input type="number" step={useMeters ? '0.01' : '1'} placeholder="高" value={row.height}
+                        onChange={e => updateRow(row.id, 'height', e.target.value)}
+                        className={`${inputStyles} text-center`} />
+                    </div>
+                  </div>
+
+                  {/* Quantity and weight */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">件数</label>
+                      <input type="number" min="1" placeholder="件数" value={row.quantity}
+                        onChange={e => updateRow(row.id, 'quantity', e.target.value)}
+                        className={`${inputStyles} text-center`} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500 mb-1 block">单件重量 (kg)</label>
+                      <input type="number" step="0.01" placeholder="kg" value={row.unitWeight}
+                        onChange={e => updateRow(row.id, 'unitWeight', e.target.value)}
+                        className={`${inputStyles} text-center`} />
+                    </div>
+                  </div>
+
+                  {/* Results summary */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
+                    <div className="text-xs text-gray-600">
+                      <span className="text-gray-400">实重合计：</span>
+                      <span className="font-medium text-gray-900">
+                        {(parseFloat(row.unitWeight) || 0) * q > 0
+                          ? `${((parseFloat(row.unitWeight) || 0) * q).toFixed(1)} kg`
+                          : '—'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-600 text-right">
+                      <span className="text-gray-400">体积重：</span>
+                      <span className="font-medium text-gray-900">
+                        {vw > 0 ? `${vw.toFixed(1)} kg` : '—'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
