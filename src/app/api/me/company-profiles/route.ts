@@ -63,8 +63,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Logo 必须是上传的图片数据，不允许外链 URL" }, { status: 400 });
   }
 
-  // If first profile, make it default
+  // Count existing profiles
   const existingCount = await prisma.userCompanyProfile.count({ where: { userId } });
+  
+  // Check membership limit (admin exempt)
+  const userRole = session.user.role;
+  const isAdmin = userRole === "admin" || userRole === "管理员";
+  const maxProfiles = member ? 10 : 1; // member: 10, free: 1
+  
+  if (!isAdmin && existingCount >= maxProfiles) {
+    return NextResponse.json(
+      { 
+        error: `免费版最多创建 ${maxProfiles} 套公司资料，升级会员可创建 10 套`,
+        limit: maxProfiles,
+        current: existingCount
+      },
+      { status: 403 }
+    );
+  }
+  
+  // If first profile, make it default
   const finalIsDefault = isDefault || existingCount === 0;
 
   // If setting as default, unset other defaults
