@@ -19,6 +19,15 @@ const ICON_EMOJI: Record<string, string> = {
   mail: "📧",
 };
 
+const TYPE_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
+  system: { label: "系统通知", emoji: "🔔", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  reward: { label: "奖励通知", emoji: "🎁", color: "bg-purple-50 text-purple-700 border-purple-200" },
+  growth: { label: "成长通知", emoji: "📈", color: "bg-green-50 text-green-700 border-green-200" },
+  review: { label: "审核通知", emoji: "📋", color: "bg-amber-50 text-amber-700 border-amber-200" },
+  mail: { label: "邮件通知", emoji: "📧", color: "bg-teal-50 text-teal-700 border-teal-200" },
+  info: { label: "其他通知", emoji: "ℹ️", color: "bg-gray-50 text-gray-700 border-gray-200" },
+};
+
 interface Notification {
   id: string;
   title: string;
@@ -131,56 +140,75 @@ export default function NotificationsClient() {
           <p className="text-sm text-gray-400">系统通知、任务提醒、等级升级等消息会显示在这里</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {notifications.map(n => {
-            const Icon = ICON_MAP[n.type] || Bell;
-            const emoji = ICON_EMOJI[n.type] || "🔔";
+        <div className="space-y-6">
+          {/* Group by type */}
+          {Object.entries(TYPE_CONFIG).map(([type, config]) => {
+            const typeNotifications = notifications.filter(n => n.type === type);
+            if (typeNotifications.length === 0) return null;
+            
             return (
-              <div
-                key={n.id}
-                className={`bg-white border rounded-xl p-4 transition-all ${
-                  n.isRead ? "border-gray-100" : "border-amber-200 bg-amber-50/30"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-lg shrink-0 mt-0.5">{emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm font-semibold ${n.isRead ? "text-gray-700" : "text-gray-900"}`}>
-                        {n.title}
-                      </span>
-                      {!n.isRead && (
-                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium">
-                          未读
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{n.content}</p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className="text-[10px] text-gray-400">
-                        {new Date(n.createdAt).toLocaleDateString("zh-CN")}
-                      </span>
-                      {n.linkUrl && (
-                        <a href={n.linkUrl} className="text-[10px] text-teal-600 hover:underline inline-flex items-center gap-0.5">
-                          查看详情 <ExternalLink className="w-2.5 h-2.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  {!n.isRead && (
-                    <button
-                      onClick={() => markAsRead(n.id)}
-                      disabled={markingId === n.id}
-                      className="shrink-0 p-1.5 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-green-600 transition-colors disabled:opacity-50"
-                      title="标记为已读"
-                    >
-                      {markingId === n.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <CheckCircle className="w-4 h-4" />
-                      )}
-                    </button>
-                  )}
+              <div key={type} className="space-y-3">
+                {/* Group header */}
+                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${config.color}`}>
+                  <span>{config.emoji}</span>
+                  <span>{config.label}</span>
+                  <span className="text-xs opacity-70">({typeNotifications.length})</span>
+                </div>
+                
+                {/* Notifications in this group */}
+                <div className="space-y-2">
+                  {typeNotifications.map(n => {
+                    const emoji = config.emoji;
+                    return (
+                      <div
+                        key={n.id}
+                        className={`bg-white border rounded-xl p-4 transition-all ${
+                          n.isRead ? "border-gray-100" : "border-amber-200 bg-amber-50/30"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-lg shrink-0 mt-0.5">{emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-sm font-semibold ${n.isRead ? "text-gray-700" : "text-gray-900"}`}>
+                                {n.title}
+                              </span>
+                              {!n.isRead && (
+                                <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium">
+                                  未读
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">{n.content}</p>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="text-[10px] text-gray-400">
+                                {new Date(n.createdAt).toLocaleDateString("zh-CN")}
+                              </span>
+                              {n.linkUrl && (
+                                <a href={n.linkUrl} className="text-[10px] text-teal-600 hover:underline inline-flex items-center gap-0.5">
+                                  查看详情 <ExternalLink className="w-2.5 h-2.5" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                          {!n.isRead && (
+                            <button
+                              onClick={() => markAsRead(n.id)}
+                              disabled={markingId === n.id}
+                              className="shrink-0 p-1.5 rounded-lg hover:bg-gray-100 text-gray-300 hover:text-green-600 transition-colors disabled:opacity-50"
+                              title="标记为已读"
+                            >
+                              {markingId === n.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <CheckCircle className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

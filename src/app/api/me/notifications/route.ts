@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const where: Record<string, unknown> = { userId };
   if (unreadOnly) where.isRead = false;
 
-  const [notifications, total] = await Promise.all([
+  const [notificationsRaw, total] = await Promise.all([
     prisma.notification.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -25,6 +25,17 @@ export async function GET(req: NextRequest) {
     }),
     prisma.notification.count({ where }),
   ]);
+
+  // Map database fields to client expected fields
+  const notifications = notificationsRaw.map(n => ({
+    id: n.id,
+    title: n.title,
+    content: n.message, // message -> content
+    type: n.type,
+    isRead: n.isRead,
+    linkUrl: n.link, // link -> linkUrl
+    createdAt: n.createdAt.toISOString(),
+  }));
 
   return NextResponse.json({
     success: true,
