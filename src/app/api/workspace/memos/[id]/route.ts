@@ -19,7 +19,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       title: body.title ?? existing.title,
       content: body.content ?? existing.content,
       category: body.category ?? existing.category,
+      color: body.color ?? existing.color,
       isPinned: body.isPinned ?? existing.isPinned,
+      dueDate: body.dueDate !== undefined ? (body.dueDate ? new Date(body.dueDate) : null) : existing.dueDate,
     },
   });
   return NextResponse.json(memo);
