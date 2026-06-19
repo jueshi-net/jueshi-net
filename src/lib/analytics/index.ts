@@ -21,6 +21,7 @@ export interface TrackEvent {
   toolName?: string;
   action?: string;
   path?: string;
+  metadata?: any;
 }
 
 export function track(event: TrackEvent) {

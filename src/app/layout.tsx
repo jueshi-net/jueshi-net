@@ -7,6 +7,7 @@ import CommandPalette, { CommandMenuProvider } from "@/components/command-palett
 import PWARegister from "@/components/PWARegister";
 import CookieConsent from "@/components/common/cookie-consent";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -65,10 +66,12 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={cn(inter.className, "min-h-screen bg-[#f8fafc] antialiased")}>
         <Providers>
-          <CommandMenuProvider>
-            {children}
-            <CommandPalette />
-          </CommandMenuProvider>
+          <AnalyticsProvider>
+            <CommandMenuProvider>
+              {children}
+              <CommandPalette />
+            </CommandMenuProvider>
+          </AnalyticsProvider>
           <PWARegister />
           <CookieConsent />
           {process.env.NEXT_PUBLIC_GA_ID && (

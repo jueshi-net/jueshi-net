@@ -670,17 +670,40 @@ model ExportLog {
 // 匿名统计埋点：只记录事件类型/工具名/路径/时间，不采集用户输入内容
 model EventLog {
   id        String   @id @default(cuid())
-  eventType String   @default("") // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action
+  eventType String   @default("") // tool_click / tool_copy / tool_calculate / tool_query / article_click / resource_click / memo_action / page_view / session_start / session_heartbeat / page_exit
   toolName  String? // tracking / shipping-calculator / hs-code / postal-code / exchange-rate / memo / resources / blog
   action    String? // 具体动作，如 copy_tracking_number / click_17track / convert_currency / add_memo 等
   path      String? // 页面路径，如 /tools/tracking
   sessionId String? // 匿名 sessionId（localStorage 生成，不关联用户身份）
   createdAt DateTime @default(now())
+  
+  // v1.20.42.10.0 Analytics MVP 扩展字段
+  userId        String?  // 关联登录用户（可选）
+  anonymousId   String?  // 匿名用户标识（可选，用于跨 session 追踪）
+  referrer      String?  // 完整来源 URL（可选）
+  referrerDomain String? // 来源域名（可选）
+  utmSource     String?  // UTM source（可选）
+  utmMedium     String?  // UTM medium（可选）
+  utmCampaign   String?  // UTM campaign（可选）
+  utmTerm       String?  // UTM term（可选）
+  utmContent    String?  // UTM content（可选）
+  deviceType    String?  // 设备类型：desktop / mobile / tablet（可选）
+  browser       String?  // 浏览器名称（可选）
+  os            String?  // 操作系统（可选）
+  country       String?  // 国家/地区（可选）
+  ipHash        String?  // IP 哈希（可选，不存明文 IP）
+  durationMs    Int?     // 停留时间毫秒（可选）
+  metadata      Json?    // 扩展元数据（可选，JSON 格式）
 
   @@index([eventType])
   @@index([toolName])
   @@index([createdAt])
   @@index([sessionId])
+  @@index([userId])
+  @@index([anonymousId])
+  @@index([path])
+  @@index([referrerDomain])
+  @@index([deviceType])
   @@map("event_logs")
 }
 
