@@ -592,9 +592,17 @@ model Resource {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  // v1.20.42.13.1: 推荐位字段
+  isFeatured      Boolean   @default(false) @map("is_featured")
+  featuredGroup   String?   @map("featured_group")
+  featuredOrder   Int?      @map("featured_order")
+  featuredStartAt DateTime? @map("featured_start_at")
+  featuredEndAt   DateTime? @map("featured_end_at")
+
   @@index([category])
   @@index([isActive])
   @@index([qualityScore])
+  @@index([isFeatured])
   @@map("resources")
 }
 
@@ -1632,3 +1640,6 @@ model ProductItem {
   @@index([userId, name])
   @@map("product_items")
 }
+
+// v1.20.42.13.1: Resource 推荐位字段（添加到 Resource 模型）
+// 注意：这些字段需要通过 migration 添加到现有 Resource 表
