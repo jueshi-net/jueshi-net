@@ -1,23 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Bell, CheckCircle, Clock, Loader2, ExternalLink, Mail, TrendingUp, AlertTriangle, Gift } from "lucide-react";
-
-const ICON_MAP: Record<string, typeof Bell> = {
-  system: Bell,
-  reward: Gift,
-  growth: TrendingUp,
-  review: AlertTriangle,
-  mail: Mail,
-};
-
-const ICON_EMOJI: Record<string, string> = {
-  system: "🔔",
-  reward: "🎁",
-  growth: "📈",
-  review: "📋",
-  mail: "📧",
-};
+import { Bell, CheckCircle, Clock, Loader2, ExternalLink, Mail, TrendingUp, AlertTriangle, Gift, Filter } from "lucide-react";
+import PageHeader from "@/components/workspace/PageHeader";
+import EmptyState from "@/components/workspace/EmptyState";
 
 const TYPE_CONFIG: Record<string, { label: string; emoji: string; color: string }> = {
   system: { label: "系统通知", emoji: "🔔", color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -51,6 +37,7 @@ export default function NotificationsClient() {
   const [loading, setLoading] = useState(true);
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [filter, setFilter] = useState<"all" | "unread" | "system" | "reward" | "growth">("all");
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -88,74 +75,128 @@ export default function NotificationsClient() {
     setUnreadCount(0);
   };
 
+  // 根据筛选条件过滤通知
+  const filteredNotifications = notifications.filter(n => {
+    if (filter === "unread") return !n.isRead;
+    if (filter === "system") return n.type === "system";
+    if (filter === "reward") return n.type === "reward";
+    if (filter === "growth") return n.type === "growth";
+    return true;
+  });
+
+  // 按类型分组
+  const groupedNotifications = filteredNotifications.reduce((acc, n) => {
+    if (!acc[n.type]) acc[n.type] = [];
+    acc[n.type].push(n);
+    return acc;
+  }, {} as Record<string, Notification[]>);
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Bell className="w-6 h-6 text-amber-500" />
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">通知中心</h1>
-            <p className="text-sm text-gray-500">
-              {unreadCount > 0 ? `${unreadCount} 条未读` : "暂无未读通知"}
-            </p>
+    <div className="max-w-6xl mx-auto">
+      <PageHeader
+        icon={<Bell className="w-5 h-5" />}
+        title="通知中心"
+        description="查看系统通知、任务提醒、等级升级等消息"
+        action={
+          unreadCount > 0 ? (
+            <button
+              onClick={markAllAsRead}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors"
+            >
+              <CheckCircle className="w-4 h-4" />
+              全部已读
+            </button>
+          ) : null
+        }
+      />
+
+      {/* 通知概览 */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div>
+              <div className="text-xs text-gray-500 mb-1">未读通知</div>
+              <div className="text-2xl font-bold text-gray-900">{unreadCount}</div>
+            </div>
+            <div className="h-8 w-px bg-gray-200"></div>
+            <div>
+              <div className="text-xs text-gray-500 mb-1">全部通知</div>
+              <div className="text-2xl font-bold text-gray-900">{pagination.total}</div>
+            </div>
           </div>
+          {unreadCount > 0 && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs">
+              <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+              {unreadCount} 条未读
+            </div>
+          )}
         </div>
-        {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors"
-          >
-            <CheckCircle className="w-3.5 h-3.5" />
-            全部已读
-          </button>
-        )}
       </div>
 
-      {/* Unread/All tabs */}
-      <div className="flex gap-2">
-        <button
-          onClick={() => {
-            setPagination(prev => ({ ...prev, page: 1 }));
-          }}
-          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-teal-600 text-white"
-        >
-          全部通知
-        </button>
-        <span className="text-xs text-gray-400 py-1.5">
-          共 {pagination.total} 条通知
-        </span>
+      {/* 筛选 tabs */}
+      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
+        <div className="flex gap-2 flex-wrap">
+          {[
+            { key: "all", label: "全部", count: pagination.total },
+            { key: "unread", label: "未读", count: unreadCount },
+            { key: "system", label: "系统", count: notifications.filter(n => n.type === "system").length },
+            { key: "reward", label: "奖励", count: notifications.filter(n => n.type === "reward").length },
+            { key: "growth", label: "成长", count: notifications.filter(n => n.type === "growth").length },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setFilter(tab.key as any)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                filter === tab.key 
+                  ? "bg-teal-600 text-white" 
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Notifications list */}
+      {/* 通知列表 */}
       {loading ? (
         <div className="p-12 text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto text-gray-400" />
           <p className="text-gray-500 mt-2">加载通知...</p>
         </div>
-      ) : notifications.length === 0 ? (
-        <div className="bg-white border border-gray-100 rounded-xl p-10 text-center">
-          <Clock className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 mb-1">暂无通知</p>
-          <p className="text-sm text-gray-400">系统通知、任务提醒、等级升级等消息会显示在这里</p>
-        </div>
+      ) : filteredNotifications.length === 0 ? (
+        filter === "unread" ? (
+          <EmptyState
+            icon={<CheckCircle className="w-8 h-8" />}
+            title="太棒了！没有未读通知"
+            description="你已经查看了所有通知。系统通知、任务提醒、等级升级等消息会显示在这里。"
+            primaryAction={{ label: "查看今日任务", href: "/workspace/tasks" }}
+            secondaryAction={{ label: "查看会员权益", href: "/workspace/member" }}
+          />
+        ) : (
+          <EmptyState
+            icon={<Clock className="w-8 h-8" />}
+            title="暂无通知"
+            description="系统通知、任务提醒、等级升级等消息会显示在这里。完成今日任务可以获得通知和奖励。"
+            primaryAction={{ label: "查看今日任务", href: "/workspace/tasks" }}
+          />
+        )
       ) : (
         <div className="space-y-6">
-          {/* Group by type */}
-          {Object.entries(TYPE_CONFIG).map(([type, config]) => {
-            const typeNotifications = notifications.filter(n => n.type === type);
-            if (typeNotifications.length === 0) return null;
+          {/* 按类型分组 */}
+          {Object.entries(groupedNotifications).map(([type, typeNotifications]) => {
+            const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
             
             return (
               <div key={type} className="space-y-3">
-                {/* Group header */}
+                {/* 分组标题 */}
                 <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border ${config.color}`}>
                   <span>{config.emoji}</span>
                   <span>{config.label}</span>
                   <span className="text-xs opacity-70">({typeNotifications.length})</span>
                 </div>
                 
-                {/* Notifications in this group */}
+                {/* 通知列表 */}
                 <div className="space-y-2">
                   {typeNotifications.map(n => {
                     const emoji = config.emoji;
@@ -169,7 +210,7 @@ export default function NotificationsClient() {
                         <div className="flex items-start gap-3">
                           <span className="text-lg shrink-0 mt-0.5">{emoji}</span>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className={`text-sm font-semibold ${n.isRead ? "text-gray-700" : "text-gray-900"}`}>
                                 {n.title}
                               </span>
@@ -180,12 +221,15 @@ export default function NotificationsClient() {
                               )}
                             </div>
                             <p className="text-xs text-gray-500 mt-1">{n.content}</p>
-                            <div className="flex items-center gap-3 mt-2">
+                            <div className="flex items-center gap-3 mt-2 flex-wrap">
                               <span className="text-[10px] text-gray-400">
                                 {new Date(n.createdAt).toLocaleDateString("zh-CN")}
                               </span>
                               {n.linkUrl && (
-                                <a href={n.linkUrl} className="text-[10px] text-teal-600 hover:underline inline-flex items-center gap-0.5">
+                                <a 
+                                  href={n.linkUrl} 
+                                  className="text-[10px] text-teal-600 hover:underline inline-flex items-center gap-0.5"
+                                >
                                   查看详情 <ExternalLink className="w-2.5 h-2.5" />
                                 </a>
                               )}
@@ -216,23 +260,23 @@ export default function NotificationsClient() {
         </div>
       )}
 
-      {/* Pagination */}
+      {/* 分页 */}
       {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 mt-6">
           <button
             disabled={pagination.page <= 1}
             onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             上一页
           </button>
-          <span className="text-xs text-gray-500">
+          <span className="text-sm text-gray-500">
             {pagination.page} / {pagination.totalPages}
           </span>
           <button
             disabled={pagination.page >= pagination.totalPages}
             onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             下一页
           </button>
