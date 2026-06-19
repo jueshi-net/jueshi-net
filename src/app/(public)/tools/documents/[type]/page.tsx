@@ -18,7 +18,7 @@ import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, s
 import { AdSlot } from '@/components/ad-slot';
 import SmartRelatedLinks from '@/components/smart-related-links';
 import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
-import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData } from '@/lib/task-chain';
+import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData, saveTaskChain, DOCUMENT_CHAIN, DOCUMENT_CHAIN_LABELS, buildTaskChainURL } from '@/lib/task-chain';
 import { trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
 
@@ -91,7 +91,34 @@ export default function DocumentEditorPage() {
     // Only fill empty fields - do NOT overwrite existing data
     const updates: Record<string, any> = {};
     
-    // Line items: only fill if first item is empty
+    // v1.20.42.13.1: Line items from document chain
+    if (taskChainData.lineItems && taskChainData.lineItems.length > 0) {
+      setLineItems(prev => {
+        // Only fill if current items are empty
+        const hasExistingData = prev.some(item => item.description || item.hsCode);
+        if (hasExistingData) return prev;
+        
+        return taskChainData.lineItems!.map(item => ({
+          description: item.description || '',
+          hsCode: item.hsCode || '',
+          quantity: item.quantity?.toString() || '',
+          unitPrice: item.unitPrice?.toString() || '',
+          currency: item.currency || '',
+          unit: item.unit || 'PCS',
+          netWeight: item.netWeight?.toString() || '',
+          grossWeight: item.grossWeight?.toString() || '',
+        }));
+      });
+    }
+    
+    // v1.20.42.13.1: Buyer info from document chain
+    if (taskChainData.buyerName) updates.buyerName = taskChainData.buyerName;
+    if (taskChainData.buyerAddress) updates.buyerAddress = taskChainData.buyerAddress;
+    if (taskChainData.buyerContact) updates.buyerContact = taskChainData.buyerContact;
+    if (taskChainData.terms) updates.terms = taskChainData.terms;
+    if (taskChainData.invoiceNo) updates.invoiceNo = taskChainData.invoiceNo;
+    
+    // Legacy: productName/hsCode for single-item chain
     if (taskChainData.productName || taskChainData.hsCode) {
       setLineItems(prev => {
         const first = prev[0] || {};
@@ -136,6 +163,50 @@ export default function DocumentEditorPage() {
     setTaskChainData(null);
     setShowTaskChainBanner(false);
   };
+
+  // v1.20.42.13.1: Generate next document in chain
+  const handleGenerateNextDocument = () => {
+    const nextType = DOCUMENT_CHAIN[type];
+    if (!nextType) return;
+
+    // Save current document data to task chain
+    const lineItemsData = lineItems.map(item => ({
+      description: item.description || '',
+      hsCode: item.hsCode || '',
+      quantity: parseFloat(item.quantity) || 0,
+      unitPrice: parseFloat(item.unitPrice) || 0,
+      currency: item.currency || formData.currency || 'USD',
+      unit: item.unit || 'PCS',
+      netWeight: parseFloat(item.netWeight) || 0,
+      grossWeight: parseFloat(item.grossWeight) || 0,
+    })).filter(item => item.description || item.hsCode);
+
+    saveTaskChain({
+      sourceTool: type as any,
+      buyerName: formData.buyerName || formData.customerName || '',
+      buyerAddress: formData.buyerAddress || formData.customerAddress || '',
+      buyerContact: formData.buyerContact || formData.customerContact || '',
+      currency: formData.currency || 'USD',
+      totalAmount: parseFloat(formData.totalAmount) || 0,
+      terms: formData.terms || formData.defaultTerms || '',
+      invoiceNo: formData.invoiceNo || '',
+      lineItems: lineItemsData,
+      totalCartons: parseFloat(formData.totalCartons) || 0,
+      totalGrossWeight: parseFloat(formData.totalGrossWeight) || 0,
+      totalNetWeight: parseFloat(formData.totalNetWeight) || 0,
+      totalVolume: parseFloat(formData.totalVolume) || 0,
+    });
+
+    // Track event
+    const eventName = `toolchain_${type.replace(/-/g, '_')}_to_${nextType.replace(/-/g, '_')}`;
+    trackEvent.custom(type, eventName);
+
+    // Navigate to next document
+    router.push(`/tools/documents/${nextType}?from=task-chain`);
+  };
+
+  const nextDocumentType = DOCUMENT_CHAIN[type];
+  const nextDocumentLabel = nextDocumentType ? DOCUMENT_CHAIN_LABELS[nextDocumentType] : '';
 
   // ── Thermal paper size for label types ──
   const isLabelType = type.endsWith('-label') || type === 'shipping-mark';
@@ -735,6 +806,11 @@ export default function DocumentEditorPage() {
             <button onClick={handleSaveToWorkspace} disabled={saving || !perms.authenticated} className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${!perms.authenticated ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200'}`} title={!perms.authenticated ? '请先登录' : '保存到工作台'}>
               <FileText className="w-4 h-4" /> {saving ? '保存中...' : '保存到工作台'}
             </button>
+            {nextDocumentType && (
+              <button onClick={handleGenerateNextDocument} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors" title={`将当前数据导入到${nextDocumentLabel}`}>
+                <ChevronRight className="w-4 h-4" /> 生成{nextDocumentLabel}
+              </button>
+            )}
                         <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">
               <Printer className="w-4 h-4" /> 打印/PDF
             </button>

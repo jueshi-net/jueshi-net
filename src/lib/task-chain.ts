@@ -7,7 +7,7 @@ export const TASK_CHAIN_KEY = 'jueshi.taskChain.shippingMvp';
 export interface TaskChainContext {
   version: 'v1';
   updatedAt: string;
-  sourceTool?: 'hs-code' | 'exchange-rate' | 'shipping-calculator' | 'address-formatter' | 'postal-code' | 'commercial-invoice' | 'quotation';
+  sourceTool?: 'hs-code' | 'exchange-rate' | 'shipping-calculator' | 'address-formatter' | 'postal-code' | 'commercial-invoice' | 'quotation' | 'quotation-sheet' | 'proforma-invoice' | 'packing-list';
   productName?: string;
   hsCode?: string;
   productDescription?: string;
@@ -21,7 +21,42 @@ export interface TaskChainContext {
   addressText?: string;
   shippingEstimate?: string;
   nextStep?: string;
+  // v1.20.42.13.1: Document chain fields
+  buyerName?: string;
+  buyerAddress?: string;
+  buyerContact?: string;
+  lineItems?: Array<{
+    description?: string;
+    hsCode?: string;
+    quantity?: number;
+    unitPrice?: number;
+    currency?: string;
+    unit?: string;
+    netWeight?: number;
+    grossWeight?: number;
+  }>;
+  totalAmount?: number;
+  terms?: string;
+  invoiceNo?: string;
+  totalCartons?: number;
+  totalGrossWeight?: number;
+  totalNetWeight?: number;
+  totalVolume?: number;
 }
+
+// v1.20.42.13.1: Document chain definition
+export const DOCUMENT_CHAIN: Record<string, string> = {
+  'quotation': 'proforma-invoice',
+  'proforma-invoice': 'commercial-invoice',
+  'commercial-invoice': 'packing-list',
+};
+
+export const DOCUMENT_CHAIN_LABELS: Record<string, string> = {
+  'quotation': '报价单',
+  'proforma-invoice': '形式发票',
+  'commercial-invoice': '商业发票',
+  'packing-list': '装箱单',
+};
 
 const DEFAULT_CONTEXT: TaskChainContext = {
   version: 'v1',
@@ -114,7 +149,8 @@ export function getTaskChainFromURL(): Partial<TaskChainContext> | null {
   const fields: (keyof TaskChainContext)[] = [
     'productName', 'hsCode', 'productDescription', 'declaredValue',
     'currency', 'exchangeRate', 'convertedValue', 'originCountry',
-    'destinationCountry', 'postalCode', 'addressText', 'shippingEstimate'
+    'destinationCountry', 'postalCode', 'addressText', 'shippingEstimate',
+    'buyerName', 'buyerAddress', 'buyerContact', 'terms', 'invoiceNo',
   ];
   
   for (const field of fields) {
