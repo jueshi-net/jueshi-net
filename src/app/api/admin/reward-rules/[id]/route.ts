@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -25,8 +25,9 @@ export async function GET(
   }
 
   try {
+    const { id } = await params;
     const rule = await prisma.rewardRule.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!rule) {
@@ -49,7 +50,7 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -66,6 +67,7 @@ export async function PUT(
   }
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const {
       name,
@@ -81,7 +83,7 @@ export async function PUT(
     } = body;
 
     const rule = await prisma.rewardRule.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         trigger,
@@ -112,7 +114,7 @@ export async function PUT(
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -129,11 +131,12 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const { enabled } = body;
 
     const rule = await prisma.rewardRule.update({
-      where: { id: params.id },
+      where: { id },
       data: { enabled },
     });
 
@@ -153,7 +156,7 @@ export async function PATCH(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -170,8 +173,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params;
     await prisma.rewardRule.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({
