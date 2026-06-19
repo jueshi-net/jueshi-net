@@ -64,6 +64,12 @@ model User {
   documentHistories      DocumentHistory[]
   taskChainDrafts        TaskChainDraft[]
   passwordResetTokens    PasswordResetToken[]
+  
+  // v1.20.42.12.0: 用户邀请系统
+  inviteCodes            InviteCode[]         @relation("UserInviteCodes")
+  inviterRedemptions     InviteRedemption[]   @relation("InviterRedemptions")
+  inviteeRedemptions     InviteRedemption[]   @relation("InviteeRedemptions")
+  rewardGrants           RewardGrant[]
 
   @@map("users")
 }
@@ -435,10 +441,95 @@ model InviteCode {
   expiresAt DateTime? @map("expires_at") // 过期时间（NULL=永不过期）
   createdBy String?   @map("created_by") // 创建者（admin email）
   note      String? // 备注说明
+  
+  // v1.20.42.12.0: 用户邀请系统扩展
+  ownerUserId String? @map("owner_user_id") // 邀请码所有者（NULL=管理员公共码）
+  source      String  @default("ADMIN")     // 来源：ADMIN/USER
+  status      String  @default("ACTIVE")    // 状态：ACTIVE/PAUSED/EXPIRED
+  
+  // 关系
+  owner       User?   @relation("UserInviteCodes", fields: [ownerUserId], references: [id])
+  redemptions InviteRedemption[]
 
   @@index([isActive, code])
   @@index([expiresAt])
+  @@index([ownerUserId])
   @@map("invite_codes")
+}
+
+// v1.20.42.12.0: 邀请关系记录
+model InviteRedemption {
+  id             String    @id @default(cuid())
+  inviteCodeId   String    @map("invite_code_id")
+  inviterUserId  String    @map("inviter_user_id")  // 邀请人
+  inviteeUserId  String    @map("invitee_user_id")  // 被邀请人
+  status         String    @default("REGISTERED")   // REGISTERED/QUALIFIED/REWARDED/REJECTED
+  qualifiedAt    DateTime? @map("qualified_at")     // 符合条件时间
+  rewardedAt     DateTime? @map("rewarded_at")      // 奖励发放时间
+  rejectReason   String?   @map("reject_reason")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  // 关系
+  inviteCode     InviteCode @relation(fields: [inviteCodeId], references: [id])
+  inviter        User       @relation("InviterRedemptions", fields: [inviterUserId], references: [id])
+  invitee        User       @relation("InviteeRedemptions", fields: [inviteeUserId], references: [id])
+  rewardGrants   RewardGrant[]
+
+  @@unique([inviteeUserId]) // 一个被邀请人只能绑定一个邀请人
+  @@index([inviterUserId])
+  @@index([inviteeUserId])
+  @@index([status])
+  @@map("invite_redemptions")
+}
+
+// v1.20.42.12.0: 奖励规则配置
+model RewardRule {
+  id                   String    @id @default(cuid())
+  name                 String    // 规则名称
+  trigger              String    // 触发条件：INVITE_REGISTER_SUCCESS/INVITE_QUALIFIED
+  rewardType           String    @map("reward_type")  // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
+  rewardValue          Int       @map("reward_value") // 奖励数值
+  rewardMetadata       Json?     @map("reward_metadata") // 额外元数据
+  enabled              Boolean   @default(true)
+  startsAt             DateTime? @map("starts_at")
+  endsAt               DateTime? @map("ends_at")
+  maxRewardsPerInviter Int?      @map("max_rewards_per_inviter") // 每个邀请人最多奖励次数
+  maxRewardsTotal      Int?      @map("max_rewards_total")       // 全局最多奖励次数
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  rewardGrants         RewardGrant[]
+
+  @@index([enabled])
+  @@index([trigger])
+  @@map("reward_rules")
+}
+
+// v1.20.42.12.0: 奖励发放记录
+model RewardGrant {
+  id                String    @id @default(cuid())
+  userId            String    @map("user_id")
+  inviteRedemptionId String?  @map("invite_redemption_id")
+  rewardRuleId      String    @map("reward_rule_id")
+  rewardType        String    @map("reward_type")  // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
+  rewardValue       Int       @map("reward_value")
+  rewardMetadata    Json?     @map("reward_metadata")
+  status            String    @default("PENDING")  // PENDING/GRANTED/FAILED/REVOKED
+  grantedAt         DateTime? @map("granted_at")
+  expiresAt         DateTime? @map("expires_at")   // 权益过期时间
+  failureReason     String?   @map("failure_reason")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  // 关系
+  user              User              @relation(fields: [userId], references: [id])
+  inviteRedemption  InviteRedemption? @relation(fields: [inviteRedemptionId], references: [id])
+  rewardRule        RewardRule        @relation(fields: [rewardRuleId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([rewardType])
+  @@unique([inviteRedemptionId, rewardRuleId]) // 幂等：同一邀请关系只能发放同一规则一次
+  @@map("reward_grants")
 }
 
 model Article {
