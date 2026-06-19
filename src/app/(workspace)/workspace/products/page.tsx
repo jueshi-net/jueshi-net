@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, ChevronDown } from 'lucide-react';
-import { PageHeader } from '@/components/workspace/PageHeader';
+import PageHeader from '@/components/workspace/PageHeader';
 
 interface ProductItem {
   id: string;
@@ -150,8 +150,9 @@ export default function ProductsPage() {
     <div className="min-h-screen bg-gray-50">
       <PageHeader
         title="商品资料"
-        subtitle="管理常用商品信息，在报价单、发票、装箱单中一键引用"
-        icon={Package}
+        description="管理常用商品信息，在报价单、发票、装箱单中一键引用"
+        icon={<Package className="w-5 h-5 text-blue-600" />}
+        backHref="/workspace"
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
