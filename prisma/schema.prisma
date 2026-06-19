@@ -70,6 +70,7 @@ model User {
   inviterRedemptions     InviteRedemption[]   @relation("InviterRedemptions")
   inviteeRedemptions     InviteRedemption[]   @relation("InviteeRedemptions")
   rewardGrants           RewardGrant[]
+  productItems           ProductItem[]
 
   @@map("users")
 }
@@ -1599,4 +1600,35 @@ model ForumComment {
   @@index([status])
   @@index([createdAt(sort: Desc)])
   @@map("forum_comments")
+}
+
+// v1.20.42.13.1: 用户商品资料库
+model ProductItem {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  name          String
+  sku           String?
+  description   String?
+  hsCode        String?  @map("hs_code")
+  unit          String?  @default("PCS")
+  unitPrice     Decimal? @map("unit_price") @db.Decimal(12, 2)
+  currency      String?  @default("USD")
+  netWeight     Decimal? @map("net_weight") @db.Decimal(10, 3)
+  grossWeight   Decimal? @map("gross_weight") @db.Decimal(10, 3)
+  length        Decimal? @db.Decimal(10, 2)
+  width         Decimal? @db.Decimal(10, 2)
+  height        Decimal? @db.Decimal(10, 2)
+  originCountry String?  @map("origin_country")
+  material      String?
+  usage         String?
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@index([userId, name])
+  @@map("product_items")
 }
