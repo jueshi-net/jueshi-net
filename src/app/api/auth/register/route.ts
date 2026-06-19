@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import * as bcrypt from "bcryptjs";
 import { authLimiter } from "@/lib/rate-limiter";
+import { grantInviteRewards } from "@/lib/invite-rewards";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!invite.isActive) {
+    if (!invite.isActive || invite.status !== 'ACTIVE') {
       return NextResponse.json(
         { success: false, error: "该邀请码已被停用" },
         { status: 403 }
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // ─── 事务：创建用户 + 邀请码计数 + 积分流水 ───
+    // ─── 事务：创建用户 + 邀请码计数 + 积分流水 + 邀请关系 ───
     const result = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -101,6 +102,37 @@ export async function POST(req: NextRequest) {
           reason: "先锋探路官注册奖励",
         },
       });
+
+      // v1.20.42.12.0: 创建邀请关系记录
+      if (invite.ownerUserId) {
+        // 检查被邀请人是否已经被邀请过（反作弊）
+        const existingRedemption = await tx.inviteRedemption.findUnique({
+          where: { inviteeUserId: user.id },
+        });
+
+        if (!existingRedemption) {
+          // 检查是否自己邀请自己（反作弊）
+          if (invite.ownerUserId !== user.id) {
+            const redemption = await tx.inviteRedemption.create({
+              data: {
+                inviteCodeId: invite.id,
+                inviterUserId: invite.ownerUserId,
+                inviteeUserId: user.id,
+                status: 'REGISTERED',
+              },
+            });
+
+            // 异步发放邀请人奖励（不阻塞注册流程）
+            grantInviteRewards(redemption.id, invite.ownerUserId, 'INVITE_REGISTER_SUCCESS')
+              .then(result => {
+                console.log('Invite rewards granted:', result);
+              })
+              .catch(error => {
+                console.error('Failed to grant invite rewards:', error);
+              });
+          }
+        }
+      }
 
       return user;
     });
