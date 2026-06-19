@@ -9,7 +9,7 @@ import { grantInviteRewards } from '@/lib/invite-rewards';
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
