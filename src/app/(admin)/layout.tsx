@@ -45,7 +45,8 @@ const navSections = [
       { href: "/admin/ads", label: "广告管理", icon: ExternalLink },
       { href: "/admin/ad-placements", label: "广告位管理", icon: Megaphone },
       { href: "/admin/ad-creatives", label: "广告素材", icon: ImageIcon },
-      { href: "/admin/analytics", label: "数据分析", icon: BarChart3 },
+      { href: "/admin/analytics/dashboard", label: "流量分析", icon: BarChart3 },
+      { href: "/admin/analytics", label: "系统分析", icon: TrendingUp },
       { href: "/admin/analytics/task-chains", label: "TaskChain Analytics", icon: TrendingUp },
     ]
   },
