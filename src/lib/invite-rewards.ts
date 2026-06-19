@@ -99,7 +99,7 @@ export async function grantInviteRewards(
           rewardRuleId: rule.id,
           rewardType: rule.rewardType,
           rewardValue: rule.rewardValue,
-          rewardMetadata: rule.rewardMetadata,
+          rewardMetadata: rule.rewardMetadata || undefined,
           status: 'PENDING',
         },
       });
