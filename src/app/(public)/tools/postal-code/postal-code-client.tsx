@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator } from 'lucide-react';
+import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator, Globe, FileText, Sparkles } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { AdSlot } from '@/components/ads/AdSlot';
 import { CountryInfoSection } from '@/components/country-info-section';
@@ -14,6 +14,7 @@ import { saveTaskChain } from '@/lib/task-chain';
 import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import { getCoverageStatus, getCoverageIcon, getCoverageLabel, type CoverageStatus } from '@/lib/postal-code-coverage-status';
 import { getOfficialLink, getPhoneCode, getTimezone, getPostalFormat, getExamplePostal } from '@/lib/postal-code-official-links';
+import { ADDRESS_FORMATS, type AddressFormat } from '@/lib/postal-code-advanced-data';
 import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
@@ -228,6 +229,25 @@ export default function PostalCodePage() {
   const [dbTotal, setDbTotal] = useState(0);
   const [dbPage, setDbPage] = useState(1);
   const [dbTab, setDbTab] = useState<'all' | 'code' | 'city'>('all');
+
+  // Advanced search state
+  const [advancedCityQuery, setAdvancedCityQuery] = useState('');
+  const [advancedCityResults, setAdvancedCityResults] = useState<any[]>([]);
+  const [advancedCityLoading, setAdvancedCityLoading] = useState(false);
+  const [advancedCityRecommendations, setAdvancedCityRecommendations] = useState<any>(null);
+
+  const [advancedRegionQuery, setAdvancedRegionQuery] = useState('');
+  const [advancedRegionResults, setAdvancedRegionResults] = useState<any[]>([]);
+  const [advancedRegionLoading, setAdvancedRegionLoading] = useState(false);
+  const [advancedRegionRecommendations, setAdvancedRegionRecommendations] = useState<any>(null);
+
+  const [advancedFormatResult, setAdvancedFormatResult] = useState<any>(null);
+  const [advancedFormatBasicInfo, setAdvancedFormatBasicInfo] = useState<any>(null);
+  const [advancedFormatLoading, setAdvancedFormatLoading] = useState(false);
+  const [formatCountryInput, setFormatCountryInput] = useState('');
+
+  const advancedCityAbortRef = useRef<AbortController | null>(null);
+  const advancedRegionAbortRef = useRef<AbortController | null>(null);
 
   const country = useMemo(
     () => allCountryData.find(c => c.code === selectedCountryCode) ?? allCountryData[0],
@@ -475,6 +495,93 @@ export default function PostalCodePage() {
     } catch { /* ignore */ }
   };
 
+  // Advanced city search (Mode 1: 查邮编)
+  const searchAdvancedCity = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setAdvancedCityResults([]);
+      setAdvancedCityRecommendations(null);
+      return;
+    }
+    if (advancedCityAbortRef.current) advancedCityAbortRef.current.abort();
+    const controller = new AbortController();
+    advancedCityAbortRef.current = controller;
+    setAdvancedCityLoading(true);
+    try {
+      const res = await fetch(`/api/postal-codes/advanced?mode=city&q=${encodeURIComponent(q)}&country=${selectedCountryCode}`, {
+        signal: controller.signal,
+      });
+      const json = await res.json();
+      setAdvancedCityResults(json.results || []);
+      setAdvancedCityRecommendations(json.recommendations || null);
+      trackEvent.custom('postal-code', 'advanced_city_search');
+    } catch (e: any) {
+      if (e.name !== 'AbortError') console.error('Advanced city search failed:', e);
+    } finally {
+      setAdvancedCityLoading(false);
+    }
+  }, [selectedCountryCode]);
+
+  // Advanced region search (Mode 2: 查地区)
+  const searchAdvancedRegion = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setAdvancedRegionResults([]);
+      setAdvancedRegionRecommendations(null);
+      return;
+    }
+    if (advancedRegionAbortRef.current) advancedRegionAbortRef.current.abort();
+    const controller = new AbortController();
+    advancedRegionAbortRef.current = controller;
+    setAdvancedRegionLoading(true);
+    try {
+      const res = await fetch(`/api/postal-codes/advanced?mode=region&q=${encodeURIComponent(q)}&country=${selectedCountryCode}`, {
+        signal: controller.signal,
+      });
+      const json = await res.json();
+      setAdvancedRegionResults(json.results || []);
+      setAdvancedRegionRecommendations(json.recommendations || null);
+      trackEvent.custom('postal-code', 'advanced_region_search');
+    } catch (e: any) {
+      if (e.name !== 'AbortError') console.error('Advanced region search failed:', e);
+    } finally {
+      setAdvancedRegionLoading(false);
+    }
+  }, [selectedCountryCode]);
+
+  // Advanced format search (Mode 3: 查地址格式)
+  const searchAdvancedFormat = useCallback((countryInput: string) => {
+    const code = countryInput || selectedCountryCode;
+    const format = ADDRESS_FORMATS[code.toUpperCase()];
+    if (format) {
+      setAdvancedFormatResult(format);
+      setAdvancedFormatBasicInfo(null);
+    } else {
+      // Build basic info from existing data
+      const country = SUPPORTED_COUNTRIES.find(c => c.code === code.toUpperCase());
+      const officialLink = getOfficialLink(code.toUpperCase());
+      setAdvancedFormatResult(null);
+      setAdvancedFormatBasicInfo({
+        countryCode: code.toUpperCase(),
+        countryName: country?.name || code,
+        countryNameEn: country?.nameEn || '',
+        flag: country?.flag || '',
+        postalFormat: getPostalFormat(code.toUpperCase()) || '请查询官方邮政网站',
+        examplePostal: getExamplePostal(code.toUpperCase()) || '',
+        phoneCode: getPhoneCode(code.toUpperCase()) || '',
+        timezone: getTimezone(code.toUpperCase()) || '',
+        officialLookupUrl: officialLink?.lookupUrl || officialLink?.officialUrl || '',
+        officialName: officialLink?.nameEn || '',
+      });
+    }
+    trackEvent.custom('postal-code', 'advanced_format_search');
+  }, [selectedCountryCode]);
+
+  // Auto-trigger format search when switching to format mode
+  useEffect(() => {
+    if (queryMode === 'format') {
+      searchAdvancedFormat(selectedCountryCode);
+    }
+  }, [queryMode, selectedCountryCode, searchAdvancedFormat]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ===== HERO ===== */}
@@ -585,34 +692,430 @@ export default function PostalCodePage() {
         {queryMode === 'format' && (
           <div className={cardStyles.base + ' mb-6'}>
             <div className="p-5">
-              <h2 className="text-lg font-bold text-gray-900 mb-3">{country.flag} {country.name}地址格式</h2>
-              <div className="space-y-3 text-sm text-gray-700">
-                <div><span className="font-medium text-gray-500">邮编格式：</span>{getPostalFormat(selectedCountryCode) || country.format || '请查询官方邮政网站'}</div>
-                {getExamplePostal(selectedCountryCode) && (
-                  <div><span className="font-medium text-gray-500">示例邮编：</span><code className="px-2 py-0.5 bg-gray-100 rounded font-mono text-teal-700">{getExamplePostal(selectedCountryCode)}</code></div>
-                )}
-                {getPhoneCode(selectedCountryCode) && (
-                  <div><span className="font-medium text-gray-500">电话区号：</span>{getPhoneCode(selectedCountryCode)}</div>
-                )}
-                {getTimezone(selectedCountryCode) && (
-                  <div><span className="font-medium text-gray-500">时区：</span>{getTimezone(selectedCountryCode)}</div>
-                )}
-                {getOfficialLink(selectedCountryCode) && (
-                  <div className="pt-2 border-t border-gray-100">
-                    <a href={getOfficialLink(selectedCountryCode)!.lookupUrl || getOfficialLink(selectedCountryCode)!.officialUrl}
-                      target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
-                      <ExternalLink className="w-4 h-4" /> 打开 {getOfficialLink(selectedCountryCode)!.nameEn} 官方查询
-                    </a>
+              <div className="flex items-center gap-2 mb-4">
+                <FileText className="w-5 h-5 text-teal-600" />
+                <h2 className="text-lg font-bold text-gray-900">
+                  {advancedFormatResult?.flag || country.flag} {advancedFormatResult?.countryNameCn || country.name}寄件地址格式
+                </h2>
+              </div>
+
+              {/* Country selector for format mode */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="text-xs text-gray-400 self-center">选择国家：</span>
+                {Object.keys(ADDRESS_FORMATS).map(code => {
+                  const fmt = ADDRESS_FORMATS[code];
+                  const sc = SUPPORTED_COUNTRIES.find(c => c.code === code);
+                  return (
+                    <button key={code} onClick={() => searchAdvancedFormat(code)}
+                      className={`px-3 py-1.5 min-h-[36px] rounded-lg text-xs font-medium transition-all ${
+                        (advancedFormatResult?.countryCode || advancedFormatBasicInfo?.countryCode) === code
+                          ? 'bg-teal-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                      }`}>
+                      {sc?.flag || fmt.flag} {fmt.countryNameCn}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {advancedFormatResult ? (
+                <div className="space-y-4">
+                  {/* Standard English Format */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-gray-700">📋 标准英文地址格式</span>
+                      <button onClick={() => copyText(advancedFormatResult.format, 'format-template')}
+                        className="flex items-center gap-1 text-xs text-teal-600 hover:underline px-2 py-1 rounded hover:bg-teal-50 transition-colors">
+                        {copiedField === 'format-template' ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制格式模板</>}
+                      </button>
+                    </div>
+                    <pre className="text-sm text-gray-900 whitespace-pre-wrap font-mono bg-white p-3 rounded-lg border">{advancedFormatResult.format}</pre>
                   </div>
-                )}
-                <div className="pt-2 border-t border-gray-100">
+
+                  {/* Chinese Explanation */}
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <span className="text-sm font-semibold text-blue-800">📝 中文说明</span>
+                    <p className="text-sm text-blue-700 mt-2 leading-relaxed">{advancedFormatResult.formatCn}</p>
+                  </div>
+
+                  {/* Example Address */}
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-semibold text-green-800">✅ 示例地址</span>
+                      <button onClick={() => copyText(advancedFormatResult.example, 'format-example')}
+                        className="flex items-center gap-1 text-xs text-green-700 hover:underline px-2 py-1 rounded hover:bg-green-100 transition-colors">
+                        {copiedField === 'format-example' ? <><Check className="w-3 h-3" /> 已复制</> : <><Copy className="w-3 h-3" /> 复制示例</>}
+                      </button>
+                    </div>
+                    <pre className="text-sm text-green-900 whitespace-pre-wrap font-sans bg-white p-3 rounded-lg border leading-relaxed">{advancedFormatResult.example}</pre>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                    <span className="text-sm font-semibold text-amber-800">⚠️ 注意事项</span>
+                    <ul className="mt-2 space-y-1.5">
+                      {advancedFormatResult.notes.map((note: string, i: number) => (
+                        <li key={i} className="text-sm text-amber-700 flex items-start gap-2">
+                          <span className="shrink-0 mt-0.5">•</span> {note}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Postal Info */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500">邮编格式</div>
+                      <div className="text-sm font-mono font-semibold text-teal-700 mt-1">{advancedFormatResult.countryCode === selectedCountryCode ? country.format : (getPostalFormat(advancedFormatResult.countryCode) || '—')}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500">示例邮编</div>
+                      <div className="text-sm font-mono font-semibold text-teal-700 mt-1">{getExamplePostal(advancedFormatResult.countryCode) || '—'}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500">电话区号</div>
+                      <div className="text-sm font-semibold text-gray-900 mt-1">{getPhoneCode(advancedFormatResult.countryCode) || '—'}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3 text-center">
+                      <div className="text-xs text-gray-500">时区</div>
+                      <div className="text-sm font-semibold text-gray-900 mt-1">{getTimezone(advancedFormatResult.countryCode) || '—'}</div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100">
+                    {advancedFormatResult.officialLookupUrl && (
+                      <a href={advancedFormatResult.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                        <ExternalLink className="w-4 h-4" /> 打开 {advancedFormatResult.officialName} 官方查询
+                      </a>
+                    )}
+                    <Link href="/tools/address-formatter"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                      <Sparkles className="w-4 h-4" /> 使用地址格式化工具
+                    </Link>
+                    <button onClick={() => copyText(advancedFormatResult.example, 'format-copy-all')}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+                      {copiedField === 'format-copy-all' ? <><Check className="w-4 h-4 text-green-600" /> 已复制</> : <><Copy className="w-4 h-4" /> 复制示例地址</>}
+                    </button>
+                  </div>
+                </div>
+              ) : advancedFormatBasicInfo ? (
+                <div className="space-y-4">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-2">{advancedFormatBasicInfo.flag} {advancedFormatBasicInfo.countryName} 邮编信息</h3>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div><span className="text-gray-500">邮编格式：</span><code className="font-mono text-teal-700">{advancedFormatBasicInfo.postalFormat}</code></div>
+                      {advancedFormatBasicInfo.examplePostal && <div><span className="text-gray-500">示例邮编：</span><code className="font-mono text-teal-700">{advancedFormatBasicInfo.examplePostal}</code></div>}
+                      {advancedFormatBasicInfo.phoneCode && <div><span className="text-gray-500">电话区号：</span>{advancedFormatBasicInfo.phoneCode}</div>}
+                      {advancedFormatBasicInfo.timezone && <div><span className="text-gray-500">时区：</span>{advancedFormatBasicInfo.timezone}</div>}
+                    </div>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                    <p className="text-sm text-amber-700">该国家的详细寄件地址格式暂未收录，请参考官方邮政网站获取完整信息。</p>
+                  </div>
+                  {advancedFormatBasicInfo.officialLookupUrl && (
+                    <a href={advancedFormatBasicInfo.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                      <ExternalLink className="w-4 h-4" /> 打开 {advancedFormatBasicInfo.officialName} 官方查询
+                    </a>
+                  )}
                   <Link href="/tools/address-formatter"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                    <ExternalLink className="w-4 h-4" /> 使用地址格式化工具
+                    className="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <Sparkles className="w-4 h-4" /> 使用地址格式化工具
                   </Link>
                 </div>
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <FileText className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">选择上方国家查看寄件地址格式</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== CITY SEARCH MODE PANEL (查邮编) ===== */}
+        {queryMode === 'postal' && (
+          <div className={cardStyles.base + ' mb-6'}>
+            <div className="p-5 border-b border-gray-100">
+              <h2 className={cardStyles.header}>
+                <Globe className="w-5 h-5 text-teal-600" />
+                智能城市邮编查询
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                输入城市名（中文或英文），查询邮编范围、地址格式和官方查询入口。支持缩写（如 LA、多伦多）。
+              </p>
+            </div>
+            <div className="p-5">
+              <div className="flex gap-3 mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    className={`${inputStyles} pl-9`}
+                    placeholder="输入城市名（如 Toronto、多伦多、LA）..."
+                    value={advancedCityQuery}
+                    onChange={e => setAdvancedCityQuery(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && searchAdvancedCity(advancedCityQuery)}
+                  />
+                </div>
+                <button onClick={() => searchAdvancedCity(advancedCityQuery)} disabled={advancedCityLoading}
+                  className={buttonVariants.primary}>
+                  {advancedCityLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  {advancedCityLoading ? '查询中…' : '查询'}
+                </button>
               </div>
+
+              {/* Quick search examples */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-xs text-gray-400">热门城市：</span>
+                {['Toronto', 'Los Angeles', 'London', 'Tokyo', 'Sydney', 'Singapore', 'New York', 'Vancouver'].map(city => (
+                  <button key={city} onClick={() => { setAdvancedCityQuery(city); searchAdvancedCity(city); }}
+                    className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded-md transition-colors">
+                    {city}
+                  </button>
+                ))}
+              </div>
+
+              {/* Loading */}
+              {advancedCityLoading && (
+                <div className="flex items-center justify-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" /> 正在查询…
+                </div>
+              )}
+
+              {/* Results */}
+              {!advancedCityLoading && advancedCityResults.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-xs text-gray-400">找到 {advancedCityResults.length} 个城市</p>
+                  <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto">
+                    {advancedCityResults.map((city, idx) => (
+                      <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div>
+                            <span className="font-bold text-lg text-gray-900">{city.en}</span>
+                            <span className="text-sm text-gray-500 ml-2">{city.cn}</span>
+                          </div>
+                          <span className="font-mono text-sm text-teal-600 bg-teal-50 px-2 py-0.5 rounded">{city.postalRange}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1 text-xs text-gray-600 mb-2">
+                          <div><span className="text-gray-400">国家：</span>{SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.flag} {SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.name}</div>
+                          <div><span className="text-gray-400">省/州：</span>{city.province}</div>
+                          <div><span className="text-gray-400">邮编格式：</span><code className="font-mono text-teal-700">{city.postalFormat}</code></div>
+                          {city.timezone && <div><span className="text-gray-400">时区：</span>{city.timezone}</div>}
+                        </div>
+                        {/* Action buttons */}
+                        <div className="flex flex-wrap gap-1.5 border-t border-gray-200 pt-2 mt-1">
+                          <button onClick={() => copyText(`${city.en}, ${city.province} ${city.postalPrefix}`, `city-adv-${idx}`)}
+                            className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
+                            {copiedField === `city-adv-${idx}` ? '✅ 已复制' : '复制城市+省+邮编'}
+                          </button>
+                          {city.addressFormat && (
+                            <button onClick={() => copyText(city.addressFormat, `addr-adv-${idx}`)}
+                              className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
+                              {copiedField === `addr-adv-${idx}` ? '✅ 已复制' : '复制地址格式'}
+                            </button>
+                          )}
+                          {city.officialLookupUrl && (
+                            <a href={city.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                              className="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors inline-flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> 官方查询
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations when no results */}
+              {!advancedCityLoading && advancedCityQuery && advancedCityResults.length === 0 && advancedCityRecommendations && (
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                    <span className="text-sm font-semibold text-gray-700">未找到匹配城市</span>
+                  </div>
+                  <div className="space-y-3">
+                    {/* Official lookup */}
+                    {advancedCityRecommendations.officialLookup && (
+                      <a href={advancedCityRecommendations.officialLookup.url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                        <ExternalLink className="w-4 h-4" /> 打开 {advancedCityRecommendations.officialLookup.name} 官方邮编查询
+                      </a>
+                    )}
+                    {/* Popular cities */}
+                    {advancedCityRecommendations.popularCities?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">热门城市推荐：</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {advancedCityRecommendations.popularCities.map((c: any, i: number) => (
+                            <button key={i} onClick={() => { setAdvancedCityQuery(c.name); searchAdvancedCity(c.name); }}
+                              className="px-2.5 py-1 text-xs bg-white hover:bg-teal-50 hover:text-teal-700 rounded border border-gray-200 transition-colors">
+                              {c.name} / {c.nameCn}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {/* Manual format generator link */}
+                    <Link href="/tools/address-formatter"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                      <Sparkles className="w-4 h-4" /> 手动地址格式生成器
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Initial empty state */}
+              {!advancedCityLoading && !advancedCityQuery && (
+                <div className="text-center py-6 bg-gray-50 rounded-lg">
+                  <Globe className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">输入城市名（中英文均可），查询邮编范围</p>
+                  <p className="text-xs text-gray-300 mt-1">支持缩写如 LA、NYC、SF</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ===== REGION SEARCH MODE PANEL (查地区) ===== */}
+        {queryMode === 'region' && (
+          <div className={cardStyles.base + ' mb-6'}>
+            <div className="p-5 border-b border-gray-100">
+              <h2 className={cardStyles.header}>
+                <MapPin className="w-5 h-5 text-indigo-600" />
+                邮编查地区
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                输入邮编，查询所属国家、城市、省份、区域和时区信息。
+              </p>
+            </div>
+            <div className="p-5">
+              <div className="flex gap-3 mb-4">
+                <input
+                  className={`${inputStyles} flex-1 font-mono`}
+                  placeholder={country.format || '输入邮编（如 M5V2T6、10001、SW1A1AA）...'}
+                  value={advancedRegionQuery}
+                  onChange={e => setAdvancedRegionQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && searchAdvancedRegion(advancedRegionQuery)}
+                />
+                <button onClick={() => searchAdvancedRegion(advancedRegionQuery)} disabled={advancedRegionLoading}
+                  className={buttonVariants.primary}>
+                  {advancedRegionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+                  {advancedRegionLoading ? '查询中…' : '查询'}
+                </button>
+              </div>
+
+              {/* Quick examples */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <span className="text-xs text-gray-400">示例：</span>
+                {['M5V2T6', '10001', 'SW1A1AA', '100-0001', '2000', '018956'].map(code => (
+                  <button key={code} onClick={() => { setAdvancedRegionQuery(code); searchAdvancedRegion(code); }}
+                    className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 rounded-md font-mono transition-colors">
+                    {code}
+                  </button>
+                ))}
+              </div>
+
+              {/* Loading */}
+              {advancedRegionLoading && (
+                <div className="flex items-center justify-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" /> 正在查询…
+                </div>
+              )}
+
+              {/* Results */}
+              {!advancedRegionLoading && advancedRegionResults.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-xs text-gray-400">找到 {advancedRegionResults.length} 条匹配</p>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {advancedRegionResults.map((r, idx) => (
+                      <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <span className="font-mono text-xl font-bold text-indigo-600">{r.postalCode}</span>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            r.matchType === 'exact' ? 'bg-green-100 text-green-700' :
+                            r.matchType === 'prefix' ? 'bg-blue-100 text-blue-700' :
+                            'bg-amber-100 text-amber-700'
+                          }`}>
+                            {r.matchType === 'exact' ? '精确匹配' : r.matchType === 'prefix' ? '前缀匹配' : '格式匹配'}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><span className="text-gray-400 text-xs">国家</span><div className="font-semibold text-gray-900">{r.country}</div></div>
+                          <div><span className="text-gray-400 text-xs">城市</span><div className="text-gray-700">{r.city || '—'}{r.cityCn ? ` (${r.cityCn})` : ''}</div></div>
+                          <div><span className="text-gray-400 text-xs">省/州</span><div className="text-gray-700">{r.province || '—'}</div></div>
+                          <div><span className="text-gray-400 text-xs">区域</span><div className="text-gray-700">{r.region || '—'}</div></div>
+                          {r.timezone && <div><span className="text-gray-400 text-xs">时区</span><div className="text-gray-700">{r.timezone}</div></div>}
+                          {r.phoneCode && <div><span className="text-gray-400 text-xs">电话区号</span><div className="text-gray-700">{r.phoneCode}</div></div>}
+                          {r.postalRange && <div className="col-span-2"><span className="text-gray-400 text-xs">邮编范围</span><div className="font-mono text-teal-700">{r.postalRange}</div></div>}
+                        </div>
+                        {/* Action buttons */}
+                        <div className="flex flex-wrap gap-1.5 border-t border-gray-200 pt-2 mt-2">
+                          <button onClick={() => copyText(`${r.city}, ${r.province} ${r.postalCode}`.trim(), `region-adv-${idx}`)}
+                            className="px-2 py-1 text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 rounded transition-colors">
+                            {copiedField === `region-adv-${idx}` ? '✅ 已复制' : '复制城市+省+邮编'}
+                          </button>
+                          {r.officialLookupUrl && (
+                            <a href={r.officialLookupUrl} target="_blank" rel="noopener noreferrer"
+                              className="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors inline-flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> 官方查询
+                            </a>
+                          )}
+                        </div>
+                        {r.note && (
+                          <p className="text-xs text-amber-600 mt-2">{r.note}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recommendations when no results */}
+              {!advancedRegionLoading && advancedRegionQuery && advancedRegionResults.length === 0 && advancedRegionRecommendations && (
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle className="w-5 h-5 text-amber-500" />
+                    <span className="text-sm font-semibold text-gray-700">未找到匹配的邮编信息</span>
+                  </div>
+                  <div className="space-y-3">
+                    {advancedRegionRecommendations.officialLookup && (
+                      <a href={advancedRegionRecommendations.officialLookup.url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors">
+                        <ExternalLink className="w-4 h-4" /> 打开 {advancedRegionRecommendations.officialLookup.name} 官方邮编查询
+                      </a>
+                    )}
+                    {advancedRegionRecommendations.popularCities?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">热门城市邮编参考：</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {advancedRegionRecommendations.popularCities.map((c: any, i: number) => (
+                            <button key={i} onClick={() => { setAdvancedRegionQuery(c.postalPrefix); searchAdvancedRegion(c.postalPrefix); }}
+                              className="px-2.5 py-1 text-xs bg-white hover:bg-indigo-50 hover:text-indigo-700 rounded border border-gray-200 transition-colors font-mono">
+                              {c.name}: {c.postalPrefix}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <Link href="/tools/address-formatter"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                      <Sparkles className="w-4 h-4" /> 手动地址格式生成器
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Initial empty state */}
+              {!advancedRegionLoading && !advancedRegionQuery && (
+                <div className="text-center py-6 bg-gray-50 rounded-lg">
+                  <MapPin className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">输入邮编，查询所属地区信息</p>
+                  <p className="text-xs text-gray-300 mt-1">支持各国邮编格式（去掉空格和连字符）</p>
+                </div>
+              )}
             </div>
           </div>
         )}

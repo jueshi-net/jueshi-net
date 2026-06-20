@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home, Target, Crown, FileText, Building2, Heart, Settings, Bell, StickyNote, Package,
-  ArrowLeft, Gift, Megaphone,
+  ArrowLeft, Gift, Megaphone, GitBranch,
 } from 'lucide-react';
 import { useUserPreferences, getTheme } from './UserPreferencesContext';
 
 const NAV_ITEMS = [
   { href: '/workspace', labelKey: 'workbench', icon: Home, emoji: '🏠' },
+  { href: '/workspace/task-chains', labelKey: 'task-chains', icon: GitBranch, emoji: '🔗' },
   { href: '/workspace/tasks', labelKey: 'tasks', icon: Target, emoji: '✅' },
   { href: '/workspace/notifications', labelKey: 'notifications', icon: Bell, emoji: '🔔' },
   { href: '/workspace/memos', labelKey: 'memos', icon: StickyNote, emoji: '📝' },
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
 
 const LABELS: Record<string, string> = {
   workbench: '我的工作台',
+  'task-chains': '任务链工作台',
   tasks: '签到与任务',
   notifications: '通知',
   memos: '备忘录',
