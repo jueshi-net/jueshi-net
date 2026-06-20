@@ -104,6 +104,64 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      // Auto-grant for growth: increment user's growth_value
+      if (rewardItem.rewardType === "growth") {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            growthValue: { increment: rewardItem.rewardValue },
+          },
+        });
+
+        // Log growth
+        await tx.growthLog.create({
+          data: {
+            userId,
+            delta: rewardItem.rewardValue,
+            reason: `兑换${rewardItem.name}`,
+            relatedId: userReward.id,
+          },
+        });
+      }
+
+      // Auto-grant for ad_slot_days: create reward_grant for ad application
+      if (rewardItem.rewardType === "ad_slot_days") {
+        // Find or create a reward rule for ad slots
+        let adSlotRule = await tx.rewardRule.findFirst({
+          where: { rewardType: "ad_slot_days" },
+        });
+
+        if (!adSlotRule) {
+          // Create a default rule if it doesn't exist
+          adSlotRule = await tx.rewardRule.create({
+            data: {
+              name: "广告权益自动发放",
+              rewardType: "ad_slot_days",
+              rewardValue: 1,
+              enabled: true,
+            },
+          });
+        }
+
+        // Create reward grant for ad slot
+        await tx.rewardGrant.create({
+          data: {
+            userId,
+            rewardRuleId: adSlotRule.id,
+            rewardType: "ad_slot_days",
+            rewardValue: rewardItem.rewardValue,
+            status: "GRANTED",
+            grantedAt: now,
+            expiresAt: new Date(now.getTime() + rewardItem.rewardValue * 24 * 60 * 60 * 1000),
+            rewardMetadata: {
+              source: "reward_redeem",
+              rewardItemId: rewardItem.id,
+              rewardItemCode: rewardItem.code,
+            },
+          },
+        });
+      }
+
       // Write point ledger
       await tx.pointLedger.create({
         data: {

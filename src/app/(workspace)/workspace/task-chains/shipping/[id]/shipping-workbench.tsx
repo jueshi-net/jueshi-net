@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import {
   Package, ArrowRight, ArrowLeft, Loader2, CheckCircle, Circle,
@@ -8,7 +8,7 @@ import {
   FileText, Globe, Truck, ClipboardList, DollarSign, Sparkles,
   ChevronRight, RotateCcw, Download, Copy, Building2, Search, Link2,
   Plus, Trash2, Zap, Droplets, Wind, Magnet, Award, X,
-  Check, Phone, ClipboardCheck, Archive, Home,
+  Check, Phone, ClipboardCheck, Archive, Home, Clock,
 } from 'lucide-react';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 
@@ -53,7 +53,10 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [context, setContext] = useState<Record<string, any>>({});
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingSaveRef = useRef<Record<string, any> | null>(null);
 
   // Fetch task data
   useEffect(() => {
@@ -73,6 +76,9 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
       setTask(tc);
       setCurrentStep(tc.context?.currentStep || 0);
       setContext(tc.context || {});
+      if (tc.updatedAt) {
+        setLastSavedAt(new Date(tc.updatedAt));
+      }
     } catch {
       // Task might not exist yet — use empty state
       setTask(null);
@@ -81,31 +87,55 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
     }
   };
 
-  // Auto-save context
-  const autoSave = useCallback(async (patch: Record<string, any>) => {
-    setSaveStatus('saving');
+  // Debounced auto-save (1 second delay)
+  const autoSave = useCallback((patch: Record<string, any>) => {
     const newContext = { ...context, ...patch };
     setContext(newContext);
-
-    try {
-      const res = await fetch(`/api/task-chains/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          context: newContext,
-          currentStep,
-        }),
-      });
-      if (res.ok) {
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      } else {
+    
+    // Store pending changes
+    pendingSaveRef.current = newContext;
+    setSaveStatus('saving');
+    
+    // Clear existing timer
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+    }
+    
+    // Set new timer for debounced save
+    saveTimerRef.current = setTimeout(async () => {
+      if (!pendingSaveRef.current) return;
+      
+      try {
+        const res = await fetch(`/api/task-chains/${taskId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            context: pendingSaveRef.current,
+            currentStep,
+          }),
+        });
+        if (res.ok) {
+          setSaveStatus('saved');
+          setLastSavedAt(new Date());
+          pendingSaveRef.current = null;
+          setTimeout(() => setSaveStatus('idle'), 2000);
+        } else {
+          setSaveStatus('error');
+        }
+      } catch {
         setSaveStatus('error');
       }
-    } catch {
-      setSaveStatus('error');
-    }
+    }, 1000); // 1 second debounce
   }, [context, currentStep, taskId]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, []);
 
   // Mark step as completed
   const completeStep = async (stepIndex: number) => {
@@ -184,6 +214,9 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
               )}
               {saveStatus === 'error' && (
                 <><AlertTriangle className="w-3 h-3 text-red-500" /><span className="text-red-600">保存失败</span></>
+              )}
+              {lastSavedAt && saveStatus === 'idle' && (
+                <><Clock className="w-3 h-3 text-gray-400" /><span className="text-gray-500">上次保存: {lastSavedAt.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span></>
               )}
             </div>
           </div>
