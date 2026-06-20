@@ -95,6 +95,7 @@ export async function grantInviteRewards(
       // 创建奖励发放记录
       const grant = await prisma.rewardGrant.create({
         data: {
+          userId: inviterUserId,
           inviteRedemptionId,
           rewardRuleId: rule.id,
           rewardType: rule.rewardType,
