@@ -28,9 +28,9 @@ export async function GET() {
 
     // 邀请增长漏斗
     const inviteFunnels = await prisma.eventLog.groupBy({
-      by: ['eventName'],
+      by: ['eventType'],
       where: {
-        eventName: {
+        eventType: {
           in: [
             'invite_code_generate',
             'invite_code_copy',
@@ -46,9 +46,9 @@ export async function GET() {
 
     // 工具链漏斗
     const toolchainFunnels = await prisma.eventLog.groupBy({
-      by: ['eventName'],
+      by: ['eventType'],
       where: {
-        eventName: {
+        eventType: {
           in: [
             'toolchain_quotation_to_proforma_invoice',
             'toolchain_proforma_invoice_to_commercial_invoice',
@@ -96,18 +96,18 @@ export async function GET() {
 
     const funnels = {
       invite: {
-        generate: inviteFunnels.find((f) => f.eventName === 'invite_code_generate')?._count || 0,
-        copy: inviteFunnels.find((f) => f.eventName === 'invite_code_copy')?._count || 0,
-        linkCopy: inviteFunnels.find((f) => f.eventName === 'invite_link_copy')?._count || 0,
-        registerSuccess: inviteFunnels.find((f) => f.eventName === 'invite_register_success')?._count || 0,
-        rewardGranted: inviteFunnels.find((f) => f.eventName === 'invite_reward_granted')?._count || 0,
+        generate: inviteFunnels.find((f) => f.eventType === 'invite_code_generate')?._count || 0,
+        copy: inviteFunnels.find((f) => f.eventType === 'invite_code_copy')?._count || 0,
+        linkCopy: inviteFunnels.find((f) => f.eventType === 'invite_link_copy')?._count || 0,
+        registerSuccess: inviteFunnels.find((f) => f.eventType === 'invite_register_success')?._count || 0,
+        rewardGranted: inviteFunnels.find((f) => f.eventType === 'invite_reward_granted')?._count || 0,
       },
       toolchain: {
-        quoteToPI: toolchainFunnels.find((f) => f.eventName === 'toolchain_quotation_to_proforma_invoice')?._count || 0,
-        piToCI: toolchainFunnels.find((f) => f.eventName === 'toolchain_proforma_invoice_to_commercial_invoice')?._count || 0,
-        ciToPL: toolchainFunnels.find((f) => f.eventName === 'toolchain_commercial_invoice_to_packing_list')?._count || 0,
-        containerToPL: toolchainFunnels.find((f) => f.eventName === 'toolchain_container_to_packing_list')?._count || 0,
-        companyProfileApply: toolchainFunnels.find((f) => f.eventName === 'company_profile_apply_to_document')?._count || 0,
+        quoteToPI: toolchainFunnels.find((f) => f.eventType === 'toolchain_quotation_to_proforma_invoice')?._count || 0,
+        piToCI: toolchainFunnels.find((f) => f.eventType === 'toolchain_proforma_invoice_to_commercial_invoice')?._count || 0,
+        ciToPL: toolchainFunnels.find((f) => f.eventType === 'toolchain_commercial_invoice_to_packing_list')?._count || 0,
+        containerToPL: toolchainFunnels.find((f) => f.eventType === 'toolchain_container_to_packing_list')?._count || 0,
+        companyProfileApply: toolchainFunnels.find((f) => f.eventType === 'company_profile_apply_to_document')?._count || 0,
       },
       products: {
         total: productStats,
