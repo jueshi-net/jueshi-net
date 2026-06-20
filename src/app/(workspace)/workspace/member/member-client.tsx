@@ -1,8 +1,10 @@
 "use client";
 
-import { Crown, Shield, Zap, Star, ArrowRight, Infinity, HeadphonesIcon, Sparkles, Check, X as XIcon, TrendingUp, Award } from "lucide-react";
+import { Crown, Shield, Zap, Star, ArrowRight, Infinity, HeadphonesIcon, Sparkles, Check, X as XIcon, TrendingUp, Award, Megaphone, Calendar, Upload, Send } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import PageHeader from "@/components/workspace/PageHeader";
+import { track } from "@/lib/analytics";
 
 const ROLE_META: Record<string, { label: string; icon: React.ReactNode; color: string; gradient: string }> = {
   admin: { 
@@ -44,6 +46,58 @@ export default function MemberClient({ userData, permissions }: { userData: any;
   const growthValue = userData?.growthValue || 0;
 
   const limits = permissions?.limits;
+
+  // Ad entitlement state
+  const [adData, setAdData] = useState<any>(null);
+  const [showApplyForm, setShowApplyForm] = useState(false);
+  const [applyForm, setApplyForm] = useState({ placementKey: "", description: "", materialUrl: "", materialType: "image", startDate: "", endDate: "" });
+  const [applying, setApplying] = useState(false);
+  const [applyError, setApplyError] = useState("");
+  const [applySuccess, setApplySuccess] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/workspace/ad-entitlements")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setAdData(data);
+          track({ eventType: "ad_entitlement_view", toolName: "ad-entitlements", action: "view", path: "/workspace/member" });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleApply = async () => {
+    setApplyError("");
+    setApplySuccess(false);
+    if (!applyForm.placementKey || !applyForm.description) {
+      setApplyError("请选择广告位并填写说明");
+      return;
+    }
+    setApplying(true);
+    try {
+      const res = await fetch("/api/workspace/ad-entitlements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(applyForm),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setApplySuccess(true);
+        setShowApplyForm(false);
+        setApplyForm({ placementKey: "", description: "", materialUrl: "", materialType: "image", startDate: "", endDate: "" });
+        track({ eventType: "ad_entitlement_apply", toolName: "ad-entitlements", action: "apply", path: "/workspace/member", metadata: { placementKey: applyForm.placementKey } });
+        // Refresh data
+        const refreshed = await fetch("/api/workspace/ad-entitlements").then((r) => r.json());
+        if (refreshed.success) setAdData(refreshed);
+      } else {
+        setApplyError(data.error || "提交失败");
+      }
+    } catch {
+      setApplyError("网络错误，请重试");
+    }
+    setApplying(false);
+  };
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -136,6 +190,178 @@ export default function MemberClient({ userData, permissions }: { userData: any;
           </div>
         </div>
       )}
+
+      {/* 广告权益 */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
+        <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <Megaphone className="w-4 h-4 text-purple-600" />
+          广告权益
+        </h2>
+
+        {adData ? (
+          <>
+            {/* 可用天数 */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+              <div className="rounded-xl p-4 bg-purple-50 border border-purple-100">
+                <div className="text-xs text-gray-500 mb-1">可用天数</div>
+                <div className="text-2xl font-bold text-purple-600">{adData.summary?.availableDays || 0}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-green-50 border border-green-100">
+                <div className="text-xs text-gray-500 mb-1">已获得</div>
+                <div className="text-2xl font-bold text-green-600">{adData.summary?.totalDays || 0}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-blue-50 border border-blue-100">
+                <div className="text-xs text-gray-500 mb-1">已使用</div>
+                <div className="text-2xl font-bold text-blue-600">{adData.summary?.usedDays || 0}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 border border-gray-100">
+                <div className="text-xs text-gray-500 mb-1">已过期</div>
+                <div className="text-2xl font-bold text-gray-400">{adData.summary?.expiredDays || 0}</div>
+              </div>
+            </div>
+
+            {/* 申请按钮 */}
+            {(adData.summary?.availableDays || 0) > 0 && !showApplyForm && (
+              <button
+                onClick={() => {
+                  setShowApplyForm(true);
+                  track({ eventType: "ad_entitlement_view", toolName: "ad-entitlements", action: "click_apply", path: "/workspace/member" });
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors mb-4"
+              >
+                <Send className="w-4 h-4" /> 申请使用广告权益
+              </button>
+            )}
+
+            {(adData.summary?.availableDays || 0) <= 0 && (
+              <p className="text-xs text-gray-500 mb-4">
+                暂无可用广告权益天数。通过邀请好友可获得广告位展示天数。
+              </p>
+            )}
+
+            {/* 申请表单 */}
+            {showApplyForm && (
+              <div className="bg-purple-50 border border-purple-100 rounded-xl p-4 mb-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">申请广告位</h3>
+                {applyError && <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-3 text-xs text-red-700">{applyError}</div>}
+                {applySuccess && <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-3 text-xs text-green-700">申请已提交，等待管理员审核</div>}
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-gray-600 block mb-1">选择广告位 *</label>
+                    <select
+                      value={applyForm.placementKey}
+                      onChange={(e) => setApplyForm({ ...applyForm, placementKey: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                    >
+                      <option value="">请选择广告位</option>
+                      {(adData.placements || []).map((p: any) => (
+                        <option key={p.key} value={p.key}>{p.name} ({p.pageType}/{p.zone})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 block mb-1">申请说明 *</label>
+                    <textarea
+                      value={applyForm.description}
+                      onChange={(e) => setApplyForm({ ...applyForm, description: e.target.value })}
+                      className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                      rows={3}
+                      placeholder="请描述您的广告内容和投放目的..."
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-600 block mb-1">素材类型</label>
+                      <select
+                        value={applyForm.materialType}
+                        onChange={(e) => setApplyForm({ ...applyForm, materialType: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                      >
+                        <option value="image">图片</option>
+                        <option value="html">HTML</option>
+                        <option value="text">文字</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600 block mb-1">素材 URL</label>
+                      <input
+                        type="text"
+                        value={applyForm.materialUrl}
+                        onChange={(e) => setApplyForm({ ...applyForm, materialUrl: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-600 block mb-1">开始日期</label>
+                      <input
+                        type="date"
+                        value={applyForm.startDate}
+                        onChange={(e) => setApplyForm({ ...applyForm, startDate: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-600 block mb-1">结束日期</label>
+                      <input
+                        type="date"
+                        value={applyForm.endDate}
+                        onChange={(e) => setApplyForm({ ...applyForm, endDate: e.target.value })}
+                        className="w-full border border-gray-200 rounded-lg p-2 text-sm bg-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleApply}
+                      disabled={applying}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+                    >
+                      {applying ? "提交中..." : "提交申请"}
+                    </button>
+                    <button
+                      onClick={() => { setShowApplyForm(false); setApplyError(""); }}
+                      className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                    >
+                      取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 申请记录 */}
+            {adData.applications && adData.applications.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-xs font-medium text-gray-700 mb-2">申请记录</h3>
+                <div className="space-y-2">
+                  {adData.applications.slice(0, 5).map((app: any) => (
+                    <div key={app.id} className="flex items-center justify-between text-xs bg-gray-50 rounded-lg p-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-600">{app.placementKey}</span>
+                        <span className={`px-2 py-0.5 rounded-full ${
+                          app.status === "PENDING" ? "bg-amber-100 text-amber-700" :
+                          app.status === "APPROVED" ? "bg-green-100 text-green-700" :
+                          app.status === "REJECTED" ? "bg-red-100 text-red-700" :
+                          "bg-gray-100 text-gray-700"
+                        }`}>
+                          {app.status === "PENDING" ? "待审核" : app.status === "APPROVED" ? "已批准" : app.status === "REJECTED" ? "已拒绝" : app.status}
+                        </span>
+                      </div>
+                      <span className="text-gray-400">{new Date(app.createdAt).toLocaleDateString("zh-CN")}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="text-sm text-gray-400">加载中...</div>
+        )}
+      </div>
 
       {/* 升级理由 */}
       {!isMember && (

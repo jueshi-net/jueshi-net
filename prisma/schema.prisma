@@ -70,6 +70,7 @@ model User {
   inviterRedemptions     InviteRedemption[]   @relation("InviterRedemptions")
   inviteeRedemptions     InviteRedemption[]   @relation("InviteeRedemptions")
   rewardGrants           RewardGrant[]
+  adApplications         AdApplication[]
   productItems           ProductItem[]
 
   @@map("users")
@@ -405,6 +406,34 @@ model AdCreative {
   @@map("ad_creatives")
 }
 
+// ─── v1.20.42.13.3: Ad Entitlement Application (用户广告权益申请) ───
+
+model AdApplication {
+  id              String    @id @default(cuid())
+  userId          String    @map("user_id")
+  rewardGrantId   String?   @map("reward_grant_id")  // 关联的 AD_SLOT_DAYS 权益
+  placementKey    String    @map("placement_key")     // 选择的广告位 key
+  description     String    @db.Text                  // 申请说明
+  materialUrl     String?   @map("material_url")      // 素材 URL（上传后存储）
+  materialType    String    @default("image") @map("material_type") // image / html / text
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  status          String    @default("PENDING")       // PENDING / APPROVED / REJECTED / ACTIVE / EXPIRED
+  reviewNote      String?   @map("review_note") @db.Text
+  reviewedBy      String?   @map("reviewed_by")
+  reviewedAt      DateTime? @map("reviewed_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  user            User        @relation(fields: [userId], references: [id])
+  rewardGrant     RewardGrant? @relation(fields: [rewardGrantId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([placementKey])
+  @@map("ad_applications")
+}
+
 // ─── v1.20.42.6.16: Ad Event Log (impression/click) ───
 
 model AdEvent {
@@ -525,6 +554,7 @@ model RewardGrant {
   user              User              @relation(fields: [userId], references: [id])
   inviteRedemption  InviteRedemption? @relation(fields: [inviteRedemptionId], references: [id])
   rewardRule        RewardRule        @relation(fields: [rewardRuleId], references: [id])
+  adApplications    AdApplication[]
 
   @@index([userId])
   @@index([status])
