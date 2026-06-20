@@ -32,11 +32,13 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
-  return updateTaskChain(req, params);
+  const resolvedParams = await params;
+  return updateTaskChain(req, resolvedParams);
 }
 
 export async function PATCH(req: NextRequest, { params }: RouteParams) {
-  return updateTaskChain(req, params);
+  const resolvedParams = await params;
+  return updateTaskChain(req, resolvedParams);
 }
 
 async function updateTaskChain(req: NextRequest, params: { id: string }) {
@@ -45,7 +47,7 @@ async function updateTaskChain(req: NextRequest, params: { id: string }) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
   }
 
-  const { id } = await params;
+  const { id } = params;
   const userId = session.user.id;
 
   // Verify ownership
