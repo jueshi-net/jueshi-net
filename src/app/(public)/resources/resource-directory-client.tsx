@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
@@ -270,16 +270,51 @@ function CategoryContext({ categoryKey, resourceCount }: { categoryKey: string; 
   );
 }
 
-// 页面顶部精选工具 — 数据来自 DB（sortOrder < 0）或 fallback
+// 页面顶部精选工具 — 数据来自 DB (isFeatured=true) 或 fallback
 function FeaturedTools({ featuredResources }: { featuredResources: Resource[] }) {
   if (!featuredResources || featuredResources.length === 0) return null;
+
+  // Track featured section view
+  useEffect(() => {
+    if (featuredResources.length > 0) {
+      try {
+        navigator.sendBeacon(
+          '/api/events',
+          JSON.stringify({
+            eventType: 'resource_featured_view',
+            resourceId: featuredResources.map(r => r.id).join(','),
+            itemCount: featuredResources.length,
+            ts: Date.now(),
+          })
+        );
+      } catch {
+        // fail silently
+      }
+    }
+  }, [featuredResources]);
+
+  const handleFeaturedClick = (resource: Resource) => {
+    try {
+      navigator.sendBeacon(
+        '/api/events',
+        JSON.stringify({
+          eventType: 'resource_featured_click',
+          resourceId: resource.id,
+          resourceName: resource.name,
+          ts: Date.now(),
+        })
+      );
+    } catch {
+      // fail silently
+    }
+  };
 
   return (
     <div className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl border border-purple-100 p-4 sm:p-5 min-w-0">
       <div className="flex items-center gap-2 mb-3">
         <Sparkles className="w-5 h-5 text-purple-600" />
         <h2 className="text-base font-bold text-gray-900">精选推荐</h2>
-        <span className="text-xs text-gray-400 ml-auto">编辑后台 sortOrder &lt; 0 可管理</span>
+        <span className="text-xs text-gray-400 ml-auto">编辑精选 · 品质保证</span>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         {featuredResources.map((r) => {
@@ -291,6 +326,7 @@ function FeaturedTools({ featuredResources }: { featuredResources: Resource[] })
               href={r.url}
               target="_blank"
               rel="noopener noreferrer nofollow"
+              onClick={() => handleFeaturedClick(r)}
               className="flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl border border-gray-100 hover:border-purple-200 hover:shadow-sm transition-all text-center min-w-0 group"
             >
               <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 overflow-hidden">

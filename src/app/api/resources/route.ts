@@ -95,6 +95,12 @@ export async function POST(req: NextRequest) {
         sortOrder: body.sortOrder || 0,
         iconUrl: body.iconUrl || null,
         isAd: body.isAd || false,
+        // v1.20.42.13.3: featured fields
+        isFeatured: body.isFeatured || false,
+        featuredGroup: body.featuredGroup || null,
+        featuredOrder: body.featuredOrder ?? null,
+        featuredStartAt: body.featuredStartAt ? new Date(body.featuredStartAt) : null,
+        featuredEndAt: body.featuredEndAt ? new Date(body.featuredEndAt) : null,
       },
     });
     return NextResponse.json({ success: true, resource });
@@ -128,6 +134,12 @@ export async function PATCH(req: NextRequest) {
     if (body.sortOrder !== undefined) data.sortOrder = body.sortOrder;
     if (body.iconUrl !== undefined) data.iconUrl = body.iconUrl;
     if (body.isAd !== undefined) data.isAd = body.isAd;
+    // v1.20.42.13.3: featured fields
+    if (body.isFeatured !== undefined) data.isFeatured = body.isFeatured;
+    if (body.featuredGroup !== undefined) data.featuredGroup = body.featuredGroup || null;
+    if (body.featuredOrder !== undefined) data.featuredOrder = body.featuredOrder;
+    if (body.featuredStartAt !== undefined) data.featuredStartAt = body.featuredStartAt ? new Date(body.featuredStartAt) : null;
+    if (body.featuredEndAt !== undefined) data.featuredEndAt = body.featuredEndAt ? new Date(body.featuredEndAt) : null;
 
     const resource = await prisma.resource.update({ where: { id }, data });
     return NextResponse.json({ success: true, resource });

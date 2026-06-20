@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe } from 'lucide-react';
+import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe, Sparkles } from 'lucide-react';
 
 interface ResourceItem {
   id: string;
@@ -20,6 +20,11 @@ interface ResourceItem {
   qualityScore: number | null;
   createdAt: string;
   updatedAt: string;
+  isFeatured: boolean;
+  featuredGroup: string | null;
+  featuredOrder: number | null;
+  featuredStartAt: string | null;
+  featuredEndAt: string | null;
 }
 
 // ─── 分类管理 ──────────────────────────────────────────────────────────────
@@ -61,6 +66,8 @@ export default function AdminResourcesPage() {
     name: '', url: '', description: '', category: 'life',
     tags: '', sourceType: 'third-party', usage: '', disclaimer: '',
     isActive: true, sortOrder: 0, iconUrl: '', isAd: false,
+    isFeatured: false, featuredGroup: '', featuredOrder: 0,
+    featuredStartAt: '', featuredEndAt: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -79,6 +86,11 @@ export default function AdminResourcesPage() {
   const [checkingLinks, setCheckingLinks] = useState(false);
   const [linkResults, setLinkResults] = useState<Record<string, { status: number | null; ok: boolean; error?: string }>>({});
   const abortRef = useRef(false);
+
+  // ─── 质量检查状态 ─────────────────────────────────────────────────────
+  const [showQualityCheck, setShowQualityCheck] = useState(false);
+  const [qualityReport, setQualityReport] = useState<any>(null);
+  const [runningQualityCheck, setRunningQualityCheck] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +117,7 @@ export default function AdminResourcesPage() {
 
   const openCreate = () => {
     setEditingId(null);
-    setFormData({ name: '', url: '', description: '', category: 'life', tags: '', sourceType: 'third-party', usage: '', disclaimer: '', isActive: true, sortOrder: 0, iconUrl: '', isAd: false });
+    setFormData({ name: '', url: '', description: '', category: 'life', tags: '', sourceType: 'third-party', usage: '', disclaimer: '', isActive: true, sortOrder: 0, iconUrl: '', isAd: false, isFeatured: false, featuredGroup: '', featuredOrder: 0, featuredStartAt: '', featuredEndAt: '' });
     setShowModal(true);
   };
 
@@ -117,6 +129,10 @@ export default function AdminResourcesPage() {
       sourceType: r.sourceType || 'third-party', usage: r.usage || '',
       disclaimer: r.disclaimer || '', isActive: r.isActive !== false,
       sortOrder: r.sortOrder || 0, iconUrl: r.iconUrl || '', isAd: r.isAd || false,
+      isFeatured: r.isFeatured || false, featuredGroup: r.featuredGroup || '',
+      featuredOrder: r.featuredOrder || 0,
+      featuredStartAt: r.featuredStartAt ? new Date(r.featuredStartAt).toISOString().slice(0, 16) : '',
+      featuredEndAt: r.featuredEndAt ? new Date(r.featuredEndAt).toISOString().slice(0, 16) : '',
     });
     setShowModal(true);
   };
@@ -127,10 +143,16 @@ export default function AdminResourcesPage() {
     try {
       const method = editingId ? 'PATCH' : 'POST';
       const url = editingId ? `/api/resources?id=${editingId}` : '/api/resources';
+      const payload = {
+        ...formData,
+        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+        featuredStartAt: formData.featuredStartAt ? new Date(formData.featuredStartAt).toISOString() : null,
+        featuredEndAt: formData.featuredEndAt ? new Date(formData.featuredEndAt).toISOString() : null,
+      };
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean) })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) { setShowModal(false); fetchResources(); }
@@ -218,6 +240,37 @@ export default function AdminResourcesPage() {
 
   const stopCheck = () => { abortRef.current = true; setCheckingLinks(false); };
 
+  // ─── 质量检查 ───────────────────────────────────────────────────────────
+  const runQualityCheck = async () => {
+    setRunningQualityCheck(true);
+    setShowQualityCheck(true);
+    try {
+      const res = await fetch('/api/admin/resources/quality-check');
+      const data = await res.json();
+      if (data.success) {
+        setQualityReport(data.report);
+        // Track quality check run
+        try {
+          navigator.sendBeacon(
+            '/api/events',
+            JSON.stringify({
+              eventType: 'resource_quality_check_run',
+              itemCount: data.report.total,
+              ts: Date.now(),
+            })
+          );
+        } catch {
+          // fail silently
+        }
+      } else {
+        alert(data.error || '质量检查失败');
+      }
+    } catch {
+      alert('质量检查失败');
+    }
+    setRunningQualityCheck(false);
+  };
+
   // ─── 分类管理 ───────────────────────────────────────────────────────────
   const addCategory = () => {
     if (!newCatValue || !newCatLabel) return;
@@ -259,6 +312,14 @@ export default function AdminResourcesPage() {
           <div className="flex flex-wrap gap-2">
             <button onClick={() => setShowCategoryModal(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm hover:bg-white/20 transition-colors min-h-[44px]">
               <Tag className="w-4 h-4" /> 分类管理
+            </button>
+            <button
+              onClick={runQualityCheck}
+              disabled={runningQualityCheck}
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm hover:bg-white/20 transition-colors min-h-[44px]"
+            >
+              <Activity className={`w-4 h-4 ${runningQualityCheck ? 'animate-pulse' : ''}`} />
+              {runningQualityCheck ? '检查中...' : '🔍 质量检查'}
             </button>
             <button
               onClick={checkingLinks ? stopCheck : runDeadLinkCheck}
@@ -373,6 +434,7 @@ export default function AdminResourcesPage() {
                   <th className="px-4 py-3 text-left hidden md:table-cell">来源</th>
                   <th className="px-4 py-3 text-left hidden lg:table-cell">质量</th>
                   <th className="px-4 py-3 text-left">状态</th>
+                  <th className="px-4 py-3 text-left hidden lg:table-cell">推荐</th>
                   <th className="px-4 py-3 text-left hidden lg:table-cell">链接健康</th>
                   <th className="px-4 py-3 text-left hidden lg:table-cell">更新时间</th>
                   <th className="px-4 py-3 text-right">操作</th>
@@ -399,6 +461,16 @@ export default function AdminResourcesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs ${r.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{r.isActive ? '启用' : '隐藏'}</span></td>
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        {r.isFeatured ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                            <Sparkles className="w-3 h-3" />
+                            推荐
+                          </span>
+                        ) : (
+                          <span className="text-gray-300 text-xs">—</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {linkResult ? (
                           linkResult.ok ? (
@@ -502,6 +574,45 @@ export default function AdminResourcesPage() {
                 </label>
               </div>
 
+              {/* ─── 推荐位管理 ─────────────────────────────────────────────── */}
+              <div className="border-t pt-3 mt-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm font-medium text-purple-700">推荐位设置</span>
+                </div>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={formData.isFeatured} onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
+                      className="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-500" />
+                    <span className="text-sm font-medium">设为推荐资源</span>
+                  </label>
+                  {formData.isFeatured && (
+                    <div className="grid grid-cols-2 gap-2 pl-6">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">推荐分组</label>
+                        <input value={formData.featuredGroup} onChange={e => setFormData({ ...formData, featuredGroup: e.target.value })}
+                          placeholder="如: 热门、新品" className="w-full px-2 py-1.5 border rounded text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">排序权重</label>
+                        <input type="number" value={formData.featuredOrder} onChange={e => setFormData({ ...formData, featuredOrder: parseInt(e.target.value) || 0 })}
+                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">开始时间</label>
+                        <input type="datetime-local" value={formData.featuredStartAt} onChange={e => setFormData({ ...formData, featuredStartAt: e.target.value })}
+                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">结束时间</label>
+                        <input type="datetime-local" value={formData.featuredEndAt} onChange={e => setFormData({ ...formData, featuredEndAt: e.target.value })}
+                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <div><label className="block text-sm font-medium mb-1">标签（逗号分隔）</label><input value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="w-full px-3 py-2 border rounded-lg" /></div>
               <div><label className="block text-sm font-medium mb-1">使用说明</label><textarea value={formData.usage} onChange={e => setFormData({ ...formData, usage: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg" /></div>
               <div><label className="block text-sm font-medium mb-1">免责声明</label><textarea value={formData.disclaimer} onChange={e => setFormData({ ...formData, disclaimer: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg" /></div>
@@ -596,6 +707,112 @@ export default function AdminResourcesPage() {
                 <textarea value={importText} onChange={e => setImportText(e.target.value)} placeholder='粘贴 JSON 数组，如：[{"name":"...", "url":"...", "category":"life"}]' rows={6} className="w-full px-3 py-2 border rounded-lg text-sm font-mono" />
                 <button onClick={handleImport} disabled={importing || !importText.trim()} className="mt-2 w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-1 min-h-[44px]"><FileJson className="w-4 h-4" />{importing ? '导入中...' : '导入'}</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quality Check Modal */}
+      {showQualityCheck && qualityReport && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <Activity className="w-5 h-5 text-purple-600" />
+                资源质量报告
+              </h2>
+              <button onClick={() => setShowQualityCheck(false)} className="p-1 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="space-y-4">
+              {/* 总览 */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-700">{qualityReport.total}</div>
+                <div className="text-sm text-gray-600">总资源数</div>
+              </div>
+
+              {/* 问题统计 */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-red-700">{qualityReport.issues.noLogo}</div>
+                  <div className="text-xs text-red-600">缺 Logo</div>
+                </div>
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-orange-700">{qualityReport.issues.noDescription}</div>
+                  <div className="text-xs text-orange-600">缺描述</div>
+                </div>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-amber-700">{qualityReport.issues.noTags}</div>
+                  <div className="text-xs text-amber-600">缺标签</div>
+                </div>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-yellow-700">{qualityReport.issues.lowQuality}</div>
+                  <div className="text-xs text-yellow-600">低质量评分</div>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-gray-700">{qualityReport.issues.inactive}</div>
+                  <div className="text-xs text-gray-600">已隐藏</div>
+                </div>
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                  <div className="text-xl font-bold text-purple-700">{qualityReport.featured}</div>
+                  <div className="text-xs text-purple-600">推荐资源</div>
+                </div>
+              </div>
+
+              {/* 分类统计 */}
+              {qualityReport.byCategory && qualityReport.byCategory.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">分类分布</h3>
+                  <div className="space-y-1">
+                    {qualityReport.byCategory.map((item: any) => (
+                      <div key={item.category} className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">{catLabel(item.category)}</span>
+                        <span className="font-medium text-gray-900">{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 建议 */}
+              {qualityReport.recommendations && qualityReport.recommendations.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-blue-700 mb-2">改进建议</h3>
+                  <ul className="space-y-1">
+                    {qualityReport.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx} className="text-sm text-blue-600 flex items-start gap-2">
+                        <span className="text-blue-400">•</span>
+                        <span>{rec}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* 重复域名 */}
+              {qualityReport.duplicateDomains && qualityReport.duplicateDomains.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-amber-700 mb-2">重复域名 ({qualityReport.duplicateDomains.length})</h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {qualityReport.duplicateDomains.slice(0, 10).map((dup: any, idx: number) => (
+                      <div key={idx} className="text-sm">
+                        <span className="font-medium text-amber-800">{dup.domain}</span>
+                        <span className="text-amber-600 ml-2">({dup.count} 个资源)</span>
+                        <div className="text-xs text-gray-500 ml-4 mt-0.5">
+                          {dup.resources.map((r: any) => r.name).join(', ')}
+                        </div>
+                      </div>
+                    ))}
+                    {qualityReport.duplicateDomains.length > 10 && (
+                      <div className="text-xs text-amber-600">...还有 {qualityReport.duplicateDomains.length - 10} 个</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end mt-4 pt-4 border-t">
+              <button onClick={() => setShowQualityCheck(false)} className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[44px]">关闭</button>
             </div>
           </div>
         </div>

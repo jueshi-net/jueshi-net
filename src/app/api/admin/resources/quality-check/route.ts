@@ -66,6 +66,28 @@ export async function GET() {
       where: { isFeatured: true },
     });
 
+    // 重复 URL 检测（按域名分组，找出有多个资源的域名）
+    const allResources = await prisma.resource.findMany({
+      select: { id: true, url: true, name: true },
+    });
+    const domainMap = new Map<string, { id: string; name: string; url: string }[]>();
+    for (const r of allResources) {
+      try {
+        const domain = new URL(r.url).hostname.replace(/^www\./, '');
+        if (!domainMap.has(domain)) domainMap.set(domain, []);
+        domainMap.get(domain)!.push({ id: r.id, name: r.name, url: r.url });
+      } catch {
+        // skip invalid URLs
+      }
+    }
+    const duplicateDomains = Array.from(domainMap.entries())
+      .filter(([, items]) => items.length > 1)
+      .map(([domain, items]) => ({
+        domain,
+        count: items.length,
+        resources: items,
+      }));
+
     // 按分类统计
     const byCategory = await prisma.resource.groupBy({
       by: ['category'],
@@ -83,6 +105,7 @@ export async function GET() {
         lowQuality,
       },
       featured,
+      duplicateDomains,
       byCategory: byCategory.map((c) => ({
         category: c.category,
         count: c._count,
@@ -93,6 +116,7 @@ export async function GET() {
         noTags > 0 && `建议为 ${noTags} 个资源添加标签`,
         lowQuality > 0 && `建议审查 ${lowQuality} 个低质量评分资源`,
         inactive > 0 && `建议清理 ${inactive} 个 inactive 资源`,
+        duplicateDomains.length > 0 && `发现 ${duplicateDomains.length} 个域名有重复资源，建议合并或去重`,
       ].filter(Boolean),
     };
 

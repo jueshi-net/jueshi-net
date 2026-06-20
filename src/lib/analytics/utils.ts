@@ -194,6 +194,9 @@ export function isValidEventType(eventType: string): boolean {
     
     // 资源
     'resource_click',
+    'resource_featured_view',
+    'resource_featured_click',
+    'resource_quality_check_run',
     'search_submit',
     
     // 转化
@@ -243,6 +246,8 @@ export function sanitizeMetadata(metadata: any): any {
     'queryType',
     'resultCount',
     'resourceId',
+    'resourceName',
+    'featuredGroup',
     'category',
     'queryLength',
     'slug',
