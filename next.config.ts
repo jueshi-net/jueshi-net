@@ -22,16 +22,6 @@ const nextConfig: NextConfig = {
         destination: '/tools/:slug*',
         permanent: true,
       },
-      {
-        source: '/guides',
-        destination: '/resources',
-        permanent: true,
-      },
-      {
-        source: '/guides/:slug*',
-        destination: '/resources/:slug*',
-        permanent: true,
-      },
       // ─── 个人中心瘦身 (规范3: 冗余入口折叠) ───
       {
         source: '/user/tasks',
