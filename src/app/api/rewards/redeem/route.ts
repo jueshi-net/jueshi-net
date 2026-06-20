@@ -117,9 +117,11 @@ export async function POST(req: NextRequest) {
         await tx.growthLog.create({
           data: {
             userId,
-            delta: rewardItem.rewardValue,
+            type: "reward_redeem",
+            value: rewardItem.rewardValue,
             reason: `兑换${rewardItem.name}`,
-            relatedId: userReward.id,
+            refType: "userReward",
+            refId: userReward.id,
           },
         });
       }
@@ -136,6 +138,7 @@ export async function POST(req: NextRequest) {
           adSlotRule = await tx.rewardRule.create({
             data: {
               name: "广告权益自动发放",
+              trigger: "REWARD_REDEEM",
               rewardType: "ad_slot_days",
               rewardValue: 1,
               enabled: true,
