@@ -3,6 +3,16 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 /**
+ * Sanitize CSV cell to prevent formula injection
+ * Removes leading =, +, -, @, \t, \r characters
+ */
+function sanitizeCsvCell(value: string): string {
+  if (!value) return value;
+  // Remove characters that can trigger formula execution in spreadsheet apps
+  return value.replace(/^[=+\-@\t\r]+/, '').trim();
+}
+
+/**
  * POST /api/workspace/products/import
  * 批量导入商品（CSV）
  */
@@ -35,19 +45,28 @@ export async function POST(req: NextRequest) {
       const item = products[i];
       const rowNum = i + 1;
 
+      // Sanitize all string fields to prevent CSV formula injection
+      const sanitizedName = sanitizeCsvCell(item.name || '');
+      const sanitizedSku = sanitizeCsvCell(item.sku || '');
+      const sanitizedDescription = sanitizeCsvCell(item.description || '');
+      const sanitizedHsCode = sanitizeCsvCell(item.hsCode || '');
+      const sanitizedOriginCountry = sanitizeCsvCell(item.originCountry || '');
+      const sanitizedMaterial = sanitizeCsvCell(item.material || '');
+      const sanitizedUsage = sanitizeCsvCell(item.usage || '');
+
       // 验证必填字段
-      if (!item.name || !item.name.trim()) {
+      if (!sanitizedName || !sanitizedName.trim()) {
         results.failed++;
         results.errors.push(`第 ${rowNum} 行：商品名称不能为空`);
         continue;
       }
 
       // 检查 SKU 是否已存在（如果提供了 SKU）
-      if (item.sku && item.sku.trim()) {
+      if (sanitizedSku && sanitizedSku.trim()) {
         const existing = await prisma.productItem.findFirst({
           where: {
             userId: session.user.id,
-            sku: item.sku.trim(),
+            sku: sanitizedSku.trim(),
           },
         });
 
@@ -57,9 +76,9 @@ export async function POST(req: NextRequest) {
             await prisma.productItem.update({
               where: { id: existing.id },
               data: {
-                name: item.name.trim(),
-                description: item.description?.trim() || null,
-                hsCode: item.hsCode?.trim() || null,
+                name: sanitizedName,
+                description: sanitizedDescription || null,
+                hsCode: sanitizedHsCode || null,
                 unit: item.unit || 'PCS',
                 unitPrice: item.unitPrice ? parseFloat(item.unitPrice) : null,
                 currency: item.currency || 'USD',
@@ -68,9 +87,9 @@ export async function POST(req: NextRequest) {
                 length: item.length ? parseFloat(item.length) : null,
                 width: item.width ? parseFloat(item.width) : null,
                 height: item.height ? parseFloat(item.height) : null,
-                originCountry: item.originCountry?.trim() || null,
-                material: item.material?.trim() || null,
-                usage: item.usage?.trim() || null,
+                originCountry: sanitizedOriginCountry || null,
+                material: sanitizedMaterial || null,
+                usage: sanitizedUsage || null,
               },
             });
             results.success++;
@@ -86,10 +105,10 @@ export async function POST(req: NextRequest) {
         await prisma.productItem.create({
           data: {
             userId: session.user.id,
-            name: item.name.trim(),
-            sku: item.sku?.trim() || null,
-            description: item.description?.trim() || null,
-            hsCode: item.hsCode?.trim() || null,
+            name: sanitizedName,
+            sku: sanitizedSku || null,
+            description: sanitizedDescription || null,
+            hsCode: sanitizedHsCode || null,
             unit: item.unit || 'PCS',
             unitPrice: item.unitPrice ? parseFloat(item.unitPrice) : null,
             currency: item.currency || 'USD',
@@ -98,9 +117,9 @@ export async function POST(req: NextRequest) {
             length: item.length ? parseFloat(item.length) : null,
             width: item.width ? parseFloat(item.width) : null,
             height: item.height ? parseFloat(item.height) : null,
-            originCountry: item.originCountry?.trim() || null,
-            material: item.material?.trim() || null,
-            usage: item.usage?.trim() || null,
+            originCountry: sanitizedOriginCountry || null,
+            material: sanitizedMaterial || null,
+            usage: sanitizedUsage || null,
           },
         });
         results.success++;

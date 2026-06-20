@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, ChevronDown, Download, Upload } from 'lucide-react';
 import PageHeader from '@/components/workspace/PageHeader';
+import { track } from '@/lib/analytics';
 
 interface ProductItem {
   id: string;
@@ -60,7 +61,15 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [search, showInactive]);
+    
+    // Track product library open
+    track({
+      eventType: 'product_library_open',
+      toolName: 'products',
+      action: 'view_product_library',
+      path: '/workspace/products',
+    });
+  }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -194,15 +203,55 @@ export default function ProductsPage() {
 
       const data = await res.json();
       if (data.success) {
+        // Track successful import
+        track({
+          eventType: 'product_csv_import',
+          toolName: 'products',
+          action: 'csv_import_success',
+          path: '/workspace/products',
+          metadata: {
+            successCount: data.results.success,
+            skippedCount: data.results.skipped,
+            failedCount: data.results.failed,
+            totalCount: importData.length,
+            overwrite: importOverwrite,
+          },
+        });
+        
         alert(`导入完成：成功 ${data.results.success} 条，跳过 ${data.results.skipped} 条，失败 ${data.results.failed} 条`);
         setShowImport(false);
         setImportData([]);
         fetchProducts();
       } else {
+        // Track failed import
+        track({
+          eventType: 'product_csv_import_failed',
+          toolName: 'products',
+          action: 'csv_import_failed',
+          path: '/workspace/products',
+          metadata: {
+            error: data.error || 'unknown',
+            totalCount: importData.length,
+          },
+        });
+        
         alert(data.error || '导入失败');
       }
     } catch (error) {
       console.error('Import failed:', error);
+      
+      // Track failed import
+      track({
+        eventType: 'product_csv_import_failed',
+        toolName: 'products',
+        action: 'csv_import_failed',
+        path: '/workspace/products',
+        metadata: {
+          error: 'network_error',
+          totalCount: importData.length,
+        },
+      });
+      
       alert('导入失败');
     } finally {
       setImporting(false);

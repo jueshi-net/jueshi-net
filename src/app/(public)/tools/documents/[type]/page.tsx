@@ -17,9 +17,10 @@ import { permissionMessages } from '@/lib/membership/permissions';
 import { saveDraft, getDraft, getDraftsByType, deleteDraft, getCompanyProfile, saveCompanyProfile, type DocumentDraft, type CompanyProfile } from '@/lib/documents/storage';
 import { AdSlot } from '@/components/ad-slot';
 import SmartRelatedLinks from '@/components/smart-related-links';
+import ProductSelector from '@/components/product-selector';
 import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/documents/a4-export-renderer';
 import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData, saveTaskChain, DOCUMENT_CHAIN, DOCUMENT_CHAIN_LABELS, buildTaskChainURL } from '@/lib/task-chain';
-import { trackEvent } from '@/lib/analytics';
+import { track, trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
 
 function getTotalLabel(key: string): string {
@@ -70,6 +71,53 @@ export default function DocumentEditorPage() {
   // ── Task Chain prefill detection ──
   const [showTaskChainBanner, setShowTaskChainBanner] = useState(false);
   const [taskChainData, setTaskChainData] = useState<ReturnType<typeof getTaskChain>>(null);
+
+  // ── Product Selector ──
+  const [showProductSelector, setShowProductSelector] = useState(false);
+  const [productSelectorTargetIdx, setProductSelectorTargetIdx] = useState<number | null>(null);
+
+  const handleProductSelect = (product: any, targetIdx: number | null) => {
+    if (targetIdx !== null) {
+      // Update existing line item
+      setLineItems(prev => {
+        const updated = [...prev];
+        updated[targetIdx] = {
+          ...updated[targetIdx],
+          description: product.name,
+          hsCode: product.hsCode || '',
+          unitPrice: product.unitPrice?.toString() || '',
+          currency: product.currency || 'USD',
+          unit: product.unit || 'PCS',
+          netWeight: product.netWeight?.toString() || '',
+          grossWeight: product.grossWeight?.toString() || '',
+        };
+        return updated;
+      });
+    } else {
+      // Add new line item
+      setLineItems(prev => [...prev, {
+        description: product.name,
+        hsCode: product.hsCode || '',
+        unitPrice: product.unitPrice?.toString() || '',
+        currency: product.currency || 'USD',
+        unit: product.unit || 'PCS',
+        netWeight: product.netWeight?.toString() || '',
+        grossWeight: product.grossWeight?.toString() || '',
+      }]);
+    }
+
+    // Track product insertion
+    track({
+      eventType: 'product_item_insert',
+      toolName: type,
+      action: 'insert_from_product_library',
+      path: `/tools/documents/${type}`,
+      metadata: {
+        productId: product.id,
+        productName: product.name,
+      },
+    });
+  };
 
   useEffect(() => {
     // Check URL params first, then localStorage
@@ -171,7 +219,7 @@ export default function DocumentEditorPage() {
 
     // Track toolchain navigation
     const eventName = `toolchain_${type.replace(/-/g, '_')}_to_${nextType.replace(/-/g, '_')}`;
-    trackEvent({
+    track({
       eventType: eventName,
       toolName: type,
       action: `navigate_to_${nextType}`,
@@ -181,7 +229,7 @@ export default function DocumentEditorPage() {
         targetType: nextType,
         lineItemsCount: lineItems.length,
       },
-    }).catch(err => console.error('Failed to track toolchain navigation:', err));
+    });
 
     // Save current document data to task chain
     const lineItemsData = lineItems.map(item => ({
@@ -210,10 +258,6 @@ export default function DocumentEditorPage() {
       totalNetWeight: parseFloat(formData.totalNetWeight) || 0,
       totalVolume: parseFloat(formData.totalVolume) || 0,
     });
-
-    // Track event
-    const eventName = `toolchain_${type.replace(/-/g, '_')}_to_${nextType.replace(/-/g, '_')}`;
-    trackEvent.custom(type, eventName);
 
     // Navigate to next document
     router.push(`/tools/documents/${nextType}?from=task-chain`);
@@ -1034,9 +1078,20 @@ export default function DocumentEditorPage() {
               <div className="bg-white rounded-xl border p-5 mb-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-semibold text-gray-900">货物/项目明细</h2>
-                  <button onClick={addLineItem} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
-                    <Plus className="w-4 h-4" /> 添加一行
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => {
+                        setProductSelectorTargetIdx(null);
+                        setShowProductSelector(true);
+                      }} 
+                      className="flex items-center gap-1 text-sm text-green-600 hover:text-green-700"
+                    >
+                      <Package className="w-4 h-4" /> 从商品库添加
+                    </button>
+                    <button onClick={addLineItem} className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
+                      <Plus className="w-4 h-4" /> 添加一行
+                    </button>
+                  </div>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
@@ -1448,6 +1503,17 @@ export default function DocumentEditorPage() {
                   </div>
                 ));
               })()}
+
+              {/* Product Selector Modal */}
+              {showProductSelector && (
+                <ProductSelector
+                  onSelect={(product) => handleProductSelect(product, productSelectorTargetIdx)}
+                  onClose={() => {
+                    setShowProductSelector(false);
+                    setProductSelectorTargetIdx(null);
+                  }}
+                />
+              )}
 
               {/* Mobile bottom action bar */}
               <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t p-3 z-50 no-print">

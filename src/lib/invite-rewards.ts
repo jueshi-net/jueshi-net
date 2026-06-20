@@ -1,6 +1,6 @@
 // v1.20.42.12.0: 邀请奖励发放逻辑
 import { prisma } from '@/lib/prisma';
-import { trackEvent } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 
 export interface RewardGrantResult {
   success: boolean;
@@ -95,7 +95,6 @@ export async function grantInviteRewards(
       // 创建奖励发放记录
       const grant = await prisma.rewardGrant.create({
         data: {
-          userId: inviterUserId,
           inviteRedemptionId,
           rewardRuleId: rule.id,
           rewardType: rule.rewardType,
@@ -111,36 +110,34 @@ export async function grantInviteRewards(
         result.granted++;
         
         // Track successful reward grant
-        trackEvent({
+        track({
           eventType: 'invite_reward_granted',
           toolName: 'invite-system',
           action: `grant_${rule.rewardType.toLowerCase()}`,
           path: '/api/auth/register',
-          userId: inviterUserId,
           metadata: {
             rewardType: rule.rewardType,
             rewardValue: rule.rewardValue,
             grantId: grant.id,
           },
-        }).catch(err => console.error('Failed to track reward grant:', err));
+        });
       } catch (error) {
         result.failed++;
         result.errors.push(`Failed to grant ${rule.rewardType}: ${error}`);
         
         // Track failed reward grant
-        trackEvent({
+        track({
           eventType: 'invite_reward_failed',
           toolName: 'invite-system',
           action: `failed_${rule.rewardType.toLowerCase()}`,
           path: '/api/auth/register',
-          userId: inviterUserId,
           metadata: {
             rewardType: rule.rewardType,
             rewardValue: rule.rewardValue,
             grantId: grant.id,
             error: error instanceof Error ? error.message : String(error),
           },
-        }).catch(err => console.error('Failed to track reward failure:', err));
+        });
         
         // 更新为失败状态
         await prisma.rewardGrant.update({

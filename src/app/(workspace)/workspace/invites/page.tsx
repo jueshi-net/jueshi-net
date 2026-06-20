@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Copy, Check, ExternalLink, Gift, Users, Calendar, Award } from 'lucide-react';
 import Link from 'next/link';
 import PageHeader from '@/components/workspace/PageHeader';
-import { trackEvent } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 
 interface InviteCode {
   id: string;
@@ -62,7 +62,7 @@ export default function InvitesPage() {
         setInviteCodes([data.inviteCode, ...inviteCodes]);
         
         // Track invite code generation
-        trackEvent({
+        track({
           eventType: 'invite_code_generate',
           toolName: 'invite-system',
           action: 'generate_code',
@@ -70,7 +70,7 @@ export default function InvitesPage() {
           metadata: {
             codeId: data.inviteCode.id,
           },
-        }).catch(err => console.error('Failed to track code generation:', err));
+        });
       } else {
         setError(data.error);
       }
@@ -88,7 +88,7 @@ export default function InvitesPage() {
       setTimeout(() => setCopiedCode(null), 2000);
       
       // Track copy action
-      trackEvent({
+      track({
         eventType: isLink ? 'invite_link_copy' : 'invite_code_copy',
         toolName: 'invite-system',
         action: isLink ? 'copy_link' : 'copy_code',
@@ -96,7 +96,7 @@ export default function InvitesPage() {
         metadata: {
           codeId,
         },
-      }).catch(err => console.error('Failed to track copy action:', err));
+      });
     } catch (error) {
       console.error('Failed to copy:', error);
     }

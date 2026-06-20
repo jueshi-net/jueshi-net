@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as bcrypt from "bcryptjs";
 import { authLimiter } from "@/lib/rate-limiter";
 import { grantInviteRewards } from "@/lib/invite-rewards";
-import { trackEvent } from "@/lib/analytics";
+import { track } from "@/lib/analytics";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Track invite register start
-    trackEvent({
+    track({
       eventType: 'invite_register_start',
       toolName: 'auth',
       action: 'register_with_invite',
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         inviteCode: inviteCode.trim().toUpperCase(),
         email,
       },
-    }).catch(err => console.error('Failed to track register start:', err));
+    });
 
     const invite = await prisma.inviteCode.findUnique({
       where: { code: inviteCode.trim().toUpperCase() },
@@ -107,14 +107,16 @@ export async function POST(req: NextRequest) {
       });
 
       // 积分流水记录
-      await tx.pointLedger.create({
-        data: {
-          userId: user.id,
-          type: "invite_signup",
-          points: 500,
-          reason: "先锋探路官注册奖励",
-        },
-      });
+      if (invite.ownerUserId) {
+        await tx.pointLedger.create({
+          data: {
+            userId: invite.ownerUserId,
+            type: "invite_signup",
+            points: 500,
+            reason: "先锋探路官注册奖励",
+          },
+        });
+      }
 
       // v1.20.42.12.0: 创建邀请关系记录
       if (invite.ownerUserId) {
@@ -160,17 +162,16 @@ export async function POST(req: NextRequest) {
     }).catch(() => {}); // silently ignore workspace creation failure
 
     // Track successful invite register
-    trackEvent({
+    track({
       eventType: 'invite_register_success',
       toolName: 'auth',
       action: 'register_completed_with_invite',
       path: '/api/auth/register',
-      userId: result.id,
       metadata: {
         inviteCode: invite.code,
         inviterUserId: invite.ownerUserId,
       },
-    }).catch(err => console.error('Failed to track register success:', err));
+    });
 
     return NextResponse.json({
       success: true,
