@@ -113,9 +113,8 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
     const tokenRole = (session.user as any).role;
     if (tokenRole) {
       const role = tokenRole.toLowerCase();
-      if (role === "admin" || role === "管理员") return "admin";
-      if (role === "member") return "member";
-      if (role === "user") return "user";
+      if (role === "admin" || role === "管理员" || role === "administrator") return "admin";
+      // For user/member from JWT, fall through to DB check for memberUntil
     }
 
     // Fallback: DB lookup
@@ -138,9 +137,17 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
     if (!dbUser) return "guest";
 
     const role = dbUser.role?.toLowerCase();
-    if (role === "admin" || role === "管理员") return "admin";
-    if (role === "member") return "member";
-    if (role === "user") return "user";
+    if (role === "admin" || role === "管理员" || role === "administrator") return "admin";
+    if (role === "user" || role === "member") {
+      // For user/member roles, check if they have active membership via memberUntil
+      // We need to query memberUntil separately
+      const fullUser = await prisma.user.findUnique({
+        where: { id: userId || "" },
+        select: { memberUntil: true },
+      }).catch(() => null);
+      if (fullUser?.memberUntil && fullUser.memberUntil > new Date()) return "member";
+      return "user";
+    }
 
     return "guest";
   } catch {

@@ -82,11 +82,13 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Auto-upgrade for member_trial: set role to member and update memberUntil
+      // Auto-upgrade for member_trial: ONLY update memberUntil, NEVER touch role.
+      // Role is for permission (admin/user), not membership status.
+      // Membership is determined by memberUntil > now.
       if (rewardItem.rewardType === "member_trial" && expiresAt) {
         const currentUser = await tx.user.findUnique({
           where: { id: userId },
-          select: { memberUntil: true, role: true },
+          select: { memberUntil: true },
         });
 
         // Calculate new memberUntil: extend from current expiry or now
@@ -97,7 +99,6 @@ export async function POST(req: NextRequest) {
         await tx.user.update({
           where: { id: userId },
           data: {
-            role: "member",
             memberUntil: newMemberUntil,
           },
         });

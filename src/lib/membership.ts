@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * Check if the current user is an active member.
- * Admin users are always considered active members for testing convenience.
- * Member check: role === 'member' OR memberUntil > now
+ * Membership is determined by memberUntil > now, NOT by role.
+ * Admin users are always considered active members.
  */
 export async function isActiveMember(): Promise<boolean> {
   try {
@@ -20,12 +20,10 @@ export async function isActiveMember(): Promise<boolean> {
     if (!user) return false;
 
     // Admin always has member privileges
-    if (["管理员", "admin", "member"].includes(user.role)) return true;
+    const role = user.role?.toLowerCase();
+    if (role === "admin" || role === "管理员" || role === "administrator") return true;
 
-    // Check explicit member role
-    if (user.role === "member") return true;
-
-    // Check memberUntil expiration
+    // Check memberUntil expiration — this is the canonical membership check
     if (user.memberUntil && user.memberUntil > new Date()) return true;
 
     return false;
@@ -35,7 +33,8 @@ export async function isActiveMember(): Promise<boolean> {
 }
 
 /**
- * Get current user's role from DB
+ * Get current user's role from DB.
+ * Returns "admin" for admin roles, "member" if memberUntil is active, "user" otherwise.
  */
 export async function getUserRole(): Promise<"guest" | "user" | "member" | "admin"> {
   try {
@@ -44,10 +43,18 @@ export async function getUserRole(): Promise<"guest" | "user" | "member" | "admi
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { role: true },
+      select: { role: true, memberUntil: true },
     });
 
-    return (user?.role as "guest" | "user" | "member" | "admin") || "user";
+    if (!user) return "guest";
+
+    const role = user.role?.toLowerCase();
+    if (role === "admin" || role === "管理员" || role === "administrator") return "admin";
+
+    // Membership from memberUntil, not from role field
+    if (user.memberUntil && user.memberUntil > new Date()) return "member";
+
+    return "user";
   } catch {
     return "guest";
   }
