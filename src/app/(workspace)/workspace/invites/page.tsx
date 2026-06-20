@@ -103,7 +103,7 @@ export default function InvitesPage() {
   };
 
   const getInviteLink = (code: string) => {
-    return `${window.location.origin}/register?invite=${code}`;
+    return `${window.location.origin}/login?invite=${code}`;
   };
 
   if (loading) {
