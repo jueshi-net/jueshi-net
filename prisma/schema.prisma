@@ -1494,6 +1494,10 @@ model LandingPage {
   updatedAt        DateTime @updatedAt @map("updated_at")
   publishedAt      DateTime? @map("published_at")
 
+  // v1.20.42.13.2: Block visibility and order controls
+  blockVisibility  Json?    @map("block_visibility") // {hero: true, primaryTool: true, relatedTools: true, ...}
+  blockOrder       Json?    @map("block_order") // ["hero", "primaryTool", "relatedTools", ...]
+
   @@index([status])
   @@index([pageType])
   @@index([slug])
