@@ -35,13 +35,13 @@ export async function GET() {
 
     // 计算已使用天数
     const usedDays = entitlements
-      .filter((e) => e.metadata && (e.metadata as any).used)
+      .filter((e) => e.rewardMetadata && (e.rewardMetadata as any).used)
       .reduce((sum, e) => sum + e.rewardValue, 0);
 
     // 计算已过期天数
     const now = new Date();
     const expiredDays = entitlements
-      .filter((e) => e.expiresAt && e.expiresAt < now && !(e.metadata && (e.metadata as any).used))
+      .filter((e) => e.expiresAt && e.expiresAt < now && !(e.rewardMetadata && (e.rewardMetadata as any).used))
       .reduce((sum, e) => sum + e.rewardValue, 0);
 
     const availableDays = totalDays - usedDays - expiredDays;
@@ -55,8 +55,8 @@ export async function GET() {
         status: e.status,
         grantedAt: e.grantedAt,
         expiresAt: e.expiresAt,
-        used: e.metadata && (e.metadata as any).used,
-        usedAt: e.metadata && (e.metadata as any).usedAt,
+        used: e.rewardMetadata && (e.rewardMetadata as any).used,
+        usedAt: e.rewardMetadata && (e.rewardMetadata as any).usedAt,
       })),
       summary: {
         totalDays,
