@@ -255,7 +255,7 @@ export default function Header() {
                         <ShieldCheck className="w-4 h-4" /> 管理后台
                       </Link>
                     )}
-                    <button onClick={() => { signOut({ callbackUrl: '/' }); setUserMenuOpen(false); }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <button onClick={async () => { await signOut({ redirect: false }); window.location.href = '/'; }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
                       <LogOut className="w-4 h-4" /> 退出登录
                     </button>
                   </div>
@@ -407,7 +407,7 @@ export default function Header() {
                       </Link>
                     )}
                     <button 
-                      onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false); }} 
+                      onClick={async () => { await signOut({ redirect: false }); window.location.href = '/'; }} 
                       className="flex w-full items-center gap-3 px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors min-h-[48px]"
                     >
                       <LogOut className="w-5 h-5 shrink-0" /> 

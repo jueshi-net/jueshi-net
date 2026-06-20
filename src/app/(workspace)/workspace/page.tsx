@@ -249,6 +249,13 @@ export default async function WorkspacePage() {
           badge={todayChecked ? "已完成" : "待完成"}
         />
         <ActionCard
+          title="积分兑换"
+          description="使用积分兑换会员和权益"
+          icon={<Gift className="w-6 h-6" />}
+          href="/workspace/member#rewards"
+          badge="新"
+        />
+        <ActionCard
           title="邀请奖励"
           description="邀请好友获得会员天数"
           icon={<Gift className="w-6 h-6" />}
@@ -394,7 +401,7 @@ export default async function WorkspacePage() {
             </div>
             <div className="text-xs text-gray-500 space-y-1">
               <p>• 每邀请 1 人获得 3 天会员</p>
-              <p>• 好友注册获得 500 积分</p>
+              <p>• 好友注册获得 50 积分</p>
             </div>
             <Link
               href="/workspace/invites"

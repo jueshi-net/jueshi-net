@@ -219,7 +219,7 @@ export default function InvitesPage() {
         <SectionCard title="邀请奖励说明">
           <div className="space-y-2 text-sm text-gray-700">
             <p>• 每成功邀请一位好友注册，您将获得 <span className="font-bold text-teal-600">3 天会员</span> 奖励</p>
-            <p>• 好友注册后将获得 <span className="font-bold text-teal-600">500 积分</span> 新手奖励</p>
+            <p>• 好友注册后将获得 <span className="font-bold text-teal-600">50 积分</span> 新手奖励</p>
             <p>• 奖励由平台规则决定，可能随活动调整</p>
             <p className="text-xs text-gray-500 mt-2">
               广告权益以内测规则为准，具体请咨询管理员
