@@ -169,6 +169,20 @@ export default function DocumentEditorPage() {
     const nextType = DOCUMENT_CHAIN[type];
     if (!nextType) return;
 
+    // Track toolchain navigation
+    const eventName = `toolchain_${type.replace(/-/g, '_')}_to_${nextType.replace(/-/g, '_')}`;
+    trackEvent({
+      eventType: eventName,
+      toolName: type,
+      action: `navigate_to_${nextType}`,
+      path: `/tools/documents/${type}`,
+      metadata: {
+        sourceType: type,
+        targetType: nextType,
+        lineItemsCount: lineItems.length,
+      },
+    }).catch(err => console.error('Failed to track toolchain navigation:', err));
+
     // Save current document data to task chain
     const lineItemsData = lineItems.map(item => ({
       description: item.description || '',
