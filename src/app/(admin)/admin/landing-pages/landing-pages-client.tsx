@@ -25,7 +25,23 @@ interface LandingPage {
   faqItems: any;
   officialLinks: any;
   ctaConfig: any;
+  blockVisibility: any;
+  blockOrder: any;
 }
+
+// Default block definitions for landing pages
+const BLOCK_DEFS = [
+  { key: "hero", label: "Hero 横幅" },
+  { key: "primaryTool", label: "主工具卡片" },
+  { key: "hotCities", label: "热门城市" },
+  { key: "relatedTools", label: "相关工具" },
+  { key: "relatedTopics", label: "相关专题" },
+  { key: "relatedArticles", label: "相关文章" },
+  { key: "relatedChecklists", label: "相关清单" },
+  { key: "faq", label: "常见问题 FAQ" },
+  { key: "officialLinks", label: "官方链接" },
+  { key: "cta", label: "CTA 行动号召" },
+];
 
 const KNOWN_TOOLS = [
   "shipping-calculator", "shipping-estimator", "hs-code", "sensitive-goods",
@@ -44,7 +60,7 @@ export default function LandingPagesClient() {
   const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({ pageType: "", status: "", search: "" });
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
+  const [form, setForm] = useState({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "", blockVisibility: "{}", blockOrder: "[]" });
 
   // Structured editing state for checklists
   const [editMode, setEditMode] = useState<"structured" | "json">("structured");
@@ -130,6 +146,15 @@ export default function LandingPagesClient() {
       relatedTopics: form.relatedTopics.split(",").map(s => s.trim()).filter(Boolean),
       relatedArticles: form.relatedArticles.split(",").map(s => s.trim()).filter(Boolean),
     };
+    // Parse block visibility and order
+    try {
+      const bv = JSON.parse(form.blockVisibility || "{}");
+      if (Object.keys(bv).length > 0) data.blockVisibility = bv;
+    } catch {}
+    try {
+      const bo = JSON.parse(form.blockOrder || "[]");
+      if (Array.isArray(bo) && bo.length > 0) data.blockOrder = bo;
+    } catch {}
     if (form.pageType === "checklist" && form.heroSectionJson) {
       try {
         data.heroSection = JSON.parse(form.heroSectionJson);
@@ -162,7 +187,7 @@ export default function LandingPagesClient() {
     const method = editing ? "PUT" : "POST";
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
     if (res.ok) {
-      setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" });
+      setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "", blockVisibility: "{}", blockOrder: "[]" });
       setEditing(null);
       setShowForm(false);
       setEditMode("structured");
@@ -177,7 +202,7 @@ export default function LandingPagesClient() {
   const handleEdit = (p: LandingPage) => {
     setEditing(p);
     const heroJson = p.heroSection ? JSON.stringify(p.heroSection, null, 2) : "";
-    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", "), heroSectionJson: heroJson });
+    setForm({ slug: p.slug, title: p.title, seoTitle: p.seoTitle || "", seoDescription: p.seoDescription || "", pageType: p.pageType, status: p.status, primaryTool: p.primaryTool || "", relatedTools: (p.relatedTools || []).join(", "), relatedTopics: (p.relatedTopics || []).join(", "), relatedArticles: (p.relatedArticles || []).join(", "), heroSectionJson: heroJson, blockVisibility: JSON.stringify(p.blockVisibility || {}), blockOrder: JSON.stringify(p.blockOrder || []) });
     if (p.pageType === "checklist") {
       initChecklistForm(heroJson);
       setEditMode("structured");
@@ -509,7 +534,7 @@ export default function LandingPagesClient() {
           <p className="text-sm text-gray-500 mt-1">配置落地页 SEO、关联内容与广告位 | 公开页面: <a href="/lp/[slug]" className="text-teal-600 hover:underline">/lp/[slug]</a> | 清单: <a href="/checklists/[slug]" className="text-purple-600 hover:underline">/checklists/[slug]</a></p>
           <p className="text-xs text-amber-600 mt-1">💡 清单提示：可使用 Hermes ContentOps 生成 checklist draft JSON，人工审核后再发布为 published。</p>
         </div>
-        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "" }); setShowForm(!showForm); setEditMode("structured"); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
+        <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "", blockVisibility: "{}", blockOrder: "[]" }); setShowForm(!showForm); setEditMode("structured"); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建落地页
         </button>
       </div>
@@ -581,6 +606,72 @@ export default function LandingPagesClient() {
             <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-500 mb-1">SEO 描述</label>
               <textarea value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
+            </div>
+            {/* Block Visibility & Order Controls */}
+            <div className="sm:col-span-2 border-t border-gray-100 pt-4">
+              <label className="block text-xs font-medium text-gray-500 mb-2">📦 模块显示与排序</label>
+              <p className="text-xs text-gray-400 mb-3">开关控制模块是否在前台显示，拖拽调整显示顺序。未勾选的模块将不会在公开页面中渲染。</p>
+              <div className="space-y-1.5">
+                {(() => {
+                  let bv: Record<string, boolean> = {};
+                  let bo: string[] = [];
+                  try { bv = JSON.parse(form.blockVisibility || "{}"); } catch {}
+                  try { bo = JSON.parse(form.blockOrder || "[]"); } catch {}
+                  // Build ordered list: items in blockOrder first, then remaining
+                  const ordered = [...bo.filter(k => BLOCK_DEFS.some(d => d.key === k))];
+                  BLOCK_DEFS.forEach(d => { if (!ordered.includes(d.key)) ordered.push(d.key); });
+                  return ordered.map((key, idx) => {
+                    const def = BLOCK_DEFS.find(d => d.key === key);
+                    if (!def) return null;
+                    const visible = bv[key] !== false; // default true
+                    return (
+                      <div key={key} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                        <span className="text-xs text-gray-400 w-5 text-center font-mono">{idx + 1}</span>
+                        <label className="flex items-center gap-2 flex-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={visible}
+                            onChange={e => {
+                              const newBv = { ...bv, [key]: e.target.checked };
+                              setForm(f => ({ ...f, blockVisibility: JSON.stringify(newBv) }));
+                            }}
+                            className="rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                          />
+                          <span className={`text-sm ${visible ? "text-gray-700" : "text-gray-400 line-through"}`}>{def.label}</span>
+                        </label>
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => {
+                              const newBo = [...ordered];
+                              [newBo[idx - 1], newBo[idx]] = [newBo[idx], newBo[idx - 1]];
+                              setForm(f => ({ ...f, blockOrder: JSON.stringify(newBo) }));
+                            }}
+                            className="p-1 text-gray-400 hover:text-teal-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="上移"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={idx === ordered.length - 1}
+                            onClick={() => {
+                              const newBo = [...ordered];
+                              [newBo[idx], newBo[idx + 1]] = [newBo[idx + 1], newBo[idx]];
+                              setForm(f => ({ ...f, blockOrder: JSON.stringify(newBo) }));
+                            }}
+                            className="p-1 text-gray-400 hover:text-teal-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                            title="下移"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
             </div>
             {form.pageType === "checklist" && (
               <div className="sm:col-span-2">

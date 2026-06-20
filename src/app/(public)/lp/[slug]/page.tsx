@@ -12,6 +12,7 @@ import {
   BookOpen,
   Star,
 } from "lucide-react";
+import { BlockViewTracker } from "./block-tracker";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -127,6 +128,20 @@ export default async function LandingPagePublic({ params }: Props) {
   // Extract relatedChecklists from ctaConfig (temporary storage)
   const relatedChecklistSlugs = ctaConfig?.relatedChecklists || [];
 
+  // Block visibility and order controls
+  const blockVisibility = (page.blockVisibility as Record<string, boolean> | null) || {};
+  const blockOrder = (page.blockOrder as string[] | null) || [];
+  const isBlockVisible = (key: string) => blockVisibility[key] !== false; // default: visible
+
+  // Default block order
+  const defaultBlockOrder = ["hero", "primaryTool", "hotCities", "relatedTools", "relatedTopics", "relatedArticles", "relatedChecklists", "faq", "officialLinks", "cta"];
+  // Compute effective order: use blockOrder if set, otherwise default
+  const effectiveOrder = blockOrder.length > 0
+    ? blockOrder.filter(k => defaultBlockOrder.includes(k))
+    : defaultBlockOrder;
+  // Add any blocks not in blockOrder
+  const visibleBlocks = effectiveOrder.filter(isBlockVisible);
+
   // Fetch matching tools
   const tools = relatedTools.map(getToolInfo).filter(Boolean);
   if (page.primaryTool) {
@@ -162,231 +177,244 @@ export default async function LandingPagePublic({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      {hero && (
-        <section className="bg-gradient-to-br from-teal-600 to-teal-800 text-white">
-          <div className="max-w-5xl mx-auto px-4 py-16 sm:py-24 text-center">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-              {hero.title || page.title}
-            </h1>
-            {(hero.subtitle || page.seoDescription) && (
-              <p className="text-lg sm:text-xl text-teal-100 mb-8 max-w-3xl mx-auto">
-                {hero.subtitle || page.seoDescription}
-              </p>
-            )}
-            {hero.ctaText && (
-              <a
-                href={hero.ctaUrl || "#"}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-teal-700 font-semibold rounded-xl hover:bg-teal-50 transition-all shadow-lg text-lg"
-              >
-                {hero.ctaText}
-                <ArrowRight className="w-5 h-5" />
-              </a>
-            )}
-          </div>
-        </section>
-      )}
+      {/* Block View Tracker - tracks which blocks are visible in viewport */}
+      <BlockViewTracker slug={slug} visibleBlocks={visibleBlocks} />
 
-      {/* Primary Tool */}
-      {page.primaryTool && getToolInfo(page.primaryTool) && (
-        <section className="max-w-5xl mx-auto px-4 -mt-8 relative z-10">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-8">
-            {(() => {
-              const t = getToolInfo(page.primaryTool)!;
-              return (
-                <Link href={t.route} className="group flex items-center gap-4">
-                  <span className="text-4xl">{t.icon}</span>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
-                      {t.name}
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-1">{t.desc}</p>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-teal-600 group-hover:translate-x-1 transition-all" />
-                </Link>
-              );
-            })()}
-          </div>
-        </section>
-      )}
-
-      {/* Hot Cities / Regions (Country Page Feature) */}
-      {hotCities.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span className="text-teal-600">🏙️</span>
-            热门城市与地区
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {hotCities.map((city) => (
-              <span
-                key={city}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-teal-300 hover:text-teal-700 transition-colors cursor-default"
-              >
-                {city}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Related Tools */}
-      {tools.length > 1 && (
-        <section className="max-w-5xl mx-auto px-4 py-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-teal-600" />
-            相关工具
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tools.map((t) => (
-              <Link
-                key={t.route}
-                href={t.route}
-                className="group flex flex-col gap-3 p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
-              >
-                <span className="text-3xl">{t.icon}</span>
-                <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">{t.name}</h3>
-                <p className="text-sm text-gray-500">{t.desc}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Ad: landing.block_between */}
-      <section className="max-w-5xl mx-auto px-4 py-4">
-        <SafeAdSlot
-          placementKey="landing.block_between"
-          pageType="landing"
-          pagePath={`/lp/${slug}`}
-          className="mb-8"
-        />
-      </section>
-
-      {/* Related Topics */}
-      {topics.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Star className="w-5 h-5 text-teal-600" />
-            相关专题
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {topics.map((topic) => (
-              <Link
-                key={topic.slug}
-                href={`/topics/${topic.slug}`}
-                className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
-              >
-                <h3 className="font-semibold text-gray-900 group-hover:text-teal-700">{topic.title}</h3>
-                {topic.summary && (
-                  <p className="text-sm text-gray-500 mt-1 line-clamp-2">{topic.summary}</p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Related Articles */}
-      {articles.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-teal-600" />
-            相关文章
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {articles.map((a) => (
-              <Link
-                key={a.slug}
-                href={`/guides/${a.slug}`}
-                className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
-              >
-                {a.category && (
-                  <span className="text-xs text-teal-600 font-medium">{a.category}</span>
-                )}
-                <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 mt-1 line-clamp-2">{a.title}</h3>
-                {a.excerpt && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{a.excerpt}</p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Related Checklists (Country Page Feature) */}
-      {checklists.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span className="text-teal-600">✅</span>
-            相关清单
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {checklists.map((c) => (
-              <Link
-                key={c.slug}
-                href={`/lp/${c.slug}`}
-                className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
-              >
-                <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-2">{c.title}</h3>
-                {c.seoDescription && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{c.seoDescription}</p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* FAQ */}
-      {faqItems.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">常见问题</h2>
-          <FAQAccordion items={faqItems} />
-        </section>
-      )}
-
-      {/* Official Links */}
-      {officialLinks.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">官方链接</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {officialLinks.map((link, i) => (
-              <a
-                key={i}
-                href={link.url}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="group flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
-              >
-                <span className="text-2xl">{link.icon || "🔗"}</span>
-                <div>
-                  <p className="font-medium text-gray-900 group-hover:text-teal-700">{link.label}</p>
-                  <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
-                    <ExternalLink className="w-3 h-3" /> 访问官网
-                  </div>
+      {/* Render blocks in configured order */}
+      {visibleBlocks.map((blockKey) => {
+        switch (blockKey) {
+          case "hero":
+            return hero ? (
+              <section key="hero" data-block="hero" className="bg-gradient-to-br from-teal-600 to-teal-800 text-white">
+                <div className="max-w-5xl mx-auto px-4 py-16 sm:py-24 text-center">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                    {hero.title || page.title}
+                  </h1>
+                  {(hero.subtitle || page.seoDescription) && (
+                    <p className="text-lg sm:text-xl text-teal-100 mb-8 max-w-3xl mx-auto">
+                      {hero.subtitle || page.seoDescription}
+                    </p>
+                  )}
+                  {hero.ctaText && (
+                    <a
+                      href={hero.ctaUrl || "#"}
+                      className="inline-flex items-center gap-2 px-8 py-4 bg-white text-teal-700 font-semibold rounded-xl hover:bg-teal-50 transition-all shadow-lg text-lg"
+                    >
+                      {hero.ctaText}
+                      <ArrowRight className="w-5 h-5" />
+                    </a>
+                  )}
                 </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+              </section>
+            ) : null;
 
-      {/* CTA */}
-      {ctaConfig && ctaConfig.text && (
-        <section className="max-w-5xl mx-auto px-4 py-12">
-          <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-8 sm:p-12 text-center text-white">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">{ctaConfig.text}</h2>
-            {ctaConfig.url && (
-              <a
-                href={ctaConfig.url}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-teal-700 font-semibold rounded-xl hover:bg-teal-50 transition-all shadow-lg"
-              >
-                {ctaConfig.text}
-                <ArrowRight className="w-5 h-5" />
-              </a>
-            )}
-          </div>
+          case "primaryTool":
+            return page.primaryTool && getToolInfo(page.primaryTool) ? (
+              <section key="primaryTool" data-block="primaryTool" className="max-w-5xl mx-auto px-4 -mt-8 relative z-10">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sm:p-8">
+                  {(() => {
+                    const t = getToolInfo(page.primaryTool)!;
+                    return (
+                      <Link href={t.route} className="group flex items-center gap-4">
+                        <span className="text-4xl">{t.icon}</span>
+                        <div className="flex-1">
+                          <h2 className="text-xl font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
+                            {t.name}
+                          </h2>
+                          <p className="text-sm text-gray-500 mt-1">{t.desc}</p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-teal-600 group-hover:translate-x-1 transition-all" />
+                      </Link>
+                    );
+                  })()}
+                </div>
+              </section>
+            ) : null;
+
+          case "hotCities":
+            return hotCities.length > 0 ? (
+              <section key="hotCities" data-block="hotCities" className="max-w-5xl mx-auto px-4 py-12">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="text-teal-600">🏙️</span>
+                  热门城市与地区
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {hotCities.map((city) => (
+                    <span
+                      key={city}
+                      className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:border-teal-300 hover:text-teal-700 transition-colors cursor-default"
+                    >
+                      {city}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "relatedTools":
+            return tools.length > 1 ? (
+              <section key="relatedTools" data-block="relatedTools" className="max-w-5xl mx-auto px-4 py-12">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <Wrench className="w-5 h-5 text-teal-600" />
+                  相关工具
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {tools.map((t) => (
+                    <Link
+                      key={t.route}
+                      href={t.route}
+                      className="group flex flex-col gap-3 p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+                    >
+                      <span className="text-3xl">{t.icon}</span>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">{t.name}</h3>
+                      <p className="text-sm text-gray-500">{t.desc}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "relatedTopics":
+            return topics.length > 0 ? (
+              <section key="relatedTopics" data-block="relatedTopics" className="max-w-5xl mx-auto px-4 py-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-teal-600" />
+                  相关专题
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {topics.map((topic) => (
+                    <Link
+                      key={topic.slug}
+                      href={`/topics/${topic.slug}`}
+                      className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+                    >
+                      <h3 className="font-semibold text-gray-900 group-hover:text-teal-700">{topic.title}</h3>
+                      {topic.summary && (
+                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">{topic.summary}</p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "relatedArticles":
+            return articles.length > 0 ? (
+              <section key="relatedArticles" data-block="relatedArticles" className="max-w-5xl mx-auto px-4 py-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-teal-600" />
+                  相关文章
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {articles.map((a) => (
+                    <Link
+                      key={a.slug}
+                      href={`/guides/${a.slug}`}
+                      className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+                    >
+                      {a.category && (
+                        <span className="text-xs text-teal-600 font-medium">{a.category}</span>
+                      )}
+                      <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 mt-1 line-clamp-2">{a.title}</h3>
+                      {a.excerpt && (
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{a.excerpt}</p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "relatedChecklists":
+            return checklists.length > 0 ? (
+              <section key="relatedChecklists" data-block="relatedChecklists" className="max-w-5xl mx-auto px-4 py-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <span className="text-teal-600">✅</span>
+                  相关清单
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {checklists.map((c) => (
+                    <Link
+                      key={c.slug}
+                      href={`/lp/${c.slug}`}
+                      className="group p-5 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+                    >
+                      <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-2">{c.title}</h3>
+                      {c.seoDescription && (
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{c.seoDescription}</p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "faq":
+            return faqItems.length > 0 ? (
+              <section key="faq" data-block="faq" className="max-w-5xl mx-auto px-4 py-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">常见问题</h2>
+                <FAQAccordion items={faqItems} />
+              </section>
+            ) : null;
+
+          case "officialLinks":
+            return officialLinks.length > 0 ? (
+              <section key="officialLinks" data-block="officialLinks" className="max-w-5xl mx-auto px-4 py-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">官方链接</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {officialLinks.map((link, i) => (
+                    <a
+                      key={i}
+                      href={link.url}
+                      target="_blank"
+                      rel="nofollow noopener noreferrer"
+                      className="group flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-white hover:shadow-md hover:border-teal-200 transition-all"
+                    >
+                      <span className="text-2xl">{link.icon || "🔗"}</span>
+                      <div>
+                        <p className="font-medium text-gray-900 group-hover:text-teal-700">{link.label}</p>
+                        <div className="flex items-center gap-1 text-xs text-gray-400 mt-0.5">
+                          <ExternalLink className="w-3 h-3" /> 访问官网
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            ) : null;
+
+          case "cta":
+            return ctaConfig && ctaConfig.text ? (
+              <section key="cta" data-block="cta" className="max-w-5xl mx-auto px-4 py-12">
+                <div className="bg-gradient-to-r from-teal-600 to-teal-700 rounded-2xl p-8 sm:p-12 text-center text-white">
+                  <h2 className="text-2xl sm:text-3xl font-bold mb-4">{ctaConfig.text}</h2>
+                  {ctaConfig.url && (
+                    <a
+                      href={ctaConfig.url}
+                      className="inline-flex items-center gap-2 px-8 py-4 bg-white text-teal-700 font-semibold rounded-xl hover:bg-teal-50 transition-all shadow-lg"
+                    >
+                      {ctaConfig.text}
+                      <ArrowRight className="w-5 h-5" />
+                    </a>
+                  )}
+                </div>
+              </section>
+            ) : null;
+
+          default:
+            return null;
+        }
+      })}
+
+      {/* Ad: landing.block_between - always shown between tools and topics if relatedTools is visible */}
+      {isBlockVisible("relatedTools") && (
+        <section className="max-w-5xl mx-auto px-4 py-4">
+          <SafeAdSlot
+            placementKey="landing.block_between"
+            pageType="landing"
+            pagePath={`/lp/${slug}`}
+            className="mb-8"
+          />
         </section>
       )}
 

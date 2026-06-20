@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
       pageType: true, status: true, primaryTool: true, relatedTools: true,
       relatedTopics: true, relatedArticles: true, createdAt: true, updatedAt: true, publishedAt: true,
       heroSection: true, faqItems: true, officialLinks: true, ctaConfig: true,
+      blockVisibility: true, blockOrder: true,
     },
   });
   return NextResponse.json(pages);
@@ -68,6 +69,8 @@ export async function POST(req: NextRequest) {
         officialLinks: body.officialLinks || null,
         adPlacements: body.adPlacements || null,
         ctaConfig: body.ctaConfig || null,
+        blockVisibility: body.blockVisibility || null,
+        blockOrder: body.blockOrder || null,
       },
     });
     return NextResponse.json(page, { status: 201 });

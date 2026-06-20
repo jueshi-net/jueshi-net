@@ -38,6 +38,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ...(body.officialLinks !== undefined && { officialLinks: body.officialLinks }),
         ...(body.adPlacements !== undefined && { adPlacements: body.adPlacements }),
         ...(body.ctaConfig !== undefined && { ctaConfig: body.ctaConfig }),
+        ...(body.blockVisibility !== undefined && { blockVisibility: body.blockVisibility }),
+        ...(body.blockOrder !== undefined && { blockOrder: body.blockOrder }),
         ...(body.status === "published" && !body.publishedAt && { publishedAt: new Date() }),
       },
     });

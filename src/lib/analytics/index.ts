@@ -171,4 +171,59 @@ export const trackEvent = {
     toolName: 'checklist',
     action: `click_from_${sourcePath}`,
   }),
+
+  // 落地页：模块浏览
+  landingPageBlockView: (slug: string, blockName: string) => track({
+    eventType: 'landing_page_block_view',
+    toolName: 'landing-page',
+    action: `view_${blockName}`,
+    metadata: { slug, blockName },
+  }),
+
+  // 落地页：模块内点击
+  landingPageBlockClick: (slug: string, blockName: string, target?: string) => track({
+    eventType: 'landing_page_block_click',
+    toolName: 'landing-page',
+    action: `click_${blockName}`,
+    metadata: { slug, blockName, target },
+  }),
+
+  // 广告权益：查看
+  adEntitlementView: () => track({
+    eventType: 'ad_entitlement_view',
+    toolName: 'ad-entitlements',
+    action: 'view',
+  }),
+
+  // 广告权益：提交申请
+  adEntitlementApply: (placementKey: string) => track({
+    eventType: 'ad_entitlement_apply',
+    toolName: 'ad-entitlements',
+    action: 'apply',
+    metadata: { placementKey },
+  }),
+
+  // 广告权益：管理员批准
+  adEntitlementApprove: (applicationId: string) => track({
+    eventType: 'ad_entitlement_approve',
+    toolName: 'ad-entitlements',
+    action: 'approve',
+    metadata: { applicationId },
+  }),
+
+  // 广告权益：管理员拒绝
+  adEntitlementReject: (applicationId: string) => track({
+    eventType: 'ad_entitlement_reject',
+    toolName: 'ad-entitlements',
+    action: 'reject',
+    metadata: { applicationId },
+  }),
+
+  // 广告权益：使用（投放开始）
+  adEntitlementUse: (applicationId: string, placementKey: string) => track({
+    eventType: 'ad_entitlement_use',
+    toolName: 'ad-entitlements',
+    action: 'use',
+    metadata: { applicationId, placementKey },
+  }),
 };
