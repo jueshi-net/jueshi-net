@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Package, Plus, Archive, Trash2, Play, Loader2, Clock,
   CheckCircle, AlertCircle, ChevronRight, ExternalLink,
-  FileText, MapPin, Calculator, Shield,
+  FileText, MapPin, Calculator, Shield, Search, Filter,
+  Copy, Edit2, X, Save, MoreVertical,
 } from 'lucide-react';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
@@ -42,7 +43,11 @@ export default function TaskChainsClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'archived'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTaskChains();
@@ -80,6 +85,7 @@ export default function TaskChainsClient() {
       });
       if (res.ok) {
         setTaskChains(prev => prev.map(tc => tc.id === id ? { ...tc, status: 'archived' } : tc));
+        setActionMenuId(null);
       }
     } catch (err) {
       console.error('Failed to archive:', err);
@@ -98,15 +104,82 @@ export default function TaskChainsClient() {
       alert('删除失败');
     } finally {
       setDeletingId(null);
+      setActionMenuId(null);
     }
   };
 
-  const filteredChains = filter === 'all'
-    ? taskChains
-    : taskChains.filter(tc => tc.status === filter);
+  const handleRename = async (id: string) => {
+    if (!renameValue.trim()) return;
+    try {
+      const res = await fetch(`/api/task-chains/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: renameValue.trim() }),
+      });
+      if (res.ok) {
+        setTaskChains(prev => prev.map(tc => tc.id === id ? { ...tc, title: renameValue.trim() } : tc));
+        setRenamingId(null);
+        setRenameValue('');
+        setActionMenuId(null);
+      }
+    } catch (err) {
+      console.error('Failed to rename:', err);
+    }
+  };
+
+  const handleDuplicate = async (task: TaskChainDraft) => {
+    try {
+      const res = await fetch('/api/task-chains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `${task.title} (副本)`,
+          sourceTool: task.sourceTool,
+          context: {
+            ...task.context,
+            currentStep: 0,
+            completedSteps: [],
+          },
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const newTask = {
+          ...data.taskChain,
+          currentStep: 0,
+          completedSteps: [],
+        };
+        setTaskChains(prev => [newTask, ...prev]);
+        setActionMenuId(null);
+      }
+    } catch (err) {
+      console.error('Failed to duplicate:', err);
+      alert('复制失败');
+    }
+  };
+
+  // Filter and search
+  const filteredChains = taskChains
+    .filter(tc => filter === 'all' || tc.status === filter)
+    .filter(tc => {
+      if (!searchQuery.trim()) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        tc.title.toLowerCase().includes(query) ||
+        tc.context?.productName?.toLowerCase().includes(query) ||
+        tc.context?.destinationCountry?.toLowerCase().includes(query)
+      );
+    });
 
   const activeCount = taskChains.filter(tc => tc.status === 'active').length;
   const completedCount = taskChains.filter(tc => tc.status === 'completed').length;
+  const archivedCount = taskChains.filter(tc => tc.status === 'archived').length;
+
+  // Recent tasks (last 5 active)
+  const recentTasks = taskChains
+    .filter(tc => tc.status === 'active')
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 5);
 
   if (loading) {
     return (
@@ -141,7 +214,7 @@ export default function TaskChainsClient() {
           { label: `全部 (${taskChains.length})`, active: filter === 'all', onClick: () => setFilter('all') },
           { label: `进行中 (${activeCount})`, active: filter === 'active', onClick: () => setFilter('active') },
           { label: `已完成 (${completedCount})`, active: filter === 'completed', onClick: () => setFilter('completed') },
-          { label: '已归档', active: filter === 'archived', onClick: () => setFilter('archived') },
+          { label: `已归档 (${archivedCount})`, active: filter === 'archived', onClick: () => setFilter('archived') },
         ]}
       />
 
@@ -165,10 +238,60 @@ export default function TaskChainsClient() {
             icon={<CheckCircle className="w-5 h-5" />}
           />
           <MetricCard
-            label="待处理"
-            value={taskChains.filter(tc => tc.status === 'active' && tc.completedSteps.length < 10).length}
-            icon={<AlertCircle className="w-5 h-5" />}
+            label="已归档"
+            value={archivedCount}
+            icon={<Archive className="w-5 h-5" />}
           />
+        </div>
+
+        {/* Recent Tasks */}
+        {recentTasks.length > 0 && (
+          <SectionCard title="最近任务" subtitle="最近更新的 5 个进行中任务">
+            <div className="space-y-2">
+              {recentTasks.map((tc) => (
+                <Link
+                  key={tc.id}
+                  href={`/workspace/task-chains/shipping/${tc.id}`}
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 transition-all"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                      <Package className="w-4 h-4 text-teal-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">{tc.title}</h4>
+                      <p className="text-xs text-gray-500">
+                        步骤 {tc.currentStep + 1}/10 · {new Date(tc.updatedAt).toLocaleDateString('zh-CN')}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                </Link>
+              ))}
+            </div>
+          </SectionCard>
+        )}
+
+        {/* Search and Filter */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="搜索任务名称、商品、目的国..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {error && (
@@ -183,17 +306,19 @@ export default function TaskChainsClient() {
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-gray-600 font-medium mb-1">
-              {filter === 'all' ? '暂无任务链' : `暂无${STATUS_CONFIG[filter]?.label || ''}任务`}
+              {searchQuery ? '未找到匹配的任务' : filter === 'all' ? '暂无任务链' : `暂无${STATUS_CONFIG[filter]?.label || ''}任务`}
             </h3>
             <p className="text-sm text-gray-400 mb-4">
-              创建一个新的发货任务，开始跨境贸易流程
+              {searchQuery ? '尝试其他关键词' : '创建一个新的发货任务，开始跨境贸易流程'}
             </p>
-            <Link
-              href="/workspace/task-chains/shipping/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" /> 新建发货任务
-            </Link>
+            {!searchQuery && (
+              <Link
+                href="/workspace/task-chains/shipping/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" /> 新建发货任务
+              </Link>
+            )}
           </div>
         ) : (
           <SectionCard title={`${filter === 'all' ? '全部任务' : STATUS_CONFIG[filter]?.label || ''} (${filteredChains.length})`}>
@@ -227,10 +352,44 @@ export default function TaskChainsClient() {
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{tc.title}</h3>
-                          <StatusBadge label={statusCfg.label} variant={statusCfg.variant} size="sm" dot />
-                        </div>
+                        {renamingId === tc.id ? (
+                          <div className="flex items-center gap-2 mb-2">
+                            <input
+                              type="text"
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              className="flex-1 px-2 py-1 border border-gray-200 rounded text-sm"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleRename(tc.id);
+                                if (e.key === 'Escape') {
+                                  setRenamingId(null);
+                                  setRenameValue('');
+                                }
+                              }}
+                            />
+                            <button
+                              onClick={() => handleRename(tc.id)}
+                              className="p-1 text-teal-600 hover:bg-teal-50 rounded"
+                            >
+                              <Save className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setRenamingId(null);
+                                setRenameValue('');
+                              }}
+                              className="p-1 text-gray-400 hover:bg-gray-50 rounded"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-900 truncate">{tc.title}</h3>
+                            <StatusBadge label={statusCfg.label} variant={statusCfg.variant} size="sm" dot />
+                          </div>
+                        )}
 
                         {/* Step Progress Bar */}
                         <div className="flex items-center gap-0.5 mb-2">
@@ -266,6 +425,11 @@ export default function TaskChainsClient() {
                               商品: {tc.context.productName}
                             </span>
                           )}
+                          {tc.context?.destinationCountry && (
+                            <span className="truncate max-w-[100px]">
+                              目的国: {tc.context.destinationCountry}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -287,27 +451,57 @@ export default function TaskChainsClient() {
                             <ChevronRight className="w-3 h-3" /> 查看
                           </Link>
                         )}
-                        {tc.status === 'active' && (
+                        
+                        {/* Action Menu */}
+                        <div className="relative">
                           <button
-                            onClick={() => handleArchive(tc.id)}
+                            onClick={() => setActionMenuId(actionMenuId === tc.id ? null : tc.id)}
                             className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                            title="归档"
                           >
-                            <Archive className="w-3.5 h-3.5" />
+                            <MoreVertical className="w-4 h-4" />
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleDelete(tc.id)}
-                          disabled={deletingId === tc.id}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-50 transition-colors"
-                          title="删除"
-                        >
-                          {deletingId === tc.id ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Trash2 className="w-3.5 h-3.5" />
+                          
+                          {actionMenuId === tc.id && (
+                            <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                              <button
+                                onClick={() => {
+                                  setRenamingId(tc.id);
+                                  setRenameValue(tc.title);
+                                  setActionMenuId(null);
+                                }}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                <Edit2 className="w-4 h-4" /> 重命名
+                              </button>
+                              <button
+                                onClick={() => handleDuplicate(tc)}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                <Copy className="w-4 h-4" /> 复制任务
+                              </button>
+                              {tc.status === 'active' && (
+                                <button
+                                  onClick={() => handleArchive(tc.id)}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  <Archive className="w-4 h-4" /> 归档
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDelete(tc.id)}
+                                disabled={deletingId === tc.id}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+                              >
+                                {deletingId === tc.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                                删除
+                              </button>
+                            </div>
                           )}
-                        </button>
+                        </div>
                       </div>
                     </div>
                   </div>
