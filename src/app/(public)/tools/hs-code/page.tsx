@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, Package, ExternalLink, ChevronDown, ChevronUp, Loader2, Copy, Check, Clock, Truck, AlertTriangle, Bookmark, BookmarkCheck, Shield, FileText, Calculator } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Search, Package, ExternalLink, ChevronDown, ChevronUp, Loader2, Copy, Check, Clock, Truck, AlertTriangle, Bookmark, BookmarkCheck, Shield, FileText, Calculator, Link2 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
@@ -153,6 +155,8 @@ function getSuggestedQueries(query: string): string[] {
 }
 
 export default function HSCodePage() {
+  const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<HSCodeItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -164,6 +168,7 @@ export default function HSCodePage() {
   const [error, setError] = useState<string | null>(null);
   const [savedProduct, setSavedProduct] = useState<string | null>(null);
   const [aliasUsed, setAliasUsed] = useState<string | null>(null); // Track if alias was used
+  const [taskChainCreating, setTaskChainCreating] = useState<string | null>(null);
   
   // Request sequence guard + AbortController
   const requestSeqRef = useRef(0);
@@ -430,6 +435,43 @@ export default function HSCodePage() {
     try { localStorage.removeItem(FAVORITES_KEY); } catch { /* empty */ }
   }, []);
 
+  const joinShippingTaskChain = useCallback(async (item: HSCodeItem) => {
+    if (sessionStatus === 'loading') return;
+    if (!session?.user) {
+      // Redirect to login
+      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    setTaskChainCreating(item.code);
+    try {
+      const res = await fetch('/api/task-chains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `发货任务 - ${item.description}`,
+          sourceTool: 'hs-code',
+          context: {
+            hsCode: item.code,
+            productDescription: item.descriptionEn || item.description,
+            productName: activeQuery,
+          },
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.taskChain) {
+        trackEvent.custom('hs-code', 'join_shipping_task_chain');
+        router.push(`/workspace/task-chains/shipping/${json.taskChain.id}`);
+      } else {
+        alert(json.error || '创建任务链失败');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('网络错误，请稍后重试');
+    } finally {
+      setTaskChainCreating(null);
+    }
+  }, [session, sessionStatus, router, activeQuery]);
+
   const sensitiveQuery = isSensitiveQuery(activeQuery);
 
   return (
@@ -681,6 +723,18 @@ export default function HSCodePage() {
                       >
                         <Bookmark className="w-3 h-3" />
                         {savedProduct === item.code ? '已保存' : '保存到商品资料库'}
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); joinShippingTaskChain(item); }}
+                        disabled={taskChainCreating === item.code}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {taskChainCreating === item.code ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <Link2 className="w-3 h-3" />
+                        )}
+                        {sessionStatus !== 'authenticated' ? '登录后继续' : '加入发货任务链'}
                       </button>
                     </div>
 

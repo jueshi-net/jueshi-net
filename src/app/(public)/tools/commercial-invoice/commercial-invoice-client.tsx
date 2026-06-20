@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, Printer, Building2, Plus, Trash2, FileText, Loader2, Eye, Code, Landmark } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
+import TaskChainGeneratorButton from "@/components/tools/task-chain-generator-button";
 import { useDraftLoader } from "@/lib/use-draft-loader";
 import { useFreemiumGate } from "@/hooks/use-freemium-gate";
 import PaywallModal from "@/components/ui/paywall-modal";
@@ -326,6 +327,46 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     setBankDetails(prev => ({ ...prev, [field]: value }));
   };
 
+  // ── Task Chain: fill form from selected task chain ──
+  const handleTaskChainSelect = (context: Record<string, any>) => {
+    // Fill buyer info
+    if (context.buyerName && !clientName) setClientName(context.buyerName);
+    if (context.buyerAddress && !clientAddress) setClientAddress(context.buyerAddress);
+
+    // Fill line items from task chain
+    if (context.lineItems && context.lineItems.length > 0) {
+      const hasExistingItems = lineItems.some(l => l.description);
+      if (!hasExistingItems) {
+        const newItems: LineItem[] = context.lineItems.map((item: any, idx: number) => ({
+          id: `tc-${idx}-${Date.now()}`,
+          description: item.description || '',
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || 0,
+          currency: item.currency || 'USD',
+        }));
+        setLineItems(newItems);
+      }
+    } else if (context.productName) {
+      // Legacy: single product from task chain
+      const hasExistingItems = lineItems.some(l => l.description);
+      if (!hasExistingItems) {
+        setLineItems([{
+          id: `tc-0-${Date.now()}`,
+          description: context.productDescription || context.productName || '',
+          quantity: 1,
+          unitPrice: parseFloat(context.declaredValue || context.convertedValue || '0') || 0,
+          currency: context.currency || 'USD',
+        }]);
+      }
+    }
+
+    // Fill invoice number if available
+    if (context.invoiceNo && !invoiceNo) setInvoiceNo(context.invoiceNo);
+
+    // Fill payment terms
+    if (context.terms && paymentTerms === 'T/T') setPaymentTerms(context.terms);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Header */}
@@ -341,6 +382,10 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
             </h1>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+            <TaskChainGeneratorButton
+              onSelect={handleTaskChainSelect}
+              filterSourceTools={['hs-code', 'exchange-rate', 'shipping-calculator', 'address-formatter', 'postal-code', 'quotation', 'proforma-invoice']}
+            />
             {currentDocId && (
               <ToolHistoryPanel documentId={currentDocId} toolKey="commercial_invoice" onRestore={handleRestore} />
             )}

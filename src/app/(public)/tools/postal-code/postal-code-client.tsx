@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator, Globe, FileText, Sparkles } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator, Globe, FileText, Sparkles, Link2 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { AdSlot } from '@/components/ads/AdSlot';
 import { CountryInfoSection } from '@/components/country-info-section';
@@ -152,6 +154,8 @@ function usePersistedState<T>(key: string, defaultValue: T): [T, React.Dispatch<
 }
 
 export default function PostalCodePage() {
+  const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
   const [selectedCountryCode, setSelectedCountryCode] = usePersistedState<string>(STORAGE_KEY + '-country', 'CA');
   const [inputCode, setInputCode] = usePersistedState<string>(STORAGE_KEY + '-input', '');
   const [validationResult, setValidationResult] = useState<ValidationDetail | null>(null);
@@ -160,6 +164,7 @@ export default function PostalCodePage() {
   const [countrySearch, setCountrySearch] = useState('');
   const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
   const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('postal');
+  const [taskChainCreating, setTaskChainCreating] = useState(false);
 
   // Track Tool_View on mount
   useEffect(() => {
@@ -493,6 +498,52 @@ export default function PostalCodePage() {
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 1500);
     } catch { /* ignore */ }
+  };
+
+  const joinShippingTaskChain = async (result?: DbResult) => {
+    if (sessionStatus === 'loading') return;
+    if (!session?.user) {
+      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    setTaskChainCreating(true);
+    try {
+      const context: Record<string, string> = {
+        destinationCountry: country.name,
+      };
+      if (result) {
+        context.postalCode = result.postalCode;
+        context.addressText = `${result.city}${result.areaName && result.areaName !== result.city ? ` (${result.areaName})` : ''}, ${result.province || result.adminName1 || ''}`.trim();
+      } else if (dbResults.length > 0) {
+        const first = dbResults[0];
+        context.postalCode = first.postalCode;
+        context.addressText = `${first.city}, ${first.province || first.adminName1 || ''}`.trim();
+      } else if (inputCode) {
+        context.postalCode = inputCode;
+      }
+
+      const res = await fetch('/api/task-chains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `发货任务 - ${country.name} ${context.postalCode || inputCode || ''}`.trim(),
+          sourceTool: 'postal-code',
+          context,
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.taskChain) {
+        trackEvent.custom('postal-code', 'join_shipping_task_chain');
+        router.push(`/workspace/task-chains/shipping/${json.taskChain.id}`);
+      } else {
+        alert(json.error || '创建任务链失败');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('网络错误，请稍后重试');
+    } finally {
+      setTaskChainCreating(false);
+    }
   };
 
   // Advanced city search (Mode 1: 查邮编)
@@ -1485,6 +1536,25 @@ export default function PostalCodePage() {
                           className="px-3 py-2 min-h-[44px] text-sm rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 transition-colors">下一页</button>
                       </div>
                     )}
+
+                    {/* 加入发货任务链按钮 */}
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <button
+                        onClick={() => joinShippingTaskChain()}
+                        disabled={taskChainCreating}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {taskChainCreating ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Link2 className="w-4 h-4" />
+                        )}
+                        <span>{sessionStatus !== 'authenticated' ? '登录后继续' : '加入发货任务链'}</span>
+                      </button>
+                      <p className="text-xs text-teal-600 dark:text-teal-400 mt-1.5 text-center">
+                        将查询到的地址信息带入发货任务链工作台，继续安排发货。
+                      </p>
+                    </div>
                   </>
                 )}
 

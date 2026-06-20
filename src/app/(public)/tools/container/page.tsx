@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Container, Info } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Container, Info, Link2, Loader2 } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
@@ -64,6 +65,7 @@ const parseBulkCargo = (text: string): { rows: BulkCargoRow[]; errors: string[] 
 
 export default function ContainerCalculatorPage() {
   const router = useRouter();
+  const { data: session, status: sessionStatus } = useSession();
   const [cargoL, setCargoL] = useState(0);
   const [cargoW, setCargoW] = useState(0);
   const [cargoH, setCargoH] = useState(0);
@@ -77,6 +79,7 @@ export default function ContainerCalculatorPage() {
   const [bulkRows, setBulkRows] = useState<BulkCargoRow[]>([]);
   const [bulkErrors, setBulkErrors] = useState<string[]>([]);
   const [bulkImportApplied, setBulkImportApplied] = useState(false);
+  const [taskChainCreating, setTaskChainCreating] = useState(false);
 
   // 单件体积 (m³)
   const singleVolume = (cargoL * cargoW * cargoH) / 1000000;
@@ -153,6 +156,45 @@ export default function ContainerCalculatorPage() {
       router.push('/tools/shipping-calculator');
     } else {
       alert('无法保存数据，请检查浏览器设置');
+    }
+  };
+
+  const joinShippingTaskChain = async () => {
+    if (sessionStatus === 'loading') return;
+    if (!session?.user) {
+      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    setTaskChainCreating(true);
+    try {
+      const res = await fetch('/api/task-chains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `发货任务 - CBM ${overallVolume.toFixed(4)} m³`,
+          sourceTool: 'container',
+          context: {
+            totalCbm: overallVolume,
+            totalWeightKg: overallWeight,
+            totalQuantity: overallQuantity,
+            unitLengthCm: cargoL,
+            unitWidthCm: cargoW,
+            unitHeightCm: cargoH,
+            unitWeightKg: cargoWeight,
+          },
+        }),
+      });
+      const json = await res.json();
+      if (json.success && json.taskChain) {
+        router.push(`/workspace/task-chains/shipping/${json.taskChain.id}`);
+      } else {
+        alert(json.error || '创建任务链失败');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('网络错误，请稍后重试');
+    } finally {
+      setTaskChainCreating(false);
     }
   };
 
@@ -280,6 +322,21 @@ export default function ContainerCalculatorPage() {
                 </button>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 text-center">
                   将当前体积、重量和件数带入运费计算器，便于继续估算运输成本。
+                </p>
+                <button
+                  onClick={joinShippingTaskChain}
+                  disabled={taskChainCreating}
+                  className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {taskChainCreating ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Link2 className="w-4 h-4" />
+                  )}
+                  <span>{sessionStatus !== 'authenticated' ? '登录后继续' : '加入发货任务链'}</span>
+                </button>
+                <p className="text-xs text-teal-600 dark:text-teal-400 mt-1.5 text-center">
+                  创建发货任务链，将 CBM、重量等数据带入发货工作台继续操作。
                 </p>
               </div>
             )}

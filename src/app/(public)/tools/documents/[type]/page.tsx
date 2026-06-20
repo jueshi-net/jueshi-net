@@ -22,6 +22,7 @@ import { buildA4ExportHTML, A4_WIDTH, A4_HEIGHT, A4_EXPORT_SCALE } from '@/lib/d
 import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData, saveTaskChain, DOCUMENT_CHAIN, DOCUMENT_CHAIN_LABELS, buildTaskChainURL } from '@/lib/task-chain';
 import { track, trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
+import TaskChainGeneratorButton from '@/components/tools/task-chain-generator-button';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -210,6 +211,70 @@ export default function DocumentEditorPage() {
     trackEvent.custom(type, 'task_chain_clear');
     setTaskChainData(null);
     setShowTaskChainBanner(false);
+  };
+
+  // ── Task Chain Generator: fill form from a saved task chain (API) ──
+  const handleTaskChainGeneratorSelect = (context: Record<string, any>) => {
+    // Fill buyer info
+    if (context.buyerName && !formData.buyerName && !formData.customerName) {
+      setFormData(prev => ({ ...prev, buyerName: context.buyerName }));
+    }
+    if (context.buyerAddress && !formData.buyerAddress && !formData.customerAddress) {
+      setFormData(prev => ({ ...prev, buyerAddress: context.buyerAddress }));
+    }
+    if (context.buyerContact && !formData.buyerContact && !formData.customerContact) {
+      setFormData(prev => ({ ...prev, buyerContact: context.buyerContact }));
+    }
+
+    // Fill line items from task chain
+    if (context.lineItems && context.lineItems.length > 0) {
+      const hasExistingData = lineItems.some(item => item.description || item.hsCode);
+      if (!hasExistingData) {
+        setLineItems(context.lineItems.map((item: any) => ({
+          description: item.description || '',
+          hsCode: item.hsCode || '',
+          quantity: item.quantity?.toString() || '',
+          unitPrice: item.unitPrice?.toString() || '',
+          currency: item.currency || formData.currency || 'USD',
+          unit: item.unit || 'PCS',
+          netWeight: item.netWeight?.toString() || '',
+          grossWeight: item.grossWeight?.toString() || '',
+        })));
+      }
+    } else if (context.productName || context.hsCode) {
+      // Legacy single-product chain
+      const hasExistingData = lineItems.some(item => item.description || item.hsCode);
+      if (!hasExistingData) {
+        setLineItems([{
+          description: context.productDescription || context.productName || '',
+          hsCode: context.hsCode || '',
+          quantity: '',
+          unitPrice: context.declaredValue || context.convertedValue || '',
+          currency: context.currency || formData.currency || 'USD',
+          unit: 'PCS',
+          netWeight: '',
+          grossWeight: '',
+        }]);
+      }
+    }
+
+    // Fill other fields
+    const updates: Record<string, any> = {};
+    if (context.invoiceNo && !formData.invoiceNo) updates.invoiceNo = context.invoiceNo;
+    if (context.terms && !formData.terms) updates.terms = context.terms;
+    if (context.currency && !formData.currency) updates.currency = context.currency;
+    if (context.totalAmount && !formData.totalAmount) updates.totalAmount = context.totalAmount;
+    // Packing-list specific fields
+    if (context.totalCartons && !formData.totalCartons) updates.totalCartons = context.totalCartons;
+    if (context.totalGrossWeight && !formData.totalGrossWeight) updates.totalGrossWeight = context.totalGrossWeight;
+    if (context.totalNetWeight && !formData.totalNetWeight) updates.totalNetWeight = context.totalNetWeight;
+    if (context.totalVolume && !formData.totalVolume) updates.totalVolume = context.totalVolume;
+
+    if (Object.keys(updates).length > 0) {
+      setFormData(prev => ({ ...prev, ...updates }));
+    }
+
+    trackEvent.custom(type, 'task_chain_generator_fill');
   };
 
   // v1.20.42.13.1: Generate next document in chain
@@ -836,6 +901,10 @@ export default function DocumentEditorPage() {
             </div>
           </div>
           <div className="hidden lg:flex items-center gap-2">
+            <TaskChainGeneratorButton
+              onSelect={handleTaskChainGeneratorSelect}
+              filterSourceTools={['hs-code', 'exchange-rate', 'shipping-calculator', 'address-formatter', 'postal-code', 'quotation', 'proforma-invoice', 'commercial-invoice', 'packing-list']}
+            />
             {p.canUseCustomStyle() && (
               <div className="relative">
                 <button onClick={() => setShowStylePicker(!showStylePicker)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-500" title="切换模板风格">
@@ -908,6 +977,13 @@ export default function DocumentEditorPage() {
         <div className="flex gap-6 print-block">
           {/* Form panel - shown on desktop always, on mobile only in edit tab */}
           <div className={`w-full lg:w-1/2 no-print ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
+            {/* Mobile: Task Chain Generator button */}
+            <div className="lg:hidden mb-4">
+              <TaskChainGeneratorButton
+                onSelect={handleTaskChainGeneratorSelect}
+                filterSourceTools={['hs-code', 'exchange-rate', 'shipping-calculator', 'address-formatter', 'postal-code', 'quotation', 'proforma-invoice', 'commercial-invoice', 'packing-list']}
+              />
+            </div>
             {/* Company info */}
             <div className="bg-white rounded-xl border p-5 mb-4">
               <div className="flex items-center justify-between mb-4">
