@@ -67,9 +67,9 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
       }
       if (!res.ok) throw new Error('Failed to load');
       const data = await res.json();
-      const tc = data.data;
+      const tc = data.taskChain;
       setTask(tc);
-      setCurrentStep(tc.currentStep || 0);
+      setCurrentStep(tc.context?.currentStep || 0);
       setContext(tc.context || {});
     } catch {
       // Task might not exist yet — use empty state
@@ -108,7 +108,8 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
   // Mark step as completed
   const completeStep = async (stepIndex: number) => {
     if (!task) return;
-    const completedSteps = [...new Set([...(task.completedSteps || []), stepIndex])];
+    const currentCompletedSteps = context.completedSteps || [];
+    const completedSteps = [...new Set([...currentCompletedSteps, stepIndex])];
     const nextStep = stepIndex + 1 < 10 ? stepIndex + 1 : stepIndex;
 
     try {
@@ -124,10 +125,9 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
       if (res.ok) {
         setTask(prev => prev ? {
           ...prev,
-          completedSteps,
-          currentStep: nextStep,
           status: stepIndex === 9 ? 'completed' : 'active',
         } : null);
+        setContext(prev => ({ ...prev, completedSteps, currentStep: nextStep }));
         if (stepIndex < 9) {
           setCurrentStep(nextStep);
         }
@@ -156,7 +156,7 @@ export default function ShippingWorkbench({ taskId }: { taskId: string }) {
   }
 
   const stepConfig = STEPS[currentStep];
-  const completedSteps = task?.completedSteps || [];
+  const completedSteps = context?.completedSteps || [];
   const isStepCompleted = completedSteps.includes(currentStep);
 
   return (

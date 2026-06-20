@@ -57,7 +57,13 @@ export default function TaskChainsClient() {
       }
       if (!res.ok) throw new Error('Failed to fetch');
       const data = await res.json();
-      setTaskChains(data.data || []);
+      // Map context fields to top-level for easier access
+      const chains = (data.taskChains || []).map((tc: any) => ({
+        ...tc,
+        currentStep: tc.context?.currentStep || 0,
+        completedSteps: tc.context?.completedSteps || [],
+      }));
+      setTaskChains(chains);
     } catch {
       setError('加载任务链失败，请重试');
     } finally {

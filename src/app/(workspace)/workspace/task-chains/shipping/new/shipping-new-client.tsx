@@ -47,7 +47,7 @@ export default function ShippingNewClient() {
       }
 
       const data = await res.json();
-      router.push(`/workspace/task-chains/shipping/${data.data.id}`);
+      router.push(`/workspace/task-chains/shipping/${data.taskChain.id}`);
     } catch (err: any) {
       setError(err.message || '创建失败，请重试');
     } finally {

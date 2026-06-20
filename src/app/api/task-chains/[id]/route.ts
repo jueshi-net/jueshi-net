@@ -1,5 +1,6 @@
 // GET /api/task-chains/[id] - Get single task chain detail
-// PUT /api/task-chains/[id] - Update task chain (auto-save)
+// PUT /api/task-chains/[id] - Update task chain (full update)
+// PATCH /api/task-chains/[id] - Update task chain (partial update, auto-save)
 // DELETE /api/task-chains/[id] - Delete (soft) task chain
 
 import { NextRequest, NextResponse } from "next/server";
@@ -31,6 +32,14 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
 }
 
 export async function PUT(req: NextRequest, { params }: RouteParams) {
+  return updateTaskChain(req, params);
+}
+
+export async function PATCH(req: NextRequest, { params }: RouteParams) {
+  return updateTaskChain(req, params);
+}
+
+async function updateTaskChain(req: NextRequest, params: { id: string }) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "未登录" }, { status: 401 });
@@ -49,7 +58,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
   }
 
   const body = await req.json();
-  const { title, status, sourceTool, lastActiveTool, context, linkedDraftHints } = body;
+  const { title, status, sourceTool, lastActiveTool, context, linkedDraftHints, currentStep, completedSteps } = body;
 
   const updateData: Record<string, unknown> = {};
 
@@ -101,6 +110,21 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
   if (linkedDraftHints !== undefined) {
     updateData.linkedDraftHints = linkedDraftHints;
+  }
+
+  // Store currentStep and completedSteps in context
+  if (currentStep !== undefined || completedSteps !== undefined) {
+    const currentContext = (existing.context as Record<string, unknown>) || {};
+    const newContext = { ...currentContext };
+    
+    if (currentStep !== undefined) {
+      newContext.currentStep = currentStep;
+    }
+    if (completedSteps !== undefined) {
+      newContext.completedSteps = completedSteps;
+    }
+    
+    updateData.context = newContext;
   }
 
   const taskChain = await prisma.taskChainDraft.update({
