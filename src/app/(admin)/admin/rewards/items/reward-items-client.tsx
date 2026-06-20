@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight } from "lucide-react";
+import Link from "next/link";
+import { Plus, Edit2, Trash2, ToggleLeft, ToggleRight, AlertTriangle, ExternalLink, History, Gift } from "lucide-react";
 
 interface RewardItem {
   id: string;
@@ -168,11 +169,65 @@ export default function RewardItemsClient({ initialItems }: RewardItemsClientPro
     return REWARD_TYPES.find((t) => t.value === type)?.label || type;
   };
 
+  const getInactiveReason = (item: RewardItem): string | null => {
+    if (item.enabled) return null;
+    if (item._count.userRewards === 0) return "从未被兑换过，建议检查积分定价是否合理";
+    if (item.costPoints > 500) return "积分门槛较高（>500），用户可能望而却步";
+    return "手动停用";
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">奖励项管理</h1>
         <p className="text-gray-600">管理用户可兑换的奖励项，包括会员体验、广告权益、文档导出券等。</p>
+      </div>
+
+      {/* Quick Links */}
+      <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link
+          href="/admin/rewards/items/records"
+          className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+        >
+          <History className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">兑换记录</div>
+            <div className="text-xs text-gray-500">查看用户兑换历史</div>
+          </div>
+        </Link>
+        <Link
+          href="/admin/invites/rewards"
+          className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-teal-300 hover:bg-teal-50 transition-colors group"
+        >
+          <Gift className="w-5 h-5 text-gray-400 group-hover:text-teal-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">邀请奖励规则</div>
+            <div className="text-xs text-gray-500">配置邀请奖励触发规则</div>
+          </div>
+        </Link>
+        <Link
+          href="/admin/invites/rewards/grants"
+          className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors group"
+        >
+          <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-purple-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">奖励发放记录</div>
+            <div className="text-xs text-gray-500">邀请奖励发放明细</div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Member Trial Risk Notice */}
+      <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-amber-800">member_trial 类型风险提示</p>
+            <p className="text-xs text-amber-700 mt-1">
+              会员体验奖励会直接延长用户会员有效期。建议：① 设置合理的积分门槛防止滥用；② 体验天数不宜过长（建议 1-7 天）；③ 关注兑换频率异常的用户。
+            </p>
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -396,15 +451,23 @@ export default function RewardItemsClient({ initialItems }: RewardItemsClientPro
                   {item._count.userRewards} 次
                 </td>
                 <td className="px-4 py-3">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      item.enabled
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {item.enabled ? "已启用" : "已停用"}
-                  </span>
+                  <div>
+                    <span
+                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        item.enabled
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {item.enabled ? "已启用" : "已停用"}
+                    </span>
+                    {!item.enabled && getInactiveReason(item) && (
+                      <div className="mt-1 text-xs text-amber-600 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        {getInactiveReason(item)}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex justify-end gap-2">

@@ -1396,8 +1396,10 @@ function Step5Invoice({ context, autoSave }: { context: Record<string, any>; aut
   const [companyProfile, setCompanyProfile] = useState<any>(null);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [invoiceCopied, setInvoiceCopied] = useState(false);
+  const [plainTextCopied, setPlainTextCopied] = useState(false);
   const [savingDoc, setSavingDoc] = useState(false);
   const [saveDocMsg, setSaveDocMsg] = useState('');
+  const [generatedAt, setGeneratedAt] = useState<string>(context.invoiceGeneratedAt || '');
 
   // Fetch company profiles
   useEffect(() => {
@@ -1495,12 +1497,72 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       })
     ]).then(() => {
       setInvoiceCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ invoiceGeneratedAt: now });
+      }
       setTimeout(() => setInvoiceCopied(false), 2000);
     }).catch(() => {
       // Fallback: copy plain text
       navigator.clipboard.writeText(html);
       setInvoiceCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ invoiceGeneratedAt: now });
+      }
       setTimeout(() => setInvoiceCopied(false), 2000);
+    });
+  };
+
+  // Generate plain text version of the invoice
+  const generateInvoicePlainText = () => {
+    const shipperName = companyProfile?.companyNameEn || companyProfile?.companyName || context.companyName || '[Your Company Name]';
+    const shipperAddr = companyProfile?.address || context.companyAddress || '[Your Address]';
+    const date = new Date().toISOString().split('T')[0];
+    const consigneeAddr = buildConsigneeAddress();
+
+    return `COMMERCIAL INVOICE
+═══════════════════════════════════════════
+Invoice No: ${context.invoiceNo || '—'}
+Date: ${date}
+
+── Shipper / Exporter ──
+${shipperName}
+${shipperAddr}
+${companyProfile?.taxId ? `Tax ID: ${companyProfile.taxId}` : ''}
+
+── Consignee ──
+${context.buyerName || '—'}
+${consigneeAddr}
+${context.buyerContact ? `Tel: ${context.buyerContact}` : ''}
+
+── Item Details ──
+Description: ${context.productDescription || context.productName || '—'}
+HS Code:     ${context.hsCode || '—'}
+Origin:      ${context.originCountry || 'China'}
+Quantity:    ${context.quantity || '—'}
+Unit Price:  USD ${parseFloat(context.unitPrice || '0').toFixed(2)}
+Amount:      USD ${totalAmount.toFixed(2)}
+
+── Total ──
+Total Amount: USD ${totalAmount.toFixed(2)}
+
+Payment Terms: T/T | Trade Terms: FOB
+We certify that this invoice is true and correct.`;
+  };
+
+  const copyInvoicePlainText = () => {
+    const text = generateInvoicePlainText();
+    navigator.clipboard.writeText(text).then(() => {
+      setPlainTextCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ invoiceGeneratedAt: now });
+      }
+      setTimeout(() => setPlainTextCopied(false), 2000);
     });
   };
 
@@ -1537,6 +1599,9 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
         }),
       });
       if (res.ok) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ invoiceGeneratedAt: now });
         setSaveDocMsg('✅ 已保存到「我的单据」');
       } else {
         const err = await res.json();
@@ -1554,6 +1619,9 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-800">
         <p className="font-medium">商业发票预览</p>
         <p className="text-xs mt-1">系统已自动带入商品信息。选择公司资料后可生成完整发票。</p>
+        {generatedAt && (
+          <p className="text-xs mt-1 text-green-600">📅 生成时间：{new Date(generatedAt).toLocaleString('zh-CN')}</p>
+        )}
       </div>
 
       {/* Company Profile Selection */}
@@ -1654,7 +1722,14 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
           className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
         >
           <Copy className="w-4 h-4" />
-          {invoiceCopied ? '已复制 HTML!' : '复制发票 HTML'}
+          {invoiceCopied ? '已复制 HTML!' : '复制 HTML（富文本）'}
+        </button>
+        <button
+          onClick={copyInvoicePlainText}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+        >
+          <ClipboardList className="w-4 h-4" />
+          {plainTextCopied ? '已复制纯文本!' : '复制纯文本'}
         </button>
         <button
           onClick={saveToDocuments}
@@ -1679,7 +1754,7 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       )}
 
       <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
-        💡 提示：复制 HTML 后可粘贴到 Word/邮件中。如需 PDF 格式，请使用「商业发票工具」进行完整编辑和导出。
+        💡 提示：「复制 HTML」可粘贴到 Word/邮件中保留格式；「复制纯文本」适合粘贴到聊天工具。PDF 导出即将开放。
       </div>
     </div>
   );
@@ -1698,8 +1773,10 @@ function Step6PackingList({ context, autoSave }: { context: Record<string, any>;
   const totalVolume = (length * width * height * cartons) / 1000000;
   const weightPerCarton = cartons > 0 ? (grossWeight / cartons) : grossWeight;
   const [packingCopied, setPackingCopied] = useState(false);
+  const [plainTextCopied, setPlainTextCopied] = useState(false);
   const [savingDoc, setSavingDoc] = useState(false);
   const [saveDocMsg, setSaveDocMsg] = useState('');
+  const [generatedAt, setGeneratedAt] = useState<string>(context.packingListGeneratedAt || '');
 
   // Generate Packing List HTML
   const generatePackingHTML = () => {
@@ -1770,11 +1847,63 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       })
     ]).then(() => {
       setPackingCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ packingListGeneratedAt: now });
+      }
       setTimeout(() => setPackingCopied(false), 2000);
     }).catch(() => {
       navigator.clipboard.writeText(html);
       setPackingCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ packingListGeneratedAt: now });
+      }
       setTimeout(() => setPackingCopied(false), 2000);
+    });
+  };
+
+  // Generate plain text version of the packing list
+  const generatePackingPlainText = () => {
+    const date = new Date().toISOString().split('T')[0];
+    const cartonLines = Array.from({ length: cartons }, (_, i) => {
+      const startQty = i * qtyPerCarton + 1;
+      const endQty = Math.min((i + 1) * qtyPerCarton, quantity);
+      const actualQty = endQty - startQty + 1;
+      return `  Carton ${i + 1}: ${context.productName || '—'} | ${actualQty} pcs (No.${startQty}-${endQty}) | ${weightPerCarton.toFixed(2)} kg | ${length}×${width}×${height} cm | ${(length * width * height / 1000000).toFixed(4)} CBM`;
+    }).join('\n');
+
+    return `PACKING LIST
+═══════════════════════════════════════════
+Date: ${date} | Invoice No: ${context.invoiceNo || '—'}
+
+── Summary ──
+Total Cartons:  ${cartons}
+Total Quantity: ${quantity} pcs
+Gross Weight:   ${grossWeight} kg
+Total Volume:   ${totalVolume.toFixed(4)} CBM
+
+── Carton Breakdown ──
+${cartonLines}
+
+── TOTAL ──
+${quantity} pcs | ${grossWeight} kg | ${cartons} cartons | ${totalVolume.toFixed(4)} CBM
+
+Shipping Marks: N/M | Package: ${cartons} cartons`;
+  };
+
+  const copyPackingPlainText = () => {
+    const text = generatePackingPlainText();
+    navigator.clipboard.writeText(text).then(() => {
+      setPlainTextCopied(true);
+      if (!generatedAt) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ packingListGeneratedAt: now });
+      }
+      setTimeout(() => setPlainTextCopied(false), 2000);
     });
   };
 
@@ -1813,6 +1942,9 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
         }),
       });
       if (res.ok) {
+        const now = new Date().toISOString();
+        setGeneratedAt(now);
+        update({ packingListGeneratedAt: now });
         setSaveDocMsg('✅ 已保存到「我的单据」');
       } else {
         const err = await res.json();
@@ -1830,6 +1962,9 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-800">
         <p className="font-medium">装箱单预览</p>
         <p className="text-xs mt-1">已自动带入商品、数量、包装尺寸和重量信息。可逐箱查看内容。</p>
+        {generatedAt && (
+          <p className="text-xs mt-1 text-green-600">📅 生成时间：{new Date(generatedAt).toLocaleString('zh-CN')}</p>
+        )}
       </div>
 
       {/* Summary Stats */}
@@ -1911,7 +2046,14 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
           className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-teal-700 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors"
         >
           <Copy className="w-4 h-4" />
-          {packingCopied ? '已复制 HTML!' : '复制装箱单 HTML'}
+          {packingCopied ? '已复制 HTML!' : '复制 HTML（富文本）'}
+        </button>
+        <button
+          onClick={copyPackingPlainText}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+        >
+          <ClipboardList className="w-4 h-4" />
+          {plainTextCopied ? '已复制纯文本!' : '复制纯文本'}
         </button>
         <button
           onClick={saveToDocuments}
@@ -1936,7 +2078,7 @@ td{padding:8px;border:1px solid #ddd;font-size:13px}
       )}
 
       <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
-        💡 提示：复制 HTML 后可粘贴到 Word/邮件中。如需 PDF 格式，请使用「装箱单工具」进行完整编辑和导出。
+        💡 提示：「复制 HTML」可粘贴到 Word/邮件中保留格式；「复制纯文本」适合粘贴到聊天工具。PDF 导出即将开放。
       </div>
     </div>
   );
@@ -2138,6 +2280,7 @@ function Step8QuoteTemplate({ context, autoSave }: { context: Record<string, any
   const [copiedLogistics, setCopiedLogistics] = useState(false);
   const [copiedCustomer, setCopiedCustomer] = useState(false);
   const [savingDoc, setSavingDoc] = useState(false);
+  const [saveDocMsg, setSaveDocMsg] = useState('');
 
   // Gather data from context
   const productName = context.productName || '—';
@@ -2257,17 +2400,55 @@ ${rate > 0 ? `• 商品总价：CNY ${(totalUSD * rate).toFixed(2)}\n` : ''}${s
 
   const saveToDocuments = async () => {
     setSavingDoc(true);
+    setSaveDocMsg('');
     try {
-      // Save quotation data to context
-      update({
-        quotationGenerated: true,
-        quotationDate: new Date().toISOString(),
-        quotationLogisticsTemplate: logisticsTemplate,
-        quotationCustomerTemplate: customerTemplate,
+      const res = await fetch('/api/user/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          documentType: 'quotation',
+          documentNo: context.invoiceNo || '',
+          documentData: {
+            formData: {
+              productName,
+              hsCode,
+              quantity,
+              unitPrice,
+              totalUSD: totalUSD.toFixed(2),
+              destinationCountry,
+              destinationCity,
+              packageDimensions: `${packageLength} × ${packageWidth} × ${packageHeight} cm`,
+              grossWeight,
+              totalCartons,
+              cbm: cbm.toFixed(4),
+              exchangeRate: rate || null,
+              shippingCost: shippingCost || null,
+              totalCNY: totalCNY.toFixed(2),
+              buyerName,
+              date: new Date().toISOString().split('T')[0],
+            },
+            logisticsTemplate,
+            customerTemplate,
+          },
+        }),
       });
-    } finally {
-      setTimeout(() => setSavingDoc(false), 1500);
+      if (res.ok) {
+        update({
+          quotationGenerated: true,
+          quotationDate: new Date().toISOString(),
+          quotationLogisticsTemplate: logisticsTemplate,
+          quotationCustomerTemplate: customerTemplate,
+        });
+        setSaveDocMsg('✅ 已保存到「我的单据」');
+      } else {
+        const err = await res.json();
+        setSaveDocMsg(`❌ 保存失败: ${err.error || '未知错误'}`);
+      }
+    } catch (e) {
+      setSaveDocMsg('❌ 保存失败，请重试');
     }
+    setSavingDoc(false);
+    setTimeout(() => setSaveDocMsg(''), 5000);
   };
 
   return (
@@ -2400,6 +2581,14 @@ ${rate > 0 ? `• 商品总价：CNY ${(totalUSD * rate).toFixed(2)}\n` : ''}${s
           在报价单工具中编辑
         </Link>
       </div>
+
+      {saveDocMsg && (
+        <p className="text-sm text-gray-600">{saveDocMsg}</p>
+      )}
+
+      <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
+        💡 提示：「物流询价模板」发给物流商获取报价；「客户报价说明」发给客户确认。PDF 导出即将开放。
+      </div>
     </div>
   );
 }
@@ -2446,21 +2635,27 @@ function Step9Complete({ task, taskId, context, completedSteps, autoSave }: {
       icon: FileText,
       done: completedSteps.includes(5),
       detail: context.invoiceNo ? `No. ${context.invoiceNo}` : '已生成',
+      generatedAt: context.invoiceGeneratedAt || '',
       href: '/tools/commercial-invoice',
+      docType: 'commercial_invoice',
     },
     {
       label: '装箱单',
       icon: ClipboardList,
       done: completedSteps.includes(6),
       detail: context.grossWeight ? `${context.grossWeight}kg / ${context.totalCartons || 1}箱` : '已生成',
+      generatedAt: context.packingListGeneratedAt || '',
       href: '/tools/documents/packing-list',
+      docType: 'packing_list',
     },
     {
       label: '报价模板',
       icon: Sparkles,
       done: completedSteps.includes(8) || context.quotationGenerated,
       detail: context.quotationGenerated ? `生成于 ${new Date(context.quotationDate).toLocaleDateString()}` : '已生成',
+      generatedAt: context.quotationDate || '',
       href: '/tools/documents/quotation',
+      docType: 'quotation',
     },
   ];
 
@@ -2545,20 +2740,68 @@ function Step9Complete({ task, taskId, context, completedSteps, autoSave }: {
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium ${doc.done ? 'text-green-800' : 'text-gray-400'}`}>{doc.label}</p>
                   <p className="text-xs text-gray-500 truncate">{doc.detail}</p>
+                  {doc.done && doc.generatedAt && (
+                    <p className="text-xs text-gray-400 mt-0.5">📅 {new Date(doc.generatedAt).toLocaleString('zh-CN')}</p>
+                  )}
                 </div>
-                {doc.done && doc.href && (
-                  <Link
-                    href={doc.href}
-                    target="_blank"
-                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-teal-600 hover:bg-teal-50 rounded transition-colors"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    查看
-                  </Link>
+                {doc.done && (
+                  <div className="flex items-center gap-1">
+                    <Link
+                      href={doc.href}
+                      target="_blank"
+                      className="inline-flex items-center gap-1 px-2 py-1 text-xs text-teal-600 hover:bg-teal-50 rounded transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      查看
+                    </Link>
+                    <button
+                      onClick={() => {
+                        // Copy summary to clipboard
+                        const summary = `${doc.label}\n${doc.detail}\n生成时间: ${doc.generatedAt ? new Date(doc.generatedAt).toLocaleString('zh-CN') : '—'}`;
+                        navigator.clipboard.writeText(summary);
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                    >
+                      <Copy className="w-3 h-3" />
+                      复制
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch('/api/user/documents', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              documentType: doc.docType,
+                              documentNo: context.invoiceNo || '',
+                              documentData: {
+                                formData: context,
+                                generatedAt: doc.generatedAt || new Date().toISOString(),
+                              },
+                            }),
+                          });
+                          if (res.ok) {
+                            alert('✅ 已保存到「我的单据」');
+                          } else {
+                            alert('❌ 保存失败');
+                          }
+                        } catch {
+                          alert('❌ 保存失败，请重试');
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded transition-colors"
+                    >
+                      <Save className="w-3 h-3" />
+                      保存
+                    </button>
+                  </div>
                 )}
               </div>
             );
           })}
+        </div>
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <p className="text-xs text-gray-400">📄 PDF 导出即将开放，敬请期待</p>
         </div>
       </div>
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { BarChart3, TrendingUp, Activity, Calendar, RefreshCw, Download, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { BarChart3, TrendingUp, Activity, Calendar, RefreshCw, Download, AlertTriangle, Layers, ExternalLink } from "lucide-react";
 
 interface AnalyticsData {
   success: boolean;
@@ -170,6 +171,62 @@ export default function TaskChainAnalyticsPage() {
           </select>
         </div>
       </div>
+
+      {/* Quick Links */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link
+          href="/admin/analytics/task-chains/templates"
+          className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group shadow-sm"
+        >
+          <Layers className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">任务链模板管理</div>
+            <div className="text-xs text-gray-500">配置预定义的任务链模板</div>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-300 ml-auto" />
+        </Link>
+        <Link
+          href="/admin/analytics/task-chains/stats"
+          className="flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors group shadow-sm"
+        >
+          <BarChart3 className="w-5 h-5 text-gray-400 group-hover:text-green-600" />
+          <div>
+            <div className="text-sm font-medium text-gray-900">任务链详细统计</div>
+            <div className="text-xs text-gray-500">按工具、用户维度查看统计</div>
+          </div>
+          <ExternalLink className="w-4 h-4 text-gray-300 ml-auto" />
+        </Link>
+      </div>
+
+      {/* Stats Summary Banner */}
+      {data && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium text-blue-800">数据概览</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-lg font-bold text-blue-900">{data.summary.total}</div>
+              <div className="text-xs text-blue-600">总任务链</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-green-700">{getStatusCount("active")}</div>
+              <div className="text-xs text-green-600">活跃中</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-gray-700">
+                {data.conversionRates.saveToWorkspaceRate === "N/A" ? "N/A" : `${data.conversionRates.saveToWorkspaceRate}%`}
+              </div>
+              <div className="text-xs text-gray-600">保存转化率</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-gray-700">{data.summary.last7d}</div>
+              <div className="text-xs text-gray-600">近 7 天新增</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

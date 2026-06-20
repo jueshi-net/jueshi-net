@@ -188,9 +188,22 @@ export default function AdminSettingsPage() {
             rows={2}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
-          <p className="text-xs text-gray-500 mt-1">
-            用于首页 meta description、OpenGraph 分享和 SEO。建议 100-200 字。
-          </p>
+          <div className="mt-1 flex items-center justify-between">
+            <p className="text-xs text-gray-500">
+              用于首页 meta description、OpenGraph 分享和 SEO。建议 100-200 字。
+            </p>
+            <span className={`text-xs ${settings.siteDescription.length > 200 ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+              {settings.siteDescription.length}/200
+            </span>
+          </div>
+          <div className="mt-2 bg-gray-50 rounded-lg p-2.5 border border-gray-100">
+            <p className="text-xs text-gray-600">
+              <strong className="text-gray-700">展示位置：</strong>
+              ① 搜索引擎结果的摘要文字 &nbsp;
+              ② 社交平台分享时的预览描述 &nbsp;
+              ③ 首页 &lt;meta name="description"&gt; 标签
+            </p>
+          </div>
         </div>
       </div>
 
@@ -260,6 +273,23 @@ export default function AdminSettingsPage() {
         </h2>
         <div className={`p-3 rounded-lg ${settings.emailEnabled ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
           {settings.emailEnabled ? '✓ SMTP 已配置，邮件功能可用' : '✗ SMTP 未配置，邮件功能不可用'}
+        </div>
+        <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+          <p className="text-xs font-medium text-gray-700 mb-2">邮件功能说明</p>
+          <ul className="text-xs text-gray-600 space-y-1.5">
+            <li className="flex items-start gap-1.5">
+              <span className="text-gray-400 mt-0.5">•</span>
+              <span><strong>已启用时：</strong>用户注册验证、密码重置、系统通知等邮件可正常发送</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-gray-400 mt-0.5">•</span>
+              <span><strong>未启用时：</strong>邮件功能静默跳过，用户仍可正常注册和使用（跳过邮件验证）</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-gray-400 mt-0.5">•</span>
+              <span><strong>配置方式：</strong>通过环境变量 SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS 配置</span>
+            </li>
+          </ul>
         </div>
       </div>
 

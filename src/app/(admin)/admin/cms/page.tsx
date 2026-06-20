@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Edit2, Archive, X, Save, FileText, Eye, Code, Loader2, AlertCircle, LinkIcon, Search, Send, BookOpen, List, MessageSquare, CheckCircle, Hash, Lightbulb, ArrowUp } from "lucide-react";
+import { Plus, Edit2, Archive, X, Save, FileText, Eye, Code, Loader2, AlertCircle, LinkIcon, Search, Send, BookOpen, List, MessageSquare, CheckCircle, Hash, Lightbulb, ArrowUp, Info } from "lucide-react";
 import { marked } from "marked";
 
 const CATEGORIES = ["跨境寄送", "海外生活", "出海经营", "AI工具", "网址导航指南"];
@@ -181,6 +181,46 @@ export default function AdminCMSPage() {
           <button onClick={() => { resetForm(); setShowForm(true); }} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-orange-700 rounded-xl text-sm font-bold hover:bg-orange-50 transition-colors min-h-[44px]">
             <Plus className="w-4 h-4" /> 新建文章
           </button>
+        </div>
+      </div>
+
+      {/* Content Center Boundary Explanation */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="flex items-start gap-2 mb-3">
+          <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-blue-800">内容中心边界说明</p>
+            <p className="text-xs text-blue-600 mt-0.5">不同内容类型的定位与使用场景</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="bg-white rounded-lg p-3 border border-blue-100">
+            <div className="flex items-center gap-2 mb-1.5">
+              <BookOpen className="w-4 h-4 text-orange-600" />
+              <span className="text-sm font-medium text-gray-900">指南页 (Guides)</span>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              即本页管理的文章。长文教程、工具推荐、操作指南。展示在 /guides 列表和详情页。适合深度内容、SEO 长尾词。
+            </p>
+          </div>
+          <div className="bg-white rounded-lg p-3 border border-blue-100">
+            <div className="flex items-center gap-2 mb-1.5">
+              <List className="w-4 h-4 text-teal-600" />
+              <span className="text-sm font-medium text-gray-900">专题 (Topics)</span>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              在 /admin/topics 管理。围绕一个主题聚合多个工具/资源的结构化页面。适合「XX 场景必备工具」类内容。
+            </p>
+          </div>
+          <div className="bg-white rounded-lg p-3 border border-blue-100">
+            <div className="flex items-center gap-2 mb-1.5">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-900">清单 (Checklists)</span>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed">
+              可勾选的交互式清单。适合「出海前准备清单」「行李清单」等需要用户逐项确认的场景。
+            </p>
+          </div>
         </div>
       </div>
 
