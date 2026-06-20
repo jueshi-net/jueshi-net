@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, ChevronDown, Download, Upload } from 'lucide-react';
-import PageHeader from '@/components/workspace/PageHeader';
+import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, Download, Upload } from 'lucide-react';
+import { WorkspacePageHeader, CompactTable, SaasEmptyState, StatusBadge, SectionCard } from '@/components/saas';
 import { track } from '@/lib/analytics';
 
 interface ProductItem {
@@ -203,7 +203,6 @@ export default function ProductsPage() {
 
       const data = await res.json();
       if (data.success) {
-        // Track successful import
         track({
           eventType: 'product_csv_import',
           toolName: 'products',
@@ -223,7 +222,6 @@ export default function ProductsPage() {
         setImportData([]);
         fetchProducts();
       } else {
-        // Track failed import
         track({
           eventType: 'product_csv_import_failed',
           toolName: 'products',
@@ -240,7 +238,6 @@ export default function ProductsPage() {
     } catch (error) {
       console.error('Import failed:', error);
       
-      // Track failed import
       track({
         eventType: 'product_csv_import_failed',
         toolName: 'products',
@@ -258,53 +255,166 @@ export default function ProductsPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <PageHeader
-        title="商品资料"
-        description="管理常用商品信息，在报价单、发票、装箱单中一键引用"
-        icon={<Package className="w-5 h-5 text-blue-600" />}
-        backHref="/workspace"
-      />
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="搜索商品名称、SKU、HS Code..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+  // Table columns for CompactTable
+  const productColumns = [
+    {
+      key: 'name',
+      header: '商品名称',
+      render: (row: ProductItem) => (
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-gray-900">{row.name}</span>
+          {row.sku && (
+            <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded font-mono">{row.sku}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'hsCode',
+      header: 'HS Code',
+      render: (row: ProductItem) => row.hsCode || <span className="text-gray-300">—</span>,
+    },
+    {
+      key: 'price',
+      header: '单价',
+      align: 'right' as const,
+      render: (row: ProductItem) => row.unitPrice 
+        ? <span className="font-medium">{row.currency} {row.unitPrice}</span>
+        : <span className="text-gray-300">—</span>,
+    },
+    {
+      key: 'status',
+      header: '状态',
+      align: 'center' as const,
+      render: (row: ProductItem) => (
+        <StatusBadge 
+          label={row.isActive ? '启用' : '停用'} 
+          variant={row.isActive ? 'success' : 'neutral'} 
+          size="sm"
+          dot
+        />
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      width: '120px',
+      align: 'right' as const,
+      render: (row: ProductItem) => (
+        <div className="flex items-center justify-end gap-1">
           <button
-            onClick={() => setShowInactive(!showInactive)}
-            className={`px-4 py-2 text-sm rounded-lg border ${showInactive ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-white text-gray-600 border-gray-200'}`}
+            onClick={(e) => { e.stopPropagation(); handleEdit(row); }}
+            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="编辑"
           >
-            {showInactive ? '显示已启用' : '显示已停用'}
+            <Edit2 className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={handleDownloadTemplate}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            onClick={(e) => { e.stopPropagation(); handleDuplicate(row); }}
+            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+            title="复制"
           >
-            <Download className="w-4 h-4" /> 下载模板
+            <Copy className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={() => setShowImport(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+            onClick={(e) => { e.stopPropagation(); handleDelete(row.id); }}
+            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="删除"
           >
-            <Upload className="w-4 h-4" /> 批量导入
-          </button>
-          <button
-            onClick={handleNew}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4" /> 新增商品
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
+      ),
+    },
+  ];
+
+  // Import preview columns
+  const importColumns = [
+    { key: 'name', header: '名称' },
+    { key: 'sku', header: 'SKU' },
+    { key: 'hsCode', header: 'HS Code' },
+    { 
+      key: 'price', 
+      header: '单价',
+      render: (row: any) => `${row.unitPrice || ''} ${row.currency || ''}`.trim(),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <WorkspacePageHeader
+        title="商品资料"
+        subtitle="管理常用商品信息，在报价单、发票、装箱单中一键引用"
+        icon={<Package className="w-5 h-5" />}
+        breadcrumbs={[{ label: "工作台", href: "/workspace" }, { label: "商品资料" }]}
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-4 h-4" /> 模板
+            </button>
+            <button
+              onClick={() => setShowImport(true)}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Upload className="w-4 h-4" /> 导入
+            </button>
+            <button
+              onClick={handleNew}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" /> 新增
+            </button>
+          </div>
+        }
+      />
+
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* 统计指标 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+            <span className="text-xs text-gray-500">商品总数</span>
+            <div className="text-xl font-bold text-gray-900">{products.length}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+            <span className="text-xs text-gray-500">已启用</span>
+            <div className="text-xl font-bold text-green-600">{products.filter(p => p.isActive).length}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+            <span className="text-xs text-gray-500">有 HS Code</span>
+            <div className="text-xl font-bold text-blue-600">{products.filter(p => p.hsCode).length}</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+            <span className="text-xs text-gray-500">有定价</span>
+            <div className="text-xl font-bold text-purple-600">{products.filter(p => p.unitPrice).length}</div>
+          </div>
+        </div>
+
+        {/* 搜索与过滤 */}
+        <SectionCard>
+          <div className="flex flex-col sm:flex-row gap-3 items-center">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="搜索商品名称、SKU、HS Code..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+            <button
+              onClick={() => { setShowInactive(!showInactive); setTimeout(fetchProducts, 0); }}
+              className={`px-4 py-2 text-sm rounded-lg border transition-colors whitespace-nowrap ${
+                showInactive ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {showInactive ? '隐藏已停用' : '显示已停用'}
+            </button>
+          </div>
+        </SectionCard>
 
         {/* Import Modal */}
         {showImport && (
@@ -347,33 +457,17 @@ export default function ProductsPage() {
                         覆盖已有商品（按 SKU 匹配）
                       </label>
                     </div>
-                    <div className="border rounded-lg overflow-hidden max-h-64 overflow-y-auto">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-50 sticky top-0">
-                          <tr>
-                            <th className="px-3 py-2 text-left">名称</th>
-                            <th className="px-3 py-2 text-left">SKU</th>
-                            <th className="px-3 py-2 text-left">HS Code</th>
-                            <th className="px-3 py-2 text-left">单价</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {importData.slice(0, 10).map((item, i) => (
-                            <tr key={i} className="border-t">
-                              <td className="px-3 py-2">{item.name}</td>
-                              <td className="px-3 py-2">{item.sku}</td>
-                              <td className="px-3 py-2">{item.hsCode}</td>
-                              <td className="px-3 py-2">{item.unitPrice} {item.currency}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {importData.length > 10 && (
-                        <div className="text-center py-2 text-sm text-gray-500 bg-gray-50">
-                          ... 还有 {importData.length - 10} 条
-                        </div>
-                      )}
-                    </div>
+                    <CompactTable
+                      columns={importColumns}
+                      data={importData.slice(0, 10)}
+                      density="compact"
+                      striped
+                    />
+                    {importData.length > 10 && (
+                      <div className="text-center py-2 text-sm text-gray-500 bg-gray-50 rounded-b-xl border border-gray-200 border-t-0">
+                        ... 还有 {importData.length - 10} 条
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -417,7 +511,7 @@ export default function ProductsPage() {
                       type="text"
                       value={formData.name || ''}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       placeholder="例如：不锈钢保温杯"
                     />
                   </div>
@@ -427,7 +521,7 @@ export default function ProductsPage() {
                       type="text"
                       value={formData.sku || ''}
                       onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       placeholder="例如：BT-500ML"
                     />
                   </div>
@@ -438,7 +532,7 @@ export default function ProductsPage() {
                   <textarea
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                     rows={2}
                     placeholder="详细描述商品特性..."
                   />
@@ -451,7 +545,7 @@ export default function ProductsPage() {
                       type="text"
                       value={formData.hsCode || ''}
                       onChange={(e) => setFormData({ ...formData, hsCode: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       placeholder="例如：9617000000"
                     />
                   </div>
@@ -461,7 +555,7 @@ export default function ProductsPage() {
                       type="text"
                       value={formData.unit || ''}
                       onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       placeholder="PCS/SET/KG"
                     />
                   </div>
@@ -478,7 +572,7 @@ export default function ProductsPage() {
                         step="0.01"
                         value={formData.unitPrice || ''}
                         onChange={(e) => setFormData({ ...formData, unitPrice: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
@@ -486,7 +580,7 @@ export default function ProductsPage() {
                       <select
                         value={formData.currency || 'USD'}
                         onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       >
                         <option value="USD">USD</option>
                         <option value="CNY">CNY</option>
@@ -508,7 +602,7 @@ export default function ProductsPage() {
                         step="0.001"
                         value={formData.netWeight || ''}
                         onChange={(e) => setFormData({ ...formData, netWeight: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
@@ -518,7 +612,7 @@ export default function ProductsPage() {
                         step="0.001"
                         value={formData.grossWeight || ''}
                         onChange={(e) => setFormData({ ...formData, grossWeight: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
@@ -527,7 +621,7 @@ export default function ProductsPage() {
                         type="text"
                         value={formData.originCountry || ''}
                         onChange={(e) => setFormData({ ...formData, originCountry: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         placeholder="例如：China"
                       />
                     </div>
@@ -538,7 +632,7 @@ export default function ProductsPage() {
                         step="0.01"
                         value={formData.length || ''}
                         onChange={(e) => setFormData({ ...formData, length: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
@@ -548,7 +642,7 @@ export default function ProductsPage() {
                         step="0.01"
                         value={formData.width || ''}
                         onChange={(e) => setFormData({ ...formData, width: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
@@ -558,7 +652,7 @@ export default function ProductsPage() {
                         step="0.01"
                         value={formData.height || ''}
                         onChange={(e) => setFormData({ ...formData, height: parseFloat(e.target.value) || undefined })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                   </div>
@@ -574,7 +668,7 @@ export default function ProductsPage() {
                         type="text"
                         value={formData.material || ''}
                         onChange={(e) => setFormData({ ...formData, material: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         placeholder="例如：304 Stainless Steel"
                       />
                     </div>
@@ -584,7 +678,7 @@ export default function ProductsPage() {
                         type="text"
                         value={formData.usage || ''}
                         onChange={(e) => setFormData({ ...formData, usage: e.target.value })}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         placeholder="例如：Drinkware"
                       />
                     </div>
@@ -602,7 +696,7 @@ export default function ProductsPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" /> {saving ? '保存中...' : '保存'}
                 </button>
@@ -615,75 +709,22 @@ export default function ProductsPage() {
         {loading ? (
           <div className="text-center py-12 text-gray-500">加载中...</div>
         ) : products.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 mb-4">
-              {search ? '没有找到匹配的商品' : '还没有添加商品'}
-            </p>
-            {!search && (
-              <button
-                onClick={handleNew}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Plus className="w-4 h-4" /> 添加第一个商品
-              </button>
-            )}
-          </div>
+          <SaasEmptyState
+            variant={search ? 'no-results' : 'no-data'}
+            title={search ? '没有找到匹配的商品' : '还没有添加商品'}
+            description={search ? '尝试使用不同的关键词搜索' : '添加商品信息后，可在报价单、发票、装箱单中一键引用'}
+            icon={<Package className="w-12 h-12" />}
+            primaryAction={!search ? { label: '添加第一个商品', onClick: handleNew } : undefined}
+            secondaryAction={search ? { label: '清除搜索', onClick: () => setSearch('') } : undefined}
+          />
         ) : (
-          <div className="grid gap-4">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className={`bg-white rounded-xl border p-4 ${!product.isActive ? 'opacity-60' : ''}`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                      {product.sku && (
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">{product.sku}</span>
-                      )}
-                      {!product.isActive && (
-                        <span className="text-xs px-2 py-0.5 bg-red-50 text-red-600 rounded">已停用</span>
-                      )}
-                    </div>
-                    {product.description && (
-                      <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-                    )}
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-500">
-                      {product.hsCode && <span>HS: {product.hsCode}</span>}
-                      {product.unitPrice && <span>{product.currency} {product.unitPrice}/{product.unit}</span>}
-                      {product.netWeight && <span>净重: {product.netWeight} KG</span>}
-                      {product.originCountry && <span>产地: {product.originCountry}</span>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 ml-4">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
-                      title="编辑"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDuplicate(product)}
-                      className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
-                      title="复制"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                      title="删除"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <CompactTable
+            columns={productColumns}
+            data={products}
+            rowKey={(row) => row.id}
+            density="comfortable"
+            striped
+          />
         )}
       </div>
     </div>

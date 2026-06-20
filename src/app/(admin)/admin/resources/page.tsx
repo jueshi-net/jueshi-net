@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe, Sparkles } from 'lucide-react';
+import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe, Sparkles, Search } from 'lucide-react';
+import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+import { SectionCard } from '@/components/saas/SectionCard';
+import { MetricCard } from '@/components/saas/MetricCard';
+import { StatusBadge } from '@/components/saas/StatusBadge';
+import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
 
 interface ResourceItem {
   id: string;
@@ -249,7 +254,6 @@ export default function AdminResourcesPage() {
       const data = await res.json();
       if (data.success) {
         setQualityReport(data.report);
-        // Track quality check run
         try {
           navigator.sendBeacon(
             '/api/events',
@@ -303,45 +307,44 @@ export default function AdminResourcesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-xl p-5 text-white">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-extrabold flex items-center gap-2"><Globe className="w-5 h-5" /> 🌍 网址导航大厅</h1>
-            <p className="text-sm text-purple-100 mt-1">管理前台 /resources 展示的导航网址。共 {total} 条。</p>
-          </div>
+      <WorkspacePageHeader
+        title="网址导航大厅"
+        subtitle={`管理前台 /resources 展示的导航网址。共 ${total} 条。`}
+        icon={<Globe className="w-5 h-5" />}
+        actions={
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setShowCategoryModal(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm hover:bg-white/20 transition-colors min-h-[44px]">
+            <button onClick={() => setShowCategoryModal(true)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors min-h-[44px]">
               <Tag className="w-4 h-4" /> 分类管理
             </button>
             <button
               onClick={runQualityCheck}
               disabled={runningQualityCheck}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm hover:bg-white/20 transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors min-h-[44px]"
             >
               <Activity className={`w-4 h-4 ${runningQualityCheck ? 'animate-pulse' : ''}`} />
-              {runningQualityCheck ? '检查中...' : '🔍 质量检查'}
+              {runningQualityCheck ? '检查中...' : '质量检查'}
             </button>
             <button
               onClick={checkingLinks ? stopCheck : runDeadLinkCheck}
               disabled={resources.length === 0}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 border rounded-xl text-sm transition-colors min-h-[44px] ${
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors min-h-[44px] ${
                 checkingLinks
-                  ? 'bg-red-500/20 border-red-300 text-white hover:bg-red-500/30'
-                  : 'bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20'
+                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <Activity className={`w-4 h-4 ${checkingLinks ? 'animate-pulse' : ''}`} />
-              {checkingLinks ? '检测中... 点击停止' : '⚡ 一键死链体检'}
+              {checkingLinks ? '检测中... 停止' : '死链体检'}
             </button>
-            <button onClick={() => setShowImportExport(true)} className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl text-sm hover:bg-white/20 transition-colors min-h-[44px]">
+            <button onClick={() => setShowImportExport(true)} className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors min-h-[44px]">
               <Upload className="w-4 h-4" /> 导入/导出
             </button>
-            <button onClick={openCreate} className="inline-flex items-center gap-1.5 px-5 py-2 bg-white text-purple-700 rounded-xl text-sm font-bold hover:bg-purple-50 transition-colors min-h-[44px]">
+            <button onClick={openCreate} className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]">
               <Plus className="w-4 h-4" /> 添加网址
             </button>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* 死链检测结果横幅 */}
       {deadLinkCount > 0 && (
@@ -353,120 +356,129 @@ export default function AdminResourcesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="bg-white border rounded-xl p-4 text-center">
-          <div className="text-2xl font-extrabold text-gray-900">{total}</div>
-          <div className="text-xs text-gray-500">总网址</div>
-        </div>
-        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-          <div className="text-2xl font-extrabold text-green-700">{activeCount}</div>
-          <div className="text-xs text-green-600">启用中</div>
-        </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-          <div className="text-2xl font-extrabold text-gray-500">{inactiveCount}</div>
-          <div className="text-xs text-gray-400">已隐藏</div>
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-          <div className="text-2xl font-extrabold text-amber-700">{adCount}</div>
-          <div className="text-xs text-amber-600">广告/赞助</div>
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-          <div className="text-2xl font-extrabold text-blue-700">{categoryCount}</div>
-          <div className="text-xs text-blue-600">分类数</div>
-        </div>
+        <MetricCard label="总网址" value={total} icon={<Globe className="w-5 h-5" />} />
+        <MetricCard label="启用中" value={activeCount} icon={<StatusBadge label="" variant="success" size="sm" />} />
+        <MetricCard label="已隐藏" value={inactiveCount} icon={<StatusBadge label="" variant="neutral" size="sm" />} />
+        <MetricCard label="广告/赞助" value={adCount} icon={<Sparkles className="w-5 h-5" />} />
+        <MetricCard label="分类数" value={categoryCount} icon={<Tag className="w-5 h-5" />} />
       </div>
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-600">{error}</p>
-          <button onClick={fetchResources} className="ml-auto px-3 py-1 bg-red-600 text-white rounded-lg text-sm min-h-[36px]">重试</button>
+          <button onClick={fetchResources} className="ml-auto px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm min-h-[36px] hover:bg-red-700">重试</button>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex gap-3 flex-wrap">
-        <input value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} placeholder="搜索名称/描述/URL..." className="flex-1 min-w-[200px] px-3 py-2 border rounded-lg text-sm min-h-[44px]" />
-        <select value={categoryFilter} onChange={e => { setCategoryFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
-          <option value="">全部分类</option>
-          {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </select>
-        <select value={sourceTypeFilter} onChange={e => { setSourceTypeFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
-          <option value="">全部来源</option>
-          <option value="official">🏛️ 官方</option>
-          <option value="third-party">🔗 第三方</option>
-          <option value="internal">🔒 内部</option>
-        </select>
-        <select value={isAdFilter} onChange={e => { setIsAdFilter(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
-          <option value="">全部类型</option>
-          <option value="true">⭐ 广告/赞助</option>
-          <option value="false">普通资源</option>
-        </select>
-        <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }} className="px-3 py-2 border rounded-lg text-sm min-h-[44px]">
-          <option value="updatedAt">最近更新</option>
-          <option value="createdAt">创建时间</option>
-          <option value="sortOrder">排序权重</option>
-          <option value="qualityScore">质量评分</option>
-          <option value="name">名称</option>
-        </select>
-      </div>
+      <SectionCard>
+        <div className="flex gap-3 flex-wrap items-center">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
+              placeholder="搜索名称/描述/URL..."
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
+          <select value={categoryFilter} onChange={e => { setCategoryFilter(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="">全部分类</option>
+            {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          </select>
+          <select value={sourceTypeFilter} onChange={e => { setSourceTypeFilter(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="">全部来源</option>
+            <option value="official">🏛️ 官方</option>
+            <option value="third-party">🔗 第三方</option>
+            <option value="internal">🔒 内部</option>
+          </select>
+          <select value={isAdFilter} onChange={e => { setIsAdFilter(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="">全部类型</option>
+            <option value="true">⭐ 广告/赞助</option>
+            <option value="false">普通资源</option>
+          </select>
+          <select value={sortBy} onChange={e => { setSortBy(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500">
+            <option value="updatedAt">最近更新</option>
+            <option value="createdAt">创建时间</option>
+            <option value="sortOrder">排序权重</option>
+            <option value="qualityScore">质量评分</option>
+            <option value="name">名称</option>
+          </select>
+        </div>
+      </SectionCard>
 
       {/* Bulk Actions */}
       {selected.length > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-          <span className="text-sm text-blue-700">已选 {selected.length} 项</span>
-          <button onClick={() => setAction('delete')} className="px-2 py-1 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50 min-h-[36px]">删除选中</button>
-          <button onClick={() => { setSelected([]); setAction(null); }} className="px-2 py-1 text-sm text-gray-500 min-h-[36px]">取消</button>
+        <div className="flex items-center gap-2 p-3 bg-teal-50 border border-teal-200 rounded-xl">
+          <span className="text-sm text-teal-700 font-medium">已选 {selected.length} 项</span>
+          <button onClick={() => setAction('delete')} className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 min-h-[36px]">删除选中</button>
+          <button onClick={() => { setSelected([]); setAction(null); }} className="px-3 py-1.5 text-sm text-gray-500 rounded-lg hover:bg-gray-100 min-h-[36px]">取消</button>
         </div>
       )}
 
       {/* Table */}
       {loading ? (
-        <div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-purple-600" /></div>
+        <div className="flex flex-col items-center justify-center py-20 gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+          <span className="text-sm text-gray-400">加载中...</span>
+        </div>
+      ) : resources.length === 0 ? (
+        <SaasEmptyState
+          variant="no-data"
+          title="暂无网址"
+          description="点击「添加网址」开始管理导航目录"
+          icon={<BookOpen className="w-12 h-12" />}
+          primaryAction={{ label: '添加网址', onClick: openCreate }}
+        />
       ) : (
-        <div className="bg-white rounded-xl border overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-gray-50/80 border-b border-gray-200">
                 <tr>
                   <th className="px-4 py-3 text-left w-10"><input type="checkbox" onChange={e => setSelected(e.target.checked ? resources.map(r => r.id) : [])} checked={selected.length === resources.length && resources.length > 0} /></th>
-                  <th className="px-4 py-3 text-left">名称</th>
-                  <th className="px-4 py-3 text-left hidden sm:table-cell">分类</th>
-                  <th className="px-4 py-3 text-left hidden md:table-cell">来源</th>
-                  <th className="px-4 py-3 text-left hidden lg:table-cell">质量</th>
-                  <th className="px-4 py-3 text-left">状态</th>
-                  <th className="px-4 py-3 text-left hidden lg:table-cell">推荐</th>
-                  <th className="px-4 py-3 text-left hidden lg:table-cell">链接健康</th>
-                  <th className="px-4 py-3 text-left hidden lg:table-cell">更新时间</th>
-                  <th className="px-4 py-3 text-right">操作</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">名称</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden sm:table-cell">分类</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden md:table-cell">来源</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">质量</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider">状态</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">推荐</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">链接健康</th>
+                  <th className="px-4 py-3 text-left font-medium text-gray-500 text-xs uppercase tracking-wider hidden lg:table-cell">更新时间</th>
+                  <th className="px-4 py-3 text-right font-medium text-gray-500 text-xs uppercase tracking-wider">操作</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {resources.map(r => {
                   const linkResult = linkResults[r.id];
                   return (
-                    <tr key={r.id} className={`border-b hover:bg-gray-50 ${linkResult && !linkResult.ok ? 'bg-red-50' : ''} ${r.isAd ? 'bg-amber-50/30' : ''}`}>
+                    <tr key={r.id} className={`hover:bg-gray-50/60 transition-colors ${linkResult && !linkResult.ok ? 'bg-red-50/50' : ''} ${r.isAd ? 'bg-amber-50/30' : ''}`}>
                       <td className="px-4 py-3"><input type="checkbox" checked={selected.includes(r.id)} onChange={e => setSelected(e.target.checked ? [...selected, r.id] : selected.filter(id => id !== r.id))} /></td>
                       <td className="px-4 py-3">
-                        <div className="font-medium max-w-[180px] truncate flex items-center gap-1">
+                        <div className="font-medium max-w-[180px] truncate flex items-center gap-1 text-gray-700">
                           {r.isAd && <span className="text-amber-500 text-xs" title="广告/赞助">⭐</span>}
                           {r.name}
                         </div>
                         <div className="text-xs text-gray-400 truncate max-w-xs">{r.url}</div>
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell"><span className={`px-2 py-0.5 rounded text-xs ${catColor(r.category)}`}>{catLabel(r.category)}</span></td>
-                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-xs">{r.sourceType === 'official' ? '🏛️ 官方' : r.sourceType === 'third-party' ? '🔗 第三方' : '🔒 内部'}</span></td>
+                      <td className="px-4 py-3 hidden sm:table-cell"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${catColor(r.category)}`}>{catLabel(r.category)}</span></td>
+                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-xs text-gray-600">{r.sourceType === 'official' ? '🏛️ 官方' : r.sourceType === 'third-party' ? '🔗 第三方' : '🔒 内部'}</span></td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className={`text-xs font-medium ${(r.qualityScore ?? 0) >= 80 ? 'text-green-600' : (r.qualityScore ?? 0) >= 50 ? 'text-amber-600' : 'text-gray-400'}`}>
+                        <span className={`text-xs font-bold ${(r.qualityScore ?? 0) >= 80 ? 'text-green-600' : (r.qualityScore ?? 0) >= 50 ? 'text-amber-600' : 'text-gray-400'}`}>
                           {r.qualityScore || 0}
                         </span>
                       </td>
-                      <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs ${r.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{r.isActive ? '启用' : '隐藏'}</span></td>
+                      <td className="px-4 py-3">
+                        {r.isActive ? (
+                          <StatusBadge label="启用" variant="success" size="sm" dot />
+                        ) : (
+                          <StatusBadge label="隐藏" variant="neutral" size="sm" />
+                        )}
+                      </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {r.isFeatured ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-                            <Sparkles className="w-3 h-3" />
-                            推荐
-                          </span>
+                          <StatusBadge label="推荐" variant="info" size="sm" icon={<Sparkles className="w-3 h-3" />} />
                         ) : (
                           <span className="text-gray-300 text-xs">—</span>
                         )}
@@ -474,12 +486,9 @@ export default function AdminResourcesPage() {
                       <td className="px-4 py-3 hidden lg:table-cell">
                         {linkResult ? (
                           linkResult.ok ? (
-                            <span className="text-green-600 text-xs">✅ {linkResult.status}</span>
+                            <StatusBadge label={`${linkResult.status}`} variant="success" size="sm" />
                           ) : (
-                            <span className="text-red-600 text-xs flex items-center gap-1">
-                              <span className="w-2 h-2 bg-red-500 rounded-full inline-block animate-pulse" />
-                              {linkResult.status || 'ERR'} {linkResult.error ? `(${linkResult.error})` : ''}
-                            </span>
+                            <StatusBadge label={`${linkResult.status || 'ERR'} ${linkResult.error ? `(${linkResult.error})` : ''}`} variant="danger" size="sm" dot pulse />
                           )
                         ) : checkingLinks ? (
                           <Loader2 className="w-3 h-3 animate-spin text-gray-400" />
@@ -490,9 +499,9 @@ export default function AdminResourcesPage() {
                       <td className="px-4 py-3 text-xs text-gray-400 hidden lg:table-cell">{r.updatedAt ? new Date(r.updatedAt).toLocaleDateString("zh-CN") : '—'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <a href={r.url} target="_blank" rel="noopener" className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]"><ExternalLink className="w-4 h-4" /></a>
-                          <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-blue-600 min-h-[36px]"><Edit className="w-4 h-4" /></button>
-                          <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 min-h-[36px]"><Trash2 className="w-4 h-4" /></button>
+                          <a href={r.url} target="_blank" rel="noopener" className="p-1.5 text-gray-400 hover:text-teal-600 rounded-lg hover:bg-gray-100 transition-colors min-h-[36px]"><ExternalLink className="w-4 h-4" /></a>
+                          <button onClick={() => openEdit(r)} className="p-1.5 text-gray-400 hover:text-teal-600 rounded-lg hover:bg-gray-100 transition-colors min-h-[36px]"><Edit className="w-4 h-4" /></button>
+                          <button onClick={() => handleDelete(r.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors min-h-[36px]"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       </td>
                     </tr>
@@ -501,13 +510,6 @@ export default function AdminResourcesPage() {
               </tbody>
             </table>
           </div>
-          {resources.length === 0 && (
-            <div className="p-12 text-center text-gray-400">
-              <BookOpen className="w-14 h-14 mx-auto mb-3 text-gray-300" />
-              <p className="text-lg font-medium text-gray-500 mb-1">暂无网址</p>
-              <p className="text-sm">点击「添加网址」开始管理导航目录</p>
-            </div>
-          )}
         </div>
       )}
 
@@ -516,9 +518,9 @@ export default function AdminResourcesPage() {
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-500">共 {total} 条</span>
           <div className="flex gap-2">
-            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-50 min-h-[36px]">上一页</button>
-            <span className="px-3 py-1 text-sm">第 {page} 页</span>
-            <button disabled={page * 50 >= total} onClick={() => setPage(p => p + 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-50 min-h-[36px]">下一页</button>
+            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 min-h-[36px] hover:bg-gray-50">上一页</button>
+            <span className="px-3 py-1.5 text-sm text-gray-600">第 {page} 页</span>
+            <button disabled={page * 50 >= total} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 min-h-[36px] hover:bg-gray-50">下一页</button>
           </div>
         </div>
       )}
@@ -526,37 +528,37 @@ export default function AdminResourcesPage() {
       {/* ─── Edit/Create Modal ─────────────────────────────────────────── */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">{editingId ? '编辑网址' : '新增网址'}</h2>
-              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+              <h2 className="text-lg font-bold text-gray-900">{editingId ? '编辑网址' : '新增网址'}</h2>
+              <button onClick={() => setShowModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-3">
-              <div><label className="block text-sm font-medium mb-1">名称 *</label><input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="block text-sm font-medium mb-1">URL *</label><input value={formData.url} onChange={e => setFormData({ ...formData, url: e.target.value })} className="w-full px-3 py-2 border rounded-lg font-mono text-sm" /></div>
-              <div><label className="block text-sm font-medium mb-1">描述</label><textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">名称 *</label><input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">URL *</label><input value={formData.url} onChange={e => setFormData({ ...formData, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">描述</label><textarea value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">分类</label>
-                  <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2 border rounded-lg">
+                  <label className="block text-sm font-medium mb-1 text-gray-700">分类</label>
+                  <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
                     {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </div>
-                <div><label className="block text-sm font-medium mb-1">来源</label><select value={formData.sourceType} onChange={e => setFormData({ ...formData, sourceType: e.target.value })} className="w-full px-3 py-2 border rounded-lg">{SOURCE_TYPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></div>
+                <div><label className="block text-sm font-medium mb-1 text-gray-700">来源</label><select value={formData.sourceType} onChange={e => setFormData({ ...formData, sourceType: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">{SOURCE_TYPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></div>
               </div>
 
               {/* ─── 网站 Logo ─────────────────────────────────────────────── */}
               <div>
-                <label className="block text-sm font-medium mb-1">网站 Logo</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700">网站 Logo</label>
                 <div className="flex gap-3">
                   <input
                     value={formData.iconUrl}
                     onChange={e => setFormData({ ...formData, iconUrl: e.target.value })}
                     placeholder="https://example.com/logo.png"
-                    className="flex-1 px-3 py-2 border rounded-lg text-sm font-mono"
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                   {formData.iconUrl && (
-                    <div className="w-10 h-10 rounded-lg border bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={formData.iconUrl} alt="Logo" className="w-7 h-7 object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
@@ -575,7 +577,7 @@ export default function AdminResourcesPage() {
               </div>
 
               {/* ─── 推荐位管理 ─────────────────────────────────────────────── */}
-              <div className="border-t pt-3 mt-3">
+              <div className="border-t border-gray-100 pt-3 mt-3">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
                   <span className="text-sm font-medium text-purple-700">推荐位设置</span>
@@ -584,46 +586,46 @@ export default function AdminResourcesPage() {
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={formData.isFeatured} onChange={e => setFormData({ ...formData, isFeatured: e.target.checked })}
                       className="w-4 h-4 rounded border-gray-300 text-purple-500 focus:ring-purple-500" />
-                    <span className="text-sm font-medium">设为推荐资源</span>
+                    <span className="text-sm font-medium text-gray-700">设为推荐资源</span>
                   </label>
                   {formData.isFeatured && (
                     <div className="grid grid-cols-2 gap-2 pl-6">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">推荐分组</label>
                         <input value={formData.featuredGroup} onChange={e => setFormData({ ...formData, featuredGroup: e.target.value })}
-                          placeholder="如: 热门、新品" className="w-full px-2 py-1.5 border rounded text-sm" />
+                          placeholder="如: 热门、新品" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">排序权重</label>
                         <input type="number" value={formData.featuredOrder} onChange={e => setFormData({ ...formData, featuredOrder: parseInt(e.target.value) || 0 })}
-                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">开始时间</label>
                         <input type="datetime-local" value={formData.featuredStartAt} onChange={e => setFormData({ ...formData, featuredStartAt: e.target.value })}
-                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">结束时间</label>
                         <input type="datetime-local" value={formData.featuredEndAt} onChange={e => setFormData({ ...formData, featuredEndAt: e.target.value })}
-                          className="w-full px-2 py-1.5 border rounded text-sm" />
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" />
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div><label className="block text-sm font-medium mb-1">标签（逗号分隔）</label><input value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="block text-sm font-medium mb-1">使用说明</label><textarea value={formData.usage} onChange={e => setFormData({ ...formData, usage: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg" /></div>
-              <div><label className="block text-sm font-medium mb-1">免责声明</label><textarea value={formData.disclaimer} onChange={e => setFormData({ ...formData, disclaimer: e.target.value })} rows={2} className="w-full px-3 py-2 border rounded-lg" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">标签（逗号分隔）</label><input value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">使用说明</label><textarea value={formData.usage} onChange={e => setFormData({ ...formData, usage: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
+              <div><label className="block text-sm font-medium mb-1 text-gray-700">免责声明</label><textarea value={formData.disclaimer} onChange={e => setFormData({ ...formData, disclaimer: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2"><input type="checkbox" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} /> 启用（隐藏后前台不展示）</label>
-                <div className="flex items-center gap-2"><span className="text-sm">排序</span><input type="number" value={formData.sortOrder} onChange={e => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })} className="w-20 px-3 py-2 border rounded-lg" /></div>
+                <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} /> 启用（隐藏后前台不展示）</label>
+                <div className="flex items-center gap-2 text-sm text-gray-700"><span>排序</span><input type="number" value={formData.sortOrder} onChange={e => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })} className="w-20 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" /></div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50 min-h-[44px]">取消</button>
-              <button onClick={handleSave} disabled={saving || !formData.name || !formData.url} className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center gap-1 min-h-[44px]">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存</button>
+            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+              <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 min-h-[44px]">取消</button>
+              <button onClick={handleSave} disabled={saving || !formData.name || !formData.url} className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 flex items-center gap-1 min-h-[44px]">{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存</button>
             </div>
           </div>
         </div>
@@ -632,16 +634,16 @@ export default function AdminResourcesPage() {
       {/* ─── 分类管理 Modal ───────────────────────────────────────────── */}
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold flex items-center gap-2"><Tag className="w-5 h-5" /> 分类管理</h2>
-              <button onClick={() => setShowCategoryModal(false)} className="p-1 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2"><Tag className="w-5 h-5" /> 分类管理</h2>
+              <button onClick={() => setShowCategoryModal(false)} className="p-1.5 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3 mb-4">
               {categories.map(c => (
                 <div key={c.value} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${c.color}`}>{c.label}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.color}`}>{c.label}</span>
                   <span className="text-xs text-gray-400 font-mono">{c.value}</span>
                   <button onClick={() => removeCategory(c.value)} className="ml-auto text-gray-400 hover:text-red-500 transition-colors min-h-[36px]">
                     <Trash2 className="w-4 h-4" />
@@ -650,29 +652,29 @@ export default function AdminResourcesPage() {
               ))}
             </div>
 
-            <div className="border-t pt-4">
-              <p className="text-sm font-medium mb-2">添加新分类</p>
+            <div className="border-t border-gray-100 pt-4">
+              <p className="text-sm font-medium mb-2 text-gray-700">添加新分类</p>
               <div className="flex gap-2">
                 <input
                   value={newCatValue}
                   onChange={e => setNewCatValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
                   placeholder="英文标识 (如 tools)"
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 <input
                   value={newCatLabel}
                   onChange={e => setNewCatLabel(e.target.value)}
                   placeholder="中文名称 (如 实用工具)"
-                  className="flex-1 px-3 py-2 border rounded-lg text-sm min-h-[44px]"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm min-h-[44px] focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button onClick={addCategory} disabled={!newCatValue || !newCatLabel} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 min-h-[44px]">
+                <button onClick={addCategory} disabled={!newCatValue || !newCatLabel} className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 min-h-[44px]">
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            <div className="flex justify-end mt-4 pt-3 border-t">
-              <button onClick={() => setShowCategoryModal(false)} className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[44px]">完成</button>
+            <div className="flex justify-end mt-4 pt-3 border-t border-gray-100">
+              <button onClick={() => setShowCategoryModal(false)} className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 min-h-[44px]">完成</button>
             </div>
           </div>
         </div>
@@ -681,11 +683,11 @@ export default function AdminResourcesPage() {
       {/* Bulk Action Confirm */}
       {action && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold mb-2">确认{action === 'delete' ? '删除' : '操作'}</h3>
+          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">确认{action === 'delete' ? '删除' : '操作'}</h3>
             <p className="text-sm text-gray-500 mb-4">确定要对选中的 {selected.length} 项执行此操作吗？</p>
             <div className="flex justify-end gap-2">
-              <button onClick={() => setAction(null)} className="px-4 py-2 text-sm border rounded-lg min-h-[44px]">取消</button>
+              <button onClick={() => setAction(null)} className="px-4 py-2 text-sm border border-gray-200 rounded-lg min-h-[44px] hover:bg-gray-50">取消</button>
               <button onClick={handleBulkAction} disabled={processing} className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 min-h-[44px]">{processing ? '处理中...' : '确认'}</button>
             </div>
           </div>
@@ -695,17 +697,17 @@ export default function AdminResourcesPage() {
       {/* Import/Export Modal */}
       {showImportExport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold">导入 / 导出</h2>
-              <button onClick={() => setShowImportExport(false)} className="p-1 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+              <h2 className="text-lg font-bold text-gray-900">导入 / 导出</h2>
+              <button onClick={() => setShowImportExport(false)} className="p-1.5 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"><X className="w-5 h-5" /></button>
             </div>
             <div className="space-y-3">
-              <button onClick={handleExport} disabled={exporting} className="w-full px-4 py-3 border rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 min-h-[44px]"><Download className="w-4 h-4" />{exporting ? '导出中...' : '导出全部资源 (JSON)'}</button>
-              <div className="border-t pt-3">
-                <label className="block text-sm font-medium mb-2">导入 JSON 数据</label>
-                <textarea value={importText} onChange={e => setImportText(e.target.value)} placeholder='粘贴 JSON 数组，如：[{"name":"...", "url":"...", "category":"life"}]' rows={6} className="w-full px-3 py-2 border rounded-lg text-sm font-mono" />
-                <button onClick={handleImport} disabled={importing || !importText.trim()} className="mt-2 w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-1 min-h-[44px]"><FileJson className="w-4 h-4" />{importing ? '导入中...' : '导入'}</button>
+              <button onClick={handleExport} disabled={exporting} className="w-full px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2 min-h-[44px] text-sm font-medium text-gray-700"><Download className="w-4 h-4" />{exporting ? '导出中...' : '导出全部资源 (JSON)'}</button>
+              <div className="border-t border-gray-100 pt-3">
+                <label className="block text-sm font-medium mb-2 text-gray-700">导入 JSON 数据</label>
+                <textarea value={importText} onChange={e => setImportText(e.target.value)} placeholder='粘贴 JSON 数组，如：[{"name":"...", "url":"...", "category":"life"}]' rows={6} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                <button onClick={handleImport} disabled={importing || !importText.trim()} className="mt-2 w-full px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 flex items-center justify-center gap-1 min-h-[44px]"><FileJson className="w-4 h-4" />{importing ? '导入中...' : '导入'}</button>
               </div>
             </div>
           </div>
@@ -715,19 +717,19 @@ export default function AdminResourcesPage() {
       {/* Quality Check Modal */}
       {showQualityCheck && qualityReport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <Activity className="w-5 h-5 text-purple-600" />
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-teal-600" />
                 资源质量报告
               </h2>
-              <button onClick={() => setShowQualityCheck(false)} className="p-1 hover:bg-gray-100 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"><X className="w-5 h-5" /></button>
+              <button onClick={() => setShowQualityCheck(false)} className="p-1.5 hover:bg-gray-100 rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-4">
               {/* 总览 */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-purple-700">{qualityReport.total}</div>
+              <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg p-4 border border-teal-100">
+                <div className="text-2xl font-bold text-teal-700">{qualityReport.total}</div>
                 <div className="text-sm text-gray-600">总资源数</div>
               </div>
 
@@ -811,8 +813,8 @@ export default function AdminResourcesPage() {
               )}
             </div>
 
-            <div className="flex justify-end mt-4 pt-4 border-t">
-              <button onClick={() => setShowQualityCheck(false)} className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[44px]">关闭</button>
+            <div className="flex justify-end mt-4 pt-4 border-t border-gray-100">
+              <button onClick={() => setShowQualityCheck(false)} className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 min-h-[44px]">关闭</button>
             </div>
           </div>
         </div>

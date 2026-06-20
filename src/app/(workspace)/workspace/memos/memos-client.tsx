@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Check, X, Pin, PinOff, StickyNote, Search } from "lucide-react";
-import PageHeader from "@/components/workspace/PageHeader";
-import EmptyState from "@/components/workspace/EmptyState";
+import { WorkspacePageHeader, SaasEmptyState, SectionCard, StatusBadge } from "@/components/saas";
 
 interface Memo {
   id: string;
@@ -69,23 +68,25 @@ export default function MemosClient() {
     .sort((a, b) => (Number(b.isPinned) - Number(a.isPinned)) || new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
   if (loading) return (
-    <div className="max-w-6xl mx-auto">
-      <PageHeader
-        icon={<StickyNote className="w-5 h-5" />}
+    <div className="min-h-screen bg-gray-50">
+      <WorkspacePageHeader
         title="备忘录"
-        description="记录重要事项、客户资料、物流备注"
+        subtitle="记录重要事项、客户资料、物流备注"
+        icon={<StickyNote className="w-5 h-5" />}
+        breadcrumbs={[{ label: "工作台", href: "/workspace" }, { label: "备忘录" }]}
       />
       <div className="p-8 text-center text-gray-400">加载中...</div>
     </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <PageHeader
-        icon={<StickyNote className="w-5 h-5" />}
+    <div className="min-h-screen bg-gray-50">
+      <WorkspacePageHeader
         title="备忘录"
-        description="记录重要事项、客户资料、物流备注"
-        action={
+        subtitle="记录重要事项、客户资料、物流备注"
+        icon={<StickyNote className="w-5 h-5" />}
+        breadcrumbs={[{ label: "工作台", href: "/workspace" }, { label: "备忘录" }]}
+        actions={
           <button 
             onClick={() => setShowForm(!showForm)} 
             className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
@@ -95,93 +96,120 @@ export default function MemosClient() {
         }
       />
 
-      {/* 工具栏 */}
-      <div className="bg-white rounded-xl border border-gray-100 p-4 mb-6">
-        <div className="flex flex-col sm:flex-row gap-3">
-          {/* 搜索框 */}
-          <div className="flex-1 relative">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="搜索备忘..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* 统计指标 */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <MetricPill label="全部备忘" value={memos.length} />
+          <MetricPill label="已置顶" value={memos.filter(m => m.isPinned).length} />
+          <MetricPill label="本周更新" value={memos.filter(m => new Date(m.updatedAt) > new Date(Date.now() - 7 * 86400000)).length} />
+        </div>
+
+        {/* 工具栏 */}
+        <SectionCard>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="搜索备忘..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery("")} 
+                className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                清除搜索
+              </button>
+            )}
+          </div>
+        </SectionCard>
+
+        {/* 新建表单 */}
+        {showForm && (
+          <SectionCard title="新建备忘" action={
+            <button onClick={() => setShowForm(false)} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-50">
+              <X className="w-4 h-4" />
+            </button>
+          }>
+            <div className="space-y-3">
+              <input 
+                type="text" 
+                placeholder="标题" 
+                value={newTitle} 
+                onChange={e => setNewTitle(e.target.value)} 
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" 
+              />
+              <textarea 
+                placeholder="内容..." 
+                value={newContent} 
+                onChange={e => setNewContent(e.target.value)} 
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none" 
+              />
+              <div className="flex gap-2 justify-end">
+                <button 
+                  onClick={() => setShowForm(false)} 
+                  className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  取消
+                </button>
+                <button 
+                  onClick={handleCreate} 
+                  className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                >
+                  保存
+                </button>
+              </div>
+            </div>
+          </SectionCard>
+        )}
+
+        {/* 备忘列表 */}
+        {sorted.length === 0 ? (
+          searchQuery ? (
+            <SaasEmptyState
+              variant="no-results"
+              title="没有找到匹配的备忘"
+              description="尝试使用不同的关键词搜索"
+              primaryAction={{ label: "清除搜索", onClick: () => setSearchQuery("") }}
             />
-          </div>
-          {/* 统计 */}
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>共 {memos.length} 条</span>
-            <span>置顶 {memos.filter(m => m.isPinned).length} 条</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 新建表单 */}
-      {showForm && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-3 mb-6">
-          <input 
-            type="text" 
-            placeholder="标题" 
-            value={newTitle} 
-            onChange={e => setNewTitle(e.target.value)} 
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500" 
-          />
-          <textarea 
-            placeholder="内容..." 
-            value={newContent} 
-            onChange={e => setNewContent(e.target.value)} 
-            rows={4} 
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none" 
-          />
-          <div className="flex gap-2 justify-end">
-            <button 
-              onClick={() => setShowForm(false)} 
-              className="px-4 py-2 text-sm text-gray-500 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              取消
-            </button>
-            <button 
-              onClick={handleCreate} 
-              className="px-4 py-2 text-sm bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
-            >
-              保存
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 备忘列表 */}
-      {sorted.length === 0 ? (
-        searchQuery ? (
-          <EmptyState
-            icon={<Search className="w-8 h-8" />}
-            title="没有找到匹配的备忘"
-            description="尝试使用不同的关键词搜索"
-            primaryAction={{ label: "清除搜索", onClick: () => setSearchQuery("") }}
-          />
+          ) : (
+            <SaasEmptyState
+              variant="no-data"
+              title="还没有备忘录"
+              description="记录客户资料、物流备注、常用链接、灵感想法。置顶重要备忘，方便快速查找。"
+              icon={<StickyNote className="w-12 h-12" />}
+              primaryAction={{ label: "新建第一条备忘", onClick: () => setShowForm(true) }}
+            />
+          )
         ) : (
-          <EmptyState
-            icon={<StickyNote className="w-8 h-8" />}
-            title="还没有备忘录"
-            description="记录客户资料、物流备注、常用链接、灵感想法。置顶重要备忘，方便快速查找。"
-            primaryAction={{ label: "新建第一条备忘", onClick: () => setShowForm(true) }}
-          />
-        )
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map(memo => (
-            <MemoCard 
-              key={memo.id} 
-              memo={memo} 
-              isEditing={editingId === memo.id} 
-              onEdit={() => setEditingId(memo.id)} 
-              onDelete={() => handleDelete(memo.id)} 
-              onUpdate={handleUpdate} 
-            />
-          ))}
-        </div>
-      )}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {sorted.map(memo => (
+              <MemoCard 
+                key={memo.id} 
+                memo={memo} 
+                isEditing={editingId === memo.id} 
+                onEdit={() => setEditingId(memo.id)} 
+                onDelete={() => handleDelete(memo.id)} 
+                onUpdate={handleUpdate} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MetricPill({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center justify-between">
+      <span className="text-sm text-gray-500">{label}</span>
+      <span className="text-lg font-bold text-gray-900">{value}</span>
     </div>
   );
 }
@@ -200,7 +228,7 @@ function MemoCard({ memo, isEditing, onEdit, onDelete, onUpdate }: {
 
   if (isEditing) {
     return (
-      <div className="bg-white border-2 border-teal-200 rounded-xl p-4 space-y-2">
+      <div className="bg-white border-2 border-teal-200 rounded-xl p-4 space-y-2 shadow-sm">
         <input 
           type="text" 
           value={title} 
@@ -233,13 +261,15 @@ function MemoCard({ memo, isEditing, onEdit, onDelete, onUpdate }: {
 
   return (
     <div className={`bg-white border rounded-xl p-4 hover:shadow-sm transition-all ${
-      memo.isPinned ? 'border-amber-200 bg-amber-50/30' : 'border-gray-100'
+      memo.isPinned ? 'border-amber-200 bg-amber-50/30' : 'border-gray-200'
     }`}>
       <div className="flex items-start justify-between mb-2 gap-2">
-        <h3 className="font-medium text-sm text-gray-900 truncate flex-1">
-          {memo.isPinned && <span className="text-amber-500 mr-1">📌</span>}
-          {memo.title}
-        </h3>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {memo.isPinned && <span className="text-amber-500 text-sm">📌</span>}
+          <h3 className="font-medium text-sm text-gray-900 truncate">
+            {memo.title}
+          </h3>
+        </div>
         <div className="flex items-center gap-1 ml-2 shrink-0">
           <button 
             onClick={() => onUpdate(memo.id, { isPinned: !memo.isPinned })} 
@@ -267,8 +297,12 @@ function MemoCard({ memo, isEditing, onEdit, onDelete, onUpdate }: {
       <p className="text-xs text-gray-500 whitespace-pre-wrap line-clamp-4 mb-3">
         {memo.content || "无内容"}
       </p>
-      <div className="text-[10px] text-gray-400">
-        更新于 {new Date(memo.updatedAt).toLocaleDateString("zh-CN")}
+      <div className="flex items-center justify-between">
+        <StatusBadge 
+          label={new Date(memo.updatedAt).toLocaleDateString("zh-CN")} 
+          variant="neutral" 
+          size="sm" 
+        />
       </div>
     </div>
   );

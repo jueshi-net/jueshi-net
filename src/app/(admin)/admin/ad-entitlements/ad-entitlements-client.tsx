@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, X, Eye, Filter, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Check, X, Eye, Filter, Clock, CheckCircle, XCircle, Loader2, Shield } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+import { SectionCard } from "@/components/saas/SectionCard";
+import { StatusBadge } from "@/components/saas/StatusBadge";
+import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
 
 interface Application {
   id: string;
@@ -30,12 +34,12 @@ const STATUS_OPTIONS = [
   { value: "REJECTED", label: "已拒绝", icon: XCircle },
 ];
 
-const STATUS_COLORS: Record<string, string> = {
-  PENDING: "bg-amber-50 text-amber-700 border-amber-200",
-  APPROVED: "bg-green-50 text-green-700 border-green-200",
-  REJECTED: "bg-red-50 text-red-700 border-red-200",
-  ACTIVE: "bg-blue-50 text-blue-700 border-blue-200",
-  EXPIRED: "bg-gray-50 text-gray-700 border-gray-200",
+const STATUS_VARIANT: Record<string, 'warning' | 'success' | 'danger' | 'info' | 'neutral'> = {
+  PENDING: 'warning',
+  APPROVED: 'success',
+  REJECTED: 'danger',
+  ACTIVE: 'info',
+  EXPIRED: 'neutral',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -108,141 +112,155 @@ export default function AdEntitlementsClient() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">广告权益审核</h1>
-        <p className="text-sm text-gray-500 mt-1">审核用户提交的广告权益申请</p>
-      </div>
+    <div className="min-h-screen bg-gray-50/50">
+      <WorkspacePageHeader
+        title="广告权益审核"
+        subtitle="审核用户提交的广告权益申请"
+        icon={<Shield className="w-5 h-5" />}
+        breadcrumbs={[
+          { label: '管理后台', href: '/admin' },
+          { label: '广告权益审核' },
+        ]}
+      />
 
-      {/* 状态筛选 */}
-      <div className="flex gap-2 mb-6">
-        {STATUS_OPTIONS.map((opt) => (
-          <button
-            key={opt.value}
-            onClick={() => setStatusFilter(opt.value)}
-            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              statusFilter === opt.value
-                ? "bg-teal-600 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            <opt.icon className="w-4 h-4" />
-            {opt.label}
-            {counts[opt.value] !== undefined && (
-              <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${
-                statusFilter === opt.value ? "bg-white/20" : "bg-gray-100"
-              }`}>
-                {counts[opt.value]}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* 申请列表 */}
-      {loading ? (
-        <div className="text-center py-12 text-gray-400">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
-          加载中...
-        </div>
-      ) : applications.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-          <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-base font-semibold text-gray-900 mb-2">暂无申请</h3>
-          <p className="text-sm text-gray-500">当前没有{statusFilter === "ALL" ? "" : STATUS_LABELS[statusFilter] + "的"}广告权益申请</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {applications.map((app) => (
-            <div key={app.id} className="bg-white rounded-xl border border-gray-100 p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-bold text-gray-900">
-                      {app.user.name || app.user.email}
-                    </span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border ${STATUS_COLORS[app.status] || STATUS_COLORS.PENDING}`}>
-                      {STATUS_LABELS[app.status] || app.status}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-500 space-x-4">
-                    <span>广告位: {app.placementKey}</span>
-                    <span>素材类型: {app.materialType}</span>
-                    <span>提交时间: {new Date(app.createdAt).toLocaleString("zh-CN")}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-xs text-gray-500 mb-1">申请说明</div>
-                <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3">{app.description}</p>
-              </div>
-
-              {app.materialUrl && (
-                <div className="mb-4">
-                  <div className="text-xs text-gray-500 mb-1">素材</div>
-                  {app.materialType === "image" ? (
-                    <img src={app.materialUrl} alt="广告素材" className="max-h-32 rounded-lg border border-gray-200" />
-                  ) : (
-                    <a href={app.materialUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-teal-600 hover:underline">
-                      {app.materialUrl}
-                    </a>
-                  )}
-                </div>
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {/* 状态筛选 */}
+        <div className="flex gap-2 flex-wrap">
+          {STATUS_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                statusFilter === opt.value
+                  ? "bg-teal-600 text-white shadow-sm shadow-teal-200"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+              }`}
+            >
+              <opt.icon className="w-4 h-4" />
+              {opt.label}
+              {counts[opt.value] !== undefined && (
+                <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                  statusFilter === opt.value ? "bg-white/20" : "bg-gray-100"
+                }`}>
+                  {counts[opt.value]}
+                </span>
               )}
-
-              {app.startDate && (
-                <div className="text-xs text-gray-500 mb-4">
-                  期望投放: {new Date(app.startDate).toLocaleDateString("zh-CN")}
-                  {app.endDate && ` ~ ${new Date(app.endDate).toLocaleDateString("zh-CN")}`}
-                </div>
-              )}
-
-              {app.reviewNote && (
-                <div className="mb-4">
-                  <div className="text-xs text-gray-500 mb-1">审核备注</div>
-                  <p className="text-sm text-gray-600 italic">{app.reviewNote}</p>
-                </div>
-              )}
-
-              {app.status === "PENDING" && (
-                <div className="flex gap-2 pt-3 border-t border-gray-100">
-                  <button
-                    onClick={() => openReview(app, "approve")}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-                  >
-                    <Check className="w-4 h-4" /> 批准
-                  </button>
-                  <button
-                    onClick={() => openReview(app, "reject")}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
-                  >
-                    <X className="w-4 h-4" /> 拒绝
-                  </button>
-                </div>
-              )}
-            </div>
+            </button>
           ))}
         </div>
-      )}
+
+        {/* 申请列表 */}
+        {loading ? (
+          <div className="text-center py-12 text-gray-400">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+            加载中...
+          </div>
+        ) : applications.length === 0 ? (
+          <SaasEmptyState
+            variant="no-data"
+            title="暂无申请"
+            description={`当前没有${statusFilter === "ALL" ? "" : STATUS_LABELS[statusFilter] + "的"}广告权益申请`}
+            icon={<Clock className="w-12 h-12" />}
+          />
+        ) : (
+          <SectionCard title="申请列表" subtitle={`共 ${applications.length} 条申请`}>
+            <div className="space-y-4">
+              {applications.map((app) => (
+                <div key={app.id} className="p-5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50/30 transition-all">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-sm font-bold text-gray-900">
+                          {app.user.name || app.user.email}
+                        </span>
+                        <StatusBadge
+                          label={STATUS_LABELS[app.status] || app.status}
+                          variant={STATUS_VARIANT[app.status] || 'neutral'}
+                          dot={app.status === 'PENDING'}
+                          pulse={app.status === 'PENDING'}
+                        />
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <span>广告位: <span className="text-gray-700 font-medium">{app.placementKey}</span></span>
+                        <span>素材类型: <span className="text-gray-700">{app.materialType}</span></span>
+                        <span>提交时间: {new Date(app.createdAt).toLocaleString("zh-CN")}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-xs text-gray-500 mb-1">申请说明</div>
+                    <p className="text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border border-gray-100">{app.description}</p>
+                  </div>
+
+                  {app.materialUrl && (
+                    <div className="mb-4">
+                      <div className="text-xs text-gray-500 mb-1">素材</div>
+                      {app.materialType === "image" ? (
+                        <img src={app.materialUrl} alt="广告素材" className="max-h-32 rounded-lg border border-gray-200 shadow-sm" />
+                      ) : (
+                        <a href={app.materialUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-teal-600 hover:underline inline-flex items-center gap-1">
+                          <Eye className="w-3.5 h-3.5" />
+                          {app.materialUrl}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {app.startDate && (
+                    <div className="text-xs text-gray-500 mb-4">
+                      期望投放: {new Date(app.startDate).toLocaleDateString("zh-CN")}
+                      {app.endDate && ` ~ ${new Date(app.endDate).toLocaleDateString("zh-CN")}`}
+                    </div>
+                  )}
+
+                  {app.reviewNote && (
+                    <div className="mb-4">
+                      <div className="text-xs text-gray-500 mb-1">审核备注</div>
+                      <p className="text-sm text-gray-600 italic bg-gray-50 rounded-lg p-2 border border-gray-100">{app.reviewNote}</p>
+                    </div>
+                  )}
+
+                  {app.status === "PENDING" && (
+                    <div className="flex gap-2 pt-3 border-t border-gray-100">
+                      <button
+                        onClick={() => openReview(app, "approve")}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors shadow-sm"
+                      >
+                        <Check className="w-4 h-4" /> 批准
+                      </button>
+                      <button
+                        onClick={() => openReview(app, "reject")}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors shadow-sm"
+                      >
+                        <X className="w-4 h-4" /> 拒绝
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+        )}
+      </div>
 
       {/* 审核弹窗 */}
       {showReviewModal && selectedApp && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-bold text-gray-900 mb-4">
               {reviewAction === "approve" ? "批准申请" : "拒绝申请"}
             </h3>
-            <div className="mb-4">
-              <div className="text-sm text-gray-600 mb-1">申请人: {selectedApp.user.name || selectedApp.user.email}</div>
-              <div className="text-sm text-gray-600">广告位: {selectedApp.placementKey}</div>
+            <div className="mb-4 space-y-1">
+              <div className="text-sm text-gray-600">申请人: <span className="font-medium text-gray-900">{selectedApp.user.name || selectedApp.user.email}</span></div>
+              <div className="text-sm text-gray-600">广告位: <span className="font-medium text-gray-900">{selectedApp.placementKey}</span></div>
             </div>
             <div className="mb-4">
-              <label className="text-sm text-gray-700 block mb-1">审核备注（可选）</label>
+              <label className="text-sm text-gray-700 block mb-1.5 font-medium">审核备注（可选）</label>
               <textarea
                 value={reviewNote}
                 onChange={(e) => setReviewNote(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-colors"
                 rows={3}
                 placeholder="填写审核意见..."
               />
@@ -250,14 +268,14 @@ export default function AdEntitlementsClient() {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowReviewModal(false)}
-                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={submitReview}
                 disabled={!!reviewingId}
-                className={`px-4 py-2 text-sm text-white rounded-lg font-medium ${
+                className={`px-4 py-2 text-sm text-white rounded-lg font-medium shadow-sm transition-colors ${
                   reviewAction === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
                 } disabled:opacity-50`}
               >

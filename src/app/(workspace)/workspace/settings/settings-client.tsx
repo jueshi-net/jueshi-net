@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Settings, Check, LogOut, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import { Settings, Check, LogOut, Lock, Eye, EyeOff } from 'lucide-react';
 import { useUserPreferences, getTheme } from '@/components/user/UserPreferencesContext';
+import { WorkspacePageHeader, SectionCard } from '@/components/saas';
 import Link from 'next/link';
 
 const THEME_COLORS = [
@@ -113,15 +114,21 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   const btnCls = `px-5 py-2 text-white rounded-xl text-xs font-medium transition-colors ${theme.btnBg} ${theme.btnHover}`;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="min-h-screen bg-gray-50">
       {toast && (
         <div className="fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg bg-white/90 border border-gray-100">{toast}</div>
       )}
 
-      <div className="bg-white rounded-2xl border border-gray-100/80 divide-y divide-gray-50">
-        {/* Profile */}
-        <div className="p-5">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">个人信息</h2>
+      <WorkspacePageHeader
+        title="设置中心"
+        subtitle="管理个人信息、主题偏好和账号安全"
+        icon={<Settings className="w-5 h-5" />}
+        breadcrumbs={[{ label: "工作台", href: "/workspace" }, { label: "设置" }]}
+      />
+
+      <div className="max-w-2xl mx-auto px-6 py-6 space-y-6">
+        {/* 个人信息 */}
+        <SectionCard title="个人信息">
           <div className="space-y-3">
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">姓名</label>
@@ -142,11 +149,13 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               {saving ? '保存中...' : '保存修改'}
             </button>
           </div>
-        </div>
+        </SectionCard>
 
-        {/* Theme Colors */}
-        <div className="p-5">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">主题颜色</h2>
+        {/* 主题颜色 */}
+        <SectionCard
+          title="主题颜色"
+          subtitle="选择你喜欢的工作区主题色"
+        >
           <div className="flex flex-wrap gap-3">
             {THEME_COLORS.map(color => {
               const isSelected = themeColor === color.key;
@@ -168,12 +177,14 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               );
             })}
           </div>
-          <p className="text-[11px] text-gray-400 mt-2">当前主题：<span className="font-medium text-gray-600">{THEME_COLORS.find(c => c.key === themeColor)?.label}</span></p>
-        </div>
+          <p className="text-[11px] text-gray-400 mt-3">当前主题：<span className="font-medium text-gray-600">{THEME_COLORS.find(c => c.key === themeColor)?.label}</span></p>
+        </SectionCard>
 
-        {/* Workspace */}
-        <div className="p-5">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4">工作台设置</h2>
+        {/* 工作台设置 */}
+        <SectionCard
+          title="工作台设置"
+          subtitle="自定义工作台显示名称"
+        >
           <div className="space-y-3">
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">工作台标题</label>
@@ -183,13 +194,13 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               {saving ? '保存中...' : '保存'}
             </button>
           </div>
-        </div>
+        </SectionCard>
 
-        {/* Account Security - Password Change */}
-        <div className="p-5">
-          <h2 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-gray-500" /> 账号安全
-          </h2>
+        {/* 账号安全 */}
+        <SectionCard
+          title="账号安全"
+          subtitle="修改密码以保护账号安全"
+        >
           <div className="space-y-3">
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">当前密码</label>
@@ -266,14 +277,14 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
               {changingPw ? '修改中...' : '修改密码'}
             </button>
           </div>
-        </div>
+        </SectionCard>
 
-        {/* Logout */}
-        <div className="p-5">
+        {/* 退出登录 */}
+        <SectionCard>
           <Link href="/api/auth/signout" className="inline-flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-colors">
             <LogOut className="w-4 h-4" /> 退出登录
           </Link>
-        </div>
+        </SectionCard>
       </div>
     </div>
   );

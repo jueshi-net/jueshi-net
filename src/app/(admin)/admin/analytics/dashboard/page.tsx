@@ -6,6 +6,12 @@ import {
   BarChart3, Gift, Link2, Package, Star, Megaphone, ArrowRight, AlertTriangle,
   RefreshCw, Calendar, Shield
 } from 'lucide-react';
+import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+import { SectionCard } from '@/components/saas/SectionCard';
+import { MetricCard } from '@/components/saas/MetricCard';
+import { StatusBadge } from '@/components/saas/StatusBadge';
+import { CompactTable } from '@/components/saas/CompactTable';
+import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -162,17 +168,21 @@ export default function AnalyticsDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center py-12">加载中...</div>
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <RefreshCw className="w-8 h-8 text-teal-600 animate-spin" />
+        <span className="text-sm text-gray-400">加载中...</span>
       </div>
     );
   }
 
   if (!overviewData) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center py-12 text-red-500">加载失败: {error}</div>
-      </div>
+      <SaasEmptyState
+        variant="error"
+        title="加载失败"
+        description={error || '无法加载 Analytics 数据'}
+        primaryAction={{ label: '重试', onClick: () => { setLoading(true); fetchOverview().finally(() => setLoading(false)); } }}
+      />
     );
   }
 
@@ -186,34 +196,17 @@ export default function AnalyticsDashboard() {
   ];
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Analytics 总览</h1>
-        <p className="text-muted-foreground mt-2">v1.20.42.13.3 Phase G — 增长漏斗分析</p>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+    <div className="space-y-6">
+      <WorkspacePageHeader
+        title="Analytics 总览"
+        subtitle="流量分析、增长漏斗与运营数据看板"
+        icon={<BarChart3 className="w-5 h-5" />}
+        tabs={tabs.map(tab => ({
+          label: tab.label,
+          active: activeTab === tab.id,
+          onClick: () => setActiveTab(tab.id),
+        }))}
+      />
 
       {/* Overview Tab */}
       {activeTab === 'overview' && <OverviewTab data={overviewData} />}
@@ -229,90 +222,100 @@ export default function AnalyticsDashboard() {
         />
       )}
 
-      {/* Legacy Tabs */}
+      {/* Pages Tab */}
       {activeTab === 'pages' && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">页面 PV 排行（近 7 天）</h3>
-          <div className="space-y-2">
-            {overviewData.topPages.map((page, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                <span className="text-sm">{page.path}</span>
-                <span className="text-sm font-medium">{page.count}</span>
-              </div>
-            ))}
-            {overviewData.topPages.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">暂无数据</p>
-            )}
-          </div>
-        </div>
+        <SectionCard title="页面 PV 排行（近 7 天）" action={<Eye className="w-5 h-5 text-blue-500" />}>
+          {overviewData.topPages.length === 0 ? (
+            <SaasEmptyState variant="no-data" title="暂无数据" description="页面访问数据将在用户使用后显示" compact />
+          ) : (
+            <CompactTable
+              columns={[
+                { key: "path", header: "页面路径", render: (row: any) => <span className="font-mono text-sm">{row.path}</span> },
+                { key: "count", header: "访问量", align: "right", render: (row: any) => <span className="font-bold text-gray-900">{row.count}</span> },
+              ]}
+              data={overviewData.topPages}
+              rowKey={(row: any, i: number) => `${row.path}-${i}`}
+              density="compact"
+            />
+          )}
+        </SectionCard>
       )}
 
+      {/* Referrers Tab */}
       {activeTab === 'referrers' && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">来源域名排行（近 7 天）</h3>
-          <div className="space-y-2">
-            {overviewData.topReferrers.map((ref, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                <span className="text-sm">{ref.domain}</span>
-                <span className="text-sm font-medium">{ref.count}</span>
-              </div>
-            ))}
-            {overviewData.topReferrers.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">暂无数据</p>
-            )}
-          </div>
-        </div>
+        <SectionCard title="来源域名排行（近 7 天）" action={<Link2 className="w-5 h-5 text-blue-500" />}>
+          {overviewData.topReferrers.length === 0 ? (
+            <SaasEmptyState variant="no-data" title="暂无数据" description="来源数据将在有外部流量后显示" compact />
+          ) : (
+            <CompactTable
+              columns={[
+                { key: "domain", header: "来源域名", render: (row: any) => <span className="font-medium text-gray-700">{row.domain}</span> },
+                { key: "count", header: "访问量", align: "right", render: (row: any) => <span className="font-bold text-gray-900">{row.count}</span> },
+              ]}
+              data={overviewData.topReferrers}
+              rowKey={(row: any, i: number) => `${row.domain}-${i}`}
+              density="compact"
+            />
+          )}
+        </SectionCard>
       )}
 
+      {/* Tools Tab */}
       {activeTab === 'tools' && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">工具使用排行（近 7 天）</h3>
-          <div className="space-y-2">
-            {overviewData.topTools.map((tool, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                <span className="text-sm">{tool.tool}</span>
-                <span className="text-sm font-medium">{tool.count}</span>
-              </div>
-            ))}
-            {overviewData.topTools.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">暂无数据</p>
-            )}
-          </div>
-        </div>
+        <SectionCard title="工具使用排行（近 7 天）" action={<MousePointer className="w-5 h-5 text-blue-500" />}>
+          {overviewData.topTools.length === 0 ? (
+            <SaasEmptyState variant="no-data" title="暂无数据" description="工具使用数据将在用户使用后显示" compact />
+          ) : (
+            <CompactTable
+              columns={[
+                { key: "tool", header: "工具名称", render: (row: any) => <span className="font-medium text-gray-700">{row.tool}</span> },
+                { key: "count", header: "使用次数", align: "right", render: (row: any) => <span className="font-bold text-gray-900">{row.count}</span> },
+              ]}
+              data={overviewData.topTools}
+              rowKey={(row: any, i: number) => `${row.tool}-${i}`}
+              density="compact"
+            />
+          )}
+        </SectionCard>
       )}
 
+      {/* Devices Tab */}
       {activeTab === 'devices' && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-4">设备分布（近 7 天）</h3>
-          <div className="space-y-2">
-            {overviewData.deviceDistribution.map((device, i) => {
-              const total = overviewData.deviceDistribution.reduce((sum, d) => sum + d.count, 0);
-              const percentage = total > 0 ? ((device.count / total) * 100).toFixed(1) : '0';
-              return (
-                <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                  <span className="text-sm">{device.device}</span>
-                  <span className="text-sm font-medium">
-                    {device.count} ({percentage}%)
-                  </span>
-                </div>
-              );
-            })}
-            {overviewData.deviceDistribution.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">暂无数据</p>
-            )}
-          </div>
-        </div>
+        <SectionCard title="设备分布（近 7 天）" action={<Users className="w-5 h-5 text-blue-500" />}>
+          {overviewData.deviceDistribution.length === 0 ? (
+            <SaasEmptyState variant="no-data" title="暂无数据" description="设备数据将在用户访问后显示" compact />
+          ) : (
+            <CompactTable
+              columns={[
+                { key: "device", header: "设备类型", render: (row: any) => <span className="font-medium text-gray-700">{row.device}</span> },
+                {
+                  key: "count",
+                  header: "访问量",
+                  align: "right",
+                  render: (row: any) => {
+                    const total = overviewData.deviceDistribution.reduce((sum, d) => sum + d.count, 0);
+                    const percentage = total > 0 ? ((row.count / total) * 100).toFixed(1) : '0';
+                    return <span className="font-bold text-gray-900">{row.count} <span className="text-gray-400 font-normal text-xs">({percentage}%)</span></span>;
+                  }
+                },
+              ]}
+              data={overviewData.deviceDistribution}
+              rowKey={(row: any, i: number) => `${row.device}-${i}`}
+              density="compact"
+            />
+          )}
+        </SectionCard>
       )}
 
       {/* Error Banner */}
       {overviewData.overview.today.errors > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-red-700">今日错误</div>
-            <AlertCircle className="h-4 w-4 text-red-500" />
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-red-700">今日错误: {overviewData.overview.today.errors} 次</p>
+            <p className="text-xs text-red-600 mt-0.5">工具错误事件</p>
           </div>
-          <div className="text-2xl font-bold text-red-700 mt-2">{overviewData.overview.today.errors}</div>
-          <p className="text-xs text-red-600 mt-1">工具错误事件</p>
+          <StatusBadge label={`${overviewData.overview.today.errors} 次`} variant="danger" dot pulse className="ml-auto" />
         </div>
       )}
     </div>
@@ -324,33 +327,38 @@ export default function AnalyticsDashboard() {
 function OverviewTab({ data }: { data: OverviewData }) {
   const { overview } = data;
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        label="今日 PV"
-        value={overview.today.pv}
-        icon={<Eye className="h-4 w-4 text-muted-foreground" />}
-        trend={overview.trends.pvChange}
-        trendLabel="vs 昨日"
-      />
-      <StatCard
-        label="今日 UV"
-        value={overview.today.uv}
-        icon={<Users className="h-4 w-4 text-muted-foreground" />}
-        trend={overview.trends.uvChange}
-        trendLabel="vs 昨日"
-      />
-      <StatCard
-        label="工具使用"
-        value={overview.today.toolUsage}
-        icon={<MousePointer className="h-4 w-4 text-muted-foreground" />}
-        subtitle="今日工具操作次数"
-      />
-      <StatCard
-        label="注册 / 反馈"
-        value={`${overview.today.signups} / ${overview.today.feedback}`}
-        icon={<MessageSquare className="h-4 w-4 text-muted-foreground" />}
-        subtitle="今日新增注册 / 反馈"
-      />
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          label="今日 PV"
+          value={overview.today.pv}
+          icon={<Eye className="w-5 h-5" />}
+          trend={overview.trends.pvChange !== 0 ? { value: `${overview.trends.pvChange >= 0 ? '+' : ''}${overview.trends.pvChange} vs 昨日`, positive: overview.trends.pvChange >= 0 } : undefined}
+        />
+        <MetricCard
+          label="今日 UV"
+          value={overview.today.uv}
+          icon={<Users className="w-5 h-5" />}
+          trend={overview.trends.uvChange !== 0 ? { value: `${overview.trends.uvChange >= 0 ? '+' : ''}${overview.trends.uvChange} vs 昨日`, positive: overview.trends.uvChange >= 0 } : undefined}
+        />
+        <MetricCard
+          label="工具使用"
+          value={overview.today.toolUsage}
+          icon={<MousePointer className="w-5 h-5" />}
+        />
+        <MetricCard
+          label="注册 / 反馈"
+          value={`${overview.today.signups} / ${overview.today.feedback}`}
+          icon={<MessageSquare className="w-5 h-5" />}
+        />
+      </div>
+
+      {/* Additional overview metrics */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <MetricCard label="今日 Sessions" value={overview.today.sessions} icon={<BarChart3 className="w-5 h-5" />} />
+        <MetricCard label="今日错误" value={overview.today.errors} icon={<AlertCircle className="w-5 h-5" />} />
+        <MetricCard label="昨日 PV / UV" value={`${overview.yesterday.pv} / ${overview.yesterday.uv}`} icon={<TrendingUp className="w-5 h-5" />} />
+      </div>
     </div>
   );
 }
@@ -371,15 +379,20 @@ function FunnelsTab({
   if (loading && !data) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
-        <RefreshCw className="w-8 h-8 text-blue-500 animate-spin" />
-        <div className="text-gray-500 text-sm">加载增长漏斗数据...</div>
+        <RefreshCw className="w-8 h-8 text-teal-600 animate-spin" />
+        <div className="text-sm text-gray-400">加载增长漏斗数据...</div>
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="text-center py-12 text-red-500">加载失败</div>
+      <SaasEmptyState
+        variant="error"
+        title="加载失败"
+        description="无法加载增长漏斗数据"
+        primaryAction={{ label: '重试', onClick: onRefresh }}
+      />
     );
   }
 
@@ -400,7 +413,7 @@ function FunnelsTab({
           <select
             value={range}
             onChange={(e) => onRangeChange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option value="7d">最近 7 天</option>
             <option value="14d">最近 14 天</option>
@@ -411,7 +424,7 @@ function FunnelsTab({
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="p-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 flex items-center gap-2"
+          className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           刷新
@@ -419,35 +432,33 @@ function FunnelsTab({
       </div>
 
       {/* Sub Tabs */}
-      <div className="border-b overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          {subTabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setSubTab(tab.id)}
-                className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
-                  subTab === tab.id
-                    ? 'border-b-2 border-blue-500 text-blue-600'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex gap-1 overflow-x-auto border-b border-gray-200">
+        {subTabs.map(tab => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setSubTab(tab.id)}
+              className={`px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap border-b-2 ${
+                subTab === tab.id
+                  ? 'border-teal-600 text-teal-700'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Sample Size Warning */}
       {data.sampleSizeWarning[subTab as keyof typeof data.sampleSizeWarning] && (
-        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-yellow-800">样本不足</p>
-            <p className="text-xs text-yellow-700 mt-1">
+            <p className="text-sm font-medium text-amber-800">样本不足</p>
+            <p className="text-xs text-amber-700 mt-1">
               当前数据量较少（&lt; 5 条），仅用于验证埋点链路，不用于产品结论。
             </p>
           </div>
@@ -485,15 +496,11 @@ function InviteFunnelSection({ data }: { data: FunnelsData['funnels']['invite'] 
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Gift className="w-5 h-5 text-purple-500" />
-          邀请增长漏斗
-        </h3>
+      <SectionCard title="邀请增长漏斗" action={<Gift className="w-5 h-5 text-purple-500" />}>
         <div className="flex items-center gap-2 overflow-x-auto pb-4">
           {steps.map((step, i) => (
             <div key={step.key} className="flex items-center gap-2 shrink-0">
-              <div className="rounded-lg bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 p-4 min-w-[120px] text-center">
+              <div className="rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 p-4 min-w-[120px] text-center">
                 <div className="text-2xl font-bold text-purple-900">{step.value}</div>
                 <div className="text-xs text-purple-600 mt-1">{step.label}</div>
               </div>
@@ -503,21 +510,20 @@ function InviteFunnelSection({ data }: { data: FunnelsData['funnels']['invite'] 
             </div>
           ))}
         </div>
-      </div>
+      </SectionCard>
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h4 className="text-sm font-semibold mb-3 text-gray-700">各阶段转化率</h4>
+      <SectionCard title="各阶段转化率">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {conversions.map(c => (
             <div key={c.label} className="bg-gray-50 rounded-lg p-3 text-center">
               <div className="text-xs text-gray-500">{c.label}</div>
-              <div className="text-lg font-bold text-blue-600 mt-1">
+              <div className="text-lg font-bold text-teal-600 mt-1">
                 {c.value === 'N/A' ? 'N/A' : `${c.value}%`}
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </SectionCard>
     </div>
   );
 }
@@ -540,15 +546,11 @@ function ToolchainFunnelSection({ data }: { data: FunnelsData['funnels']['toolch
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Link2 className="w-5 h-5 text-blue-500" />
-          工具链转化漏斗
-        </h3>
+      <SectionCard title="工具链转化漏斗" action={<Link2 className="w-5 h-5 text-blue-500" />}>
         <div className="flex items-center gap-2 overflow-x-auto pb-4">
           {steps.map((step, i) => (
             <div key={step.key} className="flex items-center gap-2 shrink-0">
-              <div className="rounded-lg bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 p-4 min-w-[120px] text-center">
+              <div className="rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 p-4 min-w-[120px] text-center">
                 <div className="text-2xl font-bold text-blue-900">{step.value}</div>
                 <div className="text-xs text-blue-600 mt-1">{step.label}</div>
               </div>
@@ -568,21 +570,14 @@ function ToolchainFunnelSection({ data }: { data: FunnelsData['funnels']['toolch
             </div>
           ))}
         </div>
-      </div>
+      </SectionCard>
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h4 className="text-sm font-semibold mb-3 text-gray-700">其他工具链事件</h4>
+      <SectionCard title="其他工具链事件">
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-xs text-gray-500">Container → PL</div>
-            <div className="text-lg font-bold text-gray-900 mt-1">{data.steps.container}</div>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <div className="text-xs text-gray-500">公司资料→文档</div>
-            <div className="text-lg font-bold text-gray-900 mt-1">{data.steps.companyProfileApply}</div>
-          </div>
+          <MetricCard label="Container → PL" value={data.steps.container} />
+          <MetricCard label="公司资料→文档" value={data.steps.companyProfileApply} />
         </div>
-      </div>
+      </SectionCard>
     </div>
   );
 }
@@ -592,27 +587,22 @@ function ToolchainFunnelSection({ data }: { data: FunnelsData['funnels']['toolch
 function ProductsSection({ data }: { data: ProductsData }) {
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Package className="w-5 h-5 text-green-500" />
-          商品库分析
-        </h3>
+      <SectionCard title="商品库分析" action={<Package className="w-5 h-5 text-green-500" />}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MiniStat label="商品总数" value={data.total} />
-          <MiniStat label="活跃商品" value={data.active} />
-          <MiniStat label="使用用户数" value={data.uniqueUsers} />
-          <MiniStat label="近期新增" value={data.recentCreated} />
+          <MetricCard label="商品总数" value={data.total} icon={<Package className="w-5 h-5" />} />
+          <MetricCard label="活跃商品" value={data.active} />
+          <MetricCard label="使用用户数" value={data.uniqueUsers} icon={<Users className="w-5 h-5" />} />
+          <MetricCard label="近期新增" value={data.recentCreated} />
         </div>
-      </div>
+      </SectionCard>
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h4 className="text-sm font-semibold mb-3 text-gray-700">导入/插入统计</h4>
+      <SectionCard title="导入/插入统计">
         <div className="grid grid-cols-3 gap-4">
-          <MiniStat label="导入次数" value={data.importCount} color="blue" />
-          <MiniStat label="插入次数" value={data.insertCount} color="green" />
-          <MiniStat label="导入失败" value={data.importFailedCount} color="red" />
+          <MetricCard label="导入次数" value={data.importCount} />
+          <MetricCard label="插入次数" value={data.insertCount} />
+          <MetricCard label="导入失败" value={data.importFailedCount} />
         </div>
-      </div>
+      </SectionCard>
     </div>
   );
 }
@@ -622,41 +612,41 @@ function ProductsSection({ data }: { data: ProductsData }) {
 function ResourcesSection({ data }: { data: ResourcesData }) {
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Star className="w-5 h-5 text-yellow-500" />
-          推荐资源分析
-        </h3>
+      <SectionCard title="推荐资源分析" action={<Star className="w-5 h-5 text-yellow-500" />}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MiniStat label="推荐资源总数" value={data.featuredTotal} />
-          <MiniStat label="活跃推荐" value={data.featuredActive} />
-          <MiniStat label="总点击数" value={data.totalClicks} />
-          <MiniStat label="推荐分组数" value={data.featuredGroups.length} />
+          <MetricCard label="推荐资源总数" value={data.featuredTotal} icon={<Star className="w-5 h-5" />} />
+          <MetricCard label="活跃推荐" value={data.featuredActive} />
+          <MetricCard label="总点击数" value={data.totalClicks} />
+          <MetricCard label="推荐分组数" value={data.featuredGroups.length} />
         </div>
-      </div>
+      </SectionCard>
 
       {data.topClicks.length > 0 && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h4 className="text-sm font-semibold mb-3 text-gray-700">Top 10 资源点击</h4>
-          <div className="space-y-2">
-            {data.topClicks.map((item, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div className="flex items-center gap-2">
+        <SectionCard title="Top 10 资源点击">
+          <CompactTable
+            columns={[
+              {
+                key: "rank",
+                header: "#",
+                width: "40px",
+                render: (_row: any, i: number) => (
                   <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600">
                     {i + 1}
                   </span>
-                  <span className="text-sm">{item.resource}</span>
-                </div>
-                <span className="text-sm font-medium">{item.count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+                ),
+              },
+              { key: "resource", header: "资源名称", render: (row: any) => <span className="font-medium text-gray-700">{row.resource}</span> },
+              { key: "count", header: "点击数", align: "right", render: (row: any) => <span className="font-bold text-gray-900">{row.count}</span> },
+            ]}
+            data={data.topClicks}
+            rowKey={(row: any, i: number) => `${row.resource}-${i}`}
+            density="compact"
+          />
+        </SectionCard>
       )}
 
       {data.featuredGroups.length > 0 && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h4 className="text-sm font-semibold mb-3 text-gray-700">Featured Group 分布</h4>
+        <SectionCard title="Featured Group 分布">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {data.featuredGroups.map((g, i) => (
               <div key={i} className="bg-gray-50 rounded-lg p-3">
@@ -665,14 +655,17 @@ function ResourcesSection({ data }: { data: ResourcesData }) {
               </div>
             ))}
           </div>
-        </div>
+        </SectionCard>
       )}
 
       {data.topClicks.length === 0 && data.featuredGroups.length === 0 && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm text-center py-8">
-          <Star className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">暂无推荐资源数据</p>
-        </div>
+        <SaasEmptyState
+          variant="no-data"
+          title="暂无推荐资源数据"
+          description="推荐资源数据将在用户点击后显示"
+          icon={<Star className="w-12 h-12" />}
+          compact
+        />
       )}
     </div>
   );
@@ -683,98 +676,48 @@ function ResourcesSection({ data }: { data: ResourcesData }) {
 function AdEntitlementsSection({ data }: { data: AdEntitlementsData }) {
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <Megaphone className="w-5 h-5 text-orange-500" />
-          广告权益分析 (AD_SLOT_DAYS)
-        </h3>
+      <SectionCard title="广告权益分析 (AD_SLOT_DAYS)" action={<Megaphone className="w-5 h-5 text-orange-500" />}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MiniStat label="已发放" value={data.granted} color="green" />
-          <MiniStat label="发放天数" value={data.grantedDays} color="blue" />
-          <MiniStat label="待发放" value={data.pending} color="yellow" />
-          <MiniStat label="发放失败" value={data.failed} color="red" />
+          <MetricCard label="已发放" value={data.granted} icon={<Shield className="w-5 h-5" />} />
+          <MetricCard label="发放天数" value={data.grantedDays} />
+          <MetricCard label="待发放" value={data.pending} />
+          <MetricCard label="发放失败" value={data.failed} />
         </div>
-      </div>
+      </SectionCard>
 
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h4 className="text-sm font-semibold mb-3 text-gray-700">广告申请状态</h4>
+      <SectionCard title="广告申请状态">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <MiniStat label="待审核" value={data.applications.pending} />
-          <MiniStat label="已通过" value={data.applications.approved} color="green" />
-          <MiniStat label="已拒绝" value={data.applications.rejected} color="red" />
-          <MiniStat label="投放中" value={data.applications.active} color="blue" />
-          <MiniStat label="已过期" value={data.applications.expired} color="gray" />
+          <div className="bg-gray-50 rounded-lg p-3 text-center">
+            <div className="text-xs text-gray-500">待审核</div>
+            <div className="text-xl font-bold text-gray-900 mt-1">{data.applications.pending}</div>
+          </div>
+          <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
+            <div className="text-xs text-green-600">已通过</div>
+            <div className="text-xl font-bold text-green-700 mt-1">{data.applications.approved}</div>
+          </div>
+          <div className="bg-red-50 rounded-lg p-3 text-center border border-red-200">
+            <div className="text-xs text-red-600">已拒绝</div>
+            <div className="text-xl font-bold text-red-700 mt-1">{data.applications.rejected}</div>
+          </div>
+          <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
+            <div className="text-xs text-blue-600">投放中</div>
+            <div className="text-xl font-bold text-blue-700 mt-1">{data.applications.active}</div>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+            <div className="text-xs text-gray-500">已过期</div>
+            <div className="text-xl font-bold text-gray-500 mt-1">{data.applications.expired}</div>
+          </div>
         </div>
-      </div>
+      </SectionCard>
 
       {data.revoked > 0 && (
-        <div className="rounded-lg border bg-card p-6 shadow-sm">
-          <h4 className="text-sm font-semibold mb-3 text-gray-700">已撤销</h4>
-          <div className="text-lg font-bold text-red-600">{data.revoked}</div>
-        </div>
+        <SectionCard title="已撤销">
+          <div className="flex items-center gap-3">
+            <StatusBadge label={`${data.revoked} 次`} variant="danger" dot />
+            <span className="text-sm text-gray-500">广告权益已被撤销</span>
+          </div>
+        </SectionCard>
       )}
-    </div>
-  );
-}
-
-// ─── Shared Components ───────────────────────────────────────────────────────
-
-function StatCard({
-  label, value, icon, trend, trendLabel, subtitle,
-}: {
-  label: string;
-  value: number | string;
-  icon?: React.ReactNode;
-  trend?: number;
-  trendLabel?: string;
-  subtitle?: string;
-}) {
-  return (
-    <div className="rounded-lg border bg-card p-6 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-muted-foreground">{label}</div>
-        {icon}
-      </div>
-      <div className="text-2xl font-bold mt-2">{value}</div>
-      {trend !== undefined && (
-        <p className="text-xs text-muted-foreground mt-1">
-          {trend >= 0 ? (
-            <span className="text-green-500 flex items-center">
-              <TrendingUp className="h-3 w-3 mr-1" />+{trend}
-            </span>
-          ) : (
-            <span className="text-red-500 flex items-center">
-              <TrendingDown className="h-3 w-3 mr-1" />{trend}
-            </span>
-          )}
-          {' '}{trendLabel}
-        </p>
-      )}
-      {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
-    </div>
-  );
-}
-
-function MiniStat({
-  label, value, color = 'default',
-}: {
-  label: string;
-  value: number;
-  color?: 'default' | 'blue' | 'green' | 'red' | 'yellow' | 'gray';
-}) {
-  const colorClasses = {
-    default: 'text-gray-900',
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    red: 'text-red-600',
-    yellow: 'text-yellow-600',
-    gray: 'text-gray-500',
-  };
-
-  return (
-    <div className="bg-gray-50 rounded-lg p-3">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className={`text-xl font-bold mt-1 ${colorClasses[color]}`}>{value}</div>
     </div>
   );
 }
