@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, ChevronDown } from 'lucide-react';
+import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, ChevronDown, Download, Upload } from 'lucide-react';
 import PageHeader from '@/components/workspace/PageHeader';
 
 interface ProductItem {
@@ -53,6 +53,10 @@ export default function ProductsPage() {
   const [formData, setFormData] = useState<Partial<ProductItem>>(emptyProduct);
   const [saving, setSaving] = useState(false);
   const [showInactive, setShowInactive] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importData, setImportData] = useState<any[]>([]);
+  const [importOverwrite, setImportOverwrite] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -146,6 +150,65 @@ export default function ProductsPage() {
     setShowForm(true);
   };
 
+  const handleDownloadTemplate = () => {
+    window.open('/api/workspace/products/template', '_blank');
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length < 2) {
+      alert('CSV 文件为空或只有表头');
+      return;
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim());
+    const products = lines.slice(1).map(line => {
+      const values = line.split(',');
+      const obj: any = {};
+      headers.forEach((h, i) => {
+        obj[h] = values[i]?.trim() || '';
+      });
+      return obj;
+    });
+
+    setImportData(products);
+  };
+
+  const handleImport = async () => {
+    if (importData.length === 0) {
+      alert('没有可导入的数据');
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const res = await fetch('/api/workspace/products/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: importData, overwrite: importOverwrite }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert(`导入完成：成功 ${data.results.success} 条，跳过 ${data.results.skipped} 条，失败 ${data.results.failed} 条`);
+        setShowImport(false);
+        setImportData([]);
+        fetchProducts();
+      } else {
+        alert(data.error || '导入失败');
+      }
+    } catch (error) {
+      console.error('Import failed:', error);
+      alert('导入失败');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader
@@ -175,12 +238,115 @@ export default function ProductsPage() {
             {showInactive ? '显示已启用' : '显示已停用'}
           </button>
           <button
+            onClick={handleDownloadTemplate}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+          >
+            <Download className="w-4 h-4" /> 下载模板
+          </button>
+          <button
+            onClick={() => setShowImport(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <Upload className="w-4 h-4" /> 批量导入
+          </button>
+          <button
             onClick={handleNew}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4" /> 新增商品
           </button>
         </div>
+
+        {/* Import Modal */}
+        {showImport && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+                <h3 className="font-semibold text-lg">批量导入商品</h3>
+                <button onClick={() => { setShowImport(false); setImportData([]); }} className="p-2 hover:bg-gray-100 rounded-lg">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">选择 CSV 文件</label>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleImportFile}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    请先下载模板，按模板格式填写后上传。单次最多导入 100 条。
+                  </p>
+                </div>
+
+                {importData.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        预览（{importData.length} 条）
+                      </label>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={importOverwrite}
+                          onChange={(e) => setImportOverwrite(e.target.checked)}
+                          className="rounded"
+                        />
+                        覆盖已有商品（按 SKU 匹配）
+                      </label>
+                    </div>
+                    <div className="border rounded-lg overflow-hidden max-h-64 overflow-y-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-50 sticky top-0">
+                          <tr>
+                            <th className="px-3 py-2 text-left">名称</th>
+                            <th className="px-3 py-2 text-left">SKU</th>
+                            <th className="px-3 py-2 text-left">HS Code</th>
+                            <th className="px-3 py-2 text-left">单价</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importData.slice(0, 10).map((item, i) => (
+                            <tr key={i} className="border-t">
+                              <td className="px-3 py-2">{item.name}</td>
+                              <td className="px-3 py-2">{item.sku}</td>
+                              <td className="px-3 py-2">{item.hsCode}</td>
+                              <td className="px-3 py-2">{item.unitPrice} {item.currency}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {importData.length > 10 && (
+                        <div className="text-center py-2 text-sm text-gray-500 bg-gray-50">
+                          ... 还有 {importData.length - 10} 条
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3">
+                <button
+                  onClick={() => { setShowImport(false); setImportData([]); }}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleImport}
+                  disabled={importData.length === 0 || importing}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                >
+                  <Upload className="w-4 h-4" /> {importing ? '导入中...' : '开始导入'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Product Form Modal */}
         {showForm && (
