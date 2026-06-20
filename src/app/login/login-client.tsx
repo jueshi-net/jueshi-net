@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   PackageSearch,
@@ -25,6 +25,7 @@ const TRUST_POINTS = [
 
 export default function LoginPage({ defaultMode = "login" }: { defaultMode?: "login" | "signup" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLogin, setIsLogin] = useState(defaultMode === "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,6 +35,18 @@ export default function LoginPage({ defaultMode = "login" }: { defaultMode?: "lo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Read invite code from URL params
+  useEffect(() => {
+    const inviteFromUrl = searchParams.get("invite") || searchParams.get("ref");
+    if (inviteFromUrl) {
+      setInviteCode(inviteFromUrl.toUpperCase());
+      // Auto-switch to signup mode if invite code present
+      if (defaultMode === "login") {
+        setIsLogin(false);
+      }
+    }
+  }, [searchParams, defaultMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

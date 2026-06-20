@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as bcrypt from "bcryptjs";
 import { authLimiter } from "@/lib/rate-limiter";
 import { grantInviteRewards } from "@/lib/invite-rewards";
+import { trackEvent } from "@/lib/analytics";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -33,6 +34,18 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
+
+    // Track invite register start
+    trackEvent({
+      eventType: 'invite_register_start',
+      toolName: 'auth',
+      action: 'register_with_invite',
+      path: '/api/auth/register',
+      metadata: {
+        inviteCode: inviteCode.trim().toUpperCase(),
+        email,
+      },
+    }).catch(err => console.error('Failed to track register start:', err));
 
     const invite = await prisma.inviteCode.findUnique({
       where: { code: inviteCode.trim().toUpperCase() },
@@ -145,6 +158,19 @@ export async function POST(req: NextRequest) {
         slug: `ws-${result.id.slice(0, 8)}`,
       },
     }).catch(() => {}); // silently ignore workspace creation failure
+
+    // Track successful invite register
+    trackEvent({
+      eventType: 'invite_register_success',
+      toolName: 'auth',
+      action: 'register_completed_with_invite',
+      path: '/api/auth/register',
+      userId: result.id,
+      metadata: {
+        inviteCode: invite.code,
+        inviterUserId: invite.ownerUserId,
+      },
+    }).catch(err => console.error('Failed to track register success:', err));
 
     return NextResponse.json({
       success: true,

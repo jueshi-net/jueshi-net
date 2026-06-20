@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Copy, Check, ExternalLink, Gift, Users, Calendar, Award } from 'lucide-react';
 import Link from 'next/link';
 import PageHeader from '@/components/workspace/PageHeader';
+import { trackEvent } from '@/lib/analytics';
 
 interface InviteCode {
   id: string;
@@ -59,6 +60,17 @@ export default function InvitesPage() {
       const data = await res.json();
       if (data.success) {
         setInviteCodes([data.inviteCode, ...inviteCodes]);
+        
+        // Track invite code generation
+        trackEvent({
+          eventType: 'invite_code_generate',
+          toolName: 'invite-system',
+          action: 'generate_code',
+          path: '/workspace/invites',
+          metadata: {
+            codeId: data.inviteCode.id,
+          },
+        }).catch(err => console.error('Failed to track code generation:', err));
       } else {
         setError(data.error);
       }
@@ -69,11 +81,22 @@ export default function InvitesPage() {
     }
   };
 
-  const copyToClipboard = async (text: string, codeId: string) => {
+  const copyToClipboard = async (text: string, codeId: string, isLink: boolean = false) => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedCode(codeId);
       setTimeout(() => setCopiedCode(null), 2000);
+      
+      // Track copy action
+      trackEvent({
+        eventType: isLink ? 'invite_link_copy' : 'invite_code_copy',
+        toolName: 'invite-system',
+        action: isLink ? 'copy_link' : 'copy_code',
+        path: '/workspace/invites',
+        metadata: {
+          codeId,
+        },
+      }).catch(err => console.error('Failed to track copy action:', err));
     } catch (error) {
       console.error('Failed to copy:', error);
     }
@@ -235,7 +258,7 @@ export default function InvitesPage() {
                     )}
                   </button>
                   <button
-                    onClick={() => copyToClipboard(getInviteLink(code.code), `${code.id}-link`)}
+                    onClick={() => copyToClipboard(getInviteLink(code.code), `${code.id}-link`, true)}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors"
                   >
                     {copiedCode === `${code.id}-link` ? (
