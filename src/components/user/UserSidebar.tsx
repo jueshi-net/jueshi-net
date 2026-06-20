@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home, Target, Crown, FileText, Building2, Heart, Settings, Bell, StickyNote, Package,
-  ArrowLeft,
+  ArrowLeft, Gift, Megaphone,
 } from 'lucide-react';
 import { useUserPreferences, getTheme } from './UserPreferencesContext';
 
@@ -14,6 +14,8 @@ const NAV_ITEMS = [
   { href: '/workspace/notifications', labelKey: 'notifications', icon: Bell, emoji: '🔔' },
   { href: '/workspace/memos', labelKey: 'memos', icon: StickyNote, emoji: '📝' },
   { href: '/workspace/member', labelKey: 'member', icon: Crown, emoji: '👑' },
+  { href: '/workspace/invites', labelKey: 'invites', icon: Gift, emoji: '🎁' },
+  { href: '/workspace/ad-entitlements', labelKey: 'ad-entitlements', icon: Megaphone, emoji: '📢' },
   { href: '/workspace/documents', labelKey: 'documents', icon: FileText, emoji: '📦' },
   { href: '/workspace/products', labelKey: 'products', icon: Package, emoji: '🏷️' },
   { href: '/workspace/company-profiles', labelKey: 'profiles', icon: Building2, emoji: '🏢' },
@@ -23,10 +25,12 @@ const NAV_ITEMS = [
 
 const LABELS: Record<string, string> = {
   workbench: '我的工作台',
-  tasks: '待办与任务',
+  tasks: '签到与任务',
   notifications: '通知',
   memos: '备忘录',
-  member: '会员与权益',
+  member: '会员权益',
+  invites: '邀请奖励',
+  'ad-entitlements': '广告权益',
   documents: '我的单据',
   products: '商品资料',
   profiles: '公司资料',

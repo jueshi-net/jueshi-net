@@ -178,6 +178,67 @@ export default function InvitesPage() {
           </div>
         )}
 
+        {/* 公共 Beta 邀请码 */}
+        <SectionCard title="🎉 Beta 公测邀请码" subtitle="使用以下邀请码即可注册">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl border border-teal-200">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl font-mono font-bold text-teal-700">BETA2026-001</span>
+                  <StatusBadge label="可用" variant="success" size="sm" dot pulse />
+                </div>
+                <div className="flex items-center gap-4 text-xs text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3 h-3" />
+                    剩余名额：5 个
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    有效期至：2026-07-18
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => copyToClipboard("BETA2026-001", "beta-public")}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors"
+                >
+                  {copiedCode === "beta-public" ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      已复制
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      复制邀请码
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => copyToClipboard(`${window.location.origin}/login?invite=BETA2026-001`, "beta-public-link", true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors border border-teal-200"
+                >
+                  {copiedCode === "beta-public-link" ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      已复制
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      复制邀请链接
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+            <div className="text-xs text-gray-500">
+              <p>💡 分享链接：<code className="px-2 py-1 bg-gray-100 rounded text-gray-700">{window.location.origin}/login?invite=BETA2026-001</code></p>
+            </div>
+          </div>
+        </SectionCard>
+
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MetricCard

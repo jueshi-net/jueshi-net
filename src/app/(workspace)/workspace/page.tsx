@@ -240,13 +240,33 @@ export default async function WorkspacePage() {
       </section>
 
       {/* ===== C. CTA 按钮区 ===== */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <ActionCard
           title="今日签到"
           description={todayChecked ? "已完成今日签到" : "签到获得积分和成长值"}
           icon={<Calendar className="w-6 h-6" />}
-          href="/workspace/member"
+          href="/workspace/tasks"
           badge={todayChecked ? "已完成" : "待完成"}
+        />
+        <ActionCard
+          title="邀请奖励"
+          description="邀请好友获得会员天数"
+          icon={<Gift className="w-6 h-6" />}
+          href="/workspace/invites"
+          badge="推荐"
+        />
+        <ActionCard
+          title="会员权益"
+          description="查看会员特权和兑换"
+          icon={<Crown className="w-6 h-6" />}
+          href="/workspace/member"
+          badge={!isMember ? "推荐" : undefined}
+        />
+        <ActionCard
+          title="广告权益"
+          description="申请使用广告资源"
+          icon={<Megaphone className="w-6 h-6" />}
+          href="/workspace/ad-entitlements"
         />
         <ActionCard
           title="新建单据"
@@ -259,13 +279,6 @@ export default async function WorkspacePage() {
           description="管理公司信息，一键填充"
           icon={<Building2 className="w-6 h-6" />}
           href="/workspace/company-profiles"
-        />
-        <ActionCard
-          title="升级会员"
-          description="解锁更多功能和额度"
-          icon={<Crown className="w-6 h-6" />}
-          href="/workspace/member"
-          badge={!isMember ? "推荐" : undefined}
         />
       </div>
 
@@ -363,6 +376,88 @@ export default async function WorkspacePage() {
           action={<Link href="/workspace/tasks" className="text-xs text-teal-600 hover:underline">全部</Link>}
         >
           <TodayTasks initialTasks={tasks} />
+        </SectionCard>
+      </div>
+
+      {/* ===== E2. 邀请奖励与权益区 ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* 邀请奖励卡 */}
+        <SectionCard
+          title="邀请奖励"
+          subtitle="邀请好友获得会员天数"
+          action={<Link href="/workspace/invites" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">已邀请</span>
+              <span className="text-lg font-bold text-teal-700">{inviteCount} 人</span>
+            </div>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 每邀请 1 人获得 3 天会员</p>
+              <p>• 好友注册获得 500 积分</p>
+            </div>
+            <Link
+              href="/workspace/invites"
+              className="block w-full text-center py-2 bg-teal-50 text-teal-700 rounded-lg text-sm font-medium hover:bg-teal-100 transition-colors"
+            >
+              查看邀请码
+            </Link>
+          </div>
+        </SectionCard>
+
+        {/* 会员权益卡 */}
+        <SectionCard
+          title="会员权益"
+          subtitle={isMember ? "会员生效中" : "免费版"}
+          action={<Link href="/workspace/member" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">会员状态</span>
+              <span className={`text-sm font-bold ${isMember ? "text-amber-600" : "text-gray-400"}`}>
+                {isMember ? "会员" : "免费版"}
+              </span>
+            </div>
+            {isMember && user?.memberUntil && (
+              <div className="text-xs text-gray-500">
+                到期时间：{new Date(user.memberUntil).toLocaleDateString("zh-CN")}
+              </div>
+            )}
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 邀请好友自动获得会员天数</p>
+              <p>• 解锁更多功能和额度</p>
+            </div>
+            <Link
+              href="/workspace/member"
+              className="block w-full text-center py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 transition-colors"
+            >
+              {isMember ? "查看权益" : "升级会员"}
+            </Link>
+          </div>
+        </SectionCard>
+
+        {/* 广告权益卡 */}
+        <SectionCard
+          title="广告权益"
+          subtitle="申请使用广告资源"
+          action={<Link href="/workspace/ad-entitlements" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">可用天数</span>
+              <span className="text-lg font-bold text-teal-700">0 天</span>
+            </div>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 邀请好友获得广告权益</p>
+              <p>• 申请使用广告资源</p>
+            </div>
+            <Link
+              href="/workspace/ad-entitlements"
+              className="block w-full text-center py-2 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+            >
+              申请使用
+            </Link>
+          </div>
         </SectionCard>
       </div>
 
