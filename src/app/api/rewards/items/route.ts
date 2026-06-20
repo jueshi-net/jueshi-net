@@ -10,25 +10,23 @@ export async function GET() {
     }
 
     // Fetch active reward items from database
-    const rewardItems = await prisma.rewardRule.findMany({
+    const rewardItems = await prisma.rewardItem.findMany({
       where: {
-        isActive: true,
+        enabled: true,
       },
       orderBy: {
-        createdAt: "desc",
+        sortOrder: "asc",
       },
     });
 
     // Transform to frontend format
-    const items = rewardItems.map((rule) => ({
-      id: rule.id,
-      name: rule.name,
-      description: rule.description,
-      costPoints: rule.costPoints,
-      rewardType: rule.rewardType,
-      rewardValue: rule.rewardValue,
-      stock: rule.stock,
-      redeemedCount: rule.redeemedCount,
+    const items = rewardItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      costPoints: item.costPoints,
+      rewardType: item.rewardType,
+      rewardValue: item.rewardValue,
     }));
 
     return NextResponse.json({ success: true, items });
