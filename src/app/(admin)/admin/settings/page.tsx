@@ -188,6 +188,9 @@ export default function AdminSettingsPage() {
             rows={2}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            用于首页 meta description、OpenGraph 分享和 SEO。建议 100-200 字。
+          </p>
         </div>
       </div>
 

@@ -17,7 +17,8 @@ async function readSettings() {
       allowRegistration: process.env.ALLOW_REGISTRATION !== 'false',
       maintenanceMode: process.env.MAINTENANCE_MODE === 'true',
       maxLinksPerUser: parseInt(process.env.MAX_LINKS_PER_USER || '100'),
-      emailEnabled: !!process.env.SMTP_HOST,
+      emailEnabled: !!(process.env.RESEND_API_KEY || process.env.SMTP_HOST),
+      emailProvider: process.env.RESEND_API_KEY ? 'resend' : process.env.SMTP_HOST ? 'smtp' : null,
       branding: {
         logoUrl: '/brand/jueshi-logo-header.png',
         logoAlt: '绝世百宝箱 jueshi.net',

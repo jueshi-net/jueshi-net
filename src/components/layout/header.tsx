@@ -24,6 +24,7 @@ const NAV_LINKS = [
   { href: "/tools/hs-code", label: "HS编码", icon: FileText },
   { href: "/tools/exchange-rate", label: "汇率", icon: DollarSign },
   { href: "/tools/postal-code", label: "邮编", icon: MapPin },
+  { href: "/guides", label: "百科指南", icon: BookOpen },
   { href: "/resources", label: "网址导航", icon: BookOpen },
   { href: "/checklists", label: "清单", icon: ListChecks },
   { href: "/topics", label: "专题", icon: BookOpen },

@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Shield, Zap, Star, ArrowRight, Infinity, HeadphonesIcon, Sparkles, Check, X as XIcon, TrendingUp, Award, Megaphone, Calendar, Upload, Send } from "lucide-react";
+import { Crown, Shield, Zap, Star, ArrowRight, Infinity, HeadphonesIcon, Sparkles, Check, X as XIcon, TrendingUp, Award, Megaphone, Calendar, Upload, Send, Gift } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { MetricCard } from "@/components/saas/MetricCard";
@@ -10,6 +10,125 @@ import { StatusBadge } from "@/components/saas/StatusBadge";
 import { CompactTable } from "@/components/saas/CompactTable";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 import { track } from "@/lib/analytics";
+
+// Points Redemption Section Component
+function PointsRedemptionSection({ userPoints }: { userPoints: number }) {
+  const [rewardItems, setRewardItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [redeeming, setRedeeming] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/rewards/items")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          setRewardItems(data.items || []);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleRedeem = async (itemId: string, itemName: string, costPoints: number) => {
+    if (userPoints < costPoints) {
+      setError("积分不足");
+      return;
+    }
+    setRedeeming(itemId);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await fetch("/api/rewards/redeem", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rewardItemId: itemId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccess(`成功兑换 ${itemName}！`);
+        track({ eventType: "reward_redeem", toolName: "member", action: "redeem", path: "/workspace/member", metadata: { itemId, itemName } });
+        setTimeout(() => setSuccess(null), 3000);
+        // Refresh reward items
+        const refreshed = await fetch("/api/rewards/items").then((r) => r.json());
+        if (refreshed.success) setRewardItems(refreshed.items || []);
+      } else {
+        setError(data.error || "兑换失败");
+      }
+    } catch {
+      setError("网络错误，请重试");
+    }
+    setRedeeming(null);
+  };
+
+  if (loading) {
+    return (
+      <SectionCard title="积分兑换" subtitle="使用积分兑换会员天数、广告权益等奖励">
+        <div className="text-sm text-gray-400">加载中...</div>
+      </SectionCard>
+    );
+  }
+
+  if (rewardItems.length === 0) {
+    return (
+      <SectionCard title="积分兑换" subtitle="使用积分兑换会员天数、广告权益等奖励">
+        <div className="text-sm text-gray-500">
+          <p>当前积分：<span className="font-bold text-teal-600">{userPoints}</span></p>
+          <p className="text-xs text-gray-400 mt-2">暂无可兑换的奖励项。请联系管理员添加奖励项。</p>
+        </div>
+      </SectionCard>
+    );
+  }
+
+  return (
+    <SectionCard title="积分兑换" subtitle="使用积分兑换会员天数、广告权益等奖励">
+      {success && <div className="bg-green-50 border border-green-200 rounded-lg p-2 mb-4 text-xs text-green-700">{success}</div>}
+      {error && <div className="bg-red-50 border border-red-200 rounded-lg p-2 mb-4 text-xs text-red-700">{error}</div>}
+      <div className="text-sm text-gray-600 mb-4">
+        当前积分：<span className="font-bold text-teal-600">{userPoints}</span>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {rewardItems.map((item) => {
+          const canAfford = userPoints >= item.costPoints;
+          const isRedeeming = redeeming === item.id;
+          return (
+            <div key={item.id} className="flex flex-col p-4 rounded-lg border border-gray-100 hover:border-teal-200 hover:bg-teal-50/30 transition-all">
+              <div className="flex-1">
+                <div className="text-sm font-bold text-gray-900 mb-1">{item.name}</div>
+                {item.description && <div className="text-xs text-gray-500 mb-2">{item.description}</div>}
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-amber-600 font-bold">{item.costPoints} 积分</span>
+                  <span className="text-gray-400">→</span>
+                  <span className="text-teal-600">
+                    {item.rewardType === "member_trial" && `${item.rewardValue} 天会员`}
+                    {item.rewardType === "ad_slot_days" && `${item.rewardValue} 天广告`}
+                    {item.rewardType === "word_export_coupon" && `${item.rewardValue} 次导出`}
+                    {item.rewardType === "no_branding_coupon" && `${item.rewardValue} 次去品牌`}
+                    {item.rewardType === "points" && `${item.rewardValue} 积分`}
+                    {item.rewardType === "growth" && `${item.rewardValue} 成长值`}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleRedeem(item.id, item.name, item.costPoints)}
+                disabled={!canAfford || isRedeeming}
+                className={`mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                  canAfford && !isRedeeming
+                    ? "bg-teal-600 text-white hover:bg-teal-700"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {isRedeeming ? "兑换中..." : canAfford ? "立即兑换" : "积分不足"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </SectionCard>
+  );
+}
+
 
 const ROLE_META: Record<string, { label: string; icon: React.ReactNode; color: string; gradient: string; badgeVariant: "success" | "warning" | "neutral" | "processing" | "info" | "danger" | "pending" }> = {
   admin: {
@@ -395,6 +514,9 @@ export default function MemberClient({ userData, permissions }: { userData: any;
             <div className="text-sm text-gray-400">加载中...</div>
           )}
         </SectionCard>
+
+        {/* Points Redemption */}
+        <PointsRedemptionSection userPoints={userData?.points || 0} />
 
         {/* Why Upgrade - Action Cards */}
         {!isMember && (

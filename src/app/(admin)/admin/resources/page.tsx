@@ -308,8 +308,8 @@ export default function AdminResourcesPage() {
     <div className="space-y-6">
       {/* Header */}
       <WorkspacePageHeader
-        title="网址导航大厅"
-        subtitle={`管理前台 /resources 展示的导航网址。共 ${total} 条。`}
+        title="网址导航管理"
+        subtitle="管理前台 /resources 页面展示的导航网址。每个网址条目包含名称、URL、分类、标签等信息。"
         icon={<Globe className="w-5 h-5" />}
         actions={
           <div className="flex flex-wrap gap-2">

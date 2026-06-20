@@ -31,6 +31,7 @@ export default function InvitesPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetchInviteCodes();
@@ -54,11 +55,16 @@ export default function InvitesPage() {
   const generateInviteCode = async () => {
     setGenerating(true);
     setError(null);
+    setSuccess(null);
     try {
       const res = await fetch('/api/workspace/invites', { method: 'POST' });
       const data = await res.json();
-      if (data.success) {
-        setInviteCodes([data.inviteCode, ...inviteCodes]);
+      
+      if (data.success && data.inviteCode) {
+        // Refresh the list to ensure consistency
+        await fetchInviteCodes();
+        
+        setSuccess('邀请码生成成功！');
         
         track({
           eventType: 'invite_code_generate',
@@ -69,11 +75,15 @@ export default function InvitesPage() {
             codeId: data.inviteCode.id,
           },
         });
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError(data.error);
+        setError(data.error || '生成邀请码失败');
       }
     } catch (error) {
-      setError('生成邀请码失败');
+      console.error('Generate invite code error:', error);
+      setError('生成邀请码失败，请稍后重试');
     } finally {
       setGenerating(false);
     }
@@ -178,8 +188,14 @@ export default function InvitesPage() {
           </div>
         )}
 
-        {/* 公共 Beta 邀请码 */}
-        <SectionCard title="🎉 Beta 公测邀请码" subtitle="使用以下邀请码即可注册">
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700">
+            {success}
+          </div>
+        )}
+
+        {/* 公共 Beta 准入码 */}
+        <SectionCard title="🎉 Beta 公测准入码" subtitle="使用以下邀请码即可注册（不计入个人邀请奖励）">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl border border-teal-200">
               <div>
@@ -197,6 +213,9 @@ export default function InvitesPage() {
                     有效期至：2026-07-18
                   </span>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 这是公共 Beta 准入码，用于邀请好友注册体验产品。使用此码注册的好友不会计入您的个人邀请奖励。
+                </p>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <button
@@ -239,24 +258,26 @@ export default function InvitesPage() {
           </div>
         </SectionCard>
 
-        {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MetricCard
-            label="已邀请人数"
-            value={invitedCount}
-            icon={<Users className="w-5 h-5" />}
-          />
-          <MetricCard
-            label="我的邀请码"
-            value={`${inviteCodes.length}/3`}
-            icon={<Gift className="w-5 h-5" />}
-          />
-          <MetricCard
-            label="当前奖励"
-            value="3 天会员/人"
-            icon={<Award className="w-5 h-5" />}
-          />
-        </div>
+        {/* 我的邀请码（个人奖励码） */}
+        <SectionCard title="🎁 我的邀请码" subtitle="邀请好友注册，获得会员奖励">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <MetricCard
+              label="已邀请人数"
+              value={invitedCount}
+              icon={<Users className="w-5 h-5" />}
+            />
+            <MetricCard
+              label="我的邀请码"
+              value={`${inviteCodes.length}/3`}
+              icon={<Gift className="w-5 h-5" />}
+            />
+            <MetricCard
+              label="当前奖励"
+              value="3 天会员/人"
+              icon={<Award className="w-5 h-5" />}
+            />
+          </div>
+        </SectionCard>
 
         {/* 奖励说明 */}
         <SectionCard title="邀请奖励说明">
