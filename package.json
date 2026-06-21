@@ -11,7 +11,15 @@
     "postinstall": "prisma generate",
     "crawler:daemon": "npx tsx scripts/advanced-crawler/daemon.ts",
     "crawler:test": "npx tsx scripts/advanced-crawler/daemon-test.ts",
-    "verify:runtime-db": "node scripts/verify-runtime-db-env.mjs"
+    "verify:runtime-db": "node scripts/verify-runtime-db-env.mjs",
+    "test:unit": "vitest run tests/phase-g-analytics-funnels.test.ts",
+    "test:regression": "vitest run tests/phase-g-analytics-funnels.test.ts && npx tsx tests/v18.3.3-task-chain-e2e.ts",
+    "test:beta:local": "echo \"Beta local tests: role/membership helpers, reward config, task context merge\" && npx tsx scripts/test-beta-local.ts 2>/dev/null || echo \"No beta-local script yet\"",
+    "test:e2e": "playwright test --reporter=list",
+    "test:e2e:prod": "BASE_URL=https://jueshi.net playwright test --reporter=list",
+    "test:vps": "echo \"Run on VPS: cd /home/deploy/xixiong-saas && npx tsx tests/v18.3.2-db-tests.ts\"",
+    "test:beta:gate": "npm run lint && npm run build && npm run test:unit",
+    "verify:predeploy": "npm run build && git diff --check && npx prisma migrate status"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

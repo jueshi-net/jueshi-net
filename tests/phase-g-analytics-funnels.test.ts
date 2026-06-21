@@ -9,7 +9,7 @@
  * 5. Empty state handling
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // ─── Test 1: API Response Schema ─────────────────────────────────────────────
 

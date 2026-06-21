@@ -1,0 +1,107 @@
+name: CI Regression Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-and-build:
+    name: Test & Build Gate
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run unit tests
+        run: npm run test:unit
+        env:
+          DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+          NEXTAUTH_SECRET: 'dummy-secret-for-ci'
+          NEXTAUTH_URL: 'http://localhost:3000'
+
+      - name: Run regression tests
+        run: npm run test:regression
+        env:
+          DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+          NEXTAUTH_SECRET: 'dummy-secret-for-ci'
+          NEXTAUTH_URL: 'http://localhost:3000'
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+          NEXTAUTH_SECRET: 'dummy-secret-for-ci'
+          NEXTAUTH_URL: 'http://localhost:3000'
+          NEXT_PUBLIC_APP_URL: 'http://localhost:3000'
+
+      - name: Check for whitespace errors
+        run: git diff --check
+
+      - name: Check migration status (dry run)
+        run: npx prisma migrate status
+        continue-on-error: true
+        env:
+          DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for secrets in code
+        run: |
+          echo "Scanning for potential secrets..."
+          
+          # Check for hardcoded passwords
+          if grep -r "password.*=.*['\"].*['\"]" src/ --include="*.ts" --include="*.tsx" | grep -v "node_modules" | grep -v ".next"; then
+            echo "WARNING: Potential hardcoded passwords found"
+          fi
+          
+          # Check for DATABASE_URL with real credentials
+          if grep -r "DATABASE_URL.*=.*postgresql://" src/ --include="*.ts" --include="*.tsx" | grep -v "node_modules" | grep -v ".next" | grep -v "dummy"; then
+            echo "ERROR: Potential real DATABASE_URL found"
+            exit 1
+          fi
+          
+          # Check for GitHub tokens
+          if grep -r "ghp_\|github_pat_\|gho_" . --include="*.ts" --include="*.tsx" --include="*.js" | grep -v "node_modules" | grep -v ".next"; then
+            echo "ERROR: Potential GitHub token found"
+            exit 1
+          fi
+          
+          echo "Security scan completed"
+
+      - name: Check for test data policy violations
+        run: |
+          echo "Checking test data policy..."
+          
+          # Check that 9833416@qq.com is not used in automated tests (except read-only checks)
+          if grep -r "9833416@qq.com" tests/ --include="*.spec.ts" | grep -v "role.*admin" | grep -v "read-only"; then
+            echo "WARNING: 9833416@qq.com used in automated tests"
+          fi
+          
+          echo "Test data policy check completed"
