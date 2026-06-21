@@ -190,6 +190,9 @@ export default async function ArticlePage({ params }: Props) {
                   </div>
                 )}
               </article>
+
+              {/* Task Chain CTA */}
+              <TaskChainCta />
             </div>
           </div>
         </ArticleLayoutClient>

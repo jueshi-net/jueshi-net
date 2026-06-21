@@ -134,6 +134,13 @@ export default async function ChecklistPage({ params }: Props) {
             </div>
           </div>
         )}
+
+        {/* Task Chain CTA */}
+        <TaskChainCta
+          title="把本清单加入发货任务链"
+          description="使用工具生成发票/装箱单草稿，一步步完成跨境发货。"
+          buttonText="开始跨境发货任务链"
+        />
       </div>
     );
   }
