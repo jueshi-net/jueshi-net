@@ -8,6 +8,8 @@ import { getRoleInfo, setRole, type UserRole } from '@/lib/membership/permission
 const roles: { role: UserRole; label: string; desc: string; color: string }[] = [
   { role: 'guest', label: '游客', desc: '3份草稿，默认模板样式，导出PDF/PNG', color: 'gray' },
   { role: 'user', label: '注册用户', desc: '10份草稿，1套公司信息，导出PDF/PNG', color: 'blue' },
+  // v1.20.42.18.4.2: 'member' is kept for demo/testing purposes
+  // In production, membership is determined by membershipTier, not role
   { role: 'member', label: '会员', desc: '无限草稿，多套公司，自定义风格，Word导出', color: 'amber' },
   { role: 'admin', label: '管理员', desc: '全部权限（同会员）', color: 'red' },
 ];

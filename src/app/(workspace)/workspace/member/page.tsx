@@ -16,7 +16,7 @@ export default async function MemberPage() {
       where: { id: session.user.id },
       select: { role: true, memberUntil: true },
     }).then(async (u) => {
-      const isMember = u?.role === "member";
+      const isMember = u?.role === 'member';
       const canUploadLogo = isMember;
       const canCloudDraft = isMember;
       const canExportWord = isMember;

@@ -138,14 +138,14 @@ export async function getCurrentUserRole(): Promise<ServerRole> {
 
     const role = dbUser.role?.toLowerCase();
     if (role === "admin" || role === "管理员" || role === "administrator") return "admin";
-    if (role === "user" || role === "member") {
-      // For user/member roles, check if they have active membership via memberUntil
-      // We need to query memberUntil separately
+    if (role === "user") {
+      // For user role, check if they have active membership via membershipTier and memberUntil
+      // v1.20.42.18.4.2: Use membershipTier instead of role for membership判断
       const fullUser = await prisma.user.findUnique({
         where: { id: userId || "" },
-        select: { memberUntil: true },
+        select: { membershipTier: true, memberUntil: true },
       }).catch(() => null);
-      if (fullUser?.memberUntil && fullUser.memberUntil > new Date()) return "member";
+      if (fullUser?.membershipTier && fullUser.membershipTier !== 'free' && fullUser.memberUntil && fullUser.memberUntil > new Date()) return "member";
       return "user";
     }
 

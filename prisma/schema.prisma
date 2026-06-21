@@ -13,7 +13,8 @@ model User {
   emailVerified          DateTime?
   image                  String?
   password               String?
-  role                   String               @default("user")
+  role                   String               @default("user") // 权限角色：admin/user
+  membershipTier         String               @default("free") @map("membership_tier") // 会员等级：free/member/premium/enterprise
   points                 Int                  @default(0) // 积分缓存
   checkinStreak          Int                  @default(0) // 连续签到天数
   lastCheckinDate        String? // 最后一次签到日期 YYYY-MM-DD

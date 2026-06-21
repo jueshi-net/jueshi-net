@@ -16,10 +16,11 @@ export async function GET() {
       return NextResponse.json({ error: "无权限" }, { status: 403 });
     }
 
-    // Users by role
+    // Users by role and membership tier
+    // v1.20.42.18.4.2: Use membershipTier instead of role for membership统计
     const [userCount, memberCount, adminCount] = await Promise.all([
-      prisma.user.count({ where: { role: "user" } }),
-      prisma.user.count({ where: { role: "member" } }),
+      prisma.user.count({ where: { role: "user", membershipTier: "free" } }),
+      prisma.user.count({ where: { membershipTier: "member" } }),
       prisma.user.count({ where: { role: "admin" } }),
     ]);
 

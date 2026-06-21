@@ -120,7 +120,7 @@ export default function TranslatePolishPage() {
                   今日剩余 <strong className="text-teal-600">{usage.remainingToday}</strong> 次
                   {usage.role === "guest" && "（游客每日限 1 次，登录获取更多次数）"}
                   {usage.role === "user" && "（注册用户每日限 3 次）"}
-                  {usage.role === "member" && "（会员无限次使用）"}
+                  {usage.membershipTier && usage.membershipTier !== 'free' && "（会员无限次使用）"}
                 </>
               ) : (
                 <>

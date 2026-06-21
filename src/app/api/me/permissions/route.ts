@@ -19,10 +19,11 @@ export async function GET() {
     try {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { points: true, role: true, memberUntil: true },
+        select: { points: true, role: true, membershipTier: true, memberUntil: true },
       });
       if (user) {
-        const hasActiveMembership = user.role === "member" && user.memberUntil !== null && user.memberUntil > new Date();
+        // v1.20.42.18.4.2: Use membershipTier instead of role for membership判断
+        const hasActiveMembership = user.role === 'member' && user.memberUntil !== null && user.memberUntil > new Date();
         pointsInfo = {
           points: user.points,
           memberUntil: hasActiveMembership && user.memberUntil ? user.memberUntil.toISOString() : null,

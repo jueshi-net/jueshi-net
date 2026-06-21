@@ -92,9 +92,10 @@ export async function loadAdminStats(): Promise<AdminStatsData | null> {
       prisma.notification.count({ where: { isRead: false } }),
       prisma.notification.count({ where: { isRead: true } }),
       prisma.notification.count(),
-      prisma.user.count({ where: { role: "user" } }),
-      prisma.user.count({ where: { role: "member" } }),
-      prisma.user.count({ where: { role: { in: ["admin", "管理员"] } } }),
+      // v1.20.42.18.4.2: Use membershipTier instead of role for membership统计
+      prisma.user.count({ where: { role: "user", membershipTier: "free" } }),
+      prisma.user.count({ where: { membershipTier: "member" } }),
+      prisma.user.count({ where: { role: "admin" } }),
       prisma.article.count(),
       prisma.article.count({ where: { status: "published" } }),
       prisma.article.count({ where: { status: "draft" } }),

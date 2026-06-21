@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Users, Search, ChevronLeft, ChevronRight, Edit, Ticket, Loader2, AlertTriangle, Award, TrendingUp, X } from "lucide-react";
 
 interface AdminUser {
-  id: string; email: string; name: string | null; role: string; points: number;
+  id: string; email: string; name: string | null; role: string; membershipTier: string; points: number;
   memberUntil: string | null; createdAt: string; updatedAt: string;
   growthValue: number; levelKey: string;
   _count: { userRewards: number; pointLedgers: number; badgeAwards: number };
@@ -184,8 +184,8 @@ export default function AdminUsersPage() {
   if (error) return <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center text-red-600">{error}</div>;
   if (!data) return <div className="text-center text-red-500">加载失败</div>;
 
-  const userCount = data.users.filter(u => u.role === "user").length;
-  const memberCount = data.users.filter(u => u.role === "member").length;
+  const userCount = data.users.filter(u => u.role === "user" && u.membershipTier === 'free').length;
+  const memberCount = data.users.filter(u => u.role === 'member').length;
   const adminCount = data.users.filter(u => isAdminRole(u.role)).length;
 
   return (

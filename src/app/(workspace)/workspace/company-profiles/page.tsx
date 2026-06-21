@@ -12,7 +12,14 @@ export default async function CompanyProfilesPage() {
     orderBy: { updatedAt: "desc" },
   }).catch(() => []);
 
-  const isMember = session.user.role === "member";
+  // v1.20.42.18.4.2: Query role from database
+  // For backward compatibility, role can still be "member"
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { role: true },
+  }).catch(() => null);
+  
+  const isMember = Boolean(user?.role === 'member');
 
   return <CompanyProfilesClient profiles={profiles} isMember={isMember} />;
 }

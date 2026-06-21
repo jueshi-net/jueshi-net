@@ -22,6 +22,8 @@ export interface ClientLimits {
 
 export interface ClientPermissions {
   authenticated: boolean;
+  // v1.20.42.18.4.2: "member" is kept for backward compatibility
+  // but should be determined by membershipTier, not role
   role: "guest" | "user" | "member" | "admin";
   limits: ClientLimits;
   loaded: boolean;

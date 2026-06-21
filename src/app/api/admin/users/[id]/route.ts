@@ -23,11 +23,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
       const updates: Record<string, unknown> = {};
 
-      if (role && ["user", "member", "admin"].includes(role)) {
+      if (role && ["user", "admin"].includes(role)) {
         updates.role = role;
-        if (role !== "member") {
-          updates.memberUntil = null;
-        }
+        // v1.20.42.18.4.2: role no longer determines membership
+        // membershipTier and memberUntil are managed separately
       }
 
       // memberUntil adjustment: set, extend, or clear
