@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import ChecklistsListClient from "./checklists-list-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "清单管理 — 管理后台",
   robots: { index: false, follow: false },

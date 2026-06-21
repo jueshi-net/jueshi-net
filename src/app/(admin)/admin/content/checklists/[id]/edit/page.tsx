@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import ChecklistEditClient from "./checklist-edit-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "编辑清单 — 管理后台",
   robots: { index: false, follow: false },

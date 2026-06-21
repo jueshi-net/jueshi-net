@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import GuideEditClient from "./guide-edit-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "编辑指南 — 管理后台",
   robots: { index: false, follow: false },

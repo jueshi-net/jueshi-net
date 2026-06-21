@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import TopicsListClient from "./topics-list-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminTopicsPage() {
   const topics = await prisma.topic.findMany({
     orderBy: { createdAt: "desc" },

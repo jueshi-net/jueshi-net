@@ -2,6 +2,8 @@
 import { prisma } from "@/lib/prisma";
 import GuidesListClient from "./guides-list-client";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "指南管理 — 管理后台",
   robots: { index: false, follow: false },

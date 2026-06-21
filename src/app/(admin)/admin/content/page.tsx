@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { BookOpen, ListChecks, LayoutTemplate, FolderOpen, ArrowRight, CheckCircle, FileEdit } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "内容中心 — 管理后台",
   robots: { index: false, follow: false },
