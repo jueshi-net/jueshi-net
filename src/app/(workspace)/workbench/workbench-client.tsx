@@ -324,18 +324,18 @@ export default function WorkbenchClient() {
         {/* ===== 1. Identity & Quota — Two-Layer Mobile ===== */}
         <div className="bg-white rounded-2xl border border-gray-100/80 shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-4">
           {/* Upper layer: Avatar+Name+Role | Quota+Upgrade */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold ${userInfo.image ? 'overflow-hidden' : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'}`}>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${userInfo.image ? 'overflow-hidden' : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500'}`}>
                 {userInfo.image ? <img src={userInfo.image} alt="" className="w-full h-full object-cover" /> : initial}
               </div>
-              <div>
-                <p className="text-sm font-bold text-gray-900 tracking-tight leading-tight">{displayName}</p>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-gray-900 tracking-tight leading-tight truncate">{displayName}</p>
                 <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold mt-0.5 ${role.cls}`}>{role.icon}{role.label}</span>
               </div>
             </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="min-w-[100px]">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="min-w-[100px] flex-1 sm:flex-none">
                 <div className="flex items-baseline justify-between mb-0.5">
                   <span className="text-[9px] font-medium text-gray-400 uppercase tracking-wider">收藏</span>
                   <span className="text-xs font-bold text-gray-800 tabular-nums"><span className={pct >= 80 ? 'text-amber-500' : ''}>{totalCount}</span><span className="text-gray-300 font-normal mx-0.5">/</span>{totalLimit}</span>
@@ -344,7 +344,7 @@ export default function WorkbenchClient() {
                   <div className={`h-full rounded-full transition-all duration-700 ease-out ${pct >= 80 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 'bg-gradient-to-r from-teal-400 to-emerald-400'}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
-              <Link href="/pricing" className={`group inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-semibold text-white bg-gradient-to-r ${theme.from} ${theme.to} rounded-lg shadow-sm ${theme.shadowColor} hover:shadow-md transition-all whitespace-nowrap`}>
+              <Link href="/pricing" className={`group inline-flex items-center gap-1 px-2.5 py-1.5 text-[10px] font-semibold text-white bg-gradient-to-r ${theme.from} ${theme.to} rounded-lg shadow-sm ${theme.shadowColor} hover:shadow-md transition-all whitespace-nowrap flex-shrink-0`}>
                 <Crown className="w-2.5 h-2.5 group-hover:rotate-12 transition-transform" /> 升级
               </Link>
             </div>

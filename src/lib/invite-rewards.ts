@@ -243,11 +243,13 @@ async function grantMemberDays(userId: string, days: number): Promise<void> {
     newMemberUntil.setDate(newMemberUntil.getDate() + days);
   }
 
+  // v1.20.42.18.4.1: Only update memberUntil, NEVER modify role.
+  // Role is for permission (admin/user), not membership status.
+  // Membership is determined by memberUntil > now.
   await prisma.user.update({
     where: { id: userId },
     data: {
       memberUntil: newMemberUntil,
-      role: 'member', // 确保角色为 member
     },
   });
 

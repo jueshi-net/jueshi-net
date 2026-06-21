@@ -264,9 +264,9 @@ export default function Header() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors min-h-[36px]"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors min-h-[36px] shrink-0 whitespace-nowrap"
               >
-                <LogIn className="w-3.5 h-3.5" /> 登录 / 免费注册
+                <LogIn className="w-3.5 h-3.5 shrink-0" /> <span className="hidden sm:inline">登录 / 免费注册</span><span className="sm:hidden">登录</span>
               </Link>
             )}
 
