@@ -9,7 +9,7 @@ test.describe('工作台移动端视觉测试', () => {
   test('工作台在不同移动端宽度下显示正常', async ({ page }) => {
     // 登录
     await page.goto('https://jueshi.net/login');
-    await page.fill('input[type="email"]', '9833616@qq.com');
+    await page.fill('input[type="email"]', 'e2e-workbench-visual@jueshi.net');
     await page.fill('input[type="password"]', 'Test123456!');
     await page.click('button[type="submit"]');
     await page.waitForURL('**/workspace**', { timeout: 10000 });
