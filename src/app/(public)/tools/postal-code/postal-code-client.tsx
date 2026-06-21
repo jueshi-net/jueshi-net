@@ -11,8 +11,10 @@ import { FAQSection } from '@/components/faq-section';
 import SmartRelatedLinks from '@/components/smart-related-links';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
+import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
+import { importToolDataToTaskChain, createTaskChain, type TaskChain } from '@/lib/task-chain-api';
 import { SUPPORTED_COUNTRIES, allCountryData, type CountryPostalData } from '@/lib/data/postal-codes';
 import { getCoverageStatus, getCoverageIcon, getCoverageLabel, type CoverageStatus } from '@/lib/postal-code-coverage-status';
 import { getOfficialLink, getPhoneCode, getTimezone, getPostalFormat, getExamplePostal } from '@/lib/postal-code-official-links';
@@ -165,6 +167,8 @@ export default function PostalCodePage() {
   const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
   const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('postal');
   const [taskChainCreating, setTaskChainCreating] = useState(false);
+  const [showTaskChainDialog, setShowTaskChainDialog] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Record<string, string> | null>(null);
 
   // Track Tool_View on mount
   useEffect(() => {
@@ -544,6 +548,68 @@ export default function PostalCodePage() {
     } finally {
       setTaskChainCreating(false);
     }
+  };
+
+  // Open task chain dialog with current address data
+  const openTaskChainDialog = (result?: DbResult) => {
+    if (sessionStatus === 'loading') return;
+    if (!session?.user) {
+      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+
+    // Collect address data
+    let addressData: Record<string, string> = {
+      country: country.name,
+    };
+
+    if (result) {
+      addressData.postalCode = result.postalCode;
+      addressData.city = result.city;
+      addressData.province = result.province || result.adminName1 || '';
+      addressData.addressLine = `${result.city}${result.areaName && result.areaName !== result.city ? ` (${result.areaName})` : ''}, ${result.province || result.adminName1 || ''}`.trim();
+    } else if (dbResults.length > 0) {
+      const first = dbResults[0];
+      addressData.postalCode = first.postalCode;
+      addressData.city = first.city;
+      addressData.province = first.province || first.adminName1 || '';
+      addressData.addressLine = `${first.city}, ${first.province || first.adminName1 || ''}`.trim();
+    } else if (inputCode) {
+      addressData.postalCode = inputCode;
+    }
+
+    setSelectedAddress(addressData);
+    setShowTaskChainDialog(true);
+  };
+
+  // Handle selecting an existing task chain
+  const handleSelectTaskChain = async (taskChain: TaskChain) => {
+    if (!selectedAddress) return;
+    setTaskChainCreating(true);
+    try {
+      await importToolDataToTaskChain(taskChain.id, 'postal-helper', selectedAddress);
+      trackEvent.custom('postal-code', 'import_to_task_chain');
+      setShowTaskChainDialog(false);
+      setSelectedAddress(null);
+      router.push(`/workspace/task-chains/${taskChain.id}`);
+    } catch (e) {
+      console.error(e);
+      alert('导入数据到任务链失败，请稍后重试');
+    } finally {
+      setTaskChainCreating(false);
+    }
+  };
+
+  // Handle creating a new task chain
+  const handleCreateNewTaskChain = async (title: string): Promise<TaskChain> => {
+    const context = selectedAddress || { country: country.name };
+    const newChain = await createTaskChain({
+      title,
+      sourceTool: 'postal-code',
+      context,
+    });
+    trackEvent.custom('postal-code', 'create_task_chain_from_dialog');
+    return newChain;
   };
 
   // Advanced city search (Mode 1: 查邮编)
@@ -1537,10 +1603,10 @@ export default function PostalCodePage() {
                       </div>
                     )}
 
-                    {/* 加入发货任务链按钮 */}
+                    {/* 加入任务链按钮 */}
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <button
-                        onClick={() => joinShippingTaskChain()}
+                        onClick={() => openTaskChainDialog()}
                         disabled={taskChainCreating}
                         className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
@@ -1549,10 +1615,10 @@ export default function PostalCodePage() {
                         ) : (
                           <Link2 className="w-4 h-4" />
                         )}
-                        <span>{sessionStatus !== 'authenticated' ? '登录后继续' : '加入发货任务链'}</span>
+                        <span>{sessionStatus !== 'authenticated' ? '登录后继续' : '加入任务链'}</span>
                       </button>
                       <p className="text-xs text-teal-600 dark:text-teal-400 mt-1.5 text-center">
-                        将查询到的地址信息带入发货任务链工作台，继续安排发货。
+                        将查询到的地址信息带入任务链工作台，继续安排发货。
                       </p>
                     </div>
                   </>
@@ -2022,6 +2088,18 @@ export default function PostalCodePage() {
           部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
         </div>
       </div>
+
+      {/* Task Chain Select Dialog */}
+      <TaskChainSelectDialog
+        isOpen={showTaskChainDialog}
+        onClose={() => {
+          setShowTaskChainDialog(false);
+          setSelectedAddress(null);
+        }}
+        onSelect={handleSelectTaskChain}
+        onCreateNew={handleCreateNewTaskChain}
+        sourceTool="postal-code"
+      />
     </div>
   );
 }

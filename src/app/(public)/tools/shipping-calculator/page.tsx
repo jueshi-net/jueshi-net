@@ -5,7 +5,7 @@ import {
   Calculator, Package, Plane, Ship, Truck, MapPin,
   Plus, Trash2, RotateCcw, Info, AlertTriangle,
   ChevronDown, ChevronUp, Clipboard, X, CheckCircle2,
-  ArrowLeftRight, Scale, Box
+  ArrowLeftRight, Scale, Box, GitBranch
 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
@@ -14,6 +14,10 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
+import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
+import { importToolDataToTaskChain, createTaskChain, type TaskChain } from '@/lib/task-chain-api';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
@@ -158,6 +162,12 @@ export default function ShippingCalculatorPage() {
   const [currency, setCurrency] = useState(saved?.currency || 'CNY');
   const [exchangeRate, setExchangeRate] = useState(saved?.exchangeRate || '1');
   const [targetCurrency, setTargetCurrency] = useState(saved?.targetCurrency || 'CNY');
+
+  // Task chain integration
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [showTaskChainDialog, setShowTaskChainDialog] = useState(false);
+  const [creatingTaskChain, setCreatingTaskChain] = useState(false);
 
   // Persist to localStorage and save to task chain
   useEffect(() => {
@@ -339,6 +349,59 @@ export default function ShippingCalculatorPage() {
     setBatchText('');
     setParsedRows([]);
     setParseErrors([]);
+  };
+
+  // ==================== Task Chain Handlers ====================
+  const collectCbmData = () => {
+    const r = calcResults();
+    // Use first row dimensions as representative data
+    const firstRow = rows[0];
+    return {
+      length: parseFloat(firstRow?.length) || 0,
+      width: parseFloat(firstRow?.width) || 0,
+      height: parseFloat(firstRow?.height) || 0,
+      cartons: r.totalCtns,
+      grossWeight: r.totalGW,
+      cbm: r.totalCBM,
+      chargeableWeight: r.chargeableWeight,
+      sourceTool: 'shipping-calculator',
+    };
+  };
+
+  const handleJoinTaskChain = () => {
+    if (!session) {
+      alert('请先登录后再加入任务链');
+      return;
+    }
+    if (results.chargeableWeight <= 0) {
+      alert('请先输入货物尺寸和重量进行计算');
+      return;
+    }
+    setShowTaskChainDialog(true);
+  };
+
+  const handleSelectTaskChain = async (taskChain: TaskChain) => {
+    try {
+      setCreatingTaskChain(true);
+      const cbmData = collectCbmData();
+      await importToolDataToTaskChain(taskChain.id, 'cbm-tool', cbmData);
+      setShowTaskChainDialog(false);
+      router.push(`/task-chains/${taskChain.id}`);
+    } catch (error) {
+      console.error('Failed to import data to task chain:', error);
+      alert('加入任务链失败，请稍后重试');
+    } finally {
+      setCreatingTaskChain(false);
+    }
+  };
+
+  const handleCreateNewTaskChain = async (title: string): Promise<TaskChain> => {
+    const cbmData = collectCbmData();
+    return createTaskChain({
+      title,
+      sourceTool: 'shipping-calculator',
+      context: cbmData,
+    });
   };
 
   const unitLabel = useMeters ? 'm' : 'cm';
@@ -828,6 +891,17 @@ export default function ShippingCalculatorPage() {
             <div className="text-center text-xs text-gray-400">
               总件数：<span className="font-semibold text-gray-600">{results.totalCtns}</span> 件
             </div>
+
+            {/* Join Task Chain Button */}
+            {results.chargeableWeight > 0 && (
+              <button
+                onClick={handleJoinTaskChain}
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-600 hover:to-indigo-700 text-white font-medium rounded-lg shadow-sm transition-all flex items-center justify-center gap-2 text-sm"
+              >
+                <GitBranch className="w-4 h-4" />
+                {session ? '加入任务链' : '登录后加入任务链'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -1083,6 +1157,15 @@ export default function ShippingCalculatorPage() {
           },
         ]} />
       </div>
+
+      {/* ==================== Task Chain Select Dialog ==================== */}
+      <TaskChainSelectDialog
+        isOpen={showTaskChainDialog}
+        onClose={() => setShowTaskChainDialog(false)}
+        onSelect={handleSelectTaskChain}
+        onCreateNew={handleCreateNewTaskChain}
+        sourceTool="shipping-calculator"
+      />
 
       {/* ==================== Batch Import Modal ==================== */}
       {showBatch && (

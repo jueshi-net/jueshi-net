@@ -10,9 +10,12 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
+import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
 import { inputStyles, cardStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
+import { importToolDataToTaskChain, createTaskChain } from '@/lib/task-chain-api';
+import type { TaskChain } from '@/lib/task-chain-api';
 import { getAliases } from '@/lib/hs-code-query-aliases';
 import Link from 'next/link';
 
@@ -169,6 +172,8 @@ export default function HSCodePage() {
   const [savedProduct, setSavedProduct] = useState<string | null>(null);
   const [aliasUsed, setAliasUsed] = useState<string | null>(null); // Track if alias was used
   const [taskChainCreating, setTaskChainCreating] = useState<string | null>(null);
+  const [showTaskChainDialog, setShowTaskChainDialog] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<HSCodeItem | null>(null);
   
   // Request sequence guard + AbortController
   const requestSeqRef = useRef(0);
@@ -435,42 +440,51 @@ export default function HSCodePage() {
     try { localStorage.removeItem(FAVORITES_KEY); } catch { /* empty */ }
   }, []);
 
-  const joinShippingTaskChain = useCallback(async (item: HSCodeItem) => {
+  const joinShippingTaskChain = useCallback((item: HSCodeItem) => {
     if (sessionStatus === 'loading') return;
     if (!session?.user) {
       // Redirect to login
       router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
-    setTaskChainCreating(item.code);
+    setSelectedItem(item);
+    setShowTaskChainDialog(true);
+  }, [session, sessionStatus, router]);
+
+  const handleSelectTaskChain = useCallback(async (taskChain: TaskChain) => {
+    if (!selectedItem) return;
+    setTaskChainCreating(selectedItem.code);
     try {
-      const res = await fetch('/api/task-chains', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: `发货任务 - ${item.description}`,
-          sourceTool: 'hs-code',
-          context: {
-            hsCode: item.code,
-            productDescription: item.descriptionEn || item.description,
-            productName: activeQuery,
-          },
-        }),
+      await importToolDataToTaskChain(taskChain.id, 'hs-tool', {
+        hsCode: selectedItem.code,
+        productDescription: selectedItem.descriptionEn || selectedItem.description,
+        productName: activeQuery,
       });
-      const json = await res.json();
-      if (json.success && json.taskChain) {
-        trackEvent.custom('hs-code', 'join_shipping_task_chain');
-        router.push(`/workspace/task-chains/shipping/${json.taskChain.id}`);
-      } else {
-        alert(json.error || '创建任务链失败');
-      }
+      trackEvent.custom('hs-code', 'join_shipping_task_chain');
+      setShowTaskChainDialog(false);
+      setSelectedItem(null);
+      router.push(`/workspace/task-chains/shipping/${taskChain.id}`);
     } catch (e) {
       console.error(e);
-      alert('网络错误，请稍后重试');
+      alert('导入数据到任务链失败，请稍后重试');
     } finally {
       setTaskChainCreating(null);
     }
-  }, [session, sessionStatus, router, activeQuery]);
+  }, [selectedItem, activeQuery, router]);
+
+  const handleCreateNewTaskChain = useCallback(async (title: string): Promise<TaskChain> => {
+    if (!selectedItem) throw new Error('No item selected');
+    const newChain = await createTaskChain({
+      title,
+      sourceTool: 'hs-code',
+      context: {
+        hsCode: selectedItem.code,
+        productDescription: selectedItem.descriptionEn || selectedItem.description,
+        productName: activeQuery,
+      },
+    });
+    return newChain;
+  }, [selectedItem, activeQuery]);
 
   const sensitiveQuery = isSensitiveQuery(activeQuery);
 
@@ -1020,6 +1034,14 @@ export default function HSCodePage() {
 
         <AdSlot placement="tool-hs-code-bottom" className="mb-4" />
       </div>
+
+      <TaskChainSelectDialog
+        isOpen={showTaskChainDialog}
+        onClose={() => { setShowTaskChainDialog(false); setSelectedItem(null); }}
+        onSelect={handleSelectTaskChain}
+        onCreateNew={handleCreateNewTaskChain}
+        sourceTool="hs-code"
+      />
     </div>
   );
 }

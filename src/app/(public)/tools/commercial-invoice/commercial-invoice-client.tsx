@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Save, Printer, Building2, Plus, Trash2, FileText, Loader2, Eye, Code, Landmark } from "lucide-react";
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
@@ -10,6 +10,7 @@ import TaskChainGeneratorButton from "@/components/tools/task-chain-generator-bu
 import { useDraftLoader } from "@/lib/use-draft-loader";
 import { useFreemiumGate } from "@/hooks/use-freemium-gate";
 import PaywallModal from "@/components/ui/paywall-modal";
+import { getTaskChain } from "@/lib/task-chain-api";
 
 interface LineItem {
   id: string;
@@ -67,6 +68,98 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // ── Load task chain context from database when taskId is in URL ──
+  const [loadingTaskChain, setLoadingTaskChain] = useState(false);
+  useEffect(() => {
+    const taskId = searchParams.get("taskId");
+    if (!taskId) return;
+    // Don't override if we already have a draftId loaded
+    if (draftId) return;
+
+    let cancelled = false;
+    setLoadingTaskChain(true);
+
+    getTaskChain(taskId)
+      .then((chain) => {
+        if (cancelled) return;
+        const ctx = chain.context || {};
+
+        // Fill buyer/client info
+        if (ctx.buyerName) setClientName(ctx.buyerName);
+        if (ctx.buyerAddress) {
+          setClientAddress(ctx.buyerAddress);
+        } else {
+          // Compose address from parts
+          const addressParts = [
+            ctx.addressLine,
+            ctx.city,
+            ctx.province,
+            ctx.postalCode,
+            ctx.country,
+          ].filter(Boolean);
+          if (addressParts.length > 0) {
+            setClientAddress(addressParts.join(", "));
+          }
+        }
+
+        // Fill line items from task chain
+        if (ctx.lineItems && ctx.lineItems.length > 0) {
+          const newItems: LineItem[] = ctx.lineItems.map((item, idx) => ({
+            id: `tc-db-${idx}-${Date.now()}`,
+            description: [
+              item.hsCode ? `HS: ${item.hsCode}` : "",
+              item.description || "",
+            ].filter(Boolean).join(" - ") || ctx.productDescription || ctx.productName || "",
+            quantity: item.quantity || 1,
+            unitPrice: item.unitPrice || 0,
+            currency: item.currency || "USD",
+          }));
+          setLineItems(newItems);
+        } else if (ctx.productDescription || ctx.productName) {
+          // Single product from task chain
+          const desc = [
+            ctx.hsCode ? `HS: ${ctx.hsCode}` : "",
+            ctx.productDescription || ctx.productName || "",
+          ].filter(Boolean).join(" - ");
+          setLineItems([{
+            id: `tc-db-0-${Date.now()}`,
+            description: desc,
+            quantity: 1,
+            unitPrice: parseFloat(String(ctx.declaredValue || ctx.convertedValue || ctx.totalAmount || "0")) || 0,
+            currency: (ctx.currency as string) || "USD",
+          }]);
+        }
+
+        // Fill invoice number
+        if (ctx.invoiceNo) setInvoiceNo(ctx.invoiceNo);
+
+        // Fill payment terms
+        if (ctx.terms) setPaymentTerms(ctx.terms);
+
+        // Fill packing info in remarks
+        const packingParts: string[] = [];
+        if (ctx.cartons) packingParts.push(`Cartons: ${ctx.cartons}`);
+        if (ctx.grossWeight) packingParts.push(`Gross Weight: ${ctx.grossWeight} kg`);
+        if (ctx.cbm) packingParts.push(`CBM: ${ctx.cbm}`);
+        if (ctx.chargeableWeight) packingParts.push(`Chargeable Weight: ${ctx.chargeableWeight} kg`);
+        if (packingParts.length > 0) {
+          setRemarks((prev) => {
+            const packingInfo = "Packing Info: " + packingParts.join(", ");
+            return prev ? `${prev}\n${packingInfo}` : packingInfo;
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load task chain context:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingTaskChain(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [searchParams, draftId]);
 
   // ── Check authentication status on mount ──
   useEffect(() => {
@@ -117,9 +210,10 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
     if (draftLoaded && draftId) setCurrentDocId(draftId);
   }, [draftLoaded, draftId]);
 
-  // ── Load from localStorage (only if no draftId) ──
+  // ── Load from localStorage (only if no draftId and no taskId) ──
   useEffect(() => {
     if (draftId) return;
+    if (searchParams.get("taskId")) return;
     const saved = localStorage.getItem("invoice-draft");
     if (saved) {
       try {
@@ -331,7 +425,21 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
   const handleTaskChainSelect = (context: Record<string, any>) => {
     // Fill buyer info
     if (context.buyerName && !clientName) setClientName(context.buyerName);
-    if (context.buyerAddress && !clientAddress) setClientAddress(context.buyerAddress);
+    if (context.buyerAddress && !clientAddress) {
+      setClientAddress(context.buyerAddress);
+    } else if (!clientAddress) {
+      // Compose address from parts
+      const addressParts = [
+        context.addressLine,
+        context.city,
+        context.province,
+        context.postalCode,
+        context.country,
+      ].filter(Boolean);
+      if (addressParts.length > 0) {
+        setClientAddress(addressParts.join(", "));
+      }
+    }
 
     // Fill line items from task chain
     if (context.lineItems && context.lineItems.length > 0) {
@@ -339,22 +447,29 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
       if (!hasExistingItems) {
         const newItems: LineItem[] = context.lineItems.map((item: any, idx: number) => ({
           id: `tc-${idx}-${Date.now()}`,
-          description: item.description || '',
+          description: [
+            item.hsCode ? `HS: ${item.hsCode}` : "",
+            item.description || "",
+          ].filter(Boolean).join(" - ") || context.productDescription || context.productName || "",
           quantity: item.quantity || 1,
           unitPrice: item.unitPrice || 0,
           currency: item.currency || 'USD',
         }));
         setLineItems(newItems);
       }
-    } else if (context.productName) {
+    } else if (context.productName || context.productDescription) {
       // Legacy: single product from task chain
       const hasExistingItems = lineItems.some(l => l.description);
       if (!hasExistingItems) {
+        const desc = [
+          context.hsCode ? `HS: ${context.hsCode}` : "",
+          context.productDescription || context.productName || "",
+        ].filter(Boolean).join(" - ");
         setLineItems([{
           id: `tc-0-${Date.now()}`,
-          description: context.productDescription || context.productName || '',
+          description: desc,
           quantity: 1,
-          unitPrice: parseFloat(context.declaredValue || context.convertedValue || '0') || 0,
+          unitPrice: parseFloat(context.declaredValue || context.convertedValue || context.totalAmount || '0') || 0,
           currency: context.currency || 'USD',
         }]);
       }
@@ -365,6 +480,19 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
 
     // Fill payment terms
     if (context.terms && paymentTerms === 'T/T') setPaymentTerms(context.terms);
+
+    // Fill packing info in remarks
+    const packingParts: string[] = [];
+    if (context.cartons) packingParts.push(`Cartons: ${context.cartons}`);
+    if (context.grossWeight) packingParts.push(`Gross Weight: ${context.grossWeight} kg`);
+    if (context.cbm) packingParts.push(`CBM: ${context.cbm}`);
+    if (context.chargeableWeight) packingParts.push(`Chargeable Weight: ${context.chargeableWeight} kg`);
+    if (packingParts.length > 0) {
+      setRemarks((prev: string) => {
+        const packingInfo = "Packing Info: " + packingParts.join(", ");
+        return prev ? `${prev}\n${packingInfo}` : packingInfo;
+      });
+    }
   };
 
   return (
@@ -407,6 +535,14 @@ export default function CommercialInvoiceClient({ draftId }: { draftId: string |
         <div className="max-w-7xl mx-auto px-4 mt-3">
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
+          </div>
+        </div>
+      )}
+
+      {loadingTaskChain && (
+        <div className="max-w-7xl mx-auto px-4 mt-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> 正在加载任务链数据...
           </div>
         </div>
       )}
