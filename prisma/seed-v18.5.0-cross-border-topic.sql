@@ -3,6 +3,7 @@
 -- Idempotent: ON CONFLICT (slug) DO NOTHING
 
 INSERT INTO topics (
+  id,
   slug,
   title,
   subtitle,
@@ -17,6 +18,7 @@ INSERT INTO topics (
   "createdAt",
   "updatedAt"
 ) VALUES (
+  'cross-border-shipping-topic-v1850',
   'cross-border-shipping',
   '跨境发货',
   '中国到海外发货全流程指南与工具',
