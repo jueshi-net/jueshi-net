@@ -17,6 +17,13 @@ const STATUS_OPTIONS = [
   { value: "archived", label: "已归档" },
 ];
 
+const ROBOTS_OPTIONS = [
+  { value: "index,follow", label: "index,follow" },
+  { value: "noindex,follow", label: "noindex,follow" },
+  { value: "noindex,nofollow", label: "noindex,nofollow" },
+  { value: "index,nofollow", label: "index,nofollow" },
+];
+
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400";
 const labelCls = "block text-sm font-medium text-gray-700 mb-1";
 
@@ -31,7 +38,7 @@ export default function NewChecklistPage() {
 
   const [form, setForm] = useState({
     title: "", slug: "", summary: "", status: "draft",
-    seoTitle: "", seoDescription: "",
+    seoTitle: "", seoDescription: "", canonicalUrl: "", robots: "index,follow",
     relatedTools: "", relatedTaskChain: "", relatedGuides: "", relatedTopics: "",
   });
   const [steps, setSteps] = useState<Step[]>([newStep()]);
@@ -78,6 +85,8 @@ export default function NewChecklistPage() {
         status: form.status,
         seoTitle: form.seoTitle.trim() || undefined,
         seoDescription: form.seoDescription.trim() || undefined,
+        canonicalUrl: form.canonicalUrl.trim() || undefined,
+        robots: form.robots,
         relatedTools: form.relatedTools.split(",").map((s) => s.trim()).filter(Boolean),
         relatedTaskChain: form.relatedTaskChain.trim() || undefined,
         relatedGuides: form.relatedGuides.split(",").map((s) => s.trim()).filter(Boolean),

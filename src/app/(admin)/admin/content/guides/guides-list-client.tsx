@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { BookOpen, Plus, Edit2, Trash2, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { BookOpen, Plus, Edit2, Trash2, AlertCircle, CheckCircle, Loader2, Search } from "lucide-react";
 
 type Guide = {
   id: string; slug: string; title: string; summary: string | null;
@@ -19,6 +19,30 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
   const [guides, setGuides] = useState<Guide[]>(initialGuides);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fetchGuides = useCallback(async (status: string, search: string) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (status && status !== "all") params.set("status", status);
+      if (search.trim()) params.set("search", search.trim());
+      const res = await fetch(`/api/admin/guides?${params.toString()}`, { cache: "no-store" });
+      const data = await res.json();
+      if (Array.isArray(data)) setGuides(data as Guide[]);
+    } catch {
+      // keep existing list on fetch error
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => fetchGuides(statusFilter, searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [statusFilter, searchTerm, fetchGuides]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("确定删除此指南？此操作不可撤销。")) return;
@@ -67,6 +91,30 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
           <span className="text-sm">{message.text}</span>
         </div>
       )}
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 bg-white min-h-[44px]"
+        >
+          <option value="all">全部状态</option>
+          <option value="published">已发布</option>
+          <option value="draft">草稿</option>
+          <option value="archived">已归档</option>
+        </select>
+        <div className="relative flex-1 max-w-xs">
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
+            placeholder="搜索标题或 slug..."
+          />
+        </div>
+        {loading && <Loader2 className="w-4 h-4 text-blue-400 animate-spin self-center" />}
+      </div>
 
       {/* Guides table */}
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">

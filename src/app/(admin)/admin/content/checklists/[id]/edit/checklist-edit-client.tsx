@@ -17,12 +17,20 @@ type Checklist = {
   relatedTools: string[]; relatedTaskChain: string | null;
   relatedGuides: string[]; relatedTopics: string[];
   seoTitle: string | null; seoDescription: string | null;
+  canonicalUrl: string | null; robots: string;
 };
 
 const STATUS_OPTIONS = [
   { value: "draft", label: "草稿" },
   { value: "published", label: "已发布" },
   { value: "archived", label: "已归档" },
+];
+
+const ROBOTS_OPTIONS = [
+  { value: "index,follow", label: "index,follow" },
+  { value: "noindex,follow", label: "noindex,follow" },
+  { value: "noindex,nofollow", label: "noindex,nofollow" },
+  { value: "index,nofollow", label: "index,nofollow" },
 ];
 
 const inputCls = "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400";
@@ -58,6 +66,8 @@ export default function ChecklistEditClient({ checklist }: { checklist: Checklis
     status: checklist.status,
     seoTitle: checklist.seoTitle || "",
     seoDescription: checklist.seoDescription || "",
+    canonicalUrl: checklist.canonicalUrl || "",
+    robots: checklist.robots || "index,follow",
     relatedTools: (checklist.relatedTools || []).join(", "),
     relatedTaskChain: checklist.relatedTaskChain || "",
     relatedGuides: (checklist.relatedGuides || []).join(", "),
