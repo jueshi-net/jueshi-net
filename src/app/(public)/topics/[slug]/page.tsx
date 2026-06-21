@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { parseYouTubeUrl, getYouTubeEmbedUrl, getYouTubeThumbnail } from "@/lib/youtube";
 import { getTopicBySlug as getCmsTopicBySlug, getAllTopicSlugs } from "@/lib/cms-utils";
 import SmartRelatedLinks from "@/components/smart-related-links";
+import TaskChainCta from "@/components/content/task-chain-cta";
 
 // Reuse rating/category constants from static data (these are UI-only constants, not data)
 import {
@@ -640,6 +641,12 @@ export default async function TopicSlugPage({
             </div>
           </div>
         </section>
+
+        {/* ===== Task Chain CTA ===== */}
+        <TaskChainCta
+          title="开始跨境发货任务链"
+          description="把本专题的工具和指南加入发货任务链，一步步完成跨境发货。"
+        />
 
         {/* ===== 相关入口 CTA ===== */}
         <section className="mb-8">

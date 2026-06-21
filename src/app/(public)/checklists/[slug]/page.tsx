@@ -5,6 +5,7 @@ import ChecklistClient from "./checklist-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ChecklistViewTracker } from "./checklist-view-tracker";
 import { ChecklistToolLink } from "./checklist-tool-link";
+import TaskChainCta from "@/components/content/task-chain-cta";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -344,6 +345,13 @@ export default async function ChecklistPage({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* Task Chain CTA */}
+      <TaskChainCta
+        title="把本清单加入发货任务链"
+        description="使用工具生成发票/装箱单草稿，一步步完成跨境发货。"
+        buttonText="开始跨境发货任务链"
+      />
 
       {/* CTA */}
       {page.ctaConfig && (

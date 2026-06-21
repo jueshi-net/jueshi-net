@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import TaskChainCta from "@/components/content/task-chain-cta";
 import {
   Home,
   ChevronRight,
@@ -329,6 +330,12 @@ export default async function CountryPage({ params }: Props) {
             )}
           </section>
         )}
+
+        {/* Task Chain CTA (always present) */}
+        <TaskChainCta
+          title="开始跨境发货任务链"
+          description="把本页工具和指南加入发货任务链，使用工具生成发票/装箱单草稿。"
+        />
 
         {/* ─── 广告位: 内容底部 ─── */}
         <AdPlaceholder label="广告位 · 内容底部" />

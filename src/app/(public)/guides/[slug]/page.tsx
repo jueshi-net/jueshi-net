@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CalendarDays, Eye, Clock, ArrowLeft, Wrench, ArrowRight, BookOpen, Home } from "lucide-react";
 import Link from "next/link";
+import TaskChainCta from "@/components/content/task-chain-cta";
 import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
 import { AdSlot } from "@/components/ad-slot";
 import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
@@ -417,6 +418,9 @@ export default async function ArticlePage({ params }: Props) {
               </div>
             </div>
           </article>
+
+          {/* Task Chain CTA */}
+          <TaskChainCta />
 
           {/* CTA Buttons */}
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
