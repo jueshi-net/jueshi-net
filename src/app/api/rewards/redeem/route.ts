@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
       if (rewardItem.rewardType === "ad_slot_days") {
         // Find or create a reward rule for ad slots
         let adSlotRule = await tx.rewardRule.findFirst({
-          where: { rewardType: "ad_slot_days" },
+          where: { rewardType: "AD_SLOT_DAYS" },
         });
 
         if (!adSlotRule) {
@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
             data: {
               name: "广告权益自动发放",
               trigger: "REWARD_REDEEM",
-              rewardType: "ad_slot_days",
+              rewardType: "AD_SLOT_DAYS",
               rewardValue: 1,
               enabled: true,
             },
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           data: {
             userId,
             rewardRuleId: adSlotRule.id,
-            rewardType: "ad_slot_days",
+            rewardType: "AD_SLOT_DAYS",
             rewardValue: rewardItem.rewardValue,
             status: "GRANTED",
             grantedAt: now,
