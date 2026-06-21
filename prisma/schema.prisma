@@ -65,6 +65,7 @@ model User {
   documentHistories      DocumentHistory[]
   taskChainDrafts        TaskChainDraft[]
   passwordResetTokens    PasswordResetToken[]
+  couponEntitlements     CouponEntitlement[]
   
   // v1.20.42.12.0: 用户邀请系统
   inviteCodes            InviteCode[]         @relation("UserInviteCodes")
@@ -904,6 +905,21 @@ model RewardItem {
   rewardValue Int // 券数量或天数
   enabled     Boolean      @default(true)
   sortOrder   Int          @default(0)
+  
+  // v1.20.42.18.4.3: 限制机制
+  stockLimit     Int?      @map("stock_limit")     // 总库存限制，null=无限制
+  stockUsed      Int       @default(0) @map("stock_used") // 已使用库存
+  perUserLimit   Int       @default(1) @map("per_user_limit") // 每人限兑次数
+  cooldownHours  Int       @default(0) @map("cooldown_hours") // 冷却期（小时）
+  startAt        DateTime? @map("start_at") // 开始时间
+  endAt          DateTime? @map("end_at") // 结束时间
+  requiresApproval Boolean @default(false) @map("requires_approval") // 需要审核
+  
+  // v1.20.42.18.4.3: 履约信息
+  fulfillmentType   String? @map("fulfillment_type")   // auto / manual / none
+  fulfillmentStatus String? @map("fulfillment_status") // implemented / partial / not_implemented
+  inactiveReason    String? @map("inactive_reason")    // 禁用原因说明
+  
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   userRewards UserReward[]
@@ -920,9 +936,17 @@ model UserReward {
   rewardItemId String
   rewardType   String // 冗余字段，便于查询
   rewardValue  Int // 券数量或天数
-  status       String     @default("active") // active / used / expired
+  status       String     @default("pending") // pending / active / used / expired / rejected
   expiresAt    DateTime?
   usedAt       DateTime?
+  
+  // v1.20.42.18.4.3: 审核和履约
+  auditStatus   String    @default("auto") @map("audit_status") // auto / pending / approved / rejected
+  auditNote     String?   @map("audit_note")
+  pointsCost    Int       @map("points_cost") // 消耗积分
+  grantId       String?   @map("grant_id") // 关联的 RewardGrant ID
+  failureReason String?   @map("failure_reason")
+  
   createdAt    DateTime   @default(now())
   user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   rewardItem   RewardItem @relation(fields: [rewardItemId], references: [id])
@@ -931,7 +955,29 @@ model UserReward {
   @@index([status])
   @@index([rewardType])
   @@index([expiresAt])
+  @@index([auditStatus])
   @@map("user_rewards")
+}
+
+// v1.20.42.18.4.3: 券类权益
+model CouponEntitlement {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  couponType  String   @map("coupon_type") // word_export / no_branding
+  quantity    Int      // 券数量
+  usedCount   Int      @default(0) @map("used_count") // 已使用数量
+  status      String   @default("active") // active / used / expired
+  expiresAt   DateTime? @map("expires_at")
+  sourceRewardId String? @map("source_reward_id") // 来源 UserReward ID
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([couponType])
+  @@index([status])
+  @@map("coupon_entitlements")
 }
 
 // NOTE: Adding memberUntil field to User model
