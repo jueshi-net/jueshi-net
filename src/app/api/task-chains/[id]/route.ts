@@ -116,8 +116,10 @@ async function updateTaskChain(req: NextRequest, params: { id: string }) {
 
   // Store currentStep and completedSteps in context
   if (currentStep !== undefined || completedSteps !== undefined) {
-    const currentContext = (existing.context as Record<string, unknown>) || {};
-    const newContext = { ...currentContext };
+    // Use updateData.context if already set, otherwise use existing.context
+    const baseContext = (updateData.context as Record<string, unknown>) || 
+                        (existing.context as Record<string, unknown>) || {};
+    const newContext = { ...baseContext };
     
     if (currentStep !== undefined) {
       newContext.currentStep = currentStep;
