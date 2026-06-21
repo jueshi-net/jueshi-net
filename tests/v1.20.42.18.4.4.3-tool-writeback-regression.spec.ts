@@ -7,7 +7,7 @@ import { test, expect } from '@playwright/test';
 
 const BASE_URL = 'https://jueshi.net';
 const TEST_USER = {
-  email: 'e2e-task-chain-20260621@jueshi.net',
+  email: 'e2e-task-chain-v18443@jueshi.net',
   password: 'Test123456!',
 };
 
@@ -86,15 +86,18 @@ test('01 - HS tool writeback to task chain', async ({ page }) => {
     fullPage: false 
   });
   
-  await page.fill('input[type="text"]', '961700');
-  await page.waitForTimeout(3000);
-  
-  const copyBtn = page.locator('button:has-text("961700")').first();
-  if (await copyBtn.count() > 0) {
-    await copyBtn.click();
-    await page.waitForTimeout(1000);
+  // Use more specific selector for HS code search input
+  const searchInput = page.locator('input[placeholder*="输入商品名称"]').first();
+  if (await searchInput.count() > 0) {
+    await searchInput.fill('961700');
+    await page.waitForTimeout(3000);
   }
   
+  // Scroll down to see results and join button
+  await page.evaluate(() => window.scrollBy(0, 500));
+  await page.waitForTimeout(1000);
+  
+  // Look for HS code result and click join button
   const joinBtn = page.locator('button:has-text("加入任务链"), button:has-text("加入发货任务链")').first();
   if (await joinBtn.count() > 0) {
     await joinBtn.click();
