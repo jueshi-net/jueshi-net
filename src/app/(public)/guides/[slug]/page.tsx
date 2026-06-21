@@ -70,8 +70,33 @@ function addHeadingIds(html: string): { html: string; toc: TocItem[] } {
   return { html: result, toc };
 }
 
+// v1.20.42.18.4.7: Guide model support — check Guide first, fallback to Article
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+
+  // 1. Check Guide model first
+  try {
+    const guide = await prisma.guide.findUnique({ where: { slug } });
+    if (guide && guide.status === "published") {
+      const desc = guide.seoDescription || guide.summary || guide.body.replace(/<[^>]*>/g, "").slice(0, 150);
+      return {
+        title: `${guide.seoTitle || guide.title} | 绝世百宝箱`,
+        description: desc,
+        alternates: guide.canonicalUrl ? { canonical: guide.canonicalUrl } : { canonical: `https://jueshi.net/guides/${slug}` },
+        robots: guide.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined,
+        openGraph: {
+          title: guide.title,
+          description: desc,
+          type: "article",
+          publishedTime: guide.publishedAt?.toISOString(),
+          authors: guide.author ? [guide.author] : ["绝世百宝箱"],
+          images: guide.coverImage ? [{ url: guide.coverImage }] : [],
+        },
+      };
+    }
+  } catch { /* Guide table may not exist during build — fall through */ }
+
+  // 2. Fallback to Article model
   const article = await prisma.article.findUnique({ where: { slug } });
   if (!article || article.status !== "published") return { title: "文章未找到" };
 
@@ -106,6 +131,72 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
 
+  // v1.20.42.18.4.7: Check Guide model first
+  try {
+    const guide = await prisma.guide.findUnique({ where: { slug } });
+    if (guide && guide.status === "published") {
+      const guideTools = getRelatedTools(guide.relatedTools);
+      const readingTime = Math.max(1, Math.ceil(guide.body.replace(/<[^>]*>/g, "").length / 500));
+      const { html: processedContent, toc } = addHeadingIds(guide.body);
+      const publishDate = guide.publishedAt || guide.createdAt;
+
+      return (
+        <ArticleLayoutClient toc={toc}>
+          <div className="min-h-screen bg-gray-50">
+            <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+              <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6" aria-label="面包屑导航">
+                <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
+                  <Home className="w-4 h-4" /><span>首页</span>
+                </Link>
+                <span className="text-gray-300">/</span>
+                <Link href="/guides" className="hover:text-gray-900 transition-colors">实用指南</Link>
+                <span className="text-gray-300">/</span>
+                <span className="text-gray-900 font-medium truncate">{guide.title}</span>
+              </nav>
+
+              <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <header className="px-6 pt-8 pb-6 sm:px-10 sm:pt-10 sm:pb-8">
+                  <div className="mb-4">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-teal-50 text-teal-700 border border-teal-100">
+                      <BookOpen className="w-3.5 h-3.5" />{guide.category}
+                    </span>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">{guide.title}</h1>
+                  {guide.summary && <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-6">{guide.summary}</p>}
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                    {guide.author && <span>{guide.author}</span>}
+                    <span className="flex items-center gap-1"><CalendarDays className="w-4 h-4" />{publishDate.toLocaleDateString("zh-CN")}</span>
+                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" />约 {readingTime} 分钟</span>
+                  </div>
+                </header>
+
+                <div className="px-6 sm:px-10 pb-8">
+                  <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: processedContent }} />
+                  <p className="mt-8 text-sm text-gray-400 border-t pt-4">⚠️ 以上内容仅供参考，不构成专业建议。HS编码、报关、税务等具体问题请咨询专业人士。</p>
+                </div>
+
+                {guideTools.length > 0 && (
+                  <div className="px-6 sm:px-10 py-6 bg-gray-50 border-t">
+                    <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2"><Wrench className="w-5 h-5 text-teal-600" />相关工具</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {guideTools.map((tool) => (
+                        <Link key={tool.route} href={tool.route} className="flex items-center gap-3 p-3 bg-white rounded-lg border hover:border-teal-300 hover:shadow-sm transition-all">
+                          <span className="text-2xl">{tool.icon}</span>
+                          <div><div className="font-medium text-gray-900">{tool.name}</div><div className="text-sm text-gray-500">{tool.desc}</div></div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </article>
+            </div>
+          </div>
+        </ArticleLayoutClient>
+      );
+    }
+  } catch { /* Guide table may not exist during build — fall through to Article */ }
+
+  // Fallback: Article model (existing behavior)
   let article: Awaited<ReturnType<typeof prisma.article.findUnique>>;
   try {
     article = await prisma.article.findUnique({ where: { slug } });

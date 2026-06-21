@@ -10,6 +10,19 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+// v1.20.42.18.4.7: Check Checklist model first, fallback to LandingPage
+async function getChecklistFromModel(slug: string) {
+  try {
+    const checklist = await prisma.checklist.findUnique({
+      where: { slug, status: "published" },
+    });
+    if (!checklist) return null;
+    return { source: "model" as const, checklist };
+  } catch {
+    return null; // Checklist table may not exist during build
+  }
+}
+
 async function getChecklist(slug: string) {
   const page = await prisma.landingPage.findUnique({
     where: { slug, pageType: "checklist", status: "published" },
@@ -32,6 +45,20 @@ async function getChecklist(slug: string) {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+
+  // v1.20.42.18.4.7: Check Checklist model first
+  const modelChecklist = await getChecklistFromModel(slug);
+  if (modelChecklist) {
+    const c = modelChecklist.checklist;
+    return {
+      title: c.seoTitle || c.title,
+      description: c.seoDescription || c.summary || "",
+      alternates: c.canonicalUrl ? { canonical: c.canonicalUrl } : { canonical: `https://jueshi.net/checklists/${c.slug}` },
+      robots: c.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined,
+    };
+  }
+
+  // Fallback to LandingPage
   const page = await getChecklist(slug);
   if (!page) return { title: "未找到清单" };
 
@@ -42,8 +69,75 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ChecklistPage({ params }: Props) {
   const { slug } = await params;
+
+  // v1.20.42.18.4.7: Check Checklist model first
+  const modelChecklist = await getChecklistFromModel(slug);
+  if (modelChecklist) {
+    const c = modelChecklist.checklist;
+    const steps = (c.steps as any[]) || [];
+    const TOOL_MAP: Record<string, { name: string; route: string; icon: string }> = {
+      "hs-code": { name: "HS编码查询", route: "/tools/hs-code", icon: "📋" },
+      "shipping-estimator": { name: "运费估算器", route: "/tools/shipping-calculator", icon: "🧮" },
+      "postal-code": { name: "邮编格式校验", route: "/tools/postal-code", icon: "📮" },
+      "commercial-invoice": { name: "发票生成器", route: "/tools/commercial-invoice", icon: "📄" },
+      "packing-list": { name: "装箱单生成", route: "/tools/packing-list", icon: "📦" },
+    };
+
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        <Breadcrumb />
+
+        <section className="text-center space-y-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{c.title}</h1>
+          {c.summary && <p className="text-lg text-gray-600 max-w-2xl mx-auto">{c.summary}</p>}
+        </section>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+          <h2 className="text-xl font-bold text-gray-900">📋 清单步骤</h2>
+          <div className="space-y-3">
+            {steps.map((step: any, idx: number) => (
+              <div key={idx} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                <input type="checkbox" className="mt-1 w-5 h-5 rounded text-teal-600" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900">{idx + 1}. {step.title}</span>
+                    {step.optional && <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full">可选</span>}
+                  </div>
+                  {step.description && <p className="text-sm text-gray-600 mt-1">{step.description}</p>}
+                  {step.toolLink && TOOL_MAP[step.toolLink] && (
+                    <a href={TOOL_MAP[step.toolLink].route} className="inline-flex items-center gap-1 mt-2 text-sm text-teal-600 hover:underline">
+                      {TOOL_MAP[step.toolLink].icon} {TOOL_MAP[step.toolLink].name} →
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-gray-400 border-t pt-4">⚠️ 以上内容仅供参考，不构成专业建议。</p>
+        </div>
+
+        {c.relatedTools.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">🔧 相关工具</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {c.relatedTools.map((ts: string) => TOOL_MAP[ts]).filter(Boolean).map((tool: any) => (
+                <a key={tool.route} href={tool.route} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border hover:border-teal-300 transition-all">
+                  <span className="text-2xl">{tool.icon}</span>
+                  <span className="font-medium text-gray-900">{tool.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Fallback: LandingPage model (existing behavior)
   const page = await getChecklist(slug);
   if (!page) notFound();
 
