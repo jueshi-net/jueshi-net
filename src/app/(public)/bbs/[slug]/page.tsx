@@ -17,7 +17,25 @@ async function getPost(slug: string) {
     const post = await prisma.forumPost.findUnique({
       where: { slug },
       include: {
-        user: { select: { id: true, name: true, email: true, levelKey: true, growthValue: true, honorScore: true } },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            levelKey: true,
+            growthValue: true,
+            honorScore: true,
+            createdAt: true,
+            role: true,
+            membershipTier: true,
+            _count: {
+              select: {
+                forumPosts: { where: { status: "published" } },
+                forumComments: { where: { status: "published" } },
+              },
+            },
+          },
+        },
         category: true,
         _count: { select: { comments: { where: { status: "published" } } } },
       },
@@ -133,7 +151,7 @@ export default async function PostDetailPage({
               {post.category.name}
             </Link>
             <ChevronRight className="w-3 h-3 text-gray-300" />
-            <span className="text-gray-400 truncate max-w-[200px]">{post.title}</span>
+            <span className="text-slate-500 truncate max-w-[200px]">{post.title}</span>
           </nav>
         </div>
       </div>
@@ -173,7 +191,7 @@ export default async function PostDetailPage({
                   </div>
                   <div>
                     <div className="font-medium text-gray-700">{displayName}</div>
-                    <div className="text-xs text-gray-400">
+                    <div className="text-xs text-slate-500">
                       {post.user.honorScore ? `🏆 ${post.user.honorScore}` : ""} 成长值 {post.user.growthValue || 0}
                     </div>
                   </div>
@@ -232,9 +250,9 @@ export default async function PostDetailPage({
 
               {/* Locked notice */}
               {isLocked && (
-                <div className="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-4 text-center">
-                  <Lock className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-                  <p className="text-sm font-medium text-gray-600">
+                <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-4 text-center">
+                  <Lock className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+                  <p className="text-sm font-semibold text-slate-700">
                     该帖已锁定，不能继续评论
                   </p>
                 </div>
@@ -250,7 +268,7 @@ export default async function PostDetailPage({
                     >
                       {/* Floor number */}
                       <div className="shrink-0 w-8 text-right">
-                        <span className="text-xs font-bold text-gray-400">#{index + 2}</span>
+                        <span className="text-xs font-bold text-slate-500">#{index + 2}</span>
                       </div>
                       {/* Avatar */}
                       <div className="shrink-0">
@@ -267,7 +285,7 @@ export default async function PostDetailPage({
                           {comment.user.honorScore ? (
                             <span className="text-xs text-amber-500">🏆 {comment.user.honorScore}</span>
                           ) : null}
-                          <time className="text-xs text-gray-400 ml-auto">
+                          <time className="text-xs text-slate-500 ml-auto">
                             {formatDateTime(comment.createdAt)}
                           </time>
                         </div>
@@ -275,10 +293,10 @@ export default async function PostDetailPage({
                           {comment.content}
                         </div>
                         <div className="flex gap-3 mt-1.5">
-                          <button className="text-xs text-gray-400 hover:text-brand transition-colors inline-flex items-center gap-0.5">
+                          <button className="text-xs text-slate-500 hover:text-brand transition-colors inline-flex items-center gap-0.5">
                             <ThumbsUp className="w-3 h-3" /> 赞
                           </button>
-                          <button className="text-xs text-gray-400 hover:text-red-500 transition-colors inline-flex items-center gap-0.5">
+                          <button className="text-xs text-slate-500 hover:text-red-500 transition-colors inline-flex items-center gap-0.5">
                             <Flag className="w-3 h-3" /> 举报
                           </button>
                         </div>
@@ -288,7 +306,7 @@ export default async function PostDetailPage({
                 </div>
               ) : !isLocked ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-gray-400">暂无回复，来做第一个回复的人吧！</p>
+                  <p className="text-sm text-slate-500">暂无回复，来做第一个回复的人吧！</p>
                 </div>
               ) : null}
 
@@ -336,50 +354,73 @@ export default async function PostDetailPage({
           {/* Right sidebar: Topic info */}
           <aside className="hidden lg:block">
             <div className="sticky top-20 space-y-4">
-              {/* Author trust card */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">作者信息</h3>
+              {/* Author trust card — expanded */}
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-bold text-slate-900 mb-3">作者信息</h3>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-full bg-brand/10 flex items-center justify-center text-lg font-bold text-brand shrink-0">
                     {displayName[0].toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <div className="font-semibold text-gray-900 text-sm">{displayName}</div>
-                    <div className="text-xs text-gray-400">
-                      成长值 {post.user.growthValue || 0}
-                      {post.user.honorScore ? ` · 🏆 ${post.user.honorScore}` : ""}
+                    <div className="font-semibold text-slate-900 text-sm flex items-center gap-1.5">
+                      {displayName}
+                      {post.user.role === "admin" && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-600 border border-red-200">管理员</span>
+                      )}
+                      {post.user.membershipTier && post.user.membershipTier !== "free" && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">{post.user.membershipTier === "pro" ? "Pro" : "会员"}</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      加入于 {formatJoinDate(post.user.createdAt)}
                     </div>
                   </div>
                 </div>
                 <div className="space-y-1.5 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500">等级</span>
-                    <span className="font-medium text-gray-700">{post.user.levelKey || "新手"}</span>
+                    <span className="text-slate-500">等级</span>
+                    <span className="font-medium text-slate-700">{post.user.levelKey || "新手"}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">成长值</span>
+                    <span className="font-medium text-slate-700">{post.user.growthValue || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">荣誉值</span>
+                    <span className="font-medium text-slate-700">{post.user.honorScore || 0} 🏆</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">发帖数</span>
+                    <span className="font-medium text-slate-700">{post.user._count?.forumPosts ?? 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500">回复数</span>
+                    <span className="font-medium text-slate-700">{post.user._count?.forumComments ?? 0}</span>
                   </div>
                 </div>
               </div>
 
               {/* Topic stats */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">话题信息</h3>
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-bold text-slate-900 mb-3">话题信息</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500">分类</span>
+                    <span className="text-slate-500">分类</span>
                     <Link href={`/bbs/category/${post.category.key}`} className="text-brand hover:underline">
                       {post.category.iconText} {post.category.name}
                     </Link>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500 inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 浏览</span>
-                    <span className="font-medium text-gray-700">{post.viewCount}</span>
+                    <span className="text-slate-500 inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 浏览</span>
+                    <span className="font-medium text-slate-700">{post.viewCount}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500 inline-flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> 回复</span>
-                    <span className="font-medium text-gray-700">{comments.length}</span>
+                    <span className="text-slate-500 inline-flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> 回复</span>
+                    <span className="font-medium text-slate-700">{comments.length}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-500 inline-flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> 发布</span>
-                    <span className="text-xs text-gray-700">{formatDateTime(post.createdAt)}</span>
+                    <span className="text-slate-500 inline-flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> 发布</span>
+                    <span className="text-xs text-slate-700">{formatDateTime(post.createdAt)}</span>
                   </div>
                 </div>
 
@@ -449,4 +490,16 @@ function maskEmail(email: string): string {
   if (!domain) return "匿名用户";
   if (local.length <= 2) return `${local[0]}***@${domain}`;
   return `${local[0]}***${local[local.length - 1]}@${domain}`;
+}
+
+function formatJoinDate(date: Date | null | undefined): string {
+  if (!date) return "未知";
+  const d = new Date(date);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 1) return "今天";
+  if (diffDays < 30) return `${diffDays} 天前`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} 个月前`;
+  return `${Math.floor(diffDays / 365)} 年前`;
 }

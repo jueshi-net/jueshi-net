@@ -267,12 +267,28 @@ export default function PostalCodePage() {
     [selectedCountryCode],
   );
 
-  // Reset search and validation on country change
+  // Reset search and validation on country change — clear ALL results
   const selectCountry = useCallback((code: string) => {
     setSelectedCountryCode(code);
     setCitySearch('');
     setValidationResult(null);
     setInputCode('');
+    // Clear DB query results from previous country
+    setDbQuery('');
+    setDbResults([]);
+    setDbTotal(0);
+    setDbPage(1);
+    setMainSearch('');
+    // Clear advanced search results
+    setAdvancedCityResults([]);
+    setAdvancedCityRecommendations(null);
+    setAdvancedCityQuery('');
+    setAdvancedRegionResults([]);
+    setAdvancedRegionRecommendations(null);
+    setAdvancedRegionQuery('');
+    setNoMatchForCountry(false);
+    setAdvancedFormatResult(null);
+    setSelectedAddress(null);
   }, [setSelectedCountryCode, setInputCode]);
 
   // Validate postal code with region lookup

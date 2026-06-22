@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BaseButton } from "@/components/ui/base-button";
 import { X, Plus } from "lucide-react";
+import { BbsComposer } from "@/components/bbs/bbs-composer";
 
 type ForumCategory = {
   id: string;
@@ -221,31 +222,25 @@ export default function PostForm({ categories }: PostFormProps) {
         )}
       </div>
 
-      {/* Content — larger area */}
+      {/* Content — BbsComposer with formatting + emoji + preview */}
       <div>
         <label
           htmlFor="content"
-          className="block text-sm font-medium text-gray-700 mb-1.5"
+          className="block text-sm font-medium text-slate-700 mb-1.5"
         >
           帖子内容 <span className="text-red-500">*</span>
         </label>
-        <textarea
-          id="content"
+        <BbsComposer
           value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="请输入帖子内容（10-3000字，纯文本）&#10;&#10;详细描述你的问题或经验，方便其他人理解和回复。"
+          onChange={setContent}
+          placeholder={"请输入帖子内容（10-3000字）\n\n支持 Markdown 排版：**加粗** *斜体* ## 标题 - 列表 > 引用 `代码`"}
           maxLength={3000}
-          rows={12}
-          className={cnInput(!!errors.content) + " resize-y min-h-[280px]"}
         />
-        <div className="flex items-center justify-between mt-1">
-          {errors.content ? (
-            <p className="text-xs text-red-500">{errors.content}</p>
-          ) : (
-            <span className="text-xs text-gray-400">不支持 HTML，纯文本即可</span>
-          )}
-          <span className="text-xs text-gray-400">{content.length}/3000</span>
-        </div>
+        {errors.content ? (
+          <p className="mt-1 text-xs text-red-500">{errors.content}</p>
+        ) : (
+          <span className="mt-1 block text-xs text-slate-500">支持 Markdown 排版，不支持 HTML</span>
+        )}
       </div>
 
       {/* Submit error */}
