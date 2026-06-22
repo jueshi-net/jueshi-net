@@ -175,6 +175,27 @@ export async function POST(
       return c;
     });
 
+    // v18.6.1: Update community stats + grant first_reply badge (fire-and-forget)
+    try {
+      const { incrementCommunityStat, ensureCommunityStat } = await import("@/lib/honor-helpers");
+      await ensureCommunityStat(session.user.id);
+      await incrementCommunityStat(session.user.id, "commentCount");
+      // Grant first_reply badge if this is user's first comment
+      const commentCount = await prisma.forumComment.count({ where: { userId: session.user.id } });
+      if (commentCount === 1) {
+        const badge = await prisma.userBadge.findUnique({ where: { key: "first_reply" } });
+        if (badge) {
+          await prisma.userBadgeAward.upsert({
+            where: { userId_badgeId: { userId: session.user.id, badgeId: badge.id } },
+            create: { userId: session.user.id, badgeId: badge.id, reason: "首次回复自动授予" },
+            update: {},
+          });
+        }
+      }
+    } catch (e) {
+      console.error("[CommunityStat comment increment error]", e);
+    }
+
     return NextResponse.json({ success: true, comment }, { status: 201 });
   } catch (error) {
     console.error("POST /api/forum/posts/[slug]/comments error:", error);

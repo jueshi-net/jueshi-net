@@ -198,6 +198,27 @@ export async function POST(req: Request) {
       },
     });
 
+    // v18.6.1: Update community stats + grant first_post badge (fire-and-forget)
+    try {
+      const { incrementCommunityStat, ensureCommunityStat } = await import("@/lib/honor-helpers");
+      await ensureCommunityStat(userId);
+      await incrementCommunityStat(userId, "postCount");
+      // Grant first_post badge if this is user's first post
+      const postCount = await prisma.forumPost.count({ where: { userId } });
+      if (postCount === 1) {
+        const badge = await prisma.userBadge.findUnique({ where: { key: "first_post" } });
+        if (badge) {
+          await prisma.userBadgeAward.upsert({
+            where: { userId_badgeId: { userId, badgeId: badge.id } },
+            create: { userId, badgeId: badge.id, reason: "首次发帖自动授予" },
+            update: {},
+          });
+        }
+      }
+    } catch (e) {
+      console.error("[CommunityStat post increment error]", e);
+    }
+
     return NextResponse.json({ success: true, post }, { status: 201 });
   } catch (error) {
     console.error("[Forum Posts POST Error]", error);
