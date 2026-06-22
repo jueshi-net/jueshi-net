@@ -73,6 +73,8 @@ model User {
   forumLikes            ForumLike[]
   forumBookmarks        ForumBookmark[]
   forumReports          ForumReport[]
+  forumNotifications    ForumNotification[]
+  moderationLogs        ModerationLog[]
   
   // v1.20.42.12.0: 用户邀请系统
   inviteCodes            InviteCode[]         @relation("UserInviteCodes")
@@ -1665,17 +1667,30 @@ model ForumPost {
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
   rewardGrantedAt  DateTime?        @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
+  tags             Json?            // 标签数组 ["shipping","cbm"]
+  isSolved         Boolean          @default(false) @map("is_solved")
+  acceptedCommentId String?         @map("accepted_comment_id")
+  isFeatured       Boolean          @default(false) @map("is_featured")  // 加精
+  relatedTool      String?          @map("related_tool")  // 关联工具 slug
+  relatedGuideId   String?          @map("related_guide_id")
+  relatedChecklistId String?        @map("related_checklist_id")
+  relatedTaskChainType String?      @map("related_task_chain_type")
 
   comments         ForumComment[]
   likes            ForumLike[]
   bookmarks        ForumBookmark[]
   reports          ForumReport[]
+  acceptedComment  ForumComment?    @relation("AcceptedComment", fields: [acceptedCommentId], references: [id])
+  notifications    ForumNotification[]
+  moderationLogs   ModerationLog[]
 
   @@index([status])
   @@index([categoryId])
   @@index([userId])
   @@index([createdAt(sort: Desc)])
   @@index([isPinned])
+  @@index([isFeatured])
+  @@index([isSolved])
   @@index([slug])
   @@map("forum_posts")
 }
@@ -1693,14 +1708,18 @@ model ForumComment {
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
   rewardGrantedAt DateTime? @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
+  floorNumber    Int       @default(0) @map("floor_number")
+  isAccepted     Boolean   @default(false) @map("is_accepted")
 
   likes            ForumLike[]
   reports          ForumReport[]
+  acceptedByPosts  ForumPost[] @relation("AcceptedComment")
 
   @@index([postId])
   @@index([userId])
   @@index([status])
   @@index([createdAt(sort: Desc)])
+  @@index([isAccepted])
   @@map("forum_comments")
 }
 
@@ -1904,4 +1923,42 @@ model ForumReport {
   @@index([commentId])
   @@index([status])
   @@map("forum_reports")
+}
+
+/// v18.6.4: Forum notifications — minimal notification system
+model ForumNotification {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")  // 接收者
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        String   // reply / like / accepted / featured / report_resolved
+  postId      String?  @map("post_id")
+  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId   String?  @map("comment_id")
+  actorId     String?  @map("actor_id")  // 触发者
+  message     String   // 通知文案
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt(sort: Desc)])
+  @@map("forum_notifications")
+}
+
+/// v18.6.4: Moderation log — audit trail for admin actions
+model ModerationLog {
+  id          String   @id @default(cuid())
+  adminId     String   @map("admin_id")
+  admin       User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action      String   // pin / unpin / feature / unfeature / lock / unlock / hide / restore / accept / reject_report
+  postId      String?  @map("post_id")
+  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId   String?  @map("comment_id")
+  reason      String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([adminId])
+  @@index([postId])
+  @@index([createdAt(sort: Desc)])
+  @@map("moderation_logs")
 }

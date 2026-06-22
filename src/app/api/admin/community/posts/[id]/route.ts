@@ -25,11 +25,19 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       case "pin":
         await prisma.forumPost.update({ where: { id }, data: { isPinned: !post.isPinned } });
         break;
-      case "feature":
-        await prisma.forumPost.update({ where: { id }, data: { status: "published" } });
-        await adjustHonor(post.userId, 20, "帖子被加精", "post_featured", post.id, session.user.id).catch(() => {});
-        await incrementCommunityStat(post.userId, "featuredPostCount").catch(() => {});
+      case "feature": {
+        // Toggle isFeatured. Only grant honor when newly featuring (防重复奖励).
+        const willFeature = !post.isFeatured;
+        await prisma.forumPost.update({
+          where: { id },
+          data: { isFeatured: willFeature, status: "published" },
+        });
+        if (willFeature) {
+          await adjustHonor(post.userId, 20, "帖子被加精", "post_featured", post.id, session.user.id).catch(() => {});
+          await incrementCommunityStat(post.userId, "featuredPostCount").catch(() => {});
+        }
         break;
+      }
       case "lock":
         await prisma.forumPost.update({ where: { id }, data: { isLocked: !post.isLocked } });
         break;

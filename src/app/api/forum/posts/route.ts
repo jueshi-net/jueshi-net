@@ -80,6 +80,19 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     let { title, content, categoryId } = body;
+    const {
+      tags,
+      relatedTool,
+      relatedGuideId,
+      relatedChecklistId,
+      relatedTaskChainType,
+    } = body as {
+      tags?: string[];
+      relatedTool?: string;
+      relatedGuideId?: string;
+      relatedChecklistId?: string;
+      relatedTaskChainType?: string;
+    };
 
     // Validate
     if (!title || typeof title !== "string") {
@@ -180,6 +193,33 @@ export async function POST(req: Request) {
     const ip = getIp(req);
     const ua = req.headers.get("user-agent") || "";
 
+    // Normalize optional related-resource fields (trim & drop empty strings).
+    const cleanTags =
+      Array.isArray(tags) && tags.length > 0
+        ? tags
+            .map((t) => String(t).trim())
+            .filter(Boolean)
+            .slice(0, 5)
+        : undefined;
+    const cleanTool =
+      typeof relatedTool === "string" && relatedTool.trim()
+        ? relatedTool.trim()
+        : null;
+    const cleanGuideId =
+      typeof relatedGuideId === "string" && relatedGuideId.trim()
+        ? relatedGuideId.trim()
+        : null;
+    const cleanChecklistId =
+      typeof relatedChecklistId === "string" && relatedChecklistId.trim()
+        ? relatedChecklistId.trim()
+        : null;
+    const cleanTaskChainType =
+      typeof relatedTaskChainType === "string" &&
+      relatedTaskChainType.trim() &&
+      relatedTaskChainType.trim() !== "none"
+        ? relatedTaskChainType.trim()
+        : null;
+
     const post = await prisma.forumPost.create({
       data: {
         userId,
@@ -191,6 +231,11 @@ export async function POST(req: Request) {
         status,
         ipHash: hashIP(ip),
         userAgent: ua.slice(0, 200),
+        ...(cleanTags ? { tags: cleanTags } : {}),
+        relatedTool: cleanTool,
+        relatedGuideId: cleanGuideId,
+        relatedChecklistId: cleanChecklistId,
+        relatedTaskChainType: cleanTaskChainType,
       },
       include: {
         user: { select: { name: true, email: true } },
