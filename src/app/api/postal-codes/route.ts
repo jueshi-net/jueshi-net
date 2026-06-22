@@ -147,12 +147,19 @@ export async function GET(req: NextRequest) {
       return true;
     });
 
-    // Determine status
+    // Determine status — CRITICAL: distinguish exact vs prefix match
     let status: string;
     if (deduped.length === 0) {
       status = 'no_match';
     } else if (isPostal) {
-      status = 'exact_match';
+      // Check if ANY result has an exact normalized match
+      const hasExact = deduped.some(r => r.normalizedPostalCode === normalized);
+      if (hasExact) {
+        status = 'exact_postal_match';
+      } else {
+        // All results are prefix matches — NOT exact
+        status = 'prefix_range_match';
+      }
     } else {
       // City/region match — check if it matched on province (region) vs city
       const hasCityMatch = deduped.some(r =>
@@ -166,6 +173,12 @@ export async function GET(req: NextRequest) {
       results: deduped,
       total: deduped.length,
       status,
+      // Include match detail for client display
+      matchDetail: isPostal ? {
+        inputNormalized: normalized,
+        hasExactMatch: deduped.some(r => r.normalizedPostalCode === normalized),
+        isPrefixOnly: !deduped.some(r => r.normalizedPostalCode === normalized),
+      } : undefined,
     });
   } catch (error) {
     console.error('Postal code API error:', error);

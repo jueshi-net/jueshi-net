@@ -72,17 +72,17 @@ export default async function NewPostPage() {
         <div className="max-w-[1000px] mx-auto px-4">
           <Link
             href="/bbs"
-            className="inline-flex items-center gap-1.5 text-sm text-brand-light hover:text-white transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white transition-colors mb-3"
           >
             <ChevronLeft className="w-4 h-4" />
             返回论坛
           </Link>
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-brand-light border border-white/10 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-white/90 border border-white/10 mb-3">
             <Sparkles className="w-4 h-4" />
             <span>发布新帖</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold">发布新帖</h1>
-          <p className="text-sm text-brand-light/80 mt-1">
+          <p className="text-sm text-white/80 mt-1">
             选择分类 · 填写标题和内容 · 提交后等待审核
           </p>
         </div>

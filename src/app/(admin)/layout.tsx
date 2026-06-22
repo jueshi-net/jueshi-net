@@ -6,6 +6,7 @@ import {
   Shield, ArrowLeft, LayoutDashboard, Users, Settings, Bell, Activity, Database,
   ExternalLink, Upload, FolderOpen, Globe, BookOpen, LayoutTemplate, Megaphone,
   MessageSquare, BarChart3, Award, TrendingUp, FileCheck, Link2, Image as ImageIcon,
+  MessageCircle, Flag, ThumbsUp,
 } from "lucide-react";
 
 
@@ -26,6 +27,18 @@ const navSections = [
       { href: "/admin/growth-logs", label: "成长值流水", icon: TrendingUp },
       { href: "/admin/invites", label: "邀请码管理", icon: Shield },
       { href: "/admin/rewards/items", label: "可兑换奖励", icon: Award },
+    ]
+  },
+  {
+    title: "社区管理",
+    items: [
+      { href: "/admin/community", label: "社区概览", icon: LayoutDashboard },
+      { href: "/admin/community/posts", label: "帖子管理", icon: MessageSquare },
+      { href: "/admin/community/comments", label: "评论管理", icon: MessageCircle },
+      { href: "/admin/community/flagged", label: "举报处理", icon: Flag },
+      { href: "/admin/community/reputation", label: "荣誉管理", icon: ThumbsUp },
+      { href: "/admin/community/badges", label: "勋章管理", icon: Award },
+      { href: "/admin/community/users", label: "用户社区资料", icon: Users },
     ]
   },
   {

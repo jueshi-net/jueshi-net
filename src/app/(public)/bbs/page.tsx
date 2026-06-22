@@ -189,7 +189,7 @@ export default async function BBSPage({
               <h1 className="text-2xl md:text-3xl font-extrabold">
                 社区论坛
               </h1>
-              <p className="text-sm text-brand-light/80 mt-1">
+              <p className="text-sm text-white/80 mt-1">
                 交流出海工具、海外生活、物流经验 · {stats.postCount} 帖 · {stats.categoryCount} 分类
               </p>
             </div>

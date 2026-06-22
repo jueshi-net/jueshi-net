@@ -241,8 +241,8 @@ export default function PostalCodePage() {
   const [dbTotal, setDbTotal] = useState(0);
   const [dbPage, setDbPage] = useState(1);
   const [dbTab, setDbTab] = useState<'all' | 'code' | 'city'>('all');
-  // Postal query state machine: idle | loading | exact_match | city_match | region_match | no_match | country_no_database | error
-  const [dbStatus, setDbStatus] = useState<'idle' | 'loading' | 'exact_match' | 'city_match' | 'region_match' | 'no_match' | 'country_no_database' | 'error'>('idle');
+  // Postal query state machine: idle | loading | exact_postal_match | prefix_range_match | city_match | region_match | no_match | country_no_database | error
+  const [dbStatus, setDbStatus] = useState<'idle' | 'loading' | 'exact_postal_match' | 'prefix_range_match' | 'city_match' | 'region_match' | 'no_match' | 'country_no_database' | 'error'>('idle');
 
   // Advanced search state
   const [advancedCityQuery, setAdvancedCityQuery] = useState('');
@@ -473,14 +473,19 @@ export default function PostalCodePage() {
           setDbStatus('country_no_database');
         } else if (results.length === 0) {
           setDbStatus('no_match');
+        } else if (json.status === 'exact_postal_match') {
+          setDbStatus('exact_postal_match');
+        } else if (json.status === 'prefix_range_match') {
+          setDbStatus('prefix_range_match');
         } else if (json.status === 'exact_match') {
-          setDbStatus('exact_match');
+          // Backward compat — treat old exact_match as exact_postal_match
+          setDbStatus('exact_postal_match');
         } else if (json.status === 'city_match') {
           setDbStatus('city_match');
         } else if (json.status === 'region_match') {
           setDbStatus('region_match');
         } else {
-          setDbStatus(results.length > 0 ? 'exact_match' : 'no_match');
+          setDbStatus(results.length > 0 ? 'exact_postal_match' : 'no_match');
         }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
@@ -632,7 +637,8 @@ export default function PostalCodePage() {
       trackEvent.custom('postal-code', 'import_to_task_chain');
       setShowTaskChainDialog(false);
       setSelectedAddress(null);
-      router.push(`/workspace/task-chains/${taskChain.id}`);
+      // FIX: redirect to /shipping/[id] not /task-chains/[id] (which 404s)
+      router.push(`/workspace/task-chains/shipping/${taskChain.id}`);
     } catch (e) {
       console.error(e);
       alert('导入数据到任务链失败，请稍后重试');
@@ -1045,8 +1051,27 @@ export default function PostalCodePage() {
             <div className="flex items-center gap-2 mb-4">
               <Database className="w-5 h-5 text-teal-600" />
               <h2 className="text-lg font-bold text-gray-900">查询结果</h2>
+              {dbStatus === 'exact_postal_match' && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">精确匹配</span>
+              )}
+              {dbStatus === 'prefix_range_match' && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">前缀范围参考</span>
+              )}
+              {dbStatus === 'city_match' && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">城市匹配</span>
+              )}
+              {dbStatus === 'region_match' && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">地区匹配</span>
+              )}
               <span className="text-xs text-gray-400 ml-auto">找到 {dbTotal.toLocaleString()} 条记录</span>
             </div>
+            {dbStatus === 'prefix_range_match' && (
+              <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-xs text-amber-800">
+                  ⚠️ 未找到该完整邮编的精确记录，以下结果基于邮编前缀匹配的区域参考。正式投递前请使用完整地址或官方入口确认。
+                </p>
+              </div>
+            )}
             <div className="grid sm:grid-cols-2 gap-3 max-h-[32rem] overflow-y-auto divide-y divide-gray-100">
               {dbResults.map((r) => {
                 const normalizedQuery = dbQuery.trim().toUpperCase().replace(/[\s-]+/g, "");
