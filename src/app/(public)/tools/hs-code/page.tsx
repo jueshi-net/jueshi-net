@@ -445,7 +445,7 @@ export default function HSCodePage() {
     if (sessionStatus === 'loading') return;
     if (!session?.user) {
       // Redirect to login
-      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      router.push('/login?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
     setSelectedItem(item);

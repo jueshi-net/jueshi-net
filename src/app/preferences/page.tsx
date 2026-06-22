@@ -29,7 +29,7 @@ export default function PreferencesPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/signin");
+      router.push("/login");
     }
     if (status === "authenticated") {
       fetchPreferences();

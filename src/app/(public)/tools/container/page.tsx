@@ -162,7 +162,7 @@ export default function ContainerCalculatorPage() {
   const joinShippingTaskChain = async () => {
     if (sessionStatus === 'loading') return;
     if (!session?.user) {
-      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      router.push('/login?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
     setTaskChainCreating(true);
