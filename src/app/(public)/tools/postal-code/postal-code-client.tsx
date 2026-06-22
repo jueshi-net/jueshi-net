@@ -1709,8 +1709,8 @@ export default function PostalCodePage() {
               </h3>
               <ul className="space-y-1 text-sm text-blue-700">
                 <li>• 本工具提供格式校验和城市邮编范围参考</li>
-                <li>• 数据库收录全球 50+ 国家邮编数据（GeoNames 全量数据）</li>
-                <li>• 邮编覆盖范围仅为主要城市，非完整数据库</li>
+                <li>• 数据库已收录 8 个重点国家邮编数据（CA/US/GB/AU/NZ/JP/SG/MY），其他国家提供地址格式和官方查询入口</li>
+                <li>• 邮编覆盖范围为主要城市，非完整数据库</li>
                 <li>• 精确投递地址验证请以当地邮政官方为准</li>
               </ul>
             </div>

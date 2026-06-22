@@ -27,7 +27,7 @@ export default async function AdminCommunityCommentsPage({
 
   return (
     <AdminCommentsManager
-      comments={comments.map(c => ({
+      comments={comments.map((c: any) => ({
         ...c,
         createdAt: c.createdAt.toISOString(),
         user: { name: c.user.name, email: c.user.email },

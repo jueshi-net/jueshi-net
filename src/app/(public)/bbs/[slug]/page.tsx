@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Eye, MessageSquare, Calendar, Lock, Pin, Home, ArrowLeft } from "lucide-react";
+import { Eye, MessageSquare, Calendar, Lock, Pin, Home, ArrowLeft, Bookmark, Flag, Share2, ThumbsUp, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { buildTitle, buildCanonical, SITE_URL } from "@/lib/seo";
+import { buildTitle, buildCanonical } from "@/lib/seo";
 import { formatDateTime } from "@/lib/utils";
 import { PostContent } from "@/components/bbs/post-content";
 import { CategoryBadge } from "@/components/bbs/category-badge";
@@ -17,14 +17,13 @@ async function getPost(slug: string) {
     const post = await prisma.forumPost.findUnique({
       where: { slug },
       include: {
-        user: { select: { id: true, name: true, email: true, levelKey: true, growthValue: true } },
+        user: { select: { id: true, name: true, email: true, levelKey: true, growthValue: true, honorScore: true } },
         category: true,
         _count: { select: { comments: { where: { status: "published" } } } },
       },
     });
 
     if (!post) return null;
-    // Only published posts are publicly viewable
     if (post.status !== "published") return null;
 
     return post;
@@ -46,7 +45,7 @@ async function getComments(slug: string) {
       where: { postId: post.id, status: "published" },
       orderBy: { createdAt: "asc" },
       include: {
-        user: { select: { name: true, email: true } },
+        user: { select: { name: true, email: true, honorScore: true } },
       },
     });
 
@@ -63,7 +62,7 @@ async function incrementViewCount(slug: string) {
       data: { viewCount: { increment: 1 } },
     });
   } catch {
-    // Ignore increment errors
+    // Ignore
   }
 }
 
@@ -106,143 +105,338 @@ export default async function PostDetailPage({
     getPost(slug),
     getComments(slug),
   ]);
-
   if (!post) {
     notFound();
   }
 
-  // Increment view count (fire-and-forget)
   await incrementViewCount(slug);
 
   const session = await auth();
   const isLoggedIn = !!session?.user;
+  const isAdmin = session?.user?.role === "admin";
 
   const displayName = post.user.name || maskEmail(post.user.email);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-8 md:py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* Breadcrumbs */}
-          <nav className="flex items-center gap-1.5 text-sm text-brand-light/80 mb-4 flex-wrap">
-            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
+      {/* Breadcrumb bar */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-[1200px] mx-auto px-4 py-2.5">
+          <nav className="flex items-center gap-1 text-sm text-gray-500 flex-wrap">
+            <Link href="/" className="hover:text-brand inline-flex items-center gap-0.5">
               <Home className="w-3.5 h-3.5" /> 首页
             </Link>
-            <span>/</span>
-            <Link href="/bbs" className="hover:text-white transition-colors">
-              社区论坛
-            </Link>
-            <span>/</span>
-            <Link href={`/bbs/category/${post.category.key}`} className="hover:text-white transition-colors">
+            <ChevronRight className="w-3 h-3 text-gray-300" />
+            <Link href="/bbs" className="hover:text-brand">社区论坛</Link>
+            <ChevronRight className="w-3 h-3 text-gray-300" />
+            <Link href={`/bbs/category/${post.category.key}`} className="hover:text-brand">
               {post.category.name}
             </Link>
+            <ChevronRight className="w-3 h-3 text-gray-300" />
+            <span className="text-gray-400 truncate max-w-[200px]">{post.title}</span>
           </nav>
-
-          {/* Category + badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <CategoryBadge category={post.category} size="md" />
-            {post.isPinned && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-red-100/80 text-red-200 border border-red-200/50">
-                <Pin className="w-3.5 h-3.5" />
-                置顶
-              </span>
-            )}
-            {post.isLocked && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-white/20 text-white border border-white/20">
-                <Lock className="w-3.5 h-3.5" />
-                已锁定
-              </span>
-            )}
-          </div>
-
-          <h1 className="text-2xl md:text-3xl font-extrabold leading-tight break-words">
-            {post.title}
-          </h1>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 -mt-5 pb-16 relative z-10">
-        {/* Meta bar */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-5 shadow-sm">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
-            {/* Author */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-sm font-medium text-brand">
-                {displayName[0].toUpperCase()}
+      {/* Main layout: 2-column on desktop */}
+      <div className="max-w-[1200px] mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+          {/* Left: Topic content + comments */}
+          <main className="min-w-0">
+            {/* Topic header */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6 mb-4">
+              {/* Category + badges */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <CategoryBadge category={post.category} size="md" />
+                {post.isPinned && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-200">
+                    <Pin className="w-3 h-3" /> 置顶
+                  </span>
+                )}
+                {post.isLocked && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                    <Lock className="w-3 h-3" /> 锁定
+                  </span>
+                )}
               </div>
-              <span className="font-medium text-gray-700">{displayName}</span>
+
+              {/* Title */}
+              <h1 className="text-xl md:text-2xl font-extrabold leading-tight break-words mb-3">
+                {post.title}
+              </h1>
+
+              {/* Author + time */}
+              <div className="flex items-center gap-3 text-sm text-gray-500 pb-3 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand shrink-0">
+                    {displayName[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-700">{displayName}</div>
+                    <div className="text-xs text-gray-400">
+                      {post.user.honorScore ? `🏆 ${post.user.honorScore}` : ""} 成长值 {post.user.growthValue || 0}
+                    </div>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 ml-auto text-xs">
+                  <Calendar className="w-3.5 h-3.5" />
+                  <time dateTime={post.createdAt.toISOString()}>
+                    {formatDateTime(post.createdAt)}
+                  </time>
+                </span>
+              </div>
             </div>
 
-            {/* Time */}
-            <span className="inline-flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5" />
-              <time dateTime={post.createdAt.toISOString()}>
-                {formatDateTime(post.createdAt)}
-              </time>
-            </span>
+            {/* Topic content — forum style, not white card */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 mb-4">
+              <div className="prose prose-sm max-w-none">
+                <PostContent content={post.content} />
+              </div>
 
-            {/* Stats */}
-            <span className="inline-flex items-center gap-1 ml-auto">
-              <Eye className="w-4 h-4" />
-              {post.viewCount}
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
-              {comments.length}
-            </span>
-          </div>
-        </div>
+              {/* Tags */}
+              {post.tags && Array.isArray(post.tags) && (post.tags as string[]).length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
+                  {(post.tags as string[]).map((tag: string, i: number) => (
+                    <span key={i} className="px-2.5 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
 
-        {/* Post content */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 shadow-sm">
-          <PostContent content={post.content} />
-        </div>
+              {/* Action bar */}
+              <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                  <ThumbsUp className="w-4 h-4" /> 点赞
+                </button>
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                  <Bookmark className="w-4 h-4" /> 收藏
+                </button>
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                  <Share2 className="w-4 h-4" /> 分享
+                </button>
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors border border-gray-200 ml-auto">
+                  <Flag className="w-4 h-4" /> 举报
+                </button>
+              </div>
+            </div>
 
-        {/* Author info card */}
-        <AuthorInfoCard post={post} />
+            {/* Reply floors */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="w-5 h-5 text-brand" />
+                <h2 className="text-lg font-bold text-gray-900">
+                  回复 ({comments.length})
+                </h2>
+              </div>
 
-        {/* Related links */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mt-5">
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/bbs"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors min-h-[44px]"
-            >
-              <ArrowLeft className="w-4 h-4" /> 返回论坛首页
-            </Link>
-            <Link
-              href={`/bbs/category/${post.category.key}`}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent/10 text-brand rounded-lg text-sm font-medium hover:bg-accent/10 transition-colors min-h-[44px]"
-            >
-              返回「{post.category.name}」
-            </Link>
-            {isLoggedIn && (
+              {/* Locked notice */}
+              {isLocked && (
+                <div className="rounded-lg bg-gray-50 border border-gray-200 p-4 mb-4 text-center">
+                  <Lock className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                  <p className="text-sm font-medium text-gray-600">
+                    该帖已锁定，不能继续评论
+                  </p>
+                </div>
+              )}
+
+              {/* Floor-style comments */}
+              {comments.length > 0 ? (
+                <div className="space-y-3">
+                  {comments.map((comment, index) => (
+                    <div
+                      key={comment.id}
+                      className="flex gap-3 pb-3 border-b border-gray-50 last:border-0"
+                    >
+                      {/* Floor number */}
+                      <div className="shrink-0 w-8 text-right">
+                        <span className="text-xs font-bold text-gray-400">#{index + 2}</span>
+                      </div>
+                      {/* Avatar */}
+                      <div className="shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand">
+                          {(comment.user.name || comment.user.email)[0].toUpperCase()}
+                        </div>
+                      </div>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-gray-700">
+                            {comment.user.name || maskEmail(comment.user.email)}
+                          </span>
+                          {comment.user.honorScore ? (
+                            <span className="text-xs text-amber-500">🏆 {comment.user.honorScore}</span>
+                          ) : null}
+                          <time className="text-xs text-gray-400 ml-auto">
+                            {formatDateTime(comment.createdAt)}
+                          </time>
+                        </div>
+                        <div className="whitespace-pre-wrap break-words text-sm text-gray-700 leading-relaxed">
+                          {comment.content}
+                        </div>
+                        <div className="flex gap-3 mt-1.5">
+                          <button className="text-xs text-gray-400 hover:text-brand transition-colors inline-flex items-center gap-0.5">
+                            <ThumbsUp className="w-3 h-3" /> 赞
+                          </button>
+                          <button className="text-xs text-gray-400 hover:text-red-500 transition-colors inline-flex items-center gap-0.5">
+                            <Flag className="w-3 h-3" /> 举报
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : !isLocked ? (
+                <div className="text-center py-8">
+                  <p className="text-sm text-gray-400">暂无回复，来做第一个回复的人吧！</p>
+                </div>
+              ) : null}
+
+              {/* Reply form */}
+              <CommentSection
+                postId={post.id}
+                slug={post.slug}
+                initialComments={[]}
+                isLocked={isLocked}
+                isLoggedIn={isLoggedIn}
+              />
+            </div>
+
+            {/* Bottom navigation */}
+            <div className="flex flex-wrap gap-2 mt-4">
               <Link
-                href={`/bbs/${slug}/edit`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors min-h-[44px]"
+                href="/bbs"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
               >
-                编辑帖子
+                <ArrowLeft className="w-4 h-4" /> 返回论坛
               </Link>
-            )}
-            <Link
-              href="/bbs/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors min-h-[44px]"
-            >
-              发布新帖
-            </Link>
-          </div>
-        </div>
+              <Link
+                href={`/bbs/category/${post.category.key}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+              >
+                返回「{post.category.name}」
+              </Link>
+              {isLoggedIn && (
+                <Link
+                  href={`/bbs/${slug}/edit`}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                >
+                  编辑帖子
+                </Link>
+              )}
+              <Link
+                href="/bbs/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark ml-auto"
+              >
+                发布新帖
+              </Link>
+            </div>
+          </main>
 
-        {/* Comments */}
-        <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 shadow-sm mt-5">
-          <CommentSection
-            postId={post.id}
-            slug={post.slug}
-            initialComments={comments}
-            isLocked={isLocked}
-            isLoggedIn={isLoggedIn}
-          />
+          {/* Right sidebar: Topic info */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-20 space-y-4">
+              {/* Author trust card */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">作者信息</h3>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-brand/10 flex items-center justify-center text-lg font-bold text-brand shrink-0">
+                    {displayName[0].toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm">{displayName}</div>
+                    <div className="text-xs text-gray-400">
+                      成长值 {post.user.growthValue || 0}
+                      {post.user.honorScore ? ` · 🏆 ${post.user.honorScore}` : ""}
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500">等级</span>
+                    <span className="font-medium text-gray-700">{post.user.levelKey || "新手"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Topic stats */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">话题信息</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500">分类</span>
+                    <Link href={`/bbs/category/${post.category.key}`} className="text-brand hover:underline">
+                      {post.category.iconText} {post.category.name}
+                    </Link>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 inline-flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 浏览</span>
+                    <span className="font-medium text-gray-700">{post.viewCount}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 inline-flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> 回复</span>
+                    <span className="font-medium text-gray-700">{comments.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-500 inline-flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> 发布</span>
+                    <span className="text-xs text-gray-700">{formatDateTime(post.createdAt)}</span>
+                  </div>
+                </div>
+
+                {/* Status badges */}
+                <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-100">
+                  {post.isPinned && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">📌 置顶</span>
+                  )}
+                  {post.isLocked && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">🔒 锁定</span>
+                  )}
+                  {!post.isPinned && !post.isLocked && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-600 border border-green-200">✅ 正常</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Tags */}
+              {post.tags && Array.isArray(post.tags) && (post.tags as string[]).length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">标签</h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(post.tags as string[]).map((tag: string, i: number) => (
+                      <span key={i} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Admin actions — only visible to admin */}
+              {isAdmin && (
+                <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
+                  <h3 className="text-sm font-bold text-amber-800 mb-2">⚙️ 管理员操作</h3>
+                  <div className="space-y-1.5">
+                    <Link href={`/admin/community/posts`} className="block text-sm text-amber-700 hover:text-amber-900">
+                      📋 帖子管理面板
+                    </Link>
+                    <Link href={`/bbs/${slug}/edit`} className="block text-sm text-amber-700 hover:text-amber-900">
+                      ✏️ 编辑此帖
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Related tools */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">相关工具</h3>
+                <div className="space-y-1.5">
+                  <Link href="/tools/hs-code" className="block text-sm text-gray-600 hover:text-brand">📦 HS 编码查询</Link>
+                  <Link href="/tools/shipping-calculator" className="block text-sm text-gray-600 hover:text-brand">🚢 运费计算器</Link>
+                  <Link href="/tools/postal-code" className="block text-sm text-gray-600 hover:text-brand">📮 邮编查询</Link>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -252,43 +446,7 @@ export default async function PostDetailPage({
 function maskEmail(email: string): string {
   if (!email) return "匿名用户";
   const [local, domain] = email.split("@");
+  if (!domain) return "匿名用户";
   if (local.length <= 2) return `${local[0]}***@${domain}`;
   return `${local[0]}***${local[local.length - 1]}@${domain}`;
-}
-
-async function AuthorInfoCard({ post }: { post: any }) {
-  const displayName = post.user.name || maskEmail(post.user.email);
-  let levelInfo: { name: string; color: string; iconText: string } | null = null;
-  try {
-    const level = await prisma.userLevel.findUnique({
-      where: { key: post.user.levelKey },
-      select: { name: true, color: true, iconText: true },
-    });
-    if (level) levelInfo = level;
-  } catch {
-    // ignore
-  }
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm mt-5">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-sm font-bold text-brand shrink-0">
-          {displayName[0].toUpperCase()}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-gray-900">{displayName}</span>
-            {levelInfo && (
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-${levelInfo.color}/10 text-${levelInfo.color} border border-${levelInfo.color}/20`}>
-                {levelInfo.iconText} {levelInfo.name}
-              </span>
-            )}
-          </div>
-          <span className="text-xs text-gray-400">
-            成长值 {post.user.growthValue || 0}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
 }

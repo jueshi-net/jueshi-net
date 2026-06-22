@@ -63,7 +63,7 @@ export default async function AdminCommunityPage() {
         hiddenComments,
         hiddenCount: hiddenPosts + hiddenComments,
       }}
-      topHonorUsers={topHonorUsers.map((u) => ({
+      topHonorUsers={topHonorUsers.map((u: any) => ({
         id: u.id,
         name: u.name,
         email: u.email,

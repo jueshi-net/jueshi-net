@@ -176,7 +176,7 @@ export default function LevelsClient({ initialLevels, initialBadges }: { initial
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {badges.map(b => (
+                {badges.map((b: any) => (
                   <tr key={b.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-lg">{b.iconText}</td>
                     <td className="px-4 py-3">

@@ -40,7 +40,7 @@ export default async function AdminCommunityPostsPage({
 
   return (
     <AdminPostsManager
-      posts={posts.map((p) => ({
+      posts={posts.map((p: any) => ({
         id: p.id,
         slug: p.slug,
         title: p.title,

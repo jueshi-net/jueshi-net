@@ -18,7 +18,7 @@ export default async function AdminCommunityBadgesPage() {
 
   return (
     <BadgeManager
-      badges={badges.map(b => ({
+      badges={badges.map((b: any) => ({
         id: b.id,
         key: b.key,
         name: b.name,

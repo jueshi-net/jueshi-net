@@ -41,9 +41,9 @@ export default async function AdminCommunityReputationPage() {
 
   return (
     <UserReputationManager
-      initialUsers={users.map(u => ({ ...u, createdAt: u.createdAt.toISOString(), honorScore: u.honorScore ?? 0 }))}
-      badges={badges.map(b => ({ ...b, createdAt: b.createdAt.toISOString(), updatedAt: b.updatedAt.toISOString() }))}
-      initialLogs={honorLogs.map(l => ({ ...l, createdAt: l.createdAt.toISOString(), user: { name: l.user.name, email: l.user.email } }))}
+      initialUsers={users.map((u: any) => ({ ...u, createdAt: u.createdAt.toISOString(), honorScore: u.honorScore ?? 0 }))}
+      badges={badges.map((b: any) => ({ ...b, createdAt: b.createdAt.toISOString(), updatedAt: b.updatedAt.toISOString() }))}
+      initialLogs={honorLogs.map((l: any) => ({ ...l, createdAt: l.createdAt.toISOString(), user: { name: l.user.name, email: l.user.email } }))}
     />
   );
 }

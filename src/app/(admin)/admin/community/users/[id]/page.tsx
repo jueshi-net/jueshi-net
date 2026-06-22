@@ -58,9 +58,9 @@ export default async function AdminUserCommunityDetailPage({
       user={{ ...user, createdAt: user.createdAt.toISOString(), honorScore: user.honorScore ?? 0 }}
       profile={profile}
       stat={stat || null}
-      badgeAwards={badgeAwards.map(a => ({ ...a, awardedAt: a.awardedAt.toISOString(), createdAt: a.createdAt.toISOString(), badge: { ...a.badge, createdAt: a.badge.createdAt.toISOString(), updatedAt: a.badge.updatedAt.toISOString() } }))}
-      allBadges={allBadges.map(b => ({ ...b, createdAt: b.createdAt.toISOString(), updatedAt: b.updatedAt.toISOString() }))}
-      honorLogs={honorLogs.map(l => ({ ...l, createdAt: l.createdAt.toISOString() }))}
+      badgeAwards={badgeAwards.map((a: any) => ({ ...a, awardedAt: a.awardedAt.toISOString(), createdAt: a.createdAt.toISOString(), badge: { ...a.badge, createdAt: a.badge.createdAt.toISOString(), updatedAt: a.badge.updatedAt.toISOString() } }))}
+      allBadges={allBadges.map((b: any) => ({ ...b, createdAt: b.createdAt.toISOString(), updatedAt: b.updatedAt.toISOString() }))}
+      honorLogs={honorLogs.map((l: any) => ({ ...l, createdAt: l.createdAt.toISOString() }))}
     />
   );
 }

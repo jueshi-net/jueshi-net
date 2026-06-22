@@ -22,7 +22,7 @@ export default async function AdminCommunityReportsPage() {
 
   return (
     <AdminReportsManager
-      reports={reports.map(r => ({
+      reports={reports.map((r: any) => ({
         ...r,
         createdAt: r.createdAt.toISOString(),
         reporter: { name: r.reporter.name, email: r.reporter.email },
