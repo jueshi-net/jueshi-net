@@ -12,6 +12,7 @@ import { RelatedChecklistSection } from '@/components/related-checklist-section'
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
 import { inputStyles, cardStyles } from "@/lib/ui-styles";
+import { RelatedDiscussionsClient } from '@/components/community/related-discussions-client';
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { importToolDataToTaskChain, createTaskChain } from '@/lib/task-chain-api';
@@ -1034,6 +1035,8 @@ export default function HSCodePage() {
 
         <AdSlot placement="tool-hs-code-bottom" className="mb-4" />
       </div>
+
+      <RelatedDiscussionsClient tool="hs-code" />
 
       <TaskChainSelectDialog
         isOpen={showTaskChainDialog}

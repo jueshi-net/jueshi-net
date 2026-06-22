@@ -13,6 +13,7 @@ import { AdSlot } from '@/components/ad-slot';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedToolsWidget } from '@/components/related-tools-widget';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
+import { RelatedDiscussionsClient } from '@/components/community/related-discussions-client';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
 import { importToolDataToTaskChain, createTaskChain, type TaskChain } from '@/lib/task-chain-api';
@@ -1292,6 +1293,8 @@ export default function ShippingCalculatorPage() {
       {/* Tool-specific ads */}
       <AdSlot placement="tool-shipping-calculator-bottom" className="mt-8 mb-4 max-w-4xl mx-auto" />
       <AdSlot placement="tool-bottom" className="mt-4 mb-8 max-w-4xl mx-auto" />
+
+      <RelatedDiscussionsClient tool="shipping-calculator" />
     </div>
   );
 }

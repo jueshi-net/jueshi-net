@@ -1685,48 +1685,6 @@ export default function PostalCodePage() {
               </div>
             </div>
 
-            {/* City / Region Search (legacy) */}
-            <div className={cardStyles.base}>
-              <div className="p-5 border-b border-gray-100">
-                <h2 className={cardStyles.header}>
-                  <Search className="w-5 h-5 text-indigo-600" />
-                  按城市/地区查询邮编范围（参考）
-                </h2>
-              </div>
-              <div className="p-5">
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    className={`${inputStyles} pl-9`}
-                    placeholder="输入城市名或地区缩写（如 Toronto、NSW、100）..."
-                    value={citySearch}
-                    onChange={e => setCitySearch(e.target.value)}
-                  />
-                </div>
-
-                {filteredRanges.length === 0 && citySearch && (
-                  <p className="text-sm text-gray-500 text-center py-6">
-                    未找到匹配 "{citySearch}" 的记录
-                  </p>
-                )}
-
-                <div className="grid sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto divide-y divide-gray-100">
-                  {filteredRanges.map((r, i) => (
-                    <div key={i} className="bg-gray-50 rounded-lg px-3 py-2.5 flex items-center justify-between">
-                      <div className="min-w-0">
-                        <span className="font-medium text-sm text-gray-900">{r.city}</span>
-                        <span className="text-xs text-gray-500 ml-1">({r.region})</span>
-                      </div>
-                      <span className="font-mono text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded shrink-0">{r.range}</span>
-                    </div>
-                  ))}
-                </div>
-                {citySearch && (
-                  <p className="text-xs text-gray-400 mt-2">找到 {filteredRanges.length} 条记录</p>
-                )}
-              </div>
-            </div>
-
             {/* Common Errors */}
             <div className="bg-red-50 border border-red-200 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-1.5">
