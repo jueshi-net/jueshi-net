@@ -49,7 +49,7 @@ export default async function PublicUserProfilePage({
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
         <p className="text-gray-500">该用户的资料不公开。</p>
-        <Link href="/community" className="text-teal-600 hover:underline mt-4 inline-block">
+        <Link href="/bbs" className="text-teal-600 hover:underline mt-4 inline-block">
           ← 返回社区
         </Link>
       </div>
@@ -87,7 +87,7 @@ export default async function PublicUserProfilePage({
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       <Link
-        href="/community"
+        href="/bbs"
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
       >
         <ArrowLeft className="w-4 h-4" />

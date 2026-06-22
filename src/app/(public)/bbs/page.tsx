@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Search, Sparkles, FileText, Tag, Clock } from "lucide-react";
+import { Plus, Search, Sparkles, FileText, Tag, Clock, MessageCircle, Eye, TrendingUp, Award, BookOpen, Wrench } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical } from "@/lib/seo";
@@ -41,7 +41,6 @@ async function getCategoriesWithCounts() {
       orderBy: { sortOrder: "asc" },
       select: { id: true, key: true, name: true, description: true, iconText: true, color: true },
     });
-    // Count posts per category
     const postCounts = await prisma.forumPost.groupBy({
       by: ["categoryId"],
       _count: { id: true },
@@ -104,6 +103,54 @@ async function getStats() {
   }
 }
 
+async function getTopUsers() {
+  try {
+    let users = await prisma.user.findMany({
+      where: { honorScore: { gt: 0 } },
+      orderBy: { honorScore: "desc" },
+      take: 5,
+      select: { id: true, name: true, honorScore: true },
+    });
+    if (users.length === 0) {
+      users = await prisma.user.findMany({
+        orderBy: { createdAt: "asc" },
+        take: 5,
+        select: { id: true, name: true, honorScore: true },
+      });
+    }
+    return users;
+  } catch {
+    return [];
+  }
+}
+
+async function getHotTags() {
+  try {
+    const posts = await prisma.forumPost.findMany({
+      where: { status: "published" },
+      select: { tags: true },
+      take: 50,
+    });
+    const tagCount = new Map<string, number>();
+    for (const p of posts) {
+      const tags = p.tags;
+      if (tags && Array.isArray(tags)) {
+        for (const t of tags) {
+          if (typeof t === "string") {
+            tagCount.set(t, (tagCount.get(t) || 0) + 1);
+          }
+        }
+      }
+    }
+    return Array.from(tagCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([tag, count]) => ({ tag, count }));
+  } catch {
+    return [];
+  }
+}
+
 export default async function BBSPage({
   searchParams,
 }: {
@@ -114,112 +161,42 @@ export default async function BBSPage({
   const category = params.category || "";
   const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
 
-  const [categories, { posts, total, pageSize }, stats, categoriesWithCounts] = await Promise.all([
+  const [categories, { posts, total, pageSize }, stats, categoriesWithCounts, topUsers, hotTags] = await Promise.all([
     getCategories(),
     getPosts({ q, category, page }),
     getStats(),
     getCategoriesWithCounts(),
+    getTopUsers(),
+    getHotTags(),
   ]);
   const session = await auth();
   const isLoggedIn = !!session?.user;
 
   const totalPages = Math.ceil(total / pageSize);
+  const medals = ["🥇", "🥈", "🥉"];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-10 md:py-14">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-brand-light border border-white/10 mb-5">
-              <Sparkles className="w-4 h-4" />
-              <span>绝世百宝箱社区</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
-              社区论坛
-            </h1>
-            <p className="text-lg text-brand-light/90 max-w-2xl leading-relaxed mb-4">
-              交流出海工具、海外生活、物流经验、AI 工具使用心得
-            </p>
-            {/* Reminders */}
-            <div className="flex flex-wrap gap-2 text-sm text-brand-light/80">
-              <span className="inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-300"></span>
-                新帖需审核后展示
-              </span>
-              <span className="hidden sm:inline text-accent">·</span>
-              <span className="inline-flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-300"></span>
-                请勿发布广告、灰产、引战内容
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 -mt-5 pb-16 relative z-10">
-        {/* Top bar: categories + search + new post */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
-          {/* Category filters */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Link
-              href="/bbs"
-              className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
-                !category
-                  ? "bg-brand text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              全部
-            </Link>
-            {categories.map((cat) => (
-              <Link
-                key={cat.key}
-                href={
-                  q
-                    ? `/bbs?category=${cat.key}&q=${encodeURIComponent(q)}`
-                    : `/bbs?category=${cat.key}`
-                }
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors min-h-[36px] ${
-                  category === cat.key
-                    ? "bg-brand text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {cat.iconText && <span>{cat.iconText}</span>}
-                <span>{cat.name}</span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Search + New Post */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <form action="/bbs" method="get" className="flex-1 flex">
-              {category && (
-                <input type="hidden" name="category" value={category} />
-              )}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                <input
-                  type="text"
-                  name="q"
-                  defaultValue={q}
-                  placeholder="搜索帖子..."
-                  className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-1"
-                />
+      {/* Compressed Hero */}
+      <div className="bg-gradient-to-br from-brand via-brand-light to-accent text-white py-6 md:py-8">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-sm mb-2">
+                <Sparkles className="w-4 h-4" />
+                <span>绝世百宝箱社区 · Beta</span>
               </div>
-              <button
-                type="submit"
-                className="ml-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors min-h-[40px] shrink-0"
-              >
-                搜索
-              </button>
-            </form>
-
+              <h1 className="text-2xl md:text-3xl font-extrabold">
+                社区论坛
+              </h1>
+              <p className="text-sm text-brand-light/80 mt-1">
+                交流出海工具、海外生活、物流经验 · {stats.postCount} 帖 · {stats.categoryCount} 分类
+              </p>
+            </div>
             {isLoggedIn ? (
               <Link
                 href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white text-brand rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 发布帖子
@@ -227,7 +204,7 @@ export default async function BBSPage({
             ) : (
               <Link
                 href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-4 py-2 border border-brand text-brand rounded-lg text-sm font-medium hover:bg-accent/10 transition-colors shrink-0 min-h-[40px]"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white text-brand rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 登录后发帖
@@ -235,160 +212,297 @@ export default async function BBSPage({
             )}
           </div>
         </div>
+      </div>
 
-        {/* Stats area */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
-            <div className="flex items-center justify-center gap-1.5 mb-1">
-              <FileText className="w-4 h-4 text-accent" />
-              <span className="text-2xl font-extrabold text-gray-900">{stats.postCount}</span>
-            </div>
-            <span className="text-xs text-gray-500">已发布帖子</span>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
-            <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Tag className="w-4 h-4 text-accent" />
-              <span className="text-2xl font-extrabold text-gray-900">{stats.categoryCount}</span>
-            </div>
-            <span className="text-xs text-gray-500">分类数</span>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center shadow-sm">
-            <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Clock className="w-4 h-4 text-accent" />
-              <span className="text-xs font-medium text-gray-700">
-                {stats.latestPostAt ? formatDateTime(stats.latestPostAt) : "暂无"}
-              </span>
-            </div>
-            <span className="text-xs text-gray-500">最新更新</span>
-          </div>
-        </div>
-
-        {/* Category cards */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-3">📂 论坛分类</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {categoriesWithCounts.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
-            ))}
-          </div>
-        </div>
-
-        {/* Posts list */}
-        {posts.length > 0 ? (
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={{
-                  ...post,
-                  createdAt: post.createdAt,
-                }}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <div className="text-4xl mb-4">📭</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
-            </h2>
-            <p className="text-sm text-gray-500 mb-5">
-              {q || category
-                ? "试试其他关键词或分类"
-                : "成为第一个发帖的人吧！"}
-            </p>
-            {q || category ? (
-              <Link
-                href="/bbs"
-                className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-              >
-                返回全部
-              </Link>
-            ) : isLoggedIn ? (
-              <Link
-                href="/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                发布第一个帖子
-              </Link>
-            ) : (
-              <Link
-                href="/login?callbackUrl=/bbs/new"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors"
-              >
-                登录后发帖
-              </Link>
-            )}
-          </div>
-        )}
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-center gap-2">
-            {page > 1 && (
-              <Link
-                href={buildPageUrl("/bbs", page - 1, { q, category })}
-                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-              >
-                上一页
-              </Link>
-            )}
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-              // Show at most 7 page buttons
-              if (totalPages <= 7 || p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
-                return (
+      {/* Three-column layout */}
+      <div className="max-w-[1400px] mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] xl:grid-cols-[220px_1fr_300px] gap-6">
+          {/* Left sidebar — Community navigation */}
+          <aside className="hidden lg:block">
+            <div className="sticky top-20 space-y-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+                  <MessageCircle className="w-4 h-4 text-brand" />
+                  社区导航
+                </h3>
+                <nav className="space-y-1">
                   <Link
-                    key={p}
-                    href={buildPageUrl("/bbs", p, { q, category })}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors ${
-                      p === page
-                        ? "bg-brand text-white"
-                        : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    href="/bbs"
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+                      !category ? "bg-brand text-white font-medium" : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
-                    {p}
+                    <span>全部</span>
+                    <span className="text-xs opacity-75">{stats.postCount}</span>
                   </Link>
-                );
-              }
-              return null;
-            })}
+                  {categoriesWithCounts.map((cat) => (
+                    <Link
+                      key={cat.id}
+                      href={`/bbs?category=${cat.key}`}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+                        category === cat.key ? "bg-brand text-white font-medium" : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        {cat.iconText && <span>{cat.iconText}</span>}
+                        <span>{cat.name}</span>
+                      </span>
+                      <span className="text-xs opacity-75">{cat.postCount}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
 
-            {page < totalPages && (
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">社区规则</h3>
+                <ul className="space-y-1.5 text-xs text-gray-500">
+                  <li>• 禁止广告、灰产、引战</li>
+                  <li>• 新帖需审核后展示</li>
+                  <li>• 尊重他人，理性讨论</li>
+                  <li>• 转载请注明出处</li>
+                </ul>
+                <Link href="/bbs" className="text-xs text-brand hover:underline mt-2 inline-block">
+                  查看完整规则 →
+                </Link>
+              </div>
+
               <Link
-                href={buildPageUrl("/bbs", page + 1, { q, category })}
-                className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                href="/bbs/new"
+                className="block bg-gradient-to-br from-brand/5 to-accent/5 rounded-xl border border-accent/20 p-4 text-center hover:border-brand/30 transition-colors"
               >
-                下一页
+                <span className="text-sm font-medium text-brand">💡 Beta 反馈</span>
+                <p className="text-xs text-gray-500 mt-1">反馈布局与功能建议</p>
               </Link>
-            )}
-          </div>
-        )}
+            </div>
+          </aside>
 
-        {/* Related links */}
-        <div className="mt-8 bg-gradient-to-br from-brand/5 to-accent/5 rounded-xl border border-accent/20 p-6">
-          <h3 className="font-bold text-gray-900 mb-3">还需要什么？</h3>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/tools"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-brand text-white rounded-lg text-sm font-medium hover:bg-brand-dark transition-colors min-h-[44px]"
-            >
-              🛠️ 工具中心
-            </Link>
-            <Link
-              href="/guides"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]"
-            >
-              📖 实用指南
-            </Link>
-            <Link
-              href="/resources"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]"
-            >
-              📚 资源库
-            </Link>
-          </div>
+          {/* Center — Topic stream */}
+          <main>
+            {/* Mobile search + new post */}
+            <div className="lg:hidden mb-4">
+              <form action="/bbs" method="get" className="flex gap-2 mb-3">
+                {category && <input type="hidden" name="category" value={category} />}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="q"
+                    defaultValue={q}
+                    placeholder="搜索帖子..."
+                    className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm"
+                  />
+                </div>
+                <button type="submit" className="px-4 py-2 bg-gray-100 rounded-lg text-sm">搜索</button>
+              </form>
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                <Link href="/bbs" className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${!category ? "bg-brand text-white" : "bg-gray-100 text-gray-600"}`}>全部</Link>
+                {categoriesWithCounts.map((cat) => (
+                  <Link key={cat.id} href={`/bbs?category=${cat.key}`} className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${category === cat.key ? "bg-brand text-white" : "bg-gray-100 text-gray-600"}`}>
+                    {cat.iconText} {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop search */}
+            <div className="hidden lg:block mb-4">
+              <form action="/bbs" method="get" className="flex gap-3">
+                {category && <input type="hidden" name="category" value={category} />}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="q"
+                    defaultValue={q}
+                    placeholder="搜索帖子..."
+                    className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm"
+                  />
+                </div>
+                <button type="submit" className="px-5 py-2 bg-gray-100 rounded-lg text-sm font-medium hover:bg-gray-200">搜索</button>
+              </form>
+            </div>
+
+            {/* Stats bar */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <FileText className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-xl font-bold text-gray-900">{stats.postCount}</span>
+                </div>
+                <span className="text-xs text-gray-500">帖子</span>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Tag className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-xl font-bold text-gray-900">{stats.categoryCount}</span>
+                </div>
+                <span className="text-xs text-gray-500">分类</span>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+                <div className="flex items-center justify-center gap-1 mb-0.5">
+                  <Clock className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-xs font-medium text-gray-700">
+                    {stats.latestPostAt ? formatDateTime(stats.latestPostAt) : "暂无"}
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500">最新更新</span>
+              </div>
+            </div>
+
+            {/* Posts list */}
+            {posts.length > 0 ? (
+              <div className="space-y-3">
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={{
+                      ...post,
+                      createdAt: post.createdAt,
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+                <div className="text-4xl mb-4">📭</div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
+                </h2>
+                <p className="text-sm text-gray-500 mb-5">
+                  {q || category ? "试试其他关键词或分类" : "成为第一个发帖的人吧！"}
+                </p>
+                {q || category ? (
+                  <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
+                    返回全部
+                  </Link>
+                ) : isLoggedIn ? (
+                  <Link href="/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
+                    <Plus className="w-4 h-4" />
+                    发布第一个帖子
+                  </Link>
+                ) : (
+                  <Link href="/login?callbackUrl=/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
+                    登录后发帖
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex items-center justify-center gap-2">
+                {page > 1 && (
+                  <Link href={buildPageUrl("/bbs", page - 1, { q, category })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                    上一页
+                  </Link>
+                )}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
+                  if (totalPages <= 7 || p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
+                    return (
+                      <Link
+                        key={p}
+                        href={buildPageUrl("/bbs", p, { q, category })}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                          p === page ? "bg-brand text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {p}
+                      </Link>
+                    );
+                  }
+                  return null;
+                })}
+                {page < totalPages && (
+                  <Link href={buildPageUrl("/bbs", page + 1, { q, category })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                    下一页
+                  </Link>
+                )}
+              </div>
+            )}
+          </main>
+
+          {/* Right sidebar — Operations */}
+          <aside className="hidden xl:block">
+            <div className="sticky top-20 space-y-4">
+              {/* New post button */}
+              {isLoggedIn ? (
+                <Link href="/bbs/new" className="block w-full bg-brand text-white rounded-xl py-3 text-center font-bold text-sm hover:bg-brand-dark transition-colors">
+                  ✍️ 发布新帖
+                </Link>
+              ) : (
+                <Link href="/login?callbackUrl=/bbs/new" className="block w-full bg-brand text-white rounded-xl py-3 text-center font-bold text-sm hover:bg-brand-dark transition-colors">
+                  ✍️ 登录后发帖
+                </Link>
+              )}
+
+              {/* Newbie guide */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-brand" />
+                  新手发帖指南
+                </h3>
+                <ol className="space-y-1.5 text-xs text-gray-500 list-decimal list-inside">
+                  <li>点击「发布新帖」</li>
+                  <li>选择合适分类</li>
+                  <li>填写标题和内容</li>
+                  <li>提交后等待审核</li>
+                  <li>审核通过后展示</li>
+                </ol>
+              </div>
+
+              {/* Hot tags */}
+              {hotTags.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                    <TrendingUp className="w-4 h-4 text-brand" />
+                    热门标签
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5">
+                    {hotTags.map(({ tag, count }) => (
+                      <span key={tag} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                        #{tag} <span className="text-gray-400">{count}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Active contributors */}
+              {topUsers.length > 0 && (
+                <div className="bg-white rounded-xl border border-gray-200 p-4">
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-brand" />
+                    活跃贡献者
+                  </h3>
+                  <div className="space-y-2">
+                    {topUsers.map((user, i) => (
+                      <div key={user.id} className="flex items-center gap-2">
+                        <span className="text-sm">{medals[i] || `${i + 1}`}</span>
+                        <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center text-xs font-bold">
+                          {user.name?.charAt(0).toUpperCase() || "U"}
+                        </div>
+                        <span className="text-sm text-gray-700 flex-1 truncate">{user.name || "匿名"}</span>
+                        <span className="text-xs text-gray-400">{user.honorScore || 0}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Related tools */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                  <Wrench className="w-4 h-4 text-brand" />
+                  相关工具入口
+                </h3>
+                <div className="space-y-1.5">
+                  <Link href="/tools/hs-code" className="block text-sm text-gray-600 hover:text-brand transition-colors">📦 HS 编码查询</Link>
+                  <Link href="/tools/shipping-calculator" className="block text-sm text-gray-600 hover:text-brand transition-colors">🚢 运费计算器</Link>
+                  <Link href="/tools/postal-code" className="block text-sm text-gray-600 hover:text-brand transition-colors">📮 邮编查询</Link>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -405,21 +519,4 @@ function buildPageUrl(
   if (params.q) sp.set("q", params.q);
   if (params.category) sp.set("category", params.category);
   return `${base}?${sp.toString()}`;
-}
-
-function CategoryCard({ category }: { category: { id: string; key: string; name: string; description: string | null; iconText: string | null; color: string | null; postCount: number } }) {
-  return (
-    <Link
-      href={`/bbs/category/${category.key}`}
-      className="block bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-accent/30 transition-all text-center group min-h-[100px] flex flex-col items-center justify-center"
-    >
-      {category.iconText && <span className="text-2xl mb-1.5 block">{category.iconText}</span>}
-      <span className="text-sm font-semibold text-gray-900 group-hover:text-brand transition-colors line-clamp-1 break-words">
-        {category.name}
-      </span>
-      <span className="text-xs text-gray-400 mt-1">
-        {category.postCount} 帖
-      </span>
-    </Link>
-  );
 }

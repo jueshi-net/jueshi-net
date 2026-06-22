@@ -242,7 +242,7 @@ export default async function CommunityPreviewV2Page({
               </div>
               <nav className="p-2">
                 <Link
-                  href="/community"
+                  href="/bbs"
                   className="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm font-medium text-white bg-gray-900 mb-0.5"
                 >
                   <span className="flex items-center gap-2">
@@ -274,14 +274,14 @@ export default async function CommunityPreviewV2Page({
               </nav>
               <div className="px-2 pb-2 pt-1 border-t border-gray-100 mt-1">
                 <Link
-                  href="/community/c/general"
+                  href="/bbs/category/general"
                   className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition"
                 >
                   <Shield className="w-3.5 h-3.5 text-gray-400" />
                   社区规则
                 </Link>
                 <Link
-                  href="/community/c/feedback"
+                  href="/bbs/category/feedback"
                   className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm text-gray-600 hover:bg-teal-50 hover:text-teal-700 transition"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-gray-400" />

@@ -341,7 +341,7 @@ export function PreviewClient({ data }: { data: CommunityPreviewV3Data }) {
                 </div>
                 <nav className="p-2">
                   <Link
-                    href="/community"
+                    href="/bbs"
                     className="flex items-center justify-between px-2.5 py-2 rounded-lg text-sm font-semibold text-white bg-violet-600 mb-0.5"
                   >
                     <span className="flex items-center gap-2">
@@ -402,7 +402,7 @@ export function PreviewClient({ data }: { data: CommunityPreviewV3Data }) {
                   </li>
                 </ul>
                 <Link
-                  href="/community/c/general"
+                  href="/bbs/category/general"
                   className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
                 >
                   查看完整规则 <ChevronRight className="w-3 h-3" />
@@ -411,7 +411,7 @@ export function PreviewClient({ data }: { data: CommunityPreviewV3Data }) {
 
               {/* Beta feedback link */}
               <Link
-                href="/community/c/feedback"
+                href="/bbs/category/feedback"
                 className="flex items-center gap-2 px-4 py-3 rounded-xl border border-violet-200 bg-white hover:bg-violet-50 transition group"
               >
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-violet-100 group-hover:bg-violet-200 transition flex-shrink-0">

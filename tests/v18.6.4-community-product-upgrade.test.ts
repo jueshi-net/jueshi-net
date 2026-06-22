@@ -122,20 +122,32 @@ describe("v18.6.4 — API Routes Exist", () => {
 });
 
 describe("v18.6.4 — Frontend Pages Exist", () => {
-  it("community home page should exist and be upgraded", () => {
-    const pagePath = path.join(process.cwd(), "src/app/(public)/community/page.tsx");
-    expect(fs.existsSync(pagePath)).toBe(true);
-    const content = fs.readFileSync(pagePath, "utf-8");
-    expect(content).toContain("force-dynamic");
-    // Check for filter tabs or upgraded features
-    expect(content.length).toBeGreaterThan(5000); // Upgraded page should be substantial
+  it("community home page should exist and be upgraded (canonical /bbs)", () => {
+    // /bbs is the canonical community route (menu + footer entry point)
+    const bbsPath = path.join(process.cwd(), "src/app/(public)/bbs/page.tsx");
+    expect(fs.existsSync(bbsPath)).toBe(true);
+    const bbsContent = fs.readFileSync(bbsPath, "utf-8");
+    expect(bbsContent).toContain("force-dynamic");
+    expect(bbsContent.length).toBeGreaterThan(5000); // Upgraded page should be substantial
+    // /community should redirect to /bbs
+    const communityPath = path.join(process.cwd(), "src/app/(public)/community/page.tsx");
+    expect(fs.existsSync(communityPath)).toBe(true);
+    const communityContent = fs.readFileSync(communityPath, "utf-8");
+    expect(communityContent).toContain("redirect");
+    expect(communityContent).toContain("/bbs");
   });
 
   it("topic detail page should exist with upgraded features", () => {
-    const pagePath = path.join(process.cwd(), "src/app/(public)/community/t/[slug]/page.tsx");
-    expect(fs.existsSync(pagePath)).toBe(true);
-    const content = fs.readFileSync(pagePath, "utf-8");
-    expect(content).toContain("force-dynamic");
+    // /bbs/[slug] is the canonical topic detail route
+    const bbsDetailPath = path.join(process.cwd(), "src/app/(public)/bbs/[slug]/page.tsx");
+    expect(fs.existsSync(bbsDetailPath)).toBe(true);
+    const bbsDetailContent = fs.readFileSync(bbsDetailPath, "utf-8");
+    expect(bbsDetailContent).toContain("force-dynamic");
+    // /community/t/[slug] should redirect to /bbs/[slug]
+    const communityDetailPath = path.join(process.cwd(), "src/app/(public)/community/t/[slug]/page.tsx");
+    expect(fs.existsSync(communityDetailPath)).toBe(true);
+    const communityDetailContent = fs.readFileSync(communityDetailPath, "utf-8");
+    expect(communityDetailContent).toContain("redirect");
   });
 
   it("topic detail client should exist", () => {
