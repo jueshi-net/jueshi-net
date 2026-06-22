@@ -7,8 +7,8 @@ import CountryHeroIntelligence from "@/components/countries/country-hero-intelli
 import {
   getCountryBySlug,
   getAllCountries,
-  type CountryConfig,
-} from "@/lib/country-config";
+  type AllCountryConfig,
+} from "@/lib/all-countries";
 import {
   Home,
   ChevronRight,
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical },
-    robots: "index,follow",
+    robots: config.indexable ? "index,follow" : "noindex,nofollow",
     openGraph: {
       title,
       description,
@@ -386,6 +386,19 @@ export default async function CountryPage({ params }: Props) {
             地图参考按城市/地区搜索，不代表精确邮编位置。邮编数据来源于公开数据源，结果仅供参考。正式发货前请以当地邮政或物流服务商信息为准。
           </p>
         </section>
+
+        {/* ─── Data Status Notice (Tier 2/3) ─── */}
+        {config.completenessTier >= 2 && (
+          <section className="bg-blue-50 border border-blue-100 rounded-xl p-5">
+            <h2 className="text-lg font-bold text-gray-900 mb-2">📊 数据覆盖说明</h2>
+            <div className="space-y-1 text-sm text-gray-600">
+              <p>邮编数据库：{config.postalDataStatus === 'full' ? '✅ 可查' : config.postalDataStatus === 'partial' ? '⚠️ 部分可查' : '❌ 暂未接入可查询邮编数据库'}</p>
+              <p>地址格式：{config.addressFormatExample && !config.addressFormatExample.includes('being collected') ? '✅ 已配置' : '⚠️ 基础参考，待补'}</p>
+              <p>官方链接：{config.officialPostalUrl && config.officialPostalUrl.trim() ? '✅ 已确认' : '⚠️ 待确认'}</p>
+              <p>指南/清单：{config.completenessTier === 1 ? '✅ 已有' : '⚠️ 正在补充'}</p>
+            </div>
+          </section>
+        )}
 
         {/* ─── Related Countries ─── */}
         <section>

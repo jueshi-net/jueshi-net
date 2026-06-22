@@ -11,11 +11,11 @@
  */
 
 import Link from "next/link";
-import type { CountryConfig } from "@/lib/country-config";
+import type { AllCountryConfig } from "@/lib/all-countries";
 import { CountryLocalTimeCard } from "./country-local-time-card";
 
 interface CountryHeroIntelligenceProps {
-  config: CountryConfig;
+  config: AllCountryConfig;
 }
 
 const POSTAL_STATUS_LABEL: Record<string, string> = {
