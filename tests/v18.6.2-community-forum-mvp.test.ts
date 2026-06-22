@@ -147,7 +147,7 @@ describe("Code Reference Audit", () => {
 
   it("should have admin report resolve API using requireAdmin", () => {
     const resolveApi = fs.readFileSync(
-      path.join(srcDir, "app/api/admin/community/reports/[id]/route.ts"), "utf-8"
+      path.join(srcDir, "app/api/admin/community/flagged/[id]/route.ts"), "utf-8"
     );
     expect(resolveApi).toMatch(/requireAdmin/);
   });
@@ -236,7 +236,7 @@ describe("MVP Feature Coverage", () => {
   });
 
   it("should have admin reports page", () => {
-    expect(fs.existsSync(path.join(process.cwd(), "src/app/(admin)/admin/community/reports/page.tsx"))).toBe(true);
+    expect(fs.existsSync(path.join(process.cwd(), "src/app/(admin)/admin/community/flagged/page.tsx"))).toBe(true);
   });
 
   it("should have like API", () => {
@@ -256,7 +256,7 @@ describe("MVP Feature Coverage", () => {
   });
 
   it("should have admin report resolve API", () => {
-    expect(fs.existsSync(path.join(process.cwd(), "src/app/api/admin/community/reports/[id]/route.ts"))).toBe(true);
+    expect(fs.existsSync(path.join(process.cwd(), "src/app/api/admin/community/flagged/[id]/route.ts"))).toBe(true);
   });
 
   it("should have admin community stats API", () => {

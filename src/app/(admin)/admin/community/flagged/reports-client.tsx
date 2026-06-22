@@ -16,7 +16,7 @@ export function AdminReportsManager({ reports }: { reports: ReportItem[] }) {
   const [message, setMessage] = useState("");
 
   async function resolve(id: string, resolution: string) {
-    const res = await fetch(`/api/admin/community/reports/${id}`, {
+    const res = await fetch(`/api/admin/community/flagged/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resolution }),

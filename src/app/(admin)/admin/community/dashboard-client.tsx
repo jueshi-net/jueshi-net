@@ -12,7 +12,7 @@ export function AdminCommunityDashboard({ stats }: { stats: {
     { label: "评论总数", value: stats.commentCount, icon: MessageSquare, href: "/admin/community/comments", color: "teal" },
     { label: "待审帖子", value: stats.pendingPosts, icon: Clock, href: "/admin/community/posts?status=pending", color: "amber" },
     { label: "待审评论", value: stats.pendingComments, icon: Clock, href: "/admin/community/comments?status=pending", color: "amber" },
-    { label: "待处理举报", value: stats.reportCount, icon: Flag, href: "/admin/community/reports", color: "red" },
+    { label: "待处理举报", value: stats.reportCount, icon: Flag, href: "/admin/community/flagged", color: "red" },
     { label: "今日新帖", value: stats.todayPosts, icon: TrendingUp, href: "/admin/community/posts", color: "green" },
     { label: "今日评论", value: stats.todayComments, icon: TrendingUp, href: "/admin/community/comments", color: "green" },
     { label: "总用户数", value: stats.userCount, icon: Users, href: "/admin/community/reputation", color: "indigo" },
@@ -50,7 +50,7 @@ export function AdminCommunityDashboard({ stats }: { stats: {
           <h3 className="font-semibold text-gray-900">评论管理</h3>
           <p className="text-sm text-gray-500 mt-1">审核、隐藏评论</p>
         </Link>
-        <Link href="/admin/community/reports" className="rounded-xl border border-gray-200 bg-white p-4 hover:border-teal-300">
+        <Link href="/admin/community/flagged" className="rounded-xl border border-gray-200 bg-white p-4 hover:border-teal-300">
           <h3 className="font-semibold text-gray-900">举报处理</h3>
           <p className="text-sm text-gray-500 mt-1">处理用户举报，驳回或成立</p>
         </Link>
