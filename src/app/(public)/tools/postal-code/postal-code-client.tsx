@@ -804,61 +804,118 @@ export default function PostalCodePage() {
           </div>
         )}
 
-        {/* ===== MAIN SEARCH CARD ===== */}
+        {/* ===== 1. 选择国家 / 地区 (核心区块 1) ===== */}
         <div className={cardStyles.base + ' mb-6'}>
+          <div className="p-5 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">1. 选择国家 / 地区</h2>
+            <p className="text-sm text-gray-500">选择国家后，下方查询区将自动切换到对应国家的邮编数据库</p>
+          </div>
           <div className="p-5">
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            {/* 当前查询国家指示器 */}
+            <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-teal-50 rounded-lg border border-teal-100">
+              <Database className="w-4 h-4 text-teal-600" />
+              <span className="text-sm font-medium text-teal-700">当前查询：{country.flag} {country.name}邮编数据库</span>
+              <span className="text-xs text-teal-500 ml-auto">{SUPPORTED_COUNTRIES.length}+ 国家可选</span>
+            </div>
+            {/* 搜索国家 */}
+            <div className="flex flex-wrap gap-2">
+              <div className="relative w-full sm:w-72">
                 <input
-                  className={`${inputStyles} pl-11 text-base`}
-                  placeholder="输入邮编、城市、州省、地址关键词，例如 M5V 3L9 / Toronto / Tokyo / 90210"
-                  value={mainSearch}
-                  onChange={e => setMainSearch(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleMainSearch()}
+                  list="country-list"
+                  placeholder="搜索国家（如 Japan、德国、JP）…"
+                  value={countrySearch}
+                  onChange={e => {
+                    setCountrySearch(e.target.value);
+                    const match = SUPPORTED_COUNTRIES.find(c =>
+                      c.code.toLowerCase() === e.target.value.toLowerCase() ||
+                      c.name.includes(e.target.value) ||
+                      c.nameEn.toLowerCase().includes(e.target.value.toLowerCase())
+                    );
+                    if (match) selectCountry(match.code);
+                  }}
+                  className={`${inputStyles} pr-10`}
                 />
+                <datalist id="country-list">
+                  {SUPPORTED_COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.nameEn})</option>
+                  ))}
+                </datalist>
+                <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
-              <button onClick={handleMainSearch}
-                className={`${buttonVariants.primary} px-6 text-base shadow-sm`}>
-                <Search className="w-4 h-4" />
-                开始查询
-              </button>
+              {/* 热门国家快捷选择 */}
+              <div className="flex flex-wrap gap-1.5">
+                {/* 北美 */}
+                {['CA', 'US'].map(code => {
+                  const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                  return (
+                    <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                      className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                        selectedCountryCode === code
+                          ? 'bg-teal-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                      }`}>
+                      {c.flag} {c.name}
+                    </button>
+                  );
+                })}
+                {/* 欧洲 */}
+                {['GB', 'DE', 'FR'].map(code => {
+                  const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                  return (
+                    <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                      className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                        selectedCountryCode === code
+                          ? 'bg-teal-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                      }`}>
+                      {c.flag} {c.name}
+                    </button>
+                  );
+                })}
+                {/* 亚太 */}
+                {['JP', 'AU', 'SG', 'MY'].map(code => {
+                  const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
+                  return (
+                    <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
+                      className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
+                        selectedCountryCode === code
+                          ? 'bg-teal-600 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
+                      }`}>
+                      {c.flag} {c.name}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ===== FUNCTION ENTRY CARDS ===== */}
-        <div className="grid md:grid-cols-3 gap-4 mb-6">
-          <button onClick={() => setQueryMode('region')}
-            className={`text-left p-5 rounded-xl border transition-all ${queryMode === 'region' ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 bg-white hover:border-teal-300 hover:shadow-sm'}`}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h3 className="font-bold text-gray-900">精确邮编查询</h3>
+        {/* ===== 2. 数据库邮编查询 (核心区块 2) ===== */}
+        <div className="bg-white rounded-xl border-2 border-teal-200 shadow-sm p-5 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Database className="w-5 h-5 text-teal-600" />
+            <h2 className="text-lg font-bold text-gray-900">2. 数据库邮编查询</h2>
+            <span className="text-xs text-gray-400 ml-auto">当前查询：{country.flag} {country.name}邮编数据库</span>
+          </div>
+          <div className="flex gap-3 mb-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                className={`${inputStyles} pl-11 text-base`}
+                placeholder="输入邮编、城市、州省、地址关键词，例如 M5V 3L9 / Toronto / Tokyo / 90210"
+                value={mainSearch}
+                onChange={e => setMainSearch(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleMainSearch()}
+              />
             </div>
-            <p className="text-sm text-gray-500 leading-relaxed">适合已有邮编、地址片段或完整地址时使用</p>
-          </button>
-          <button onClick={() => setQueryMode('format')}
-            className={`text-left p-5 rounded-xl border transition-all ${queryMode === 'format' ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 bg-white hover:border-teal-300 hover:shadow-sm'}`}>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-blue-600" />
-              </div>
-              <h3 className="font-bold text-gray-900">地址格式查询</h3>
-            </div>
-            <p className="text-sm text-gray-500 leading-relaxed">查看国家/地区收件地址写法和格式</p>
-          </button>
-          <button onClick={scrollToOfficialLinks}
-            className="text-left p-5 rounded-xl border border-gray-200 bg-white hover:border-green-300 hover:shadow-sm transition-all">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-                <ExternalLink className="w-5 h-5 text-green-600" />
-              </div>
-              <h3 className="font-bold text-gray-900">官方入口确认</h3>
-            </div>
-            <p className="text-sm text-gray-500 leading-relaxed">跳转官方邮编/地址查询入口进行最终确认</p>
-          </button>
+            <button onClick={handleMainSearch}
+              className={`${buttonVariants.primary} px-6 text-base shadow-sm whitespace-nowrap`}>
+              <Search className="w-4 h-4" />
+              开始查询
+            </button>
+          </div>
+          <p className="text-xs text-gray-400">数据来源于公开邮编数据源，结果仅供参考。精确邮编以数据库查询、完整地址或官方入口确认为准。</p>
         </div>
 
         {/* ===== FORMAT MODE PANEL ===== */}
@@ -1025,7 +1082,7 @@ export default function PostalCodePage() {
               </p>
               <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                城市级结果仅供参考，精确邮编请使用下方"邮编格式校验"或官方入口确认。
+                城市级结果仅供参考，精确邮编以数据库查询、完整地址或官方入口确认为准。
               </p>
             </div>
             <div className="p-5">
@@ -1299,93 +1356,6 @@ export default function PostalCodePage() {
             </div>
           </div>
         )}
-
-        {/* ===== COUNTRY SELECTOR ===== */}
-        <div className={cardStyles.base}>
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家 / 地区</h2>
-          <div className="flex flex-wrap gap-2">
-            {/* Searchable select */}
-            <div className="relative w-full sm:w-72">
-              <input
-                list="country-list"
-                placeholder="搜索国家（如 Japan、德国、JP）…"
-                value={countrySearch}
-                onChange={e => {
-                  setCountrySearch(e.target.value);
-                  // Auto-select if exact match
-                  const match = SUPPORTED_COUNTRIES.find(c =>
-                    c.code.toLowerCase() === e.target.value.toLowerCase() ||
-                    c.name.includes(e.target.value) ||
-                    c.nameEn.toLowerCase().includes(e.target.value.toLowerCase())
-                  );
-                  if (match) selectCountry(match.code);
-                }}
-                className={`${inputStyles} pr-10`}
-              />
-              <datalist id="country-list">
-                {SUPPORTED_COUNTRIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.nameEn})</option>
-                ))}
-              </datalist>
-              <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-            </div>
-
-            {/* Quick-pick: popular countries by region */}
-            <div className="flex flex-wrap gap-1.5">
-              {/* North America */}
-              {['CA', 'US'].map(code => {
-                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
-                return (
-                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
-                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
-                      selectedCountryCode === code
-                        ? 'bg-teal-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
-                    }`}>
-                    {c.flag} {c.name}
-                  </button>
-                );
-              })}
-              {/* Europe */}
-              {['GB', 'DE', 'FR', 'IT', 'ES', 'NL'].map(code => {
-                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
-                return (
-                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
-                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
-                      selectedCountryCode === code
-                        ? 'bg-teal-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
-                    }`}>
-                    {c.flag} {c.name}
-                  </button>
-                );
-              })}
-              {/* Asia Pacific */}
-              {['JP', 'KR', 'AU', 'NZ', 'SG', 'MY'].map(code => {
-                const c = SUPPORTED_COUNTRIES.find(x => x.code === code)!;
-                return (
-                  <button key={code} onClick={() => { selectCountry(code); setCountrySearch(''); }}
-                    className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-all duration-200 ${
-                      selectedCountryCode === code
-                        ? 'bg-teal-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700'
-                    }`}>
-                    {c.flag} {c.name}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Current selection badge */}
-            <div className="w-full mt-2 flex items-center gap-2">
-              <span className="text-xs text-gray-400">当前：</span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-                {country.flag} {country.name} ({country.code})
-              </span>
-              <span className="text-xs text-gray-400 ml-auto">{SUPPORTED_COUNTRIES.length} 个国家可选</span>
-            </div>
-          </div>
-        </div>
 
         {/* ===== MAIN GRID ===== */}
         <div className="grid lg:grid-cols-3 gap-6">
