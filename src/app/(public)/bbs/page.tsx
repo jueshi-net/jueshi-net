@@ -221,7 +221,7 @@ export default async function BBSPage({
           <aside className="hidden lg:block">
             <div className="sticky top-20 space-y-4">
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5">
+                <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
                   <MessageCircle className="w-4 h-4 text-brand" />
                   社区导航
                 </h3>
@@ -229,7 +229,7 @@ export default async function BBSPage({
                   <Link
                     href="/bbs"
                     className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                      !category ? "bg-brand text-white font-medium" : "text-gray-600 hover:bg-gray-100"
+                      !category ? "bg-brand text-white font-medium" : "text-slate-700 hover:bg-slate-100"
                     }`}
                   >
                     <span>全部</span>
@@ -240,7 +240,7 @@ export default async function BBSPage({
                       key={cat.id}
                       href={`/bbs?category=${cat.key}`}
                       className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                        category === cat.key ? "bg-brand text-white font-medium" : "text-gray-600 hover:bg-gray-100"
+                        category === cat.key ? "bg-brand text-white font-medium" : "text-slate-700 hover:bg-slate-100"
                       }`}
                     >
                       <span className="flex items-center gap-1.5">
@@ -254,8 +254,8 @@ export default async function BBSPage({
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-2">社区规则</h3>
-                <ul className="space-y-1.5 text-xs text-gray-500">
+                <h3 className="text-sm font-bold text-slate-900 mb-2">社区规则</h3>
+                <ul className="space-y-1.5 text-xs text-slate-600">
                   <li>• 禁止广告、灰产、引战</li>
                   <li>• 新帖需审核后展示</li>
                   <li>• 尊重他人，理性讨论</li>
@@ -271,7 +271,7 @@ export default async function BBSPage({
                 className="block bg-gradient-to-br from-brand/5 to-accent/5 rounded-xl border border-accent/20 p-4 text-center hover:border-brand/30 transition-colors"
               >
                 <span className="text-sm font-medium text-brand">💡 Beta 反馈</span>
-                <p className="text-xs text-gray-500 mt-1">反馈布局与功能建议</p>
+                <p className="text-xs text-slate-600 mt-1">反馈布局与功能建议</p>
               </Link>
             </div>
           </aside>
@@ -283,7 +283,7 @@ export default async function BBSPage({
               <form action="/bbs" method="get" className="flex gap-2 mb-3">
                 {category && <input type="hidden" name="category" value={category} />}
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
                     type="text"
                     name="q"
@@ -295,9 +295,9 @@ export default async function BBSPage({
                 <button type="submit" className="px-4 py-2 bg-gray-100 rounded-lg text-sm">搜索</button>
               </form>
               <div className="flex gap-2 overflow-x-auto pb-2">
-                <Link href="/bbs" className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${!category ? "bg-brand text-white" : "bg-gray-100 text-gray-600"}`}>全部</Link>
+                <Link href="/bbs" className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${!category ? "bg-brand text-white" : "bg-slate-100 text-slate-700"}`}>全部</Link>
                 {categoriesWithCounts.map((cat) => (
-                  <Link key={cat.id} href={`/bbs?category=${cat.key}`} className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${category === cat.key ? "bg-brand text-white" : "bg-gray-100 text-gray-600"}`}>
+                  <Link key={cat.id} href={`/bbs?category=${cat.key}`} className={`shrink-0 px-3 py-1.5 rounded-full text-sm ${category === cat.key ? "bg-brand text-white" : "bg-slate-100 text-slate-700"}`}>
                     {cat.iconText} {cat.name}
                   </Link>
                 ))}
@@ -309,7 +309,7 @@ export default async function BBSPage({
               <form action="/bbs" method="get" className="flex gap-3">
                 {category && <input type="hidden" name="category" value={category} />}
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
                     type="text"
                     name="q"
@@ -327,16 +327,16 @@ export default async function BBSPage({
               <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <FileText className="w-3.5 h-3.5 text-accent" />
-                  <span className="text-xl font-bold text-gray-900">{stats.postCount}</span>
+                  <span className="text-xl font-bold text-slate-900">{stats.postCount}</span>
                 </div>
-                <span className="text-xs text-gray-500">帖子</span>
+                <span className="text-xs text-slate-600">帖子</span>
               </div>
               <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Tag className="w-3.5 h-3.5 text-accent" />
-                  <span className="text-xl font-bold text-gray-900">{stats.categoryCount}</span>
+                  <span className="text-xl font-bold text-slate-900">{stats.categoryCount}</span>
                 </div>
-                <span className="text-xs text-gray-500">分类</span>
+                <span className="text-xs text-slate-600">分类</span>
               </div>
               <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
                 <div className="flex items-center justify-center gap-1 mb-0.5">
@@ -345,7 +345,7 @@ export default async function BBSPage({
                     {stats.latestPostAt ? formatDateTime(stats.latestPostAt) : "暂无"}
                   </span>
                 </div>
-                <span className="text-xs text-gray-500">最新更新</span>
+                <span className="text-xs text-slate-600">最新更新</span>
               </div>
             </div>
 
@@ -365,10 +365,10 @@ export default async function BBSPage({
             ) : (
               <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
                 <div className="text-4xl mb-4">📭</div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-slate-900 mb-2">
                   {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
                 </h2>
-                <p className="text-sm text-gray-500 mb-5">
+                <p className="text-sm text-slate-600 mb-5">
                   {q || category ? "试试其他关键词或分类" : "成为第一个发帖的人吧！"}
                 </p>
                 {q || category ? (
@@ -437,11 +437,11 @@ export default async function BBSPage({
 
               {/* Newbie guide */}
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4 text-brand" />
                   新手发帖指南
                 </h3>
-                <ol className="space-y-1.5 text-xs text-gray-500 list-decimal list-inside">
+                <ol className="space-y-1.5 text-xs text-slate-600 list-decimal list-inside">
                   <li>点击「发布新帖」</li>
                   <li>选择合适分类</li>
                   <li>填写标题和内容</li>
@@ -453,14 +453,14 @@ export default async function BBSPage({
               {/* Hot tags */}
               {hotTags.length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                     <TrendingUp className="w-4 h-4 text-brand" />
                     热门标签
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
                     {hotTags.map(({ tag, count }) => (
                       <span key={tag} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                        #{tag} <span className="text-gray-400">{count}</span>
+                        #{tag} <span className="text-slate-500">{count}</span>
                       </span>
                     ))}
                   </div>
@@ -470,7 +470,7 @@ export default async function BBSPage({
               {/* Active contributors */}
               {topUsers.length > 0 && (
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                     <Award className="w-4 h-4 text-brand" />
                     活跃贡献者
                   </h3>
@@ -482,7 +482,7 @@ export default async function BBSPage({
                           {user.name?.charAt(0).toUpperCase() || "U"}
                         </div>
                         <span className="text-sm text-gray-700 flex-1 truncate">{user.name || "匿名"}</span>
-                        <span className="text-xs text-gray-400">{user.honorScore || 0}</span>
+                        <span className="text-xs text-slate-500">{user.honorScore || 0}</span>
                       </div>
                     ))}
                   </div>
@@ -491,7 +491,7 @@ export default async function BBSPage({
 
               {/* Related tools */}
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-1.5">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-1.5">
                   <Wrench className="w-4 h-4 text-brand" />
                   相关工具入口
                 </h3>

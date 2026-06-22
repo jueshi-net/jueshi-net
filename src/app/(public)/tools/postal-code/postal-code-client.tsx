@@ -241,6 +241,8 @@ export default function PostalCodePage() {
   const [dbTotal, setDbTotal] = useState(0);
   const [dbPage, setDbPage] = useState(1);
   const [dbTab, setDbTab] = useState<'all' | 'code' | 'city'>('all');
+  // Postal query state machine: idle | loading | exact_match | city_match | region_match | no_match | country_no_database | error
+  const [dbStatus, setDbStatus] = useState<'idle' | 'loading' | 'exact_match' | 'city_match' | 'region_match' | 'no_match' | 'country_no_database' | 'error'>('idle');
 
   // Advanced search state
   const [advancedCityQuery, setAdvancedCityQuery] = useState('');
@@ -289,6 +291,7 @@ export default function PostalCodePage() {
     setNoMatchForCountry(false);
     setAdvancedFormatResult(null);
     setSelectedAddress(null);
+    setDbStatus('idle');
   }, [setSelectedCountryCode, setInputCode]);
 
   // Validate postal code with region lookup
@@ -435,11 +438,13 @@ export default function PostalCodePage() {
       setDbResults([]);
       setDbTotal(0);
       setDbLoading(false);
+      setDbStatus('idle');
       return;
     }
 
-    // Always set loading when starting a new query (fixes stale loading on rapid type→clear)
+    // Always set loading when starting a new query
     setDbLoading(true);
+    setDbStatus('loading');
 
     // Cancel previous in-flight request
     if (abortControllerRef.current) {
@@ -462,9 +467,25 @@ export default function PostalCodePage() {
         setDbResults(results);
         setDbTotal(json.total || results.length);
         setDbPage(1);
+
+        // Set state machine status from API response
+        if (json.status === 'country_no_database') {
+          setDbStatus('country_no_database');
+        } else if (results.length === 0) {
+          setDbStatus('no_match');
+        } else if (json.status === 'exact_match') {
+          setDbStatus('exact_match');
+        } else if (json.status === 'city_match') {
+          setDbStatus('city_match');
+        } else if (json.status === 'region_match') {
+          setDbStatus('region_match');
+        } else {
+          setDbStatus(results.length > 0 ? 'exact_match' : 'no_match');
+        }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
           console.error('DB query failed:', e);
+          setDbStatus('error');
         }
       } finally {
         setDbLoading(false);
@@ -527,7 +548,7 @@ export default function PostalCodePage() {
   const joinShippingTaskChain = async (result?: DbResult) => {
     if (sessionStatus === 'loading') return;
     if (!session?.user) {
-      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      router.push('/login?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
     setTaskChainCreating(true);
@@ -574,7 +595,7 @@ export default function PostalCodePage() {
   const openTaskChainDialog = (result?: DbResult) => {
     if (sessionStatus === 'loading') return;
     if (!session?.user) {
-      router.push('/auth/signin?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
+      router.push('/login?callbackUrl=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
 
@@ -977,21 +998,37 @@ export default function PostalCodePage() {
             </div>
           </div>
         )}
-        {/* ===== 无结果状态 ===== */}
+        {/* ===== 无结果状态 — driven by state machine ===== */}
         {!dbLoading && !advancedRegionLoading && dbResults.length === 0 && advancedRegionResults.length === 0 && (dbQuery.trim() || mainSearch.trim()) && (
           <div className="bg-white rounded-xl border-2 border-amber-200 shadow-sm p-5 mb-6">
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="flex-1">
-                {noMatchForCountry ? (
+                {dbStatus === 'country_no_database' ? (
                   <>
-                    <p className="text-sm font-semibold text-gray-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
-                    <p className="text-sm text-gray-600">未找到精确结果。请尝试更完整地址、城市英文名、邮编格式，或使用官方入口确认。</p>
+                    <p className="text-sm font-semibold text-slate-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
+                    <p className="text-sm text-slate-600">请使用地址格式参考或下方官方入口确认。</p>
+                  </>
+                ) : dbStatus === 'no_match' ? (
+                  <>
+                    <p className="text-sm font-semibold text-slate-900 mb-1">未找到匹配结果</p>
+                    <p className="text-sm text-slate-600">请检查邮编格式、城市英文名，或使用官方入口确认。</p>
+                    <p className="text-xs text-slate-500 mt-1">当前国家已有邮编数据库，但输入的关键词未匹配到任何记录。</p>
+                  </>
+                ) : dbStatus === 'error' ? (
+                  <>
+                    <p className="text-sm font-semibold text-slate-900 mb-1">查询失败</p>
+                    <p className="text-sm text-slate-600">网络错误，请稍后重试。</p>
+                  </>
+                ) : noMatchForCountry ? (
+                  <>
+                    <p className="text-sm font-semibold text-slate-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
+                    <p className="text-sm text-slate-600">请尝试更完整地址、城市英文名、邮编格式，或使用官方入口确认。</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm font-semibold text-gray-900 mb-1">未找到精确结果</p>
-                    <p className="text-sm text-gray-600">请尝试更完整的地址、城市英文名或邮编格式，或使用官方入口确认。</p>
+                    <p className="text-sm font-semibold text-slate-900 mb-1">未找到匹配结果</p>
+                    <p className="text-sm text-slate-600">请尝试更完整的地址、城市英文名或邮编格式，或使用官方入口确认。</p>
                   </>
                 )}
                 {advancedRegionRecommendations?.officialLookup && (

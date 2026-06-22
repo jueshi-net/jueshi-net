@@ -138,9 +138,9 @@ export default async function PostDetailPage({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb bar */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white border-b border-slate-200">
         <div className="max-w-[1200px] mx-auto px-4 py-2.5">
-          <nav className="flex items-center gap-1 text-sm text-gray-500 flex-wrap">
+          <nav className="flex items-center gap-1 text-sm text-slate-500 flex-wrap">
             <Link href="/" className="hover:text-brand inline-flex items-center gap-0.5">
               <Home className="w-3.5 h-3.5" /> 首页
             </Link>
@@ -162,7 +162,7 @@ export default async function PostDetailPage({
           {/* Left: Topic content + comments */}
           <main className="min-w-0">
             {/* Topic header */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6 mb-4">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6 mb-4">
               {/* Category + badges */}
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 <CategoryBadge category={post.category} size="md" />
@@ -172,7 +172,7 @@ export default async function PostDetailPage({
                   </span>
                 )}
                 {post.isLocked && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-slate-600 border border-slate-200">
                     <Lock className="w-3 h-3" /> 锁定
                   </span>
                 )}
@@ -184,13 +184,13 @@ export default async function PostDetailPage({
               </h1>
 
               {/* Author + time */}
-              <div className="flex items-center gap-3 text-sm text-gray-500 pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-3 text-sm text-slate-500 pb-3 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand shrink-0">
                     {displayName[0].toUpperCase()}
                   </div>
                   <div>
-                    <div className="font-medium text-gray-700">{displayName}</div>
+                    <div className="font-medium text-slate-700">{displayName}</div>
                     <div className="text-xs text-slate-500">
                       {post.user.honorScore ? `🏆 ${post.user.honorScore}` : ""} 成长值 {post.user.growthValue || 0}
                     </div>
@@ -206,7 +206,7 @@ export default async function PostDetailPage({
             </div>
 
             {/* Topic content — forum style, not white card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-8 mb-4">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-8 mb-4">
               <div className="prose prose-sm max-w-none">
                 <PostContent content={post.content} />
               </div>
@@ -215,7 +215,7 @@ export default async function PostDetailPage({
               {post.tags && Array.isArray(post.tags) && (post.tags as string[]).length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
                   {(post.tags as string[]).map((tag: string, i: number) => (
-                    <span key={i} className="px-2.5 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
+                    <span key={i} className="px-2.5 py-1 bg-gray-100 rounded-full text-xs text-slate-600">
                       #{tag}
                     </span>
                   ))}
@@ -224,26 +224,26 @@ export default async function PostDetailPage({
 
               {/* Action bar */}
               <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-gray-100">
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-brand/5 hover:text-brand transition-colors border border-slate-200">
                   <ThumbsUp className="w-4 h-4" /> 点赞
                 </button>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-brand/5 hover:text-brand transition-colors border border-slate-200">
                   <Bookmark className="w-4 h-4" /> 收藏
                 </button>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-brand/5 hover:text-brand transition-colors border border-gray-200">
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-brand/5 hover:text-brand transition-colors border border-slate-200">
                   <Share2 className="w-4 h-4" /> 分享
                 </button>
-                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors border border-gray-200 ml-auto">
+                <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors border border-slate-200 ml-auto">
                   <Flag className="w-4 h-4" /> 举报
                 </button>
               </div>
             </div>
 
             {/* Reply floors */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-6">
+            <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6">
               <div className="flex items-center gap-2 mb-4">
                 <MessageSquare className="w-5 h-5 text-brand" />
-                <h2 className="text-lg font-bold text-gray-900">
+                <h2 className="text-lg font-bold text-slate-900">
                   回复 ({comments.length})
                 </h2>
               </div>
@@ -279,7 +279,7 @@ export default async function PostDetailPage({
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-700">
+                          <span className="text-sm font-medium text-slate-700">
                             {comment.user.name || maskEmail(comment.user.email)}
                           </span>
                           {comment.user.honorScore ? (
@@ -289,7 +289,7 @@ export default async function PostDetailPage({
                             {formatDateTime(comment.createdAt)}
                           </time>
                         </div>
-                        <div className="whitespace-pre-wrap break-words text-sm text-gray-700 leading-relaxed">
+                        <div className="whitespace-pre-wrap break-words text-sm text-slate-700 leading-relaxed">
                           {comment.content}
                         </div>
                         <div className="flex gap-3 mt-1.5">
@@ -324,20 +324,20 @@ export default async function PostDetailPage({
             <div className="flex flex-wrap gap-2 mt-4">
               <Link
                 href="/bbs"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-gray-50"
               >
                 <ArrowLeft className="w-4 h-4" /> 返回论坛
               </Link>
               <Link
                 href={`/bbs/category/${post.category.key}`}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-gray-50"
               >
                 返回「{post.category.name}」
               </Link>
               {isLoggedIn && (
                 <Link
                   href={`/bbs/${slug}/edit`}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-gray-50"
                 >
                   编辑帖子
                 </Link>
@@ -430,7 +430,7 @@ export default async function PostDetailPage({
                     <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">📌 置顶</span>
                   )}
                   {post.isLocked && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">🔒 锁定</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-slate-600 border border-slate-200">🔒 锁定</span>
                   )}
                   {!post.isPinned && !post.isLocked && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-600 border border-green-200">✅ 正常</span>
@@ -440,11 +440,11 @@ export default async function PostDetailPage({
 
               {/* Tags */}
               {post.tags && Array.isArray(post.tags) && (post.tags as string[]).length > 0 && (
-                <div className="bg-white rounded-xl border border-gray-200 p-4">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">标签</h3>
+                <div className="bg-white rounded-xl border border-slate-200 p-4">
+                  <h3 className="text-sm font-bold text-slate-900 mb-2">标签</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {(post.tags as string[]).map((tag: string, i: number) => (
-                      <span key={i} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                      <span key={i} className="px-2 py-1 bg-gray-100 rounded text-xs text-slate-600">
                         #{tag}
                       </span>
                     ))}
@@ -468,12 +468,12 @@ export default async function PostDetailPage({
               )}
 
               {/* Related tools */}
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-2">相关工具</h3>
+              <div className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="text-sm font-bold text-slate-900 mb-2">相关工具</h3>
                 <div className="space-y-1.5">
-                  <Link href="/tools/hs-code" className="block text-sm text-gray-600 hover:text-brand">📦 HS 编码查询</Link>
-                  <Link href="/tools/shipping-calculator" className="block text-sm text-gray-600 hover:text-brand">🚢 运费计算器</Link>
-                  <Link href="/tools/postal-code" className="block text-sm text-gray-600 hover:text-brand">📮 邮编查询</Link>
+                  <Link href="/tools/hs-code" className="block text-sm text-slate-600 hover:text-brand">📦 HS 编码查询</Link>
+                  <Link href="/tools/shipping-calculator" className="block text-sm text-slate-600 hover:text-brand">🚢 运费计算器</Link>
+                  <Link href="/tools/postal-code" className="block text-sm text-slate-600 hover:text-brand">📮 邮编查询</Link>
                 </div>
               </div>
             </div>

@@ -109,32 +109,41 @@ function handleRegionSearch(query: string, countryCode: string) {
     return NextResponse.json({ error: '请输入邮编', results: [], recommendations: getRecommendations(countryCode) });
   }
 
-  const normalized = query.trim().toUpperCase().replace(/[\s\-]+/g, '');
+  const normalized = query.trim().toUpperCase().replace(/[\s-]+/g, '');
   const results: any[] = [];
 
-  // Search through city mappings by postal prefix
-  for (const city of CITY_MAPPINGS) {
-    if (countryCode && city.countryCode !== countryCode) continue;
+  // CRITICAL: Only return prefix matches if the postal code format is VALID for the country.
+  // Previous bug: any code starting with a city prefix (e.g. "M99999" for Canada) returned
+  // a result, even though the code doesn't exist. Now we validate format first.
+  const countryData = allCountryData.find(c => c.code === countryCode);
+  const formatValid = countryData ? new RegExp(countryData.formatRegex).test(normalized) : false;
 
-    // Check if the postal code starts with the city's prefix
-    if (normalized.startsWith(city.postalPrefix)) {
-      const officialLink = getOfficialLink(city.countryCode);
-      results.push({
-        postalCode: query.trim(),
-        normalizedPostalCode: normalized,
-        country: SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.name || city.countryCode,
-        countryCode: city.countryCode,
-        city: city.en,
-        cityCn: city.cn,
-        province: city.province,
-        region: city.province,
-        postalRange: city.postalRange,
-        timezone: getTimezone(city.countryCode) || '',
-        phoneCode: getPhoneCode(city.countryCode) || '',
-        officialLookupUrl: officialLink?.lookupUrl || officialLink?.officialUrl || '',
-        officialName: officialLink?.nameEn || '',
-        matchType: normalized === city.postalPrefix ? 'exact' : 'prefix',
-      });
+  if (formatValid) {
+    // Search through city mappings by postal prefix — ONLY when format is valid
+    for (const city of CITY_MAPPINGS) {
+      if (countryCode && city.countryCode !== countryCode) continue;
+
+      // Check if the postal code starts with the city's prefix
+      if (normalized.startsWith(city.postalPrefix)) {
+        const officialLink = getOfficialLink(city.countryCode);
+        results.push({
+          postalCode: query.trim(),
+          normalizedPostalCode: normalized,
+          country: SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.name || city.countryCode,
+          countryCode: city.countryCode,
+          city: city.en,
+          cityCn: city.cn,
+          province: city.province,
+          region: city.province,
+          postalRange: city.postalRange,
+          timezone: getTimezone(city.countryCode) || '',
+          phoneCode: getPhoneCode(city.countryCode) || '',
+          officialLookupUrl: officialLink?.lookupUrl || officialLink?.officialUrl || '',
+          officialName: officialLink?.nameEn || '',
+          matchType: normalized === city.postalPrefix ? 'exact' : 'prefix',
+          note: '邮编格式正确，区域信息基于邮编前缀推断，具体地址请以数据库查询或官方入口为准。',
+        });
+      }
     }
   }
 
@@ -167,14 +176,19 @@ function handleRegionSearch(query: string, countryCode: string) {
     }
   }
 
-  // If country is selected but no results, return explicit "no match" with official entry
+  // If country is selected but no results, check if country has DB coverage
   if (results.length === 0 && countryCode) {
     const officialLink = getOfficialLink(countryCode);
     const country = SUPPORTED_COUNTRIES.find(c => c.code === countryCode);
+    // Only set noMatchForSelectedCountry when the country truly has NO database
+    // Countries with DB: CA, US, GB, AU, NZ, JP, SG, MY
+    const COUNTRIES_WITH_DB = new Set(['CA', 'US', 'GB', 'AU', 'NZ', 'JP', 'SG', 'MY']);
+    const hasDb = COUNTRIES_WITH_DB.has(countryCode.toUpperCase());
     return NextResponse.json({
       results: [],
       total: 0,
-      noMatchForSelectedCountry: true,
+      // Only true when country has NO database — not when it has DB but no match
+      noMatchForSelectedCountry: !hasDb,
       selectedCountry: {
         code: countryCode,
         name: country?.name || countryCode,

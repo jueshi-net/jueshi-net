@@ -154,7 +154,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg whitespace-nowrap"
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-slate-700 hover:text-teal-600 transition-colors rounded-lg whitespace-nowrap"
                 >
                   <Icon className="w-3.5 h-3.5" />
                   <span>{link.label}</span>
@@ -166,7 +166,7 @@ export default function Header() {
             <div ref={toolsMenuRef} className="relative">
               <button 
                 onClick={() => setToolsMenuOpen(!toolsMenuOpen)}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-gray-600 hover:text-teal-600 transition-colors rounded-lg"
+                className="flex items-center gap-1 px-2.5 py-1.5 text-sm text-slate-700 hover:text-teal-600 transition-colors rounded-lg"
               >
                 <Wrench className="w-3.5 h-3.5" />
                 <span>工具</span>
@@ -184,7 +184,7 @@ export default function Header() {
                       <tool.icon className="w-4 h-4 text-teal-600 shrink-0" />
                       <div>
                         <div className="text-sm font-medium text-gray-800">{tool.label}</div>
-                        <div className="text-[10px] text-gray-500">{tool.desc}</div>
+                        <div className="text-[10px] text-slate-600">{tool.desc}</div>
                       </div>
                     </Link>
                   ))}
@@ -197,14 +197,14 @@ export default function Header() {
           <div className="flex items-center gap-2">
             {/* Search bar */}
             <div className="hidden md:flex items-center relative">
-              <Search className="absolute left-3 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+              <Search className="absolute left-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 placeholder="搜索工具…"
-                className="pl-9 pr-14 h-9 w-32 lg:w-44 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400"
+                className="pl-9 pr-14 h-9 w-32 lg:w-44 bg-gray-100 rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-slate-500"
               />
               <button
                 onClick={handleSearch}
@@ -221,7 +221,7 @@ export default function Header() {
                 className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="通知"
               >
-                <Bell className="w-4 h-4 text-gray-600" />
+                <Bell className="w-4 h-4 text-slate-700" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
               </Link>
             ) : (
@@ -230,7 +230,7 @@ export default function Header() {
                 className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="通知（需登录）"
               >
-                <Bell className="w-4 h-4 text-gray-600" />
+                <Bell className="w-4 h-4 text-slate-700" />
               </Link>
             )}
 
@@ -244,8 +244,8 @@ export default function Header() {
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
                     <div className="px-3 py-2 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                      <p className="text-xs text-gray-500">{isAdmin ? '管理员' : '注册用户'}</p>
+                      <p className="text-sm font-semibold text-slate-900 truncate">{userEmail}</p>
+                      <p className="text-xs text-slate-600">{isAdmin ? '管理员' : '注册用户'}</p>
                     </div>
                     <Link href="/workbench" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <LayoutDashboard className="w-4 h-4" /> 工作台
@@ -295,13 +295,13 @@ export default function Header() {
           <div className="fixed top-0 right-0 h-dvh w-[86vw] max-w-[360px] bg-white shadow-2xl z-[70] lg:hidden flex flex-col">
             {/* Drawer header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
-              <span className="font-bold text-gray-900 text-lg">菜单</span>
+              <span className="font-bold text-slate-900 text-lg">菜单</span>
               <button 
                 onClick={() => setMobileOpen(false)} 
                 className="p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
                 aria-label="关闭菜单"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-slate-700" />
               </button>
             </div>
             
@@ -317,9 +317,9 @@ export default function Header() {
                         key={link.href} 
                         href={link.href} 
                         onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-900 hover:bg-gray-50 transition-colors min-h-[48px]"
                       >
-                        <Icon className="w-5 h-5 text-gray-500 shrink-0" />
+                        <Icon className="w-5 h-5 text-slate-600 shrink-0" />
                         <span className="font-medium">{link.label}</span>
                       </Link>
                     );
@@ -329,10 +329,10 @@ export default function Header() {
                 {/* Tool categories accordion */}
                 <div className="px-4 mb-4">
                   <details className="group">
-                    <summary className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px] cursor-pointer list-none">
-                      <Wrench className="w-5 h-5 text-gray-500 shrink-0" />
+                    <summary className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-900 hover:bg-gray-50 transition-colors min-h-[48px] cursor-pointer list-none">
+                      <Wrench className="w-5 h-5 text-slate-600 shrink-0" />
                       <span className="font-medium">工具分类</span>
-                      <ChevronDown className="w-4 h-4 ml-auto text-gray-400 group-open:rotate-180 transition-transform" />
+                      <ChevronDown className="w-4 h-4 ml-auto text-slate-500 group-open:rotate-180 transition-transform" />
                     </summary>
                     <div className="pl-11 pr-2 pb-2 pt-1 space-y-0.5">
                       {TOOL_CATEGORIES.map((tool) => (
@@ -342,7 +342,7 @@ export default function Header() {
                           onClick={() => setMobileOpen(false)}
                           className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors min-h-[44px] text-sm"
                         >
-                          <tool.icon className="w-4 h-4 text-gray-400 shrink-0" />
+                          <tool.icon className="w-4 h-4 text-slate-500 shrink-0" />
                           <span>{tool.label}</span>
                         </Link>
                       ))}
@@ -353,14 +353,14 @@ export default function Header() {
                 {/* Search */}
                 <div className="px-4 mb-4">
                   <div className="flex items-center gap-2">
-                    <Search className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Search className="w-4 h-4 text-slate-500 shrink-0" />
                     <input
                       type="text"
                       placeholder="搜索工具…"
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
                       onKeyDown={handleSearchKeyDown}
-                      className="flex-1 bg-gray-100 rounded-lg text-sm px-3 py-2.5 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-gray-400 min-h-[44px]"
+                      className="flex-1 bg-gray-100 rounded-lg text-sm px-3 py-2.5 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all placeholder:text-slate-500 min-h-[44px]"
                     />
                     <button
                       onClick={() => { handleSearch(); setMobileOpen(false); }}
@@ -377,32 +377,32 @@ export default function Header() {
                 {isLoggedIn ? (
                   <div className="px-4 space-y-1">
                     <div className="px-3 py-3 border-b border-gray-100 mb-2">
-                      <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{isAdmin ? '管理员' : '注册用户'}</p>
+                      <p className="text-sm font-semibold text-slate-900 truncate">{userEmail}</p>
+                      <p className="text-xs text-slate-600 mt-0.5">{isAdmin ? '管理员' : '注册用户'}</p>
                     </div>
                     <Link 
                       href="/workbench" 
                       onClick={() => setMobileOpen(false)} 
-                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-900 hover:bg-gray-50 transition-colors min-h-[48px]"
                     >
-                      <LayoutDashboard className="w-5 h-5 text-gray-500 shrink-0" /> 
+                      <LayoutDashboard className="w-5 h-5 text-slate-600 shrink-0" /> 
                       <span className="font-medium">工作台</span>
                     </Link>
                     <Link 
                       href="/workspace/notifications" 
                       onClick={() => setMobileOpen(false)} 
-                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-900 hover:bg-gray-50 transition-colors min-h-[48px]"
                     >
-                      <Bell className="w-5 h-5 text-gray-500 shrink-0" /> 
+                      <Bell className="w-5 h-5 text-slate-600 shrink-0" /> 
                       <span className="font-medium">通知中心</span>
                     </Link>
                     {isAdmin && (
                       <Link 
                         href="/admin" 
                         onClick={() => setMobileOpen(false)} 
-                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-900 hover:bg-gray-50 transition-colors min-h-[48px]"
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg text-slate-900 hover:bg-gray-50 transition-colors min-h-[48px]"
                       >
-                        <ShieldCheck className="w-5 h-5 text-gray-500 shrink-0" /> 
+                        <ShieldCheck className="w-5 h-5 text-slate-600 shrink-0" /> 
                         <span className="font-medium">管理后台</span>
                       </Link>
                     )}
