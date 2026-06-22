@@ -1065,6 +1065,7 @@ export default function PostalCodePage() {
               )}
               <span className="text-xs text-gray-400 ml-auto">找到 {dbTotal.toLocaleString()} 条记录</span>
             </div>
+            <p className="text-xs text-gray-400 mb-3">地图参考按城市/地区搜索，不代表精确邮编位置。</p>
             {dbStatus === 'prefix_range_match' && (
               <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-xs text-amber-800">
@@ -1099,9 +1100,9 @@ export default function PostalCodePage() {
                       <button onClick={() => copyText(r.postalCode, `postal-${r.id}`)} className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
                         {copiedField === `postal-${r.id}` ? "✅ 已复制" : "复制邮编"}
                       </button>
-                      {/* Map reference — uses OpenStreetMap, no API key needed */}
+                      {/* Map reference — uses OpenStreetMap, no API key needed. Query uses city+region+country only, NOT postal code */}
                       {r.city && (
-                        <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.postalCode}, ${r.city}, ${r.province || r.adminName1 || ''}, ${r.country}`)}`}
+                        <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.city}, ${r.province || r.adminName1 || ''}, ${r.country}`)}`}
                           target="_blank" rel="noopener noreferrer"
                           className="px-2 py-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors inline-flex items-center gap-1">
                           <MapPin className="w-3 h-3" /> 地图参考
@@ -1422,9 +1423,9 @@ export default function PostalCodePage() {
                             className="px-2 py-1 text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 rounded transition-colors">
                             {copiedField === `region-adv-${idx}` ? '✅ 已复制' : '复制城市+省+邮编'}
                           </button>
-                          {/* Map reference — uses OpenStreetMap, no API key needed */}
+                          {/* Map reference — uses OpenStreetMap, no API key needed. Query uses city+region+country only, NOT postal code */}
                           {r.city && r.province && (
-                            <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.postalCode}, ${r.city}, ${r.province}, ${r.country}`)}`}
+                            <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.city}, ${r.province}, ${r.country}`)}`}
                               target="_blank" rel="noopener noreferrer"
                               className="px-2 py-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors inline-flex items-center gap-1">
                               <MapPin className="w-3 h-3" /> 地图参考
