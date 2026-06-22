@@ -7,7 +7,8 @@ function normalizePostal(input: string): string {
 
 function looksLikePostalCode(q: string): boolean {
   const normalized = normalizePostal(q);
-  return /^[A-Z0-9]{2,10}$/.test(normalized);
+  // Must contain at least one digit — pure-alpha strings are city names
+  return /^[A-Z0-9]{2,10}$/.test(normalized) && /\d/.test(normalized);
 }
 
 /**
@@ -33,8 +34,8 @@ export async function GET(req: NextRequest) {
     let params: any[];
 
     if (action === 'search-city' || isCity) {
-      // City search — use indexed countryCode + city prefix match
-      const cityPrefix = query.trim().slice(0, 3);
+      // City search — use full query for precise matching
+      const cityQuery = query.trim();
       sql = `
         SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
                "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
@@ -42,9 +43,9 @@ export async function GET(req: NextRequest) {
                "isActive", "createdAt", "updatedAt"
         FROM postal_codes
         WHERE "isActive" = true
-        AND city ILIKE $1
+        AND (city ILIKE $1 OR "areaName" ILIKE $1)
       `;
-      params = [`${cityPrefix}%`];
+      params = [`${cityQuery}%`];
       if (country) {
         sql += ` AND "countryCode" = $2`;
         params.push(country);

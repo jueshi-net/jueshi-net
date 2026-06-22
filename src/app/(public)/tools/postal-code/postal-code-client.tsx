@@ -77,7 +77,9 @@ function normalizePostal(input: string): string {
 
 function looksLikePostalCode(q: string): boolean {
   const normalized = normalizePostal(q);
-  return /^[A-Z0-9]{2,10}$/.test(normalized);
+  // Must contain at least one digit to be considered a postal code
+  // Pure-alpha strings like "Toronto", "Tokyo", "Calgary" are city names
+  return /^[A-Z0-9]{2,10}$/.test(normalized) && /\d/.test(normalized);
 }
 
 const STORAGE_KEY = 'postal-code-tool-state';
@@ -744,10 +746,10 @@ export default function PostalCodePage() {
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-4">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                <Database className="w-3.5 h-3.5" /> 全球邮编库
+                <Database className="w-3.5 h-3.5" /> 邮编查询
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                {SUPPORTED_COUNTRIES.length}+ 国家
+                {SUPPORTED_COUNTRIES.length}+ 国家地址/邮编资料
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
                 地址核对
@@ -815,7 +817,7 @@ export default function PostalCodePage() {
             <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-teal-50 rounded-lg border border-teal-100">
               <Database className="w-4 h-4 text-teal-600" />
               <span className="text-sm font-medium text-teal-700">当前查询：{country.flag} {country.name}邮编数据库</span>
-              <span className="text-xs text-teal-500 ml-auto">{SUPPORTED_COUNTRIES.length}+ 国家可选</span>
+              <span className="text-xs text-teal-500 ml-auto">{SUPPORTED_COUNTRIES.length}+ 国家资料</span>
             </div>
             {/* 搜索国家 */}
             <div className="flex flex-wrap gap-2">
