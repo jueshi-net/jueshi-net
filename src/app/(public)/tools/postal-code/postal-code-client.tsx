@@ -165,7 +165,8 @@ export default function PostalCodePage() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
   const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
-  const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('postal');
+  const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('region');
+  const [mainSearch, setMainSearch] = useState('');
   const [taskChainCreating, setTaskChainCreating] = useState(false);
   const [showTaskChainDialog, setShowTaskChainDialog] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Record<string, string> | null>(null);
@@ -699,6 +700,26 @@ export default function PostalCodePage() {
     }
   }, [queryMode, selectedCountryCode, searchAdvancedFormat]);
 
+  // Main unified search handler — routes postal codes to region lookup, city/address to DB search
+  const handleMainSearch = () => {
+    const q = mainSearch.trim();
+    if (!q) return;
+    if (looksLikePostalCode(q)) {
+      setQueryMode('region');
+      setAdvancedRegionQuery(q);
+      searchAdvancedRegion(q);
+    } else {
+      setDbQuery(q);
+      queryDb(q, selectedCountryCode);
+    }
+    trackEvent.postalQuery();
+  };
+
+  // Scroll to the official links section
+  const scrollToOfficialLinks = () => {
+    document.getElementById('official-links')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ===== HERO ===== */}
@@ -737,7 +758,7 @@ export default function PostalCodePage() {
             </div>
 
             <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              {country.flag} 国际地址与邮编助手
+              海外地址与邮编助手
             </h1>
             <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
               支持输入城市、邮编、州省、地址关键词，查询精确邮编、邮编范围、地址格式和官方查询入口。适用于跨境电商、国际物流、留学、海外生活等场景。
@@ -783,25 +804,60 @@ export default function PostalCodePage() {
           </div>
         )}
 
-        {/* ===== QUERY MODE TABS ===== */}
-        <div className="flex gap-2 mb-6">
-          <button onClick={() => setQueryMode('postal')}
-            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
-              queryMode === 'postal' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
-            }`}>
-            <Search className="w-4 h-4 inline mr-1.5" />查邮编/精确查询
-          </button>
+        {/* ===== MAIN SEARCH CARD ===== */}
+        <div className={cardStyles.base + ' mb-6'}>
+          <div className="p-5">
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  className={`${inputStyles} pl-11 text-base`}
+                  placeholder="输入邮编、城市、州省、地址关键词，例如 M5V 3L9 / Toronto / Tokyo / 90210"
+                  value={mainSearch}
+                  onChange={e => setMainSearch(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleMainSearch()}
+                />
+              </div>
+              <button onClick={handleMainSearch}
+                className={`${buttonVariants.primary} px-6 text-base shadow-sm`}>
+                <Search className="w-4 h-4" />
+                开始查询
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== FUNCTION ENTRY CARDS ===== */}
+        <div className="grid md:grid-cols-3 gap-4 mb-6">
           <button onClick={() => setQueryMode('region')}
-            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
-              queryMode === 'region' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
-            }`}>
-            <MapPin className="w-4 h-4 inline mr-1.5" />查地区
+            className={`text-left p-5 rounded-xl border transition-all ${queryMode === 'region' ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 bg-white hover:border-teal-300 hover:shadow-sm'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h3 className="font-bold text-gray-900">精确邮编查询</h3>
+            </div>
+            <p className="text-sm text-gray-500 leading-relaxed">适合已有邮编、地址片段或完整地址时使用</p>
           </button>
           <button onClick={() => setQueryMode('format')}
-            className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
-              queryMode === 'format' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
-            }`}>
-            <Info className="w-4 h-4 inline mr-1.5" />查地址格式
+            className={`text-left p-5 rounded-xl border transition-all ${queryMode === 'format' ? 'border-teal-500 bg-teal-50 shadow-sm' : 'border-gray-200 bg-white hover:border-teal-300 hover:shadow-sm'}`}>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-gray-900">地址格式查询</h3>
+            </div>
+            <p className="text-sm text-gray-500 leading-relaxed">查看国家/地区收件地址写法和格式</p>
+          </button>
+          <button onClick={scrollToOfficialLinks}
+            className="text-left p-5 rounded-xl border border-gray-200 bg-white hover:border-green-300 hover:shadow-sm transition-all">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+                <ExternalLink className="w-5 h-5 text-green-600" />
+              </div>
+              <h3 className="font-bold text-gray-900">官方入口确认</h3>
+            </div>
+            <p className="text-sm text-gray-500 leading-relaxed">跳转官方邮编/地址查询入口进行最终确认</p>
           </button>
         </div>
 
@@ -952,14 +1008,18 @@ export default function PostalCodePage() {
           </div>
         )}
 
-        {/* ===== CITY SEARCH MODE PANEL (查邮编) ===== */}
-        {queryMode === 'postal' && (
-          <div className={cardStyles.base + ' mb-6'}>
-            <div className="p-5 border-b border-gray-100">
+        {/* ===== CITY RANGE SEARCH (辅助参考) ===== */}
+        <div className={cardStyles.base + ' mb-6'}>
+          <div className="p-5 border-b border-gray-100">
+            <div className="flex items-center gap-2">
               <h2 className={cardStyles.header}>
-                <Globe className="w-5 h-5 text-teal-600" />
+                <Globe className="w-5 h-5 text-gray-400" />
                 城市/地区邮编范围查询
               </h2>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 border border-gray-200">
+                辅助参考
+              </span>
+            </div>
               <p className="text-sm text-gray-500 mt-1">
                 输入城市名（中文或英文），查询邮编范围、地址格式和官方查询入口。支持缩写（如 LA、多伦多）。
               </p>
@@ -1097,10 +1157,9 @@ export default function PostalCodePage() {
                 </div>
               )}
             </div>
-          </div>
-        )}
+            </div>
 
-        {/* ===== REGION SEARCH MODE PANEL (查地区) ===== */}
+            {/* ===== REGION SEARCH MODE PANEL (查地区) ===== */}
         {queryMode === 'region' && (
           <div className={cardStyles.base + ' mb-6'}>
             <div className="p-5 border-b border-gray-100">
@@ -1771,7 +1830,7 @@ export default function PostalCodePage() {
             </div>
 
             {/* Official Lookup Links */}
-            <div className={cardStyles.base}>
+            <div id="official-links" className={cardStyles.base}>
               <div className="p-4 border-b border-gray-100">
                 <h2 className={cardStyles.header}>
                   <ExternalLink className="w-4 h-4 text-green-600" />
