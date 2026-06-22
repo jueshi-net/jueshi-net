@@ -1,4 +1,5 @@
-import { requireAdmin } from "@/lib/auth-guard";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { AdminUserCommunityDetail } from "./detail-client";
@@ -10,8 +11,8 @@ export default async function AdminUserCommunityDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const authRes = await requireAdmin();
-  if (authRes instanceof Response) return authRes;
+  const session = await auth();
+  if (!session || (session.user as any)?.role !== "admin") redirect("/login");
 
   const { id } = await params;
 
