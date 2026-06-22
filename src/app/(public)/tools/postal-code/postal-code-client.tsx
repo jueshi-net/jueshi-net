@@ -1099,6 +1099,14 @@ export default function PostalCodePage() {
                       <button onClick={() => copyText(r.postalCode, `postal-${r.id}`)} className="px-2 py-1 text-xs bg-gray-100 hover:bg-teal-50 hover:text-teal-700 rounded transition-colors">
                         {copiedField === `postal-${r.id}` ? "✅ 已复制" : "复制邮编"}
                       </button>
+                      {/* Map reference — uses OpenStreetMap, no API key needed */}
+                      {r.city && (
+                        <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.postalCode}, ${r.city}, ${r.province || r.adminName1 || ''}, ${r.country}`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="px-2 py-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors inline-flex items-center gap-1">
+                          <MapPin className="w-3 h-3" /> 地图参考
+                        </a>
+                      )}
                       {getOfficialLink(r.countryCode) && (
                         <a href={getOfficialLink(r.countryCode)!.lookupUrl || getOfficialLink(r.countryCode)!.officialUrl} target="_blank" rel="noopener noreferrer" className="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors inline-flex items-center gap-1">
                           <ExternalLink className="w-3 h-3" /> 官方查询
@@ -1129,15 +1137,25 @@ export default function PostalCodePage() {
             <div className="flex items-center gap-2 mb-4">
               <MapPin className="w-5 h-5 text-indigo-600" />
               <h2 className="text-lg font-bold text-gray-900">查询结果</h2>
+              {advancedRegionResults.some(r => r.matchType !== 'exact') && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">辅助参考</span>
+              )}
               <span className="text-xs text-gray-400 ml-auto">找到 {advancedRegionResults.length} 条匹配</span>
             </div>
+            {advancedRegionResults.some(r => r.matchType !== 'exact') && (
+              <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-xs text-amber-800">
+                  ⚠️ 以下结果中包含基于邮编前缀的区域参考，不代表完整邮编存在。精确邮编请以数据库查询结果或官方入口确认为准。
+                </p>
+              </div>
+            )}
             <div className="grid sm:grid-cols-2 gap-3">
               {advancedRegionResults.map((r, idx) => (
                 <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <span className="font-mono text-xl font-bold text-indigo-600">{r.postalCode}</span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${r.matchType === "exact" ? "bg-green-100 text-green-700" : r.matchType === "prefix" ? "bg-blue-100 text-blue-700" : "bg-amber-100 text-amber-700"}`}>
-                      {r.matchType === "exact" ? "精确匹配" : r.matchType === "prefix" ? "前缀匹配" : "格式匹配"}
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${r.matchType === "exact" ? "bg-green-100 text-green-700" : r.matchType === "prefix" ? "bg-amber-100 text-amber-700" : "bg-amber-100 text-amber-700"}`}>
+                      {r.matchType === "exact" ? "精确匹配" : r.matchType === "prefix" ? "前缀范围参考" : "格式参考"}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-sm">
@@ -1340,8 +1358,8 @@ export default function PostalCodePage() {
         )}
 
 
-            {/* ===== REGION SEARCH MODE PANEL (查地区) ===== */}
-        {queryMode === 'region' && (
+            {/* ===== REGION SEARCH MODE PANEL (查地区) — DEDUP: no separate input, results shown below main search ===== */}
+        {queryMode === 'region' && (advancedRegionResults.length > 0 || (advancedRegionQuery && !advancedRegionLoading)) && (
           <div className={cardStyles.base + ' mb-6'}>
             <div className="p-5 border-b border-gray-100">
               <h2 className={cardStyles.header}>
@@ -1353,32 +1371,6 @@ export default function PostalCodePage() {
               </p>
             </div>
             <div className="p-5">
-              <div className="flex gap-3 mb-4">
-                <input
-                  className={`${inputStyles} flex-1 font-mono`}
-                  placeholder={country.format || '输入邮编（如 M5V2T6、10001、SW1A1AA）...'}
-                  value={advancedRegionQuery}
-                  onChange={e => setAdvancedRegionQuery(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && searchAdvancedRegion(advancedRegionQuery)}
-                />
-                <button onClick={() => searchAdvancedRegion(advancedRegionQuery)} disabled={advancedRegionLoading}
-                  className={buttonVariants.primary}>
-                  {advancedRegionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-                  {advancedRegionLoading ? '查询中…' : '查询'}
-                </button>
-              </div>
-
-              {/* Quick examples */}
-              <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="text-xs text-gray-400">示例：</span>
-                {['M5V2T6', '10001', 'SW1A1AA', '100-0001', '2000', '018956'].map(code => (
-                  <button key={code} onClick={() => { setAdvancedRegionQuery(code); searchAdvancedRegion(code); }}
-                    className="px-2.5 py-1 text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 rounded-md font-mono transition-colors">
-                    {code}
-                  </button>
-                ))}
-              </div>
-
               {/* Loading */}
               {advancedRegionLoading && (
                 <div className="flex items-center justify-center py-8 text-gray-500 bg-gray-50 rounded-lg">
@@ -1386,10 +1378,22 @@ export default function PostalCodePage() {
                 </div>
               )}
 
-              {/* Results */}
+              {/* Results — prefix matches shown as 参考, NOT 查询结果 */}
               {!advancedRegionLoading && advancedRegionResults.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-xs text-gray-400">找到 {advancedRegionResults.length} 条匹配</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-400">找到 {advancedRegionResults.length} 条匹配</p>
+                    {advancedRegionResults.some(r => r.matchType !== 'exact') && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">辅助参考</span>
+                    )}
+                  </div>
+                  {advancedRegionResults.some(r => r.matchType !== 'exact') && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-xs text-amber-800">
+                        ⚠️ 以下结果中包含基于邮编前缀的区域参考，不代表完整邮编存在。精确邮编请以数据库查询结果或官方入口确认为准。
+                      </p>
+                    </div>
+                  )}
                   <div className="grid sm:grid-cols-2 gap-3">
                     {advancedRegionResults.map((r, idx) => (
                       <div key={idx} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -1397,10 +1401,10 @@ export default function PostalCodePage() {
                           <span className="font-mono text-xl font-bold text-indigo-600">{r.postalCode}</span>
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                             r.matchType === 'exact' ? 'bg-green-100 text-green-700' :
-                            r.matchType === 'prefix' ? 'bg-blue-100 text-blue-700' :
+                            r.matchType === 'prefix' ? 'bg-amber-100 text-amber-700' :
                             'bg-amber-100 text-amber-700'
                           }`}>
-                            {r.matchType === 'exact' ? '精确匹配' : r.matchType === 'prefix' ? '前缀匹配' : '格式匹配'}
+                            {r.matchType === 'exact' ? '精确匹配' : r.matchType === 'prefix' ? '前缀范围参考' : '格式参考'}
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
@@ -1412,12 +1416,20 @@ export default function PostalCodePage() {
                           {r.phoneCode && <div><span className="text-gray-400 text-xs">电话区号</span><div className="text-gray-700">{r.phoneCode}</div></div>}
                           {r.postalRange && <div className="col-span-2"><span className="text-gray-400 text-xs">邮编范围</span><div className="font-mono text-teal-700">{r.postalRange}</div></div>}
                         </div>
-                        {/* Action buttons */}
+                        {/* Action buttons — including map reference */}
                         <div className="flex flex-wrap gap-1.5 border-t border-gray-200 pt-2 mt-2">
                           <button onClick={() => copyText(`${r.city}, ${r.province} ${r.postalCode}`.trim(), `region-adv-${idx}`)}
                             className="px-2 py-1 text-xs bg-gray-100 hover:bg-indigo-50 hover:text-indigo-700 rounded transition-colors">
                             {copiedField === `region-adv-${idx}` ? '✅ 已复制' : '复制城市+省+邮编'}
                           </button>
+                          {/* Map reference — uses OpenStreetMap, no API key needed */}
+                          {r.city && r.province && (
+                            <a href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(`${r.postalCode}, ${r.city}, ${r.province}, ${r.country}`)}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="px-2 py-1 text-xs bg-green-50 hover:bg-green-100 text-green-700 rounded transition-colors inline-flex items-center gap-1">
+                              <MapPin className="w-3 h-3" /> 地图参考
+                            </a>
+                          )}
                           {r.officialLookupUrl && (
                             <a href={r.officialLookupUrl} target="_blank" rel="noopener noreferrer"
                               className="px-2 py-1 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded transition-colors inline-flex items-center gap-1">
@@ -1434,7 +1446,7 @@ export default function PostalCodePage() {
                 </div>
               )}
 
-              {/* Recommendations when no results */}
+              {/* Recommendations when no results — NO fake map */}
               {!advancedRegionLoading && advancedRegionQuery && advancedRegionResults.length === 0 && advancedRegionRecommendations && (
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
@@ -1466,15 +1478,6 @@ export default function PostalCodePage() {
                       <Sparkles className="w-4 h-4" /> 手动地址格式生成器
                     </Link>
                   </div>
-                </div>
-              )}
-
-              {/* Initial empty state */}
-              {!advancedRegionLoading && !advancedRegionQuery && (
-                <div className="text-center py-6 bg-gray-50 rounded-lg">
-                  <MapPin className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">输入邮编，查询所属地区信息</p>
-                  <p className="text-xs text-gray-300 mt-1">支持各国邮编格式（去掉空格和连字符）</p>
                 </div>
               )}
             </div>

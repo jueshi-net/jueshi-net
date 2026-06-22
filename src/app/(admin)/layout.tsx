@@ -23,7 +23,7 @@ const navSections = [
       { href: "/admin/users", label: "用户管理", icon: Users },
       { href: "/admin/feedback", label: "反馈管理", icon: MessageSquare },
       { href: "/admin/tool-reviews", label: "工具点评", icon: FileCheck },
-      { href: "/admin/levels", label: "等级与勋章", icon: Award },
+      { href: "/admin/levels", label: "等级管理", icon: Award },
       { href: "/admin/growth-logs", label: "成长值流水", icon: TrendingUp },
       { href: "/admin/invites", label: "邀请码管理", icon: Shield },
       { href: "/admin/rewards/items", label: "可兑换奖励", icon: Award },
