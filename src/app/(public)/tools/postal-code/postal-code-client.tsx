@@ -252,6 +252,7 @@ export default function PostalCodePage() {
   const [advancedRegionResults, setAdvancedRegionResults] = useState<any[]>([]);
   const [advancedRegionLoading, setAdvancedRegionLoading] = useState(false);
   const [advancedRegionRecommendations, setAdvancedRegionRecommendations] = useState<any>(null);
+  const [noMatchForCountry, setNoMatchForCountry] = useState(false);
 
   const [advancedFormatResult, setAdvancedFormatResult] = useState<any>(null);
   const [advancedFormatBasicInfo, setAdvancedFormatBasicInfo] = useState<any>(null);
@@ -652,6 +653,7 @@ export default function PostalCodePage() {
     const controller = new AbortController();
     advancedRegionAbortRef.current = controller;
     setAdvancedRegionLoading(true);
+    setNoMatchForCountry(false);
     try {
       const res = await fetch(`/api/postal-codes/advanced?mode=region&q=${encodeURIComponent(q)}&country=${selectedCountryCode}`, {
         signal: controller.signal,
@@ -659,6 +661,7 @@ export default function PostalCodePage() {
       const json = await res.json();
       setAdvancedRegionResults(json.results || []);
       setAdvancedRegionRecommendations(json.recommendations || null);
+      setNoMatchForCountry(json.noMatchForSelectedCountry || false);
       trackEvent.custom('postal-code', 'advanced_region_search');
     } catch (e: any) {
       if (e.name !== 'AbortError') console.error('Advanced region search failed:', e);
@@ -702,14 +705,18 @@ export default function PostalCodePage() {
     }
   }, [queryMode, selectedCountryCode, searchAdvancedFormat]);
 
-  // Main unified search handler — routes postal codes to region lookup, city/address to DB search
+  // Main unified search handler — routes postal codes to BOTH DB + region lookup, city/address to DB search
   const handleMainSearch = () => {
     const q = mainSearch.trim();
     if (!q) return;
     if (looksLikePostalCode(q)) {
+      // For postal codes: query BOTH the real database (country-scoped) AND region lookup (format info)
       setQueryMode('region');
       setAdvancedRegionQuery(q);
       searchAdvancedRegion(q);
+      // ALSO query the real database — this is the truth source, not static city mappings
+      setDbQuery(q);
+      queryDb(q, selectedCountryCode);
     } else {
       setDbQuery(q);
       queryDb(q, selectedCountryCode);
@@ -898,7 +905,7 @@ export default function PostalCodePage() {
           <div className="flex items-center gap-2 mb-3">
             <Database className="w-5 h-5 text-teal-600" />
             <h2 className="text-lg font-bold text-gray-900">2. 数据库邮编查询</h2>
-            <span className="text-xs text-gray-400 ml-auto">当前查询：{country.flag} {country.name}邮编数据库</span>
+            <span className="text-xs text-gray-400 ml-auto">当前查询：{country.flag} {country.name}{(() => { const c = getCoverageStatus(selectedCountryCode); return c.status === 'full' || c.status === 'partial' ? '邮编数据库' : '邮编资料'; })()}</span>
           </div>
           <div className="flex gap-3 mb-3">
             <div className="relative flex-1">
@@ -918,12 +925,65 @@ export default function PostalCodePage() {
             </button>
           </div>
           <p className="text-xs text-gray-400">数据来源于公开邮编数据源，结果仅供参考。精确邮编以数据库查询、完整地址或官方入口确认为准。</p>
+          {/* 数据状态卡 */}
+          {(() => {
+            const coverage = getCoverageStatus(selectedCountryCode);
+            const icon = getCoverageIcon(coverage.status);
+            const label = getCoverageLabel(coverage.status);
+            const officialLink = getOfficialLink(selectedCountryCode);
+            const hasDb = coverage.status === 'full' || coverage.status === 'partial';
+            return (
+              <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="font-semibold text-gray-700">{country.flag} {country.name} 数据状态</span>
+                  <span className={`px-1.5 py-0.5 rounded-full font-medium ${coverage.status === 'full' ? 'bg-green-100 text-green-700' : coverage.status === 'partial' ? 'bg-amber-100 text-amber-700' : coverage.status === 'none' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                    {icon} {label}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-500">
+                  <span>数据库查询：{hasDb ? '✅ 支持' : '❌ 暂不支持'}</span>
+                  {coverage.recordCount != null && <span>记录数：{coverage.recordCount.toLocaleString()}</span>}
+                  {coverage.notes && <span>备注：{coverage.notes}</span>}
+                  {officialLink && <span>官方入口：<a href={officialLink.lookupUrl || officialLink.officialUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{officialLink.nameEn}</a></span>}
+                </div>
+                {!hasDb && (
+                  <p className="mt-1.5 text-amber-600">⚠️ 当前国家暂未接入可查询邮编数据库，请使用地址格式参考或官方入口确认。</p>
+                )}
+              </div>
+            );
+          })()}
         </div>
         {/* ===== 查询结果 (紧贴查询框) ===== */}
         {(dbLoading || advancedRegionLoading) && (
           <div className="bg-white rounded-xl border-2 border-teal-200 shadow-sm p-5 mb-6">
             <div className="flex items-center justify-center py-8 text-gray-500">
               <Loader2 className="w-5 h-5 animate-spin mr-2" /> 正在查询…
+            </div>
+          </div>
+        )}
+        {/* ===== 无结果状态 ===== */}
+        {!dbLoading && !advancedRegionLoading && dbResults.length === 0 && advancedRegionResults.length === 0 && (dbQuery.trim() || mainSearch.trim()) && (
+          <div className="bg-white rounded-xl border-2 border-amber-200 shadow-sm p-5 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                {noMatchForCountry ? (
+                  <>
+                    <p className="text-sm font-semibold text-gray-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
+                    <p className="text-sm text-gray-600">未找到精确结果。请尝试更完整地址、城市英文名、邮编格式，或使用官方入口确认。</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-semibold text-gray-900 mb-1">未找到精确结果</p>
+                    <p className="text-sm text-gray-600">请尝试更完整的地址、城市英文名或邮编格式，或使用官方入口确认。</p>
+                  </>
+                )}
+                {advancedRegionRecommendations?.officialLookup && (
+                  <a href={advancedRegionRecommendations.officialLookup.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700">
+                    <ExternalLink className="w-3.5 h-3.5" /> {advancedRegionRecommendations.officialLookup.name} 官方查询
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         )}

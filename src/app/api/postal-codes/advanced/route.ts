@@ -139,8 +139,11 @@ function handleRegionSearch(query: string, countryCode: string) {
   }
 
   // Also try to match against known country formats
-  if (results.length === 0) {
-    // Try to detect country from postal code format
+  // CRITICAL: When user has selected a country, NEVER override with format detection.
+  // detectCountryFromPostal defaults 5-digit codes to US, which causes Malaysian
+  // postal codes (50000) to return US results.
+  if (results.length === 0 && !countryCode) {
+    // Only use format detection when NO country is selected
     const detectedCountry = detectCountryFromPostal(normalized);
     if (detectedCountry) {
       const officialLink = getOfficialLink(detectedCountry);
@@ -162,6 +165,26 @@ function handleRegionSearch(query: string, countryCode: string) {
         note: '邮编格式匹配，具体城市请使用官方查询',
       });
     }
+  }
+
+  // If country is selected but no results, return explicit "no match" with official entry
+  if (results.length === 0 && countryCode) {
+    const officialLink = getOfficialLink(countryCode);
+    const country = SUPPORTED_COUNTRIES.find(c => c.code === countryCode);
+    return NextResponse.json({
+      results: [],
+      total: 0,
+      noMatchForSelectedCountry: true,
+      selectedCountry: {
+        code: countryCode,
+        name: country?.name || countryCode,
+      },
+      officialLookup: officialLink ? {
+        url: officialLink.lookupUrl || officialLink.officialUrl,
+        name: officialLink.nameEn,
+      } : null,
+      recommendations: getRecommendations(countryCode),
+    });
   }
 
   return NextResponse.json({

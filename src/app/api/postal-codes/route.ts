@@ -52,26 +52,12 @@ export async function GET(req: NextRequest) {
       }
       sql += ` ORDER BY city ASC, "postalCode" ASC LIMIT 20`;
     } else {
-      // Postal code search — use indexed countryCode + normalizedPostalCode prefix match
-      // This is the HOT path: hits @@index([countryCode, normalizedPostalCode])
+      // Postal code search — REQUIRES country parameter (no US default)
+      // Previous bug: country || 'US' caused Malaysian postal codes to return US results
       const prefix = normalized.slice(0, Math.min(normalized.length, 6));
 
-      sql = `
-        SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
-               "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
-               latitude, longitude, accuracy, source, "sourceUrl", "sourceVersion",
-               "isActive", "createdAt", "updatedAt"
-        FROM postal_codes
-        WHERE "isActive" = true
-        AND "countryCode" = $1
-        AND "normalizedPostalCode" LIKE $2
-        ORDER BY "normalizedPostalCode" ASC
-        LIMIT 20
-      `;
-      params = [country || 'US', `${prefix}%`];
-
-      // If no country specified, search across all countries with exact/prefix
       if (!country) {
+        // No country selected — search all countries by prefix
         sql = `
           SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
                  "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
@@ -84,10 +70,8 @@ export async function GET(req: NextRequest) {
           LIMIT 20
         `;
         params = [`${prefix}%`];
-      }
-
-      // Exact match fallback: if prefix search returns nothing and query is short, try exact
-      if (normalized.length <= 4 && !country) {
+      } else {
+        // Country-scoped search — ONLY search within selected country
         sql = `
           SELECT id, country, "countryCode", city, "postalCode", "normalizedPostalCode", province, district,
                  "areaName", "adminName1", "adminCode1", "adminName2", "adminCode2",
@@ -95,11 +79,12 @@ export async function GET(req: NextRequest) {
                  "isActive", "createdAt", "updatedAt"
           FROM postal_codes
           WHERE "isActive" = true
-          AND "normalizedPostalCode" = $1
+          AND "countryCode" = $1
+          AND "normalizedPostalCode" LIKE $2
           ORDER BY "normalizedPostalCode" ASC
           LIMIT 20
         `;
-        params = [normalized];
+        params = [country, `${prefix}%`];
       }
     }
 
