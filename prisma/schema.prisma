@@ -70,6 +70,9 @@ model User {
   communityProfile      UserCommunityProfile?
   honorLogs             HonorLog[]
   communityStat         CommunityStat?
+  forumLikes            ForumLike[]
+  forumBookmarks        ForumBookmark[]
+  forumReports          ForumReport[]
   
   // v1.20.42.12.0: 用户邀请系统
   inviteCodes            InviteCode[]         @relation("UserInviteCodes")
@@ -1664,6 +1667,9 @@ model ForumPost {
   rewardGrantedAt  DateTime?        @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
 
   comments         ForumComment[]
+  likes            ForumLike[]
+  bookmarks        ForumBookmark[]
+  reports          ForumReport[]
 
   @@index([status])
   @@index([categoryId])
@@ -1687,6 +1693,9 @@ model ForumComment {
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
   rewardGrantedAt DateTime? @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
+
+  likes            ForumLike[]
+  reports          ForumReport[]
 
   @@index([postId])
   @@index([userId])
@@ -1838,4 +1847,61 @@ model CommunityStat {
   updatedAt             DateTime  @updatedAt @map("updated_at")
 
   @@map("community_stats")
+}
+
+// v1.20.42.18.6.2: Forum MVP — likes, bookmarks, reports, moderation
+
+model ForumLike {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?  @map("post_id")
+  post      ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?  @map("comment_id")
+  comment   ForumComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+  @@index([postId])
+  @@index([commentId])
+  @@map("forum_likes")
+}
+
+model ForumBookmark {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String   @map("post_id")
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([userId, postId])
+  @@index([userId])
+  @@index([postId])
+  @@map("forum_bookmarks")
+}
+
+model ForumReport {
+  id          String   @id @default(cuid())
+  reporterId  String   @map("reporter_id")
+  reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  postId      String?  @map("post_id")
+  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId   String?  @map("comment_id")
+  comment     ForumComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  reason      String   // spam / abuse / harassment / illegal / other
+  description String?
+  status      String   @default("pending") // pending / resolved / dismissed
+  resolvedBy  String?  @map("resolved_by")
+  resolvedAt  DateTime? @map("resolved_at")
+  resolution  String?  // action_taken / no_action
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@unique([reporterId, postId])
+  @@unique([reporterId, commentId])
+  @@index([postId])
+  @@index([commentId])
+  @@index([status])
+  @@map("forum_reports")
 }
