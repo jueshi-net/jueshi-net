@@ -740,7 +740,7 @@ export default function PostalCodePage() {
               {country.flag} 国际地址与邮编助手
             </h1>
             <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
-              查询海外城市邮编、省州地区、地址格式和寄件填写参考。适用于跨境电商、国际物流、留学、海外生活等场景。
+              支持输入城市、邮编、州省、地址关键词，查询精确邮编、邮编范围、地址格式和官方查询入口。适用于跨境电商、国际物流、留学、海外生活等场景。
             </p>
             {/* Coverage status badge */}
             {(() => {
@@ -789,7 +789,7 @@ export default function PostalCodePage() {
             className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
               queryMode === 'postal' ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-teal-50 hover:text-teal-700 border border-gray-200'
             }`}>
-            <Search className="w-4 h-4 inline mr-1.5" />查邮编
+            <Search className="w-4 h-4 inline mr-1.5" />查邮编/精确查询
           </button>
           <button onClick={() => setQueryMode('region')}
             className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${
@@ -958,10 +958,14 @@ export default function PostalCodePage() {
             <div className="p-5 border-b border-gray-100">
               <h2 className={cardStyles.header}>
                 <Globe className="w-5 h-5 text-teal-600" />
-                智能城市邮编查询
+                城市/地区邮编范围查询
               </h2>
               <p className="text-sm text-gray-500 mt-1">
                 输入城市名（中文或英文），查询邮编范围、地址格式和官方查询入口。支持缩写（如 LA、多伦多）。
+              </p>
+              <p className="text-xs text-amber-600 mt-1.5 flex items-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                城市级结果仅供参考，精确邮编请使用下方"邮编格式校验"或官方入口确认。
               </p>
             </div>
             <div className="p-5">

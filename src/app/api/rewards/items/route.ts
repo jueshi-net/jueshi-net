@@ -22,6 +22,7 @@ export async function GET() {
     // Transform to frontend format
     const items = rewardItems.map((item) => ({
       id: item.id,
+      code: item.code,
       name: item.name,
       description: item.description,
       costPoints: item.costPoints,

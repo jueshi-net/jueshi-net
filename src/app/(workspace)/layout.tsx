@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { UserNavSidebar } from "@/components/user/UserSidebar";
+import { UserNavSidebar, MobileNavTabs } from "@/components/user/UserSidebar";
 import { WorkspaceProviders } from "@/components/user/WorkspaceProviders";
 import TopBar from "./topbar";
 
@@ -21,6 +21,8 @@ export default async function WorkspaceLayout({
         <UserNavSidebar className="hidden lg:flex w-60 flex-shrink-0" />
         <div className="flex flex-col flex-1 w-full min-h-0">
           <TopBar className="flex-shrink-0" />
+          {/* Mobile nav tabs — inside main content to avoid flex width steal */}
+          <MobileNavTabs />
           <main className="w-full flex-1 p-4 md:p-6 pb-24">{children}</main>
         </div>
       </div>

@@ -70,7 +70,10 @@ function PointsRedemptionSection({ userPoints }: { userPoints: number }) {
     );
   }
 
-  if (rewardItems.length === 0) {
+  // Filter out ad_slot_7day — ad slots are managed separately via ad entitlements page
+  const visibleItems = rewardItems.filter((item) => item.code !== "ad_slot_7day");
+
+  if (visibleItems.length === 0) {
     return (
       <SectionCard title="积分兑换" subtitle="使用积分兑换会员天数、广告权益等奖励">
         <div className="text-sm text-gray-500">
@@ -89,7 +92,7 @@ function PointsRedemptionSection({ userPoints }: { userPoints: number }) {
         当前积分：<span className="font-bold text-teal-600">{userPoints}</span>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {rewardItems.map((item) => {
+        {visibleItems.map((item) => {
           const canAfford = userPoints >= item.costPoints;
           const isRedeeming = redeeming === item.id;
           return (
@@ -106,7 +109,7 @@ function PointsRedemptionSection({ userPoints }: { userPoints: number }) {
                     {item.rewardType === "word_export_coupon" && `${item.rewardValue} 次导出`}
                     {item.rewardType === "no_branding_coupon" && `${item.rewardValue} 次去品牌`}
                     {item.rewardType === "points" && `${item.rewardValue} 积分`}
-                    {item.rewardType === "growth" && `${item.rewardValue} 成长值`}
+                    {item.rewardType === "growth" && `成长值权益 +${item.rewardValue}`}
                   </span>
                 </div>
               </div>
@@ -194,6 +197,33 @@ export default function MemberClient({ userData, permissions }: { userData: any;
       .catch(() => {});
   }, []);
 
+  // Hash-based section navigation: scroll to #rewards or top based on URL hash
+  useEffect(() => {
+    const scrollToSection = () => {
+      const hash = window.location.hash;
+      if (hash === "#rewards") {
+        const el = document.getElementById("rewards");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+      }
+      // #benefits or empty hash → scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    // Handle initial hash on mount (small delay for DOM render)
+    const timer = setTimeout(scrollToSection, 100);
+
+    // Listen for hash changes (e.g., clicking sidebar link while already on page)
+    window.addEventListener("hashchange", scrollToSection);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("hashchange", scrollToSection);
+    };
+  }, []);
+
   const handleApply = async () => {
     setApplyError("");
     setApplySuccess(false);
@@ -262,7 +292,13 @@ export default function MemberClient({ userData, permissions }: { userData: any;
         }
       />
 
-      <div className="px-4 py-6 space-y-6">
+      <div id="benefits" className="px-4 py-6 space-y-6">
+        {/* Section Header: 会员权益 */}
+        <div className="flex items-center gap-2 mb-2">
+          <Crown className="w-5 h-5 text-amber-600" />
+          <h2 className="text-base font-bold text-gray-900">会员权益</h2>
+        </div>
+
         {/* Hero: Membership Status */}
         <div className={`bg-gradient-to-br ${roleInfo.gradient} rounded-xl p-6 text-white shadow-lg relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-12 translate-x-12" />
@@ -515,8 +551,22 @@ export default function MemberClient({ userData, permissions }: { userData: any;
           )}
         </SectionCard>
 
+        {/* Section Divider: 积分兑换 */}
+        <div className="pt-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-px flex-1 bg-gray-200" />
+            <div className="flex items-center gap-2 px-4 py-1.5 bg-teal-50 rounded-full border border-teal-100">
+              <Gift className="w-4 h-4 text-teal-600" />
+              <span className="text-sm font-bold text-teal-700">积分兑换</span>
+            </div>
+            <div className="h-px flex-1 bg-gray-200" />
+          </div>
+        </div>
+
         {/* Points Redemption */}
-        <PointsRedemptionSection userPoints={userData?.points || 0} />
+        <div id="rewards" className="scroll-mt-6">
+          <PointsRedemptionSection userPoints={userData?.points || 0} />
+        </div>
 
         {/* Why Upgrade - Action Cards */}
         {!isMember && (

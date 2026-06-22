@@ -85,11 +85,13 @@ export function UserNavSidebar({ className }: { className?: string }) {
           <p className="text-[10px] text-gray-300 text-center">绝世百宝箱 v1.20.42.6.6</p>
         </div>
       </aside>
-
-      {/* Mobile sticky tabs */}
-      <MobileStickyTabs />
     </>
   );
+}
+
+/** Mobile sticky tabs — must be rendered INSIDE the main content area, not as a flex sibling */
+export function MobileNavTabs() {
+  return <MobileStickyTabs />;
 }
 
 function MobileStickyTabs() {

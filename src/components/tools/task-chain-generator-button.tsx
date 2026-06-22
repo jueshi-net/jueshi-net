@@ -84,14 +84,18 @@ export default function TaskChainGeneratorButton({
       </button>
 
       {open && (
-        <>
-          {/* Backdrop */}
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-
-          {/* Dropdown / Modal */}
-          <div className="absolute right-0 top-full mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden">
+        /* Modal overlay — also serves as backdrop; click to close */
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setOpen(false)}
+        >
+          {/* Modal card */}
+          <div
+            className="w-full max-w-md max-w-[calc(100vw-2rem)] bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden flex flex-col max-h-[calc(100vh-2rem)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 shrink-0">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <GitBranch className="w-4 h-4 text-teal-600" />
                 选择发货任务
@@ -102,7 +106,7 @@ export default function TaskChainGeneratorButton({
             </div>
 
             {/* Content */}
-            <div className="max-h-80 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto min-h-0">
               {loading && (
                 <div className="flex items-center justify-center py-8 gap-2 text-gray-500">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -193,7 +197,7 @@ export default function TaskChainGeneratorButton({
 
             {/* Footer */}
             {isLoggedIn === true && taskChains.length > 0 && (
-              <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50">
+              <div className="px-4 py-2.5 border-t border-gray-100 bg-gray-50 shrink-0">
                 <Link
                   href="/workspace/task-chains"
                   className="text-xs text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
@@ -204,7 +208,7 @@ export default function TaskChainGeneratorButton({
               </div>
             )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
