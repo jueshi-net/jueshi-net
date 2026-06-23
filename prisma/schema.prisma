@@ -1408,6 +1408,8 @@ model Destination {
   docCount       String   @default("0") @map("doc_count")
   isActive       Boolean  @default(true) @map("is_active")
   sortOrder      Int      @default(0) @map("sort_order")
+  /// JSON: module config (visibility, sort, titles, ad slots, FAQ, official links)
+  moduleConfig   Json?    @map("module_config")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
 

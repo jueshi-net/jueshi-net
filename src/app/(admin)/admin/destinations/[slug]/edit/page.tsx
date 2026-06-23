@@ -4,11 +4,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   ArrowLeft, Loader2, Save, Sparkles, Plus, Trash2, Globe, BookOpen,
-  Shield, Wrench, AlertCircle, ChevronDown
+  Shield, Wrench, AlertCircle, ChevronDown, ListChecks, Megaphone
 } from "lucide-react";
 
 interface Guide { title: string; description: string; type: string }
 interface Service { title: string; category: string; description: string; websiteUrl?: string }
+
+interface ModuleItem { key: string; label: string; visible: boolean; sortOrder: number; title: string }
+interface AdSlot { id: string; name: string; placement: string; enabled: boolean; label: string; title: string; description: string; linkUrl: string; sponsorName: string; sortOrder: number }
 
 interface FormData {
   id: string; slug: string; name: string; nameEn: string; currency: string;
@@ -16,6 +19,8 @@ interface FormData {
   seoTitle: string; seoDescription: string; keywords: string; keyCities: string;
   userCount: string; docCount: string; isActive: boolean;
   tools: string[]; guides: Guide[]; services: Service[];
+  modules: ModuleItem[];
+  adSlots: AdSlot[];
 }
 
 const REGION_OPTIONS = ["北美", "欧洲", "东南亚", "日韩", "拉美", "中东", "澳洲"];
@@ -66,7 +71,7 @@ export default function DestinationEditPage() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [activeTab, setActiveTab] = useState<"basic" | "guides" | "services" | "tools">("basic");
+  const [activeTab, setActiveTab] = useState<"basic" | "guides" | "services" | "tools" | "modules" | "ads">("basic");
 
   const [form, setForm] = useState<FormData>({
     id: "", slug: "", name: "", nameEn: "", currency: "USD",
@@ -74,6 +79,26 @@ export default function DestinationEditPage() {
     seoTitle: "", seoDescription: "", keywords: "", keyCities: "",
     userCount: "0", docCount: "0", isActive: true,
     tools: [], guides: [], services: [],
+    modules: [
+      { key: "hero", label: "Hero 智能区", visible: true, sortOrder: 0, title: "" },
+      { key: "quickEntry", label: "快捷入口", visible: true, sortOrder: 1, title: "" },
+      { key: "guides", label: "实用指南", visible: true, sortOrder: 2, title: "" },
+      { key: "topics", label: "关联专题", visible: true, sortOrder: 3, title: "" },
+      { key: "checklists", label: "关联清单", visible: true, sortOrder: 4, title: "" },
+      { key: "tools", label: "常用工具", visible: true, sortOrder: 5, title: "" },
+      { key: "officialLinks", label: "常用网址", visible: true, sortOrder: 6, title: "" },
+      { key: "taskChain", label: "任务链", visible: true, sortOrder: 7, title: "" },
+      { key: "community", label: "社区讨论", visible: true, sortOrder: 8, title: "" },
+      { key: "faq", label: "FAQ", visible: true, sortOrder: 9, title: "" },
+      { key: "adSlots", label: "广告位", visible: true, sortOrder: 10, title: "" },
+      { key: "disclaimer", label: "免责声明", visible: true, sortOrder: 11, title: "" },
+    ],
+    adSlots: [
+      { id: "hero_secondary_ad", name: "Hero 下方广告位", placement: "hero_secondary", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 0 },
+      { id: "after_guides_ad", name: "指南后广告位", placement: "after_guides", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 1 },
+      { id: "after_tools_ad", name: "工具后广告位", placement: "after_tools", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 2 },
+      { id: "bottom_sponsor_ad", name: "底部赞助广告位", placement: "bottom_sponsor", enabled: false, label: "赞助", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 3 },
+    ],
   });
 
   const isEditMode = slug !== "new";
@@ -96,6 +121,31 @@ export default function DestinationEditPage() {
         setLoading(false);
         return;
       }
+      const mc = d.moduleConfig || {};
+      const defaultModules = [
+        { key: "hero", label: "Hero 智能区", visible: true, sortOrder: 0, title: "" },
+        { key: "quickEntry", label: "快捷入口", visible: true, sortOrder: 1, title: "" },
+        { key: "guides", label: "实用指南", visible: true, sortOrder: 2, title: "" },
+        { key: "topics", label: "关联专题", visible: true, sortOrder: 3, title: "" },
+        { key: "checklists", label: "关联清单", visible: true, sortOrder: 4, title: "" },
+        { key: "tools", label: "常用工具", visible: true, sortOrder: 5, title: "" },
+        { key: "officialLinks", label: "常用网址", visible: true, sortOrder: 6, title: "" },
+        { key: "taskChain", label: "任务链", visible: true, sortOrder: 7, title: "" },
+        { key: "community", label: "社区讨论", visible: true, sortOrder: 8, title: "" },
+        { key: "faq", label: "FAQ", visible: true, sortOrder: 9, title: "" },
+        { key: "adSlots", label: "广告位", visible: true, sortOrder: 10, title: "" },
+        { key: "disclaimer", label: "免责声明", visible: true, sortOrder: 11, title: "" },
+      ];
+      const dbModules = mc.modules || {};
+      const mergedModules = defaultModules.map(dm => {
+        const dbM = dbModules[dm.key];
+        return dbM ? { ...dm, visible: dbM.visible ?? dm.visible, sortOrder: dbM.sortOrder ?? dm.sortOrder, title: dbM.title || dm.title } : dm;
+      });
+      const dbAdSlots = (mc.adSlots || []).map((s: any) => ({
+        id: s.id || "", name: s.name || "", placement: s.placement || "", enabled: s.enabled || false,
+        label: s.label || "广告", title: s.title || "", description: s.description || "",
+        linkUrl: s.linkUrl || "", sponsorName: s.sponsorName || "", sortOrder: s.sortOrder || 0,
+      }));
       setForm({
         id: d.id || "", slug: d.slug, name: d.name, nameEn: d.nameEn,
         currency: d.currency, region: d.region, emoji: d.emoji,
@@ -108,6 +158,13 @@ export default function DestinationEditPage() {
         tools: (d.tools || []).map((t: any) => t.toolSlug),
         guides: (d.guides || []).map((g: any) => ({ title: g.title, description: g.description, type: g.type })),
         services: (d.services || []).map((s: any) => ({ title: s.title, category: s.category, description: s.description, websiteUrl: s.websiteUrl || '' })),
+        modules: mergedModules,
+        adSlots: dbAdSlots.length > 0 ? dbAdSlots : [
+          { id: "hero_secondary_ad", name: "Hero 下方广告位", placement: "hero_secondary", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 0 },
+          { id: "after_guides_ad", name: "指南后广告位", placement: "after_guides", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 1 },
+          { id: "after_tools_ad", name: "工具后广告位", placement: "after_tools", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 2 },
+          { id: "bottom_sponsor_ad", name: "底部赞助广告位", placement: "bottom_sponsor", enabled: false, label: "赞助", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 3 },
+        ],
       });
     } catch (e: any) {
       setMessage({ type: "error", text: `获取数据失败: ${e.message}` });
@@ -134,6 +191,8 @@ export default function DestinationEditPage() {
       const g = data.data;
       setForm(prev => ({
         ...prev,
+        modules: prev.modules,
+        adSlots: prev.adSlots,
         slug: g.slug || prev.slug || (g.nameEn || "").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
         name: g.name || prev.name,
         nameEn: g.nameEn || prev.nameEn,
@@ -180,6 +239,10 @@ export default function DestinationEditPage() {
         tools: form.tools,
         guides: form.guides.map(g => ({ title: g.title, description: g.description, type: g.type })),
         services: form.services.map(s => ({ title: s.title, category: s.category, description: s.description, websiteUrl: s.websiteUrl || undefined })),
+        moduleConfig: {
+          modules: Object.fromEntries(form.modules.map(m => [m.key, { visible: m.visible, sortOrder: m.sortOrder, title: m.title }])),
+          adSlots: form.adSlots.map(s => ({ id: s.id, name: s.name, placement: s.placement, enabled: s.enabled, label: s.label, title: s.title, description: s.description, linkUrl: s.linkUrl, sponsorName: s.sponsorName, sortOrder: s.sortOrder })),
+        },
       };
       if (form.id) body.id = form.id;
 
@@ -284,7 +347,9 @@ export default function DestinationEditPage() {
           { key: "basic" as const, label: "基础与 SEO", icon: Globe },
           { key: "guides" as const, label: `百科指南 (${form.guides.length})`, icon: BookOpen },
           { key: "services" as const, label: `服务商 (${form.services.length})`, icon: Shield },
-          { key: "tools" as const, label: `工具挂载 (${form.tools.length})`, icon: Wrench },
+          { key: "tools" as const, label: `工具 (${form.tools.length})`, icon: Wrench },
+          { key: "modules" as const, label: "模块配置", icon: ListChecks },
+          { key: "ads" as const, label: "广告位", icon: Megaphone },
         ].map(tab => (
           <button
             key={tab.key}
@@ -491,6 +556,82 @@ export default function DestinationEditPage() {
           </div>
         )}
       </div>
+
+        {/* Modules Tab */}
+        {activeTab === "modules" && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500 mb-2">配置国家详情页各模块的显示/隐藏、排序和标题。保存后前台立即生效。</p>
+            <div className="space-y-2">
+              {form.modules.map((m, i) => (
+                <div key={m.key} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <label className="flex items-center gap-2 text-sm min-w-[100px]">
+                    <input type="checkbox" checked={m.visible} onChange={e => {
+                      const mods = [...form.modules]; mods[i] = { ...mods[i], visible: e.target.checked };
+                      setForm({ ...form, modules: mods });
+                    }} className="rounded" />
+                    {m.label}
+                  </label>
+                  <input type="number" value={m.sortOrder} onChange={e => {
+                    const mods = [...form.modules]; mods[i] = { ...mods[i], sortOrder: parseInt(e.target.value) || 0 };
+                    setForm({ ...form, modules: mods });
+                  }} className="w-16 px-2 py-1 border rounded text-sm text-center" placeholder="排序" />
+                  <input value={m.title} onChange={e => {
+                    const mods = [...form.modules]; mods[i] = { ...mods[i], title: e.target.value };
+                    setForm({ ...form, modules: mods });
+                  }} className="flex-1 px-3 py-1.5 border rounded text-sm" placeholder="自定义标题（留空用默认）" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Ads Tab */}
+        {activeTab === "ads" && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500 mb-2">配置广告位。广告必须清晰标注，不得伪装为官方资源。空广告位前台不显示。</p>
+            <div className="space-y-3">
+              {form.adSlots.map((slot, i) => (
+                <div key={slot.id} className="border rounded-lg p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">{slot.name}</span>
+                    <label className="flex items-center gap-2 text-xs cursor-pointer">
+                      <input type="checkbox" checked={slot.enabled} onChange={e => {
+                        const slots = [...form.adSlots]; slots[i] = { ...slots[i], enabled: e.target.checked };
+                        setForm({ ...form, adSlots: slots });
+                      }} className="rounded" />
+                      启用
+                    </label>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input value={slot.title} onChange={e => {
+                      const slots = [...form.adSlots]; slots[i] = { ...slots[i], title: e.target.value };
+                      setForm({ ...form, adSlots: slots });
+                    }} className="px-3 py-1.5 border rounded text-sm" placeholder="广告标题" />
+                    <input value={slot.sponsorName} onChange={e => {
+                      const slots = [...form.adSlots]; slots[i] = { ...slots[i], sponsorName: e.target.value };
+                      setForm({ ...form, adSlots: slots });
+                    }} className="px-3 py-1.5 border rounded text-sm" placeholder="赞助商名称" />
+                  </div>
+                  <textarea value={slot.description} onChange={e => {
+                    const slots = [...form.adSlots]; slots[i] = { ...slots[i], description: e.target.value };
+                    setForm({ ...form, adSlots: slots });
+                  }} rows={2} className="w-full px-3 py-1.5 border rounded text-sm resize-none" placeholder="广告描述" />
+                  <input value={slot.linkUrl} onChange={e => {
+                    const slots = [...form.adSlots]; slots[i] = { ...slots[i], linkUrl: e.target.value };
+                    setForm({ ...form, adSlots: slots });
+                  }} className="w-full px-3 py-1.5 border rounded text-sm" placeholder="链接 URL (https://...)" />
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-gray-400">标签:</label>
+                    <input value={slot.label} onChange={e => {
+                      const slots = [...form.adSlots]; slots[i] = { ...slots[i], label: e.target.value };
+                      setForm({ ...form, adSlots: slots });
+                    }} className="px-2 py-1 border rounded text-xs" placeholder="广告/赞助/推广" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       {/* Bottom Save Bar */}
       <div className="flex items-center justify-between bg-white rounded-xl border border-gray-100 p-4">
