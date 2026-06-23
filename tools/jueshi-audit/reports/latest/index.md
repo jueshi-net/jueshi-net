@@ -1,9 +1,9 @@
-# jueshi-audit — Self-Test Report
+# jueshi-audit — Full Audit Report
 
-**Date:** 2026-06-23T11:51:32.558Z
+**Date:** 2026-06-23T14:31:53.415Z
 **Target:** https://i.jueshi.net
-**Mode:** public-only
-**Verdict:** STAGING_AUDIT_READY_NO_P0P1
+**Mode:** full (with credentials)
+**Verdict:** STAGING_AUDIT_FOUND_ISSUES
 
 ---
 
@@ -11,69 +11,87 @@
 
 | Metric | Count |
 |--------|-------|
-| Total | 15 |
-| PASS | 10 |
-| FAIL | 3 |
-| BLOCKED | 2 |
+| Total | 43 |
+| PASS | 31 |
+| FAIL | 12 |
+| BLOCKED | 0 |
 | NOT_RUN | 0 |
-
-## P0/P1 Failures
-
-No P0/P1 failures detected. ✅
-
-## Bug List
-
-No bugs detected. ✅
-
-
-## Evidence Directory
-
-| Type | Path |
-|------|------|
-| Screenshots | artifacts/screenshots/ |
-| Console Logs | artifacts/console/ |
-| Network Logs | artifacts/network/ |
+| P0 failures | 0 |
+| P1 failures | 3 |
+| Bugs | 12 |
 
 ## All Test Results
 
-| ID | Module | Priority | URL | Status | Notes |
-|-----|--------|----------|-----|--------|-------|
-| P0-001 | Public Pages | P0 | / | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-002 | Public Pages | P0 | /destinations | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-003 | Public Pages | P0 | /destinations/canada | PASS | Console errors: 1, Network 5xx: 0 |
-| P0-004 | Public Pages | P0 | /destinations/united-states | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-005 | Public Pages | P0 | /bbs | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-006 | Public Pages | P0 | /tools/postal-code | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-007 | Public Pages | P0 | /login | PASS | Console errors: 0, Network 5xx: 0 |
-| P0-008 | Redirects | P0 | /destinations/usa | PASS |  |
-| P0-009 | Redirects | P0 | /countries | PASS |  |
-| P0-010 | Redirects | P0 | /community | PASS |  |
-| P3-001 | SEO | P3 | / | FAIL |  |
-| P3-002 | SEO | P3 | /destinations/canada | FAIL |  |
-| P3-003 | SEO | P3 | /bbs | FAIL |  |
-| P1-001 | Login | P1 | /login | BLOCKED | BLOCKED_NO_CREDENTIAL |
-| P2-001 | Admin | P2 | /admin | BLOCKED | BLOCKED_NO_CREDENTIAL |
+| ID | Module | Priority | Status | Notes |
+|-----|--------|----------|--------|-------|
+| P1-001 | Postal Code | P1 | FAIL | No country selector found |
+| P1-002 | Postal Code | P1 | PASS | CA ZZZ999 no_match correct |
+| P1-003 | Postal Code | P1 | PASS | US 90210 Beverly Hills result |
+| P1-004 | Postal Code | P1 | PASS | JP 100-0000 Tokyo result |
+| P1-005 | Postal Code | P1 | PASS | No map link (acceptable for no_match or non-exact) |
+| P1-009 | Country Page | P1 | PASS | Hero/H1 found |
+| P1-010 | Country Page | P1 | PASS | Time card found |
+| P1-011 | Country Page | P1 | PASS | 44 quick links found |
+| P1-012 | Country Page | P1 | PASS | 0 tool-related elements |
+| P1-013 | Country Page | P1 | PASS | BBS link found |
+| P1-014 | Country Page | P1 | PASS | FAQ section found |
+| P1-015 | Country Page | P1 | FAIL | No disclaimer |
+| P1-016 | Country Page | P1 | PASS | Layout check (2-col or single acceptable) |
+| P1-017 | Country Page | P1 | PASS | US page: 200 |
+| P1-017 | BBS | P1 | PASS | 10 post links found |
+| P1-018 | BBS | P1 | PASS | Post detail loaded (9498 chars) |
+| P1-019 | BBS | P1 | PASS | Unauthenticated /bbs/new redirected to login |
+| P1-020 | Login | P1 | FAIL | Login failed |
+| P2-001 | Admin Login | P2 | FAIL | Admin login failed |
+| P2-MOBILE-iphone12- | Mobile | P2 | PASS | iphone12 /: scrollW=390 clientW=390 OK |
+| P2-MOBILE-iphone12-destinations-canada | Mobile | P2 | PASS | iphone12 /destinations/canada: scrollW=390 clientW=390 OK |
+| P2-MOBILE-iphone12-tools-postal-code | Mobile | P2 | PASS | iphone12 /tools/postal-code: scrollW=390 clientW=390 OK |
+| P2-MOBILE-iphone12-bbs | Mobile | P2 | PASS | iphone12 /bbs: scrollW=390 clientW=390 OK |
+| P2-MOBILE-android360- | Mobile | P2 | PASS | android360 /: scrollW=360 clientW=360 OK |
+| P2-MOBILE-android360-destinations-canada | Mobile | P2 | PASS | android360 /destinations/canada: scrollW=360 clientW=360 OK |
+| P2-MOBILE-android360-tools-postal-code | Mobile | P2 | PASS | android360 /tools/postal-code: scrollW=360 clientW=360 OK |
+| P2-MOBILE-android360-bbs | Mobile | P2 | PASS | android360 /bbs: scrollW=360 clientW=360 OK |
+| P2-MOBILE-ipad- | Mobile | P2 | PASS | ipad /: scrollW=768 clientW=768 OK |
+| P2-MOBILE-ipad-destinations-canada | Mobile | P2 | PASS | ipad /destinations/canada: scrollW=768 clientW=768 OK |
+| P2-MOBILE-ipad-tools-postal-code | Mobile | P2 | PASS | ipad /tools/postal-code: scrollW=768 clientW=768 OK |
+| P2-MOBILE-ipad-bbs | Mobile | P2 | PASS | ipad /bbs: scrollW=768 clientW=768 OK |
+| P2-MOBILE-desktop- | Mobile | P2 | FAIL | desktop /: scrollW=1329 clientW=1280 OVERFLOW! |
+| P2-MOBILE-desktop-destinations-canada | Mobile | P2 | FAIL | desktop /destinations/canada: scrollW=1329 clientW=1280 OVERFLOW! |
+| P2-MOBILE-desktop-tools-postal-code | Mobile | P2 | FAIL | desktop /tools/postal-code: scrollW=1329 clientW=1280 OVERFLOW! |
+| P2-MOBILE-desktop-bbs | Mobile | P2 | FAIL | desktop /bbs: scrollW=1329 clientW=1280 OVERFLOW! |
+| P3-001 | SEO | P3 | FAIL | page.getAttribute: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator(' |
+| P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=index,follow |
+| P3-003 | SEO | P3 | FAIL | page.getAttribute: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator(' |
+| P3-004 | SEO | P3 | PASS | X-Robots-Tag: noindex, nofollow |
+| P3-005 | Security | P3 | PASS | Unauth /admin → /login?reason=no-session |
+| P3-006 | Security | P3 | PASS | XSS input not executed (escaped) |
+| P3-007 | Security | P3 | FAIL | 500 error on SQL injection input |
+| P3-008 | Ops | P3 | FAIL | /api/health: 401 |
 
 ## Production Release Gate
 
 | Check | Result |
 |-------|--------|
 | P0 failures | 0 ✅ |
-| P1 failures | 0 ✅ |
-| Allowed to proceed to OPS production release | YES (with user confirmation) |
+| P1 failures | 3 ❌ |
+| Allowed to proceed | NO |
 
 ## Safety Checklist
 
 | Check | Result |
 |-------|--------|
-| prisma db push executed | NO ✅ |
-| destructive SQL executed | NO ✅ |
+| prisma db push | NO ✅ |
+| destructive SQL | NO ✅ |
 | production modified | NO ✅ |
 | secrets in output | NO ✅ |
 | 9833416@qq.com modified | NO ✅ |
 
-## Next Steps
+## Evidence
 
-1. Review any FAIL items above
-2. For BLOCKED items, provide credentials and re-run without --public-only
-3. Once all P0/P1 pass, ask user to confirm production release
+- Screenshots: 56 files in artifacts/screenshots/
+- Console logs: 12 files in artifacts/console/
+- Network logs: 12 files in artifacts/network/

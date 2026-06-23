@@ -2,12 +2,13 @@
   "verdict": "STAGING_AUDIT_FOUND_ISSUES",
   "timestamp": "2026-06-23T14:31:53.415Z",
   "target": "https://i.jueshi.net",
-  "p0Failures": 0,
-  "p1Failures": 3,
+  "mode": "full",
   "total": 43,
   "pass": 31,
   "fail": 12,
   "blocked": 0,
   "notRun": 0,
-  "bugs": 12
+  "p0Fail": 0,
+  "p1Fail": 3,
+  "bugCount": 12
 }
