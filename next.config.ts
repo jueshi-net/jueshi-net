@@ -54,6 +54,27 @@ const nextConfig: NextConfig = {
         destination: '/destinations/:slug*',
         permanent: true,
       },
+      // ─── Destination slug canonical aliases (v18.6.5.3) ───
+      {
+        source: '/destinations/usa',
+        destination: '/destinations/united-states',
+        permanent: true,
+      },
+      {
+        source: '/destinations/us',
+        destination: '/destinations/united-states',
+        permanent: true,
+      },
+      {
+        source: '/destinations/uk',
+        destination: '/destinations/united-kingdom',
+        permanent: true,
+      },
+      {
+        source: '/destinations/uae',
+        destination: '/destinations/united-arab-emirates',
+        permanent: true,
+      },
     ];
   },
 
