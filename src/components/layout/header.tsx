@@ -147,7 +147,7 @@ export default function Header() {
           </Link>
 
           {/* Center: Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 min-w-0 overflow-hidden">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
               return (
@@ -194,9 +194,9 @@ export default function Header() {
           </nav>
 
           {/* Right: Search + Bell + Login */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 overflow-hidden">
             {/* Search bar */}
-            <div className="hidden md:flex items-center relative">
+            <div className="hidden md:flex items-center relative shrink-0">
               <Search className="absolute left-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
               <input
                 type="text"

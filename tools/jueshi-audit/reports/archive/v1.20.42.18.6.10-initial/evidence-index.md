@@ -26,7 +26,6 @@
 - artifacts/screenshots/P0-016-user-admin-denied.png
 - artifacts/screenshots/P0-017-admin-login.png
 - artifacts/screenshots/P0-018-admin-access.png
-- artifacts/screenshots/P1-001-ca-m5v3l9.png
 - artifacts/screenshots/P1-002-zzz999.png
 - artifacts/screenshots/P1-003-us-90210.png
 - artifacts/screenshots/P1-004-jp-1000000.png
@@ -54,12 +53,38 @@
 - artifacts/screenshots/P2-MOBILE-iphone12-bbs.png
 - artifacts/screenshots/P2-MOBILE-iphone12-destinations-canada.png
 - artifacts/screenshots/P2-MOBILE-iphone12-tools-postal-code.png
-- artifacts/screenshots/P3-001-seo.png
 - artifacts/screenshots/P3-002-seo.png
-- artifacts/screenshots/P3-003-seo.png
 - artifacts/screenshots/P3-005-admin-redirect.png
 - artifacts/screenshots/P3-006-xss.png
 - artifacts/screenshots/P3-007-sqli.png
 - artifacts/screenshots/P3-008-health.png
 
-**Total screenshots:** 59
+## Console Logs
+
+- artifacts/console/P0-001-homepage.json
+- artifacts/console/P0-001.json
+- artifacts/console/P0-002-destinations-list.json
+- artifacts/console/P0-002.json
+- artifacts/console/P0-003-canada-page.json
+- artifacts/console/P0-003.json
+- artifacts/console/P0-004-usa-page.json
+- artifacts/console/P0-004.json
+- artifacts/console/P0-005-bbs-index.json
+- artifacts/console/P0-005.json
+- artifacts/console/P0-006-postal-code.json
+- artifacts/console/P0-007-login-page.json
+
+## Network Logs
+
+- artifacts/network/P0-001-homepage.json
+- artifacts/network/P0-001.json
+- artifacts/network/P0-002-destinations-list.json
+- artifacts/network/P0-002.json
+- artifacts/network/P0-003-canada-page.json
+- artifacts/network/P0-003.json
+- artifacts/network/P0-004-usa-page.json
+- artifacts/network/P0-004.json
+- artifacts/network/P0-005-bbs-index.json
+- artifacts/network/P0-005.json
+- artifacts/network/P0-006-postal-code.json
+- artifacts/network/P0-007-login-page.json
