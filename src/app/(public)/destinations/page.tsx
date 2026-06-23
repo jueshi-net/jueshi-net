@@ -154,7 +154,7 @@ export default async function DestinationsIndexPage() {
 
       {/* ===== SEARCHABLE COUNTRY INDEX (new, from /countries) ===== */}
       <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-10">
-        <DestinationsIndexClient countries={mergedCountries} featured={featured} regionToolCtas={REGION_TOOL_CTAS} />
+        <DestinationsIndexClient countries={mergedCountries} featured={featured} />
       </div>
 
       {/* ===== COMMON SCENARIOS (keep original) ===== */}

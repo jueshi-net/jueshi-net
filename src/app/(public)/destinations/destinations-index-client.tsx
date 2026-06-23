@@ -4,12 +4,10 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { AllCountryConfig } from "@/lib/all-countries";
 import { Globe, Search, Filter } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 interface DestinationsIndexClientProps {
   countries: AllCountryConfig[];
   featured: AllCountryConfig[];
-  regionToolCtas: { label: string; href: string; icon: LucideIcon }[];
 }
 
 const REGION_LABELS: Record<string, string> = {

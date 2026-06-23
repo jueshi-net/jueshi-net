@@ -43,6 +43,17 @@ const nextConfig: NextConfig = {
         destination: '/user/membership-growth',
         permanent: true,
       },
+      // ─── /countries → /destinations canonical merge (v18.6.5.2) ───
+      {
+        source: '/countries',
+        destination: '/destinations',
+        permanent: true,
+      },
+      {
+        source: '/countries/:slug*',
+        destination: '/destinations/:slug*',
+        permanent: true,
+      },
     ];
   },
 
