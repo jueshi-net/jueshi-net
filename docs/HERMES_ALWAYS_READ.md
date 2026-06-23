@@ -303,7 +303,27 @@ Hot Standby (do not touch):
 
 ---
 
-## 12. Related Documents
+## 12. Root Entry Files
+
+Two files in the repository root serve as agent entry points:
+
+- **`AGENTS.md`** — Repository-root agent entry point. All agents (Hermes, Claude Code, Codex, etc.) must read this file first.
+- **`HERMES.md`** — Hermes-specific execution entry point. Contains the minimal task template and mode declaration requirements.
+
+### Conflict Resolution
+
+If `AGENTS.md` or `HERMES.md` conflicts with `docs/HERMES_ALWAYS_READ.md`, the **stricter rule in `docs/HERMES_ALWAYS_READ.md` always wins**.
+
+### Missing CURRENT_MODE
+
+If any task arrives without `CURRENT_MODE` declared:
+- Hermes MUST stop at AUDIT mode (read-only).
+- Hermes MUST NOT deploy, write to DB, switch DNS, or execute any high-risk operation.
+- Hermes MUST ask the user to confirm the mode before proceeding.
+
+---
+
+## 13. Related Documents
 
 - `docs/HERMES_ROLE_POLICY.md` — DEV / OPS mode definitions
 - `docs/STAGING_FIRST_POLICY.md` — staging-first enforcement
