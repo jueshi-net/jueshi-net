@@ -1,4 +1,6 @@
-# Staging-First Policy — v1.20.42.18.6.6.5
+# Staging-First Policy — v1.20.42.18.6.6.5.1
+
+> **READ FIRST:** `docs/HERMES_ALWAYS_READ.md` — this is the mandatory entry point for all Hermes tasks.
 
 ## 强制规则
 

@@ -1,8 +1,12 @@
-# Hermes Role Policy — v1.20.42.18.6.6.5
+# Hermes Role Policy — v1.20.42.18.6.6.5.1
+
+> **READ FIRST:** `docs/HERMES_ALWAYS_READ.md` — this is the mandatory entry point for all Hermes tasks.
 
 ## 双模式制度
 
 每次任务开头必须声明 `CURRENT_MODE`。未声明则只做只读审计或先询问用户。
+
+See also: `docs/HERMES_ALWAYS_READ.md` (always-read policy), `docs/STAGING_FIRST_POLICY.md` (staging-first enforcement).
 
 ---
 
