@@ -69,6 +69,15 @@ TARGET_DOMAIN=i.jueshi.net|jueshi.net
 - ❌ Publish to production without staging acceptance
 - ❌ Switch DNS without explicit user confirmation
 - ❌ Claim user is satisfied
+- ❌ Publish to production without audit gate (run `tools/jueshi-audit` first)
+
+### Audit Gate (mandatory before production release)
+
+- **Run `tools/jueshi-audit` before production release.** This is mandatory.
+- **Audit results without evidence paths cannot be used as a pass basis.** A verdict without evidence in `tools/jueshi-audit/evidence/<run-id>/` is invalid.
+- **P0/P1 not cleared cannot enter OPS production release.** The user cannot exempt P0 or P1.
+- **The user can exempt P2/P3** but not P0/P1.
+- See `docs/JUESHI_AUDIT_TO_RELEASE_GATE.md` for the full release-gate flow.
 
 ---
 

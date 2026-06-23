@@ -1,0 +1,24 @@
+{
+  "name": "jueshi-audit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Read-only audit tool for jueshi.net / xixiong-saas — P0 public page and redirect verification via Playwright",
+  "scripts": {
+    "audit": "tsx src/index.ts",
+    "audit:p0": "tsx src/index.ts --suite p0-public-pages,p0-redirects",
+    "audit:public": "tsx src/index.ts --suite p0-public-pages",
+    "audit:redirects": "tsx src/index.ts --suite p0-redirects",
+    "audit:staging": "tsx src/index.ts --base-url https://i.jueshi.net",
+    "audit:prod": "tsx src/index.ts --base-url https://jueshi.net",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.59.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.22.0",
+    "typescript": "^5"
+  }
+}

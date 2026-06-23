@@ -16,6 +16,19 @@
 10. **production 发布必须观察 PM2/Nginx/error log**
 11. **没有 staging 验收，不准上线**
 12. **没有用户确认，不准上线**
+13. **production 发布前必须运行 `tools/jueshi-audit` 审计工具**
+14. **没有 evidence 路径的审计结果不能作为通过依据**
+15. **P0/P1 未清零不能进入 OPS production 发布（用户不可豁免 P0/P1）**
+16. **用户可以豁免 P2/P3，但不能豁免 P0/P1**
+
+## 审计门 (Audit Gate)
+
+详见 `docs/JUESHI_AUDIT_TO_RELEASE_GATE.md`。
+
+- 审计判定为 `STAGING_AUDIT_READY_NO_P0P1` → 可进入 OPS 发布（需用户确认）
+- 审计判定为 `STAGING_AUDIT_FOUND_ISSUES` → 用户可豁免 P2/P3 后进入 OPS 发布
+- 审计判定为 `STAGING_AUDIT_BLOCKED` → 禁止发布，修复后重新审计
+- 审计判定为 `FAILED` → 审计未完成，不可作为发布依据，重新运行
 
 ## 违规后果
 

@@ -58,10 +58,18 @@ These rules apply to ALL modes. They can NEVER be overridden.
 ## Staging-First Flow
 
 ```
-feature/* → staging branch → i.jueshi.net → user acceptance → main → jueshi.net → smoke test → observation
+feature/* → staging branch → i.jueshi.net → user acceptance → audit (tools/jueshi-audit) → main → jueshi.net → smoke test → observation
 ```
 
 Anything not accepted on i.jueshi.net MUST NOT enter jueshi.net.
+
+### Audit Gate (mandatory before production release)
+
+- **Run `tools/jueshi-audit` before production release.** This is mandatory.
+- **Audit results without evidence paths cannot be used as a pass basis.** A verdict without evidence in `tools/jueshi-audit/evidence/<run-id>/` is invalid.
+- **P0/P1 not cleared cannot enter OPS production release.** The user cannot exempt P0 or P1.
+- **The user can exempt P2/P3** but not P0/P1.
+- See `docs/JUESHI_AUDIT_TO_RELEASE_GATE.md` for the full release-gate flow.
 
 ---
 
@@ -89,6 +97,7 @@ If environment marker does not match → `exit 1`.
 - `docs/HERMES_ALWAYS_READ.md` — **MUST READ FIRST** (authoritative, strictest rules)
 - `docs/HERMES_ROLE_POLICY.md` — DEV / OPS mode definitions
 - `docs/STAGING_FIRST_POLICY.md` — staging-first enforcement
+- `docs/JUESHI_AUDIT_TO_RELEASE_GATE.md` — audit verdict → release gate flow
 - `docs/BRANCHING_POLICY.md` — branch strategy
 - `docs/HERMES_TASK_TEMPLATES.md` — task templates
 - `docs/CONTENT_PUBLISHING_WORKFLOW.md` — content publish flow
