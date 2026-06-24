@@ -1,0 +1,143 @@
+{
+  "version": "v1.20.42.18.6.11.6",
+  "description": "P1 Word Export DOCX integrity audit cases",
+  "cases": [
+    {
+      "id": "P1-WORD-EXPORT-QUOTE",
+      "priority": "P1",
+      "name": "Quote Sheet Word Export produces valid DOCX",
+      "tool": "quote-sheet",
+      "url": "/tools/quote-sheet",
+      "wordButtonTestId": "word-export-btn",
+      "companyName": "QS Test Company",
+      "description": "Export quote sheet as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-COMMERCIAL-INVOICE",
+      "priority": "P1",
+      "name": "Commercial Invoice Word Export produces valid DOCX",
+      "tool": "commercial-invoice",
+      "url": "/tools/documents/commercial-invoice",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export commercial invoice as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-PACKING-LIST",
+      "priority": "P1",
+      "name": "Packing List Word Export produces valid DOCX",
+      "tool": "packing-list",
+      "url": "/tools/documents/packing-list",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export packing list as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-PROFORMA-INVOICE",
+      "priority": "P1",
+      "name": "Proforma Invoice Word Export produces valid DOCX",
+      "tool": "proforma-invoice",
+      "url": "/tools/documents/proforma-invoice",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export proforma invoice as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-SALES-CONTRACT",
+      "priority": "P1",
+      "name": "Sales Contract Word Export produces valid DOCX",
+      "tool": "sales-contract",
+      "url": "/tools/documents/sales-contract",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export sales contract as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-EXPRESS-DECLARATION",
+      "priority": "P1",
+      "name": "Express Declaration Word Export produces valid DOCX",
+      "tool": "express-declaration",
+      "url": "/tools/documents/express-declaration",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export express declaration as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-DYNAMIC-DOCUMENTS",
+      "priority": "P1",
+      "name": "Dynamic document route Word Export produces valid DOCX",
+      "tool": "customs-declaration",
+      "url": "/tools/documents/customs-declaration",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "description": "Export customs declaration (dynamic route) as Word and validate DOCX integrity"
+    },
+    {
+      "id": "P1-WORD-EXPORT-COMPANY-SWITCH-A",
+      "priority": "P1",
+      "name": "Word export with Company A selection",
+      "tool": "commercial-invoice",
+      "url": "/tools/documents/commercial-invoice",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "QS Test Company",
+      "companySwitch": true,
+      "companyTestId": "company-option-A",
+      "description": "Switch to Company A, export Word, verify company name in DOCX"
+    },
+    {
+      "id": "P1-WORD-EXPORT-COMPANY-SWITCH-B",
+      "priority": "P1",
+      "name": "Word export with Company B selection",
+      "tool": "commercial-invoice",
+      "url": "/tools/documents/commercial-invoice",
+      "wordButtonSelector": "button:has-text('Word')",
+      "companyName": "Audit Test Co B Ltd",
+      "companySwitch": true,
+      "companyTestId": "company-option-B",
+      "description": "Switch to Company B, export Word, verify company name in DOCX"
+    },
+    {
+      "id": "P1-WORD-EXPORT-NO-BROKEN-DOWNLOADS",
+      "priority": "P1",
+      "name": "No broken downloads across all document types",
+      "tool": "all",
+      "url": "/tools/documents",
+      "wordButtonSelector": null,
+      "companyName": null,
+      "description": "Scan all document types for broken download links or missing Word buttons"
+    },
+    {
+      "id": "P1-WORD-EXPORT-FREE-LIMIT-MESSAGE",
+      "priority": "P1",
+      "name": "Free User Daily Limit Message",
+      "tool": "commercial-invoice",
+      "url": "/tools/documents/commercial-invoice",
+      "companyName": "QS Test Company",
+      "testUser": "free",
+      "specialType": "free-limit",
+      "description": "Free user exceeds 3/day Word export limit, should see clear message, no broken download"
+    },
+    {
+      "id": "P1-WORD-EXPORT-MEMBER-BYPASS-LIMIT",
+      "priority": "P1",
+      "name": "Member Bypass Daily Limit",
+      "tool": "commercial-invoice",
+      "url": "/tools/documents/commercial-invoice",
+      "companyName": "QS Test Company",
+      "testUser": "member",
+      "specialType": "member-bypass",
+      "description": "Member user exports Word 5+ times without limit, all produce valid DOCX"
+    },
+    {
+      "id": "P1-WORD-EXPORT-AUTH-CONSISTENCY",
+      "priority": "P1",
+      "name": "Authorization Consistency (quote-sheet vs dynamic)",
+      "tool": "quote-sheet",
+      "url": "/tools/quote-sheet",
+      "companyName": "QS Test Company",
+      "testUser": "member",
+      "specialType": "auth-consistency",
+      "description": "Both quote-sheet and dynamic document route call /api/export/authorize consistently"
+    }
+  ]
+}
