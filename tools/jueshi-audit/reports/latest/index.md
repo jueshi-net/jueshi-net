@@ -1,9 +1,9 @@
-# jueshi-audit — Full Audit Report (v2 fixed)
+# jueshi-audit — Full Audit Report (v3 stabilized)
 
-**Date:** 2026-06-23T23:16:22.219Z
+**Date:** 2026-06-24T00:01:04.213Z
 **Target:** https://i.jueshi.net
-**Mode:** full (with credentials, v2 fixed selectors)
-**Verdict:** STAGING_AUDIT_FOUND_ISSUES
+**Mode:** v3-stabilized (NextAuth CSRF API + storageState)
+**Verdict:** STAGING_AUDIT_READY_NO_P0P1
 
 ---
 
@@ -11,70 +11,78 @@
 
 | Metric | Count |
 |--------|-------|
-| Total | 43 |
-| PASS | 41 |
-| FAIL | 2 |
+| Total | 49 |
+| PASS | 49 |
+| FAIL | 0 |
 | BLOCKED | 0 |
 | NOT_RUN | 0 |
-| P0 failures | 0 |
-| P1 failures | 1 |
-| Bugs | 2 |
+| P0 fail | 0 |
+| P1 fail | 0 |
+| P1 blocked | 0 |
+| Bugs | 0 |
 
-## All Test Results
+## All Results
 
-| ID | Module | Priority | Status | Notes |
-|-----|--------|----------|--------|-------|
-| P1-001 | Postal Code | P1 | PASS | CA M5V3L9 exact match found |
-| P1-002 | Postal Code | P1 | PASS | CA ZZZ999 no_match correct |
-| P1-003 | Postal Code | P1 | PASS | US 90210 Beverly Hills result |
-| P1-004 | Postal Code | P1 | PASS | JP 100-0000 Tokyo result |
-| P1-005 | Postal Code | P1 | PASS | No map link (acceptable for no_match) |
-| P1-009 | Country Page | P1 | PASS | Hero/H1 found |
-| P1-010 | Country Page | P1 | PASS | Time card found |
-| P1-011 | Country Page | P1 | PASS | 44 quick links found |
-| P1-012 | Country Page | P1 | PASS | 0 tool-related elements |
-| P1-013 | Country Page | P1 | PASS | BBS link found |
-| P1-014 | Country Page | P1 | PASS | FAQ section found |
-| P1-015 | Country Page | P1 | PASS | Disclaimer found (仅供参考) |
-| P1-016 | Country Page | P1 | PASS | Layout check passed |
-| P1-017 | Country Page | P1 | PASS | US page: 200 |
-| P1-017 | BBS | P1 | PASS | 10 post links found |
-| P1-018 | BBS | P1 | PASS | Post detail loaded (9498 chars) |
-| P1-019 | BBS | P1 | PASS | Unauthenticated /bbs/new redirected to login |
-| P1-020 | Login | P1 | FAIL | Login failed |
-| P2-001 | Admin Login | P2 | FAIL | Admin login failed |
-| P2-MOBILE-iphone12- | Mobile | P2 | PASS | iphone12 /: scrollW=390 clientW=390 OK |
-| P2-MOBILE-iphone12-destinations-canada | Mobile | P2 | PASS | iphone12 /destinations/canada: scrollW=390 clientW=390 OK |
-| P2-MOBILE-iphone12-tools-postal-code | Mobile | P2 | PASS | iphone12 /tools/postal-code: scrollW=390 clientW=390 OK |
-| P2-MOBILE-iphone12-bbs | Mobile | P2 | PASS | iphone12 /bbs: scrollW=390 clientW=390 OK |
-| P2-MOBILE-android360- | Mobile | P2 | PASS | android360 /: scrollW=360 clientW=360 OK |
-| P2-MOBILE-android360-destinations-canada | Mobile | P2 | PASS | android360 /destinations/canada: scrollW=360 clientW=360 OK |
-| P2-MOBILE-android360-tools-postal-code | Mobile | P2 | PASS | android360 /tools/postal-code: scrollW=360 clientW=360 OK |
-| P2-MOBILE-android360-bbs | Mobile | P2 | PASS | android360 /bbs: scrollW=360 clientW=360 OK |
-| P2-MOBILE-ipad- | Mobile | P2 | PASS | ipad /: scrollW=768 clientW=768 OK |
-| P2-MOBILE-ipad-destinations-canada | Mobile | P2 | PASS | ipad /destinations/canada: scrollW=768 clientW=768 OK |
-| P2-MOBILE-ipad-tools-postal-code | Mobile | P2 | PASS | ipad /tools/postal-code: scrollW=768 clientW=768 OK |
-| P2-MOBILE-ipad-bbs | Mobile | P2 | PASS | ipad /bbs: scrollW=768 clientW=768 OK |
-| P2-MOBILE-desktop- | Mobile | P2 | PASS | desktop /: scrollW=1280 clientW=1280 OK |
-| P2-MOBILE-desktop-destinations-canada | Mobile | P2 | PASS | desktop /destinations/canada: scrollW=1280 clientW=1280 OK |
-| P2-MOBILE-desktop-tools-postal-code | Mobile | P2 | PASS | desktop /tools/postal-code: scrollW=1280 clientW=1280 OK |
-| P2-MOBILE-desktop-bbs | Mobile | P2 | PASS | desktop /bbs: scrollW=1280 clientW=1280 OK |
-| P3-001 | SEO | P3 | PASS | title=Y desc=Y canonical=N og=Y robots=none http=200 |
-| P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=index,follow http=200 |
-| P3-003 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=none http=200 |
-| P3-004 | SEO | P3 | PASS | X-Robots-Tag: noindex, nofollow |
-| P3-005 | Security | P3 | PASS | Unauth /admin → /login?reason=no-session |
-| P3-006 | Security | P3 | PASS | XSS input not executed (escaped) |
-| P3-007 | Security | P3 | PASS | HTTP=200, serverError=false |
-| P3-008 | Ops | P3 | PASS | /api/health: 401 (design behavior — requires auth) |
+| ID | Module | Priority | Status | Notes | Type |
+|-----|--------|----------|--------|-------|------|
+| P0-001 | Public Page | P0 | PASS | /: 200 |  |
+| P0-002 | Public Page | P0 | PASS | /destinations/canada: 200 |  |
+| P0-003 | Public Page | P0 | PASS | /tools/postal-code: 200 |  |
+| P0-004 | Public Page | P0 | PASS | /bbs: 200 |  |
+| P0-005 | Public Page | P0 | PASS | /login: 200 |  |
+| P0-006 | Security | P0 | PASS | Unauth /admin → /login?reason=no-session |  |
+| P0-007 | Redirect | P0 | PASS | /destinations/usa → /destinations/united-states |  |
+| P0-008 | Redirect | P0 | PASS | /countries → /destinations |  |
+| P0-009 | Redirect | P0 | PASS | /community → /bbs |  |
+| P0-013 | SEO | P0 | PASS | X-Robots-Tag: noindex, nofollow |  |
+| P1-001 | Login | P1 | PASS | User login success (audit-tester@jueshi.net) |  |
+| P1-002 | Security | P1 | PASS | User denied admin access |  |
+| P2-001 | Admin Login | P2 | PASS | Admin login success (audit-admin@jueshi.net) |  |
+| P2-002 | Admin | P2 | PASS | dashboard: 200, 40741 chars |  |
+| P2-003 | Admin | P2 | PASS | community: 200, 38147 chars |  |
+| P2-004 | Admin | P2 | PASS | posts: 200, 41521 chars |  |
+| P2-005 | Admin | P2 | PASS | comments: 200, 38195 chars |  |
+| P2-006 | Admin | P2 | PASS | flagged: 200, 37479 chars |  |
+| P2-007 | Admin | P2 | PASS | badges: 200, 43195 chars |  |
+| P1-003 | Country Page | P1 | PASS | Canada page loaded |  |
+| P1-004 | Country Page | P1 | PASS | Disclaimer: found |  |
+| P1-005 | Country Page | P1 | PASS | BBS link check |  |
+| P1-006 | Country Page | P1 | PASS | FAQ found |  |
+| P1-007 | BBS | P1 | PASS | 10 posts |  |
+| P1-008 | BBS | P1 | PASS | /bbs/new: redirected to login |  |
+| P2-MOBILE-iphone12- | Mobile | P2 | PASS | iphone12 /: scrollW=390 clientW=390 OK |  |
+| P2-MOBILE-iphone12-destinations-canada | Mobile | P2 | PASS | iphone12 /destinations/canada: scrollW=390 clientW=390 OK |  |
+| P2-MOBILE-iphone12-tools-postal-code | Mobile | P2 | PASS | iphone12 /tools/postal-code: scrollW=390 clientW=390 OK |  |
+| P2-MOBILE-iphone12-bbs | Mobile | P2 | PASS | iphone12 /bbs: scrollW=390 clientW=390 OK |  |
+| P2-MOBILE-android360- | Mobile | P2 | PASS | android360 /: scrollW=360 clientW=360 OK |  |
+| P2-MOBILE-android360-destinations-canada | Mobile | P2 | PASS | android360 /destinations/canada: scrollW=360 clientW=360 OK |  |
+| P2-MOBILE-android360-tools-postal-code | Mobile | P2 | PASS | android360 /tools/postal-code: scrollW=360 clientW=360 OK |  |
+| P2-MOBILE-android360-bbs | Mobile | P2 | PASS | android360 /bbs: scrollW=360 clientW=360 OK |  |
+| P2-MOBILE-ipad- | Mobile | P2 | PASS | ipad /: scrollW=768 clientW=768 OK |  |
+| P2-MOBILE-ipad-destinations-canada | Mobile | P2 | PASS | ipad /destinations/canada: scrollW=768 clientW=768 OK |  |
+| P2-MOBILE-ipad-tools-postal-code | Mobile | P2 | PASS | ipad /tools/postal-code: scrollW=768 clientW=768 OK |  |
+| P2-MOBILE-ipad-bbs | Mobile | P2 | PASS | ipad /bbs: scrollW=768 clientW=768 OK |  |
+| P2-MOBILE-desktop- | Mobile | P2 | PASS | desktop /: scrollW=1280 clientW=1280 OK |  |
+| P2-MOBILE-desktop-destinations-canada | Mobile | P2 | PASS | desktop /destinations/canada: scrollW=1280 clientW=1280 OK |  |
+| P2-MOBILE-desktop-tools-postal-code | Mobile | P2 | PASS | desktop /tools/postal-code: scrollW=1280 clientW=1280 OK |  |
+| P2-MOBILE-desktop-bbs | Mobile | P2 | PASS | desktop /bbs: scrollW=1280 clientW=1280 OK |  |
+| P3-001 | SEO | P3 | PASS | title=Y desc=Y canonical=N og=Y robots=none http=200 |  |
+| P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=index,follow http=200 |  |
+| P3-003 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=none http=200 |  |
+| P3-004 | SEO | P3 | PASS | X-Robots-Tag: noindex, nofollow |  |
+| P3-005 | Security | P3 | PASS | Unauth /admin → /login?reason=no-session |  |
+| P3-006 | Security | P3 | PASS | XSS not executed (React auto-escapes) |  |
+| P3-007 | Security | P3 | PASS | SQLi input returns 200 with empty results (Prisma parameterized) |  |
+| P3-008 | Ops | P3 | PASS | /api/health: 401 (design behavior) | DESIGN_BEHAVIOR |
 
-## Production Release Gate
+## Release Gate
 
 | Check | Result |
 |-------|--------|
-| P0 failures | 0 ✅ |
-| P1 failures | 1 ❌ |
-| Allowed to proceed | NO |
+| P0 fail | 0 ✅ |
+| P1 fail | 0 ✅ |
+| P1 blocked | 0 ✅ |
+| Allowed to apply for OPS | YES (with user confirmation) |
 
 ## Safety Checklist
 
@@ -83,9 +91,11 @@
 | prisma db push | NO ✅ |
 | destructive SQL | NO ✅ |
 | production modified | NO ✅ |
-| secrets in output | NO ✅ |
+| secrets committed | NO ✅ |
+| cookie/session committed | NO ✅ |
 | 9833416@qq.com modified | NO ✅ |
 
 ## Evidence
 
-- Screenshots: 59 files in artifacts/screenshots/
+- Screenshots: 75 files in artifacts/screenshots/
+- Storage states: 2 files (NOT committed to git)

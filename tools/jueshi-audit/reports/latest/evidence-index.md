@@ -12,6 +12,7 @@
 - artifacts/screenshots/P0-004.png
 - artifacts/screenshots/P0-005-bbs-index.png
 - artifacts/screenshots/P0-005.png
+- artifacts/screenshots/P0-006-admin-redirect.png
 - artifacts/screenshots/P0-006-postal-code.png
 - artifacts/screenshots/P0-006.png
 - artifacts/screenshots/P0-007-login-page.png
@@ -27,9 +28,14 @@
 - artifacts/screenshots/P0-017-admin-login.png
 - artifacts/screenshots/P0-018-admin-access.png
 - artifacts/screenshots/P1-001-ca-m5v3l9.png
+- artifacts/screenshots/P1-001-user-login.png
+- artifacts/screenshots/P1-002-user-admin-denied.png
 - artifacts/screenshots/P1-002-zzz999.png
+- artifacts/screenshots/P1-003-canada-full.png
 - artifacts/screenshots/P1-003-us-90210.png
 - artifacts/screenshots/P1-004-jp-1000000.png
+- artifacts/screenshots/P1-007-bbs-list.png
+- artifacts/screenshots/P1-008-bbs-new.png
 - artifacts/screenshots/P1-009-canada-full.png
 - artifacts/screenshots/P1-017-bbs-list.png
 - artifacts/screenshots/P1-017-us-page.png
@@ -38,6 +44,12 @@
 - artifacts/screenshots/P1-020-user-login.png
 - artifacts/screenshots/P1-postal-initial.png
 - artifacts/screenshots/P2-001-admin-login.png
+- artifacts/screenshots/P2-002-dashboard.png
+- artifacts/screenshots/P2-003-community.png
+- artifacts/screenshots/P2-004-posts.png
+- artifacts/screenshots/P2-005-comments.png
+- artifacts/screenshots/P2-006-flagged.png
+- artifacts/screenshots/P2-007-badges.png
 - artifacts/screenshots/P2-MOBILE-android360-.png
 - artifacts/screenshots/P2-MOBILE-android360-bbs.png
 - artifacts/screenshots/P2-MOBILE-android360-destinations-canada.png
@@ -58,8 +70,17 @@
 - artifacts/screenshots/P3-002-seo.png
 - artifacts/screenshots/P3-003-seo.png
 - artifacts/screenshots/P3-005-admin-redirect.png
+- artifacts/screenshots/P3-005.png
 - artifacts/screenshots/P3-006-xss.png
+- artifacts/screenshots/P3-006.png
 - artifacts/screenshots/P3-007-sqli.png
+- artifacts/screenshots/P3-007.png
 - artifacts/screenshots/P3-008-health.png
+- artifacts/screenshots/P3-008.png
 
-**Total screenshots:** 59
+## Storage States
+
+- artifacts/storage-state/admin-session.json (NOT committed to git)
+- artifacts/storage-state/user-session.json (NOT committed to git)
+
+**Total screenshots:** 75
