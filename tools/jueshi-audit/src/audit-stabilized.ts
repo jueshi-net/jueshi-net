@@ -1300,6 +1300,32 @@ async function main() {
   }
   await secCtx.close();
 
+  // ── P3: Resources V2 ────────────────────────────────────
+  const rv2Ctx = await browser.newContext();
+  const rv2Page = await rv2Ctx.newPage();
+  try {
+    const rv2Resp = await rv2Page.goto(BASE_URL + '/resources-v2', { waitUntil: 'domcontentloaded', timeout: 15000 });
+    const rv2Status = rv2Resp?.status() || 0;
+    rec('P3-009', 'ResourcesV2', 'P3', rv2Status === 200 ? 'PASS' : 'FAIL', `/resources-v2 status=${rv2Status}`, '');
+
+    // Check scenario cards present
+    const bodyText = await rv2Page.textContent('body').catch(() => '');
+    const hasScenarios = bodyText?.includes('我要寄件') && bodyText?.includes('我要做发票') && bodyText?.includes('我要查邮编');
+    rec('P3-010', 'ResourcesV2', 'P3', hasScenarios ? 'PASS' : 'FAIL', `Scenario cards: ${hasScenarios ? 'found' : 'missing'}`, '');
+
+    // Check no 500 errors
+    const noErrors = !bodyText?.includes('500') && !bodyText?.includes('Internal Server Error');
+    rec('P3-011', 'ResourcesV2', 'P3', noErrors ? 'PASS' : 'FAIL', `No server errors: ${noErrors}`, '');
+
+    // Check existing /resources still works
+    const oldResp = await rv2Page.goto(BASE_URL + '/resources', { waitUntil: 'domcontentloaded', timeout: 15000 });
+    const oldStatus = oldResp?.status() || 0;
+    rec('P3-012', 'ResourcesV2', 'P3', oldStatus === 200 ? 'PASS' : 'FAIL', `/resources (old) status=${oldStatus}`, '');
+  } catch (e: any) {
+    rec('P3-009', 'ResourcesV2', 'P3', 'FAIL', `Resources V2 test failed: ${e.message}`, '');
+  }
+  await rv2Ctx.close();
+
   await browser.close();
 
   // ── Generate Reports ───────────────────────────────────
