@@ -25,6 +25,8 @@ import { Loader2 } from 'lucide-react';
 import TaskChainGeneratorButton from '@/components/tools/task-chain-generator-button';
 import CompanyProfilePicker from '@/components/document-tools/company-profile-picker';
 import DocumentChainActions from '@/components/document-tools/document-chain-actions';
+import ToolContentSection from '@/components/document-tools/tool-content-section';
+import BbsToolLinkage from '@/components/document-tools/bbs-tool-linkage';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -1367,6 +1369,16 @@ export default function DocumentEditorPage() {
                 </Link>
               </div>
             )}
+
+            {/* Tool Content Section: Guide, FAQ, Common Errors */}
+            <div className="no-print mb-4">
+              <ToolContentSection toolSlug={type} toolName={docType?.titleZh || type} />
+            </div>
+
+            {/* BBS Tool Linkage: Related Discussions */}
+            <div className="no-print mb-4">
+              <BbsToolLinkage toolSlug={type} toolName={docType?.titleZh || type} />
+            </div>
 
             {/* Ad Slot */}
             <div className="no-print"><AdSlot placement="document-editor-bottom" variant="card" /></div>
