@@ -54,6 +54,60 @@
 - artifacts/screenshots/P1-COMPANY-QUOTE-SHEET-PICKER.png
 - artifacts/screenshots/P1-COMPANY-SAVE-BUTTON.png
 - artifacts/screenshots/P1-COMPANY-SHIPPING-LABEL-PICKER.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-BOOKINGINSTRUCTION-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-BOOKINGINSTRUCTION-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-BOOKINGINSTRUCTION-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CERTIFICATEOFORIGINTEMPLATE-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CERTIFICATEOFORIGINTEMPLATE-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CERTIFICATEOFORIGINTEMPLATE-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-COMMERCIAL-INVOICE-company-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-COMMERCIAL-INVOICE-company-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-COMMERCIAL-INVOICE-company-C.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-COMMERCIAL-INVOICE-selector-open.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CONTAINERLOADINGLIST-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CONTAINERLOADINGLIST-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CONTAINERLOADINGLIST-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CUSTOMSDECLARATIONAUTHORIZATION-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CUSTOMSDECLARATIONAUTHORIZATION-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-CUSTOMSDECLARATIONAUTHORIZATION-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-DELIVERYNOTE-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-DELIVERYNOTE-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-DELIVERYNOTE-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-EXPRESSDECLARATION-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-EXPRESSDECLARATION-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-EXPRESSDECLARATION-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-FREIGHTSTATEMENT-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-FREIGHTSTATEMENT-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-FREIGHTSTATEMENT-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-INBOUND-RECEIPT-company-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-INBOUND-RECEIPT-company-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-INBOUND-RECEIPT-company-C.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-INBOUND-RECEIPT-selector-open.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-LETTEROFCREDITINFOSHEET-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-LETTEROFCREDITINFOSHEET-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-LETTEROFCREDITINFOSHEET-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PACKINGLIST-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PACKINGLIST-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PACKINGLIST-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PROFORMAINVOICE-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PROFORMAINVOICE-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-PROFORMAINVOICE-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-QUOTE-company-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-QUOTE-company-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-QUOTE-company-C.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-QUOTE-selector-open.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-RETURNPACKINGLIST-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-RETURNPACKINGLIST-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-RETURNPACKINGLIST-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SALESCONTRACT-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SALESCONTRACT-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SALESCONTRACT-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SHIPPINGINSTRUCTION-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SHIPPINGINSTRUCTION-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-SHIPPINGINSTRUCTION-selector.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-TRUCKINGDISPATCHORDER-co-A.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-TRUCKINGDISPATCHORDER-co-B.png
+- artifacts/screenshots/P1-COMPANY-SWITCH-TRUCKINGDISPATCHORDER-selector.png
 - artifacts/screenshots/P1-DOC-COMPANY-BOOKING_INSTRUCTION.png
 - artifacts/screenshots/P1-DOC-COMPANY-CERTIFICATE_OF_ORIGIN_TEMPLATE.png
 - artifacts/screenshots/P1-DOC-COMPANY-COMMERCIAL_INVOICE.png
@@ -132,4 +186,4 @@
 - artifacts/storage-state/admin-session.json (NOT committed to git)
 - artifacts/storage-state/user-session.json (NOT committed to git)
 
-**Total screenshots:** 124
+**Total screenshots:** 178
