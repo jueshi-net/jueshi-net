@@ -33,17 +33,17 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { documentType, documentData, companyProfileId } = body;
+    const { toolKey, title, dataJson, previewJson, companyProfileId } = body;
 
-    if (!documentType || !documentData) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!toolKey || !dataJson) {
+      return NextResponse.json({ error: "Missing required fields: toolKey, dataJson" }, { status: 400 });
     }
 
-    // Check if draft exists for this type
+    // Check if draft exists for this toolKey
     const existing = await prisma.toolDocumentDraft.findFirst({
       where: {
         userId: session.user.id,
-        documentType,
+        toolKey,
       },
     });
 
@@ -53,9 +53,10 @@ export async function POST(req: NextRequest) {
       draft = await prisma.toolDocumentDraft.update({
         where: { id: existing.id },
         data: {
-          documentData,
+          title: title || existing.title,
+          dataJson,
+          previewJson: previewJson || null,
           companyProfileId: companyProfileId || null,
-          status: "draft",
         },
       });
     } else {
@@ -63,10 +64,11 @@ export async function POST(req: NextRequest) {
       draft = await prisma.toolDocumentDraft.create({
         data: {
           userId: session.user.id,
-          documentType,
-          documentData,
+          toolKey,
+          title: title || toolKey,
+          dataJson,
+          previewJson: previewJson || null,
           companyProfileId: companyProfileId || null,
-          status: "draft",
         },
       });
     }

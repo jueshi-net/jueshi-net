@@ -1,15 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface DocumentChainActionsProps {
   currentType: string;
   formData: Record<string, any>;
-  items?: any[];
-  companyProfileId?: string;
+  lineItems: Record<string, any>[];
+  companyProfile: { id?: string; companyName?: string; companyNameEn?: string } | null;
+  // Callbacks to page-level functions
+  onGenerateNext?: (targetType: string) => void;
+  onSaveDraft?: () => Promise<string | null>;
+  onLoadDraft?: () => void;
+  draftId?: string | null;
 }
 
-// Chain mapping: which document can chain to which
+// Extended chain map: each document can chain to multiple targets
 const CHAIN_MAP: Record<string, { target: string; label: string; icon: string; testId: string }[]> = {
   "quotation": [
     { target: "proforma-invoice", label: "生成形式发票", icon: "📄", testId: "document-chain-next-pi" },
@@ -23,122 +30,80 @@ const CHAIN_MAP: Record<string, { target: string; label: string; icon: string; t
   ],
   "packing-list": [
     { target: "container-loading-list", label: "生成装柜明细单", icon: "🚢", testId: "document-chain-next-container" },
-    { target: "shipping-mark", label: "生成唛头", icon: "🏷️", testId: "document-chain-next-shipping-mark" },
+  ],
+  "sales-contract": [
+    { target: "commercial-invoice", label: "生成商业发票", icon: "🧾", testId: "document-chain-next-ci" },
   ],
 };
 
-// Mappable fields between document types
-const MAPPABLE_FIELDS = [
-  'companyName', 'companyNameEn', 'companyAddress', 'companyPhone', 'companyEmail',
-  'buyerName', 'buyerAddress', 'buyerPhone', 'buyerEmail',
-  'invoiceNo', 'piNo', 'contractNo', 'currency', 'paymentTerms',
-  'deliveryTerms', 'deliveryDate', 'expiryDate',
-  'items', 'totalAmount', 'totalQuantity',
-];
+// Map source type to display name
+const TYPE_LABELS: Record<string, string> = {
+  "quotation": "报价单",
+  "proforma-invoice": "形式发票",
+  "commercial-invoice": "商业发票",
+  "packing-list": "装箱单",
+  "sales-contract": "外贸销售合同",
+  "container-loading-list": "装柜明细单",
+  "customs-declaration-authorization": "报关委托书",
+};
 
 export default function DocumentChainActions({
   currentType,
   formData,
-  items,
-  companyProfileId,
+  lineItems,
+  companyProfile,
+  onGenerateNext,
+  onSaveDraft,
+  onLoadDraft,
+  draftId,
 }: DocumentChainActionsProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [saved, setSaved] = useState(false);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [importedBadge, setImportedBadge] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedDraftId, setSavedDraftId] = useState<string | null>(draftId || null);
 
   const chainOptions = CHAIN_MAP[currentType] || [];
+  const fromChain = searchParams.get("from") || searchParams.get("fromChain");
+  const sourceType = fromChain || searchParams.get("source");
 
-  useEffect(() => {
-    // Check for existing draft
-    if (typeof window !== "undefined") {
-      setHasDraft(!!localStorage.getItem(`jueshi:draft:${currentType}`));
-    }
-    // Check for chain import
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const fromChain = params.get("fromChain");
-      if (fromChain) {
-        const chainData = localStorage.getItem(`jueshi:chain:${currentType}`);
-        if (chainData) {
-          try {
-            const parsed = JSON.parse(chainData);
-            setImportedBadge(`从 ${parsed.sourceType} 导入`);
-            // Dispatch event for parent to import data
-            window.dispatchEvent(new CustomEvent("chain-import", { detail: parsed }));
-          } catch {
-            // Invalid data
-          }
-        }
-      }
-    }
-    // Listen for draft-loaded events
-    const handleDraftLoaded = () => setHasDraft(true);
-    window.addEventListener("draft-loaded", handleDraftLoaded);
-    return () => window.removeEventListener("draft-loaded", handleDraftLoaded);
-  }, [currentType]);
-
-  if (chainOptions.length === 0 && currentType !== "quotation" && currentType !== "proforma-invoice" && currentType !== "commercial-invoice" && currentType !== "packing-list" && currentType !== "sales-contract") {
+  // Only show for documents that have chain options or are chain targets
+  const isChainTarget = !!sourceType;
+  if (chainOptions.length === 0 && !isChainTarget && currentType !== "sales-contract") {
     return null;
   }
 
-  const handleChain = (target: string) => {
-    // Save current data to localStorage for chain transfer
-    // Only pass mappable fields, don't fabricate data
-    const chainData = {
-      sourceType: currentType,
-      sourceData: formData,
-      sourceItems: items,
-      companyProfileId,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem(`jueshi:chain:${target}`, JSON.stringify(chainData));
-
-    // Navigate to target tool
-    window.location.href = `/tools/documents/${target}?fromChain=${currentType}`;
+  const handleChain = (targetType: string) => {
+    if (onGenerateNext) {
+      // Use the page's existing handleGenerateNextDocument logic
+      // but with a specific target type
+      onGenerateNext(targetType);
+    } else {
+      // Fallback: direct navigation
+      router.push(`/tools/documents/${targetType}?from=${currentType}`);
+    }
   };
 
   const handleSaveDraft = async () => {
-    const draftData = {
-      type: currentType,
-      data: formData,
-      items,
-      companyProfileId,
-      timestamp: Date.now(),
-    };
-    // Save to localStorage (MVP - DB persistence requires auth)
-    localStorage.setItem(`jueshi:draft:${currentType}`, JSON.stringify(draftData));
-    setSaved(true);
-    setHasDraft(true);
-    setTimeout(() => setSaved(false), 2000);
-
-    // Try to save to DB if authenticated
+    setSaveError(null);
     try {
-      await fetch("/api/workspace/document-drafts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          documentType: currentType,
-          documentData: JSON.stringify(draftData),
-          companyProfileId: companyProfileId || null,
-        }),
-      });
-    } catch {
-      // DB save failed, localStorage is fallback
+      if (onSaveDraft) {
+        const id = await onSaveDraft();
+        if (id) {
+          setSavedDraftId(id);
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        }
+      } else {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
+      }
+    } catch (e: any) {
+      setSaveError(e.message || "保存失败");
     }
   };
 
-  const handleLoadDraft = () => {
-    const saved = localStorage.getItem(`jueshi:draft:${currentType}`);
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        // Emit event for parent to pick up
-        window.dispatchEvent(new CustomEvent("draft-loaded", { detail: data }));
-      } catch {
-        // Invalid data
-      }
-    }
-  };
+  const sourceLabel = sourceType ? (TYPE_LABELS[sourceType] || sourceType) : null;
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-4 mt-4" data-testid="document-chain-actions">
@@ -152,9 +117,9 @@ export default function DocumentChainActions({
           >
             {saved ? "✓ 已保存" : "保存草稿"}
           </button>
-          {hasDraft && (
+          {onLoadDraft && (
             <button
-              onClick={handleLoadDraft}
+              onClick={onLoadDraft}
               data-testid="document-draft-load-btn"
               className="text-xs px-2.5 py-1 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-gray-600"
             >
@@ -164,13 +129,42 @@ export default function DocumentChainActions({
         </div>
       </div>
 
-      {importedBadge && (
-        <div data-testid="document-chain-import-source" className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs">
-          <span>↩</span>
-          <span>{importedBadge}</span>
+      {/* Source badge - shows when this document was generated from another */}
+      {sourceLabel && (
+        <div className="mb-3 flex items-center gap-2">
+          <span
+            data-testid="document-chain-source-badge"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs"
+          >
+            <span>↩</span>
+            <span data-testid="document-chain-generated-from">由 {sourceLabel} 生成</span>
+          </span>
+          <Link
+            href={`/tools/documents/${sourceType}`}
+            data-testid="document-chain-back-to-source"
+            className="text-xs text-blue-600 hover:text-blue-700 underline"
+          >
+            ← 返回{sourceLabel}
+          </Link>
         </div>
       )}
 
+      {/* Company info display */}
+      {companyProfile?.companyName && (
+        <div data-testid="document-chain-imported-company" className="mb-2 text-xs text-gray-500">
+          当前公司: {companyProfile.companyName}
+          {companyProfile.companyNameEn ? ` (${companyProfile.companyNameEn})` : ""}
+        </div>
+      )}
+
+      {/* Line items count */}
+      {lineItems.length > 0 && (
+        <div data-testid="document-chain-imported-items" className="mb-2 text-xs text-gray-500">
+          商品明细: {lineItems.length} 行
+        </div>
+      )}
+
+      {/* Chain buttons */}
       {chainOptions.length > 0 && (
         <>
           <div className="flex flex-wrap gap-2">
@@ -188,15 +182,29 @@ export default function DocumentChainActions({
             ))}
           </div>
           <p className="text-xs text-gray-400 mt-2">
-            链路传递：公司资料 + 商品明细将自动带入下一单据
+            链路传递：公司资料 + 商品明细 + 客户信息 + 币种将自动带入下一单据
           </p>
         </>
       )}
 
+      {/* Save status */}
       {saved && (
-        <div data-testid="document-draft-saved-toast" className="mt-2 text-xs text-green-600 flex items-center gap-1">
+        <div data-testid="document-draft-save-status" className="mt-2 text-xs text-green-600 flex items-center gap-1">
           <span>✓</span>
-          <span>草稿已保存到本地，可在工作台查看</span>
+          <span>草稿已保存{savedDraftId ? ` (ID: ${savedDraftId.substring(0, 8)}...)` : ""}</span>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="mt-2 text-xs text-red-600 flex items-center gap-1">
+          <span>✗</span>
+          <span>保存失败: {saveError}</span>
+        </div>
+      )}
+
+      {savedDraftId && (
+        <div data-testid="document-draft-id" className="mt-1 text-xs text-gray-400">
+          草稿 ID: {savedDraftId}
         </div>
       )}
     </div>

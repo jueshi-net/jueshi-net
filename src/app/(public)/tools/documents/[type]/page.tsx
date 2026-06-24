@@ -171,6 +171,13 @@ export default function DocumentEditorPage() {
     if (taskChainData.terms) updates.terms = taskChainData.terms;
     if (taskChainData.invoiceNo) updates.invoiceNo = taskChainData.invoiceNo;
     
+    // v1.20.42.18.6.14: Company info from document chain
+    if (taskChainData.companyName) updates.companyName = taskChainData.companyName;
+    if (taskChainData.companyNameEn) updates.companyNameEn = taskChainData.companyNameEn;
+    if (taskChainData.companyAddress) updates.companyAddress = taskChainData.companyAddress;
+    if (taskChainData.companyPhone) updates.companyPhone = taskChainData.companyPhone;
+    if (taskChainData.companyEmail) updates.companyEmail = taskChainData.companyEmail;
+    
     // Legacy: productName/hsCode for single-item chain
     if (taskChainData.productName || taskChainData.hsCode) {
       setLineItems(prev => {
@@ -281,9 +288,9 @@ export default function DocumentEditorPage() {
     trackEvent.custom(type, 'task_chain_generator_fill');
   };
 
-  // v1.20.42.13.1: Generate next document in chain
-  const handleGenerateNextDocument = () => {
-    const nextType = DOCUMENT_CHAIN[type];
+  // v1.20.42.13.1: Generate next document in chain (supports custom target)
+  const handleGenerateNextDocument = useCallback((targetType?: string) => {
+    const nextType = targetType || DOCUMENT_CHAIN[type];
     if (!nextType) return;
 
     // Track toolchain navigation
@@ -326,11 +333,18 @@ export default function DocumentEditorPage() {
       totalGrossWeight: parseFloat(formData.totalGrossWeight) || 0,
       totalNetWeight: parseFloat(formData.totalNetWeight) || 0,
       totalVolume: parseFloat(formData.totalVolume) || 0,
+      // v1.20.42.18.6.14: Company profile in chain
+      companyProfileId: companyProfile?.id,
+      companyName: companyProfile?.companyName || formData.companyName || '',
+      companyNameEn: companyProfile?.companyNameEn || formData.companyNameEn || '',
+      companyAddress: companyProfile?.address || formData.companyAddress || '',
+      companyPhone: companyProfile?.phone || formData.companyPhone || '',
+      companyEmail: companyProfile?.email || formData.companyEmail || '',
     });
 
     // Navigate to next document
-    router.push(`/tools/documents/${nextType}?from=task-chain`);
-  };
+    router.push(`/tools/documents/${nextType}?from=${type}`);
+  }, [type, formData, lineItems, router]);
 
   const nextDocumentType = DOCUMENT_CHAIN[type];
   const nextDocumentLabel = nextDocumentType ? DOCUMENT_CHAIN_LABELS[nextDocumentType] : '';
@@ -968,7 +982,7 @@ export default function DocumentEditorPage() {
               <FileText className="w-4 h-4" /> {saving ? '保存中...' : '保存到工作台'}
             </button>
             {nextDocumentType && (
-              <button onClick={handleGenerateNextDocument} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors" title={`将当前数据导入到${nextDocumentLabel}`}>
+              <button onClick={() => handleGenerateNextDocument()} className="flex items-center gap-1.5 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors" title={`将当前数据导入到${nextDocumentLabel}`}>
                 <ChevronRight className="w-4 h-4" /> 生成{nextDocumentLabel}
               </button>
             )}
@@ -1021,10 +1035,16 @@ export default function DocumentEditorPage() {
             </div>
             {/* Document Chain Actions */}
             <DocumentChainActions
-              currentType={docType}
+              currentType={type}
               formData={formData}
-              items={formData.items || []}
-              companyProfileId={companyProfile?.id}
+              lineItems={lineItems}
+              companyProfile={companyProfile}
+              onGenerateNext={handleGenerateNextDocument}
+              onSaveDraft={async () => {
+                handleSaveDraft();
+                return draftId;
+              }}
+              draftId={draftId}
             />
             {/* Company info */}
             <div className="bg-white rounded-xl border p-5 mb-4">
@@ -1258,6 +1278,12 @@ export default function DocumentEditorPage() {
                               ) : (
                                 <input type={col.key === 'quantity' || col.key === 'unitPrice' || col.key === 'grossWeight' || col.key === 'netWeight' || col.key === 'volume' || col.key === 'weight' ? 'number' : 'text'}
                                   value={item[col.key] || ''} onChange={e => updateLineItem(idx, col.key, e.target.value)}
+                                  data-testid={
+                                    col.key === 'description' ? 'document-line-item-product-name' :
+                                    col.key === 'hsCode' ? 'document-line-item-hs-code' :
+                                    col.key === 'unitPrice' ? 'document-line-item-unit-price' :
+                                    undefined
+                                  }
                                   className="w-full px-2 py-1 border rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder={col.label} />
                               )}
                             </td>

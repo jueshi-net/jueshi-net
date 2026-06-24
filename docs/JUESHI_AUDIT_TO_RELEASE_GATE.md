@@ -1,5 +1,20 @@
 # JUESHI_AUDIT_TO_RELEASE_GATE.md — Audit to Release Gate Flow
 
+## v18.6.14 深度审计命令
+
+| 命令 | 覆盖范围 |
+|------|----------|
+| `npm run jueshi-audit:document-chain-deep` | 单据链路深度（Quote→PI→CI→PL→Container） |
+| `npm run jueshi-audit:document-drafts-deep` | 草稿保存/恢复/复制/删除 |
+| `npm run jueshi-audit:product-catalog-deep` | 商品资料库 CRUD + 单据选择器 |
+| `npm run jueshi-audit:resources-v2-deep` | 资源导航 V2 搜索/筛选/场景页 |
+| `npm run jueshi-audit:tool-content-deep` | 工具内容系统（指南/FAQ/错误） |
+| `npm run jueshi-audit:bbs-tool-linkage-deep` | 社区联动（发帖上下文/回链） |
+| `npm run jueshi-audit:entitlements-deep` | 会员权益一致性 |
+| `npm run jueshi-audit:webkit-deep` | WebKit 全链路回归 |
+| `npm run jueshi-audit:mobile-deep` | 移动端全链路回归 |
+| `npm run jueshi-audit:deep-staging` | 聚合全量深度审计 |
+
 ## Audit Commands (v18.6.12)
 
 | Command | Suite | Description |

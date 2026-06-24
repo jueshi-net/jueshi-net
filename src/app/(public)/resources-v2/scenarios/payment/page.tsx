@@ -4,11 +4,14 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 const SCENARIO = {
-  title: "我要找官方机构",
-  desc: "海关、邮政、商务部门",
-  icon: "🏛️",
-  tools: [] as { name: string; route: string; icon: string }[],
-  official: ["海关总署", "中国邮政集团", "商务部"],
+  title: "我要找跨境收款",
+  desc: "跨境收款平台、汇率查询、支付工具",
+  icon: "💰",
+  tools: [
+    { name: "汇率查询", route: "/tools/exchange-rate", icon: "💱" },
+    { name: "运费计算", route: "/tools/shipping-calculator", icon: "🚢" },
+  ],
+  official: ["国家外汇管理局", "中国人民银行"],
 };
 
 export default async function ScenarioPage() {
@@ -19,7 +22,25 @@ export default async function ScenarioPage() {
     resources = await prisma.resource.findMany({
       where: {
         isActive: true,
-        sourceType: "official",
+        OR: [
+          {
+            tags: {
+              hasSome: [
+                "支付",
+                "收款",
+                "payment",
+                "汇率",
+                "金融",
+                "pay",
+                "fintech",
+                "银行",
+                "bank",
+                "Stripe",
+                "PayPal",
+              ],
+            },
+          },
+        ],
       },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       take: 20,
@@ -79,7 +100,7 @@ export default async function ScenarioPage() {
 
           <div>
             <h2 className="mb-3 text-sm font-semibold text-gray-700">
-              官方机构列表
+              官方资源
             </h2>
             <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
               <ul className="space-y-2">
@@ -98,7 +119,7 @@ export default async function ScenarioPage() {
 
           <div>
             <h2 className="mb-3 text-sm font-semibold text-gray-700">
-              官方资源库
+              相关资源
             </h2>
             {dbError ? (
               <div
@@ -115,19 +136,25 @@ export default async function ScenarioPage() {
                     href={r.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xl border border-amber-200 bg-amber-50 p-4 transition-all hover:border-amber-400 hover:shadow-sm"
+                    className="rounded-xl border bg-white p-4 transition-all hover:border-blue-300 hover:shadow-sm"
                     data-testid="resources-v2-resource-card"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-gray-800">
                         {r.name}
                       </span>
-                      <span className="ml-2 rounded bg-amber-200 px-1.5 py-0.5 text-xs text-amber-800">
-                        官方
+                      <span
+                        className={`ml-2 rounded px-1.5 py-0.5 text-xs ${
+                          r.sourceType === "official"
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {r.sourceType === "official" ? "官方" : "第三方"}
                       </span>
                     </div>
                     {r.description && (
-                      <div className="mt-1 text-xs text-gray-500">
+                      <div className="mt-1 text-xs text-gray-400">
                         {r.description}
                       </div>
                     )}
@@ -136,7 +163,7 @@ export default async function ScenarioPage() {
                         {r.tags.slice(0, 4).map((tag: string) => (
                           <span
                             key={tag}
-                            className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-600"
+                            className="rounded bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-400"
                           >
                             {tag}
                           </span>
@@ -151,9 +178,9 @@ export default async function ScenarioPage() {
                 data-testid="resources-v2-empty-state"
                 className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center"
               >
-                <div className="mb-2 text-3xl">🏛️</div>
+                <div className="mb-2 text-3xl">💰</div>
                 <p className="text-sm text-gray-400">
-                  暂无官方资源，资源库持续更新中。
+                  暂无跨境收款相关资源，资源库持续更新中。
                 </p>
               </div>
             )}

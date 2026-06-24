@@ -12,7 +12,7 @@ const SCENARIOS = [
   { slug: "payment", title: "我要找跨境收款", desc: "收款平台、汇率查询", icon: "💰", color: "bg-emerald-50 hover:bg-emerald-100 border-emerald-200" },
   { slug: "company", title: "我要注册公司", desc: "海外公司注册指南", icon: "🏢", color: "bg-indigo-50 hover:bg-indigo-100 border-indigo-200" },
   { slug: "customs", title: "我要查海关", desc: "HS编码、报关流程", icon: "🛃", color: "bg-cyan-50 hover:bg-cyan-100 border-cyan-200" },
-  { slug: "education", title: "我要留学/生活", desc: "签证、学校、海外生活", icon: "🎓", color: "bg-pink-50 hover:bg-pink-100 border-pink-200" },
+  { slug: "life", title: "我要海外生活", desc: "签证、学校、日常生活", icon: "🎓", color: "bg-pink-50 hover:bg-pink-100 border-pink-200" },
 ];
 
 const POPULAR_COUNTRIES = [
@@ -36,21 +36,24 @@ const RELATED_TOOLS = [
 export default async function ResourcesV2Page() {
   let resources: any[] = [];
   let officialResources: any[] = [];
+  let dbError = false;
 
   try {
-    resources = await prisma.resource.findMany({
-      where: { isActive: true },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-      take: 12,
-    });
-
-    officialResources = await prisma.resource.findMany({
-      where: { isActive: true, sourceType: "official" },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-      take: 8,
-    });
+    [resources, officialResources] = await Promise.all([
+      prisma.resource.findMany({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        take: 50,
+      }),
+      prisma.resource.findMany({
+        where: { isActive: true, sourceType: "official" },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        take: 8,
+      }),
+    ]);
   } catch {
-    // DB not available, use fallback
+    // DB not available — client will render error state
+    dbError = true;
   }
 
   return (
@@ -59,6 +62,7 @@ export default async function ResourcesV2Page() {
         scenarios={SCENARIOS}
         countries={POPULAR_COUNTRIES}
         tools={RELATED_TOOLS}
+        error={dbError}
         resources={resources.map((r) => ({
           id: r.id,
           name: r.name,
@@ -67,6 +71,7 @@ export default async function ResourcesV2Page() {
           category: r.category,
           sourceType: r.sourceType,
           usage: r.usage || "",
+          tags: r.tags || [],
         }))}
         officialResources={officialResources.map((r) => ({
           id: r.id,
