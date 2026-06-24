@@ -15,6 +15,8 @@
     "audit:company": "tsx src/audit-stabilized.ts --suite company",
     "audit:documents": "tsx src/audit-stabilized.ts --suite documents",
     "audit:membership": "tsx src/audit-stabilized.ts --suite membership",
+    "audit:company-switch": "tsx src/audit-stabilized.ts --suite company-switch",
+    "audit:documents-company-switch": "tsx src/audit-stabilized.ts --suite documents-company-switch",
     "audit:webkit": "tsx src/audit-stabilized.ts --engine webkit",
     "audit:stabilized:staging": "AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",
     "audit:webkit": "AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",

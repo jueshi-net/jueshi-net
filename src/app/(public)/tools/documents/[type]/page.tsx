@@ -23,6 +23,7 @@ import { getTaskChain, getTaskChainFromURL, clearTaskChain, hasTaskChainData, sa
 import { track, trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
 import TaskChainGeneratorButton from '@/components/tools/task-chain-generator-button';
+import CompanyProfilePicker from '@/components/document-tools/company-profile-picker';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -1018,7 +1019,30 @@ export default function DocumentEditorPage() {
             </div>
             {/* Company info */}
             <div className="bg-white rounded-xl border p-5 mb-4">
-              <div className="flex items-center justify-between mb-4">
+              {/* v1.20.42.18.6.11.5: Multi-company selector for logged-in users */}
+              <div data-testid="doc-company-picker-wrapper" className="mb-4">
+                <CompanyProfilePicker
+                  selectedId={companyProfile?.id || null}
+                  onSelect={(profile) => {
+                    setCompanyProfile(profile);
+                    // Sync form data with selected company
+                    setFormData(prev => ({
+                      ...prev,
+                      companyName: profile.companyName || '',
+                      companyNameEn: profile.companyNameEn || '',
+                      companyAddress: profile.address || '',
+                      companyPhone: profile.phone || '',
+                      companyEmail: profile.email || '',
+                      companyWebsite: profile.website || '',
+                      companyLogo: profile.logoUrl || profile.logoDataUrl || '',
+                      currency: profile.defaultCurrency || prev.currency || 'USD',
+                    }));
+                    saveCompanyProfile(profile);
+                    setShowCompanyForm(false);
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between mb-2">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2"><Building2 className="w-4 h-4" /> 公司信息</h2>
                 <div className="flex items-center gap-2">
                   {!perms.authenticated && perms.role === 'guest' && (

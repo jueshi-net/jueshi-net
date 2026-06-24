@@ -1,0 +1,128 @@
+{
+  "version": "1.20.42.18.6.11.5",
+  "description": "Multi-company switching audit cases for all document tools",
+  "test_companies": {
+    "A": { "name": "QS Test Company", "id": "cmq4wr3mp0002xj5pxf093le6", "isDefault": true },
+    "B": { "name": "Audit Test Co B Ltd", "id": "audit-co-b", "isDefault": false },
+    "C": { "name": "Audit Test Co C Inc", "id": "audit-co-c", "isDefault": false }
+  },
+  "cases": [
+    {
+      "id": "P1-COMPANY-SWITCH-QUOTE",
+      "module": "Document",
+      "route": "/tools/quote-sheet",
+      "picker_type": "CompanyProfilePicker",
+      "description": "Switch between 3 companies on quote sheet, verify preview updates"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-COMMERCIAL-INVOICE",
+      "module": "Document",
+      "route": "/tools/commercial-invoice",
+      "picker_type": "CompanyProfilePicker"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-PACKING-LIST",
+      "module": "Document",
+      "route": "/tools/documents/packing-list",
+      "picker_type": "dynamic",
+      "description": "Switch companies on packing list via dynamic route picker"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-PROFORMA-INVOICE",
+      "module": "Document",
+      "route": "/tools/documents/proforma-invoice",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-SALES-CONTRACT",
+      "module": "Document",
+      "route": "/tools/documents/sales-contract",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-BOOKING-REQUEST",
+      "module": "Document",
+      "route": "/tools/documents/booking-request",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-CUSTOMS-DECLARATION",
+      "module": "Document",
+      "route": "/tools/documents/customs-declaration",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-BL-INSTRUCTION",
+      "module": "Document",
+      "route": "/tools/documents/bl-instruction",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-DELIVERY-NOTE",
+      "module": "Document",
+      "route": "/tools/documents/delivery-note",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-TRUCK-DISPATCH",
+      "module": "Document",
+      "route": "/tools/documents/truck-dispatch",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-CONTAINER-LOADING",
+      "module": "Document",
+      "route": "/tools/documents/container-loading",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-EXPRESS-DECLARATION",
+      "module": "Document",
+      "route": "/tools/documents/express-declaration",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-CO-TEMPLATE",
+      "module": "Document",
+      "route": "/tools/documents/co-template",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-INBOUND-RECEIPT",
+      "module": "Document",
+      "route": "/tools/inbound-receipt",
+      "picker_type": "CompanyProfilePicker"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-RETURN-PACKING",
+      "module": "Document",
+      "route": "/tools/documents/return-packing-list",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-FREIGHT-RECONCILIATION",
+      "module": "Document",
+      "route": "/tools/documents/freight-reconciliation",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-LC-SIMPLE",
+      "module": "Document",
+      "route": "/tools/documents/lc-simple",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-META-FORM-TOOLS",
+      "module": "Document",
+      "route": "/tools/documents/meta-form",
+      "picker_type": "dynamic"
+    },
+    {
+      "id": "P1-COMPANY-SWITCH-ALL-DYNAMIC-DOCUMENTS",
+      "module": "Document",
+      "route": "/tools/documents/*",
+      "picker_type": "dynamic",
+      "description": "Batch test all dynamic document routes for company switching"
+    }
+  ]
+}

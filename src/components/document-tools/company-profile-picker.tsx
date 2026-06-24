@@ -240,6 +240,7 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
             {profiles.map(p => (
               <button
                 key={p.id}
+                data-testid={`company-option-${p.id}`}
                 onClick={() => handleSelect(p)}
                 className={`w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between ${p.id === selectedId ? "bg-teal-50" : ""}`}
               >
