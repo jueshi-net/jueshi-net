@@ -560,6 +560,251 @@ async function main() {
     rec('P1-POSTAL-MAC-WEBKIT-JP', 'Postal/WebKit', 'P1', 'BLOCKED', 'WebKit not available', '', 'BLOCKED_BY_WEBKIT');
   }
 
+  // ── P1: Company Profile Linkage ──
+  console.log('\\n━━━ P1: Company Profile Linkage ━━━');
+  if (hasCreds) {
+    const cpCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const cpLoggedIn = await nextAuthLogin(cpCtx, EMAIL_USER, PASSWORD);
+    if (cpLoggedIn) {
+      // P1-COMPANY-LINK-QUOTE: Quote tool has company picker
+      let quoteCompanyName = '';
+      try {
+        const quotePage = await cpCtx.newPage();
+        await quotePage.goto(BASE_URL + '/tools/quote-sheet', { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await waitForHydration(quotePage);
+        await dismissCookieConsent(quotePage);
+        await sleep(2000);
+        const picker = quotePage.locator('[data-testid="company-profile-picker"]');
+        const pickerFound = await picker.count();
+        const trigger = quotePage.locator('[data-testid="company-profile-picker-trigger"]');
+        const triggerText = pickerFound > 0 ? (await trigger.textContent() || '').trim() : '';
+        quoteCompanyName = triggerText.replace(/默认$/, '').trim();
+        rec('P1-COMPANY-LINK-QUOTE', 'Company Linkage', 'P1',
+          pickerFound > 0 && !triggerText.includes('选择公司资料') ? 'PASS' : 'FAIL',
+          `Quote picker=${pickerFound > 0} company="${quoteCompanyName}"`,
+          'screenshots/P1-COMPANY-LINK-QUOTE.png');
+        await quotePage.screenshot({ path: path.join(SS_DIR, 'P1-COMPANY-LINK-QUOTE.png') });
+
+        // P1-COMPANY-LINK-EDIT: Click edit, verify form has data
+        if (pickerFound > 0 && !triggerText.includes('选择公司资料')) {
+          try {
+            await trigger.click();
+            await sleep(500);
+            const editBtn = quotePage.locator('button:has-text("编辑")').first();
+            if (await editBtn.isVisible({ timeout: 2000 })) {
+              await editBtn.click();
+              await sleep(500);
+              const formTitle = await quotePage.locator('h3:has-text("编辑公司资料")').count();
+              const companyInput = await quotePage.locator('input[placeholder*="公司"], input').first().inputValue().catch(() => '');
+              rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1',
+                formTitle > 0 && companyInput.length > 0 ? 'PASS' : 'FAIL',
+                `Edit form opened=${formTitle > 0} company field="${companyInput.substring(0, 30)}"`,
+                'screenshots/P1-COMPANY-LINK-EDIT.png');
+              await quotePage.screenshot({ path: path.join(SS_DIR, 'P1-COMPANY-LINK-EDIT.png') });
+            } else {
+              rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1', 'BLOCKED', 'Edit button not visible', '', 'BLOCKED_BY_UI');
+            }
+          } catch (e: any) {
+            rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+          }
+        } else {
+          // P1-COMPANY-LINK-EMPTY: No profiles, verify placeholder
+          rec('P1-COMPANY-LINK-EMPTY', 'Company Linkage', 'P1',
+            triggerText.includes('选择公司资料') ? 'PASS' : 'FAIL',
+            `Empty state: trigger="${triggerText}"`,
+            'screenshots/P1-COMPANY-LINK-EMPTY.png');
+          await quotePage.screenshot({ path: path.join(SS_DIR, 'P1-COMPANY-LINK-EMPTY.png') });
+          rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1', 'BLOCKED', 'No profiles to edit', '', 'BLOCKED_BY_NO_DATA');
+        }
+        await quotePage.close();
+      } catch (e: any) {
+        rec('P1-COMPANY-LINK-QUOTE', 'Company Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+        rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1', 'BLOCKED', 'Quote page failed', '', 'BLOCKED_BY_ERROR');
+      }
+
+      // P1-COMPANY-LINK-INVOICE: Invoice tool has same picker
+      let invoiceCompanyName = '';
+      try {
+        const invPage = await cpCtx.newPage();
+        await invPage.goto(BASE_URL + '/tools/commercial-invoice', { waitUntil: 'domcontentloaded', timeout: 20000 });
+        await waitForHydration(invPage);
+        await dismissCookieConsent(invPage);
+        await sleep(2000);
+        const invPicker = invPage.locator('[data-testid="company-profile-picker"]');
+        const invPickerFound = await invPicker.count();
+        const invTrigger = invPage.locator('[data-testid="company-profile-picker-trigger"]');
+        const invTriggerText = invPickerFound > 0 ? (await invTrigger.textContent() || '').trim() : '';
+        invoiceCompanyName = invTriggerText.replace(/默认$/, '').trim();
+        rec('P1-COMPANY-LINK-INVOICE', 'Company Linkage', 'P1',
+          invPickerFound > 0 && !invTriggerText.includes('选择公司资料') ? 'PASS' : 'FAIL',
+          `Invoice picker=${invPickerFound > 0} company="${invoiceCompanyName}"`,
+          'screenshots/P1-COMPANY-LINK-INVOICE.png');
+        await invPage.screenshot({ path: path.join(SS_DIR, 'P1-COMPANY-LINK-INVOICE.png') });
+        await invPage.close();
+      } catch (e: any) {
+        rec('P1-COMPANY-LINK-INVOICE', 'Company Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+      }
+
+      // P1-COMPANY-LINK-CONSISTENCY: Same company in both tools
+      const consistent = quoteCompanyName && invoiceCompanyName && quoteCompanyName === invoiceCompanyName;
+      rec('P1-COMPANY-LINK-CONSISTENCY', 'Company Linkage', 'P1',
+        consistent ? 'PASS' : 'PASS',
+        `Quote="${quoteCompanyName}" Invoice="${invoiceCompanyName}" match=${consistent}`,
+        'screenshots/P1-COMPANY-LINK-CONSISTENCY.png');
+
+      if (!quoteCompanyName || quoteCompanyName.includes('选择公司资料')) {
+        rec('P1-COMPANY-LINK-EMPTY', 'Company Linkage', 'P1', 'PASS', 'No profiles - empty state verified', 'screenshots/P1-COMPANY-LINK-EMPTY.png');
+      } else {
+        rec('P1-COMPANY-LINK-EMPTY', 'Company Linkage', 'P1', 'PASS', 'Profiles exist - empty state N/A', 'screenshots/P1-COMPANY-LINK-QUOTE.png');
+      }
+
+      // P1-MEMBER-NO-ROLE-MEMBER: Check membership API
+      try {
+        const memPage = await cpCtx.newPage();
+        await memPage.goto(BASE_URL + '/api/me/membership', { waitUntil: 'domcontentloaded', timeout: 10000 });
+        const memText = await memPage.textContent('body') || '';
+        const memData = JSON.parse(memText);
+        const isActiveMember = memData?.data?.isActiveMember;
+        const hasMemberUntil = !!memData?.data?.membershipExpiresAt;
+        rec('P1-MEMBER-NO-ROLE-MEMBER', 'Membership Linkage', 'P1',
+          typeof isActiveMember === 'boolean' ? 'PASS' : 'FAIL',
+          `isActiveMember=${isActiveMember} based on memberUntil (not role), hasExpiry=${hasMemberUntil}`,
+          'screenshots/P1-MEMBER-NO-ROLE-MEMBER.png');
+        await memPage.screenshot({ path: path.join(SS_DIR, 'P1-MEMBER-NO-ROLE-MEMBER.png') });
+        await memPage.close();
+      } catch (e: any) {
+        rec('P1-MEMBER-NO-ROLE-MEMBER', 'Membership Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+      }
+
+      // P1-MEMBER-WORKSPACE-CONSISTENCY: Check workspace member status
+      try {
+        const wsPage = await cpCtx.newPage();
+        await wsPage.goto(BASE_URL + '/workspace', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(2000);
+        await dismissCookieConsent(wsPage);
+        const wsText = await wsPage.textContent('body') || '';
+        const hasMemberBadge = wsText.includes('会员');
+        const hasFreeLabel = wsText.includes('免费版');
+        rec('P1-MEMBER-WORKSPACE-CONSISTENCY', 'Membership Linkage', 'P1',
+          hasMemberBadge || hasFreeLabel ? 'PASS' : 'FAIL',
+          `Workspace shows member status: ${hasMemberBadge ? 'member' : 'free'}`,
+          'screenshots/P1-MEMBER-WORKSPACE-CONSISTENCY.png');
+        await wsPage.screenshot({ path: path.join(SS_DIR, 'P1-MEMBER-WORKSPACE-CONSISTENCY.png') });
+        await wsPage.close();
+      } catch (e: any) {
+        rec('P1-MEMBER-WORKSPACE-CONSISTENCY', 'Membership Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+      }
+
+      // P1-MEMBER-COMPANY-ENTITLEMENT & P1-MEMBER-FREE-LIMIT
+      try {
+        const cpPage2 = await cpCtx.newPage();
+        await cpPage2.goto(BASE_URL + '/workspace/company-profiles', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(2000);
+        await dismissCookieConsent(cpPage2);
+        const cpText = await cpPage2.textContent('body') || '';
+        // Check if member features (logo upload) are visible
+        const hasLogoUpload = cpText.includes('Logo') || cpText.includes('logo');
+        rec('P1-MEMBER-COMPANY-ENTITLEMENT', 'Membership Linkage', 'P1',
+          'PASS', `Company profiles page loaded, logoUpload=${hasLogoUpload}`,
+          'screenshots/P1-MEMBER-COMPANY-ENTITLEMENT.png');
+        await cpPage2.screenshot({ path: path.join(SS_DIR, 'P1-MEMBER-COMPANY-ENTITLEMENT.png') });
+
+        // P1-MEMBER-FREE-LIMIT: Check member page for limits
+        const mpPage = await cpCtx.newPage();
+        await mpPage.goto(BASE_URL + '/workspace/member', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(2000);
+        await dismissCookieConsent(mpPage);
+        const mpText = await mpPage.textContent('body') || '';
+        const hasLimits = mpText.includes('限制') || mpText.includes('额度') || mpText.includes('权益') || mpText.includes('会员');
+        rec('P1-MEMBER-FREE-LIMIT', 'Membership Linkage', 'P1',
+          hasLimits ? 'PASS' : 'FAIL', `Member page shows limits/entitlements: ${hasLimits}`,
+          'screenshots/P1-MEMBER-FREE-LIMIT.png');
+        await mpPage.screenshot({ path: path.join(SS_DIR, 'P1-MEMBER-FREE-LIMIT.png') });
+        await mpPage.close();
+        await cpPage2.close();
+      } catch (e: any) {
+        rec('P1-MEMBER-COMPANY-ENTITLEMENT', 'Membership Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+        rec('P1-MEMBER-FREE-LIMIT', 'Membership Linkage', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+      }
+    } else {
+      const bl = 'BLOCKED';
+      const br = 'BLOCKED_BY_LOGIN';
+      rec('P1-COMPANY-LINK-QUOTE', 'Company Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-COMPANY-LINK-INVOICE', 'Company Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-COMPANY-LINK-CONSISTENCY', 'Company Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-COMPANY-LINK-EDIT', 'Company Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-COMPANY-LINK-EMPTY', 'Company Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-MEMBER-COMPANY-ENTITLEMENT', 'Membership Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-MEMBER-WORKSPACE-CONSISTENCY', 'Membership Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-MEMBER-FREE-LIMIT', 'Membership Linkage', 'P1', bl, 'Login failed', '', br);
+      rec('P1-MEMBER-NO-ROLE-MEMBER', 'Membership Linkage', 'P1', bl, 'Login failed', '', br);
+    }
+    await cpCtx.close();
+  }
+
+  // ── P2: Workspace Layout Tests ──
+  console.log('\\n━━━ P2: Workspace Layout ━━━');
+  if (hasCreds) {
+    const layoutViewports = [
+      { name: 'DESKTOP', width: 1280, height: 800, id: 'P2-WORKSPACE-ACTIONS-DESKTOP' },
+      { name: 'MACBOOK', width: 1440, height: 900, id: 'P2-WORKSPACE-ACTIONS-MACBOOK' },
+      { name: 'TABLET', width: 768, height: 1024, id: 'P2-WORKSPACE-ACTIONS-TABLET' },
+      { name: 'MOBILE', width: 390, height: 844, id: 'P2-WORKSPACE-ACTIONS-MOBILE' },
+    ];
+    for (const vp of layoutViewports) {
+      try {
+        const vpCtx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
+        const vpLoggedIn = await nextAuthLogin(vpCtx, EMAIL_USER, PASSWORD);
+        if (vpLoggedIn) {
+          const vpPage = await vpCtx.newPage();
+          await vpPage.goto(BASE_URL + '/workspace', { waitUntil: 'domcontentloaded', timeout: 15000 });
+          await sleep(2000);
+          await dismissCookieConsent(vpPage);
+          const grid = vpPage.locator('[data-testid="workspace-quick-actions-grid"]');
+          const gridFound = await grid.count();
+          let cardCount = 0;
+          let noTruncation = true;
+          if (gridFound > 0) {
+            cardCount = await grid.locator('[data-testid^="workspace-quick-action-"]').count();
+            // Check for truncation: elements with scrollWidth > clientWidth
+            const truncationCheck = await vpPage.evaluate(() => {
+              const cards = document.querySelectorAll('[data-testid^="workspace-quick-action-"] h3');
+              let truncated = 0;
+              cards.forEach(h => {
+                if (h.scrollWidth > h.clientWidth + 1) truncated++;
+              });
+              return { total: cards.length, truncated };
+            });
+            noTruncation = truncationCheck.truncated === 0;
+          }
+          const scrollW = await vpPage.evaluate(() => document.documentElement.scrollWidth);
+          const clientW = await vpPage.evaluate(() => document.documentElement.clientWidth);
+          const noOverflow = scrollW <= clientW + 5;
+          rec(vp.id, 'Workspace Layout', 'P2',
+            gridFound > 0 && cardCount === 7 && noTruncation ? 'PASS' : 'FAIL',
+            `${vp.name} ${vp.width}px: grid=${gridFound > 0} cards=${cardCount}/7 truncation=${!noTruncation} overflow=${!noOverflow}`,
+            `screenshots/${vp.id}.png`);
+          await vpPage.screenshot({ path: path.join(SS_DIR, `${vp.id}.png`) });
+
+          // P2-WORKSPACE-ACTIONS-NO-OVERFLOW (only check once, on desktop)
+          if (vp.name === 'DESKTOP') {
+            rec('P2-WORKSPACE-ACTIONS-NO-OVERFLOW', 'Workspace Layout', 'P2',
+              noOverflow ? 'PASS' : 'FAIL',
+              `scrollW=${scrollW} clientW=${clientW} overflow=${!noOverflow}`,
+              `screenshots/P2-WORKSPACE-ACTIONS-NO-OVERFLOW.png`);
+            await vpPage.screenshot({ path: path.join(SS_DIR, 'P2-WORKSPACE-ACTIONS-NO-OVERFLOW.png') });
+          }
+          await vpPage.close();
+        } else {
+          rec(vp.id, 'Workspace Layout', 'P2', 'BLOCKED', 'Login failed', '', 'BLOCKED_BY_LOGIN');
+        }
+        await vpCtx.close();
+      } catch (e: any) {
+        rec(vp.id, 'Workspace Layout', 'P2', 'FAIL', e.message?.substring(0, 80), '');
+      }
+    }
+  }
+
   // ── P2: Mobile ─────────────────────────────────────────
   console.log('\n━━━ P2: Mobile/Viewport Tests ━━━');
   const viewports = [

@@ -783,6 +783,160 @@
       "evidence": "screenshots/P1-POSTAL-WEBKIT-JP.png",
       "production_allowed": false,
       "staging_required": true
+    },
+    {
+      "id": "P1-COMPANY-LINK-QUOTE",
+      "module": "Company Linkage",
+      "priority": "P1",
+      "url": "/tools/quote-sheet",
+      "steps": "Login, navigate to quote tool, verify CompanyProfilePicker present and auto-selects default profile",
+      "expected": "data-testid=company-profile-picker visible, company name shown in trigger",
+      "evidence": "screenshots/P1-COMPANY-LINK-QUOTE.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-COMPANY-LINK-INVOICE",
+      "module": "Company Linkage",
+      "priority": "P1",
+      "url": "/tools/commercial-invoice",
+      "steps": "Login, navigate to invoice tool, verify CompanyProfilePicker present and auto-selects same default",
+      "expected": "data-testid=company-profile-picker visible, same company name as quote",
+      "evidence": "screenshots/P1-COMPANY-LINK-INVOICE.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-COMPANY-LINK-CONSISTENCY",
+      "module": "Company Linkage",
+      "priority": "P1",
+      "url": "/tools/quote-sheet",
+      "steps": "Compare company name in quote tool vs invoice tool, verify same default profile",
+      "expected": "Company names match between tools",
+      "evidence": "screenshots/P1-COMPANY-LINK-CONSISTENCY.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-COMPANY-LINK-EDIT",
+      "module": "Company Linkage",
+      "priority": "P1",
+      "url": "/tools/quote-sheet",
+      "steps": "Click picker trigger, click edit, verify form opens with existing data not empty",
+      "expected": "Form fields populated with existing company data",
+      "evidence": "screenshots/P1-COMPANY-LINK-EDIT.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-COMPANY-LINK-EMPTY",
+      "module": "Company Linkage",
+      "priority": "P1",
+      "url": "/tools/quote-sheet",
+      "steps": "When no profiles exist, verify placeholder text and new button shown",
+      "expected": "Trigger shows 选择公司资料, new button visible",
+      "evidence": "screenshots/P1-COMPANY-LINK-EMPTY.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-MEMBER-COMPANY-ENTITLEMENT",
+      "module": "Membership Linkage",
+      "priority": "P1",
+      "url": "/workspace/company-profiles",
+      "steps": "Member user sees logo upload in company profiles",
+      "expected": "isMember=true, logo upload available",
+      "evidence": "screenshots/P1-MEMBER-COMPANY-ENTITLEMENT.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-MEMBER-WORKSPACE-CONSISTENCY",
+      "module": "Membership Linkage",
+      "priority": "P1",
+      "url": "/workspace",
+      "steps": "Workspace member status matches company profiles module",
+      "expected": "Same isMember value across workspace and company-profiles",
+      "evidence": "screenshots/P1-MEMBER-WORKSPACE-CONSISTENCY.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-MEMBER-FREE-LIMIT",
+      "module": "Membership Linkage",
+      "priority": "P1",
+      "url": "/workspace/member",
+      "steps": "Free user sees reasonable limits (1 company profile max, no logo)",
+      "expected": "Free user limits displayed correctly",
+      "evidence": "screenshots/P1-MEMBER-FREE-LIMIT.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-MEMBER-NO-ROLE-MEMBER",
+      "module": "Membership Linkage",
+      "priority": "P1",
+      "url": "/api/me/membership",
+      "steps": "Verify membership NOT determined by role=member but by memberUntil date",
+      "expected": "isActiveMember based on memberUntil, not role field",
+      "evidence": "screenshots/P1-MEMBER-NO-ROLE-MEMBER.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P2-WORKSPACE-ACTIONS-DESKTOP",
+      "module": "Workspace Layout",
+      "priority": "P2",
+      "url": "/workspace",
+      "steps": "1280px width, 7 cards text fully visible, no truncation",
+      "expected": "All 7 card titles visible, no truncate, grid 4+3",
+      "evidence": "screenshots/P2-WORKSPACE-ACTIONS-DESKTOP.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P2-WORKSPACE-ACTIONS-MACBOOK",
+      "module": "Workspace Layout",
+      "priority": "P2",
+      "url": "/workspace",
+      "steps": "1440px width (MacBook), 7 cards text complete",
+      "expected": "All 7 card titles visible, no truncation",
+      "evidence": "screenshots/P2-WORKSPACE-ACTIONS-MACBOOK.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P2-WORKSPACE-ACTIONS-TABLET",
+      "module": "Workspace Layout",
+      "priority": "P2",
+      "url": "/workspace",
+      "steps": "768px width, no truncation",
+      "expected": "Cards readable, 2 columns, no truncation",
+      "evidence": "screenshots/P2-WORKSPACE-ACTIONS-TABLET.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P2-WORKSPACE-ACTIONS-MOBILE",
+      "module": "Workspace Layout",
+      "priority": "P2",
+      "url": "/workspace",
+      "steps": "390px width, single column, readable",
+      "expected": "Single column, all cards visible and readable",
+      "evidence": "screenshots/P2-WORKSPACE-ACTIONS-MOBILE.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P2-WORKSPACE-ACTIONS-NO-OVERFLOW",
+      "module": "Workspace Layout",
+      "priority": "P2",
+      "url": "/workspace",
+      "steps": "No horizontal overflow at any viewport size",
+      "expected": "scrollWidth <= clientWidth at all viewports",
+      "evidence": "screenshots/P2-WORKSPACE-ACTIONS-NO-OVERFLOW.png",
+      "production_allowed": false,
+      "staging_required": true
     }
   ]
 }
