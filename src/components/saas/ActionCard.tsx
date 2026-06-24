@@ -22,7 +22,7 @@ export function ActionCard({ title, description, icon, href, onClick, badge, cla
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-base font-semibold text-gray-900 truncate">{title}</h3>
+            <h3 className="text-base font-semibold text-gray-900">{title}</h3>
             {badge && (
               <span className="flex-shrink-0 px-2 py-0.5 text-xs font-medium bg-teal-50 text-teal-700 rounded-full">
                 {badge}

@@ -234,7 +234,8 @@ export default function DashboardClient() {
 
   // ===== Derived State =====
 
-  const isPremium = membership?.isActiveMember || permissions?.isMember || permissions?.role === 'member' || isAdminRole(permissions?.role);
+  // v1.20.42.18.6.11.3: Use memberUntil for membership, not role=member
+  const isPremium = membership?.isActiveMember || permissions?.isMember || Boolean(permissions?.memberUntil && new Date(permissions.memberUntil) > new Date()) || isAdminRole(permissions?.role);
   const userPoints = permissions?.points ?? dashboard?.points ?? 0;
   const memberUntil = membership?.membershipExpiresAt || permissions?.memberUntil;
 

@@ -282,6 +282,68 @@ async function main() {
     } else {
       rec('P1-002', 'Security', 'P1', 'BLOCKED', 'Cannot test - login failed', '', 'BLOCKED_BY_LOGIN');
     }
+
+    // P1-NAV-AVATAR-USER: User avatar menu opens on click
+    if (userLoggedIn) {
+      console.log('\n  ── P1-NAV-AVATAR: Avatar Menu Tests ──');
+      const avatarCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const avatarLoggedIn = await nextAuthLogin(avatarCtx, EMAIL_USER, PASSWORD);
+      if (avatarLoggedIn) {
+        const avatarPage = await avatarCtx.newPage();
+        await avatarPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(2000);
+        await dismissCookieConsent(avatarPage);
+        await avatarPage.screenshot({ path: path.join(SS_DIR, 'P1-NAV-AVATAR-USER-01-loggedin.png') });
+
+        // P1-NAV-AVATAR-USER: Click avatar, menu should appear
+        try {
+          const avatarBtn = avatarPage.locator('[data-testid="user-avatar-menu-button"]');
+          const btnFound = await avatarBtn.count();
+          if (btnFound > 0) {
+            const ariaExpanded = await avatarBtn.getAttribute('aria-expanded');
+            const ariaHasPopup = await avatarBtn.getAttribute('aria-haspopup');
+            const tagName = await avatarBtn.evaluate(el => el.tagName);
+            await avatarBtn.click();
+            await sleep(500);
+            const menuVisible = await avatarPage.locator('[data-testid="user-avatar-menu"]').count();
+            rec('P1-NAV-AVATAR-USER', 'Navigation', 'P1',
+              menuVisible > 0 ? 'PASS' : 'FAIL',
+              `Avatar btn=${tagName} aria-expanded=${ariaExpanded} aria-haspopup=${ariaHasPopup} menu=${menuVisible > 0}`,
+              'screenshots/P1-NAV-AVATAR-USER-02-menu.png');
+            await avatarPage.screenshot({ path: path.join(SS_DIR, 'P1-NAV-AVATAR-USER-02-menu.png') });
+
+            // P1-NAV-AVATAR-WORKSPACE: Workspace link present
+            if (menuVisible > 0) {
+              const wsLink = await avatarPage.locator('[data-testid="nav-workspace-link"]').count();
+              rec('P1-NAV-AVATAR-WORKSPACE', 'Navigation', 'P1',
+                wsLink > 0 ? 'PASS' : 'FAIL',
+                `Workspace link in avatar menu: ${wsLink > 0 ? 'found' : 'missing'}`,
+                'screenshots/P1-NAV-AVATAR-USER-02-menu.png');
+
+              // P1-NAV-AVATAR-PERMISSION: Admin link hidden for regular user
+              const adminLink = await avatarPage.locator('[data-testid="nav-admin-link"]').count();
+              rec('P1-NAV-AVATAR-PERMISSION', 'Navigation', 'P1',
+                adminLink === 0 ? 'PASS' : 'FAIL',
+                `Admin link for regular user: ${adminLink === 0 ? 'hidden (correct)' : 'visible (WRONG)'}`,
+                'screenshots/P1-NAV-AVATAR-USER-02-menu.png');
+            }
+          } else {
+            rec('P1-NAV-AVATAR-USER', 'Navigation', 'P1', 'FAIL', 'Avatar button not found', '');
+            rec('P1-NAV-AVATAR-WORKSPACE', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - avatar button missing', '', 'BLOCKED_BY_AVATAR');
+            rec('P1-NAV-AVATAR-PERMISSION', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - avatar button missing', '', 'BLOCKED_BY_AVATAR');
+          }
+          await avatarPage.close();
+        } catch (e: any) {
+          rec('P1-NAV-AVATAR-USER', 'Navigation', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+        }
+      } else {
+        rec('P1-NAV-AVATAR-USER', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - login failed', '', 'BLOCKED_BY_LOGIN');
+        rec('P1-NAV-AVATAR-WORKSPACE', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - login failed', '', 'BLOCKED_BY_LOGIN');
+        rec('P1-NAV-AVATAR-PERMISSION', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - login failed', '', 'BLOCKED_BY_LOGIN');
+      }
+      await avatarCtx.close();
+    }
+
     await userCtx.close();
 
     // Admin login
@@ -333,6 +395,42 @@ async function main() {
       }
     }
     await adminPage.close();
+
+    // P1-NAV-AVATAR-ADMIN: Admin avatar menu with admin link
+    if (adminLoggedIn) {
+      console.log('\n  ── P1-NAV-AVATAR-ADMIN: Admin Avatar Menu ──');
+      const adminAvatarCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+      const adminAvatarLoggedIn = await nextAuthLogin(adminAvatarCtx, EMAIL_ADMIN, PASSWORD);
+      if (adminAvatarLoggedIn) {
+        const adminAvatarPage = await adminAvatarCtx.newPage();
+        await adminAvatarPage.goto(BASE_URL + '/', { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(2000);
+        await dismissCookieConsent(adminAvatarPage);
+        try {
+          const avatarBtn = adminAvatarPage.locator('[data-testid="user-avatar-menu-button"]');
+          if (await avatarBtn.count() > 0) {
+            await avatarBtn.click();
+            await sleep(500);
+            const menuVisible = await adminAvatarPage.locator('[data-testid="user-avatar-menu"]').count();
+            const adminLink = await adminAvatarPage.locator('[data-testid="nav-admin-link"]').count();
+            rec('P1-NAV-AVATAR-ADMIN', 'Navigation', 'P1',
+              menuVisible > 0 && adminLink > 0 ? 'PASS' : 'FAIL',
+              `Admin avatar menu=${menuVisible > 0} admin-link=${adminLink > 0}`,
+              'screenshots/P1-NAV-AVATAR-ADMIN-menu.png');
+            await adminAvatarPage.screenshot({ path: path.join(SS_DIR, 'P1-NAV-AVATAR-ADMIN-menu.png') });
+          } else {
+            rec('P1-NAV-AVATAR-ADMIN', 'Navigation', 'P1', 'FAIL', 'Admin avatar button not found', '');
+          }
+          await adminAvatarPage.close();
+        } catch (e: any) {
+          rec('P1-NAV-AVATAR-ADMIN', 'Navigation', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+        }
+      } else {
+        rec('P1-NAV-AVATAR-ADMIN', 'Navigation', 'P1', 'BLOCKED', 'Cannot test - admin login failed', '', 'BLOCKED_BY_LOGIN');
+      }
+      await adminAvatarCtx.close();
+    }
+
     await adminCtx.close();
   }
 
@@ -379,6 +477,88 @@ async function main() {
     rec('P1-ERR2', 'BBS', 'P1', 'FAIL', e.message?.substring(0, 120), '');
   }
   await bbsCtx.close();
+
+  // ── P1: Postal Code — WebKit (Safari/Mac) Compatibility ──
+  console.log('\n━━━ P1: Postal Code — WebKit Compatibility ━━━');
+  try {
+    const { webkit } = await import('playwright');
+    const wkBrowser = await webkit.launch({ headless: true });
+    const wkCtx = await wkBrowser.newContext({ viewport: { width: 1440, height: 900 }, ignoreHTTPSErrors: true });
+    const wkPage = await wkCtx.newPage();
+
+    await wkPage.goto(BASE_URL + '/tools/postal-code', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await waitForHydration(wkPage);
+    await dismissCookieConsent(wkPage);
+    await wkPage.screenshot({ path: path.join(SS_DIR, 'P1-POSTAL-WEBKIT-01-loaded.png') });
+
+    // P1-POSTAL-MAC-WEBKIT-COUNTRY: Country dropdown opens on click
+    try {
+      const combobox = wkPage.locator('input[role="combobox"]');
+      const comboFound = await combobox.count();
+      if (comboFound > 0) {
+        await combobox.click();
+        await sleep(500);
+        const listbox = await wkPage.locator('[role="listbox"]').count();
+        const selector = await wkPage.locator('[data-testid="postal-country-selector"]').count();
+        rec('P1-POSTAL-MAC-WEBKIT-COUNTRY', 'Postal/WebKit', 'P1',
+          listbox > 0 ? 'PASS' : 'FAIL',
+          `WebKit: combobox=${comboFound} selector=${selector} dropdown=${listbox > 0}`,
+          'screenshots/P1-POSTAL-WEBKIT-02-dropdown.png');
+        await wkPage.screenshot({ path: path.join(SS_DIR, 'P1-POSTAL-WEBKIT-02-dropdown.png') });
+
+        // Test each country
+        if (listbox > 0) {
+          const countries = [
+            { name: 'Canada', code: 'CA' },
+            { name: 'United States', code: 'US' },
+            { name: 'Japan', code: 'JP' },
+          ];
+          for (const c of countries) {
+            try {
+              if (c.name !== 'Canada') {
+                await combobox.click();
+                await sleep(300);
+                await combobox.fill(c.name);
+                await sleep(300);
+              }
+              const opt = wkPage.locator(`[data-testid="postal-country-option-${c.code.toLowerCase()}"]`);
+              const optCount = await opt.count();
+              if (optCount > 0) {
+                await opt.click({ timeout: 5000 });
+                await sleep(500);
+                rec(`P1-POSTAL-MAC-WEBKIT-${c.code}`, 'Postal/WebKit', 'P1', 'PASS',
+                  `WebKit: ${c.name} selected`, `screenshots/P1-POSTAL-WEBKIT-${c.code}.png`);
+                await wkPage.screenshot({ path: path.join(SS_DIR, `P1-POSTAL-WEBKIT-${c.code}.png`) });
+              } else {
+                rec(`P1-POSTAL-MAC-WEBKIT-${c.code}`, 'Postal/WebKit', 'P1', 'FAIL',
+                  `WebKit: ${c.name} option not found`, '');
+              }
+            } catch (e: any) {
+              rec(`P1-POSTAL-MAC-WEBKIT-${c.code}`, 'Postal/WebKit', 'P1', 'FAIL',
+                `WebKit: ${c.name} — ${e.message?.substring(0, 60)}`, '');
+            }
+          }
+        }
+      } else {
+        rec('P1-POSTAL-MAC-WEBKIT-COUNTRY', 'Postal/WebKit', 'P1', 'FAIL',
+          'WebKit: combobox not found', '');
+        rec('P1-POSTAL-MAC-WEBKIT-CA', 'Postal/WebKit', 'P1', 'BLOCKED', 'No combobox', '', 'BLOCKED_BY_DROPDOWN');
+        rec('P1-POSTAL-MAC-WEBKIT-US', 'Postal/WebKit', 'P1', 'BLOCKED', 'No combobox', '', 'BLOCKED_BY_DROPDOWN');
+        rec('P1-POSTAL-MAC-WEBKIT-JP', 'Postal/WebKit', 'P1', 'BLOCKED', 'No combobox', '', 'BLOCKED_BY_DROPDOWN');
+      }
+    } catch (e: any) {
+      rec('P1-POSTAL-MAC-WEBKIT-COUNTRY', 'Postal/WebKit', 'P1', 'FAIL', e.message?.substring(0, 80), '');
+    }
+
+    await wkCtx.close();
+    await wkBrowser.close();
+  } catch (e: any) {
+    console.log(`  ⚠️ WebKit not available: ${e.message?.substring(0, 60)}`);
+    rec('P1-POSTAL-MAC-WEBKIT-COUNTRY', 'Postal/WebKit', 'P1', 'BLOCKED', 'WebKit not available', '', 'BLOCKED_BY_WEBKIT');
+    rec('P1-POSTAL-MAC-WEBKIT-CA', 'Postal/WebKit', 'P1', 'BLOCKED', 'WebKit not available', '', 'BLOCKED_BY_WEBKIT');
+    rec('P1-POSTAL-MAC-WEBKIT-US', 'Postal/WebKit', 'P1', 'BLOCKED', 'WebKit not available', '', 'BLOCKED_BY_WEBKIT');
+    rec('P1-POSTAL-MAC-WEBKIT-JP', 'Postal/WebKit', 'P1', 'BLOCKED', 'WebKit not available', '', 'BLOCKED_BY_WEBKIT');
+  }
 
   // ── P2: Mobile ─────────────────────────────────────────
   console.log('\n━━━ P2: Mobile/Viewport Tests ━━━');

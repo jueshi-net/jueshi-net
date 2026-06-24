@@ -12,14 +12,13 @@ export default async function CompanyProfilesPage() {
     orderBy: { updatedAt: "desc" },
   }).catch(() => []);
 
-  // v1.20.42.18.4.2: Query role from database
-  // For backward compatibility, role can still be "member"
+  // v1.20.42.18.6.11.3: Use memberUntil date for membership, NOT role=member
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { role: true },
+    select: { role: true, memberUntil: true },
   }).catch(() => null);
   
-  const isMember = Boolean(user?.role === 'member');
+  const isMember = Boolean(user?.memberUntil && new Date(user.memberUntil) > new Date());
 
   return <CompanyProfilesClient profiles={profiles} isMember={isMember} />;
 }

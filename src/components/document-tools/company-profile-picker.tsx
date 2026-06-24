@@ -58,7 +58,8 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
       const res = await fetch("/api/me/membership");
       if (res.ok) {
         const d = await res.json();
-        setIsMember(d.isMember);
+        // v1.20.42.18.6.11.3: Fix field path — API returns { data: { isActiveMember } }
+        setIsMember(Boolean(d?.data?.isActiveMember));
       }
     } catch { /* ignore */ }
     setMemberChecked(true);
@@ -210,10 +211,11 @@ export default function CompanyProfilePicker({ onSelect, selectedId }: CompanyPr
   const selected = profiles.find(p => p.id === selectedId) || profiles.find(p => p.isDefault);
 
   return (
-    <div className="relative">
+    <div className="relative" data-testid="company-profile-picker">
       {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
+        data-testid="company-profile-picker-trigger"
         className="w-full flex items-center justify-between px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm min-h-[44px] hover:border-gray-300"
       >
         <span className="flex items-center gap-2 min-w-0">

@@ -166,6 +166,9 @@ export default function PostalCodePage() {
   const [citySearch, setCitySearch] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [countrySearch, setCountrySearch] = useState('');
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const [highlightedCountryIdx, setHighlightedCountryIdx] = useState(-1);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
   const [recentQueries, addRecentQuery] = useRecentQueries(RECENT_QUERIES_KEY);
   const [queryMode, setQueryMode] = useState<'postal' | 'region' | 'format'>('region');
   const [mainSearch, setMainSearch] = useState('');
@@ -293,6 +296,67 @@ export default function PostalCodePage() {
     setSelectedAddress(null);
     setDbStatus('idle');
   }, [setSelectedCountryCode, setInputCode]);
+
+  // Filtered countries for custom dropdown (replaces datalist for WebKit compatibility)
+  const filteredCountries = useMemo(() => {
+    const q = countrySearch.trim().toLowerCase();
+    if (!q) return SUPPORTED_COUNTRIES;
+    return SUPPORTED_COUNTRIES.filter(c =>
+      c.code.toLowerCase() === q ||
+      c.code.toLowerCase().includes(q) ||
+      c.name.includes(countrySearch.trim()) ||
+      c.nameEn.toLowerCase().includes(q)
+    );
+  }, [countrySearch]);
+
+  // Close country dropdown on outside click
+  useEffect(() => {
+    if (!countryDropdownOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(e.target as Node)) {
+        setCountryDropdownOpen(false);
+        setHighlightedCountryIdx(-1);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [countryDropdownOpen]);
+
+  // Handle country selection from dropdown
+  const handleCountrySelect = useCallback((code: string) => {
+    selectCountry(code);
+    setCountrySearch('');
+    setCountryDropdownOpen(false);
+    setHighlightedCountryIdx(-1);
+  }, [selectCountry]);
+
+  // Keyboard navigation for country dropdown
+  const handleCountryKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!countryDropdownOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter') {
+        setCountryDropdownOpen(true);
+        setHighlightedCountryIdx(0);
+        e.preventDefault();
+      }
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedCountryIdx(prev => Math.min(prev + 1, filteredCountries.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedCountryIdx(prev => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightedCountryIdx >= 0 && highlightedCountryIdx < filteredCountries.length) {
+        handleCountrySelect(filteredCountries[highlightedCountryIdx].code);
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      setCountryDropdownOpen(false);
+      setHighlightedCountryIdx(-1);
+    }
+  }, [countryDropdownOpen, filteredCountries, highlightedCountryIdx, handleCountrySelect]);
 
   // Validate postal code with region lookup
   const validate = useCallback(() => {
@@ -871,28 +935,49 @@ export default function PostalCodePage() {
             </div>
             {/* 搜索国家 */}
             <div className="flex flex-wrap gap-2">
-              <div className="relative w-full sm:w-72">
+              <div ref={countryDropdownRef} className="relative w-full sm:w-72" data-testid="postal-country-selector">
                 <input
-                  list="country-list"
+                  type="text"
+                  role="combobox"
+                  aria-expanded={countryDropdownOpen}
+                  aria-controls="country-dropdown-listbox"
+                  aria-autocomplete="list"
                   placeholder="搜索国家（如 Japan、德国、JP）…"
                   value={countrySearch}
                   onChange={e => {
                     setCountrySearch(e.target.value);
-                    const match = SUPPORTED_COUNTRIES.find(c =>
-                      c.code.toLowerCase() === e.target.value.toLowerCase() ||
-                      c.name.includes(e.target.value) ||
-                      c.nameEn.toLowerCase().includes(e.target.value.toLowerCase())
-                    );
-                    if (match) selectCountry(match.code);
+                    setCountryDropdownOpen(true);
+                    setHighlightedCountryIdx(-1);
                   }}
+                  onFocus={() => setCountryDropdownOpen(true)}
+                  onKeyDown={handleCountryKeyDown}
                   className={`${inputStyles} pr-10`}
                 />
-                <datalist id="country-list">
-                  {SUPPORTED_COUNTRIES.map(c => (
-                    <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.nameEn})</option>
-                  ))}
-                </datalist>
                 <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                {countryDropdownOpen && filteredCountries.length > 0 && (
+                  <ul
+                    id="country-dropdown-listbox"
+                    role="listbox"
+                    className="absolute left-0 top-full mt-1 w-full max-h-64 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-xl z-50 py-1"
+                  >
+                    {filteredCountries.map((c, idx) => (
+                      <li
+                        key={c.code}
+                        role="option"
+                        aria-selected={selectedCountryCode === c.code}
+                        data-testid={`postal-country-option-${c.code.toLowerCase()}`}
+                        onClick={() => handleCountrySelect(c.code)}
+                        className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer transition-colors ${
+                          idx === highlightedCountryIdx ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="text-lg">{c.flag}</span>
+                        <span className="font-medium">{c.name}</span>
+                        <span className="text-xs text-gray-400 ml-auto">{c.code}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               {/* 热门国家快捷选择 */}
               <div className="flex flex-wrap gap-1.5">
@@ -954,6 +1039,7 @@ export default function PostalCodePage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
+                data-testid="postal-query-input"
                 className={`${inputStyles} pl-11 text-base`}
                 placeholder="输入邮编、城市、州省、地址关键词，例如 M5V 3L9 / Toronto / Tokyo / 90210"
                 value={mainSearch}
@@ -962,6 +1048,7 @@ export default function PostalCodePage() {
               />
             </div>
             <button onClick={handleMainSearch}
+              data-testid="postal-search-button"
               className={`${buttonVariants.primary} px-6 text-base shadow-sm whitespace-nowrap`}>
               <Search className="w-4 h-4" />
               开始查询
@@ -1047,7 +1134,7 @@ export default function PostalCodePage() {
           </div>
         )}
         {!dbLoading && !advancedRegionLoading && dbResults.length > 0 && (
-          <div className="bg-white rounded-xl border-2 border-teal-200 shadow-sm p-5 mb-6">
+          <div data-testid="postal-result-panel" className="bg-white rounded-xl border-2 border-teal-200 shadow-sm p-5 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Database className="w-5 h-5 text-teal-600" />
               <h2 className="text-lg font-bold text-gray-900">查询结果</h2>

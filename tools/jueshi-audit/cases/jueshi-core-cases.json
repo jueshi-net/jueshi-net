@@ -695,6 +695,94 @@
       "evidence": "screenshots/P3-007-health.png",
       "production_allowed": true,
       "staging_required": true
+    },
+    {
+      "id": "P1-NAV-AVATAR-USER",
+      "module": "Navigation",
+      "priority": "P1",
+      "url": "/",
+      "steps": "Login as regular user, click avatar button, verify menu appears",
+      "expected": "Menu visible with data-testid=user-avatar-menu, button has aria-expanded/aria-haspopup",
+      "evidence": "screenshots/P1-NAV-AVATAR-USER-02-menu.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-NAV-AVATAR-WORKSPACE",
+      "module": "Navigation",
+      "priority": "P1",
+      "url": "/",
+      "steps": "After opening avatar menu, verify workspace link present",
+      "expected": "data-testid=nav-workspace-link visible in menu",
+      "evidence": "screenshots/P1-NAV-AVATAR-USER-02-menu.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-NAV-AVATAR-ADMIN",
+      "module": "Navigation",
+      "priority": "P1",
+      "url": "/",
+      "steps": "Login as admin, click avatar, verify admin link in menu",
+      "expected": "data-testid=nav-admin-link visible for admin role",
+      "evidence": "screenshots/P1-NAV-AVATAR-ADMIN-menu.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-NAV-AVATAR-PERMISSION",
+      "module": "Navigation",
+      "priority": "P1",
+      "url": "/",
+      "steps": "Login as regular user, open avatar menu, verify admin link NOT visible",
+      "expected": "data-testid=nav-admin-link count=0 for user role",
+      "evidence": "screenshots/P1-NAV-AVATAR-USER-02-menu.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-POSTAL-MAC-WEBKIT-COUNTRY",
+      "module": "Postal/WebKit",
+      "priority": "P1",
+      "url": "/tools/postal-code",
+      "steps": "Open page in WebKit, click country combobox, verify dropdown opens",
+      "expected": "role=listbox visible, data-testid=postal-country-selector present",
+      "evidence": "screenshots/P1-POSTAL-WEBKIT-02-dropdown.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-POSTAL-MAC-WEBKIT-CA",
+      "module": "Postal/WebKit",
+      "priority": "P1",
+      "url": "/tools/postal-code",
+      "steps": "WebKit: select Canada from country dropdown",
+      "expected": "postal-country-option-ca clickable and selected",
+      "evidence": "screenshots/P1-POSTAL-WEBKIT-CA.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-POSTAL-MAC-WEBKIT-US",
+      "module": "Postal/WebKit",
+      "priority": "P1",
+      "url": "/tools/postal-code",
+      "steps": "WebKit: select United States from country dropdown",
+      "expected": "postal-country-option-us clickable and selected",
+      "evidence": "screenshots/P1-POSTAL-WEBKIT-US.png",
+      "production_allowed": false,
+      "staging_required": true
+    },
+    {
+      "id": "P1-POSTAL-MAC-WEBKIT-JP",
+      "module": "Postal/WebKit",
+      "priority": "P1",
+      "url": "/tools/postal-code",
+      "steps": "WebKit: select Japan from country dropdown",
+      "expected": "postal-country-option-jp clickable and selected",
+      "evidence": "screenshots/P1-POSTAL-WEBKIT-JP.png",
+      "production_allowed": false,
+      "staging_required": true
     }
   ]
 }

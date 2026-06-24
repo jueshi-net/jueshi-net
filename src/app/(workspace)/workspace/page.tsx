@@ -240,7 +240,8 @@ export default async function WorkspacePage() {
       </section>
 
       {/* ===== C. CTA 按钮区 ===== */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div data-testid="workspace-quick-actions-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div data-testid="workspace-quick-action-checkin">
         <ActionCard
           title="今日签到"
           description={todayChecked ? "已完成今日签到" : "签到获得积分和成长值"}
@@ -248,6 +249,8 @@ export default async function WorkspacePage() {
           href="/workspace/tasks"
           badge={todayChecked ? "已完成" : "待完成"}
         />
+        </div>
+        <div data-testid="workspace-quick-action-points">
         <ActionCard
           title="积分兑换"
           description="使用积分兑换会员和权益"
@@ -255,6 +258,8 @@ export default async function WorkspacePage() {
           href="/workspace/member#rewards"
           badge="新"
         />
+        </div>
+        <div data-testid="workspace-quick-action-invite">
         <ActionCard
           title="邀请奖励"
           description="邀请好友获得会员天数"
@@ -262,6 +267,8 @@ export default async function WorkspacePage() {
           href="/workspace/invites"
           badge="推荐"
         />
+        </div>
+        <div data-testid="workspace-quick-action-membership">
         <ActionCard
           title="会员权益"
           description="查看会员特权和兑换"
@@ -269,24 +276,31 @@ export default async function WorkspacePage() {
           href="/workspace/member"
           badge={!isMember ? "推荐" : undefined}
         />
+        </div>
+        <div data-testid="workspace-quick-action-ads">
         <ActionCard
           title="广告权益"
           description="申请使用广告资源"
           icon={<Megaphone className="w-6 h-6" />}
           href="/workspace/ad-entitlements"
         />
+        </div>
+        <div data-testid="workspace-quick-action-documents">
         <ActionCard
           title="新建单据"
           description="快速创建发票、装箱单等"
           icon={<FileText className="w-6 h-6" />}
           href="/tools/documents"
         />
+        </div>
+        <div data-testid="workspace-quick-action-company">
         <ActionCard
           title="添加公司资料"
           description="管理公司信息，一键填充"
           icon={<Building2 className="w-6 h-6" />}
           href="/workspace/company-profiles"
         />
+        </div>
       </div>
 
       {/* ===== D. 核心数据卡 ===== */}

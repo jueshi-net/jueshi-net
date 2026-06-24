@@ -17,6 +17,10 @@
     "test:beta:local": "echo \"Beta local tests: role/membership helpers, reward config, task context merge\" && npx tsx scripts/test-beta-local.ts 2>/dev/null || echo \"No beta-local script yet\"",
     "test:e2e": "playwright test --reporter=list",
     "test:e2e:prod": "BASE_URL=https://jueshi.net playwright test --reporter=list",
+    "jueshi-audit:p0": "cd tools/jueshi-audit && npm run audit:staging -- --suite p0-public-pages,p0-redirects",
+    "jueshi-audit:p1": "cd tools/jueshi-audit && AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",
+    "jueshi-audit:full": "cd tools/jueshi-audit && AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",
+    "jueshi-audit:webkit": "cd tools/jueshi-audit && AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",
     "test:vps": "echo \"Run on VPS: cd /home/deploy/xixiong-saas && npx tsx tests/v18.3.2-db-tests.ts\"",
     "test:beta:gate": "npm run lint && npm run build && npm run test:unit",
     "verify:predeploy": "npm run build && git diff --check && npx prisma migrate status"

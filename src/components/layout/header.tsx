@@ -110,6 +110,18 @@ export default function Header() {
     }
   }, [mobileOpen]);
 
+  // Escape key closes user menu
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [userMenuOpen]);
+
   const handleSearch = useCallback(() => {
     const q = searchQuery.trim();
     if (!q) return;
@@ -147,7 +159,7 @@ export default function Header() {
           </Link>
 
           {/* Center: Nav */}
-          <nav className="hidden lg:flex items-center gap-1 min-w-0 overflow-hidden">
+          <nav className="hidden lg:flex items-center gap-1 min-w-0">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
               return (
@@ -194,7 +206,7 @@ export default function Header() {
           </nav>
 
           {/* Right: Search + Bell + Login */}
-          <div className="flex items-center gap-2 shrink-0 overflow-hidden">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Search bar */}
             <div className="hidden md:flex items-center relative shrink-0">
               <Search className="absolute left-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
@@ -236,26 +248,44 @@ export default function Header() {
 
             {isLoggedIn ? (
               <div ref={userMenuRef} className="relative">
-                <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors min-h-[36px]">
+                <button
+                  type="button"
+                  data-testid="user-avatar-menu-button"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-label="用户菜单"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="true"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors min-h-[36px]"
+                >
                   <div className="w-7 h-7 bg-teal-100 rounded-full flex items-center justify-center">
                     <span className="text-xs font-bold text-teal-700">{userInitial}</span>
                   </div>
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50">
+                  <div
+                    role="menu"
+                    aria-label="用户菜单"
+                    data-testid="user-avatar-menu"
+                    className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-50"
+                  >
                     <div className="px-3 py-2 border-b border-gray-100">
                       <p className="text-sm font-semibold text-slate-900 truncate">{userEmail}</p>
                       <p className="text-xs text-slate-600">{isAdmin ? '管理员' : '注册用户'}</p>
                     </div>
-                    <Link href="/workbench" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link href="/workbench" data-testid="nav-workspace-link" onClick={() => setUserMenuOpen(false)} role="menuitem" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <LayoutDashboard className="w-4 h-4" /> 工作台
                     </Link>
                     {isAdmin && (
-                      <Link href="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                      <Link href="/admin" data-testid="nav-admin-link" onClick={() => setUserMenuOpen(false)} role="menuitem" className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         <ShieldCheck className="w-4 h-4" /> 管理后台
                       </Link>
                     )}
-                    <button onClick={async () => { await signOut({ redirect: false }); window.location.href = '/'; }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <button
+                      type="button"
+                      onClick={async () => { await signOut({ redirect: false }); window.location.href = '/'; }}
+                      role="menuitem"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
                       <LogOut className="w-4 h-4" /> 退出登录
                     </button>
                   </div>

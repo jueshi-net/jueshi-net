@@ -171,7 +171,8 @@ const BENEFITS = [
 export default function MemberClient({ userData, permissions }: { userData: any; permissions: any }) {
   const role = userData?.role || "user";
   const roleInfo = ROLE_META[role] || ROLE_META.user;
-  const isMember = role === 'member';
+  // v1.20.42.18.6.11.3: Use memberUntil date for membership, NOT role=member
+  const isMember = Boolean(userData?.memberUntil && new Date(userData.memberUntil) > new Date());
   const memberUntil = userData?.memberUntil;
   const growthValue = userData?.growthValue || 0;
 
