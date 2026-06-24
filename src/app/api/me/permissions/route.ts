@@ -22,8 +22,8 @@ export async function GET() {
         select: { points: true, role: true, membershipTier: true, memberUntil: true },
       });
       if (user) {
-        // v1.20.42.18.4.2: Use membershipTier instead of role for membership判断
-        const hasActiveMembership = user.role === 'member' && user.memberUntil !== null && user.memberUntil > new Date();
+        // v1.20.42.18.6.11.4: Membership determined by memberUntil only, NOT role
+        const hasActiveMembership = user.memberUntil !== null && user.memberUntil > new Date();
         pointsInfo = {
           points: user.points,
           memberUntil: hasActiveMembership && user.memberUntil ? user.memberUntil.toISOString() : null,

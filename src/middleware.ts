@@ -23,9 +23,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
+  // /community → /bbs (permanent, legacy path)
+  if (pathname === "/community") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/bbs";
+    return NextResponse.redirect(url, 308);
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/tools/quote", "/tools/quote-sheet"],
+  matcher: ["/tools/quote", "/tools/quote-sheet", "/community"],
 };

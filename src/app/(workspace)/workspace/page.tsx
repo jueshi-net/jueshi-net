@@ -117,9 +117,10 @@ export default async function WorkspacePage() {
   const companyCount = companyCountRes.status === "fulfilled" ? companyCountRes.value : 0;
   const inviteCount = inviteCountRes.status === "fulfilled" ? inviteCountRes.value : 0;
 
-  const memberLevel = user?.role === "管理员" ? "管理员" : user?.levelKey === "member" ? "会员" : "免费版用户";
-  const displayName = user?.name?.split("@")[0] || user?.email?.split("@")[0] || "用户";
+  // v1.20.42.18.6.11.4: Use memberUntil for membership, not levelKey
   const isMember = user?.memberUntil && new Date(user.memberUntil) > new Date();
+  const memberLevel = user?.role === "管理员" ? "管理员" : isMember ? "会员" : "免费版用户";
+  const displayName = user?.name?.split("@")[0] || user?.email?.split("@")[0] || "用户";
   const levelLabel = user?.levelKey && levelLabels[user.levelKey] ? levelLabels[user.levelKey] : "Lv.1 新手";
   const todayChecked = user?.lastCheckinDate === new Date().toISOString().split("T")[0];
 

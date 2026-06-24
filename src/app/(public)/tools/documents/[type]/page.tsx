@@ -367,6 +367,38 @@ export default function DocumentEditorPage() {
       // Load logo from company profile into form state
       if (cp.logoUrl) setFormData(prev => ({ ...prev, companyLogo: cp.logoUrl }));
     }
+
+    // v1.20.42.18.6.11.4: Sync default company from server API (source of truth)
+    fetch('/api/me/company-profiles').then(res => {
+      if (!res.ok) return null;
+      return res.json();
+    }).then(data => {
+      const serverProfiles = data?.data || [];
+      const defaultProfile = serverProfiles.find((p: any) => p.isDefault) || serverProfiles[0];
+      if (defaultProfile) {
+        const syncedProfile: CompanyProfile = {
+          id: defaultProfile.id,
+          companyName: defaultProfile.companyName || '',
+          companyNameEn: defaultProfile.companyNameEn || '',
+          address: defaultProfile.address || '',
+          addressEn: '',
+          phone: defaultProfile.phone || '',
+          email: defaultProfile.email || '',
+          website: defaultProfile.website || '',
+          taxId: defaultProfile.taxId || '',
+          contactPerson: defaultProfile.contactPerson || defaultProfile.contactName || '',
+          defaultCurrency: defaultProfile.defaultCurrency || 'USD',
+          logoUrl: defaultProfile.logoDataUrl || '',
+        };
+        setCompanyProfile(syncedProfile);
+        saveCompanyProfile(syncedProfile);
+        if (syncedProfile.logoUrl) {
+          setFormData(prev => ({ ...prev, companyLogo: syncedProfile.logoUrl }));
+        }
+      }
+    }).catch(() => {
+      // Network error — fall back to localStorage profile (already loaded above)
+    });
   }, [type]);
 
   useEffect(() => {
@@ -1000,7 +1032,7 @@ export default function DocumentEditorPage() {
                 </div>
               </div>
               {!showCompanyForm && companyProfile && (
-                <div className="text-sm text-gray-600 space-y-1">
+                <div data-testid="doc-company-profile-display">
                   <p className="font-medium">{companyProfile.companyName}</p>
                   {companyProfile.companyNameEn && <p className="text-xs text-gray-400">{companyProfile.companyNameEn}</p>}
                   {companyProfile.phone && <p className="text-xs">{companyProfile.phone}</p>}

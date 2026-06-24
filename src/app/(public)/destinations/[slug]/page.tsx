@@ -536,6 +536,15 @@ export default async function DestinationPage({ params }: { params: Promise<{ sl
                 </p>
               </div>
             )}
+            {/* v1.20.42.18.6.11.4: Fallback disclaimer — always rendered to ensure compliance text visible */}
+            {!visibleModules.includes("disclaimer") && (
+              <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  <MapPin className="w-3.5 h-3.5 inline mr-1 text-blue-500" />
+                  <strong>数据说明：</strong>页面内容仅供参考，正式业务请以当地官方要求为准。
+                </p>
+              </div>
+            )}
           </div>
 
           {/* ─── RIGHT: Sidebar (sticky) ─── */}

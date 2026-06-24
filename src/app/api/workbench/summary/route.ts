@@ -68,7 +68,7 @@ export async function GET(req: Request) {
       },
       points: user?.points || 0,
       memberInfo: {
-        isMember: user?.role === 'member' && user?.memberUntil && user.memberUntil > new Date(),
+        isMember: user?.memberUntil && user.memberUntil > new Date(),
         memberUntil: user?.memberUntil?.toISOString() || null,
       },
     });
