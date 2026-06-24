@@ -1313,8 +1313,8 @@ async function main() {
     const hasScenarios = bodyText?.includes('我要寄件') && bodyText?.includes('我要做发票') && bodyText?.includes('我要查邮编');
     rec('P3-010', 'ResourcesV2', 'P3', hasScenarios ? 'PASS' : 'FAIL', `Scenario cards: ${hasScenarios ? 'found' : 'missing'}`, '');
 
-    // Check no 500 errors
-    const noErrors = !bodyText?.includes('500') && !bodyText?.includes('Internal Server Error');
+    // Check no 500 errors (look for actual error messages, not just "500" number)
+    const noErrors = !bodyText?.includes('Internal Server Error') && !bodyText?.includes('Application error') && !bodyText?.includes('Something went wrong');
     rec('P3-011', 'ResourcesV2', 'P3', noErrors ? 'PASS' : 'FAIL', `No server errors: ${noErrors}`, '');
 
     // Check existing /resources still works
