@@ -354,7 +354,12 @@ async function main() {
   }
 
   // ── Login tests (BLOCKED if public-only or no creds) ──
-  const hasCreds = !!process.env.AUDIT_TEST_PASSWORD;
+  // v1.20.42.18.6.11.6.1: Support AUDIT_TEST_PASSWORD_FILE (file-based password)
+  let _pwd = process.env.AUDIT_TEST_PASSWORD || '';
+  if (!process.env.AUDIT_TEST_PASSWORD && process.env.AUDIT_TEST_PASSWORD_FILE) {
+    try { _pwd = require('fs').readFileSync(process.env.AUDIT_TEST_PASSWORD_FILE, 'utf-8').trim(); } catch {}
+  }
+  const hasCreds = !!_pwd;
   if (!PUBLIC_ONLY && hasCreds) {
     console.log('━━━ Phase 1: Login Tests ━━━');
     // Would run login tests here

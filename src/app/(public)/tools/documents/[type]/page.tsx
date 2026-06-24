@@ -787,17 +787,15 @@ export default function DocumentEditorPage() {
       alert(authResult.error || permissionMessages.exportWord);
       return;
     }
+    // v1.20.42.18.6.11.6: Generate real OOXML .docx (not fake .doc HTML)
     const content = previewRef.current?.innerHTML || '';
-    const html = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><meta charset="utf-8"><style>body{font-family:SimSun,serif;font-size:12pt;}table{border-collapse:collapse;width:100%;}td,th{border:1px solid #000;padding:4px 8px;}</style></head>
-      <body>${content}</body></html>
-    `;
-    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-    const link = document.createElement('a');
-    link.download = `${docType?.exportFileNamePrefix || type}-${formData.documentNo || 'draft'}-${new Date().toISOString().slice(0, 10)}.doc`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
+    const companyNameForDoc = companyProfile?.companyName || formData.companyName || '';
+    const filename = `${docType?.exportFileNamePrefix || type}-${formData.documentNo || 'draft'}-${new Date().toISOString().slice(0, 10)}.docx`;
+    const { downloadDocx } = await import('@/lib/documents/generate-docx');
+    await downloadDocx(content, filename, {
+      title: docType?.name || type,
+      companyName: companyNameForDoc,
+    });
     setWordExportsToday(prev => prev + 1);
 
     // Fire Export Event (Data Bridge)
@@ -811,7 +809,7 @@ export default function DocumentEditorPage() {
         exportType: 'word',
       }),
     }).catch(() => {});
-  }, [p, selectedStyle, previewRef, docType, formData.documentNo, type]);
+  }, [p, selectedStyle, previewRef, docType, formData.documentNo, type, companyProfile, formData.companyName]);
 
   if (!docType || !template) {
     return (
@@ -978,6 +976,7 @@ export default function DocumentEditorPage() {
               {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : 'PNG'}
             </button>
             <button onClick={handleExportWord}
+              data-testid="word-export-btn"
               className={`flex items-center gap-1.5 px-3 py-2 text-sm rounded-lg transition-colors ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
               title={!p.canExportWord() ? permissionMessages.exportWord : '导出 Word'}>
               <FileSpreadsheet className="w-4 h-4" /> Word
@@ -1398,6 +1397,7 @@ export default function DocumentEditorPage() {
                     {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />} {exporting ? '生成中...' : '导出 PNG'}
                   </button>
                   <button onClick={handleExportWord}
+                    data-testid="word-export-btn-mobile"
                     className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm rounded-xl font-medium ${p.canExportWord() ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-gray-200 text-gray-400'}`}
                     title={!p.canExportWord() ? permissionMessages.exportWord : ''}>
                     <FileSpreadsheet className="w-4 h-4" /> Word

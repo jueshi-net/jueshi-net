@@ -13,6 +13,8 @@ import { ArrowLeft, Save, Printer, FileText, Loader2, Building2, Eye, Code, Plus
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
 import { useDocumentToolEngine } from "@/hooks/use-document-tool-engine";
+import { authorizeExportClient } from "@/lib/auth/client-permissions";
+import { permissionMessages } from "@/lib/membership/permissions";
 import { QuoteSheetData, QuoteSheetLine, defaultQuoteSheetData, serialize, deserialize, mapCompanyProfile, calculateTotals } from "./quote-sheet-types";
 import QuoteSheetPreview from "./quote-sheet-preview";
 import DocumentToolLayout from "@/components/document-tools/document-tool-layout";
@@ -140,37 +142,34 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
     setExporting(false);
   }, [currentDocId, setError]);
 
-  // Handle Word Export (Blob .doc approach)
-  const handleExportWord = useCallback(() => {
+  // Handle Word Export (v1.20.42.18.6.11.6: real OOXML .docx via JSZip + unified authorization)
+  const handleExportWord = useCallback(async () => {
     try {
+      // v1.20.42.18.6.11.6.1: Unified authorization — same as dynamic document routes
+      const authResult = await authorizeExportClient({
+        exportType: 'word',
+        documentType: 'quote-sheet',
+      });
+      if (!authResult.allowed) {
+        alert(authResult.error || permissionMessages.exportWord);
+        return;
+      }
+
       const el = previewRef.current;
       if (!el) {
         setError("预览内容不存在，无法导出 Word");
         return;
       }
 
-      const html = `
-        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-        <head><meta charset="utf-8"><title>报价单</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-          th { background: #f5f5f5; }
-          h1 { text-align: center; color: #0d9488; }
-        </style></head>
-        <body>${el.innerHTML}</body></html>
-      `;
-
-      const blob = new Blob(["\ufeff", html], { type: "application/msword" });
-      const link = document.createElement("a");
-      const ts = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-      link.download = `quote-sheet-${ts}.doc`;
-      link.href = URL.createObjectURL(blob);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(link.href);
+      const content = el.innerHTML || '';
+      const companyNameForDoc = (data as any).companyName || '';
+      const ts = new Date().toISOString().slice(0, 10);
+      const filename = `quote-sheet-${ts}.docx`;
+      const { downloadDocx } = await import('@/lib/documents/generate-docx');
+      await downloadDocx(content, filename, {
+        title: '报价单',
+        companyName: companyNameForDoc,
+      });
 
       // Track Document_Export event
       try {
@@ -190,7 +189,7 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
       console.error("[Word Export] Failed:", e);
       setError("Word 导出失败，请重试");
     }
-  }, [currentDocId, setError]);
+  }, [currentDocId, setError, data]);
 
   // Line item manipulation
   const addLine = useCallback(() => {
@@ -323,6 +322,7 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
             <button
               onClick={handleExportWord}
               disabled={exporting}
+              data-testid="word-export-btn"
               className="inline-flex items-center gap-1 px-3 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 min-h-[44px]"
             >
               <Download className="w-4 h-4" /> Word
