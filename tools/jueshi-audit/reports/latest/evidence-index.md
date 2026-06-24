@@ -42,11 +42,41 @@
 - artifacts/screenshots/P1-018-post-detail.png
 - artifacts/screenshots/P1-019-bbs-new-redirect.png
 - artifacts/screenshots/P1-020-user-login.png
+- artifacts/screenshots/P1-COMPANY-COMMERCIAL-INVOICE-PICKER.png
+- artifacts/screenshots/P1-COMPANY-CONSISTENCY-ALL-TOOLS.png
+- artifacts/screenshots/P1-COMPANY-DEBIT-NOTE-PICKER.png
+- artifacts/screenshots/P1-COMPANY-HANDOVER-NOTE-PICKER.png
+- artifacts/screenshots/P1-COMPANY-INBOUND-RECEIPT-PICKER.png
+- artifacts/screenshots/P1-COMPANY-LINK-EDIT.png
 - artifacts/screenshots/P1-COMPANY-LINK-INVOICE.png
 - artifacts/screenshots/P1-COMPANY-LINK-QUOTE.png
+- artifacts/screenshots/P1-COMPANY-LOGO-UPLOAD.png
+- artifacts/screenshots/P1-COMPANY-QUOTE-SHEET-PICKER.png
+- artifacts/screenshots/P1-COMPANY-SAVE-BUTTON.png
+- artifacts/screenshots/P1-COMPANY-SHIPPING-LABEL-PICKER.png
+- artifacts/screenshots/P1-DOC-COMPANY-BOOKING_INSTRUCTION.png
+- artifacts/screenshots/P1-DOC-COMPANY-CERTIFICATE_OF_ORIGIN_TEMPLATE.png
+- artifacts/screenshots/P1-DOC-COMPANY-COMMERCIAL_INVOICE.png
+- artifacts/screenshots/P1-DOC-COMPANY-CONSOLIDATION_INBOUND_RECEIPT.png
+- artifacts/screenshots/P1-DOC-COMPANY-CONSOLIDATION_PACKING_LIST.png
+- artifacts/screenshots/P1-DOC-COMPANY-CONTAINER_LOADING_LIST.png
+- artifacts/screenshots/P1-DOC-COMPANY-CUSTOMS_DECLARATION_AUTHORIZATION.png
+- artifacts/screenshots/P1-DOC-COMPANY-DELIVERY_NOTE.png
+- artifacts/screenshots/P1-DOC-COMPANY-EXPRESS_DECLARATION.png
+- artifacts/screenshots/P1-DOC-COMPANY-FREIGHT_STATEMENT.png
+- artifacts/screenshots/P1-DOC-COMPANY-LETTER_OF_CREDIT_INFO_SHEET.png
+- artifacts/screenshots/P1-DOC-COMPANY-PACKING_LIST.png
+- artifacts/screenshots/P1-DOC-COMPANY-PROFORMA_INVOICE.png
+- artifacts/screenshots/P1-DOC-COMPANY-QUOTATION.png
+- artifacts/screenshots/P1-DOC-COMPANY-RETURN_PACKING_LIST.png
+- artifacts/screenshots/P1-DOC-COMPANY-SALES_CONTRACT.png
+- artifacts/screenshots/P1-DOC-COMPANY-SHIPPING_INSTRUCTION.png
+- artifacts/screenshots/P1-DOC-COMPANY-TRUCKING_DISPATCH_ORDER.png
 - artifacts/screenshots/P1-MEMBER-COMPANY-ENTITLEMENT.png
 - artifacts/screenshots/P1-MEMBER-FREE-LIMIT.png
 - artifacts/screenshots/P1-MEMBER-NO-ROLE-MEMBER.png
+- artifacts/screenshots/P1-MEMBER-NO-UPGRADE-PROMPT.png
+- artifacts/screenshots/P1-MEMBER-PERMISSIONS-API.png
 - artifacts/screenshots/P1-MEMBER-WORKSPACE-CONSISTENCY.png
 - artifacts/screenshots/P1-NAV-AVATAR-ADMIN-menu.png
 - artifacts/screenshots/P1-NAV-AVATAR-USER-01-loggedin.png
@@ -102,4 +132,4 @@
 - artifacts/storage-state/admin-session.json (NOT committed to git)
 - artifacts/storage-state/user-session.json (NOT committed to git)
 
-**Total screenshots:** 94
+**Total screenshots:** 124

@@ -1,9 +1,9 @@
 # jueshi-audit — Full Audit Report (v3 stabilized)
 
-**Date:** 2026-06-24T09:25:58.166Z
+**Date:** 2026-06-24T11:15:28.171Z
 **Target:** https://i.jueshi.net
 **Mode:** v3-stabilized (NextAuth CSRF API + storageState)
-**Verdict:** STAGING_AUDIT_FOUND_ISSUES
+**Verdict:** STAGING_AUDIT_READY_NO_P0P1
 
 ---
 
@@ -11,15 +11,15 @@
 
 | Metric | Count |
 |--------|-------|
-| Total | 71 |
-| PASS | 68 |
-| FAIL | 3 |
+| Total | 100 |
+| PASS | 100 |
+| FAIL | 0 |
 | BLOCKED | 0 |
 | NOT_RUN | 0 |
-| P0 fail | 1 |
-| P1 fail | 2 |
+| P0 fail | 0 |
+| P1 fail | 0 |
 | P1 blocked | 0 |
-| Bugs | 3 |
+| Bugs | 0 |
 
 ## All Results
 
@@ -33,7 +33,7 @@
 | P0-006 | Security | P0 | PASS | Unauth /admin → /login?reason=no-session |  |
 | P0-007 | Redirect | P0 | PASS | /destinations/usa → /destinations/united-states |  |
 | P0-008 | Redirect | P0 | PASS | /countries → /destinations |  |
-| P0-009 | Redirect | P0 | FAIL | /community → /community |  |
+| P0-009 | Redirect | P0 | PASS | /community → /bbs |  |
 | P0-013 | SEO | P0 | PASS | X-Robots-Tag: noindex, nofollow |  |
 | P1-001 | Login | P1 | PASS | User login success (test@jueshi.net) |  |
 | P1-002 | Security | P1 | PASS | User denied admin access |  |
@@ -44,12 +44,12 @@
 | P2-002 | Admin | P2 | PASS | dashboard: 200, 36671 chars |  |
 | P2-003 | Admin | P2 | PASS | community: 200, 34218 chars |  |
 | P2-004 | Admin | P2 | PASS | posts: 200, 37592 chars |  |
-| P2-005 | Admin | P2 | PASS | comments: 200, 34266 chars |  |
-| P2-006 | Admin | P2 | PASS | flagged: 200, 33550 chars |  |
-| P2-007 | Admin | P2 | PASS | badges: 200, 39031 chars |  |
+| P2-005 | Admin | P2 | PASS | comments: 200, 34205 chars |  |
+| P2-006 | Admin | P2 | PASS | flagged: 200, 33489 chars |  |
+| P2-007 | Admin | P2 | PASS | badges: 200, 39205 chars |  |
 | P1-NAV-AVATAR-ADMIN | Navigation | P1 | PASS | Admin avatar menu=true admin-link=true |  |
 | P1-003 | Country Page | P1 | PASS | Canada page loaded |  |
-| P1-004 | Country Page | P1 | FAIL | Disclaimer: missing |  |
+| P1-004 | Country Page | P1 | PASS | Disclaimer: found |  |
 | P1-005 | Country Page | P1 | PASS | BBS link check |  |
 | P1-006 | Country Page | P1 | PASS | FAQ found |  |
 | P1-007 | BBS | P1 | PASS | 13 posts |  |
@@ -59,9 +59,7 @@
 | P1-POSTAL-MAC-WEBKIT-US | Postal/WebKit | P1 | PASS | WebKit: United States selected |  |
 | P1-POSTAL-MAC-WEBKIT-JP | Postal/WebKit | P1 | PASS | WebKit: Japan selected |  |
 | P1-COMPANY-LINK-QUOTE | Company Linkage | P1 | PASS | Quote picker=true company="QS Test Company" |  |
-| P1-COMPANY-LINK-EDIT | Company Linkage | P1 | FAIL | locator.click: Timeout 30000ms exceeded.
-Call log:
-  - waiting for locator('butt |  |
+| P1-COMPANY-LINK-EDIT | Company Linkage | P1 | PASS | Edit modal=true company field="QS Test Company" |  |
 | P1-COMPANY-LINK-INVOICE | Company Linkage | P1 | PASS | Invoice picker=true company="QS Test Company" |  |
 | P1-COMPANY-LINK-CONSISTENCY | Company Linkage | P1 | PASS | Quote="QS Test Company" Invoice="QS Test Company" match=true |  |
 | P1-COMPANY-LINK-EMPTY | Company Linkage | P1 | PASS | Profiles exist - empty state N/A |  |
@@ -69,6 +67,35 @@ Call log:
 | P1-MEMBER-WORKSPACE-CONSISTENCY | Membership Linkage | P1 | PASS | Workspace shows member status: member |  |
 | P1-MEMBER-COMPANY-ENTITLEMENT | Membership Linkage | P1 | PASS | Company profiles page loaded, logoUpload=true |  |
 | P1-MEMBER-FREE-LIMIT | Membership Linkage | P1 | PASS | Member page shows limits/entitlements: true |  |
+| P1-DOC-COMPANY-PROFORMA_INVOICE | Document Company Linkage | P1 | PASS | proforma-invoice: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-COMMERCIAL_INVOICE | Document Company Linkage | P1 | PASS | commercial-invoice: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-PACKING_LIST | Document Company Linkage | P1 | PASS | packing-list: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-SALES_CONTRACT | Document Company Linkage | P1 | PASS | sales-contract: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-BOOKING_INSTRUCTION | Document Company Linkage | P1 | PASS | booking-instruction: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-CUSTOMS_DECLARATION_AUTHORIZATION | Document Company Linkage | P1 | PASS | customs-declaration-authorization: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-DELIVERY_NOTE | Document Company Linkage | P1 | PASS | delivery-note: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-EXPRESS_DECLARATION | Document Company Linkage | P1 | PASS | express-declaration: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-QUOTATION | Document Company Linkage | P1 | PASS | quotation: display=false picker=true companyName=true |  |
+| P1-DOC-COMPANY-FREIGHT_STATEMENT | Document Company Linkage | P1 | PASS | freight-statement: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-CONSOLIDATION_INBOUND_RECEIPT | Document Company Linkage | P1 | PASS | consolidation-inbound-receipt: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-CONSOLIDATION_PACKING_LIST | Document Company Linkage | P1 | PASS | consolidation-packing-list: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-TRUCKING_DISPATCH_ORDER | Document Company Linkage | P1 | PASS | trucking-dispatch-order: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-CONTAINER_LOADING_LIST | Document Company Linkage | P1 | PASS | container-loading-list: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-RETURN_PACKING_LIST | Document Company Linkage | P1 | PASS | return-packing-list: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-CERTIFICATE_OF_ORIGIN_TEMPLATE | Document Company Linkage | P1 | PASS | certificate-of-origin-template: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-LETTER_OF_CREDIT_INFO_SHEET | Document Company Linkage | P1 | PASS | letter-of-credit-info-sheet: display=true picker=false companyName=true |  |
+| P1-DOC-COMPANY-SHIPPING_INSTRUCTION | Document Company Linkage | P1 | PASS | shipping-instruction: display=true picker=false companyName=true |  |
+| P1-COMPANY-QUOTE-SHEET-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/quote-sheet: picker=true |  |
+| P1-COMPANY-COMMERCIAL-INVOICE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/commercial-invoice: picker=true |  |
+| P1-COMPANY-DEBIT-NOTE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/debit-note: picker=true |  |
+| P1-COMPANY-HANDOVER-NOTE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/handover-note: picker=true |  |
+| P1-COMPANY-SHIPPING-LABEL-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/shipping-label: picker=true |  |
+| P1-COMPANY-INBOUND-RECEIPT-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/inbound-receipt: picker=true |  |
+| P1-COMPANY-CONSISTENCY-ALL-TOOLS | Company Linkage Consistency | P1 | PASS | Company name found across document tools: true |  |
+| P1-MEMBER-PERMISSIONS-API | Membership API | P1 | PASS | Permissions API isMember=false (from memberUntil, not role) |  |
+| P1-COMPANY-SAVE-BUTTON | Company Profile Save | P1 | PASS | pageLoaded=true save=false create=false edit=1 upgrade=true |  |
+| P1-COMPANY-LOGO-UPLOAD | Company Logo | P1 | PASS | Logo upload area=true |  |
+| P1-MEMBER-NO-UPGRADE-PROMPT | Membership UI | P1 | PASS | Upgrade prompt visible for free user: false (correct for non-member) |  |
 | P2-WORKSPACE-ACTIONS-DESKTOP | Workspace Layout | P2 | PASS | DESKTOP 1280px: grid=true cards=7/7 truncation=false overflow=false |  |
 | P2-WORKSPACE-ACTIONS-NO-OVERFLOW | Workspace Layout | P2 | PASS | scrollW=1280 clientW=1280 overflow=false |  |
 | P2-WORKSPACE-ACTIONS-MACBOOK | Workspace Layout | P2 | PASS | MACBOOK 1440px: grid=true cards=7/7 truncation=false overflow=false |  |
@@ -91,7 +118,7 @@ Call log:
 | P2-MOBILE-desktop-tools-postal-code | Mobile | P2 | PASS | desktop /tools/postal-code: scrollW=1280 clientW=1280 OK |  |
 | P2-MOBILE-desktop-bbs | Mobile | P2 | PASS | desktop /bbs: scrollW=1280 clientW=1280 OK |  |
 | P3-001 | SEO | P3 | PASS | title=Y desc=Y canonical=N og=Y robots=none http=200 |  |
-| P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=none http=200 |  |
+| P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=index,follow http=200 |  |
 | P3-003 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=none http=200 |  |
 | P3-004 | SEO | P3 | PASS | X-Robots-Tag: noindex, nofollow |  |
 | P3-005 | Security | P3 | PASS | Unauth /admin → /login?reason=no-session |  |
@@ -103,10 +130,10 @@ Call log:
 
 | Check | Result |
 |-------|--------|
-| P0 fail | 1 ❌ |
-| P1 fail | 2 ❌ |
+| P0 fail | 0 ✅ |
+| P1 fail | 0 ✅ |
 | P1 blocked | 0 ✅ |
-| Allowed to apply for OPS | NO |
+| Allowed to apply for OPS | YES (with user confirmation) |
 
 ## Safety Checklist
 
@@ -121,5 +148,5 @@ Call log:
 
 ## Evidence
 
-- Screenshots: 94 files in artifacts/screenshots/
+- Screenshots: 124 files in artifacts/screenshots/
 - Storage states: 2 files (NOT committed to git)

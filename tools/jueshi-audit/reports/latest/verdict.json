@@ -1,14 +1,14 @@
 {
-  "verdict": "STAGING_AUDIT_FOUND_ISSUES",
-  "timestamp": "2026-06-24T09:25:58.166Z",
+  "verdict": "STAGING_AUDIT_READY_NO_P0P1",
+  "timestamp": "2026-06-24T11:15:28.171Z",
   "target": "https://i.jueshi.net",
-  "p0Failures": 1,
-  "p1Failures": 2,
+  "p0Failures": 0,
+  "p1Failures": 0,
   "p1Blocked": 0,
-  "total": 71,
-  "pass": 68,
-  "fail": 3,
+  "total": 100,
+  "pass": 100,
+  "fail": 0,
   "blocked": 0,
   "notRun": 0,
-  "bugs": 3
+  "bugs": 0
 }
