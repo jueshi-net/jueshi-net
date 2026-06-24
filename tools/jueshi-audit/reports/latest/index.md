@@ -1,9 +1,9 @@
 # jueshi-audit — Full Audit Report (v3 stabilized)
 
-**Date:** 2026-06-24T00:01:04.213Z
-**Target:** https://i.jueshi.net
+**Date:** 2026-06-24T00:39:38.381Z
+**Target:** https://jueshi.net
 **Mode:** v3-stabilized (NextAuth CSRF API + storageState)
-**Verdict:** STAGING_AUDIT_READY_NO_P0P1
+**Verdict:** STAGING_AUDIT_FOUND_ISSUES
 
 ---
 
@@ -11,14 +11,14 @@
 
 | Metric | Count |
 |--------|-------|
-| Total | 49 |
-| PASS | 49 |
+| Total | 42 |
+| PASS | 40 |
 | FAIL | 0 |
-| BLOCKED | 0 |
+| BLOCKED | 2 |
 | NOT_RUN | 0 |
 | P0 fail | 0 |
 | P1 fail | 0 |
-| P1 blocked | 0 |
+| P1 blocked | 2 |
 | Bugs | 0 |
 
 ## All Results
@@ -35,15 +35,8 @@
 | P0-008 | Redirect | P0 | PASS | /countries → /destinations |  |
 | P0-009 | Redirect | P0 | PASS | /community → /bbs |  |
 | P0-013 | SEO | P0 | PASS | X-Robots-Tag: noindex, nofollow |  |
-| P1-001 | Login | P1 | PASS | User login success (audit-tester@jueshi.net) |  |
-| P1-002 | Security | P1 | PASS | User denied admin access |  |
-| P2-001 | Admin Login | P2 | PASS | Admin login success (audit-admin@jueshi.net) |  |
-| P2-002 | Admin | P2 | PASS | dashboard: 200, 40741 chars |  |
-| P2-003 | Admin | P2 | PASS | community: 200, 38147 chars |  |
-| P2-004 | Admin | P2 | PASS | posts: 200, 41521 chars |  |
-| P2-005 | Admin | P2 | PASS | comments: 200, 38195 chars |  |
-| P2-006 | Admin | P2 | PASS | flagged: 200, 37479 chars |  |
-| P2-007 | Admin | P2 | PASS | badges: 200, 43195 chars |  |
+| P1-001 | Login | P1 | BLOCKED | BLOCKED_NO_CREDENTIAL | BLOCKED_NO_CREDENTIAL |
+| P1-002 | Login | P1 | BLOCKED | BLOCKED_NO_CREDENTIAL | BLOCKED_NO_CREDENTIAL |
 | P1-003 | Country Page | P1 | PASS | Canada page loaded |  |
 | P1-004 | Country Page | P1 | PASS | Disclaimer: found |  |
 | P1-005 | Country Page | P1 | PASS | BBS link check |  |
@@ -81,8 +74,8 @@
 |-------|--------|
 | P0 fail | 0 ✅ |
 | P1 fail | 0 ✅ |
-| P1 blocked | 0 ✅ |
-| Allowed to apply for OPS | YES (with user confirmation) |
+| P1 blocked | 2 ⚠️ |
+| Allowed to apply for OPS | NO |
 
 ## Safety Checklist
 

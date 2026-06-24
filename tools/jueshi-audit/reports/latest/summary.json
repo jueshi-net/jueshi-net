@@ -1,15 +1,15 @@
 {
-  "verdict": "STAGING_AUDIT_READY_NO_P0P1",
-  "timestamp": "2026-06-24T00:01:04.213Z",
-  "target": "https://i.jueshi.net",
+  "verdict": "STAGING_AUDIT_FOUND_ISSUES",
+  "timestamp": "2026-06-24T00:39:38.381Z",
+  "target": "https://jueshi.net",
   "mode": "v3-stabilized-nextauth-csrf",
-  "total": 49,
-  "pass": 49,
+  "total": 42,
+  "pass": 40,
   "fail": 0,
-  "blocked": 0,
+  "blocked": 2,
   "notRun": 0,
   "p0Fail": 0,
   "p1Fail": 0,
-  "p1Blocked": 0,
+  "p1Blocked": 2,
   "bugCount": 0
 }

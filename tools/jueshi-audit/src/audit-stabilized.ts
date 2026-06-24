@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const TOOL_DIR = path.resolve(__dirname, '..');
-const BASE_URL = 'https://i.jueshi.net';
+const BASE_URL = process.env.AUDIT_BASE_URL || 'https://i.jueshi.net';
 const SS_DIR = path.join(TOOL_DIR, 'artifacts', 'screenshots');
 const REPORT_DIR = path.join(TOOL_DIR, 'reports', 'latest');
 const STORAGE_DIR = path.join(TOOL_DIR, 'artifacts', 'storage-state');
