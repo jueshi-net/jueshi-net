@@ -42,6 +42,20 @@
 - artifacts/screenshots/P1-018-post-detail.png
 - artifacts/screenshots/P1-019-bbs-new-redirect.png
 - artifacts/screenshots/P1-020-user-login.png
+- artifacts/screenshots/P1-COMPANY-LINK-INVOICE.png
+- artifacts/screenshots/P1-COMPANY-LINK-QUOTE.png
+- artifacts/screenshots/P1-MEMBER-COMPANY-ENTITLEMENT.png
+- artifacts/screenshots/P1-MEMBER-FREE-LIMIT.png
+- artifacts/screenshots/P1-MEMBER-NO-ROLE-MEMBER.png
+- artifacts/screenshots/P1-MEMBER-WORKSPACE-CONSISTENCY.png
+- artifacts/screenshots/P1-NAV-AVATAR-ADMIN-menu.png
+- artifacts/screenshots/P1-NAV-AVATAR-USER-01-loggedin.png
+- artifacts/screenshots/P1-NAV-AVATAR-USER-02-menu.png
+- artifacts/screenshots/P1-POSTAL-WEBKIT-01-loaded.png
+- artifacts/screenshots/P1-POSTAL-WEBKIT-02-dropdown.png
+- artifacts/screenshots/P1-POSTAL-WEBKIT-CA.png
+- artifacts/screenshots/P1-POSTAL-WEBKIT-JP.png
+- artifacts/screenshots/P1-POSTAL-WEBKIT-US.png
 - artifacts/screenshots/P1-postal-initial.png
 - artifacts/screenshots/P2-001-admin-login.png
 - artifacts/screenshots/P2-002-dashboard.png
@@ -66,6 +80,11 @@
 - artifacts/screenshots/P2-MOBILE-iphone12-bbs.png
 - artifacts/screenshots/P2-MOBILE-iphone12-destinations-canada.png
 - artifacts/screenshots/P2-MOBILE-iphone12-tools-postal-code.png
+- artifacts/screenshots/P2-WORKSPACE-ACTIONS-DESKTOP.png
+- artifacts/screenshots/P2-WORKSPACE-ACTIONS-MACBOOK.png
+- artifacts/screenshots/P2-WORKSPACE-ACTIONS-MOBILE.png
+- artifacts/screenshots/P2-WORKSPACE-ACTIONS-NO-OVERFLOW.png
+- artifacts/screenshots/P2-WORKSPACE-ACTIONS-TABLET.png
 - artifacts/screenshots/P3-001-seo.png
 - artifacts/screenshots/P3-002-seo.png
 - artifacts/screenshots/P3-003-seo.png
@@ -83,4 +102,4 @@
 - artifacts/storage-state/admin-session.json (NOT committed to git)
 - artifacts/storage-state/user-session.json (NOT committed to git)
 
-**Total screenshots:** 75
+**Total screenshots:** 94
