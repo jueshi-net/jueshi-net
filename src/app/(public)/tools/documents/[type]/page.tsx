@@ -24,6 +24,7 @@ import { track, trackEvent } from '@/lib/analytics';
 import { Loader2 } from 'lucide-react';
 import TaskChainGeneratorButton from '@/components/tools/task-chain-generator-button';
 import CompanyProfilePicker from '@/components/document-tools/company-profile-picker';
+import DocumentChainActions from '@/components/document-tools/document-chain-actions';
 
 function getTotalLabel(key: string): string {
   const labels: Record<string, string> = {
@@ -1016,6 +1017,13 @@ export default function DocumentEditorPage() {
                 filterSourceTools={['hs-code', 'exchange-rate', 'shipping-calculator', 'address-formatter', 'postal-code', 'quotation', 'proforma-invoice', 'commercial-invoice', 'packing-list']}
               />
             </div>
+            {/* Document Chain Actions */}
+            <DocumentChainActions
+              currentType={docType}
+              formData={formData}
+              items={formData.items || []}
+              companyProfileId={companyProfile?.id}
+            />
             {/* Company info */}
             <div className="bg-white rounded-xl border p-5 mb-4">
               {/* v1.20.42.18.6.11.5: Multi-company selector for logged-in users */}
