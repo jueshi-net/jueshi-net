@@ -1,13 +1,14 @@
 # Recommendations
 
+3. **P1 BLOCKED:** Resolve blocked P1 tests (may need user exemption).
 
 ## Failed Tests
 
-- **P2-001 [P2]** Admin Login: Admin login failed (9833416@qq.com) [AUTH_AUTOMATION_ISSUE]
+- **P3-011 [P3]** ResourcesV2: No server errors: false
 
 ## Release Gate
 
 - P0 fail: 0 ✅
 - P1 fail: 0 ✅
-- P1 blocked: 0 ✅
-- Verdict: STAGING_AUDIT_READY_NO_P0P1
+- P1 blocked: 2 ⚠️
+- Verdict: STAGING_AUDIT_FOUND_ISSUES

@@ -1,9 +1,9 @@
 # jueshi-audit — Full Audit Report (v3 stabilized)
 
-**Date:** 2026-06-24T13:24:51.859Z
+**Date:** 2026-06-24T16:59:46.904Z
 **Target:** https://i.jueshi.net
 **Mode:** v3-stabilized (NextAuth CSRF API + storageState)
-**Verdict:** STAGING_AUDIT_READY_NO_P0P1
+**Verdict:** STAGING_AUDIT_FOUND_ISSUES
 
 ---
 
@@ -11,14 +11,14 @@
 
 | Metric | Count |
 |--------|-------|
-| Total | 112 |
-| PASS | 111 |
+| Total | 50 |
+| PASS | 47 |
 | FAIL | 1 |
-| BLOCKED | 0 |
+| BLOCKED | 2 |
 | NOT_RUN | 0 |
 | P0 fail | 0 |
 | P1 fail | 0 |
-| P1 blocked | 0 |
+| P1 blocked | 2 |
 | Bugs | 1 |
 
 ## All Results
@@ -35,12 +35,8 @@
 | P0-008 | Redirect | P0 | PASS | /countries → /destinations |  |
 | P0-009 | Redirect | P0 | PASS | /community → /bbs |  |
 | P0-013 | SEO | P0 | PASS | X-Robots-Tag: noindex, nofollow |  |
-| P1-001 | Login | P1 | PASS | User login success (test@jueshi.net) |  |
-| P1-002 | Security | P1 | PASS | User denied admin access |  |
-| P1-NAV-AVATAR-USER | Navigation | P1 | PASS | Avatar btn=BUTTON aria-expanded=false aria-haspopup=true menu=true |  |
-| P1-NAV-AVATAR-WORKSPACE | Navigation | P1 | PASS | Workspace link in avatar menu: found |  |
-| P1-NAV-AVATAR-PERMISSION | Navigation | P1 | PASS | Admin link for regular user: hidden (correct) |  |
-| P2-001 | Admin Login | P2 | FAIL | Admin login failed (9833416@qq.com) | AUTH_AUTOMATION_ISSUE |
+| P1-001 | Login | P1 | BLOCKED | BLOCKED_NO_CREDENTIAL | BLOCKED_NO_CREDENTIAL |
+| P1-002 | Login | P1 | BLOCKED | BLOCKED_NO_CREDENTIAL | BLOCKED_NO_CREDENTIAL |
 | P1-003 | Country Page | P1 | PASS | Canada page loaded |  |
 | P1-004 | Country Page | P1 | PASS | Disclaimer: found |  |
 | P1-005 | Country Page | P1 | PASS | BBS link check |  |
@@ -51,49 +47,6 @@
 | P1-POSTAL-MAC-WEBKIT-CA | Postal/WebKit | P1 | PASS | WebKit: Canada selected |  |
 | P1-POSTAL-MAC-WEBKIT-US | Postal/WebKit | P1 | PASS | WebKit: United States selected |  |
 | P1-POSTAL-MAC-WEBKIT-JP | Postal/WebKit | P1 | PASS | WebKit: Japan selected |  |
-| P1-COMPANY-LINK-QUOTE | Company Linkage | P1 | PASS | Quote picker=true company="QS Test Company" |  |
-| P1-COMPANY-LINK-EDIT | Company Linkage | P1 | PASS | Edit modal=true company field="Audit Test Co C Inc" |  |
-| P1-COMPANY-LINK-INVOICE | Company Linkage | P1 | PASS | Invoice picker=true company="QS Test Company" |  |
-| P1-COMPANY-LINK-CONSISTENCY | Company Linkage | P1 | PASS | Quote="QS Test Company" Invoice="QS Test Company" match=true |  |
-| P1-COMPANY-LINK-EMPTY | Company Linkage | P1 | PASS | Profiles exist - empty state N/A |  |
-| P1-MEMBER-NO-ROLE-MEMBER | Membership Linkage | P1 | PASS | isActiveMember=false based on memberUntil (not role), hasExpiry=false |  |
-| P1-MEMBER-WORKSPACE-CONSISTENCY | Membership Linkage | P1 | PASS | Workspace shows member status: member |  |
-| P1-MEMBER-COMPANY-ENTITLEMENT | Membership Linkage | P1 | PASS | Company profiles page loaded, logoUpload=true |  |
-| P1-MEMBER-FREE-LIMIT | Membership Linkage | P1 | PASS | Member page shows limits/entitlements: true |  |
-| P1-DOC-COMPANY-PROFORMA_INVOICE | Document Company Linkage | P1 | PASS | proforma-invoice: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-COMMERCIAL_INVOICE | Document Company Linkage | P1 | PASS | commercial-invoice: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-PACKING_LIST | Document Company Linkage | P1 | PASS | packing-list: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-SALES_CONTRACT | Document Company Linkage | P1 | PASS | sales-contract: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-BOOKING_INSTRUCTION | Document Company Linkage | P1 | PASS | booking-instruction: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-CUSTOMS_DECLARATION_AUTHORIZATION | Document Company Linkage | P1 | PASS | customs-declaration-authorization: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-DELIVERY_NOTE | Document Company Linkage | P1 | PASS | delivery-note: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-EXPRESS_DECLARATION | Document Company Linkage | P1 | PASS | express-declaration: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-QUOTATION | Document Company Linkage | P1 | PASS | quotation: display=false picker=true companyName=true |  |
-| P1-DOC-COMPANY-FREIGHT_STATEMENT | Document Company Linkage | P1 | PASS | freight-statement: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-CONSOLIDATION_INBOUND_RECEIPT | Document Company Linkage | P1 | PASS | consolidation-inbound-receipt: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-CONSOLIDATION_PACKING_LIST | Document Company Linkage | P1 | PASS | consolidation-packing-list: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-TRUCKING_DISPATCH_ORDER | Document Company Linkage | P1 | PASS | trucking-dispatch-order: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-CONTAINER_LOADING_LIST | Document Company Linkage | P1 | PASS | container-loading-list: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-RETURN_PACKING_LIST | Document Company Linkage | P1 | PASS | return-packing-list: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-CERTIFICATE_OF_ORIGIN_TEMPLATE | Document Company Linkage | P1 | PASS | certificate-of-origin-template: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-LETTER_OF_CREDIT_INFO_SHEET | Document Company Linkage | P1 | PASS | letter-of-credit-info-sheet: display=true picker=true companyName=true |  |
-| P1-DOC-COMPANY-SHIPPING_INSTRUCTION | Document Company Linkage | P1 | PASS | shipping-instruction: display=true picker=true companyName=true |  |
-| P1-COMPANY-QUOTE-SHEET-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/quote-sheet: picker=true |  |
-| P1-COMPANY-COMMERCIAL-INVOICE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/commercial-invoice: picker=true |  |
-| P1-COMPANY-DEBIT-NOTE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/debit-note: picker=true |  |
-| P1-COMPANY-HANDOVER-NOTE-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/handover-note: picker=true |  |
-| P1-COMPANY-SHIPPING-LABEL-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/shipping-label: picker=true |  |
-| P1-COMPANY-INBOUND-RECEIPT-PICKER | Standalone Tool Company Linkage | P1 | PASS | /tools/inbound-receipt: picker=true |  |
-| P1-COMPANY-CONSISTENCY-ALL-TOOLS | Company Linkage Consistency | P1 | PASS | Company name found across document tools: true |  |
-| P1-MEMBER-PERMISSIONS-API | Membership API | P1 | PASS | Permissions API isMember=false (from memberUntil, not role) |  |
-| P1-COMPANY-SAVE-BUTTON | Company Profile Save | P1 | PASS | pageLoaded=true save=false create=false edit=3 upgrade=true |  |
-| P1-COMPANY-LOGO-UPLOAD | Company Logo | P1 | PASS | Logo upload area=true |  |
-| P1-MEMBER-NO-UPGRADE-PROMPT | Membership UI | P1 | PASS | Upgrade prompt visible for free user: false (correct for non-member) |  |
-| P2-WORKSPACE-ACTIONS-DESKTOP | Workspace Layout | P2 | PASS | DESKTOP 1280px: grid=true cards=7/7 truncation=false overflow=false |  |
-| P2-WORKSPACE-ACTIONS-NO-OVERFLOW | Workspace Layout | P2 | PASS | scrollW=1280 clientW=1280 overflow=false |  |
-| P2-WORKSPACE-ACTIONS-MACBOOK | Workspace Layout | P2 | PASS | MACBOOK 1440px: grid=true cards=7/7 truncation=false overflow=false |  |
-| P2-WORKSPACE-ACTIONS-TABLET | Workspace Layout | P2 | PASS | TABLET 768px: grid=true cards=7/7 truncation=false overflow=true |  |
-| P2-WORKSPACE-ACTIONS-MOBILE | Workspace Layout | P2 | PASS | MOBILE 390px: grid=true cards=7/7 truncation=false overflow=true |  |
 | P2-MOBILE-iphone12- | Mobile | P2 | PASS | iphone12 /: scrollW=390 clientW=390 OK |  |
 | P2-MOBILE-iphone12-destinations-canada | Mobile | P2 | PASS | iphone12 /destinations/canada: scrollW=390 clientW=390 OK |  |
 | P2-MOBILE-iphone12-tools-postal-code | Mobile | P2 | PASS | iphone12 /tools/postal-code: scrollW=390 clientW=390 OK |  |
@@ -110,25 +63,6 @@
 | P2-MOBILE-desktop-destinations-canada | Mobile | P2 | PASS | desktop /destinations/canada: scrollW=1280 clientW=1280 OK |  |
 | P2-MOBILE-desktop-tools-postal-code | Mobile | P2 | PASS | desktop /tools/postal-code: scrollW=1280 clientW=1280 OK |  |
 | P2-MOBILE-desktop-bbs | Mobile | P2 | PASS | desktop /bbs: scrollW=1280 clientW=1280 OK |  |
-| P1-COMPANY-SWITCH-QUOTE | CompanySwitch | P1 | PASS | options=3 switchSuccess=true / QS Test Company: found=true text="QS Test Company |  |
-| P1-COMPANY-SWITCH-COMMERCIAL-INVOICE | CompanySwitch | P1 | PASS | options=3 switchSuccess=true / QS Test Company: found=true text="QS Test Company |  |
-| P1-COMPANY-SWITCH-INBOUND-RECEIPT | CompanySwitch | P1 | PASS | options=3 switchSuccess=true / QS Test Company: found=true text="QS Test Company |  |
-| P1-COMPANY-SWITCH-PROFORMAINVOICE | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-PACKINGLIST | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-SALESCONTRACT | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-BOOKINGINSTRUCTION | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-CUSTOMSDECLARATIONAUTHORIZATION | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-SHIPPINGINSTRUCTION | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-DELIVERYNOTE | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-TRUCKINGDISPATCHORDER | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-CONTAINERLOADINGLIST | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-EXPRESSDECLARATION | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-CERTIFICATEOFORIGINTEMPLATE | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-RETURNPACKINGLIST | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-FREIGHTSTATEMENT | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-LETTEROFCREDITINFOSHEET | CompanySwitch | P1 | PASS | switchOk=true |  |
-| P1-COMPANY-SWITCH-ALL-DYNAMIC-DOCUMENTS | CompanySwitch | P1 | PASS | dynamicPass=14 dynamicFail=0 total=14 |  |
-| P1-COMPANY-SWITCH-META-FORM-TOOLS | CompanySwitch | P1 | PASS | picker=false / N/A: meta-form is form builder, not export document |  |
 | P3-001 | SEO | P3 | PASS | title=Y desc=Y canonical=N og=Y robots=none http=200 |  |
 | P3-002 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=index,follow http=200 |  |
 | P3-003 | SEO | P3 | PASS | title=Y desc=Y canonical=Y og=Y robots=none http=200 |  |
@@ -137,6 +71,10 @@
 | P3-006 | Security | P3 | PASS | XSS not executed (React auto-escapes) |  |
 | P3-007 | Security | P3 | PASS | SQLi input returns 200 with empty results (Prisma parameterized) |  |
 | P3-008 | Ops | P3 | PASS | /api/health: 401 (design behavior) | DESIGN_BEHAVIOR |
+| P3-009 | ResourcesV2 | P3 | PASS | /resources-v2 status=200 |  |
+| P3-010 | ResourcesV2 | P3 | PASS | Scenario cards: found |  |
+| P3-011 | ResourcesV2 | P3 | FAIL | No server errors: false |  |
+| P3-012 | ResourcesV2 | P3 | PASS | /resources (old) status=200 |  |
 
 ## Release Gate
 
@@ -144,8 +82,8 @@
 |-------|--------|
 | P0 fail | 0 ✅ |
 | P1 fail | 0 ✅ |
-| P1 blocked | 0 ✅ |
-| Allowed to apply for OPS | YES (with user confirmation) |
+| P1 blocked | 2 ⚠️ |
+| Allowed to apply for OPS | NO |
 
 ## Safety Checklist
 
@@ -160,5 +98,5 @@
 
 ## Evidence
 
-- Screenshots: 178 files in artifacts/screenshots/
+- Screenshots: 219 files in artifacts/screenshots/
 - Storage states: 2 files (NOT committed to git)

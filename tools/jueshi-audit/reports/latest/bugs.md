@@ -1,7 +1,7 @@
 # Bug List
 
-## BUG-1 [P2] [AUTH_AUTOMATION_ISSUE] — P2-001 Admin Login
+## BUG-1 [P3] — P3-011 ResourcesV2
 - **URL:** https://i.jueshi.net
-- **Actual:** Admin login failed (9833416@qq.com)
+- **Actual:** No server errors: false
 - **Expected:** See test spec
 
