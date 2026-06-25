@@ -20,8 +20,11 @@ import type {
   TemplateStyleConfig,
   TemplateLayoutConfig,
   ContentBlock,
+  CompanyProfile,
+  ProductItem,
+  DocumentData,
 } from "./template-schema";
-import type { CompanyProfile, ProductItem, DocumentData } from "./template-schema";
+import { getCompanyDisplayName, getCompanyDisplayNameEn } from "./template-schema";
 
 // ============================================================
 // 数据接口
@@ -129,21 +132,27 @@ function CompanyInfo({
   }
 
   return (
-    <div style={{ marginBottom: "16px", padding: "12px", border: `2px solid ${style.primaryColor}`, borderRadius: "4px" }}>
-      <div style={{ fontSize: "18px", fontWeight: "bold", color: style.primaryColor, marginBottom: "4px" }}>
-        {company.name || ""}
+    <div style={{ marginBottom: "16px", padding: "12px", border: `2px solid ${style.primaryColor}`, borderRadius: "4px" }} data-testid="template-preview-company-info">
+      <div style={{ fontSize: "18px", fontWeight: "bold", color: style.primaryColor, marginBottom: "4px" }} data-testid="template-preview-company-name">
+        {getCompanyDisplayName(company)}
       </div>
-      {company.nameEn && (
-        <div style={{ fontSize: "14px", color: "#666", marginBottom: "4px" }}>{company.nameEn}</div>
+      {getCompanyDisplayNameEn(company) && (
+        <div style={{ fontSize: "14px", color: "#666", marginBottom: "4px" }}>{getCompanyDisplayNameEn(company)}</div>
       )}
-      {company.address && (
-        <div style={{ fontSize: "13px", color: "#555" }}>地址: {company.address}</div>
+      {company.contactName && (
+        <div style={{ fontSize: "13px", color: "#555" }}>联系人: {company.contactName}</div>
+      )}
+      {(company.address || company.cityPostal) && (
+        <div style={{ fontSize: "13px", color: "#555" }}>地址: {company.address || ""}{company.cityPostal ? ` ${company.cityPostal}` : ""}</div>
       )}
       {company.phone && (
         <div style={{ fontSize: "13px", color: "#555" }}>电话: {company.phone}</div>
       )}
       {company.email && (
         <div style={{ fontSize: "13px", color: "#555" }}>邮箱: {company.email}</div>
+      )}
+      {company.website && (
+        <div style={{ fontSize: "13px", color: "#555" }}>网址: {company.website}</div>
       )}
       {company.taxId && (
         <div style={{ fontSize: "13px", color: "#555" }}>税号: {company.taxId}</div>
@@ -484,9 +493,9 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
       >
         {/* Logo */}
         <LogoArea
-          logo={company?.logo}
+          logo={company?.logoDataUrl || company?.logo}
           position={style.logoPosition}
-          companyName={company?.name}
+          companyName={company ? getCompanyDisplayName(company) : undefined}
         />
 
         {/* 标题 */}

@@ -140,7 +140,15 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
           const data: CompanyApiResponse = await res.json();
           if (data.success && data.data && data.data.length > 0) {
             setCompanies(data.data);
-            setSelectedCompanyId(data.data[0].id);
+            // Only set default if no company is currently selected or the
+            // current selection doesn't exist in the new list (e.g. after
+            // restoring a saved template's selectedCompanyId).
+            setSelectedCompanyId(prev => {
+              if (prev && data.data.find(c => c.id === prev)) return prev;
+              // Prefer the default company if one exists
+              const defaultCo = data.data.find(c => c.isDefault);
+              return defaultCo?.id || data.data[0].id;
+            });
             return;
           }
         }
@@ -223,10 +231,15 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
           .then(res => res.json())
           .then(data => {
             if (data.success && data.data) {
-              setConfig({
+              const loadedConfig = {
                 ...data.data,
                 contentBlocks: data.data.contentBlocks || [],
-              });
+              };
+              setConfig(loadedConfig);
+              // Restore selectedCompanyId if it exists in the saved template
+              if (loadedConfig.selectedCompanyId) {
+                setSelectedCompanyId(loadedConfig.selectedCompanyId);
+              }
             }
             setLoading(false);
           })
@@ -529,11 +542,13 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
       setSaveStatus(`保存失败: ${result.errors.join(", ")}`);
       return;
     }
+    // Persist selectedCompanyId with the template
+    const configToSave = { ...config, selectedCompanyId };
     try {
       const res = await fetch("/api/template-studio/templates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config }),
+        body: JSON.stringify({ config: configToSave }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -1117,20 +1132,34 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
           <div className="border rounded-lg p-4">
             <h3 className="text-sm font-medium mb-2">公司资料（数据绑定）</h3>
             {companies.length === 0 ? (
-              <div className="text-xs text-gray-400 py-2" data-testid="no-companies">
-                暂无公司资料，请先在"我的资料"中添加
+              <div className="text-xs text-gray-400 py-2" data-testid="template-company-empty-state">
+                暂无公司资料，请先添加公司
               </div>
             ) : (
-              <select
-                value={selectedCompanyId}
-                onChange={e => handleCompanySwitch(e.target.value)}
-                className="w-full px-3 py-2 border rounded text-sm"
-                data-testid="company-selector"
-              >
-                {companies.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+              <>
+                <select
+                  value={selectedCompanyId}
+                  onChange={e => handleCompanySwitch(e.target.value)}
+                  className="w-full px-3 py-2 border rounded text-sm"
+                  data-testid="template-company-selector"
+                >
+                  {companies.map((c, idx) => {
+                    const displayName = c.companyName || c.name || c.profileName || c.contactName || c.email || `未命名公司 #${idx + 1}`;
+                    const meta = [c.contactName, c.email].filter(Boolean).join(" · ");
+                    const defaultFlag = c.isDefault ? " (默认)" : "";
+                    return (
+                      <option key={c.id} value={c.id} data-testid="template-company-option">
+                        {displayName}{defaultFlag}{meta ? ` — ${meta}` : ""}
+                      </option>
+                    );
+                  })}
+                </select>
+                {selectedCompany && (
+                  <div className="mt-2 text-xs text-gray-600" data-testid="template-selected-company-name">
+                    当前: {selectedCompany.companyName || selectedCompany.name || selectedCompany.profileName || selectedCompany.contactName || selectedCompany.email || "未命名公司"}
+                  </div>
+                )}
+              </>
             )}
           </div>
 

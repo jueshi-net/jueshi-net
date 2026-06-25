@@ -149,6 +149,8 @@ export interface TemplateConfig {
   layout: TemplateLayoutConfig;
   /** Data binding toggles */
   bindings: TemplateDataBinding;
+  /** Selected company ID for data binding (persisted) */
+  selectedCompanyId?: string;
   /** Creation timestamp ISO */
   createdAt: string;
   /** Last modified timestamp ISO */
@@ -205,14 +207,66 @@ export function validateTemplateConfig(config: unknown): { valid: boolean; error
 
 export interface CompanyProfile {
   id: string;
-  name: string;
+  /** Company name (from API companyName field) */
+  companyName?: string;
+  /** Legacy name field (backward compat) */
+  name?: string;
+  /** Profile name (from API profileName field) */
+  profileName?: string;
+  /** English company name */
+  companyNameEn?: string;
+  /** Legacy English name field */
   nameEn?: string;
-  address?: string;
+  /** Contact person name */
+  contactName?: string;
+  /** Phone number */
   phone?: string;
+  /** Email address */
   email?: string;
+  /** Website URL */
+  website?: string;
+  /** Full address */
+  address?: string;
+  /** City and postal code */
+  cityPostal?: string;
+  /** Tax ID */
   taxId?: string;
+  /** CNY bank info */
+  bankCnyInfo?: string;
+  /** USD bank info */
+  bankUsdInfo?: string;
+  /** Default currency */
+  defaultCurrency?: string;
+  /** Logo as data URL */
+  logoDataUrl?: string;
+  /** Legacy logo field */
   logo?: string;
+  /** Logo text (abbreviation) */
+  logoText?: string;
+  /** Is this the default company */
   isDefault?: boolean;
+}
+
+/**
+ * Get a display name for a company profile, with fallback chain.
+ * Never returns blank — always falls back to "未命名公司 #N".
+ */
+export function getCompanyDisplayName(company: CompanyProfile, index: number = 0): string {
+  return (
+    company.companyName ||
+    company.name ||
+    company.profileName ||
+    company.contactName ||
+    company.email ||
+    `未命名公司 #${index + 1}`
+  );
+}
+
+/**
+ * Get company name for display in English if available.
+ */
+export function getCompanyDisplayNameEn(company: CompanyProfile): string | undefined {
+  return company.companyNameEn || company.nameEn || undefined;
 }
 
 export interface ProductItem {
