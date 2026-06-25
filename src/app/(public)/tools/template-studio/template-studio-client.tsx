@@ -965,6 +965,66 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
                 <option value="none">无 (不显示印章)</option>
               </select>
             </div>
+            {/* Seal Customization (only visible in generated mode) */}
+            {(config.style.stampMode === "generated") && (
+              <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200" data-testid="seal-config-panel">
+                <h4 className="text-xs font-medium text-gray-600 mb-2">印章文字配置</h4>
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-0.5">顶部文字 (公司名，留空使用公司名)</label>
+                    <input
+                      type="text"
+                      value={config.style.sealTopText || ""}
+                      onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, sealTopText: e.target.value }, updatedAt: new Date().toISOString() }))}
+                      className="w-full px-2 py-1 border rounded text-xs"
+                      placeholder="留空 = 公司名"
+                      data-testid="seal-top-text-input"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-0.5">底部文字</label>
+                      <input
+                        type="text"
+                        value={config.style.sealBottomText || "专用章"}
+                        onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, sealBottomText: e.target.value }, updatedAt: new Date().toISOString() }))}
+                        className="w-full px-2 py-1 border rounded text-xs"
+                        data-testid="seal-bottom-text-input"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-0.5">中心文字</label>
+                      <input
+                        type="text"
+                        value={config.style.sealCenterText || "★"}
+                        onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, sealCenterText: e.target.value }, updatedAt: new Date().toISOString() }))}
+                        className="w-full px-2 py-1 border rounded text-xs"
+                        data-testid="seal-center-text-input"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-0.5">印章颜色</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={config.style.sealColor || "#dc2626"}
+                        onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, sealColor: e.target.value }, updatedAt: new Date().toISOString() }))}
+                        className="h-7 w-12 border rounded cursor-pointer"
+                        data-testid="seal-color-input"
+                      />
+                      <input
+                        type="text"
+                        value={config.style.sealColor || "#dc2626"}
+                        onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, sealColor: e.target.value }, updatedAt: new Date().toISOString() }))}
+                        className="flex-1 px-2 py-1 border rounded text-xs font-mono"
+                        data-testid="seal-color-text-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Border Radius + Cell Padding */}
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div>
