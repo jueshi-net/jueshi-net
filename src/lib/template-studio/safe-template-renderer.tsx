@@ -246,7 +246,7 @@ function ProductTable({
       <thead>
         <tr style={{ ...primaryBgStyle(style.primaryColor), color: "#fff" }}>
           {visibleColumns.map(col => (
-            <th key={col.key} style={{ padding: "8px 12px", textAlign: "left", border: `1px solid ${style.primaryColor}` }}>
+            <th key={col.key} style={{ padding: style.cellPadding || "8px 12px", textAlign: "left", border: `1px solid ${style.primaryColor}` }}>
               {col.label}
             </th>
           ))}
@@ -281,7 +281,7 @@ function ProductTable({
                     break;
                 }
                 return (
-                  <td key={col.key} style={{ padding: "8px 12px", border: "1px solid #e5e7eb" }}>
+                  <td key={col.key} style={{ padding: style.cellPadding || "8px 12px", border: "1px solid #e5e7eb" }}>
                     {value}
                   </td>
                 );
@@ -414,12 +414,83 @@ function SignatureArea({
   style,
   showSignature,
   showStamp,
+  companyName,
+  company,
 }: {
   style: TemplateStyleConfig;
   showSignature: boolean;
   showStamp: boolean;
+  companyName?: string;
+  company?: CompanyProfile | null;
 }) {
   if (!showSignature && !showStamp) return null;
+
+  const stampMode = style.stampMode || "placeholder";
+
+  // Determine stamp rendering
+  let stampElement: React.ReactNode = null;
+  if (showStamp && stampMode !== "none") {
+    if (stampMode === "placeholder") {
+      // Placeholder: visible on screen, hidden in print/PNG
+      stampElement = (
+        <div style={{ minWidth: "200px", textAlign: "right" }}>
+          <div
+            data-testid="stamp-placeholder"
+            className="stamp-placeholder"
+            style={{
+              width: "80px",
+              height: "80px",
+              border: `2px dashed ${style.primaryColor}`,
+              borderRadius: "50%",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: style.primaryColor,
+              fontSize: "12px",
+              opacity: 0.4,
+            }}
+          >
+            印章占位
+          </div>
+          <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>盖章</div>
+        </div>
+      );
+    } else if (stampMode === "generated") {
+      // Generated: real circular stamp with company name, visible in print/PNG
+      const stampText = companyName || "公司印章";
+      stampElement = (
+        <div style={{ minWidth: "200px", textAlign: "right" }}>
+          <div
+            data-testid="stamp-generated"
+            className="stamp-generated"
+            style={{
+              width: "90px",
+              height: "90px",
+              border: `3px solid ${style.primaryColor}`,
+              borderRadius: "50%",
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              color: style.primaryColor,
+              fontSize: "10px",
+              fontWeight: "bold",
+              textAlign: "center",
+              lineHeight: "1.2",
+              padding: "4px",
+              boxSizing: "border-box",
+              opacity: 0.85,
+              transform: "rotate(-5deg)",
+            }}
+          >
+            <span>{stampText.length > 12 ? stampText.substring(0, 12) + "…" : stampText}</span>
+            <span style={{ fontSize: "8px", marginTop: "2px" }}>专用章</span>
+          </div>
+          <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>盖章</div>
+        </div>
+      );
+    }
+  }
 
   return (
     <div style={{ display: "flex", justifyContent: "space-between", marginTop: "32px", paddingTop: "16px", borderTop: `1px solid ${style.primaryColor}` }}>
@@ -429,25 +500,7 @@ function SignatureArea({
           <div style={{ fontSize: "12px", color: "#999" }}>签字人</div>
         </div>
       )}
-      {showStamp && (
-        <div style={{ minWidth: "200px", textAlign: "right" }}>
-          <div style={{
-            width: "80px",
-            height: "80px",
-            border: `2px solid ${style.primaryColor}`,
-            borderRadius: "50%",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: style.primaryColor,
-            fontSize: "12px",
-            opacity: 0.5,
-          }}>
-            印章占位
-          </div>
-          <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>盖章</div>
-        </div>
-      )}
+      {stampElement}
     </div>
   );
 }
@@ -489,6 +542,7 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
           maxWidth: "800px",
           margin: "0 auto",
           minHeight: "400px",
+          borderRadius: style.borderRadius || "8px",
         }}
       >
         {/* Logo */}
@@ -548,6 +602,8 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
           style={style}
           showSignature={style.showSignature}
           showStamp={style.showStamp}
+          companyName={company ? getCompanyDisplayName(company) : undefined}
+          company={company}
         />
       </div>
     );
