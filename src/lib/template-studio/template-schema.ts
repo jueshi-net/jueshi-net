@@ -67,6 +67,14 @@ export interface TemplateStyleConfig {
   borderRadius: string;
   /** Table cell padding, e.g. "8px" */
   cellPadding: string;
+  /** Seal top text override (default: company name) */
+  sealTopText?: string;
+  /** Seal bottom text (default: "专用章") */
+  sealBottomText?: string;
+  /** Seal center text (default: "★") */
+  sealCenterText?: string;
+  /** Seal color (default: #dc2626) */
+  sealColor?: string;
 }
 
 // ============================================================

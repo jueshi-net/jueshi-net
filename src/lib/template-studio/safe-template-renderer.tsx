@@ -24,10 +24,11 @@ import type {
   ProductItem,
   DocumentData,
 } from "./template-schema";
-import { getCompanyDisplayName, getCompanyDisplayNameEn } from "./template-schema";
-
-// ============================================================
-// 数据接口
+import {
+  getCompanyDisplayName,
+  getCompanyDisplayNameEn,
+} from "./template-schema";
+import { SealGenerator, defaultSealConfig } from "./seal-generator";
 // ============================================================
 
 export interface TemplateRenderData {
@@ -456,35 +457,28 @@ function SignatureArea({
         </div>
       );
     } else if (stampMode === "generated") {
-      // Generated: real circular stamp with company name, visible in print/PNG
+      // Generated: real SVG circular seal with arc text, visible in print/PNG
       const stampText = companyName || "公司印章";
+      const sealColor = style.sealColor || "#dc2626";
+      const sealConfig = defaultSealConfig(
+        style.sealTopText || stampText,
+        sealColor,
+      );
+      // Override with user-configured values if provided
+      if (style.sealBottomText) sealConfig.bottomText = style.sealBottomText;
+      if (style.sealCenterText) sealConfig.centerText = style.sealCenterText;
       stampElement = (
         <div style={{ minWidth: "200px", textAlign: "right" }}>
           <div
             data-testid="stamp-generated"
             className="stamp-generated"
             style={{
-              width: "90px",
-              height: "90px",
-              border: `3px solid ${style.primaryColor}`,
-              borderRadius: "50%",
-              display: "inline-flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              color: style.primaryColor,
-              fontSize: "10px",
-              fontWeight: "bold",
-              textAlign: "center",
-              lineHeight: "1.2",
-              padding: "4px",
-              boxSizing: "border-box",
+              display: "inline-block",
               opacity: 0.85,
               transform: "rotate(-5deg)",
             }}
           >
-            <span>{stampText.length > 12 ? stampText.substring(0, 12) + "…" : stampText}</span>
-            <span style={{ fontSize: "8px", marginTop: "2px" }}>专用章</span>
+            <SealGenerator {...sealConfig} size={120} />
           </div>
           <div style={{ fontSize: "12px", color: "#999", marginTop: "4px" }}>盖章</div>
         </div>
