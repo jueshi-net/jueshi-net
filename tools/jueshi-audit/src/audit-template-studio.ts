@@ -277,10 +277,10 @@ async function run() {
   // TS-012: 切换公司后预览更新
   // ============================================================
   try {
-    const companySelector = page.locator('[data-testid="company-selector"]');
+    const companySelector = page.locator('[data-testid="template-company-selector"]');
     const selectorExists = await companySelector.count();
     if (selectorExists > 0) {
-      const options = await page.locator('[data-testid="company-selector"] option').count();
+      const options = await page.locator('[data-testid="template-company-selector"] option').count();
       if (options > 1) {
         const beforePreview = await page.locator('[data-testid="template-preview"]').textContent();
         await companySelector.selectOption({ index: 1 });
@@ -367,7 +367,7 @@ async function run() {
     await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
     await page.waitForTimeout(2000);
     // Check if company selector has real data (not mock IDs like "demo-a")
-    const selector = page.locator('[data-testid="company-selector"]');
+    const selector = page.locator('[data-testid="template-company-selector"]');
     const selectorExists = await selector.count();
     if (selectorExists > 0) {
       const options = await selector.evaluate((el: HTMLSelectElement) => {
@@ -379,7 +379,7 @@ async function run() {
         `Options: ${JSON.stringify(options).substring(0, 200)}, mock=${hasMockIds}, real=${hasRealIds}`);
     } else {
       // No selector = no companies in DB, but no mock fallback = correct behavior
-      const noMock = await page.locator('[data-testid="no-companies"]').count();
+      const noMock = await page.locator('[data-testid="template-company-empty-state"]').count();
       record("TS-017", "真实公司资料绑定", "P1", noMock > 0 ? "PASS" : "FAIL",
         `No company selector, no-mock message shown: ${noMock > 0}`);
     }
@@ -391,10 +391,10 @@ async function run() {
   // TS-018: 多公司切换
   // ============================================================
   try {
-    const selector = page.locator('[data-testid="company-selector"]');
+    const selector = page.locator('[data-testid="template-company-selector"]');
     const selectorExists = await selector.count();
     if (selectorExists > 0) {
-      const options = await page.locator('[data-testid="company-selector"] option').count();
+      const options = await page.locator('[data-testid="template-company-selector"] option').count();
       if (options > 1) {
         const beforeText = await page.locator('[data-testid="template-preview"]').textContent();
         await selector.selectOption({ index: 1 });
@@ -721,7 +721,7 @@ async function run() {
     await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
     await page.waitForTimeout(2000);
     // Check that company selector doesn't have mock IDs
-    const selector = page.locator('[data-testid="company-selector"]');
+    const selector = page.locator('[data-testid="template-company-selector"]');
     const selectorExists = await selector.count();
     let noMockData = true;
     if (selectorExists > 0) {
@@ -740,11 +740,11 @@ async function run() {
       noMockData = noMockData && !productIds.some((id: string) => id?.includes("demo-") || id?.includes("mock-"));
     }
     // Check no-mock messages
-    const noCompaniesMsg = await page.locator('[data-testid="no-companies"]').count();
+    const noCompaniesMsg = await page.locator('[data-testid="template-company-empty-state"]').count();
     const noProductsMsg = await page.locator('[data-testid="no-products"]').count();
     const isPass = noMockData || noCompaniesMsg > 0 || noProductsMsg > 0;
     record("TS-033", "mock 数据不得在登录态默认使用", "P1", isPass ? "PASS" : "FAIL",
-      `No mock data: ${noMockData}, no-companies-msg: ${noCompaniesMsg}, no-products-msg: ${noProductsMsg}`);
+      `No mock data: ${noMockData}, template-company-empty-state-msg: ${noCompaniesMsg}, no-products-msg: ${noProductsMsg}`);
   } catch (err) {
     record("TS-033", "mock 数据不得在登录态默认使用", "P1", "FAIL", `Error: ${err}`);
   }
@@ -773,6 +773,194 @@ async function run() {
     await page.screenshot({ path: join(ARTIFACTS_DIR, "screenshots", "TS-034-mobile-editor.png") });
   } catch (err) {
     record("TS-034", "移动端编辑器可用", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-COMPANY-SELECTOR-OPTIONS-NOT-BLANK
+  // ============================================================
+  try {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const selector = page.locator('[data-testid="template-company-selector"]');
+    const selectorExists = await selector.count();
+    if (selectorExists > 0) {
+      const options = await selector.locator("option").all();
+      let allNotBlank = true;
+      let optionTexts: string[] = [];
+      for (const opt of options) {
+        const text = (await opt.textContent())?.trim() || "";
+        optionTexts.push(text);
+        if (text.length === 0) allNotBlank = false;
+      }
+      record("TS-COMPANY-SELECTOR-OPTIONS-NOT-BLANK", "公司选择器选项不空白", "P0",
+        allNotBlank && options.length >= 3 ? "PASS" : "FAIL",
+        `Options: ${options.length}, texts: ${JSON.stringify(optionTexts)}`);
+    } else {
+      record("TS-COMPANY-SELECTOR-OPTIONS-NOT-BLANK", "公司选择器选项不空白", "P0", "FAIL",
+        `No company selector found`);
+    }
+  } catch (err) {
+    record("TS-COMPANY-SELECTOR-OPTIONS-NOT-BLANK", "公司选择器选项不空白", "P0", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-COMPANY-SELECTOR-SHOWS-COMPANY-NAME
+  // ============================================================
+  try {
+    const selector = page.locator('[data-testid="template-company-selector"]');
+    const optionTexts = await selector.locator("option").allTextContents();
+    // At least one option should contain a real company name (not just "未命名公司")
+    const hasRealName = optionTexts.some(t => t && !t.includes("未命名公司") && t.trim().length > 0);
+    record("TS-COMPANY-SELECTOR-SHOWS-COMPANY-NAME", "公司选择器显示公司名称", "P0",
+      hasRealName ? "PASS" : "FAIL",
+      `Option texts: ${JSON.stringify(optionTexts)}`);
+  } catch (err) {
+    record("TS-COMPANY-SELECTOR-SHOWS-COMPANY-NAME", "公司选择器显示公司名称", "P0", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-COMPANY-SELECTOR-PREVIEW-UPDATES
+  // ============================================================
+  try {
+    const selector = page.locator('[data-testid="template-company-selector"]');
+    const options = await selector.locator("option").all();
+    if (options.length >= 2) {
+      // Select first company
+      const firstVal = await options[0].getAttribute("value");
+      await selector.selectOption(firstVal!);
+      await page.waitForTimeout(500);
+      const previewName1 = await page.locator('[data-testid="template-preview-company-name"]').textContent();
+
+      // Select second company
+      const secondVal = await options[1].getAttribute("value");
+      await selector.selectOption(secondVal!);
+      await page.waitForTimeout(500);
+      const previewName2 = await page.locator('[data-testid="template-preview-company-name"]').textContent();
+
+      const changed = previewName1 !== previewName2 && previewName2 && previewName2.length > 0;
+      record("TS-COMPANY-SELECTOR-PREVIEW-UPDATES", "切换公司预览更新", "P1",
+        changed ? "PASS" : "FAIL",
+        `Company A preview: "${previewName1}", Company B preview: "${previewName2}", changed: ${changed}`);
+    } else {
+      record("TS-COMPANY-SELECTOR-PREVIEW-UPDATES", "切换公司预览更新", "P1", "PASS",
+        `Only ${options.length} companies available`);
+    }
+  } catch (err) {
+    record("TS-COMPANY-SELECTOR-PREVIEW-UPDATES", "切换公司预览更新", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-COMPANY-SELECTOR-SAVE-RESTORE
+  // ============================================================
+  try {
+    // Select second company and save
+    const selector = page.locator('[data-testid="template-company-selector"]');
+    const options = await selector.locator("option").all();
+    let savedCompanyName = "";
+    if (options.length >= 2) {
+      const secondVal = await options[1].getAttribute("value");
+      await selector.selectOption(secondVal!);
+      await page.waitForTimeout(500);
+      savedCompanyName = await page.locator('[data-testid="template-selected-company-name"]').textContent() || "";
+      // Set template name and save
+      await page.locator('[data-testid="template-name-input"]').fill("公司恢复测试模板");
+      await page.waitForTimeout(200);
+      await page.locator('[data-testid="save-template-btn"]').click();
+      await page.waitForTimeout(2000);
+    }
+
+    // Go to list and find the saved template, then reopen
+    await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const userCards = await page.locator('[data-testid^="template-card-user-"]').count();
+    // Click edit on the first user template
+    if (userCards > 0) {
+      // Click edit link on the first user template
+      const editLink = page.locator('[data-testid^="edit-template-user-"]').first();
+      if (await editLink.count() > 0) {
+        await editLink.click();
+        await page.waitForTimeout(5000);
+        // Wait for company selector to be populated
+        await page.waitForSelector('[data-testid="template-company-selector"]', { timeout: 10000 }).catch(() => {});
+        await page.waitForTimeout(2000);
+        // Check that selector is not blank
+        const restoredSelector = page.locator('[data-testid="template-company-selector"]');
+        const restoredOptions = await restoredSelector.locator("option").all();
+        let allNotBlank = true;
+        for (const opt of restoredOptions) {
+          const text = (await opt.textContent())?.trim() || "";
+          if (text.length === 0) allNotBlank = false;
+        }
+        // Check preview shows a company name (either the saved one or default)
+        const previewName = await page.locator('[data-testid="template-preview-company-name"]').textContent().catch(() => "");
+        const hasPreview = previewName && previewName.trim().length > 0;
+        record("TS-COMPANY-SELECTOR-SAVE-RESTORE", "保存恢复公司选择器", "P1",
+          allNotBlank && hasPreview ? "PASS" : "FAIL",
+          `Restored options not blank: ${allNotBlank}, preview name: "${previewName}", saved company was: "${savedCompanyName}"`);
+      } else {
+        // Navigate directly to the edit URL using the template ID from the card
+        const card = page.locator('[data-testid^="template-card-user-"]').first();
+        const cardTestId = await card.getAttribute("data-testid") || "";
+        const templateId = cardTestId.replace("template-card-", "");
+        if (templateId) {
+          await page.goto(`${BASE_URL}/tools/template-studio/${templateId}/edit`, { waitUntil: "domcontentloaded", timeout: 15000 });
+        }
+        await page.waitForTimeout(5000);
+        await page.waitForSelector('[data-testid="template-company-selector"]', { timeout: 10000 }).catch(() => {});
+        await page.waitForTimeout(2000);
+        const restoredSelector = page.locator('[data-testid="template-company-selector"]');
+        const restoredOptions = await restoredSelector.locator("option").all();
+        let allNotBlank = true;
+        for (const opt of restoredOptions) {
+          const text = (await opt.textContent())?.trim() || "";
+          if (text.length === 0) allNotBlank = false;
+        }
+        const previewName = await page.locator('[data-testid="template-preview-company-name"]').textContent().catch(() => "");
+        const hasPreview = previewName && previewName.trim().length > 0;
+        record("TS-COMPANY-SELECTOR-SAVE-RESTORE", "保存恢复公司选择器", "P1",
+          allNotBlank && hasPreview ? "PASS" : "FAIL",
+          `Restored options not blank: ${allNotBlank}, preview name: "${previewName}"`);
+      }
+    } else {
+      record("TS-COMPANY-SELECTOR-SAVE-RESTORE", "保存恢复公司选择器", "P1", "FAIL",
+        `No user templates to reopen`);
+    }
+  } catch (err) {
+    record("TS-COMPANY-SELECTOR-SAVE-RESTORE", "保存恢复公司选择器", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-COMPANY-SELECTOR-NO-MOCK-IN-LOGIN
+  // ============================================================
+  try {
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const selector = page.locator('[data-testid="template-company-selector"]');
+    const selectorExists = await selector.count();
+    let noMock = true;
+    if (selectorExists > 0) {
+      const optionTexts = await selector.locator("option").allTextContents();
+      // Check for mock/demo company names — only flag obvious mock prefixes
+      // Real companies like "QS Test Company" or "Audit Test Co" are NOT mock
+      noMock = !optionTexts.some(t =>
+        t.toLowerCase().startsWith("demo ") ||
+        t.toLowerCase().startsWith("mock ") ||
+        t.toLowerCase().startsWith("example ") ||
+        t.toLowerCase().startsWith("示例") ||
+        t.toLowerCase().includes("demo-a") ||
+        t.toLowerCase().includes("demo-b") ||
+        t.toLowerCase().includes("demo-c") ||
+        t.toLowerCase().includes("mock-a") ||
+        t.toLowerCase().includes("mock-b") ||
+        t.toLowerCase().includes("mock-c")
+      );
+    }
+    record("TS-COMPANY-SELECTOR-NO-MOCK-IN-LOGIN", "登录态无 mock 公司名", "P1",
+      noMock ? "PASS" : "FAIL",
+      `No mock company names: ${noMock}`);
+  } catch (err) {
+    record("TS-COMPANY-SELECTOR-NO-MOCK-IN-LOGIN", "登录态无 mock 公司名", "P1", "FAIL", `Error: ${err}`);
   }
 
   // ============================================================
