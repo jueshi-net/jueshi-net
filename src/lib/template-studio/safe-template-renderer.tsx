@@ -19,6 +19,7 @@ import type {
   TemplateColumnConfig,
   TemplateStyleConfig,
   TemplateLayoutConfig,
+  ContentBlock,
 } from "./template-schema";
 import type { CompanyProfile, ProductItem, DocumentData } from "./template-schema";
 
@@ -265,6 +266,10 @@ function ProductTable({
                   case "weight": value = product.weight ? `${product.weight} kg` : ""; break;
                   case "volume": value = product.volume ? `${product.volume} m³` : ""; break;
                   case "origin": value = product.origin || ""; break;
+                  default:
+                    // Custom column: look up by key on product object
+                    value = (product as Record<string, unknown>)[col.key] as string | number || "";
+                    break;
                 }
                 return (
                   <td key={col.key} style={{ padding: "8px 12px", border: "1px solid #e5e7eb" }}>
@@ -348,6 +353,53 @@ function RemarksTerms({
   );
 }
 
+/** 自定义内容块渲染 */
+function ContentBlocks({ blocks }: { blocks: ContentBlock[] }) {
+  const sorted = [...blocks].sort((a, b) => a.order - b.order);
+  const visible = sorted.filter(b => b.visible);
+
+  if (visible.length === 0) return null;
+
+  return (
+    <>
+      {visible.map(block => {
+        if (block.type === "spacer") {
+          return <div key={block.id} style={{ height: "24px" }} />;
+        }
+        if (block.type === "divider") {
+          return (
+            <div
+              key={block.id}
+              style={{ height: "1px", backgroundColor: "#e5e7eb", margin: "12px 0" }}
+            />
+          );
+        }
+        // text block
+        return (
+          <div
+            key={block.id}
+            style={{
+              marginBottom: "12px",
+              padding: "12px",
+              border: "1px solid #e5e7eb",
+              borderRadius: "4px",
+            }}
+          >
+            {block.title && (
+              <div style={{ fontSize: "13px", color: "#999", marginBottom: "4px" }}>
+                {block.title}
+              </div>
+            )}
+            <div style={{ fontSize: "13px", color: "#555", whiteSpace: "pre-wrap" }}>
+              {block.content}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 /** 签名/印章区 */
 function SignatureArea({
   style,
@@ -409,7 +461,7 @@ export interface SafeTemplateRendererProps {
  */
 export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRendererProps>(
   ({ config, data }, ref) => {
-    const { style, layout, fields, columns } = config;
+    const { style, layout, fields, columns, contentBlocks } = config;
     const company = data.company || null;
     const products = data.products || [];
     const doc = data.document;
@@ -418,13 +470,13 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
       <div
         ref={ref}
         data-testid="template-preview"
-        className="template-preview"
+        className="template-preview template-print-area"
         style={{
           fontFamily: style.fontFamily || "system-ui, sans-serif",
           fontSize: style.fontSize || "14px",
           color: "#333",
           backgroundColor: "#fff",
-          padding: "32px",
+          padding: style.pageMargin || "32px",
           maxWidth: "800px",
           margin: "0 auto",
           minHeight: "400px",
@@ -441,7 +493,7 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
         {layout.showHeader && (
           <h1 style={{
             textAlign: "center",
-            fontSize: "22px",
+            fontSize: style.titleFontSize || "22px",
             fontWeight: "bold",
             color: style.primaryColor,
             marginBottom: "20px",
@@ -470,6 +522,9 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
 
         {/* 金额汇总 */}
         <AmountSummary products={products} doc={doc} style={style} layout={layout} />
+
+        {/* 自定义内容块 */}
+        <ContentBlocks blocks={contentBlocks || []} />
 
         {/* 备注/条款 */}
         <RemarksTerms

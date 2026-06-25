@@ -47,6 +47,10 @@ export interface TemplateStyleConfig {
   fontFamily: string;
   /** Base font size, e.g. "14px" */
   fontSize: string;
+  /** Title font size, e.g. "22px" */
+  titleFontSize: string;
+  /** Page margin in px, e.g. "32px" */
+  pageMargin: string;
   /** Where to place the company logo */
   logoPosition: "left" | "right" | "center" | "none";
   /** Show signature placeholder area */
@@ -102,6 +106,22 @@ export interface TemplateDataBinding {
   customer: boolean;
 }
 
+/** A custom content block that users can add/reorder/remove */
+export interface ContentBlock {
+  /** Unique block ID */
+  id: string;
+  /** Block type */
+  type: "text" | "spacer" | "divider";
+  /** Block title/label for editor display */
+  title: string;
+  /** Text content (for type="text") */
+  content: string;
+  /** Sort order (0-based) */
+  order: number;
+  /** Whether this block is visible */
+  visible: boolean;
+}
+
 // ============================================================
 // Complete Template Config
 // ============================================================
@@ -121,6 +141,8 @@ export interface TemplateConfig {
   fields: TemplateFieldConfig[];
   /** Table column configurations */
   columns: TemplateColumnConfig[];
+  /** Custom content blocks */
+  contentBlocks: ContentBlock[];
   /** Visual style */
   style: TemplateStyleConfig;
   /** Layout toggles */
@@ -260,6 +282,8 @@ export function defaultStyle(): TemplateStyleConfig {
     primaryColor: "#1a56db",
     fontFamily: "'Helvetica Neue', Arial, sans-serif",
     fontSize: "14px",
+    titleFontSize: "22px",
+    pageMargin: "32px",
     logoPosition: "left",
     showSignature: true,
     showStamp: true,
@@ -298,6 +322,11 @@ export function defaultBindings(): TemplateDataBinding {
   };
 }
 
+/** Default content blocks — empty array, user adds their own */
+export function defaultContentBlocks(): ContentBlock[] {
+  return [];
+}
+
 /** Create a new template config with defaults */
 export function createTemplateConfig(opts: {
   id: string;
@@ -315,6 +344,7 @@ export function createTemplateConfig(opts: {
     ownerId: opts.ownerId || "",
     fields: defaultFields(),
     columns: defaultColumns(),
+    contentBlocks: defaultContentBlocks(),
     style: defaultStyle(),
     layout: defaultLayout(),
     bindings: defaultBindings(),
