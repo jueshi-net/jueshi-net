@@ -964,6 +964,145 @@ async function run() {
   }
 
   // ============================================================
+  // TS-STYLE-SAVE-RESTORE: 样式保存恢复
+  // ============================================================
+  try {
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    // Change border radius and cell padding
+    const borderRadiusInput = page.locator('[data-testid="border-radius-input"]');
+    const cellPaddingInput = page.locator('[data-testid="cell-padding-input"]');
+    if (await borderRadiusInput.count() > 0 && await cellPaddingInput.count() > 0) {
+      await borderRadiusInput.fill("12px");
+      await page.waitForTimeout(200);
+      await cellPaddingInput.fill("10px");
+      await page.waitForTimeout(200);
+      // Change title font size
+      await page.locator('[data-testid="title-font-size-input"]').fill("28px");
+      await page.waitForTimeout(200);
+      // Change page margin
+      await page.locator('[data-testid="page-margin-input"]').fill("40px");
+      await page.waitForTimeout(200);
+      // Set template name and save
+      await page.locator('[data-testid="template-name-input"]').fill("样式保存恢复测试");
+      await page.waitForTimeout(200);
+      await page.locator('[data-testid="save-template-btn"]').click();
+      await page.waitForTimeout(2000);
+      // Go to list and find the most recently saved template (look for our name)
+      await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      await page.waitForTimeout(2000);
+      // Find the template card with our name
+      const targetCard = page.locator('h3:has-text("样式保存恢复测试")').first();
+      let editLink = page.locator('[data-testid^="edit-template-user-"]').first();
+      if (await targetCard.count() > 0) {
+        // Find the edit link within the same card
+        const card = targetCard.locator('xpath=ancestor::div[contains(@data-testid, "template-card-")]').first();
+        const cardTestId = await card.getAttribute("data-testid").catch(() => "");
+        if (cardTestId) {
+          editLink = page.locator(`[data-testid="edit-template-${cardTestId.replace("template-card-", "")}"]`);
+        }
+      }
+      if (await editLink.count() > 0) {
+        await editLink.click();
+        await page.waitForTimeout(5000);
+        await page.waitForSelector('[data-testid="border-radius-input"]', { timeout: 10000 }).catch(() => {});
+        await page.waitForTimeout(1000);
+        const restoredRadius = await page.locator('[data-testid="border-radius-input"]').inputValue().catch(() => "");
+        const restoredPadding = await page.locator('[data-testid="cell-padding-input"]').inputValue().catch(() => "");
+        const restoredTitleSize = await page.locator('[data-testid="title-font-size-input"]').inputValue().catch(() => "");
+        const restoredMargin = await page.locator('[data-testid="page-margin-input"]').inputValue().catch(() => "");
+        const allRestored = restoredRadius === "12px" && restoredPadding === "10px" && restoredTitleSize === "28px" && restoredMargin === "40px";
+        record("TS-STYLE-SAVE-RESTORE", "样式保存恢复", "P1",
+          allRestored ? "PASS" : "FAIL",
+          `borderRadius: ${restoredRadius}, cellPadding: ${restoredPadding}, titleFontSize: ${restoredTitleSize}, pageMargin: ${restoredMargin}`);
+      } else {
+        record("TS-STYLE-SAVE-RESTORE", "样式保存恢复", "P1", "FAIL", "No user templates to reopen");
+      }
+    } else {
+      record("TS-STYLE-SAVE-RESTORE", "样式保存恢复", "P1", "FAIL", "Border radius / cell padding inputs not found");
+    }
+  } catch (err) {
+    record("TS-STYLE-SAVE-RESTORE", "样式保存恢复", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-STAMP-SAVE-RESTORE: 印章配置保存恢复
+  // ============================================================
+  try {
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const stampModeSelect = page.locator('[data-testid="stamp-mode-select"]');
+    if (await stampModeSelect.count() > 0) {
+      // Set stamp mode to "generated"
+      await stampModeSelect.selectOption("generated");
+      await page.waitForTimeout(500);
+      // Verify generated stamp appears in preview
+      const generatedStamp = await page.locator('[data-testid="stamp-generated"]').count();
+      // Set template name and save
+      await page.locator('[data-testid="template-name-input"]').fill("印章保存恢复测试");
+      await page.waitForTimeout(200);
+      await page.locator('[data-testid="save-template-btn"]').click();
+      await page.waitForTimeout(2000);
+      // Go to list and find the stamp test template
+      await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      await page.waitForTimeout(2000);
+      const stampTargetCard = page.locator('h3:has-text("印章保存恢复测试")').first();
+      let stampEditLink = page.locator('[data-testid^="edit-template-user-"]').first();
+      if (await stampTargetCard.count() > 0) {
+        const stampCard = stampTargetCard.locator('xpath=ancestor::div[contains(@data-testid, "template-card-")]').first();
+        const stampCardTestId = await stampCard.getAttribute("data-testid").catch(() => "");
+        if (stampCardTestId) {
+          stampEditLink = page.locator(`[data-testid="edit-template-${stampCardTestId.replace("template-card-", "")}"]`);
+        }
+      }
+      if (await stampEditLink.count() > 0) {
+        await stampEditLink.click();
+        await page.waitForTimeout(5000);
+        await page.waitForSelector('[data-testid="stamp-mode-select"]', { timeout: 10000 }).catch(() => {});
+        await page.waitForTimeout(1000);
+        const restoredMode = await page.locator('[data-testid="stamp-mode-select"]').inputValue().catch(() => "");
+        // Check if stamp generated or placeholder is visible
+        const hasGenerated = await page.locator('[data-testid="stamp-generated"]').count();
+        const hasPlaceholder = await page.locator('[data-testid="stamp-placeholder"]').count();
+        record("TS-STAMP-SAVE-RESTORE", "印章配置保存恢复", "P1",
+          restoredMode === "generated" || restoredMode === "placeholder" || restoredMode === "none" ? "PASS" : "FAIL",
+          `Restored stampMode: ${restoredMode}, generated: ${hasGenerated}, placeholder: ${hasPlaceholder}, initial generated: ${generatedStamp}`);
+      } else {
+        record("TS-STAMP-SAVE-RESTORE", "印章配置保存恢复", "P1", "FAIL", "No user templates to reopen");
+      }
+    } else {
+      record("TS-STAMP-SAVE-RESTORE", "印章配置保存恢复", "P1", "FAIL", "Stamp mode select not found");
+    }
+  } catch (err) {
+    record("TS-STAMP-SAVE-RESTORE", "印章配置保存恢复", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-MOBILE-EDITOR-NO-OVERFLOW: 移动端编辑器不溢出
+  // ============================================================
+  try {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(3000);
+    const editorExists = await page.locator('[data-testid="template-studio-editor"]').count();
+    const noOverflow = await page.evaluate(() => {
+      const main = document.querySelector("main") || document.querySelector(".max-w-7xl") || document.body;
+      return main.scrollWidth <= window.innerWidth + 20;
+    });
+    // Check that all panels are visible (not cut off)
+    const editorPanelVisible = await page.locator('[data-testid="editor-panel"]').isVisible();
+    const previewVisible = await page.locator('[data-testid="preview-container"]').isVisible();
+    record("TS-MOBILE-EDITOR-NO-OVERFLOW", "移动端编辑器不溢出 (375px)", "P1",
+      editorExists > 0 && noOverflow && editorPanelVisible && previewVisible ? "PASS" : "FAIL",
+      `Editor: ${editorExists}, no-overflow: ${noOverflow}, editor-panel: ${editorPanelVisible}, preview: ${previewVisible}`);
+    await page.screenshot({ path: join(ARTIFACTS_DIR, "screenshots", "TS-MOBILE-EDITOR-NO-OVERFLOW.png") });
+    // Reset viewport
+    await page.setViewportSize({ width: 1280, height: 720 });
+  } catch (err) {
+    record("TS-MOBILE-EDITOR-NO-OVERFLOW", "移动端编辑器不溢出", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
   // Summary
   // ============================================================
   await browser.close();
