@@ -62,7 +62,10 @@ const PRINT_CSS = `
     max-width: none !important;
     margin: 0 !important;
     padding: 32px !important;
+    border-radius: 0 !important;
   }
+  /* Hide stamp placeholders in print — only generated stamps should appear */
+  .stamp-placeholder { display: none !important; }
 }
 `;
 
@@ -621,12 +624,21 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
       setSaveStatus("正在生成 PNG...");
       // Dynamically import html2canvas
       const html2canvas = (await import("html2canvas")).default;
+
+      // Hide stamp placeholders before capture — only generated stamps should appear
+      const placeholders = previewRef.current.querySelectorAll(".stamp-placeholder");
+      placeholders.forEach(el => { (el as HTMLElement).style.display = "none"; });
+
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: "#ffffff",
         scale: 2,
         useCORS: true,
         logging: false,
       });
+
+      // Restore placeholder visibility
+      placeholders.forEach(el => { (el as HTMLElement).style.display = ""; });
+
       const link = document.createElement("a");
       link.download = `${config?.name || "template"}-${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
@@ -938,6 +950,43 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
                 />
                 显示印章区
               </label>
+            </div>
+            {/* Stamp Mode */}
+            <div className="mt-3">
+              <label className="block text-xs text-gray-500 mb-1">印章模式</label>
+              <select
+                value={config.style.stampMode || "placeholder"}
+                onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, stampMode: e.target.value as "placeholder" | "none" | "generated" }, updatedAt: new Date().toISOString() }))}
+                className="px-2 py-1 border rounded text-xs w-48"
+                data-testid="stamp-mode-select"
+              >
+                <option value="placeholder">占位 (仅屏幕显示，不进入打印/PNG)</option>
+                <option value="generated">生成 (真实印章，进入打印/PNG)</option>
+                <option value="none">无 (不显示印章)</option>
+              </select>
+            </div>
+            {/* Border Radius + Cell Padding */}
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">圆角</label>
+                <input
+                  type="text"
+                  value={config.style.borderRadius || "8px"}
+                  onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, borderRadius: e.target.value }, updatedAt: new Date().toISOString() }))}
+                  className="w-full px-2 py-1 border rounded text-xs"
+                  data-testid="border-radius-input"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">单元格内边距</label>
+                <input
+                  type="text"
+                  value={config.style.cellPadding || "8px"}
+                  onChange={e => updateConfig(prev => ({ ...prev, style: { ...prev.style, cellPadding: e.target.value }, updatedAt: new Date().toISOString() }))}
+                  className="w-full px-2 py-1 border rounded text-xs"
+                  data-testid="cell-padding-input"
+                />
+              </div>
             </div>
           </div>
 

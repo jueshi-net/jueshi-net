@@ -55,12 +55,18 @@ export interface TemplateStyleConfig {
   logoPosition: "left" | "right" | "center" | "none";
   /** Show signature placeholder area */
   showSignature: boolean;
-  /** Show stamp/seal placeholder area */
+  /** Show stamp/seal area */
   showStamp: boolean;
+  /** Stamp mode: placeholder (screen only), none (hidden), generated (real stamp) */
+  stampMode: "placeholder" | "none" | "generated";
   /** Table header background color */
   tableHeaderBg: string;
   /** Table header text color */
   tableHeaderColor: string;
+  /** Border radius for cards/sections, e.g. "8px" */
+  borderRadius: string;
+  /** Table cell padding, e.g. "8px" */
+  cellPadding: string;
 }
 
 // ============================================================
@@ -341,8 +347,11 @@ export function defaultStyle(): TemplateStyleConfig {
     logoPosition: "left",
     showSignature: true,
     showStamp: true,
+    stampMode: "placeholder",
     tableHeaderBg: "#1a56db",
     tableHeaderColor: "#ffffff",
+    borderRadius: "8px",
+    cellPadding: "8px",
   };
 }
 
