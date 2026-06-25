@@ -1,0 +1,175 @@
+{
+  "timestamp": "2026-06-25T00:25:32.279Z",
+  "baseUrl": "https://i.jueshi.net",
+  "summary": {
+    "total": 23,
+    "pass": 23,
+    "fail": 0,
+    "blocked": 0,
+    "p0Fail": 0,
+    "p1Fail": 0
+  },
+  "cases": [
+    {
+      "id": "DR-001",
+      "name": "Template Registry 正常加载，>= 8 个工具",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Found 8 tools: standard-quotation, commercial-invoice, supply-chain-quote, inbound-receipt, handover-note, shipping-label, debit-note, shooting-script"
+    },
+    {
+      "id": "DR-002-standard-quotation",
+      "name": "工具注册存在: standard-quotation",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/documents/quotation, renderer=standard-document"
+    },
+    {
+      "id": "DR-002-commercial-invoice",
+      "name": "工具注册存在: commercial-invoice",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/documents/commercial-invoice, renderer=standard-document"
+    },
+    {
+      "id": "DR-002-supply-chain-quote",
+      "name": "工具注册存在: supply-chain-quote",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/documents/quotation, renderer=custom-form"
+    },
+    {
+      "id": "DR-002-inbound-receipt",
+      "name": "工具注册存在: inbound-receipt",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/inbound-receipt, renderer=custom-form"
+    },
+    {
+      "id": "DR-002-handover-note",
+      "name": "工具注册存在: handover-note",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/handover-note, renderer=custom-form"
+    },
+    {
+      "id": "DR-002-shipping-label",
+      "name": "工具注册存在: shipping-label",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/shipping-label, renderer=label-print"
+    },
+    {
+      "id": "DR-002-debit-note",
+      "name": "工具注册存在: debit-note",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/debit-note, renderer=custom-form"
+    },
+    {
+      "id": "DR-002-shooting-script",
+      "name": "工具注册存在: shooting-script",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "route=/tools/video-script-sop, renderer=script-generator"
+    },
+    {
+      "id": "DR-003",
+      "name": "hasCapability() 功能正确",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "company=true, export=true, product(inbound)=false"
+    },
+    {
+      "id": "DR-004",
+      "name": "供应链报价单仍可用 (/tools/documents/quotation)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"报价单生成器 - 绝世百宝箱\""
+    },
+    {
+      "id": "DR-005",
+      "name": "商业发票(标准单据)仍可用 (/tools/documents/commercial-invoice)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"绝世百宝箱 - 海外华人的实用工具箱\""
+    },
+    {
+      "id": "DR-006",
+      "name": "入库单仍可用 (/tools/inbound-receipt)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"绝世百宝箱 - 海外华人的实用工具箱\""
+    },
+    {
+      "id": "DR-007",
+      "name": "交接单仍可用 (/tools/handover-note)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"绝世百宝箱 - 海外华人的实用工具箱\""
+    },
+    {
+      "id": "DR-008",
+      "name": "标签打印仍可用 (/tools/shipping-label)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"唛头标签打印 — Shipping Label | 绝世百宝箱\""
+    },
+    {
+      "id": "DR-009",
+      "name": "Debit Note仍可用 (/tools/debit-note)",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "HTTP 200, title=\"绝世百宝箱 - 海外华人的实用工具箱\""
+    },
+    {
+      "id": "DR-010",
+      "name": "CustomFormShell demo 页面可用，3 个 tab 存在",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Tabs found: supply-chain=1, inbound=1, debit=1"
+    },
+    {
+      "id": "DR-011",
+      "name": "Tab 切换：入库单 demo 渲染",
+      "level": "P2",
+      "status": "PASS",
+      "evidence": "demo-inbound element count=1"
+    },
+    {
+      "id": "DR-012",
+      "name": "Tab 切换：Debit Note demo 渲染",
+      "level": "P2",
+      "status": "PASS",
+      "evidence": "demo-debit element count=1"
+    },
+    {
+      "id": "DR-013",
+      "name": "标准单据页面加载不回归",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Form elements: 49, hasContent: true (page loads without crash)"
+    },
+    {
+      "id": "DR-014",
+      "name": "Word 导出按钮存在",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Word export buttons: 1"
+    },
+    {
+      "id": "DR-015",
+      "name": "不存在明显 XSS 风险（无危险脚本模式）",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Dangerous patterns found: 0"
+    },
+    {
+      "id": "DR-016",
+      "name": "移动端不破坏（375px main 内容无溢出）",
+      "level": "P1",
+      "status": "PASS",
+      "evidence": "Main content scrollWidth <= innerWidth+20: true"
+    }
+  ]
+}

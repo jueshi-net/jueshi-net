@@ -19,6 +19,7 @@
     "audit:documents-company-switch": "tsx src/audit-stabilized.ts --suite documents-company-switch",
     "audit:word-export": "tsx src/audit-word-export.ts",
     "audit:full": "tsx src/audit-stabilized.ts --suite all && tsx src/audit-word-export.ts",
+    "audit:document-runtime": "tsx src/audit-document-runtime.ts",
     "audit:webkit": "AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts --engine webkit",
     "audit:stabilized:staging": "AUDIT_BASE_URL=https://i.jueshi.net tsx src/audit-stabilized.ts",
     "typecheck": "tsc --noEmit"
