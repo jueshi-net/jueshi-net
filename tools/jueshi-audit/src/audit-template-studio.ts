@@ -1103,6 +1103,195 @@ async function run() {
   }
 
   // ============================================================
+  // TS-SEAL-GENERATED-ARC-TEXT: SVG 印章包含 textPath
+  // ============================================================
+  try {
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    // Set stamp mode to generated
+    await page.locator('[data-testid="stamp-mode-select"]').selectOption("generated");
+    await page.waitForTimeout(1000);
+    // Check that SVG seal is rendered
+    const sealSvg = await page.locator('[data-testid="seal-svg"]').count();
+    // Check that SVG contains textPath elements
+    const hasTextPath = await page.locator('svg textPath').count();
+    // Check for stamp-generated container
+    const stampGenerated = await page.locator('[data-testid="stamp-generated"]').count();
+    record("TS-SEAL-GENERATED-ARC-TEXT", "SVG 印章包含 textPath 弧形文字", "P1",
+      sealSvg > 0 && hasTextPath > 0 && stampGenerated > 0 ? "PASS" : "FAIL",
+      `seal-svg: ${sealSvg}, textPath count: ${hasTextPath}, stamp-generated: ${stampGenerated}`);
+    await page.screenshot({ path: join(ARTIFACTS_DIR, "screenshots", "TS-SEAL-GENERATED-ARC-TEXT.png") });
+  } catch (err) {
+    record("TS-SEAL-GENERATED-ARC-TEXT", "SVG 印章包含 textPath", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-TOP-TEXT-COMPANY-NAME: 顶部弧线显示公司名
+  // ============================================================
+  try {
+    // The seal should already be in generated mode from previous test
+    // Wait for company selector and pick a company
+    const companySelector = page.locator('[data-testid="template-company-selector"]');
+    if (await companySelector.count() > 0) {
+      // Get the first option text (company name)
+      const options = await companySelector.locator("option").allTextContents();
+      const firstCompanyName = options[0]?.split(" — ")[0]?.trim() || "";
+      // Select the first company
+      await companySelector.selectOption({ index: 0 });
+      await page.waitForTimeout(500);
+      // Get the top textPath content
+      const topTextContent = await page.locator('svg textPath').first().textContent().catch(() => "");
+      const hasCompanyName = firstCompanyName.length > 0 && topTextContent.includes(firstCompanyName.substring(0, Math.min(6, firstCompanyName.length)));
+      record("TS-SEAL-TOP-TEXT-COMPANY-NAME", "顶部弧线显示公司名", "P1",
+        hasCompanyName ? "PASS" : "FAIL",
+        `Company: "${firstCompanyName.substring(0, 30)}", topText: "${topTextContent?.substring(0, 30)}"`);
+    } else {
+      record("TS-SEAL-TOP-TEXT-COMPANY-NAME", "顶部弧线显示公司名", "P1", "FAIL", "Company selector not found");
+    }
+  } catch (err) {
+    record("TS-SEAL-TOP-TEXT-COMPANY-NAME", "顶部弧线显示公司名", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-BOTTOM-TEXT: 底部弧线显示 "专用章"
+  // ============================================================
+  try {
+    // Get the second textPath (bottom arc)
+    const textPaths = await page.locator('svg textPath').allTextContents();
+    const bottomText = textPaths.length > 1 ? textPaths[1] : "";
+    const hasBottomText = bottomText.includes("专用章") || bottomText.includes("章");
+    record("TS-SEAL-BOTTOM-TEXT", "底部弧线显示专用章", "P1",
+      hasBottomText ? "PASS" : "FAIL",
+      `Bottom text: "${bottomText}"`);
+  } catch (err) {
+    record("TS-SEAL-BOTTOM-TEXT", "底部弧线显示专用章", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-CENTER-TEXT: 中心显示 "★"
+  // ============================================================
+  try {
+    // Get the center text (the third text element without textPath)
+    const centerText = await page.locator('[data-testid="seal-svg"] text:not(:has(textPath))').textContent().catch(() => "");
+    const hasCenterText = centerText && centerText.trim().length > 0;
+    record("TS-SEAL-CENTER-TEXT", "中心显示文字/图案", "P1",
+      hasCenterText ? "PASS" : "FAIL",
+      `Center text: "${centerText}"`);
+  } catch (err) {
+    record("TS-SEAL-CENTER-TEXT", "中心显示文字/图案", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-LONG-NAME-NO-TRUNCATION: 长公司名不裁切
+  // ============================================================
+  try {
+    // Set custom top text with a very long name
+    const sealTopInput = page.locator('[data-testid="seal-top-text-input"]');
+    if (await sealTopInput.count() > 0) {
+      const longName = "深圳市绝世百宝箱国际贸易股份有限公司";
+      await sealTopInput.fill(longName);
+      await page.waitForTimeout(500);
+      // Check that the full name appears in the SVG (not truncated with …)
+      const topTextContent = await page.locator('svg textPath').first().textContent().catch(() => "");
+      const notTruncated = topTextContent && !topTextContent.includes("…") && !topTextContent.includes("...");
+      const containsFull = topTextContent && topTextContent.length >= longName.length * 0.8;
+      record("TS-SEAL-LONG-NAME-NO-TRUNCATION", "长公司名不裁切", "P1",
+        notTruncated && containsFull ? "PASS" : "FAIL",
+        `Input: ${longName.length} chars, SVG: "${topTextContent}" (${topTextContent?.length} chars), truncated: ${!notTruncated}`);
+    } else {
+      record("TS-SEAL-LONG-NAME-NO-TRUNCATION", "长公司名不裁切", "P1", "FAIL", "Seal top text input not found");
+    }
+  } catch (err) {
+    record("TS-SEAL-LONG-NAME-NO-TRUNCATION", "长公司名不裁切", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-CUSTOM-TEXT-SAVE-RESTORE: 自定义印章文字保存恢复
+  // ============================================================
+  try {
+    // Set custom bottom and center text
+    const sealBottomInput = page.locator('[data-testid="seal-bottom-text-input"]');
+    const sealCenterInput = page.locator('[data-testid="seal-center-text-input"]');
+    if (await sealBottomInput.count() > 0 && await sealCenterInput.count() > 0) {
+      await sealBottomInput.fill("财务专用章");
+      await page.waitForTimeout(200);
+      await sealCenterInput.fill("财");
+      await page.waitForTimeout(200);
+      // Save template
+      await page.locator('[data-testid="template-name-input"]').fill("印章生成器测试");
+      await page.waitForTimeout(200);
+      await page.locator('[data-testid="save-template-btn"]').click();
+      await page.waitForTimeout(2000);
+      // Go to list and find the template
+      await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
+      await page.waitForTimeout(2000);
+      const sealTargetCard = page.locator('h3:has-text("印章生成器测试")').first();
+      let sealEditLink = page.locator('[data-testid^="edit-template-user-"]').first();
+      if (await sealTargetCard.count() > 0) {
+        const sealCard = sealTargetCard.locator('xpath=ancestor::div[contains(@data-testid, "template-card-")]').first();
+        const sealCardTestId = await sealCard.getAttribute("data-testid").catch(() => "");
+        if (sealCardTestId) {
+          sealEditLink = page.locator(`[data-testid="edit-template-${sealCardTestId.replace("template-card-", "")}"]`);
+        }
+      }
+      if (await sealEditLink.count() > 0) {
+        await sealEditLink.click();
+        await page.waitForTimeout(5000);
+        await page.waitForSelector('[data-testid="stamp-mode-select"]', { timeout: 10000 }).catch(() => {});
+        await page.waitForTimeout(1000);
+        // Check that stamp mode is still generated
+        const restoredMode = await page.locator('[data-testid="stamp-mode-select"]').inputValue().catch(() => "");
+        const restoredBottom = await page.locator('[data-testid="seal-bottom-text-input"]').inputValue().catch(() => "");
+        const restoredCenter = await page.locator('[data-testid="seal-center-text-input"]').inputValue().catch(() => "");
+        const allRestored = restoredMode === "generated" && restoredBottom === "财务专用章" && restoredCenter === "财";
+        record("TS-SEAL-CUSTOM-TEXT-SAVE-RESTORE", "自定义印章文字保存恢复", "P1",
+          allRestored ? "PASS" : "FAIL",
+          `Mode: ${restoredMode}, bottom: ${restoredBottom}, center: ${restoredCenter}`);
+      } else {
+        record("TS-SEAL-CUSTOM-TEXT-SAVE-RESTORE", "自定义印章文字保存恢复", "P1", "FAIL", "Template not found in list");
+      }
+    } else {
+      record("TS-SEAL-CUSTOM-TEXT-SAVE-RESTORE", "自定义印章文字保存恢复", "P1", "FAIL", "Seal config inputs not found");
+    }
+  } catch (err) {
+    record("TS-SEAL-CUSTOM-TEXT-SAVE-RESTORE", "自定义印章文字保存恢复", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
+  // TS-SEAL-SVG-SECURITY: SVG textPath 安全 (无 XSS)
+  // ============================================================
+  try {
+    // Try injecting script tag via seal top text
+    await page.goto(`${BASE_URL}/tools/template-studio/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    await page.locator('[data-testid="stamp-mode-select"]').selectOption("generated");
+    await page.waitForTimeout(500);
+    const sealTopInput = page.locator('[data-testid="seal-top-text-input"]');
+    if (await sealTopInput.count() > 0) {
+      // Count scripts before injection
+      const scriptsBefore = await page.locator('script:not([src])').count();
+      await sealTopInput.fill('<script>alert("xss")</script>');
+      await page.waitForTimeout(500);
+      // Count scripts after injection — should be the same (no new script elements created)
+      const scriptsAfter = await page.locator('script:not([src])').count();
+      // The seal text should contain the literal string as TEXT (React escapes it)
+      // This means the <script> was rendered as text, not as a DOM element
+      const sealText = await page.locator('svg textPath').first().textContent().catch(() => "");
+      // Check that no NEW script elements were created
+      const noNewScripts = scriptsAfter === scriptsBefore;
+      // The text should be the literal string (escaped by React), which is safe
+      const renderedAsText = sealText.includes("script");
+      record("TS-SEAL-SVG-SECURITY", "SVG textPath 安全 (无 XSS)", "P1",
+        noNewScripts && renderedAsText ? "PASS" : "FAIL",
+        `Scripts before: ${scriptsBefore}, after: ${scriptsAfter}, rendered as text: ${renderedAsText}, sealText: "${sealText?.substring(0, 40)}"`);
+    } else {
+      record("TS-SEAL-SVG-SECURITY", "SVG textPath 安全", "P1", "FAIL", "Seal top text input not found");
+    }
+  } catch (err) {
+    record("TS-SEAL-SVG-SECURITY", "SVG textPath 安全", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
   // Summary
   // ============================================================
   await browser.close();
