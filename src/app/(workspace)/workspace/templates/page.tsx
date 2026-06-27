@@ -66,13 +66,29 @@ export default function WorkspaceTemplatesPage() {
           <h1 className="text-xl font-bold">我的模板</h1>
           <p className="text-sm text-gray-500 mt-1">管理已保存的单据模板</p>
         </div>
-        <a
-          href="/tools/template-studio"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-          data-testid="goto-template-studio"
-        >
-          模板工作室
-        </a>
+        <div className="flex gap-2">
+          <a
+            href="/workspace"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+            data-testid="workspace-templates-back-button"
+          >
+            返回工作台
+          </a>
+          <a
+            href="/tools"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+            data-testid="workspace-templates-tools-button"
+          >
+            工具中心
+          </a>
+          <a
+            href="/tools/template-studio/new"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+            data-testid="workspace-templates-new-button"
+          >
+            + 新建模板
+          </a>
+        </div>
       </div>
 
       <div className="mt-6">
@@ -84,7 +100,7 @@ export default function WorkspaceTemplatesPage() {
             <a
               href="/tools/template-studio/new"
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-              data-testid="create-first-template"
+              data-testid="workspace-templates-empty-cta"
             >
               创建第一个模板
             </a>

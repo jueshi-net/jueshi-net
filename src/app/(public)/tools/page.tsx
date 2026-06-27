@@ -89,6 +89,15 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
                 外贸单据模板中心
                 <ArrowRight className="w-3 h-3" />
               </Link>
+              <Link
+                href="/tools/template-studio"
+                data-testid="tools-template-studio-card"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
+              >
+                <Wrench className="w-3.5 h-3.5" />
+                模板设计器
+                <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
           )}
         </div>

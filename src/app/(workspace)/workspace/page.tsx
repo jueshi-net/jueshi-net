@@ -302,6 +302,15 @@ export default async function WorkspacePage() {
           href="/workspace/company-profiles"
         />
         </div>
+        <div data-testid="workspace-template-studio-entry">
+        <ActionCard
+          title="模板设计器"
+          description="自定义报价单、发票、标签纸模板"
+          icon={<FileText className="w-6 h-6" />}
+          href="/tools/template-studio"
+          badge="新"
+        />
+        </div>
       </div>
 
       {/* ===== D. 核心数据卡 ===== */}

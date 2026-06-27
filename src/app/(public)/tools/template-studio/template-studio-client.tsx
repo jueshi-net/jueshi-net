@@ -730,13 +730,22 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
       <div className="max-w-5xl mx-auto p-6" data-testid="template-studio-list">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">模板工作室</h1>
-          <a
-            href="/tools/template-studio/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            data-testid="new-template-btn"
-          >
-            + 新建模板
-          </a>
+          <div className="flex gap-2">
+            <a
+              href="/workspace/templates"
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              data-testid="template-studio-my-templates-button"
+            >
+              我的模板
+            </a>
+            <a
+              href="/tools/template-studio/new"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              data-testid="template-studio-new-button"
+            >
+              + 新建模板
+            </a>
+          </div>
         </div>
 
         <div className="mb-4 text-sm text-gray-500">

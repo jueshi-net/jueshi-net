@@ -103,6 +103,15 @@ export default async function DocumentsHubPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
+                href="/tools/template-studio"
+                data-testid="document-tool-template-studio-link"
+                className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg cursor-pointer"
+              >
+                <FileText className="w-5 h-5" />
+                模板设计器
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
                 href="/tools?cat=documents"
                 className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
               >
