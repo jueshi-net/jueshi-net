@@ -65,12 +65,20 @@ interface ProductData {
   id: string;
   name: string;
   sku?: string;
-  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  unit?: string;
 }
 
 interface CompanyList {
   id: string;
   companyName: string;
+}
+
+interface ProductList {
+  id: string;
+  name: string;
+  sku?: string;
 }
 
 // ============================================================
@@ -88,7 +96,9 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [productData, setProductData] = useState<ProductData | null>(null);
   const [companyList, setCompanyList] = useState<CompanyList[]>([]);
+  const [productList, setProductList] = useState<ProductList[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>(companyId);
+  const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   
@@ -108,6 +118,18 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .catch(err => console.error("Failed to fetch company list:", err));
   }, []);
 
+  // Fetch product list
+  useEffect(() => {
+    fetch("/api/workspace/products")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.products)) {
+          setProductList(data.products.map((p: any) => ({ id: p.id, name: p.name, sku: p.sku })));
+        }
+      })
+      .catch(err => console.error("Failed to fetch product list:", err));
+  }, []);
+
   // Fetch company data
   useEffect(() => {
     if (selectedCompanyId) {
@@ -121,6 +143,20 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         .catch(err => console.error("Failed to fetch company:", err));
     }
   }, [selectedCompanyId]);
+
+  // Fetch product data
+  useEffect(() => {
+    if (selectedProductId) {
+      fetch(`/api/workspace/products/${selectedProductId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setProductData(data.product);
+          }
+        })
+        .catch(err => console.error("Failed to fetch product:", err));
+    }
+  }, [selectedProductId]);
 
   // Calculate scale on mount and resize
   useEffect(() => {
@@ -285,6 +321,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return (companyData as any)[field] || "";
     }
     if (category === "product" && productData) {
+      // Map product.price to productData.unitPrice
+      if (field === "price") return String(productData.unitPrice || "");
       return (productData as any)[field] || "";
     }
     if (category === "batch" && canvas.batch) {
@@ -467,6 +505,22 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
             <option value="">选择公司</option>
             {companyList.map(c => (
               <option key={c.id} value={c.id}>{c.companyName}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Product Selector */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">商品</label>
+          <select
+            value={selectedProductId || ""}
+            onChange={e => setSelectedProductId(e.target.value || undefined)}
+            className="w-full px-2 py-1 border rounded text-sm"
+            data-testid="canvas-product-selector"
+          >
+            <option value="">选择商品</option>
+            {productList.map(p => (
+              <option key={p.id} value={p.id}>{p.name}{p.sku ? ` (${p.sku})` : ""}</option>
             ))}
           </select>
         </div>
