@@ -256,8 +256,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   // Drag & Resize Handlers
   // ============================================================
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, elementId: string) => {
+  const handlePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
+    // 支持鼠标左键和触控（pointerType === 'touch' 时 button 可能为 0 或 -1）
+    const isTouch = e.pointerType === 'touch';
+    const isLeftClick = e.button === 0;
+    if (!isTouch && !isLeftClick) return;
+
     const element = canvas.elements.find(el => el.id === elementId);
     if (!element || element.locked) return;
     
@@ -271,8 +276,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     });
   }, [canvas.elements]);
 
-  const handleResizeMouseDown = useCallback((e: React.MouseEvent, elementId: string) => {
+  const handleResizePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
+    // 支持鼠标左键和触控
+    const isTouch = e.pointerType === 'touch';
+    const isLeftClick = e.button === 0;
+    if (!isTouch && !isLeftClick) return;
+
     const element = canvas.elements.find(el => el.id === elementId);
     if (!element || element.locked) return;
     
@@ -285,7 +295,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     });
   }, [canvas.elements]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (dragState) {
       const dx = pxToMm((e.clientX - dragState.startX) / scale);
       const dy = pxToMm((e.clientY - dragState.startY) / scale);
@@ -317,7 +327,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     }
   }, [dragState, resizeState, scale, canvas.grid, updateElement]);
 
-  const handleMouseUp = useCallback(() => {
+  const handlePointerUp = useCallback(() => {
     setDragState(null);
     setResizeState(null);
   }, []);
@@ -487,7 +497,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           ...style,
           zIndex: element.zIndex,
         }}
-        onMouseDown={pageIndex === undefined ? e => handleMouseDown(e, element.id) : undefined}
+        onPointerDown={pageIndex === undefined ? e => handlePointerDown(e, element.id) : undefined}
         data-testid="canvas-element"
         data-element-id={element.id}
       >
@@ -499,7 +509,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         {isSelected && !element.locked && pageIndex === undefined && (
           <div
             className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize"
-            onMouseDown={e => handleResizeMouseDown(e, element.id)}
+            onPointerDown={e => handleResizePointerDown(e, element.id)}
             data-testid="canvas-resize-handle"
           />
         )}
@@ -747,9 +757,9 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         ref={canvasRef}
         className="flex-1 overflow-auto p-10 pt-16 lg:pt-10 print:p-0"
         onClick={handleCanvasClick}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
         data-testid="canvas-editor-root"
       >
         <div ref={printRootRef} data-testid="canvas-print-root">

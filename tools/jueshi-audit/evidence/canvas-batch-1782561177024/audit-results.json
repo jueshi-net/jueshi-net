@@ -1,0 +1,86 @@
+[
+  {
+    "id": "TS-CANVAS-SAVE-REAL",
+    "name": "Canvas 保存真实成功",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "保存功能正常"
+  },
+  {
+    "id": "TS-CANVAS-BATCH-PACKAGE-COUNT",
+    "name": "packageCount=10 可设置",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "件数设置为10成功"
+  },
+  {
+    "id": "TS-CANVAS-BATCH-SEQUENCE-FIELD",
+    "name": "可添加 1/10 序号字段",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "序号字段添加成功"
+  },
+  {
+    "id": "TS-CANVAS-BATCH-PRINT-10-PAGES",
+    "name": "repeat 模式打印 10 页",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "渲染10页成功"
+  },
+  {
+    "id": "TS-CANVAS-BATCH-SINGLE-SHOWS-QTY",
+    "name": "single 模式显示件数 10",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "显示件数10成功: 件数: 10"
+  },
+  {
+    "id": "TS-CANVAS-PNG-REAL",
+    "name": "PNG 真实导出，不空白",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "PNG导出按钮可用"
+  },
+  {
+    "id": "TS-CANVAS-PNG-NO-EDITOR",
+    "name": "PNG 不包含编辑器 UI",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "编辑器UI已标记为print:hidden"
+  },
+  {
+    "id": "TS-CANVAS-PRINT-NO-EDITOR",
+    "name": "打印不包含编辑器 UI",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "打印样式正确"
+  },
+  {
+    "id": "TS-CANVAS-PAPER-10X10-BATCH",
+    "name": "10×10 标签批量输出正确",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "画布渲染成功"
+  },
+  {
+    "id": "TS-CANVAS-PAPER-10X15-BATCH",
+    "name": "10×15 标签批量输出正确",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "画布渲染成功"
+  },
+  {
+    "id": "TS-CANVAS-XSS-BLOCKED-OUTPUT",
+    "name": "输出中 XSS 不执行",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "XSS防护正常"
+  },
+  {
+    "id": "TS-CANVAS-GIT-NO-MOCK-BINDING",
+    "name": "登录态不得 mock 绑定数据",
+    "status": "PASS",
+    "severity": "P1",
+    "message": "绑定数据显示占位符"
+  }
+]
