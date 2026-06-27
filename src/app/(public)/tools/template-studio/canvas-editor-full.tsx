@@ -103,10 +103,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
+  const [editingElementId, setEditingElementId] = useState<string | null>(null);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const printRootRef = useRef<HTMLDivElement>(null);
+  const textEditorRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-hide side panels on small screens
   useEffect(() => {
@@ -253,11 +255,56 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.elements]);
 
   // ============================================================
+  // Text Editing Handlers
+  // ============================================================
+
+  const startEditing = useCallback((elementId: string) => {
+    const element = canvas.elements.find(el => el.id === elementId);
+    if (!element || element.type !== "text" || element.locked) return;
+    
+    setEditingElementId(elementId);
+    setSelectedElementId(elementId);
+  }, [canvas.elements]);
+
+  const stopEditing = useCallback(() => {
+    setEditingElementId(null);
+  }, []);
+
+  const handleTextDoubleClick = useCallback((e: React.MouseEvent, elementId: string) => {
+    e.stopPropagation();
+    startEditing(elementId);
+  }, [startEditing]);
+
+  const handleTextContentChange = useCallback((elementId: string, newText: string) => {
+    updateElement(elementId, { text: newText });
+  }, [updateElement]);
+
+  const handleTextEditConfirm = useCallback(() => {
+    stopEditing();
+  }, [stopEditing]);
+
+  const handleTextEditCancel = useCallback(() => {
+    stopEditing();
+  }, [stopEditing]);
+
+  // Focus text editor when entering edit mode
+  useEffect(() => {
+    if (editingElementId && textEditorRef.current) {
+      textEditorRef.current.focus();
+      textEditorRef.current.select();
+    }
+  }, [editingElementId]);
+
+  // ============================================================
   // Drag & Resize Handlers
   // ============================================================
 
   const handlePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
+    
+    // Don't start drag if in edit mode
+    if (editingElementId === elementId) return;
+    
     // 支持鼠标左键和触控（pointerType === 'touch' 时 button 可能为 0 或 -1）
     const isTouch = e.pointerType === 'touch';
     const isLeftClick = e.button === 0;
@@ -274,7 +321,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       startElementX: element.x,
       startElementY: element.y,
     });
-  }, [canvas.elements]);
+  }, [canvas.elements, editingElementId]);
 
   const handleResizePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
@@ -458,15 +505,72 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     
     const pos = getElementPositionPx(element, scale);
     const isSelected = element.id === selectedElementId && pageIndex === undefined;
+    const isEditing = element.id === editingElementId && pageIndex === undefined;
     const style = canvasStyleToCSS(sanitizeCanvasStyle(element.style));
     
     let content = null;
     
     if (element.type === "text") {
-      content = sanitizeText(element.text || "");
+      if (isEditing) {
+        // Edit mode: show textarea
+        content = (
+          <div className="w-full h-full relative" data-testid="canvas-text-editor">
+            <textarea
+              ref={textEditorRef}
+              value={element.text || ""}
+              onChange={e => handleTextContentChange(element.id, e.target.value)}
+              onBlur={handleTextEditConfirm}
+              onKeyDown={e => {
+                if (e.key === "Escape") {
+                  handleTextEditCancel();
+                } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                  handleTextEditConfirm();
+                }
+              }}
+              className="w-full h-full p-1 border-2 border-blue-500 resize-none focus:outline-none bg-white"
+              style={{
+                fontSize: `${element.style.fontSize || 12}px`,
+                color: element.style.color || "#000000",
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+              }}
+              placeholder="输入文本..."
+              data-testid="canvas-text-content-input"
+            />
+            <div className="absolute bottom-0 right-0 flex gap-1 bg-white border border-gray-300 rounded shadow-sm">
+              <button
+                onClick={handleTextEditConfirm}
+                className="px-2 py-1 text-xs text-green-600 hover:bg-green-50"
+                data-testid="canvas-text-edit-confirm"
+              >
+                ✓
+              </button>
+              <button
+                onClick={handleTextEditCancel}
+                className="px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                data-testid="canvas-text-edit-cancel"
+              >
+                ✗
+              </button>
+            </div>
+          </div>
+        );
+      } else {
+        // Display mode: show text with placeholder
+        const textContent = element.text || "";
+        content = (
+          <div 
+            className="w-full h-full overflow-hidden"
+            style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+            data-testid="canvas-text-element"
+          >
+            {textContent || <span className="text-gray-400" data-testid="canvas-text-placeholder">双击编辑文本</span>}
+          </div>
+        );
+      }
     } else if (element.type === "field") {
       const resolved = resolveBinding(element.binding);
-      content = resolved || `[${element.binding || "未绑定"}]`;
+      content = <div className="w-full h-full overflow-hidden">{resolved || `[${element.binding || "未绑定"}]`}</div>;
     } else if (element.type === "table") {
       content = <span className="text-xs text-gray-500">商品表格</span>;
     } else if (element.type === "seal") {
@@ -488,7 +592,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     return (
       <div
         key={element.id}
-        className={`absolute ${pageIndex === undefined ? "cursor-move" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
+        className={`absolute ${pageIndex === undefined && !isEditing ? "cursor-move" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
         style={{
           left: `${pos.x}px`,
           top: `${pos.y}px`,
@@ -497,16 +601,29 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           ...style,
           zIndex: element.zIndex,
         }}
-        onPointerDown={pageIndex === undefined ? e => handlePointerDown(e, element.id) : undefined}
+        onPointerDown={pageIndex === undefined && !isEditing ? e => handlePointerDown(e, element.id) : undefined}
+        onDoubleClick={element.type === "text" && pageIndex === undefined && !isEditing ? e => handleTextDoubleClick(e, element.id) : undefined}
         data-testid="canvas-element"
         data-element-id={element.id}
       >
-        <div className="w-full h-full overflow-hidden">
-          {content}
-        </div>
+        {content}
+
+        {/* Edit Button for text elements (mobile/tablet friendly) */}
+        {element.type === "text" && isSelected && !isEditing && !element.locked && pageIndex === undefined && (
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              startEditing(element.id);
+            }}
+            className="absolute top-0 right-0 px-2 py-1 text-xs bg-blue-500 text-white rounded shadow-sm hover:bg-blue-600"
+            data-testid="canvas-edit-text-button"
+          >
+            编辑
+          </button>
+        )}
 
         {/* Resize Handle */}
-        {isSelected && !element.locked && pageIndex === undefined && (
+        {isSelected && !element.locked && pageIndex === undefined && !isEditing && (
           <div
             className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize"
             onPointerDown={e => handleResizePointerDown(e, element.id)}
@@ -887,6 +1004,22 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         
         {selectedElement ? (
           <div className="space-y-4" data-testid="canvas-properties-panel">
+            {/* Text Content Editor (for text elements) */}
+            {selectedElement.type === "text" && (
+              <div>
+                <label className="block text-sm font-medium mb-1">文本内容</label>
+                <textarea
+                  value={selectedElement.text || ""}
+                  onChange={e => handleTextContentChange(selectedElement.id, e.target.value)}
+                  className="w-full px-2 py-1 border rounded text-sm resize-y min-h-[80px]"
+                  placeholder="输入文本内容..."
+                  rows={4}
+                  data-testid="canvas-text-content-input"
+                />
+                <p className="text-xs text-gray-500 mt-1">支持多行文本，换行将保留</p>
+              </div>
+            )}
+            
             <div>
               <label className="block text-sm font-medium mb-1">X (mm)</label>
               <input
