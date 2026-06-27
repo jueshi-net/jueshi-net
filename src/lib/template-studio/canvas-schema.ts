@@ -22,6 +22,8 @@ export interface CanvasTemplate {
   elements: CanvasElement[];
   /** Grid settings */
   grid: CanvasGridConfig;
+  /** Batch label configuration */
+  batch?: CanvasBatchConfig;
   /** Created timestamp */
   createdAt: string;
   /** Updated timestamp */
@@ -49,6 +51,21 @@ export interface CanvasGridConfig {
 }
 
 // ============================================================
+// Batch Label Configuration
+// ============================================================
+
+export interface CanvasBatchConfig {
+  /** Output mode: "single" (one page with qty) or "repeat" (N pages) */
+  outputMode: "single" | "repeat";
+  /** Total package count (件数) */
+  packageCount: number;
+  /** Show sequence number (1/N, 2/N, ...) */
+  showSequence: boolean;
+  /** Sequence format: "1/10" or "1 of 10" */
+  sequenceFormat: "fraction" | "of";
+}
+
+// ============================================================
 // Canvas Element
 // ============================================================
 
@@ -62,7 +79,8 @@ export type CanvasElementType =
   | "line" 
   | "rect" 
   | "qrcode" 
-  | "barcode";
+  | "barcode"
+  | "sequence";
 
 export interface CanvasElement {
   /** Unique element ID */
@@ -162,6 +180,12 @@ export const ALLOWED_BINDING_PATHS = [
   
   // Seal
   "seal.generated",
+  
+  // Batch/Package fields
+  "batch.packageCount",
+  "batch.sequence",
+  "batch.currentIndex",
+  "batch.totalCount",
 ] as const;
 
 export type AllowedBindingPath = typeof ALLOWED_BINDING_PATHS[number];
@@ -196,6 +220,15 @@ export function defaultCanvasGrid(): CanvasGridConfig {
     show: true,
     sizeMm: 5,
     snap: true,
+  };
+}
+
+export function defaultCanvasBatch(): CanvasBatchConfig {
+  return {
+    outputMode: "single",
+    packageCount: 1,
+    showSequence: false,
+    sequenceFormat: "fraction",
   };
 }
 
@@ -286,6 +319,21 @@ export function defaultCanvasElement(type: CanvasElementType): CanvasElement {
         style: baseStyle,
       };
     
+    case "sequence":
+      return {
+        id: `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: "sequence",
+        x: 20,
+        y: 20,
+        width: 40,
+        height: 10,
+        rotation: 0,
+        zIndex: 1,
+        locked: false,
+        visible: true,
+        style: { ...baseStyle, fontSize: 14, fontWeight: "bold" },
+      };
+    
     default:
       return {
         id: `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -310,6 +358,7 @@ export function defaultCanvasTemplate(): CanvasTemplate {
     paper: defaultCanvasPaper("A4"),
     elements: [],
     grid: defaultCanvasGrid(),
+    batch: defaultCanvasBatch(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
