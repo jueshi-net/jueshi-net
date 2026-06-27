@@ -68,6 +68,11 @@ interface ProductData {
   price?: number;
 }
 
+interface CompanyList {
+  id: string;
+  companyName: string;
+}
+
 // ============================================================
 // Canvas Editor Full Component
 // ============================================================
@@ -82,6 +87,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [scale, setScale] = useState(1);
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [productData, setProductData] = useState<ProductData | null>(null);
+  const [companyList, setCompanyList] = useState<CompanyList[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>(companyId);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   
@@ -89,10 +96,22 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const paperRef = useRef<HTMLDivElement>(null);
   const printRootRef = useRef<HTMLDivElement>(null);
 
+  // Fetch company list
+  useEffect(() => {
+    fetch("/api/me/company-profiles")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data)) {
+          setCompanyList(data.data.map((c: any) => ({ id: c.id, companyName: c.companyName })));
+        }
+      })
+      .catch(err => console.error("Failed to fetch company list:", err));
+  }, []);
+
   // Fetch company data
   useEffect(() => {
-    if (companyId) {
-      fetch(`/api/me/company-profiles/${companyId}`)
+    if (selectedCompanyId) {
+      fetch(`/api/me/company-profiles/${selectedCompanyId}`)
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -101,7 +120,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         })
         .catch(err => console.error("Failed to fetch company:", err));
     }
-  }, [companyId]);
+  }, [selectedCompanyId]);
 
   // Calculate scale on mount and resize
   useEffect(() => {
@@ -323,7 +342,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     if (!paperRef.current) return;
     
     try {
-      const canvas = await html2canvas(paperRef.current, {
+      const canvasElement = await html2canvas(paperRef.current, {
         backgroundColor: "#ffffff",
         scale: 2,
         useCORS: true,
@@ -332,7 +351,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       
       const link = document.createElement("a");
       link.download = `${canvas.name || "template"}.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.href = canvasElement.toDataURL("image/png");
       link.click();
     } catch (err) {
       console.error("PNG export failed:", err);
@@ -436,6 +455,22 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto print:hidden">
         <h2 className="text-lg font-bold mb-4">工具</h2>
         
+        {/* Company Selector */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1">公司</label>
+          <select
+            value={selectedCompanyId || ""}
+            onChange={e => setSelectedCompanyId(e.target.value || undefined)}
+            className="w-full px-2 py-1 border rounded text-sm"
+            data-testid="canvas-company-selector"
+          >
+            <option value="">选择公司</option>
+            {companyList.map(c => (
+              <option key={c.id} value={c.id}>{c.companyName}</option>
+            ))}
+          </select>
+        </div>
+        
         <div className="space-y-2">
           <button
             onClick={() => addElement("text")}
@@ -497,6 +532,28 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           >
             打印
           </button>
+        </div>
+
+        {/* Paper Size Selector */}
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold mb-2">纸张尺寸</h3>
+          <select
+            value={canvas.paper.preset}
+            onChange={e => {
+              const preset = e.target.value as "A4" | "10x10" | "10x15" | "custom";
+              const newPaper = defaultCanvasPaper(preset);
+              setCanvas(prev => ({
+                ...prev,
+                paper: newPaper,
+              }));
+            }}
+            className="w-full px-2 py-1 border rounded text-sm"
+            data-testid="canvas-paper-size"
+          >
+            <option value="A4">A4 (210×297mm)</option>
+            <option value="10x10">10×10 (100×100mm)</option>
+            <option value="10x15">10×15 (100×150mm)</option>
+          </select>
         </div>
 
         {/* Batch Config */}
