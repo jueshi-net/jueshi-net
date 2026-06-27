@@ -1748,6 +1748,92 @@ async function run() {
   }
 
   // ============================================================
+  // Navigation Entry Cases (v18.6.16.5.4)
+  // ============================================================
+
+  // TS-NAV-WORKSPACE-ENTRY: Workspace has template studio entry
+  try {
+    await page.goto(`${BASE_URL}/workspace`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const entry = page.locator('[data-testid="workspace-template-studio-entry"]');
+    const entryExists = await entry.count() > 0;
+    if (entryExists) {
+      const link = await entry.locator('a').first().getAttribute('href');
+      record("TS-NAV-WORKSPACE-ENTRY", "工作台模板设计器入口", "P1",
+        entryExists && link ? "PASS" : "FAIL",
+        `Entry exists: ${entryExists}, href: ${link}`);
+    } else {
+      record("TS-NAV-WORKSPACE-ENTRY", "工作台模板设计器入口", "P1", "FAIL", "Entry not found");
+    }
+  } catch (err) {
+    record("TS-NAV-WORKSPACE-ENTRY", "工作台模板设计器入口", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // TS-NAV-TOOLS-CARD: Tools center has template studio card
+  try {
+    await page.goto(`${BASE_URL}/tools`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const card = page.locator('[data-testid="tools-template-studio-card"]');
+    const cardExists = await card.count() > 0;
+    if (cardExists) {
+      const link = await card.getAttribute('href');
+      record("TS-NAV-TOOLS-CARD", "工具中心模板设计器卡片", "P1",
+        cardExists && link ? "PASS" : "FAIL",
+        `Card exists: ${cardExists}, href: ${link}`);
+    } else {
+      record("TS-NAV-TOOLS-CARD", "工具中心模板设计器卡片", "P1", "FAIL", "Card not found");
+    }
+  } catch (err) {
+    record("TS-NAV-TOOLS-CARD", "工具中心模板设计器卡片", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // TS-NAV-TEMPLATE-LIST-NEW: Template studio list page has new button
+  try {
+    await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const newBtn = page.locator('[data-testid="template-studio-new-button"]');
+    const myBtn = page.locator('[data-testid="template-studio-my-templates-button"]');
+    const newBtnExists = await newBtn.count() > 0;
+    const myBtnExists = await myBtn.count() > 0;
+    record("TS-NAV-TEMPLATE-LIST-NEW", "模板工作室新建按钮", "P1",
+      newBtnExists && myBtnExists ? "PASS" : "FAIL",
+      `New button: ${newBtnExists}, My templates button: ${myBtnExists}`);
+  } catch (err) {
+    record("TS-NAV-TEMPLATE-LIST-NEW", "模板工作室新建按钮", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // TS-NAV-WORKSPACE-TEMPLATES-NEW: Workspace templates page has new button
+  try {
+    await page.goto(`${BASE_URL}/workspace/templates`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const newBtn = page.locator('[data-testid="workspace-templates-new-button"]');
+    const newBtnExists = await newBtn.count() > 0;
+    record("TS-NAV-WORKSPACE-TEMPLATES-NEW", "工作台模板页新建按钮", "P1",
+      newBtnExists ? "PASS" : "FAIL",
+      `New button exists: ${newBtnExists}`);
+  } catch (err) {
+    record("TS-NAV-WORKSPACE-TEMPLATES-NEW", "工作台模板页新建按钮", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // TS-NAV-DOCUMENT-TOOLS-LINK: Document tools page has template studio link
+  try {
+    await page.goto(`${BASE_URL}/tools/documents`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(2000);
+    const link = page.locator('[data-testid="document-tool-template-studio-link"]');
+    const linkExists = await link.count() > 0;
+    if (linkExists) {
+      const href = await link.getAttribute('href');
+      record("TS-NAV-DOCUMENT-TOOLS-LINK", "单据工具页模板设计器入口", "P1",
+        linkExists && href ? "PASS" : "FAIL",
+        `Link exists: ${linkExists}, href: ${href}`);
+    } else {
+      record("TS-NAV-DOCUMENT-TOOLS-LINK", "单据工具页模板设计器入口", "P1", "FAIL", "Link not found");
+    }
+  } catch (err) {
+    record("TS-NAV-DOCUMENT-TOOLS-LINK", "单据工具页模板设计器入口", "P1", "FAIL", `Error: ${err}`);
+  }
+
+  // ============================================================
   // Summary
   // ============================================================
   await browser.close();
