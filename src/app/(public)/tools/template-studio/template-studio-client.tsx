@@ -739,11 +739,18 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
               我的模板
             </a>
             <a
+              href="/tools/template-studio/canvas/new"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              data-testid="template-studio-canvas-mode-button"
+            >
+              🎨 自由画布模式
+            </a>
+            <a
               href="/tools/template-studio/new"
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               data-testid="template-studio-new-button"
             >
-              + 新建模板
+              + 结构化模板
             </a>
           </div>
         </div>
