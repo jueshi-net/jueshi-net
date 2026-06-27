@@ -101,10 +101,33 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
+  const [showLeftPanel, setShowLeftPanel] = useState(true);
+  const [showRightPanel, setShowRightPanel] = useState(true);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const printRootRef = useRef<HTMLDivElement>(null);
+
+  // Auto-hide side panels on small screens
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 768) {
+        setShowLeftPanel(false);
+        setShowRightPanel(false);
+      } else if (width < 1024) {
+        setShowLeftPanel(true);
+        setShowRightPanel(false);
+      } else {
+        setShowLeftPanel(true);
+        setShowRightPanel(true);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Fetch company list
   useEffect(() => {
@@ -485,12 +508,33 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* Dynamic print styles */}
       <style dangerouslySetInnerHTML={{ __html: printStyle }} />
       
+      {/* Mobile/Tablet Toggle Buttons */}
+      <div className="fixed top-4 left-4 z-50 flex gap-2 lg:hidden">
+        <button
+          onClick={() => setShowLeftPanel(!showLeftPanel)}
+          className="px-3 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm hover:bg-gray-50"
+          data-testid="canvas-toggle-left-panel"
+        >
+          {showLeftPanel ? "← 隐藏工具" : "工具 →"}
+        </button>
+        {selectedElement && (
+          <button
+            onClick={() => setShowRightPanel(!showRightPanel)}
+            className="px-3 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm hover:bg-gray-50"
+            data-testid="canvas-toggle-right-panel"
+          >
+            {showRightPanel ? "隐藏属性 →" : "← 属性"}
+          </button>
+        )}
+      </div>
+      
       {/* Left Panel - Tools */}
-      <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto print:hidden">
+      {showLeftPanel && (
+        <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto print:hidden absolute lg:relative z-40 h-full shadow-lg lg:shadow-none">
         <h2 className="text-lg font-bold mb-4">工具</h2>
         
         {/* Company Selector */}
@@ -696,11 +740,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           </label>
         </div>
       </div>
+      )}
 
       {/* Center - Canvas */}
       <div
         ref={canvasRef}
-        className="flex-1 overflow-auto p-10 print:p-0"
+        className="flex-1 overflow-auto p-10 pt-16 lg:pt-10 print:p-0"
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -826,7 +871,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       </div>
 
       {/* Right Panel - Properties */}
-      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto print:hidden">
+      {showRightPanel && (
+      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto print:hidden absolute right-0 lg:relative z-40 h-full shadow-lg lg:shadow-none">
         <h2 className="text-lg font-bold mb-4">属性</h2>
         
         {selectedElement ? (
@@ -960,6 +1006,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           <p className="text-sm text-gray-500">选择一个元素以查看属性</p>
         )}
       </div>
+      )}
     </div>
   );
 }
