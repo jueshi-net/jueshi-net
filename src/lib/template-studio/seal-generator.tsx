@@ -1,14 +1,14 @@
 /**
- * SealGenerator — Real circular seal/stamp using SVG textPath
+ * SealGenerator — Real circular seal/stamp using per-character rotation
  *
- * Renders a circular company seal with:
- * - Top arc: company name (curved along the top of the circle)
- * - Bottom arc: secondary text (e.g. "专用章")
- * - Center: star or abbreviation
+ * Instead of textPath (which clips and has weird arc behavior),
+ * each character is individually positioned and rotated along the circle.
  *
- * Security: All text is rendered as React children inside <text>/<textPath>.
- * No dangerouslySetInnerHTML. React escapes all text content.
- * SVG namespace is handled by React's JSX, preventing XSS.
+ * Top arc: characters distributed from -70° to 70° (top of circle)
+ * Bottom arc: characters distributed from 250° to 110° (bottom of circle, readable)
+ * Center: star or custom text
+ *
+ * Security: All text rendered as React children. No dangerouslySetInnerHTML.
  *
  * @module template-studio/seal-generator
  */
@@ -20,138 +20,195 @@ import React from "react";
 // ============================================================
 
 export interface SealConfig {
-  /** Top arc text (usually company name) */
   topText: string;
-  /** Bottom arc text (e.g. "专用章", "财务专用章") */
   bottomText: string;
-  /** Center text or symbol (e.g. "★", company abbreviation) */
   centerText: string;
-  /** Seal color (default: #dc2626 red) */
   color: string;
-  /** Seal diameter in px (default: 120) */
   size?: number;
+  fontSize?: number;
+  letterSpacing?: number;
+  showInnerRing?: boolean;
+  rotation?: number;
 }
 
 // ============================================================
-// SVG Path Definitions
+// Character width estimation
 // ============================================================
 
-/**
- * Top arc path: text reads left-to-right along the top of the circle.
- * For a 120x120 viewBox, the arc goes from (18,62) to (102,62), curving upward.
- * sweep=1 (clockwise) makes the arc curve upward — text sits on top.
- */
-const TOP_ARC_PATH = "M 18,62 A 44,44 0 0,1 102,62";
-
-/**
- * Bottom arc path: text reads left-to-right along the bottom of the circle.
- * The arc goes from (24,62) to (96,62), curving downward.
- * sweep=0 (counter-clockwise) makes the arc curve downward — text sits on bottom.
- */
-const BOTTOM_ARC_PATH = "M 24,62 A 38,38 0 0,0 96,62";
-
-// ============================================================
-// Font Size Auto-Shrink
-// ============================================================
-
-/**
- * Calculate font size for top arc text so it fits along the arc without overflow.
- * The top arc length is approximately π * 44 * 0.7 ≈ 97 units (70% of semicircle).
- * We estimate each character takes about 0.55 * fontSize in width.
- *
- * @param text - The text to fit
- * @param maxFontSize - Maximum font size (default 11)
- * @param arcLength - Available arc length in SVG units (default 95)
- * @returns Font size in px that fits the text along the arc
- */
-function calcTopFontSize(text: string, maxFontSize: number = 11, arcLength: number = 95): number {
-  if (!text || text.length === 0) return maxFontSize;
-  const charWidth = 0.55; // approximate width per character as ratio of font size
-  const neededLength = text.length * charWidth * maxFontSize;
-  if (neededLength <= arcLength) return maxFontSize;
-  // Shrink proportionally, but not below 5px
-  const shrunk = Math.max(5, Math.floor((arcLength / (text.length * charWidth)) * 10) / 10);
-  return shrunk;
+function isCJK(ch: string): boolean {
+  const code = ch.charCodeAt(0);
+  return (
+    (code >= 0x4e00 && code <= 0x9fff) ||
+    (code >= 0x3000 && code <= 0x303f) ||
+    (code >= 0xff00 && code <= 0xffef)
+  );
 }
 
+function charWidth(ch: string): number {
+  return isCJK(ch) ? 1.0 : 0.55;
+}
+
+function textWidth(text: string): number {
+  let w = 0;
+  for (const ch of text) w += charWidth(ch);
+  return w;
+}
+
+// ============================================================
+// Auto-shrink font size
+// ============================================================
+
 /**
- * Calculate font size for bottom arc text.
- * Bottom arc is shorter (length ≈ π * 38 * 0.6 ≈ 72 units).
+ * Calculate font size so text fits within the arc.
+ * arcSpanDeg = degrees of arc available
+ * radius = radius of the arc
+ * Returns font size in SVG units.
  */
-function calcBottomFontSize(text: string, maxFontSize: number = 9, arcLength: number = 72): number {
+function calcFontSize(
+  text: string,
+  maxFontSize: number,
+  arcSpanDeg: number,
+  radius: number,
+  letterSpacing: number = 0
+): number {
   if (!text || text.length === 0) return maxFontSize;
-  const charWidth = 0.55;
-  const neededLength = text.length * charWidth * maxFontSize;
-  if (neededLength <= arcLength) return maxFontSize;
-  return Math.max(4, Math.floor((arcLength / (text.length * charWidth)) * 10) / 10);
+  const arcLength = (arcSpanDeg * Math.PI / 180) * radius;
+  const totalChars = text.length;
+  const totalLetterSpacing = letterSpacing * (totalChars - 1);
+  const availableForChars = arcLength - totalLetterSpacing;
+  const widthUnits = textWidth(text);
+  const needed = widthUnits * maxFontSize;
+  if (needed <= availableForChars) return maxFontSize;
+  // Shrink but not below 4
+  return Math.max(4, Math.floor((availableForChars / widthUnits) * 10) / 10);
 }
 
 // ============================================================
 // Sanitization
 // ============================================================
 
-/**
- * Sanitize text for SVG — removes characters that could break SVG parsing.
- * React already escapes text content, but we also strip control chars
- * and limit length to prevent overflow even with adversarial input.
- *
- * Security notes:
- * - React's JSX text rendering escapes < > & " ' automatically
- * - We strip control characters (0x00-0x1F except tab/newline)
- * - We limit text length to 50 chars for top, 20 for bottom
- * - No dangerouslySetInnerHTML is used anywhere
- */
 function sanitizeSealText(text: string, maxLength: number = 50): string {
   if (!text || typeof text !== "string") return "";
-  // Strip control characters (keep tab \t and newline \n are not needed in seal)
-  const cleaned = text.replace(/[\x00-\x1F\x7F]/g, "");
-  // Truncate to maxLength (but we DON'T add "…" — we shrink font instead)
-  return cleaned.substring(0, maxLength);
+  return text.replace(/[\x00-\x1F\x7F]/g, "").substring(0, maxLength);
+}
+
+// ============================================================
+// Arc character positioning
+// ============================================================
+
+interface CharPos {
+  char: string;
+  x: number;
+  y: number;
+  rotation: number;
+}
+
+/**
+ * Calculate positions for characters along an arc.
+ *
+ * Convention: angle in degrees, 0° = top (12 o'clock), positive = clockwise.
+ * - 0° = top, 90° = right, 180° = bottom, 270° = left
+ *
+ * For a character at angle α:
+ *   x = cx + r * sin(α * π / 180)
+ *   y = cy - r * cos(α * π / 180)
+ *
+ * Top arc: characters from -spanDeg/2 to +spanDeg/2 (through top)
+ *   rotation = α (character upright at top, tilts along curve)
+ *
+ * Bottom arc: characters from (180-spanDeg/2) to (180+spanDeg/2) going clockwise
+ *   but reversed for left-to-right reading: from (180+spanDeg/2) to (180-spanDeg/2)
+ *   rotation = α - 180 (character upright at bottom, tilts along curve)
+ */
+function layoutArcChars(
+  text: string,
+  cx: number,
+  cy: number,
+  radius: number,
+  spanDeg: number,
+  isBottom: boolean,
+  fontSize: number,
+  letterSpacing: number = 0
+): CharPos[] {
+  const chars = Array.from(text);
+  if (chars.length === 0) return [];
+
+  const positions: CharPos[] = [];
+  const n = chars.length;
+
+  // Calculate the angle step per character
+  // We use the effective width of each character to determine its angular position
+  const totalWidth = textWidth(text);
+  const arcLength = (spanDeg * Math.PI / 180) * radius;
+  const scale = arcLength / Math.max(totalWidth * fontSize + letterSpacing * (n - 1), 1);
+
+  let accumulatedAngle = isBottom ? (180 + spanDeg / 2) : (-spanDeg / 2);
+  const direction = isBottom ? -1 : 1; // bottom goes right-to-left in angle terms for left-to-right reading
+
+  for (let i = 0; i < n; i++) {
+    const ch = chars[i];
+    const w = charWidth(ch) * fontSize;
+    const halfW = w / 2;
+    const angleForHalfW = (halfW / radius) * (180 / Math.PI);
+    const angleForLetterSpacing = i > 0 ? (letterSpacing / radius) * (180 / Math.PI) / 2 : 0;
+
+    const alpha = accumulatedAngle + direction * (angleForHalfW + angleForLetterSpacing);
+    const rad = alpha * Math.PI / 180;
+    const x = cx + radius * Math.sin(rad);
+    const y = cy - radius * Math.cos(rad);
+    const rotation = isBottom ? alpha - 180 : alpha;
+
+    positions.push({ char: ch, x, y, rotation });
+
+    // Advance
+    const fullStepAngle = ((w + (i < n - 1 ? letterSpacing : 0)) / radius) * (180 / Math.PI);
+    accumulatedAngle += direction * fullStepAngle;
+  }
+
+  return positions;
 }
 
 // ============================================================
 // Seal Generator Component
 // ============================================================
 
-/**
- * SealGenerator — renders a circular company seal using SVG.
- *
- * The seal has:
- * 1. Outer circle (double ring)
- * 2. Top arc text (company name, auto-shrunk to fit)
- * 3. Bottom arc text (e.g. "专用章")
- * 4. Center text (e.g. "★" or company abbreviation)
- *
- * The SVG is self-contained and scalable. It renders correctly in:
- * - Screen display
- * - Print (no .stamp-placeholder class)
- * - PNG export (html2canvas captures SVG)
- *
- * @example
- * ```tsx
- * <SealGenerator
- *   topText="深圳市绝世百宝箱科技有限公司"
- *   bottomText="专用章"
- *   centerText="★"
- *   color="#dc2626"
- * />
- * ```
- */
 export function SealGenerator({
   topText,
   bottomText,
   centerText,
   color,
   size = 120,
+  fontSize: overrideFontSize,
+  letterSpacing = 0.5,
+  showInnerRing = true,
+  rotation = 0,
 }: SealConfig): React.ReactElement {
-  // Sanitize all text inputs
   const safeTop = sanitizeSealText(topText, 50);
   const safeBottom = sanitizeSealText(bottomText, 20);
   const safeCenter = sanitizeSealText(centerText, 6);
 
-  // Auto-shrink font sizes based on text length
-  const topFontSize = calcTopFontSize(safeTop);
-  const bottomFontSize = calcBottomFontSize(safeBottom);
+  // SVG viewBox is 120x120, center at (60,60)
+  const cx = 60;
+  const cy = 60;
+  const outerR = 54;
+  const innerR = 50;
+  const topArcR = 45;  // text sits just inside the inner ring
+  const bottomArcR = 45;
+  const topSpanDeg = 140;  // -70° to 70°
+  const bottomSpanDeg = 120; // 120° to 240° (through bottom)
+
+  // Auto-shrink font sizes
+  const topFontSize = overrideFontSize || calcFontSize(safeTop, 10, topSpanDeg, topArcR, letterSpacing);
+  const bottomFontSize = overrideFontSize
+    ? Math.max(4, overrideFontSize * 0.85)
+    : calcFontSize(safeBottom, 8, bottomSpanDeg, bottomArcR, letterSpacing);
+
+  // Layout characters
+  const topChars = layoutArcChars(safeTop, cx, cy, topArcR, topSpanDeg, false, topFontSize, letterSpacing);
+  const bottomChars = layoutArcChars(safeBottom, cx, cy, bottomArcR, bottomSpanDeg, true, bottomFontSize, letterSpacing);
+
+  // Group rotation
+  const groupTransform = rotation ? `rotate(${rotation} ${cx} ${cy})` : undefined;
 
   return (
     <svg
@@ -160,89 +217,83 @@ export function SealGenerator({
       height={size}
       viewBox="0 0 120 120"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ display: "block" }}
+      style={{ display: "block", overflow: "visible" }}
     >
-      <defs>
-        <path id="seal-top-arc" d={TOP_ARC_PATH} fill="none" />
-        <path id="seal-bottom-arc" d={BOTTOM_ARC_PATH} fill="none" />
-      </defs>
+      <g transform={groupTransform}>
+        {/* Outer ring */}
+        <circle cx={cx} cy={cy} r={outerR} fill="none" stroke={color} strokeWidth="2" />
 
-      {/* Outer ring */}
-      <circle
-        cx="60"
-        cy="60"
-        r="54"
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-      />
+        {/* Inner ring */}
+        {showInnerRing && (
+          <circle cx={cx} cy={cy} r={innerR} fill="none" stroke={color} strokeWidth="0.8" />
+        )}
 
-      {/* Inner ring */}
-      <circle
-        cx="60"
-        cy="60"
-        r="50"
-        fill="none"
-        stroke={color}
-        strokeWidth="1"
-      />
+        {/* Top arc characters */}
+        {topChars.map((cp, i) => (
+          <text
+            key={`top-${i}`}
+            x={cp.x}
+            y={cp.y}
+            fill={color}
+            fontSize={topFontSize}
+            fontWeight="bold"
+            fontFamily="serif"
+            textAnchor="middle"
+            dominantBaseline="central"
+            transform={`rotate(${cp.rotation} ${cp.x} ${cp.y})`}
+          >
+            {cp.char}
+          </text>
+        ))}
 
-      {/* Top arc text — company name */}
-      <text
-        fill={color}
-        fontSize={topFontSize}
-        fontWeight="bold"
-        fontFamily="serif"
-        letterSpacing="0.5"
-      >
-        <textPath href="#seal-top-arc" startOffset="50%" textAnchor="middle">
-          {safeTop}
-        </textPath>
-      </text>
+        {/* Bottom arc characters */}
+        {bottomChars.map((cp, i) => (
+          <text
+            key={`bot-${i}`}
+            x={cp.x}
+            y={cp.y}
+            fill={color}
+            fontSize={bottomFontSize}
+            fontWeight="bold"
+            fontFamily="serif"
+            textAnchor="middle"
+            dominantBaseline="central"
+            transform={`rotate(${cp.rotation} ${cp.x} ${cp.y})`}
+          >
+            {cp.char}
+          </text>
+        ))}
 
-      {/* Bottom arc text — e.g. "专用章" */}
-      <text
-        fill={color}
-        fontSize={bottomFontSize}
-        fontWeight="bold"
-        fontFamily="serif"
-        letterSpacing="1"
-      >
-        <textPath href="#seal-bottom-arc" startOffset="50%" textAnchor="middle">
-          {safeBottom}
-        </textPath>
-      </text>
+        {/* Center text/star */}
+        <text
+          x={cx}
+          y={cy}
+          fill={color}
+          fontSize="20"
+          fontWeight="bold"
+          textAnchor="middle"
+          dominantBaseline="central"
+        >
+          {safeCenter || "★"}
+        </text>
 
-      {/* Center star/text */}
-      <text
-        x="60"
-        y="64"
-        fill={color}
-        fontSize="22"
-        fontWeight="bold"
-        textAnchor="middle"
-        dominantBaseline="middle"
-      >
-        {safeCenter}
-      </text>
-
-      {/* Decorative center line under star */}
-      <line
-        x1="38"
-        y1="72"
-        x2="82"
-        y2="72"
-        stroke={color}
-        strokeWidth="0.8"
-        opacity="0.6"
-      />
+        {/* Decorative line under center */}
+        <line
+          x1={cx - 18}
+          y1={cy + 12}
+          x2={cx + 18}
+          y2={cy + 12}
+          stroke={color}
+          strokeWidth="0.6"
+          opacity="0.5"
+        />
+      </g>
     </svg>
   );
 }
 
 /**
  * Default seal config from company name.
- * Generates sensible defaults: company name on top, "专用章" on bottom, "★" in center.
  */
 export function defaultSealConfig(companyName: string, color: string = "#dc2626"): SealConfig {
   return {
