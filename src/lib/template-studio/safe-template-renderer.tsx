@@ -27,6 +27,7 @@ import type {
 import {
   getCompanyDisplayName,
   getCompanyDisplayNameEn,
+  getPaperSizeConfig,
 } from "./template-schema";
 import { SealGenerator, defaultSealConfig } from "./seal-generator";
 // ============================================================
@@ -124,40 +125,44 @@ function CompanyInfo({
   company: CompanyProfile | null | undefined;
   style: TemplateStyleConfig;
 }) {
+  const blockStyle = style.companyBlockStyle || "subtle";
+
   if (!company) {
     return (
-      <div style={{ padding: "12px", color: "#999", border: "1px dashed #ddd", borderRadius: "4px", marginBottom: "16px" }}>
+      <div className="guide-outline" style={{ padding: "12px", color: "#999", border: "1px dashed #ccc", borderRadius: "4px", marginBottom: "16px" }}>
         未选择公司资料
       </div>
     );
   }
 
+  // Determine container style based on companyBlockStyle
+  let containerStyle: React.CSSProperties = { marginBottom: "16px" };
+  if (blockStyle === "none") {
+    containerStyle = { marginBottom: "16px", padding: "0" };
+  } else if (blockStyle === "subtle") {
+    containerStyle = { marginBottom: "16px", padding: "10px 14px", borderLeft: `3px solid ${style.primaryColor}`, backgroundColor: "#fafafa", borderRadius: "0 4px 4px 0" };
+  } else if (blockStyle === "card") {
+    containerStyle = { marginBottom: "16px", padding: "14px 16px", border: "1px solid #e5e7eb", borderRadius: "6px", backgroundColor: "#fdfdfd" };
+  } else if (blockStyle === "bordered") {
+    containerStyle = { marginBottom: "16px", padding: "12px 14px", border: `1px solid ${style.primaryColor}`, borderRadius: "4px" };
+  }
+
   return (
-    <div style={{ marginBottom: "16px", padding: "12px", border: `2px solid ${style.primaryColor}`, borderRadius: "4px" }} data-testid="template-preview-company-info">
-      <div style={{ fontSize: "18px", fontWeight: "bold", color: style.primaryColor, marginBottom: "4px" }} data-testid="template-preview-company-name">
+    <div style={containerStyle} data-testid="template-preview-company-info">
+      <div style={{ fontSize: "17px", fontWeight: "bold", color: style.primaryColor, marginBottom: "3px" }} data-testid="template-preview-company-name">
         {getCompanyDisplayName(company)}
       </div>
       {getCompanyDisplayNameEn(company) && (
-        <div style={{ fontSize: "14px", color: "#666", marginBottom: "4px" }}>{getCompanyDisplayNameEn(company)}</div>
+        <div style={{ fontSize: "13px", color: "#888", marginBottom: "4px" }}>{getCompanyDisplayNameEn(company)}</div>
       )}
-      {company.contactName && (
-        <div style={{ fontSize: "13px", color: "#555" }}>联系人: {company.contactName}</div>
-      )}
-      {(company.address || company.cityPostal) && (
-        <div style={{ fontSize: "13px", color: "#555" }}>地址: {company.address || ""}{company.cityPostal ? ` ${company.cityPostal}` : ""}</div>
-      )}
-      {company.phone && (
-        <div style={{ fontSize: "13px", color: "#555" }}>电话: {company.phone}</div>
-      )}
-      {company.email && (
-        <div style={{ fontSize: "13px", color: "#555" }}>邮箱: {company.email}</div>
-      )}
-      {company.website && (
-        <div style={{ fontSize: "13px", color: "#555" }}>网址: {company.website}</div>
-      )}
-      {company.taxId && (
-        <div style={{ fontSize: "13px", color: "#555" }}>税号: {company.taxId}</div>
-      )}
+      <div style={{ fontSize: "12px", color: "#666", lineHeight: "1.6" }}>
+        {company.contactName && <span>联系人: {company.contactName}　</span>}
+        {(company.address || company.cityPostal) && <span>地址: {company.address || ""}{company.cityPostal ? ` ${company.cityPostal}` : ""}　</span>}
+        {company.phone && <span>电话: {company.phone}　</span>}
+        {company.email && <span>邮箱: {company.email}　</span>}
+        {company.website && <span>网址: {company.website}　</span>}
+        {company.taxId && <span>税号: {company.taxId}</span>}
+      </div>
     </div>
   );
 }
@@ -237,17 +242,43 @@ function ProductTable({
   style: TemplateStyleConfig;
 }) {
   const visibleColumns = columns.filter(c => c.visible);
+  const tableStyleName = style.tableStyle || "clean";
 
   if (visibleColumns.length === 0) {
     return null;
   }
 
+  // Header style: thin bottom border, no heavy box
+  const headerBorderStyle = tableStyleName === "bordered"
+    ? `1px solid ${style.tableHeaderBg}`
+    : `1px solid ${style.tableHeaderBg}`;
+  const headerBg = style.tableHeaderBg || style.primaryColor;
+  const headerColor = style.tableHeaderColor || "#fff";
+
+  // Cell border: very thin, light color
+  const cellBorder = tableStyleName === "bordered"
+    ? "1px solid #d1d5db"
+    : "none";
+  const cellBorderBottom = tableStyleName === "clean"
+    ? "1px solid #e5e7eb"
+    : "1px solid #d1d5db";
+
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: style.fontSize || "13px" }}>
+    <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: "16px", fontSize: style.fontSize || "13px" }} data-testid="template-product-table">
       <thead>
-        <tr style={{ ...primaryBgStyle(style.primaryColor), color: "#fff" }}>
+        <tr style={{ backgroundColor: headerBg }}>
           {visibleColumns.map(col => (
-            <th key={col.key} style={{ padding: style.cellPadding || "8px 12px", textAlign: "left", border: `1px solid ${style.primaryColor}` }}>
+            <th key={col.key} style={{
+              padding: style.cellPadding || "8px 12px",
+              textAlign: "left",
+              color: headerColor,
+              fontSize: "12px",
+              fontWeight: "600",
+              borderBottom: `1px solid ${style.primaryColor}`,
+              borderLeft: tableStyleName === "bordered" ? cellBorder : "none",
+              borderRight: tableStyleName === "bordered" ? cellBorder : "none",
+              borderTop: tableStyleName === "bordered" ? cellBorder : "none",
+            }}>
               {col.label}
             </th>
           ))}
@@ -256,17 +287,21 @@ function ProductTable({
       <tbody>
         {products.length === 0 ? (
           <tr>
-            <td colSpan={visibleColumns.length} style={{ padding: "16px", textAlign: "center", color: "#999", border: "1px solid #e5e7eb" }}>
+            <td colSpan={visibleColumns.length} style={{ padding: "16px", textAlign: "center", color: "#999", borderBottom: cellBorderBottom }}>
               暂无商品明细
             </td>
           </tr>
         ) : (
           products.map((product, idx) => (
-            <tr key={product.id || idx} style={{ borderBottom: "1px solid #e5e7eb" }}>
+            <tr key={product.id || idx} style={{
+              borderBottom: cellBorderBottom,
+              backgroundColor: tableStyleName === "striped" && idx % 2 === 1 ? "#f9fafb" : "transparent",
+            }}>
               {visibleColumns.map(col => {
                 let value: string | number = "";
                 switch (col.key) {
                   case "name": value = product.name || ""; break;
+                  case "sku": value = product.sku || ""; break;
                   case "nameEn": value = product.nameEn || ""; break;
                   case "hsCode": value = product.hsCode || ""; break;
                   case "unit": value = product.unit || ""; break;
@@ -277,12 +312,18 @@ function ProductTable({
                   case "volume": value = product.volume ? `${product.volume} m³` : ""; break;
                   case "origin": value = product.origin || ""; break;
                   default:
-                    // Custom column: look up by key on product object
                     value = (product as Record<string, unknown>)[col.key] as string | number || "";
                     break;
                 }
                 return (
-                  <td key={col.key} style={{ padding: style.cellPadding || "8px 12px", border: "1px solid #e5e7eb" }}>
+                  <td key={col.key} style={{
+                    padding: style.cellPadding || "8px 12px",
+                    borderBottom: cellBorderBottom,
+                    borderLeft: tableStyleName === "bordered" ? cellBorder : "none",
+                    borderRight: tableStyleName === "bordered" ? cellBorder : "none",
+                    fontSize: "13px",
+                    color: "#333",
+                  }}>
                     {value}
                   </td>
                 );
@@ -312,21 +353,58 @@ function AmountSummary({
   const subtotal = products.reduce((sum, p) => sum + (p.totalPrice || 0), 0);
   const currency = doc?.currency || "CNY";
   const itemCount = products.length;
+  const totalStyle = style.totalBlockStyle || "minimal";
 
+  // Minimal: no border, just right-aligned text
+  // Table: small clean table
+  // Card: light border card
+  let containerStyle: React.CSSProperties = {};
+  if (totalStyle === "minimal") {
+    containerStyle = { minWidth: "220px" };
+  } else if (totalStyle === "table") {
+    containerStyle = { minWidth: "240px" };
+  } else if (totalStyle === "card") {
+    containerStyle = { minWidth: "240px", padding: "10px 14px", border: "1px solid #e5e7eb", borderRadius: "6px", backgroundColor: "#fdfdfd" };
+  }
+
+  if (totalStyle === "table") {
+    return (
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+        <table style={{ ...containerStyle, borderCollapse: "collapse", fontSize: "13px" }}>
+          <tbody>
+            <tr>
+              <td style={{ padding: "4px 16px 4px 0", color: "#666", textAlign: "right" }}>商品数量</td>
+              <td style={{ padding: "4px 0", fontWeight: "500", textAlign: "right", minWidth: "80px" }}>{itemCount}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: "4px 16px 4px 0", color: "#666", textAlign: "right" }}>小计</td>
+              <td style={{ padding: "4px 0", fontWeight: "500", textAlign: "right" }}>{currency} {subtotal.toFixed(2)}</td>
+            </tr>
+            <tr style={{ borderTop: `1px solid ${style.primaryColor}` }}>
+              <td style={{ padding: "6px 16px 6px 0", fontWeight: "bold", color: style.primaryColor, textAlign: "right" }}>总计</td>
+              <td style={{ padding: "6px 0", fontWeight: "bold", color: style.primaryColor, textAlign: "right", fontSize: "15px" }}>{currency} {subtotal.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Minimal or card
   return (
     <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
-      <div style={{ minWidth: "250px", padding: "12px", border: `2px solid ${style.primaryColor}`, borderRadius: "4px`" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-          <span style={{ fontSize: "13px", color: "#666" }}>商品数量:</span>
-          <span style={{ fontSize: "14px", fontWeight: "500" }}>{itemCount}</span>
+      <div style={containerStyle}>
+        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2px" }}>
+          <span style={{ fontSize: "12px", color: "#888" }}>商品数量</span>
+          <span style={{ fontSize: "13px", fontWeight: "500", color: "#555" }}>{itemCount}</span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-          <span style={{ fontSize: "13px", color: "#666" }}>小计:</span>
-          <span style={{ fontSize: "14px", fontWeight: "500" }}>{currency} {subtotal.toFixed(2)}</span>
+          <span style={{ fontSize: "12px", color: "#888" }}>小计</span>
+          <span style={{ fontSize: "13px", fontWeight: "500", color: "#555" }}>{currency} {subtotal.toFixed(2)}</span>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "8px", borderTop: `1px solid ${style.primaryColor}` }}>
-          <span style={{ fontSize: "15px", fontWeight: "bold", color: style.primaryColor }}>总计:</span>
-          <span style={{ fontSize: "16px", fontWeight: "bold", color: style.primaryColor }}>{currency} {subtotal.toFixed(2)}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", paddingTop: "6px", borderTop: `1px solid ${style.primaryColor}` }}>
+          <span style={{ fontSize: "14px", fontWeight: "bold", color: style.primaryColor }}>总计</span>
+          <span style={{ fontSize: "15px", fontWeight: "bold", color: style.primaryColor }}>{currency} {subtotal.toFixed(2)}</span>
         </div>
       </div>
     </div>
@@ -487,11 +565,11 @@ function SignatureArea({
   }
 
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", marginTop: "32px", paddingTop: "16px", borderTop: `1px solid ${style.primaryColor}` }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "40px", paddingTop: "16px", borderTop: `1px solid #d1d5db` }}>
       {showSignature && (
         <div style={{ minWidth: "200px" }}>
-          <div style={{ height: "60px", borderBottom: "1px solid #999", marginBottom: "4px" }} />
-          <div style={{ fontSize: "12px", color: "#999" }}>签字人</div>
+          <div style={{ height: "50px" }} />
+          <div style={{ borderTop: "1px solid #555", paddingTop: "4px", fontSize: "12px", color: "#666" }}>授权签字</div>
         </div>
       )}
       {stampElement}
@@ -522,6 +600,12 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
     const products = data.products || [];
     const doc = data.document;
 
+    const paperConfig = getPaperSizeConfig(style.paperSize || "A4");
+    const aspectRatio = paperConfig.aspectRatio;
+    // Calculate preview dimensions based on paper size (scale down for screen)
+    const previewWidth = 800; // px
+    const previewHeight = previewWidth / aspectRatio;
+
     return (
       <div
         ref={ref}
@@ -533,10 +617,12 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
           color: "#333",
           backgroundColor: "#fff",
           padding: style.pageMargin || "32px",
-          maxWidth: "800px",
+          width: `${previewWidth}px`,
+          height: `${previewHeight}px`,
           margin: "0 auto",
-          minHeight: "400px",
           borderRadius: style.borderRadius || "8px",
+          aspectRatio: `${paperConfig.width} / ${paperConfig.height}`,
+          overflow: "hidden",
         }}
       >
         {/* Logo */}
@@ -555,8 +641,8 @@ export const SafeTemplateRenderer = forwardRef<HTMLDivElement, SafeTemplateRende
             color: style.primaryColor,
             marginBottom: "20px",
             paddingBottom: "8px",
-            borderBottom: `2px solid ${style.primaryColor}`,
-          }}>
+            borderBottom: `1px solid ${style.primaryColor}`,
+          }} data-testid="template-preview-title">
             {config.name}
           </h1>
         )}

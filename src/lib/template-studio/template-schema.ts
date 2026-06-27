@@ -75,6 +75,18 @@ export interface TemplateStyleConfig {
   sealCenterText?: string;
   /** Seal color (default: #dc2626) */
   sealColor?: string;
+  /** Company info block visual style */
+  companyBlockStyle?: "none" | "subtle" | "card" | "bordered";
+  /** Total/amount summary block visual style */
+  totalBlockStyle?: "minimal" | "table" | "card";
+  /** Product table visual style */
+  tableStyle?: "clean" | "bordered" | "striped";
+  /** Show dashed guide outlines in editor mode only (hidden in print/PNG) */
+  guideOutline?: boolean;
+  /** Style preset name */
+  stylePreset?: string;
+  /** Paper size: A4, 10x10 (label), 10x15 (label) */
+  paperSize?: "A4" | "10x10" | "10x15";
 }
 
 // ============================================================
@@ -286,6 +298,7 @@ export function getCompanyDisplayNameEn(company: CompanyProfile): string | undef
 export interface ProductItem {
   id?: string;
   name: string;
+  sku?: string;
   nameEn?: string;
   hsCode?: string;
   unit?: string;
@@ -332,6 +345,7 @@ export function defaultColumns(): TemplateColumnConfig[] {
   return [
     { key: "seq", label: "#", visible: true, width: "40px" },
     { key: "name", label: "商品名称", visible: true, width: "200px" },
+    { key: "sku", label: "SKU", visible: false, width: "100px" },
     { key: "nameEn", label: "英文名称", visible: false, width: "150px" },
     { key: "hsCode", label: "HS编码", visible: true, width: "100px" },
     { key: "quantity", label: "数量", visible: true, width: "80px" },
@@ -360,7 +374,142 @@ export function defaultStyle(): TemplateStyleConfig {
     tableHeaderColor: "#ffffff",
     borderRadius: "8px",
     cellPadding: "8px",
+    companyBlockStyle: "subtle",
+    totalBlockStyle: "minimal",
+    tableStyle: "clean",
+    guideOutline: true,
+    stylePreset: "classic-blue",
+    paperSize: "A4",
   };
+}
+
+// ============================================================
+// Paper Sizes
+// ============================================================
+
+export interface PaperSizeConfig {
+  name: string;
+  label: string;
+  width: number; // mm
+  height: number; // mm
+  aspectRatio: number; // width / height
+}
+
+export const PAPER_SIZES: PaperSizeConfig[] = [
+  { name: "A4", label: "A4 (210×297mm)", width: 210, height: 297, aspectRatio: 210 / 297 },
+  { name: "10x10", label: "10×10cm 标签", width: 100, height: 100, aspectRatio: 1 },
+  { name: "10x15", label: "10×15cm 标签", width: 100, height: 150, aspectRatio: 100 / 150 },
+];
+
+export function getPaperSizeConfig(name: string): PaperSizeConfig {
+  return PAPER_SIZES.find(p => p.name === name) || PAPER_SIZES[0];
+}
+
+// ============================================================
+// Style Presets
+// ============================================================
+
+export interface StylePreset {
+  name: string;
+  label: string;
+  style: Partial<TemplateStyleConfig>;
+}
+
+export const STYLE_PRESETS: StylePreset[] = [
+  {
+    name: "classic-blue",
+    label: "经典蓝 (Classic Blue)",
+    style: {
+      primaryColor: "#1a56db",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontSize: "14px",
+      titleFontSize: "22px",
+      pageMargin: "32px",
+      tableHeaderBg: "#1a56db",
+      tableHeaderColor: "#ffffff",
+      borderRadius: "6px",
+      cellPadding: "8px",
+      companyBlockStyle: "subtle",
+      totalBlockStyle: "minimal",
+      tableStyle: "clean",
+    },
+  },
+  {
+    name: "minimal-black",
+    label: "极简黑 (Minimal Black)",
+    style: {
+      primaryColor: "#1f2937",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontSize: "13px",
+      titleFontSize: "20px",
+      pageMargin: "40px",
+      tableHeaderBg: "#1f2937",
+      tableHeaderColor: "#ffffff",
+      borderRadius: "2px",
+      cellPadding: "6px",
+      companyBlockStyle: "none",
+      totalBlockStyle: "minimal",
+      tableStyle: "clean",
+    },
+  },
+  {
+    name: "logistics-orange",
+    label: "物流橙 (Logistics Orange)",
+    style: {
+      primaryColor: "#ea580c",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontSize: "14px",
+      titleFontSize: "22px",
+      pageMargin: "32px",
+      tableHeaderBg: "#ea580c",
+      tableHeaderColor: "#ffffff",
+      borderRadius: "6px",
+      cellPadding: "8px",
+      companyBlockStyle: "subtle",
+      totalBlockStyle: "table",
+      tableStyle: "bordered",
+    },
+  },
+  {
+    name: "finance-green",
+    label: "财务绿 (Finance Green)",
+    style: {
+      primaryColor: "#059669",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      fontSize: "14px",
+      titleFontSize: "22px",
+      pageMargin: "32px",
+      tableHeaderBg: "#059669",
+      tableHeaderColor: "#ffffff",
+      borderRadius: "6px",
+      cellPadding: "8px",
+      companyBlockStyle: "subtle",
+      totalBlockStyle: "table",
+      tableStyle: "striped",
+    },
+  },
+  {
+    name: "premium-gray",
+    label: "高级灰 (Premium Gray)",
+    style: {
+      primaryColor: "#475569",
+      fontFamily: "Georgia, 'Times New Roman', serif",
+      fontSize: "14px",
+      titleFontSize: "22px",
+      pageMargin: "36px",
+      tableHeaderBg: "#475569",
+      tableHeaderColor: "#ffffff",
+      borderRadius: "4px",
+      cellPadding: "8px",
+      companyBlockStyle: "card",
+      totalBlockStyle: "card",
+      tableStyle: "bordered",
+    },
+  },
+];
+
+export function getPresetByName(name: string): StylePreset | undefined {
+  return STYLE_PRESETS.find(p => p.name === name);
 }
 
 /** Default layout */

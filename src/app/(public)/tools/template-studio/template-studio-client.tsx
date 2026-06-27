@@ -11,12 +11,14 @@ import {
   type CompanyProfile,
   type ProductItem,
   type DocumentData,
+  defaultStyle,
   defaultFields,
   defaultColumns,
-  defaultStyle,
+  defaultContentBlocks,
   defaultLayout,
   defaultBindings,
-  defaultContentBlocks,
+  STYLE_PRESETS,
+  PAPER_SIZES,
   isValidHexColor,
   isValidFontSize,
 } from "@/lib/template-studio/template-schema";
@@ -33,7 +35,8 @@ interface CompanyApiResponse {
 
 interface ProductApiResponse {
   success: boolean;
-  data: ProductItem[];
+  products?: ProductItem[];
+  data?: ProductItem[];
 }
 
 interface TemplateListResponse {
@@ -50,24 +53,35 @@ interface AuthCheckResponse {
 // Print CSS — only print the template canvas
 // ============================================================
 
-const PRINT_CSS = `
+function getPrintCSS(paperSize: string = "A4"): string {
+  const paperConfig = PAPER_SIZES.find(p => p.name === paperSize) || PAPER_SIZES[0];
+  return `
 @media print {
+  @page {
+    size: ${paperConfig.width}mm ${paperConfig.height}mm;
+    margin: 0;
+  }
   body * { visibility: hidden !important; }
   .template-print-area, .template-print-area * { visibility: visible !important; }
   .template-print-area {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
-    width: 100% !important;
-    max-width: none !important;
+    width: ${paperConfig.width}mm !important;
+    height: ${paperConfig.height}mm !important;
     margin: 0 !important;
-    padding: 32px !important;
+    padding: 10mm !important;
     border-radius: 0 !important;
   }
   /* Hide stamp placeholders in print — only generated stamps should appear */
   .stamp-placeholder { display: none !important; }
+  /* Hide editor guide outlines in print — only show in edit mode */
+  .guide-outline { display: none !important; border: none !important; }
 }
 `;
+}
+
+const PRINT_CSS = getPrintCSS("A4");
 
 // ============================================================
 // Main Component
@@ -172,9 +186,27 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
         const res = await fetch("/api/workspace/products");
         if (res.ok) {
           const data: ProductApiResponse = await res.json();
-          if (data.success && data.data && data.data.length > 0) {
-            setProducts(data.data);
-            setSelectedProducts(data.data.slice(0, 2));
+          // API returns { success, products } — handle both formats
+          const rawItems = data.products || data.data || [];
+          // Map Prisma fields to ProductItem interface
+          const items: ProductItem[] = rawItems.map((p: Record<string, unknown>) => ({
+            id: p.id as string,
+            name: (p.name as string) || "",
+            sku: p.sku as string | undefined,
+            nameEn: p.nameEn as string | undefined,
+            hsCode: p.hsCode as string | undefined,
+            unit: p.unit as string | undefined,
+            quantity: p.quantity as number | undefined,
+            unitPrice: p.unitPrice as number | undefined,
+            totalPrice: p.totalPrice as number | undefined,
+            weight: (p.weight as number) || (p.netWeight as number) || undefined,
+            volume: (p.volume as number) || undefined,
+            currency: p.currency as string | undefined,
+            origin: (p.origin as string) || (p.originCountry as string) || undefined,
+          }));
+          if (data.success && items.length > 0) {
+            setProducts(items);
+            setSelectedProducts(items.slice(0, 2));
             return;
           }
         }
@@ -625,9 +657,9 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
       // Dynamically import html2canvas
       const html2canvas = (await import("html2canvas")).default;
 
-      // Hide stamp placeholders before capture — only generated stamps should appear
-      const placeholders = previewRef.current.querySelectorAll(".stamp-placeholder");
-      placeholders.forEach(el => { (el as HTMLElement).style.display = "none"; });
+      // Hide stamp placeholders and guide outlines before capture
+      const hiddenEls = previewRef.current.querySelectorAll(".stamp-placeholder, .guide-outline");
+      hiddenEls.forEach(el => { (el as HTMLElement).style.display = "none"; });
 
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: "#ffffff",
@@ -636,8 +668,8 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
         logging: false,
       });
 
-      // Restore placeholder visibility
-      placeholders.forEach(el => { (el as HTMLElement).style.display = ""; });
+      // Restore visibility
+      hiddenEls.forEach(el => { (el as HTMLElement).style.display = ""; });
 
       const link = document.createElement("a");
       link.download = `${config?.name || "template"}-${Date.now()}.png`;
@@ -801,8 +833,8 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
 
   return (
     <div className="max-w-7xl mx-auto p-4 overflow-x-hidden" data-testid="template-studio-editor">
-      {/* Print CSS */}
-      <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
+      {/* Print CSS — dynamic based on paper size */}
+      <style dangerouslySetInnerHTML={{ __html: getPrintCSS(config.style.paperSize || "A4") }} />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
@@ -859,6 +891,52 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
               className="w-full px-3 py-2 border rounded text-sm"
               data-testid="template-name-input"
             />
+          </div>
+
+          {/* Style Preset */}
+          <div className="border rounded-lg p-4">
+            <label className="block text-sm font-medium mb-2">视觉预设</label>
+            <select
+              value={config.style.stylePreset || "classic-blue"}
+              onChange={e => {
+                const presetName = e.target.value;
+                const preset = STYLE_PRESETS.find(p => p.name === presetName);
+                if (preset) {
+                  updateConfig(prev => ({
+                    ...prev,
+                    style: { ...prev.style, ...preset.style, stylePreset: presetName },
+                    updatedAt: new Date().toISOString(),
+                  }));
+                }
+              }}
+              className="w-full px-3 py-2 border rounded text-sm"
+              data-testid="style-preset-select"
+            >
+              {STYLE_PRESETS.map(p => (
+                <option key={p.name} value={p.name}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Paper Size */}
+          <div className="border rounded-lg p-4">
+            <label className="block text-sm font-medium mb-2">纸张尺寸</label>
+            <select
+              value={config.style.paperSize || "A4"}
+              onChange={e => {
+                updateConfig(prev => ({
+                  ...prev,
+                  style: { ...prev.style, paperSize: e.target.value as "A4" | "10x10" | "10x15" },
+                  updatedAt: new Date().toISOString(),
+                }));
+              }}
+              className="w-full px-3 py-2 border rounded text-sm"
+              data-testid="paper-size-select"
+            >
+              {PAPER_SIZES.map(p => (
+                <option key={p.name} value={p.name}>{p.label}</option>
+              ))}
+            </select>
           </div>
 
           {/* Style: Primary Color */}
@@ -1273,23 +1351,29 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
           </div>
 
           {/* Product Selector */}
-          <div className="border rounded-lg p-4">
+          <div className="border rounded-lg p-4" data-testid="template-product-selector">
             <h3 className="text-sm font-medium mb-2">商品明细（数据绑定）</h3>
             {products.length === 0 ? (
-              <div className="text-xs text-gray-400 py-2" data-testid="no-products">
-                暂无商品，请先在"商品管理"中添加
+              <div className="text-xs text-gray-400 py-2" data-testid="template-product-empty-state">
+                暂无商品资料，请先
+                <a href="/workspace/products" className="text-blue-500 underline ml-1">添加商品</a>
               </div>
             ) : (
               <div className="space-y-1 max-h-40 overflow-y-auto">
                 {products.map(p => (
-                  <label key={p.id} className="flex items-center gap-2 text-sm">
+                  <label key={p.id} className="flex items-center gap-2 text-sm" data-testid="template-product-option">
                     <input
                       type="checkbox"
                       checked={!!selectedProducts.find(sp => sp.id === p.id)}
                       onChange={() => handleProductToggle(p)}
                       data-testid={`product-toggle-${p.id}`}
                     />
-                    {p.name} — {p.unitPrice} × {p.quantity}
+                    <span data-testid="template-product-option-name">{p.name}</span>
+                    <span className="text-gray-400 text-xs" data-testid="template-product-option-meta">
+                      {p.sku && `SKU: ${p.sku} · `}
+                      {p.unitPrice !== undefined && `${p.unitPrice} · `}
+                      {p.unit || "PCS"}
+                    </span>
                   </label>
                 ))}
               </div>
