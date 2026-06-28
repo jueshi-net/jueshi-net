@@ -753,12 +753,148 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.name, pngStatus]);
 
   // ============================================================
-  // Print
+  // Print — iframe-based print-only (v18.6.16.6.23)
+  // Isolates canvas labels from site layout (header/footer/nav)
   // ============================================================
 
   const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
+    const printRoot = printRootRef.current;
+    if (!printRoot) {
+      console.error("Print root not found");
+      return;
+    }
+
+    // Create hidden iframe for isolated printing
+    const iframe = document.createElement("iframe");
+    iframe.id = "canvas-print-iframe";
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    iframe.style.visibility = "hidden";
+    document.body.appendChild(iframe);
+
+    const iframeDoc = iframe.contentWindow!.document;
+    iframeDoc.open();
+
+    // Collect all stylesheets from parent document
+    const styleElements = Array.from(
+      document.head.querySelectorAll("style, link[rel='stylesheet']")
+    )
+      .map((el) => el.outerHTML)
+      .join("\n");
+
+    const paperWidthMm = canvas.paper.widthMm;
+    const paperHeightMm = canvas.paper.heightMm;
+
+    // Build iframe HTML with only the canvas content
+    const iframeHTML = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Canvas Print</title>
+${styleElements}
+<style>
+  @page {
+    size: ${paperWidthMm}mm ${paperHeightMm}mm;
+    margin: 0;
+  }
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Canvas pages: page break after each */
+  [data-testid="canvas-print-page"] {
+    box-shadow: none !important;
+    margin: 0 !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  [data-testid="canvas-print-page"]:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  [data-testid="canvas-paper"] {
+    box-shadow: none !important;
+  }
+  /* Hide ALL UI elements — only label content should print */
+  [data-testid="canvas-print-page-count"],
+  [data-testid="canvas-print-page-sequence"],
+  [data-testid="canvas-grid-overlay"],
+  [data-testid="canvas-resize-handle"],
+  [data-testid="canvas-sequence-resize-handle"],
+  [data-testid="canvas-edit-text-button"],
+  [data-testid="canvas-text-editor"],
+  [data-testid="canvas-draft-restore-banner"],
+  .print\\:hidden {
+    display: none !important;
+  }
+  /* Remove selection ring */
+  .ring-2 {
+    box-shadow: none !important;
+  }
+  /* Ensure colors print correctly */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+</style>
+</head>
+<body>
+${printRoot.innerHTML}
+</body>
+</html>`;
+
+    iframeDoc.write(iframeHTML);
+    iframeDoc.close();
+
+    // Wait for stylesheets to load, then trigger print
+    const triggerPrint = () => {
+      setTimeout(() => {
+        try {
+          iframe.contentWindow!.focus();
+          iframe.contentWindow!.print();
+        } catch (err) {
+          console.error("Print failed:", err);
+        }
+        // Clean up iframe after print dialog
+        setTimeout(() => {
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+      }, 750);
+    };
+
+    // Wait for external stylesheets to load
+    const links = iframeDoc.querySelectorAll("link[rel='stylesheet']");
+    if (links.length > 0) {
+      let loaded = 0;
+      const total = links.length;
+      const onLoad = () => {
+        loaded++;
+        if (loaded >= total) triggerPrint();
+      };
+      links.forEach((link) => {
+        if ((link as HTMLLinkElement).sheet) {
+          onLoad();
+        } else {
+          link.addEventListener("load", onLoad);
+          link.addEventListener("error", onLoad);
+        }
+      });
+      // Safety timeout — trigger print even if styles haven't loaded
+      setTimeout(triggerPrint, 3000);
+    } else {
+      triggerPrint();
+    }
+  }, [canvas.paper.widthMm, canvas.paper.heightMm]);
 
   // ============================================================
   // Render
