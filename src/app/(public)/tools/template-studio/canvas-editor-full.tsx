@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import html2canvas from "html2canvas";
 import {
   type CanvasTemplate,
@@ -81,14 +81,22 @@ interface ProductList {
   sku?: string;
 }
 
+const DRAFT_KEY = "canvas-editor-draft";
+const FONT_FAMILIES = [
+  { label: "系统默认", value: "system-ui, -apple-system, sans-serif" },
+  { label: "衬线体 (宋体)", value: "'Noto Serif SC', 'SimSun', serif" },
+  { label: "无衬线 (黑体)", value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
+  { label: "等宽字体", value: "'Courier New', monospace" },
+];
+
 // ============================================================
 // Canvas Editor Full Component
 // ============================================================
 
 export default function CanvasEditorFull({ template, templateId, companyId }: CanvasEditorFullProps) {
-  const [canvas, setCanvas] = useState<CanvasTemplate>(
-    template || defaultCanvasTemplate()
-  );
+  // Initialize canvas and history with the same initial state
+  const initialCanvas = useMemo(() => template || defaultCanvasTemplate(), [template]);
+  const [canvas, setCanvas] = useState<CanvasTemplate>(initialCanvas);
   const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [resizeState, setResizeState] = useState<ResizeState | null>(null);
@@ -100,21 +108,113 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | undefined>(companyId);
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>();
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveMessage, setSaveMessage] = useState<string>("");
+  const [pngStatus, setPngStatus] = useState<"idle" | "exporting" | "done" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [editingElementId, setEditingElementId] = useState<string | null>(null);
+  const [hasDraft, setHasDraft] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   
-  // History for undo/redo
-  const [history, setHistory] = useState<CanvasTemplate[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  // History for undo/redo — stores snapshots at meaningful boundaries
+  // Initialize with the initial canvas state so undo can go back to it
+  const [history, setHistory] = useState<CanvasTemplate[]>([initialCanvas]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  // Track whether we're mid-action (drag/resize) to avoid pushing every frame
+  const isMidAction = useRef(false);
   
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const printRootRef = useRef<HTMLDivElement>(null);
   const textEditorRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-hide side panels on small screens
+  // ============================================================
+  // Draft auto-save / restore (localStorage)
+  // ============================================================
+
+  // Check for draft on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        setHasDraft(true);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Debounced draft save
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          canvas,
+          selectedCompanyId,
+          selectedProductId,
+          savedAt: new Date().toISOString(),
+        }));
+      } catch { /* ignore */ }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [canvas, selectedCompanyId, selectedProductId]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (saveStatus !== "saved") {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [saveStatus]);
+
+  const restoreDraft = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (draft.canvas) setCanvas(draft.canvas);
+        if (draft.selectedCompanyId) setSelectedCompanyId(draft.selectedCompanyId);
+        if (draft.selectedProductId) setSelectedProductId(draft.selectedProductId);
+        setHasDraft(false);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const discardDraft = useCallback(() => {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+      setHasDraft(false);
+    } catch { /* ignore */ }
+  }, []);
+
+  // ============================================================
+  // Prevent iPad page scroll during drag/resize
+  // ============================================================
+
+  useEffect(() => {
+    if (!dragState && !resizeState) return;
+    
+    const preventScroll = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+    
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    document.addEventListener("touchmove", preventScroll, { passive: false });
+    
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+      document.removeEventListener("touchmove", preventScroll);
+    };
+  }, [dragState, resizeState]);
+
+  // ============================================================
+  // Side panel auto-hide on small screens
+  // ============================================================
+
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -135,7 +235,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch company list
+  // ============================================================
+  // Data fetching
+  // ============================================================
+
   useEffect(() => {
     fetch("/api/me/company-profiles")
       .then(res => res.json())
@@ -147,7 +250,6 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .catch(err => console.error("Failed to fetch company list:", err));
   }, []);
 
-  // Fetch product list
   useEffect(() => {
     fetch("/api/workspace/products")
       .then(res => res.json())
@@ -159,7 +261,6 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .catch(err => console.error("Failed to fetch product list:", err));
   }, []);
 
-  // Fetch company data
   useEffect(() => {
     if (selectedCompanyId) {
       fetch(`/api/me/company-profiles/${selectedCompanyId}`)
@@ -170,24 +271,35 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           }
         })
         .catch(err => console.error("Failed to fetch company:", err));
+    } else {
+      setCompanyData(null);
     }
   }, [selectedCompanyId]);
 
-  // Fetch product data
   useEffect(() => {
     if (selectedProductId) {
       fetch(`/api/workspace/products/${selectedProductId}`)
         .then(res => res.json())
         .then(data => {
-          if (data.success) {
+          if (data.success && data.product) {
             setProductData(data.product);
+          } else {
+            setProductData(null);
           }
         })
-        .catch(err => console.error("Failed to fetch product:", err));
+        .catch(err => {
+          console.error("Failed to fetch product:", err);
+          setProductData(null);
+        });
+    } else {
+      setProductData(null);
     }
   }, [selectedProductId]);
 
-  // Calculate scale on mount and resize
+  // ============================================================
+  // Scale
+  // ============================================================
+
   useEffect(() => {
     const updateScale = () => {
       if (canvasRef.current) {
@@ -203,22 +315,18 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.paper]);
 
   // ============================================================
-  // Element Operations
+  // History (undo/redo) — push only at action boundaries
   // ============================================================
 
-  // Push current state to history
   const pushHistory = useCallback((newCanvas: CanvasTemplate) => {
     setHistory(prev => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      newHistory.push(newCanvas);
-      // Keep only last 50 states
-      if (newHistory.length > 50) {
-        newHistory.shift();
-      }
+      const idx = prev.length; // always append at end
+      const newHistory = [...prev.slice(0, idx), newCanvas];
+      if (newHistory.length > 50) newHistory.shift();
       return newHistory;
     });
-    setHistoryIndex(prev => Math.min(prev + 1, 49));
-  }, [historyIndex]);
+    setHistoryIndex(prev => prev + 1);
+  }, []);
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
@@ -236,6 +344,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     }
   }, [history, historyIndex]);
 
+  // ============================================================
+  // Element Operations
+  // ============================================================
+
   const addElement = useCallback((type: CanvasElementType) => {
     const newElement = defaultCanvasElement(type);
     newElement.zIndex = getNextZIndex(canvas.elements);
@@ -244,9 +356,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       elements: [...canvas.elements, newElement],
       updatedAt: new Date().toISOString(),
     };
-    pushHistory(newCanvas);
     setCanvas(newCanvas);
+    pushHistory(newCanvas);
     setSelectedElementId(newElement.id);
+    setSaveStatus("idle");
   }, [canvas, pushHistory]);
 
   const updateElement = useCallback((id: string, updates: Partial<CanvasElement>) => {
@@ -260,15 +373,18 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, []);
 
   const deleteElement = useCallback((id: string) => {
-    setCanvas(prev => ({
-      ...prev,
-      elements: prev.elements.filter(el => el.id !== id),
+    const newCanvas = {
+      ...canvas,
+      elements: canvas.elements.filter(el => el.id !== id),
       updatedAt: new Date().toISOString(),
-    }));
+    };
+    setCanvas(newCanvas);
+    pushHistory(newCanvas);
     if (selectedElementId === id) {
       setSelectedElementId(null);
     }
-  }, [selectedElementId]);
+    setSaveStatus("idle");
+  }, [canvas, selectedElementId, pushHistory]);
 
   const duplicateElement = useCallback((id: string) => {
     const element = canvas.elements.find(el => el.id === id);
@@ -282,13 +398,16 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       zIndex: getNextZIndex(canvas.elements),
     };
     
-    setCanvas(prev => ({
-      ...prev,
-      elements: [...prev.elements, newElement],
+    const newCanvas = {
+      ...canvas,
+      elements: [...canvas.elements, newElement],
       updatedAt: new Date().toISOString(),
-    }));
+    };
+    setCanvas(newCanvas);
+    pushHistory(newCanvas);
     setSelectedElementId(newElement.id);
-  }, [canvas.elements]);
+    setSaveStatus("idle");
+  }, [canvas, pushHistory]);
 
   // ============================================================
   // Text Editing Handlers
@@ -304,7 +423,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
 
   const stopEditing = useCallback(() => {
     setEditingElementId(null);
-  }, []);
+    // Push history when text editing is confirmed
+    setCanvas(current => {
+      pushHistory(current);
+      return current;
+    });
+    setSaveStatus("idle");
+  }, [pushHistory]);
 
   const handleTextDoubleClick = useCallback((e: React.MouseEvent, elementId: string) => {
     e.stopPropagation();
@@ -320,10 +445,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [stopEditing]);
 
   const handleTextEditCancel = useCallback(() => {
-    stopEditing();
-  }, [stopEditing]);
+    setEditingElementId(null);
+    // Don't push history on cancel
+  }, []);
 
-  // Focus text editor when entering edit mode
   useEffect(() => {
     if (editingElementId && textEditorRef.current) {
       textEditorRef.current.focus();
@@ -332,22 +457,23 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [editingElementId]);
 
   // ============================================================
-  // Drag & Resize Handlers
+  // Drag & Resize Handlers — push history only on pointer UP
   // ============================================================
 
   const handlePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
     
-    // Don't start drag if in edit mode
     if (editingElementId === elementId) return;
     
-    // 支持鼠标左键和触控（pointerType === 'touch' 时 button 可能为 0 或 -1）
-    const isTouch = e.pointerType === 'touch';
+    const isTouch = e.pointerType === "touch";
     const isLeftClick = e.button === 0;
     if (!isTouch && !isLeftClick) return;
 
     const element = canvas.elements.find(el => el.id === elementId);
     if (!element || element.locked) return;
+    
+    // Capture pointer for reliable tracking
+    try { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); } catch { /* synthetic event */ }
     
     setSelectedElementId(elementId);
     setDragState({
@@ -357,17 +483,19 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       startElementX: element.x,
       startElementY: element.y,
     });
+    isMidAction.current = true;
   }, [canvas.elements, editingElementId]);
 
   const handleResizePointerDown = useCallback((e: React.PointerEvent, elementId: string) => {
     e.stopPropagation();
-    // 支持鼠标左键和触控
-    const isTouch = e.pointerType === 'touch';
+    const isTouch = e.pointerType === "touch";
     const isLeftClick = e.button === 0;
     if (!isTouch && !isLeftClick) return;
 
     const element = canvas.elements.find(el => el.id === elementId);
     if (!element || element.locked) return;
+    
+    try { (e.target as HTMLElement).setPointerCapture?.(e.pointerId); } catch { /* synthetic event */ }
     
     setResizeState({
       elementId,
@@ -376,6 +504,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       startWidth: element.width,
       startHeight: element.height,
     });
+    isMidAction.current = true;
   }, [canvas.elements]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
@@ -411,9 +540,18 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [dragState, resizeState, scale, canvas.grid, updateElement]);
 
   const handlePointerUp = useCallback(() => {
+    if (isMidAction.current) {
+      // Push history ONCE at end of drag/resize
+      setCanvas(current => {
+        pushHistory(current);
+        return current;
+      });
+      isMidAction.current = false;
+      setSaveStatus("idle");
+    }
     setDragState(null);
     setResizeState(null);
-  }, []);
+  }, [pushHistory]);
 
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
     if (e.target === canvasRef.current || e.target === paperRef.current) {
@@ -437,7 +575,6 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return (companyData as any)[field] || "";
     }
     if (category === "product" && productData) {
-      // Map product.price to productData.unitPrice
       if (field === "price") return String(productData.unitPrice || "");
       return (productData as any)[field] || "";
     }
@@ -457,11 +594,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [companyData, productData, canvas.batch]);
 
   // ============================================================
-  // Save & Load
+  // Save — with real feedback
   // ============================================================
 
   const handleSave = useCallback(async () => {
     setSaveStatus("saving");
+    setSaveMessage("保存中...");
     try {
       const response = await fetch("/api/template-studio/templates", {
         method: "POST",
@@ -471,30 +609,49 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           name: canvas.name,
           type: "canvas",
           config: canvas,
+          companyId: selectedCompanyId,
+          productId: selectedProductId,
         }),
       });
+      
+      if (response.status === 401) {
+        setSaveStatus("error");
+        setSaveMessage("请先登录后再保存");
+        return;
+      }
       
       const data = await response.json();
       if (data.success) {
         setCurrentTemplateId(data.data.id);
         setSaveStatus("saved");
-        setTimeout(() => setSaveStatus("idle"), 2000);
+        const now = new Date().toLocaleTimeString();
+        setSaveMessage(`✓ 已保存 ${now}`);
+        setLastSavedAt(now);
+        // Clear draft after successful save
+        try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
+        setTimeout(() => {
+          setSaveStatus("idle");
+          setSaveMessage("");
+        }, 3000);
       } else {
         setSaveStatus("error");
+        setSaveMessage(`保存失败: ${data.error || "未知错误"}`);
       }
     } catch (err) {
       console.error("Save failed:", err);
       setSaveStatus("error");
+      setSaveMessage("保存失败: 网络错误");
     }
-  }, [canvas, currentTemplateId]);
+  }, [canvas, currentTemplateId, selectedCompanyId, selectedProductId]);
 
   // ============================================================
-  // PNG Export
+  // PNG Export — with loading feedback
   // ============================================================
 
   const handleExportPng = useCallback(async () => {
-    if (!paperRef.current) return;
+    if (!paperRef.current || pngStatus === "exporting") return;
     
+    setPngStatus("exporting");
     try {
       const canvasElement = await html2canvas(paperRef.current, {
         backgroundColor: "#ffffff",
@@ -507,10 +664,14 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       link.download = `${canvas.name || "template"}.png`;
       link.href = canvasElement.toDataURL("image/png");
       link.click();
+      setPngStatus("done");
+      setTimeout(() => setPngStatus("idle"), 2000);
     } catch (err) {
       console.error("PNG export failed:", err);
+      setPngStatus("error");
+      setTimeout(() => setPngStatus("idle"), 3000);
     }
-  }, [canvas.name]);
+  }, [canvas.name, pngStatus]);
 
   // ============================================================
   // Print
@@ -527,14 +688,103 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const selectedElement = canvas.elements.find(el => el.id === selectedElementId);
   const paperDimensions = getScaledPaperDimensions(canvas.paper, scale);
 
-  // Generate dynamic print styles based on paper size
+  // Comprehensive print styles — hide ALL UI, show only canvas
   const printStyle = `
     @media print {
       @page {
         size: ${canvas.paper.widthMm}mm ${canvas.paper.heightMm}mm;
+        margin: 0;
+      }
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      /* Hide ALL non-print UI */
+      .print\\:hidden,
+      [data-testid="canvas-toggle-left-panel"],
+      [data-testid="canvas-toggle-right-panel"],
+      [data-testid="canvas-undo-button"],
+      [data-testid="canvas-redo-button"],
+      [data-testid="canvas-history-state"],
+      [data-testid="canvas-draft-restore-banner"],
+      [data-testid="canvas-resize-handle"],
+      [data-testid="canvas-edit-text-button"],
+      [data-testid="canvas-text-editor"],
+      [data-testid="canvas-grid-overlay"] {
+        display: none !important;
+      }
+      /* Hide side panels */
+      .w-64.print\\:hidden,
+      .w-80.print\\:hidden {
+        display: none !important;
+      }
+      /* Make canvas area fill page */
+      [data-testid="canvas-editor-root"] {
+        overflow: visible !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      /* Remove shadows and margins from pages */
+      [data-testid="canvas-print-page"] {
+        box-shadow: none !important;
+        margin: 0 !important;
+        page-break-after: always;
+        break-after: page;
+      }
+      [data-testid="canvas-paper"] {
+        box-shadow: none !important;
+      }
+      /* Hide page count indicators in print */
+      [data-testid="canvas-print-page-count"] {
+        display: none !important;
+      }
+      /* Hide ring selection indicator */
+      .ring-2 {
+        box-shadow: none !important;
       }
     }
   `;
+
+  // Grid overlay component — shared between single and repeat mode
+  const renderGridOverlay = () => {
+    if (!canvas.grid.show) return null;
+    const gridPx = mmToPx(canvas.grid.sizeMm) * scale;
+    const cols = Math.ceil(paperDimensions.width / gridPx);
+    const rows = Math.ceil(paperDimensions.height / gridPx);
+    
+    return (
+      <svg
+        className="absolute inset-0 pointer-events-none print:hidden"
+        width={paperDimensions.width}
+        height={paperDimensions.height}
+        data-testid="canvas-grid-overlay"
+      >
+        {Array.from({ length: cols + 1 }).map((_, i) => (
+          <line
+            key={`v-${i}`}
+            x1={i * gridPx}
+            y1={0}
+            x2={i * gridPx}
+            y2={paperDimensions.height}
+            stroke="#e5e7eb"
+            strokeWidth="0.5"
+          />
+        ))}
+        {Array.from({ length: rows + 1 }).map((_, i) => (
+          <line
+            key={`h-${i}`}
+            x1={0}
+            y1={i * gridPx}
+            x2={paperDimensions.width}
+            y2={i * gridPx}
+            stroke="#e5e7eb"
+            strokeWidth="0.5"
+          />
+        ))}
+      </svg>
+    );
+  };
 
   const renderElement = (element: CanvasElement, pageIndex?: number) => {
     if (!element.visible) return null;
@@ -548,7 +798,6 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     
     if (element.type === "text") {
       if (isEditing) {
-        // Edit mode: show textarea
         content = (
           <div className="w-full h-full relative" data-testid="canvas-text-editor">
             <textarea
@@ -592,12 +841,15 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           </div>
         );
       } else {
-        // Display mode: show text with placeholder
         const textContent = element.text || "";
         content = (
           <div 
             className="w-full h-full overflow-hidden"
-            style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+            style={{ 
+              whiteSpace: "pre-wrap", 
+              wordWrap: "break-word",
+              fontFamily: element.style.fontFamily || undefined,
+            }}
             data-testid="canvas-text-element"
           >
             {textContent || <span className="text-gray-400" data-testid="canvas-text-placeholder">双击编辑文本</span>}
@@ -606,10 +858,18 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       }
     } else if (element.type === "field") {
       const resolved = resolveBinding(element.binding);
-      content = <div className="w-full h-full overflow-hidden">{resolved || `[${element.binding || "未绑定"}]`}</div>;
+      content = (
+        <div 
+          className="w-full h-full overflow-hidden"
+          style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+        >
+          {resolved || `[${element.binding || "未绑定"}]`}
+        </div>
+      );
     } else if (element.type === "table") {
-      // Real product table
-      const hasProduct = productData && selectedProductId;
+      // SAFE product table — handle null/undefined gracefully
+      const safeProduct = productData;
+      const hasProduct = safeProduct != null && selectedProductId;
       
       if (!hasProduct) {
         content = (
@@ -618,6 +878,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           </div>
         );
       } else {
+        const pName = safeProduct?.name ?? "—";
+        const pSku = safeProduct?.sku ?? "—";
+        const pPrice = typeof safeProduct?.unitPrice === "number" 
+          ? safeProduct.unitPrice.toFixed(2) 
+          : "0.00";
+        
         content = (
           <div className="w-full h-full overflow-auto" data-testid="canvas-product-table">
             <table className="w-full text-xs border-collapse">
@@ -631,10 +897,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
               </thead>
               <tbody>
                 <tr data-testid="canvas-product-table-row">
-                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-name">{productData.name}</td>
-                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-sku">{productData.sku || "-"}</td>
+                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-name">{pName}</td>
+                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-sku">{pSku}</td>
                   <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-qty">1</td>
-                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-price">{productData.unitPrice?.toFixed(2) || "0.00"}</td>
+                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-price">{pPrice}</td>
                 </tr>
               </tbody>
             </table>
@@ -642,7 +908,14 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         );
       }
     } else if (element.type === "seal") {
-      content = <span className="text-xs">印章</span>;
+      // Seal is hidden from toolbar (option B), but if it exists in old data, show a visual indicator
+      content = (
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full border-2 border-red-500 flex items-center justify-center text-red-500 text-xs font-bold">
+            印章
+          </div>
+        </div>
+      );
     } else if (element.type === "sequence") {
       if (canvas.batch && canvas.batch.showSequence && pageIndex !== undefined) {
         const idx = pageIndex + 1;
@@ -683,7 +956,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
               e.stopPropagation();
               startEditing(element.id);
             }}
-            className="absolute top-0 right-0 px-2 py-1 text-xs bg-blue-500 text-white rounded shadow-sm hover:bg-blue-600"
+            className="absolute top-0 right-0 px-2 py-1 text-xs bg-blue-500 text-white rounded shadow-sm hover:bg-blue-600 print:hidden"
             data-testid="canvas-edit-text-button"
           >
             编辑
@@ -693,10 +966,55 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         {/* Resize Handle */}
         {isSelected && !element.locked && pageIndex === undefined && !isEditing && (
           <div
-            className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize"
+            className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize print:hidden"
             onPointerDown={e => handleResizePointerDown(e, element.id)}
             data-testid="canvas-resize-handle"
           />
+        )}
+      </div>
+    );
+  };
+
+  // Page component — used for both single and repeat mode
+  const renderPage = (pageIndex?: number) => {
+    const isRepeat = canvas.batch?.outputMode === "repeat";
+    const showPageIndicator = isRepeat && canvas.batch?.showSequence;
+    
+    return (
+      <div
+        key={pageIndex ?? "single"}
+        ref={pageIndex === 0 || pageIndex === undefined ? paperRef : undefined}
+        className={`bg-white shadow-lg relative mx-auto ${isRepeat ? "mb-8" : ""} print:mb-0 print:shadow-none`}
+        style={{
+          width: `${paperDimensions.width}px`,
+          height: `${paperDimensions.height}px`,
+        }}
+        data-testid={isRepeat ? "canvas-print-page" : "canvas-paper"}
+      >
+        {/* Grid overlay — on every page */}
+        {renderGridOverlay()}
+
+        {/* Elements */}
+        {canvas.elements.map(element => renderElement(element, pageIndex))}
+
+        {/* Page count indicator — only when showSequence is ON */}
+        {showPageIndicator && (
+          <div
+            className="absolute bottom-2 right-2 text-xs text-gray-400 print:hidden"
+            data-testid="canvas-print-page-count"
+          >
+            {(pageIndex ?? 0) + 1}/{canvas.batch?.packageCount || 1}
+          </div>
+        )}
+
+        {/* Package count indicator (single mode) */}
+        {!isRepeat && canvas.batch && canvas.batch.packageCount > 1 && (
+          <div
+            className="absolute bottom-2 right-2 text-xs text-gray-400 print:hidden"
+            data-testid="canvas-print-page-sequence"
+          >
+            件数: {canvas.batch.packageCount}
+          </div>
         )}
       </div>
     );
@@ -707,8 +1025,31 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       {/* Dynamic print styles */}
       <style dangerouslySetInnerHTML={{ __html: printStyle }} />
       
+      {/* Draft restore banner */}
+      {hasDraft && (
+        <div className="fixed top-0 left-0 right-0 z-[100] bg-yellow-100 border-b border-yellow-300 px-4 py-2 flex items-center justify-between print:hidden" data-testid="canvas-draft-restore-banner">
+          <span className="text-sm text-yellow-800">检测到未保存的草稿，是否恢复？</span>
+          <div className="flex gap-2">
+            <button
+              onClick={restoreDraft}
+              className="px-3 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
+              data-testid="canvas-restore-draft-button"
+            >
+              恢复
+            </button>
+            <button
+              onClick={discardDraft}
+              className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"
+              data-testid="canvas-discard-draft-button"
+            >
+              丢弃
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Mobile/Tablet Toggle Buttons */}
-      <div className="fixed top-4 left-4 z-50 flex gap-2 lg:hidden">
+      <div className="fixed top-4 left-4 z-50 flex gap-2 lg:hidden print:hidden">
         <button
           onClick={() => setShowLeftPanel(!showLeftPanel)}
           className="px-3 py-2 bg-white border border-gray-300 rounded shadow-sm text-sm hover:bg-gray-50"
@@ -733,7 +1074,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         <h2 className="text-lg font-bold mb-4">工具</h2>
         
         {/* Undo/Redo Buttons */}
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-2">
           <button
             onClick={undo}
             disabled={historyIndex <= 0}
@@ -816,30 +1157,41 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           >
             + 表格
           </button>
-          <button
-            onClick={() => addElement("seal")}
-            className="w-full px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100 text-sm"
-            data-testid="canvas-add-seal"
-          >
-            + 印章
-          </button>
+          {/* Seal button hidden (option B) — real stamp generation is NEXT */}
         </div>
 
         <div className="mt-6 space-y-2">
           <button
             onClick={handleSave}
-            className="w-full px-3 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm"
+            className={`w-full px-3 py-2 rounded text-sm text-white ${
+              saveStatus === "saving" ? "bg-teal-400 cursor-wait" :
+              saveStatus === "saved" ? "bg-green-600" :
+              saveStatus === "error" ? "bg-red-600" :
+              "bg-teal-600 hover:bg-teal-700"
+            }`}
             data-testid="canvas-save-button"
             disabled={saveStatus === "saving"}
           >
-            {saveStatus === "saving" ? "保存中..." : saveStatus === "saved" ? "✓ 已保存" : "保存"}
+            {saveStatus === "saving" ? "保存中..." : saveStatus === "saved" ? saveMessage || "✓ 已保存" : saveStatus === "error" ? saveMessage || "保存失败" : "保存"}
           </button>
+          {saveStatus === "error" && saveMessage && (
+            <p className="text-xs text-red-600" data-testid="canvas-save-error">{saveMessage}</p>
+          )}
+          {lastSavedAt && (
+            <p className="text-xs text-gray-500" data-testid="canvas-last-saved-at">上次保存: {lastSavedAt}</p>
+          )}
           <button
             onClick={handleExportPng}
-            className="w-full px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
+            className={`w-full px-3 py-2 rounded text-sm text-white ${
+              pngStatus === "exporting" ? "bg-indigo-400 cursor-wait" :
+              pngStatus === "done" ? "bg-green-600" :
+              pngStatus === "error" ? "bg-red-600" :
+              "bg-indigo-600 hover:bg-indigo-700"
+            }`}
             data-testid="canvas-png-export-button"
+            disabled={pngStatus === "exporting"}
           >
-            导出 PNG
+            {pngStatus === "exporting" ? "正在生成..." : pngStatus === "done" ? "✓ 已导出" : pngStatus === "error" ? "导出失败" : "导出 PNG"}
           </button>
           <button
             onClick={handlePrint}
@@ -953,8 +1305,24 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
                 ...prev,
                 grid: { ...prev.grid, snap: e.target.checked },
               }))}
+              data-testid="canvas-snap-grid-toggle"
             />
             吸附网格
+          </label>
+          <label className="block text-sm mt-2">
+            <span className="text-gray-700">网格大小 (mm)</span>
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={canvas.grid.sizeMm}
+              onChange={e => setCanvas(prev => ({
+                ...prev,
+                grid: { ...prev.grid, sizeMm: parseInt(e.target.value) || 5 },
+              }))}
+              className="mt-1 w-full px-2 py-1 border rounded text-sm"
+              data-testid="canvas-grid-size-input"
+            />
           </label>
         </div>
       </div>
@@ -963,7 +1331,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       {/* Center - Canvas */}
       <div
         ref={canvasRef}
-        className="flex-1 overflow-auto p-10 pt-16 lg:pt-10 print:p-0"
+        className="flex-1 overflow-auto p-10 pt-16 lg:pt-10 print:p-0 print:overflow-visible"
+        style={{ touchAction: dragState || resizeState ? "none" : "auto" }}
         onClick={handleCanvasClick}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -974,116 +1343,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           {canvas.batch?.outputMode === "repeat" ? (
             // Repeat mode: render N pages
             Array.from({ length: canvas.batch.packageCount }).map((_, pageIndex) => (
-              <div
-                key={pageIndex}
-                ref={pageIndex === 0 ? paperRef : undefined}
-                className="bg-white shadow-lg relative mx-auto mb-8 print:mb-0 print:shadow-none"
-                style={{
-                  width: `${paperDimensions.width}px`,
-                  height: `${paperDimensions.height}px`,
-                }}
-                data-testid="canvas-print-page"
-              >
-                {/* Grid (only on first page in editor) */}
-                {canvas.grid.show && pageIndex === 0 && (
-                  <svg
-                    className="absolute inset-0 pointer-events-none"
-                    width={paperDimensions.width}
-                    height={paperDimensions.height}
-                  >
-                    {Array.from({ length: Math.ceil(canvas.paper.widthMm / canvas.grid.sizeMm) }).map((_, i) => (
-                      <line
-                        key={`v-${i}`}
-                        x1={mmToPx(i * canvas.grid.sizeMm) * scale}
-                        y1={0}
-                        x2={mmToPx(i * canvas.grid.sizeMm) * scale}
-                        y2={paperDimensions.height}
-                        stroke="#e5e7eb"
-                        strokeWidth="0.5"
-                      />
-                    ))}
-                    {Array.from({ length: Math.ceil(canvas.paper.heightMm / canvas.grid.sizeMm) }).map((_, i) => (
-                      <line
-                        key={`h-${i}`}
-                        x1={0}
-                        y1={mmToPx(i * canvas.grid.sizeMm) * scale}
-                        x2={paperDimensions.width}
-                        y2={mmToPx(i * canvas.grid.sizeMm) * scale}
-                        stroke="#e5e7eb"
-                        strokeWidth="0.5"
-                      />
-                    ))}
-                  </svg>
-                )}
-
-                {/* Elements */}
-                {canvas.elements.map(element => renderElement(element, pageIndex))}
-
-                {/* Page count indicator */}
-                <div
-                  className="absolute bottom-2 right-2 text-xs text-gray-400 print:text-black"
-                  data-testid="canvas-print-page-count"
-                >
-                  {pageIndex + 1}/{canvas.batch?.packageCount || 1}
-                </div>
-              </div>
+              <React.Fragment key={pageIndex}>
+                {renderPage(pageIndex)}
+              </React.Fragment>
             ))
           ) : (
             // Single mode: render one page
-            <div
-              ref={paperRef}
-              className="bg-white shadow-lg relative mx-auto"
-              style={{
-                width: `${paperDimensions.width}px`,
-                height: `${paperDimensions.height}px`,
-              }}
-              data-testid="canvas-paper"
-            >
-              {/* Grid */}
-              {canvas.grid.show && (
-                <svg
-                  className="absolute inset-0 pointer-events-none"
-                  width={paperDimensions.width}
-                  height={paperDimensions.height}
-                >
-                  {Array.from({ length: Math.ceil(canvas.paper.widthMm / canvas.grid.sizeMm) }).map((_, i) => (
-                    <line
-                      key={`v-${i}`}
-                      x1={mmToPx(i * canvas.grid.sizeMm) * scale}
-                      y1={0}
-                      x2={mmToPx(i * canvas.grid.sizeMm) * scale}
-                      y2={paperDimensions.height}
-                      stroke="#e5e7eb"
-                      strokeWidth="0.5"
-                    />
-                  ))}
-                  {Array.from({ length: Math.ceil(canvas.paper.heightMm / canvas.grid.sizeMm) }).map((_, i) => (
-                    <line
-                      key={`h-${i}`}
-                      x1={0}
-                      y1={mmToPx(i * canvas.grid.sizeMm) * scale}
-                      x2={paperDimensions.width}
-                      y2={mmToPx(i * canvas.grid.sizeMm) * scale}
-                      stroke="#e5e7eb"
-                      strokeWidth="0.5"
-                    />
-                  ))}
-                </svg>
-              )}
-
-              {/* Elements */}
-              {canvas.elements.map(element => renderElement(element))}
-
-              {/* Package count indicator (single mode) */}
-              {canvas.batch && canvas.batch.packageCount > 1 && (
-                <div
-                  className="absolute bottom-2 right-2 text-xs text-gray-400"
-                  data-testid="canvas-print-page-sequence"
-                >
-                  件数: {canvas.batch.packageCount}
-                </div>
-              )}
-            </div>
+            renderPage()
           )}
         </div>
       </div>
@@ -1108,6 +1374,25 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
                   data-testid="canvas-text-content-input"
                 />
                 <p className="text-xs text-gray-500 mt-1">支持多行文本，换行将保留</p>
+              </div>
+            )}
+            
+            {/* Font Family */}
+            {(selectedElement.type === "text" || selectedElement.type === "field" || selectedElement.type === "sequence") && (
+              <div>
+                <label className="block text-sm font-medium mb-1">字体</label>
+                <select
+                  value={selectedElement.style.fontFamily || FONT_FAMILIES[0].value}
+                  onChange={e => updateElement(selectedElement.id, {
+                    style: { ...selectedElement.style, fontFamily: e.target.value },
+                  })}
+                  className="w-full px-2 py-1 border rounded text-sm"
+                  data-testid="canvas-font-family-select"
+                >
+                  {FONT_FAMILIES.map(f => (
+                    <option key={f.value} value={f.value}>{f.label}</option>
+                  ))}
+                </select>
               </div>
             )}
             

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-27T16:40:37.814Z",
+  "timestamp": "2026-06-28T03:54:54.744Z",
   "baseUrl": "https://i.jueshi.net",
   "summary": {
     "total": 75,
@@ -85,7 +85,7 @@
       "name": "重新打开模板",
       "level": "P1",
       "status": "PASS",
-      "evidence": "User template cards: 95"
+      "evidence": "User template cards: 117"
     },
     {
       "id": "TS-011",
@@ -162,14 +162,14 @@
       "name": "block 排序",
       "level": "P1",
       "status": "PASS",
-      "evidence": "First block before: content-block-block-1782578302132, after: content-block-block-1782578302557, moved: true"
+      "evidence": "First block before: content-block-block-1782618759975, after: content-block-block-1782618760441, moved: true"
     },
     {
       "id": "TS-022",
       "name": "自定义文本保存恢复",
       "level": "P1",
       "status": "PASS",
-      "evidence": "User templates after save: 96"
+      "evidence": "User templates after save: 118"
     },
     {
       "id": "TS-023",
@@ -218,21 +218,21 @@
       "name": "PNG 导出真实文件",
       "level": "P1",
       "status": "PASS",
-      "evidence": "Download triggered: true, filename: 我的自定义模板-1782578316249.png"
+      "evidence": "Download triggered: true, filename: 我的自定义模板-1782618773259.png"
     },
     {
       "id": "TS-030",
       "name": "PNG 文件验证",
       "level": "P1",
       "status": "PASS",
-      "evidence": "PNG files: 4, valid: true, size: 221502 bytes"
+      "evidence": "PNG files: 7, valid: true, size: 221502 bytes"
     },
     {
       "id": "TS-031",
       "name": "保存后重新打开完整恢复",
       "level": "P1",
       "status": "PASS",
-      "evidence": "User templates visible after save: 97"
+      "evidence": "User templates visible after save: 119"
     },
     {
       "id": "TS-032",
