@@ -699,61 +699,51 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     
     setPngStatus("exporting");
     try {
-      // Dynamically import html2canvas (avoids SSR issues)
-      const html2canvas = (await import("html2canvas")).default;
-      // Fix: html2canvas v1.4.1 doesn't support lab()/oklch() color functions
-      // used by Tailwind CSS v4. Replace them with safe rgb values via onclone.
-      // Also hide grid overlay, resize handles, edit buttons, and selection rings.
-      const onclone = (clonedDoc: Document) => {
-        // Fix lab()/oklch() colors
-        const allEls = clonedDoc.querySelectorAll('*');
-        allEls.forEach(el => {
-          const cs = clonedDoc.defaultView?.getComputedStyle(el);
-          if (!cs) return;
-          if (cs.color && (cs.color.includes('lab') || cs.color.includes('oklch'))) {
-            (el as HTMLElement).style.color = '#000000';
-          }
-          if (cs.backgroundColor && (cs.backgroundColor.includes('lab') || cs.backgroundColor.includes('oklch'))) {
-            (el as HTMLElement).style.backgroundColor = '#ffffff';
-          }
-          if (cs.borderColor && (cs.borderColor.includes('lab') || cs.borderColor.includes('oklch'))) {
-            (el as HTMLElement).style.borderColor = '#e5e7eb';
-          }
-        });
-        // Hide UI elements
-        const hideSelectors = [
-          '[data-testid="canvas-grid-overlay"]',
-          '[data-testid="canvas-resize-handle"]',
-          '[data-testid="canvas-sequence-resize-handle"]',
-          '[data-testid="canvas-edit-text-button"]',
-          '[data-testid="canvas-print-page-count"]',
-          '[data-testid="canvas-print-page-sequence"]',
-        ];
-        hideSelectors.forEach(sel => {
-          clonedDoc.querySelectorAll(sel).forEach(el => {
-            (el as HTMLElement).style.display = 'none';
-          });
-        });
-        // Hide selection rings
-        clonedDoc.querySelectorAll('.ring-2').forEach(el => {
-          (el as HTMLElement).style.boxShadow = 'none';
-        });
+      // Dynamically import html-to-image (avoids SSR issues).
+      // html-to-image natively supports lab()/oklch() color functions
+      // used by Tailwind CSS v4 — no onclone color-replacement hack needed.
+      const { toPng } = await import("html-to-image");
+
+      // Temporarily hide selection rings via a <style> tag
+      const styleId = "png-export-ring-hide";
+      const styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      styleEl.textContent = ".ring-2{box-shadow:none!important}";
+      document.head.appendChild(styleEl);
+
+      // Filter out UI elements that should not appear in the export
+      const hideTestIds = new Set([
+        "canvas-grid-overlay",
+        "canvas-resize-handle",
+        "canvas-sequence-resize-handle",
+        "canvas-edit-text-button",
+        "canvas-print-page-count",
+        "canvas-print-page-sequence",
+      ]);
+      const filter = (node: HTMLElement) => {
+        const testid =
+          node?.dataset?.testid ?? node?.getAttribute?.("data-testid") ?? "";
+        return !hideTestIds.has(testid);
       };
-      const canvasElement = await html2canvas(paperRef.current, {
+
+      const dataUrl = await toPng(paperRef.current, {
+        pixelRatio: 2,
         backgroundColor: "#ffffff",
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        onclone,
+        filter,
       });
+
+      // Clean up temporary style
+      styleEl.remove();
 
       const link = document.createElement("a");
       link.download = `${canvas.name || "template"}.png`;
-      link.href = canvasElement.toDataURL("image/png");
+      link.href = dataUrl;
       link.click();
       setPngStatus("done");
       setTimeout(() => setPngStatus("idle"), 2000);
     } catch (err) {
+      // Ensure temp style is removed on error too
+      document.getElementById("png-export-ring-hide")?.remove();
       console.error("PNG export failed:", err);
       setPngStatus("error");
       setSaveMessage(`导出失败: ${err instanceof Error ? err.message : "未知错误"}`);

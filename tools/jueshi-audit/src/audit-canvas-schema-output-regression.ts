@@ -783,6 +783,12 @@ const auditCases: Array<{
     run: async (page) => {
       try {
         await page.setViewportSize({ width: 1440, height: 900 });
+        // Capture console errors
+        const consoleErrors: string[] = [];
+        page.on("console", (msg) => {
+          if (msg.type() === "error") consoleErrors.push(msg.text());
+        });
+        page.on("pageerror", (err) => consoleErrors.push(`PAGE_ERROR: ${err.message}`));
         await gotoCanvasEditor(page);
         await page.click('[data-testid="canvas-add-text"]');
         await page.waitForTimeout(300);
@@ -793,11 +799,25 @@ const auditCases: Array<{
         await pngBtn.click();
         await page.waitForTimeout(2000);
         const btnText = await pngBtn.textContent() || "";
+        // Also capture saveMessage and any error text on the page
+        const saveMsg = await page.$eval('[data-testid="canvas-save-message"]', el => el.textContent || "").catch(() => "no save-message element");
+        const allErrorText = await page.evaluate(() => {
+          const matches: string[] = [];
+          document.querySelectorAll("*").forEach(el => {
+            const t = el.textContent?.trim();
+            if (t && t.includes("导出失败") && t.length < 300) matches.push(t);
+          });
+          return [...new Set(matches)];
+        }).catch(() => []);
         // Button should show "正在生成..." or "✓ 已导出" — NOT "导出失败"
         if (btnText.includes("导出失败")) {
-          return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: `PNG export failed, button: "${btnText}"` };
+          const errMsg = saveMsg || allErrorText.join("; ") || "no error message found";
+          return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: `PNG FAIL. btn="${btnText}" saveMsg="${saveMsg}" errors=[${consoleErrors.join(" | ")}] allErrorText=[${allErrorText.join(" | ")}]` };
         }
-        return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "PASS", severity: "P1", message: `PNG export triggered, button: "${btnText}"` };
+        if (consoleErrors.length > 0) {
+          return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "PASS", severity: "P1", message: `PNG export triggered (btn="${btnText}"), but console errors: ${consoleErrors.join(" | ")}` };
+        }
+        return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "PASS", severity: "P1", message: `PNG export triggered, button: "${btnText}", saveMsg="${saveMsg}"` };
       } catch (err) {
         return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: `Error: ${err}` };
       }
