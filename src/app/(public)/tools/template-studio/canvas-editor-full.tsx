@@ -666,14 +666,14 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         setCurrentTemplateId(data.data.id);
         setSaveStatus("saved");
         const now = new Date().toLocaleTimeString();
-        setSaveMessage(`✓ 已保存 ${now}`);
+        setSaveMessage(`✓ 已保存 ${now} — 在"我的模板"中查看`);
         setLastSavedAt(now);
         // Clear draft after successful save
         try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
         setTimeout(() => {
           setSaveStatus("idle");
           setSaveMessage("");
-        }, 3000);
+        }, 5000);
       } else {
         setSaveStatus("error");
         setSaveMessage(`保存失败: ${data.error || "未知错误"}`);
@@ -1506,6 +1506,11 @@ ${pagesHTML}
           {saveStatus === "error" && saveMessage && (
             <p className="text-xs text-red-600" data-testid="canvas-save-error">{saveMessage}</p>
           )}
+          {saveStatus === "saved" && (
+            <a href="/workspace/templates" className="text-xs text-blue-600 hover:underline" data-testid="canvas-view-my-templates-link">
+              📋 查看我的模板
+            </a>
+          )}
           {lastSavedAt && (
             <p className="text-xs text-gray-500" data-testid="canvas-last-saved-at">上次保存: {lastSavedAt}</p>
           )}
@@ -1823,7 +1828,7 @@ ${pagesHTML}
                   data-testid="canvas-binding-select"
                 >
                   <option value="">选择字段</option>
-                  <option value="company.name">公司名称</option>
+                  <option value="company.companyName">公司名称</option>
                   <option value="company.contactName">联系人</option>
                   <option value="company.email">邮箱</option>
                   <option value="company.phone">电话</option>
