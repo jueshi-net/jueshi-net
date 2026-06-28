@@ -370,6 +370,9 @@ const auditCases: Array<{
       try {
         await page.setViewportSize({ width: 1440, height: 900 });
         await gotoCanvasEditor(page);
+        // Discard any existing draft first
+        const discardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (discardBtn) { await discardBtn.click(); await page.waitForTimeout(500); }
         await page.click('[data-testid="canvas-add-table"]');
         await page.waitForTimeout(2000); // wait for draft save
         const draftExists = await page.evaluate(() => {
@@ -385,6 +388,12 @@ const auditCases: Array<{
         await page.reload();
         await page.waitForSelector('[data-testid="canvas-editor-root"]', { timeout: 10000 });
         await page.waitForTimeout(1000);
+        // Click draft restore button if banner appears
+        const restoreBtn = await page.$('[data-testid="canvas-restore-draft-button"]');
+        if (restoreBtn) {
+          await restoreBtn.click();
+          await page.waitForTimeout(2000);
+        }
         const restoredTable = await page.$('[data-testid="canvas-product-table"], [data-testid="canvas-product-table-empty"]');
         if (!restoredTable) {
           return { id: "TS-CANVAS-TABLE-EDIT-SAVE-RESTORE", name: "Table edit save restore", status: "FAIL", severity: "P0", message: "Table not restored after reload" };
@@ -440,11 +449,13 @@ const auditCases: Array<{
       try {
         await page.setViewportSize({ width: 1440, height: 900 });
         await gotoCanvasEditor(page);
+        // Discard any existing draft first
+        const fontDiscardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (fontDiscardBtn) { await fontDiscardBtn.click(); await page.waitForTimeout(500); }
         await page.click('[data-testid="canvas-add-text"]');
         await page.waitForTimeout(300);
         await page.click('[data-testid="canvas-element"]');
         await page.waitForTimeout(300);
-        // Change font to 楷体 (index 5)
         const fontSelect = await page.$('[data-testid="canvas-font-family-select"]');
         if (fontSelect) {
           await fontSelect.selectOption({ index: 5 });
@@ -488,6 +499,10 @@ const auditCases: Array<{
         await page.setViewportSize({ width: 1440, height: 900 });
         await gotoCanvasEditor(page);
         const steps: string[] = [];
+
+        // 0. Discard any existing draft
+        const e2eDiscardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (e2eDiscardBtn) { await e2eDiscardBtn.click(); await page.waitForTimeout(500); }
 
         // 1. Select 10x15 paper
         await page.selectOption('[data-testid="canvas-paper-size"]', "10x15").catch(() => {});
@@ -533,6 +548,12 @@ const auditCases: Array<{
         await page.reload();
         await page.waitForSelector('[data-testid="canvas-editor-root"]', { timeout: 10000 });
         await page.waitForTimeout(1000);
+        // Click draft restore button if banner appears
+        const e2eRestoreBtn = await page.$('[data-testid="canvas-restore-draft-button"]');
+        if (e2eRestoreBtn) {
+          await e2eRestoreBtn.click();
+          await page.waitForTimeout(2000);
+        }
         const elementsAfterReload = await page.$$('[data-testid="canvas-element"]');
         if (elementsAfterReload.length < 3) {
           return { id: "TS-CANVAS-END-TO-END-USER-FLOW", name: "E2E user flow", status: "FAIL", severity: "P0", message: `Only ${elementsAfterReload.length} elements after reload (expected 3+). Steps: ${steps.join(",")}` };

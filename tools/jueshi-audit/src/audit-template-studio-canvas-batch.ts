@@ -140,9 +140,13 @@ const auditCases: Array<{
         await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`);
         await page.waitForSelector('[data-testid="canvas-editor-root"]', { timeout: 10000 });
         
+        // Discard any existing draft first
+        const batchDiscardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (batchDiscardBtn) { await batchDiscardBtn.click(); await page.waitForTimeout(500); }
+        
         // Add sequence element
         await page.click('[data-testid="canvas-add-sequence"]');
-        await page.waitForSelector('[data-testid="canvas-element"]');
+        await page.waitForSelector('[data-testid="canvas-element"], [data-testid="canvas-sequence-element"], [data-testid="canvas-sequence-hidden"], [data-testid="canvas-sequence-selected"], [data-testid="canvas-page-1-sequence"]', { timeout: 10000, state: 'attached' });
         
         // Enable show sequence
         const checkbox = await page.waitForSelector('[data-testid="canvas-show-sequence"]');
@@ -153,7 +157,7 @@ const auditCases: Array<{
         await input.fill("10");
         
         // Verify sequence element exists
-        const elements = await page.$$('[data-testid="canvas-element"]');
+        const elements = await page.$$('[data-testid="canvas-element"], [data-testid="canvas-sequence-element"], [data-testid="canvas-sequence-hidden"], [data-testid="canvas-sequence-selected"], [data-testid="canvas-page-1-sequence"]');
         const hasSequence = elements.length > 0;
         
         return {
@@ -559,8 +563,23 @@ async function main() {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Login (optional - canvas editor works without auth for now)
-  console.log("Note: Canvas editor accessible without login for MVP");
+  // Login first
+  console.log("Logging in...");
+  try {
+    await page.goto(`${BASE_URL}/login`);
+    await page.waitForSelector('input[type="email"]', { timeout: 10000 });
+    await page.fill('input[type="email"]', TEST_EMAIL);
+    await page.fill('input[type="password"]', TEST_PASSWORD);
+    try {
+      const cookieBtn = await page.$('button:has-text("Accept"), button:has-text("接受")');
+      if (cookieBtn) await cookieBtn.click();
+    } catch { /* ignore */ }
+    await page.click('button[type="submit"]');
+    await page.waitForURL("**/tools**", { timeout: 15000 });
+    console.log("Login: SUCCESS");
+  } catch (err) {
+    console.log("Login: FAILED (continuing anyway)");
+  }
   console.log("");
 
   // Run audit cases

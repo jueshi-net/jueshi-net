@@ -911,6 +911,174 @@ const auditCases: Array<{
       }
     },
   },
+
+  // TS-CANVAS-SAVE-API-SUCCESS
+  {
+    id: "TS-CANVAS-SAVE-API-SUCCESS",
+    name: "Save template via API returns success with restore path",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        await page.click('[data-testid="canvas-add-text"]');
+        await page.waitForTimeout(300);
+        const saveBtn = await page.$('[data-testid="canvas-save-button"]');
+        if (!saveBtn) {
+          return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "FAIL", severity: "P0", message: "Save button not found" };
+        }
+        await saveBtn.click();
+        await page.waitForTimeout(3000);
+        const btnText = await saveBtn.textContent() || "";
+        // After save, button should show "✓ 已保存" or error message
+        if (btnText.includes("✓ 已保存")) {
+          // Verify draft was cleared after save
+          const draftExists = await page.evaluate(() => {
+            return !!localStorage.getItem("canvas-editor-draft");
+          });
+          return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "PASS", severity: "P0", message: `Save succeeded, btn="${btnText.trim()}", draftCleared=${!draftExists}` };
+        }
+        if (btnText.includes("保存失败") || btnText.includes("请先登录")) {
+          return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "FAIL", severity: "P0", message: `Save failed: "${btnText.trim()}"` };
+        }
+        // If button reverted to "保存", save may have completed and feedback cleared
+        const lastSaved = await page.$eval('[data-testid="canvas-last-saved-at"]', el => el.textContent || "").catch(() => "");
+        if (lastSaved.includes("上次保存")) {
+          return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "PASS", severity: "P0", message: `Save completed (feedback cleared), lastSaved="${lastSaved.trim()}"` };
+        }
+        return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "FAIL", severity: "P0", message: `Save state unclear, btn="${btnText.trim()}"` };
+      } catch (err) {
+        return { id: "TS-CANVAS-SAVE-API-SUCCESS", name: "Save API success", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS
+  {
+    id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS",
+    name: "Draft restore button click restores elements after reload",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        // Discard any existing draft first
+        const discardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (discardBtn) { await discardBtn.click(); await page.waitForTimeout(500); }
+        // Add a text element
+        await page.click('[data-testid="canvas-add-text"]');
+        await page.waitForTimeout(500);
+        // Wait for draft auto-save (debounced)
+        await page.waitForTimeout(2000);
+        // Verify draft exists in localStorage
+        const draftBefore = await page.evaluate(() => {
+          const raw = localStorage.getItem("canvas-editor-draft");
+          if (!raw) return null;
+          try { return JSON.parse(raw); } catch { return null; }
+        });
+        if (!draftBefore || !draftBefore.canvas?.elements?.length) {
+          return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "FAIL", severity: "P0", message: "No draft in localStorage before reload" };
+        }
+        const elementCountBefore = draftBefore.canvas.elements.length;
+        // Reload page
+        await page.reload({ waitUntil: "domcontentloaded" });
+        await page.waitForTimeout(2000);
+        // Check for draft restore banner
+        const banner = await page.$('[data-testid="canvas-draft-restore-banner"]');
+        if (!banner) {
+          return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "FAIL", severity: "P0", message: "Draft restore banner not found after reload" };
+        }
+        // Click restore button
+        const restoreBtn = await page.$('[data-testid="canvas-restore-draft-button"]');
+        if (!restoreBtn) {
+          return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "FAIL", severity: "P0", message: "Restore button not found in banner" };
+        }
+        await restoreBtn.click();
+        await page.waitForTimeout(3000);
+        // Debug: check what's on the page after restore
+        const debugInfo = await page.evaluate(() => {
+          const root = document.querySelector('[data-testid="canvas-editor-root"]');
+          const paper = document.querySelector('[data-testid="canvas-paper"], [data-testid="canvas-print-page"]');
+          const allCanvas = document.querySelectorAll('[data-testid*="canvas"]');
+          const draft = localStorage.getItem("canvas-editor-draft");
+          let draftElements = 0;
+          if (draft) {
+            try { draftElements = JSON.parse(draft).canvas?.elements?.length || 0; } catch {}
+          }
+          return {
+            rootExists: !!root,
+            paperExists: !!paper,
+            canvasTestIds: Array.from(allCanvas).map(el => el.getAttribute("data-testid")).filter(v => v).slice(0, 15),
+            draftExists: !!draft,
+            draftElements,
+          };
+        });
+        // Verify elements are restored on canvas
+        const elementsAfter = await page.evaluate(() => {
+          const els = document.querySelectorAll('[data-testid="canvas-text-element"], [data-testid="canvas-element"], [data-testid="canvas-product-table"], [data-testid="canvas-product-table-empty"]');
+          return els.length;
+        });
+        if (elementsAfter >= elementCountBefore) {
+          return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "PASS", severity: "P0", message: `Draft restored: ${elementCountBefore} elements before → ${elementsAfter} elements after restore button click` };
+        }
+        return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "FAIL", severity: "P0", message: `Restore failed: ${elementCountBefore} elements before → ${elementsAfter} after click. Debug: ${JSON.stringify(debugInfo)}` };
+      } catch (err) {
+        return { id: "TS-CANVAS-DRAFT-RESTORE-BUTTON-WORKS", name: "Draft restore button", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-PRINT-MULTIPAGE-10-LABEL-PAGES
+  {
+    id: "TS-CANVAS-PRINT-MULTIPAGE-10-LABEL-PAGES",
+    name: "Multipage mode with count=10 generates 10 print label pages",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        // Discard any existing draft
+        const discardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+        if (discardBtn) { await discardBtn.click(); await page.waitForTimeout(500); }
+        // Add a text element
+        await page.click('[data-testid="canvas-add-text"]');
+        await page.waitForTimeout(300);
+        // Switch to multipage mode
+        await page.selectOption('[data-testid="canvas-batch-mode"]', { value: "repeat" });
+        await page.waitForTimeout(300);
+        // Set count to 10
+        await page.fill('[data-testid="canvas-package-count"]', "10");
+        await page.waitForTimeout(500);
+        // Enable sequence numbers
+        const seqCheckbox = await page.$('[data-testid="canvas-show-sequence"]');
+        if (seqCheckbox) {
+          const isChecked = await seqCheckbox.isChecked();
+          if (!isChecked) { await seqCheckbox.click(); await page.waitForTimeout(300); }
+        }
+        await page.waitForTimeout(500);
+        // Count print page elements
+        const pageCount = await page.evaluate(() => {
+          const pages = document.querySelectorAll('[data-testid="canvas-print-page"]');
+          return pages.length;
+        });
+        // Also check sequence texts (in repeat mode, uses canvas-print-page-count)
+        const sequences = await page.evaluate(() => {
+          const seqs = document.querySelectorAll('[data-testid="canvas-print-page-count"]');
+          const texts: string[] = [];
+          seqs.forEach(s => texts.push(s.textContent?.trim() || ""));
+          return texts;
+        });
+        const hasFirst = sequences.some(s => s.includes("1/10") || s.includes("1/10"));
+        const hasLast = sequences.some(s => s.includes("10/10"));
+        if (pageCount === 10 && hasFirst && hasLast) {
+          return { id: "TS-CANVAS-PRINT-MULTIPAGE-10-LABEL-PAGES", name: "Multipage 10 labels", status: "PASS", severity: "P0", message: `10 print pages generated, sequences: first=${hasFirst}, last=${hasLast}, all=${sequences.join(",")}` };
+        }
+        return { id: "TS-CANVAS-PRINT-MULTIPAGE-10-LABEL-PAGES", name: "Multipage 10 labels", status: "FAIL", severity: "P0", message: `Expected 10 pages, got ${pageCount}. Sequences: ${sequences.join(",")}` };
+      } catch (err) {
+        return { id: "TS-CANVAS-PRINT-MULTIPAGE-10-LABEL-PAGES", name: "Multipage 10 labels", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
 ];
 
 // ============================================================

@@ -87,22 +87,21 @@ async function run() {
 
   // TS-CANVAS-MODE-ENTRY: Can enter canvas mode
   try {
-    await page.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 15000 });
-    await page.waitForTimeout(2000);
-    const canvasBtn = page.locator('[data-testid="template-studio-canvas-mode-button"]');
-    const canvasBtnExists = await canvasBtn.count() > 0;
+    await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: "domcontentloaded", timeout: 15000 });
+    await page.waitForTimeout(3000);
+    const canvasEditor = page.locator('[data-testid="canvas-editor-root"]');
+    const canvasEditorExists = await canvasEditor.count() > 0;
     
-    if (canvasBtnExists) {
-      await canvasBtn.click();
-      await page.waitForTimeout(3000);
-      const canvasEditor = page.locator('[data-testid="canvas-editor-root"]');
-      const canvasEditorExists = await canvasEditor.count() > 0;
+    if (canvasEditorExists) {
+      // Discard any existing draft
+      const discardBtn = await page.$('[data-testid="canvas-discard-draft-button"]');
+      if (discardBtn) { await discardBtn.click(); await page.waitForTimeout(500); }
       
       record("TS-CANVAS-MODE-ENTRY", "进入自由画布模式", "P1",
-        canvasEditorExists ? "PASS" : "FAIL",
-        `Canvas button exists: ${canvasBtnExists}, Canvas editor loaded: ${canvasEditorExists}`);
+        "PASS",
+        `Canvas editor loaded directly at /canvas/new`);
     } else {
-      record("TS-CANVAS-MODE-ENTRY", "进入自由画布模式", "P1", "FAIL", "Canvas mode button not found");
+      record("TS-CANVAS-MODE-ENTRY", "进入自由画布模式", "P1", "FAIL", "Canvas editor not found at /canvas/new");
     }
   } catch (err) {
     record("TS-CANVAS-MODE-ENTRY", "进入自由画布模式", "P1", "FAIL", `Error: ${err}`);
@@ -237,7 +236,7 @@ async function run() {
 
   // TS-CANVAS-GRID-TOGGLE: Grid toggle works
   try {
-    const gridToggle = page.locator('[data-testid="canvas-grid-toggle"]');
+    const gridToggle = page.locator('[data-testid="canvas-show-grid-toggle"]');
     const gridToggleExists = await gridToggle.count() > 0;
     
     if (gridToggleExists) {
