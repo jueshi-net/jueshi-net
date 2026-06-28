@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "id": "TS-TOOLS-HAS-REAL-CTA-BANNER",
+      "name": "/tools has real CTA banner",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Banner with title, subtitle, and 3 CTAs found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664438221/tools-banner.png"
+    },
+    {
+      "id": "AUDIT-ERROR",
+      "name": "Audit execution error",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "TimeoutError: page.waitForLoadState: Timeout 30000ms exceeded."
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 0,
+    "blocked": 1,
+    "total": 2
+  }
+}

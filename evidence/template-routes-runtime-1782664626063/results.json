@@ -1,0 +1,65 @@
+{
+  "results": [
+    {
+      "id": "TS-TOOLS-HAS-REAL-CTA-BANNER",
+      "name": "/tools has real CTA banner",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Banner with title, subtitle, and 3 CTAs found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/tools-banner.png"
+    },
+    {
+      "id": "TS-TEMPLATE-STUDIO-PAGE-LOADS",
+      "name": "/tools/template-studio loads",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Missing: startDesign=false, myTemplates=false",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/template-studio.png"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-UNAUTH-HANDLED",
+      "name": "/workspace/templates unauth handled",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Redirected to login",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/workspace-templates-unauth.png"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-AUTH-LOADS",
+      "name": "/workspace/templates auth loads",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "No title found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/workspace-templates-auth.png"
+    },
+    {
+      "id": "TS-SAVED-CANVAS-APPEARS-IN-TEMPLATES",
+      "name": "Saved canvas appears in templates",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Template not found in list",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/saved-template-in-list.png"
+    },
+    {
+      "id": "TS-TEMPLATE-EDIT-LINK-NO-CRASH",
+      "name": "Template edit link doesn't crash",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "No edit link found"
+    },
+    {
+      "id": "TS-CTA-MOBILE-NO-BREAK",
+      "name": "CTA mobile doesn't break",
+      "status": "PASS",
+      "severity": "P1",
+      "message": "CTA container wraps correctly on mobile",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664626063/tools-mobile.png"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "blocked": 1,
+    "total": 7
+  }
+}

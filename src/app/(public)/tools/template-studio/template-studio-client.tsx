@@ -743,7 +743,7 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
               data-testid="template-studio-canvas-mode-button"
             >
-              🎨 自由画布模式
+              开始设计
             </a>
             <a
               href="/tools/template-studio/new"
