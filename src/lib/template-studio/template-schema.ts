@@ -207,6 +207,11 @@ export function validateTemplateConfig(config: unknown): { valid: boolean; error
 
   const c = config as Partial<TemplateConfig>;
 
+  // Canvas mode has a completely different schema — validate separately
+  if ((c as any).mode === "canvas") {
+    return validateCanvasTemplateConfig(config);
+  }
+
   if (!c.id || typeof c.id !== "string") errors.push("Missing or invalid id");
   if (!c.toolKey || typeof c.toolKey !== "string") errors.push("Missing or invalid toolKey");
   if (!c.name || typeof c.name !== "string") errors.push("Missing or invalid name");
@@ -222,6 +227,69 @@ export function validateTemplateConfig(config: unknown): { valid: boolean; error
     }
   } else {
     errors.push("Missing style config");
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/** Validate a canvas template config object — normalizes elements and checks schema */
+export function validateCanvasTemplateConfig(config: unknown): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!config || typeof config !== "object") {
+    return { valid: false, errors: ["Canvas config is not an object"] };
+  }
+
+  const c = config as any;
+
+  // Required top-level fields
+  if (!c.name || typeof c.name !== "string") errors.push("Missing or invalid name");
+  if (!c.paper || typeof c.paper !== "object") errors.push("Missing paper config");
+  if (!Array.isArray(c.elements)) errors.push("elements must be an array");
+
+  // Normalize and validate each element
+  if (Array.isArray(c.elements)) {
+    c.elements.forEach((el: any, idx: number) => {
+      if (!el.id || typeof el.id !== "string") {
+        // Auto-fix: generate id if missing
+        el.id = `el-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`;
+      }
+      if (!el.type || typeof el.type !== "string") {
+        errors.push(`Element ${idx}: missing type`);
+      }
+      if (typeof el.x !== "number" || typeof el.y !== "number") {
+        errors.push(`Element ${idx}: missing or invalid x/y`);
+      }
+      if (typeof el.width !== "number" || typeof el.height !== "number") {
+        errors.push(`Element ${idx}: missing or invalid width/height`);
+      }
+      if (!el.style || typeof el.style !== "object") {
+        // Auto-fix: add default style if missing
+        el.style = {
+          fontSize: 12,
+          fontFamily: "Arial, sans-serif",
+          fontWeight: "normal",
+          color: "#000000",
+          textAlign: "left",
+          backgroundColor: "transparent",
+          borderColor: "transparent",
+          borderWidth: 0,
+          borderRadius: 0,
+          padding: 2,
+          opacity: 1,
+        };
+      }
+    });
+  }
+
+  // Grid config optional but if present must be object
+  if (c.grid && typeof c.grid !== "object") {
+    errors.push("grid must be an object");
+  }
+
+  // Batch config optional
+  if (c.batch && typeof c.batch !== "object") {
+    errors.push("batch must be an object");
   }
 
   return { valid: errors.length === 0, errors };

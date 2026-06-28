@@ -10,7 +10,7 @@ import path from "path";
 
 const BASE_URL = process.env.AUDIT_BASE_URL || "https://i.jueshi.net";
 const TEST_EMAIL = process.env.AUDIT_TEST_EMAIL || "test@jueshi.net";
-const TEST_PASSWORD_FILE=*** || "/tmp/staging_pwd.txt";
+const TEST_PASSWORD_FILE = process.env.AUDIT_TEST_PASSWORD_FILE || "/tmp/staging_pwd.txt";
 const SCREENSHOT_DIR = path.join(process.cwd(), "evidence", `canvas-responsive-${Date.now()}`);
 
 // Viewport configurations

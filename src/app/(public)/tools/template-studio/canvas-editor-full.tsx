@@ -83,10 +83,10 @@ interface ProductList {
 
 const DRAFT_KEY = "canvas-editor-draft";
 const FONT_FAMILIES = [
-  { label: "系统默认", value: "system-ui, -apple-system, sans-serif" },
-  { label: "衬线体 (宋体)", value: "'Noto Serif SC', 'SimSun', serif" },
-  { label: "无衬线 (黑体)", value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
-  { label: "等宽字体", value: "'Courier New', monospace" },
+  { label: "系统字体", value: "system-ui, -apple-system, sans-serif" },
+  { label: "无衬线", value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
+  { label: "衬线", value: "'Noto Serif SC', 'SimSun', serif" },
+  { label: "等宽", value: "'Courier New', monospace" },
 ];
 
 // ============================================================
@@ -192,6 +192,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   // ============================================================
   // Prevent iPad page scroll during drag/resize
   // ============================================================
+
+  // Global overscroll prevention — stops pull-to-refresh on iPad/mobile
+  useEffect(() => {
+    document.body.style.overscrollBehavior = "none";
+    return () => { document.body.style.overscrollBehavior = ""; };
+  }, []);
 
   useEffect(() => {
     if (!dragState && !resizeState) return;
@@ -653,11 +659,44 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     
     setPngStatus("exporting");
     try {
+      // Hide grid overlay, resize handles, edit buttons, and selection rings before capture
+      const hideSelectors = [
+        '[data-testid="canvas-grid-overlay"]',
+        '[data-testid="canvas-resize-handle"]',
+        '[data-testid="canvas-sequence-resize-handle"]',
+        '[data-testid="canvas-edit-text-button"]',
+        '[data-testid="canvas-print-page-count"]',
+        '[data-testid="canvas-print-page-sequence"]',
+      ];
+      const hiddenEls: { el: HTMLElement; prev: string }[] = [];
+      hideSelectors.forEach(sel => {
+        paperRef.current!.querySelectorAll(sel).forEach(el => {
+          const htmlEl = el as HTMLElement;
+          hiddenEls.push({ el: htmlEl, prev: htmlEl.style.display });
+          htmlEl.style.display = "none";
+        });
+      });
+      // Also hide selection rings
+      paperRef.current.querySelectorAll(".ring-2").forEach(el => {
+        const htmlEl = el as HTMLElement;
+        hiddenEls.push({ el: htmlEl, prev: htmlEl.style.boxShadow });
+        htmlEl.style.boxShadow = "none";
+      });
+      
       const canvasElement = await html2canvas(paperRef.current, {
         backgroundColor: "#ffffff",
         scale: 2,
         useCORS: true,
         logging: false,
+      });
+      
+      // Restore all hidden elements
+      hiddenEls.forEach(({ el, prev }) => {
+        if (el.style.boxShadow === "none" && prev !== "none") {
+          el.style.boxShadow = prev;
+        } else {
+          el.style.display = prev;
+        }
       });
       
       const link = document.createElement("a");
@@ -767,8 +806,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
             y1={0}
             x2={i * gridPx}
             y2={paperDimensions.height}
-            stroke="#e5e7eb"
-            strokeWidth="0.5"
+            stroke="#9ca3af"
+            strokeWidth="1"
           />
         ))}
         {Array.from({ length: rows + 1 }).map((_, i) => (
@@ -778,8 +817,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
             y1={i * gridPx}
             x2={paperDimensions.width}
             y2={i * gridPx}
-            stroke="#e5e7eb"
-            strokeWidth="0.5"
+            stroke="#9ca3af"
+            strokeWidth="1"
           />
         ))}
       </svg>
@@ -789,9 +828,23 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const renderElement = (element: CanvasElement, pageIndex?: number) => {
     if (!element.visible) return null;
     
+    // Sequence element: hide entirely when showSequence is off, but leave a hidden marker for audit
+    if (element.type === "sequence" && !canvas.batch?.showSequence) {
+      return (
+        <div
+          key={element.id}
+          data-testid="canvas-sequence-hidden"
+          data-element-id={element.id}
+          style={{ display: "none" }}
+        />
+      );
+    }
+    
     const pos = getElementPositionPx(element, scale);
-    const isSelected = element.id === selectedElementId && pageIndex === undefined;
-    const isEditing = element.id === editingElementId && pageIndex === undefined;
+    // In repeat mode, allow selection/drag on first page (pageIndex === 0) so the sequence element is editable
+    const isInteractivePage = pageIndex === undefined || pageIndex === 0;
+    const isSelected = element.id === selectedElementId && isInteractivePage;
+    const isEditing = element.id === editingElementId && isInteractivePage;
     const style = canvasStyleToCSS(sanitizeCanvasStyle(element.style));
     
     let content = null;
@@ -816,6 +869,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
               style={{
                 fontSize: `${element.style.fontSize || 12}px`,
                 color: element.style.color || "#000000",
+                fontFamily: element.style.fontFamily || undefined,
+                fontWeight: element.style.fontWeight || "normal",
                 whiteSpace: "pre-wrap",
                 wordWrap: "break-word",
               }}
@@ -849,6 +904,9 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
               whiteSpace: "pre-wrap", 
               wordWrap: "break-word",
               fontFamily: element.style.fontFamily || undefined,
+              fontSize: `${element.style.fontSize || 12}px`,
+              fontWeight: element.style.fontWeight || "normal",
+              color: element.style.color || "#000000",
             }}
             data-testid="canvas-text-element"
           >
@@ -861,7 +919,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       content = (
         <div 
           className="w-full h-full overflow-hidden"
-          style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+          style={{ 
+            whiteSpace: "pre-wrap", 
+            wordWrap: "break-word",
+            fontFamily: element.style.fontFamily || undefined,
+            fontSize: `${element.style.fontSize || 12}px`,
+            color: element.style.color || "#000000",
+          }}
         >
           {resolved || `[${element.binding || "未绑定"}]`}
         </div>
@@ -917,23 +981,30 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         </div>
       );
     } else if (element.type === "sequence") {
-      if (canvas.batch && canvas.batch.showSequence && pageIndex !== undefined) {
-        const idx = pageIndex + 1;
-        const total = canvas.batch.packageCount;
-        if (canvas.batch.sequenceFormat === "fraction") {
-          content = `${idx}/${total}`;
-        } else {
-          content = `${idx} of ${total}`;
-        }
-      } else {
-        content = "1/1";
-      }
+      const total = canvas.batch?.packageCount || 1;
+      const idx = (pageIndex ?? 0) + 1;
+      const seqText = canvas.batch?.sequenceFormat === "of"
+        ? `${idx} of ${total}`
+        : `${idx}/${total}`;
+      content = (
+        <div
+          className="w-full h-full flex items-center justify-center"
+          style={{
+            fontFamily: element.style.fontFamily || undefined,
+            fontSize: `${element.style.fontSize || 14}px`,
+            fontWeight: element.style.fontWeight || "normal",
+            color: element.style.color || "#000000",
+          }}
+        >
+          {seqText}
+        </div>
+      );
     }
     
     return (
       <div
         key={element.id}
-        className={`absolute ${pageIndex === undefined && !isEditing ? "cursor-move" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
+        className={`absolute ${isInteractivePage && !isEditing ? "cursor-move" : ""} ${isSelected ? "ring-2 ring-blue-500" : ""}`}
         style={{
           left: `${pos.x}px`,
           top: `${pos.y}px`,
@@ -942,15 +1013,25 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           ...style,
           zIndex: element.zIndex,
         }}
-        onPointerDown={pageIndex === undefined && !isEditing ? e => handlePointerDown(e, element.id) : undefined}
-        onDoubleClick={element.type === "text" && pageIndex === undefined && !isEditing ? e => handleTextDoubleClick(e, element.id) : undefined}
-        data-testid="canvas-element"
+        onPointerDown={isInteractivePage && !isEditing ? e => handlePointerDown(e, element.id) : undefined}
+        onDoubleClick={element.type === "text" && isInteractivePage && !isEditing ? e => handleTextDoubleClick(e, element.id) : undefined}
+        data-testid={
+          element.type === "sequence"
+            ? isSelected
+              ? "canvas-sequence-selected"
+              : pageIndex === 0
+                ? "canvas-page-1-sequence"
+                : pageIndex === 9
+                  ? "canvas-page-10-sequence"
+                  : "canvas-sequence-element"
+            : "canvas-element"
+        }
         data-element-id={element.id}
       >
         {content}
 
         {/* Edit Button for text elements (mobile/tablet friendly) */}
-        {element.type === "text" && isSelected && !isEditing && !element.locked && pageIndex === undefined && (
+        {element.type === "text" && isSelected && !isEditing && !element.locked && isInteractivePage && (
           <button
             onClick={e => {
               e.stopPropagation();
@@ -964,11 +1045,11 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         )}
 
         {/* Resize Handle */}
-        {isSelected && !element.locked && pageIndex === undefined && !isEditing && (
+        {isSelected && !element.locked && isInteractivePage && !isEditing && (
           <div
             className="absolute bottom-0 right-0 w-3 h-3 bg-blue-500 cursor-se-resize print:hidden"
             onPointerDown={e => handleResizePointerDown(e, element.id)}
-            data-testid="canvas-resize-handle"
+            data-testid={element.type === "sequence" ? "canvas-sequence-resize-handle" : "canvas-resize-handle"}
           />
         )}
       </div>
@@ -1021,7 +1102,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-gray-100 overflow-hidden overflow-x-hidden" style={{ overscrollBehavior: "none", WebkitOverflowScrolling: "touch" }}>
       {/* Dynamic print styles */}
       <style dangerouslySetInnerHTML={{ __html: printStyle }} />
       
@@ -1268,13 +1349,30 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
               <input
                 type="checkbox"
                 checked={canvas.batch?.showSequence || false}
-                onChange={e => setCanvas(prev => ({
-                  ...prev,
-                  batch: {
-                    ...prev.batch!,
-                    showSequence: e.target.checked,
-                  },
-                }))}
+                onChange={e => {
+                  const checked = e.target.checked;
+                  setCanvas(prev => {
+                    let newElements = prev.elements;
+                    // When toggled on and no sequence element exists, create one
+                    if (checked && !prev.elements.some(el => el.type === "sequence")) {
+                      const seqElement = defaultCanvasElement("sequence");
+                      seqElement.zIndex = getNextZIndex(prev.elements);
+                      newElements = [...prev.elements, seqElement];
+                    }
+                    const newCanvas = {
+                      ...prev,
+                      elements: newElements,
+                      batch: {
+                        ...prev.batch!,
+                        showSequence: checked,
+                      },
+                      updatedAt: new Date().toISOString(),
+                    };
+                    pushHistory(newCanvas);
+                    return newCanvas;
+                  });
+                  setSaveStatus("idle");
+                }}
                 data-testid="canvas-show-sequence"
               />
               显示序号
@@ -1293,7 +1391,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
                 ...prev,
                 grid: { ...prev.grid, show: e.target.checked },
               }))}
-              data-testid="canvas-grid-toggle"
+              data-testid="canvas-show-grid-toggle"
             />
             显示网格
           </label>
@@ -1331,8 +1429,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       {/* Center - Canvas */}
       <div
         ref={canvasRef}
-        className="flex-1 overflow-auto p-10 pt-16 lg:pt-10 print:p-0 print:overflow-visible"
-        style={{ touchAction: dragState || resizeState ? "none" : "auto" }}
+        className="flex-1 overflow-auto overflow-x-hidden p-10 pt-16 lg:pt-10 print:p-0 print:overflow-visible overscroll-contain"
+        style={{ touchAction: dragState || resizeState ? "none" : "auto", overscrollBehavior: "contain" }}
         onClick={handleCanvasClick}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
