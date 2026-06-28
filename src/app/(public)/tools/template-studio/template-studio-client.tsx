@@ -763,27 +763,39 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-testid="template-grid">
-          {templates.map(t => (
+          {templates.map(t => {
+            const displayName = t.name || "未命名模板";
+            const displayType = t.toolKey || "自定义模板";
+            const displayOrigin = t.origin === "official" ? "官方模板" : "用户模板";
+            const hasId = !!t.id;
+            
+            return (
             <div
-              key={t.id}
+              key={t.id || Math.random()}
               className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-              data-testid={`template-card-${t.id}`}
+              data-testid={`template-card-${t.id || 'unknown'}`}
             >
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: t.style.primaryColor }} />
-                <h3 className="font-semibold text-sm">{t.name}</h3>
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: t.style?.primaryColor || "#6366f1" }} />
+                <h3 className="font-semibold text-sm">{displayName}</h3>
               </div>
               <div className="text-xs text-gray-500 mb-3">
-                {t.origin === "official" ? "官方模板" : "用户模板"} · {t.toolKey}
+                {displayOrigin} · {displayType}
               </div>
               <div className="flex gap-2 flex-wrap">
-                <a
-                  href={`/tools/template-studio/${t.id}/edit`}
-                  className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
-                  data-testid={`edit-template-${t.id}`}
-                >
-                  编辑
-                </a>
+                {hasId ? (
+                  <a
+                    href={`/tools/template-studio/${t.id}/edit`}
+                    className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
+                    data-testid={`edit-template-${t.id}`}
+                  >
+                    编辑
+                  </a>
+                ) : (
+                  <span className="text-xs px-3 py-1.5 bg-gray-100 text-gray-500 rounded">
+                    异常项：缺少 ID
+                  </span>
+                )}
                 {t.origin === "user" && (
                   <>
                     <button
@@ -831,7 +843,8 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );

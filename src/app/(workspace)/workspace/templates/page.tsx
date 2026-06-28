@@ -110,58 +110,73 @@ export default function WorkspaceTemplatesPage() {
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-testid="workspace-template-grid">
-            {templates.map(t => (
+            {templates.map(t => {
+              const displayName = t.name || "未命名模板";
+              const displayType = t.toolKey || "自定义模板";
+              const displayTime = (t.updatedAt || t.createdAt) ? new Date(t.updatedAt || t.createdAt).toLocaleDateString("zh-CN") : "时间未知";
+              const hasId = !!t.id;
+              
+              return (
               <div
-                key={t.id}
+                key={t.id || Math.random()}
                 className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
-                data-testid={`workspace-template-card-${t.id}`}
+                data-testid={`workspace-template-card-${t.id || 'unknown'}`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div
                     className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: t.style.primaryColor }}
+                    style={{ backgroundColor: t.style?.primaryColor || "#6366f1" }}
                   />
-                  <h3 className="font-semibold text-sm truncate">{t.name}</h3>
+                  <h3 className="font-semibold text-sm truncate">{displayName}</h3>
                 </div>
                 <div className="text-xs text-gray-500 mb-3">
-                  {t.toolKey} · 更新于 {new Date(t.updatedAt).toLocaleDateString("zh-CN")}
+                  {displayType} · 更新于 {displayTime}
                 </div>
                 <div className="flex gap-2">
-                  <a
-                    href={`/tools/template-studio/${t.id}/edit`}
-                    className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
-                    data-testid={`workspace-edit-${t.id}`}
-                  >
-                    编辑
-                  </a>
-                  {deleteConfirmId === t.id ? (
-                    <span className="flex items-center gap-1">
-                      <button
-                        onClick={() => handleDelete(t.id)}
-                        className="text-xs px-2 py-1.5 bg-red-600 text-white rounded hover:bg-red-700"
-                        data-testid={`workspace-confirm-delete-${t.id}`}
-                      >
-                        确认删除
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirmId("")}
-                        className="text-xs px-2 py-1.5 bg-gray-200 rounded"
-                      >
-                        取消
-                      </button>
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => setDeleteConfirmId(t.id)}
-                      className="text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100"
-                      data-testid={`workspace-delete-${t.id}`}
+                  {hasId ? (
+                    <a
+                      href={`/tools/template-studio/${t.id}/edit`}
+                      className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
+                      data-testid={`workspace-edit-${t.id}`}
                     >
-                      删除
-                    </button>
+                      编辑
+                    </a>
+                  ) : (
+                    <span className="text-xs px-3 py-1.5 bg-gray-100 text-gray-500 rounded">
+                      异常项：缺少 ID
+                    </span>
+                  )}
+                  {hasId && (
+                    deleteConfirmId === t.id ? (
+                      <span className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleDelete(t.id)}
+                          className="text-xs px-2 py-1.5 bg-red-600 text-white rounded hover:bg-red-700"
+                          data-testid={`workspace-confirm-delete-${t.id}`}
+                        >
+                          确认删除
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId("")}
+                          className="text-xs px-2 py-1.5 bg-gray-200 rounded"
+                        >
+                          取消
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirmId(t.id)}
+                        className="text-xs px-3 py-1.5 bg-red-50 text-red-600 rounded hover:bg-red-100"
+                        data-testid={`workspace-delete-${t.id}`}
+                      >
+                        删除
+                      </button>
+                    )
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
