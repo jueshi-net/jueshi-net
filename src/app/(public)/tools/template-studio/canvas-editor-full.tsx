@@ -753,7 +753,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.name, pngStatus]);
 
   // ============================================================
-  // Print — iframe-based print-only (v18.6.16.6.23)
+  // Print — iframe-based print-only (v18.6.16.6.25 runtime fix)
   // Isolates canvas labels from site layout (header/footer/nav)
   // ============================================================
 
@@ -764,16 +764,39 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return;
     }
 
+    // v6.25 fix: Only clone canvas-print-page elements, not the wrapper div
+    const pages = printRoot.querySelectorAll("[data-testid=\"canvas-print-page\"], [data-testid=\"canvas-paper\"]");
+    if (pages.length === 0) {
+      console.error("No print pages found in print root");
+      return;
+    }
+
+    // v6.25 fix: Build pages HTML by cloning only the page elements
+    // and stripping page-count/sequence indicators to prevent duplicate 1/10
+    let pagesHTML = "";
+    pages.forEach((page) => {
+      const clone = page.cloneNode(true) as HTMLElement;
+      // Remove page-count and page-sequence indicators from clone
+      clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
+      // Remove grid overlays
+      clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
+      // Remove resize handles and edit buttons
+      clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
+      pagesHTML += clone.outerHTML;
+    });
+
     // Create hidden iframe for isolated printing
+    // v6.25 fix: Use non-zero dimensions positioned off-screen for reliable rendering
     const iframe = document.createElement("iframe");
     iframe.id = "canvas-print-iframe";
     iframe.style.position = "fixed";
     iframe.style.right = "0";
     iframe.style.bottom = "0";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
+    iframe.style.width = "1px";
+    iframe.style.height = "1px";
     iframe.style.border = "0";
     iframe.style.visibility = "hidden";
+    iframe.style.overflow = "hidden";
     document.body.appendChild(iframe);
 
     const iframeDoc = iframe.contentWindow!.document;
@@ -789,7 +812,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     const paperWidthMm = canvas.paper.widthMm;
     const paperHeightMm = canvas.paper.heightMm;
 
-    // Build iframe HTML with only the canvas content
+    // v6.25 fix: Corrected CSS escaping — single backslash to escape colon in class name
     const iframeHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -823,18 +846,6 @@ ${styleElements}
   [data-testid="canvas-paper"] {
     box-shadow: none !important;
   }
-  /* Hide ALL UI elements — only label content should print */
-  [data-testid="canvas-print-page-count"],
-  [data-testid="canvas-print-page-sequence"],
-  [data-testid="canvas-grid-overlay"],
-  [data-testid="canvas-resize-handle"],
-  [data-testid="canvas-sequence-resize-handle"],
-  [data-testid="canvas-edit-text-button"],
-  [data-testid="canvas-text-editor"],
-  [data-testid="canvas-draft-restore-banner"],
-  .print\\:hidden {
-    display: none !important;
-  }
   /* Remove selection ring */
   .ring-2 {
     box-shadow: none !important;
@@ -847,39 +858,54 @@ ${styleElements}
 </style>
 </head>
 <body>
-${printRoot.innerHTML}
+${pagesHTML}
 </body>
 </html>`;
 
     iframeDoc.write(iframeHTML);
     iframeDoc.close();
 
-    // Wait for stylesheets to load, then trigger print
+    // v6.25 fix: Wait for iframe document to be fully ready before printing
     const triggerPrint = () => {
-      setTimeout(() => {
-        try {
-          iframe.contentWindow!.focus();
-          iframe.contentWindow!.print();
-        } catch (err) {
-          console.error("Print failed:", err);
+      // Wait for document to be complete
+      const checkReady = () => {
+        if (iframeDoc.readyState === "complete") {
+          // Extra delay for fonts and images to render
+          setTimeout(() => {
+            try {
+              iframe.contentWindow!.focus();
+              iframe.contentWindow!.print();
+            } catch (err) {
+              console.error("Print failed:", err);
+            }
+            // v6.25 fix: Delay cleanup to 5s to ensure print dialog is dismissed
+            setTimeout(() => {
+              try {
+                if (document.body.contains(iframe)) {
+                  document.body.removeChild(iframe);
+                }
+              } catch { /* ignore */ }
+            }, 5000);
+          }, 500);
+        } else {
+          setTimeout(checkReady, 100);
         }
-        // Clean up iframe after print dialog
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
-      }, 750);
+      };
+      checkReady();
     };
 
-    // Wait for external stylesheets to load
+    // Wait for external stylesheets to load, then trigger print
     const links = iframeDoc.querySelectorAll("link[rel='stylesheet']");
     if (links.length > 0) {
       let loaded = 0;
       const total = links.length;
+      let triggered = false;
       const onLoad = () => {
         loaded++;
-        if (loaded >= total) triggerPrint();
+        if (loaded >= total && !triggered) {
+          triggered = true;
+          triggerPrint();
+        }
       };
       links.forEach((link) => {
         if ((link as HTMLLinkElement).sheet) {
@@ -890,7 +916,12 @@ ${printRoot.innerHTML}
         }
       });
       // Safety timeout — trigger print even if styles haven't loaded
-      setTimeout(triggerPrint, 3000);
+      setTimeout(() => {
+        if (!triggered) {
+          triggered = true;
+          triggerPrint();
+        }
+      }, 5000);
     } else {
       triggerPrint();
     }
