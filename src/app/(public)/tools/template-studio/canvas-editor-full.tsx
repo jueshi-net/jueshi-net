@@ -785,18 +785,22 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       pagesHTML += clone.outerHTML;
     });
 
-    // Create hidden iframe for isolated printing
-    // v6.25 fix: Use non-zero dimensions positioned off-screen for reliable rendering
+    // v6.26 fix: Use large enough iframe to render full page content without clipping
+    // Position off-screen but give it the actual paper dimensions in pixels
+    const paperWidthMm = canvas.paper.widthMm;
+    const paperHeightMm = canvas.paper.heightMm;
+    const paperWidthPx = Math.ceil(paperWidthMm * 3.7795275591); // mm to px at 96 DPI
+    const paperHeightPx = Math.ceil(paperHeightMm * 3.7795275591);
     const iframe = document.createElement("iframe");
     iframe.id = "canvas-print-iframe";
     iframe.style.position = "fixed";
-    iframe.style.right = "0";
-    iframe.style.bottom = "0";
-    iframe.style.width = "1px";
-    iframe.style.height = "1px";
+    iframe.style.left = "-9999px";
+    iframe.style.top = "-9999px";
+    iframe.style.width = `${paperWidthPx + 20}px`;
+    iframe.style.height = `${paperHeightPx * Math.max(pages.length, 1) + 20}px`;
     iframe.style.border = "0";
     iframe.style.visibility = "hidden";
-    iframe.style.overflow = "hidden";
+    iframe.style.overflow = "visible";
     document.body.appendChild(iframe);
 
     const iframeDoc = iframe.contentWindow!.document;
@@ -809,10 +813,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .map((el) => el.outerHTML)
       .join("\n");
 
-    const paperWidthMm = canvas.paper.widthMm;
-    const paperHeightMm = canvas.paper.heightMm;
-
-    // v6.25 fix: Corrected CSS escaping — single backslash to escape colon in class name
+    // v6.26: iframe CSS for print pages
     const iframeHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
