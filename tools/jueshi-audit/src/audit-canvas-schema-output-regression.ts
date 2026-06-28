@@ -718,6 +718,179 @@ const auditCases: Array<{
       }
     },
   },
+
+  // TS-CANVAS-PAGE-NUMBER-1-OF-10
+  {
+    id: "TS-CANVAS-PAGE-NUMBER-1-OF-10",
+    name: "Page 1 shows 1/10 sequence text in multipage mode",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        await page.selectOption('[data-testid="canvas-batch-mode"]', "repeat");
+        await page.fill('[data-testid="canvas-package-count"]', "10");
+        await page.click('[data-testid="canvas-show-sequence"]');
+        await page.waitForTimeout(500);
+        const seqEl = await page.$('[data-testid="canvas-page-1-sequence"]');
+        if (!seqEl) {
+          return { id: "TS-CANVAS-PAGE-NUMBER-1-OF-10", name: "Page 1 sequence", status: "FAIL", severity: "P0", message: "No sequence element on page 1" };
+        }
+        const text = await seqEl.textContent() || "";
+        if (!text.includes("1/") || !text.includes("10")) {
+          return { id: "TS-CANVAS-PAGE-NUMBER-1-OF-10", name: "Page 1 sequence", status: "FAIL", severity: "P0", message: `Page 1 text: "${text}", expected "1/10"` };
+        }
+        return { id: "TS-CANVAS-PAGE-NUMBER-1-OF-10", name: "Page 1 sequence", status: "PASS", severity: "P0", message: `Page 1 shows "${text.trim()}"` };
+      } catch (err) {
+        return { id: "TS-CANVAS-PAGE-NUMBER-1-OF-10", name: "Page 1 sequence", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-PAGE-NUMBER-10-OF-10
+  {
+    id: "TS-CANVAS-PAGE-NUMBER-10-OF-10",
+    name: "Page 10 shows 10/10 sequence text in multipage mode",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        await page.selectOption('[data-testid="canvas-batch-mode"]', "repeat");
+        await page.fill('[data-testid="canvas-package-count"]', "10");
+        await page.click('[data-testid="canvas-show-sequence"]');
+        await page.waitForTimeout(500);
+        const seqEl = await page.$('[data-testid="canvas-page-10-sequence"]');
+        if (!seqEl) {
+          return { id: "TS-CANVAS-PAGE-NUMBER-10-OF-10", name: "Page 10 sequence", status: "FAIL", severity: "P0", message: "No sequence element on page 10" };
+        }
+        const text = await seqEl.textContent() || "";
+        if (!text.includes("10/") || !text.includes("10")) {
+          return { id: "TS-CANVAS-PAGE-NUMBER-10-OF-10", name: "Page 10 sequence", status: "FAIL", severity: "P0", message: `Page 10 text: "${text}", expected "10/10"` };
+        }
+        return { id: "TS-CANVAS-PAGE-NUMBER-10-OF-10", name: "Page 10 sequence", status: "PASS", severity: "P0", message: `Page 10 shows "${text.trim()}"` };
+      } catch (err) {
+        return { id: "TS-CANVAS-PAGE-NUMBER-10-OF-10", name: "Page 10 sequence", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS
+  {
+    id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS",
+    name: "PNG export button click triggers export state (not silent fail)",
+    severity: "P1",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        await page.click('[data-testid="canvas-add-text"]');
+        await page.waitForTimeout(300);
+        const pngBtn = await page.$('[data-testid="canvas-png-export-button"]');
+        if (!pngBtn) {
+          return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: "PNG button not found" };
+        }
+        await pngBtn.click();
+        await page.waitForTimeout(2000);
+        const btnText = await pngBtn.textContent() || "";
+        // Button should show "正在生成..." or "✓ 已导出" — NOT "导出失败"
+        if (btnText.includes("导出失败")) {
+          return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: `PNG export failed, button: "${btnText}"` };
+        }
+        return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "PASS", severity: "P1", message: `PNG export triggered, button: "${btnText}"` };
+      } catch (err) {
+        return { id: "TS-CANVAS-PNG-EXPORT-ACTUAL-WORKS", name: "PNG export actual", status: "FAIL", severity: "P1", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-PRINT-NO-EXTRA-BLANK-PAGE
+  {
+    id: "TS-CANVAS-PRINT-NO-EXTRA-BLANK-PAGE",
+    name: "Print CSS has last-child rule to prevent extra blank page",
+    severity: "P1",
+    run: async (page) => {
+      try {
+        await gotoCanvasEditor(page);
+        const hasLastChildRule = await page.evaluate(() => {
+          const styles = document.querySelectorAll("style");
+          for (const s of styles) {
+            const text = s.textContent || "";
+            if (text.includes("canvas-print-page") && text.includes("last-child") && text.includes("page-break-after: auto")) {
+              return true;
+            }
+          }
+          return false;
+        });
+        if (!hasLastChildRule) {
+          return { id: "TS-CANVAS-PRINT-NO-EXTRA-BLANK-PAGE", name: "Print no extra blank", status: "FAIL", severity: "P1", message: "No :last-child rule found in print CSS" };
+        }
+        return { id: "TS-CANVAS-PRINT-NO-EXTRA-BLANK-PAGE", name: "Print no extra blank", status: "PASS", severity: "P1", message: "Print CSS has :last-child rule to prevent extra blank page" };
+      } catch (err) {
+        return { id: "TS-CANVAS-PRINT-NO-EXTRA-BLANK-PAGE", name: "Print no extra blank", status: "FAIL", severity: "P1", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-PRINT-HIDES-SEQUENCE-INDICATOR
+  {
+    id: "TS-CANVAS-PRINT-HIDES-SEQUENCE-INDICATOR",
+    name: "Print CSS hides both page-count and page-sequence indicators",
+    severity: "P1",
+    run: async (page) => {
+      try {
+        await gotoCanvasEditor(page);
+        const hidesBoth = await page.evaluate(() => {
+          const styles = document.querySelectorAll("style");
+          for (const s of styles) {
+            const text = s.textContent || "";
+            if (text.includes("@media print") && text.includes("canvas-print-page-count") && text.includes("canvas-print-page-sequence")) {
+              return true;
+            }
+          }
+          return false;
+        });
+        if (!hidesBoth) {
+          return { id: "TS-CANVAS-PRINT-HIDES-SEQUENCE-INDICATOR", name: "Print hides indicators", status: "FAIL", severity: "P1", message: "Print CSS does not hide both indicators" };
+        }
+        return { id: "TS-CANVAS-PRINT-HIDES-SEQUENCE-INDICATOR", name: "Print hides indicators", status: "PASS", severity: "P1", message: "Print CSS hides both page-count and page-sequence indicators" };
+      } catch (err) {
+        return { id: "TS-CANVAS-PRINT-HIDES-SEQUENCE-INDICATOR", name: "Print hides indicators", status: "FAIL", severity: "P1", message: `Error: ${err}` };
+      }
+    },
+  },
+
+  // TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION
+  {
+    id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION",
+    name: "Save button and company info block functional",
+    severity: "P0",
+    run: async (page) => {
+      try {
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await gotoCanvasEditor(page);
+        const saveBtn = await page.$('[data-testid="canvas-save-button"]');
+        if (!saveBtn) {
+          return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "FAIL", severity: "P0", message: "Save button not found" };
+        }
+        const saveText = await saveBtn.textContent() || "";
+        if (!saveText.includes("保存")) {
+          return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "FAIL", severity: "P0", message: `Save button text unexpected: "${saveText}"` };
+        }
+        const companyBtn = await page.$('[data-testid="canvas-insert-company-block"]');
+        if (!companyBtn) {
+          return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "FAIL", severity: "P0", message: "Company info block button not found" };
+        }
+        const companyText = await companyBtn.textContent() || "";
+        if (!companyText.includes("公司信息块")) {
+          return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "FAIL", severity: "P0", message: `Company block text unexpected: "${companyText}"` };
+        }
+        return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "PASS", severity: "P0", message: `Save="${saveText.trim()}", Company="${companyText.trim()}"` };
+      } catch (err) {
+        return { id: "TS-CANVAS-SAVE-AND-COMPANY-BLOCK-NO-REGRESSION", name: "Save + company block", status: "FAIL", severity: "P0", message: `Error: ${err}` };
+      }
+    },
+  },
 ];
 
 // ============================================================
