@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import html2canvas from "html2canvas";
 import {
   type CanvasTemplate,
   type CanvasElement,
@@ -690,50 +689,64 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   // ============================================================
 
   const handleExportPng = useCallback(async () => {
-    if (!paperRef.current || pngStatus === "exporting") return;
+    if (pngStatus === "exporting") return;
+    if (!paperRef.current) {
+      setPngStatus("error");
+      setSaveMessage("导出失败: 画布未就绪，请先添加内容");
+      setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 3000);
+      return;
+    }
     
     setPngStatus("exporting");
     try {
-      // Hide grid overlay, resize handles, edit buttons, and selection rings before capture
-      const hideSelectors = [
-        '[data-testid="canvas-grid-overlay"]',
-        '[data-testid="canvas-resize-handle"]',
-        '[data-testid="canvas-sequence-resize-handle"]',
-        '[data-testid="canvas-edit-text-button"]',
-        '[data-testid="canvas-print-page-count"]',
-        '[data-testid="canvas-print-page-sequence"]',
-      ];
-      const hiddenEls: { el: HTMLElement; prev: string }[] = [];
-      hideSelectors.forEach(sel => {
-        paperRef.current!.querySelectorAll(sel).forEach(el => {
-          const htmlEl = el as HTMLElement;
-          hiddenEls.push({ el: htmlEl, prev: htmlEl.style.display });
-          htmlEl.style.display = "none";
+      // Dynamically import html2canvas (avoids SSR issues)
+      const html2canvas = (await import("html2canvas")).default;
+      // Fix: html2canvas v1.4.1 doesn't support lab()/oklch() color functions
+      // used by Tailwind CSS v4. Replace them with safe rgb values via onclone.
+      // Also hide grid overlay, resize handles, edit buttons, and selection rings.
+      const onclone = (clonedDoc: Document) => {
+        // Fix lab()/oklch() colors
+        const allEls = clonedDoc.querySelectorAll('*');
+        allEls.forEach(el => {
+          const cs = clonedDoc.defaultView?.getComputedStyle(el);
+          if (!cs) return;
+          if (cs.color && (cs.color.includes('lab') || cs.color.includes('oklch'))) {
+            (el as HTMLElement).style.color = '#000000';
+          }
+          if (cs.backgroundColor && (cs.backgroundColor.includes('lab') || cs.backgroundColor.includes('oklch'))) {
+            (el as HTMLElement).style.backgroundColor = '#ffffff';
+          }
+          if (cs.borderColor && (cs.borderColor.includes('lab') || cs.borderColor.includes('oklch'))) {
+            (el as HTMLElement).style.borderColor = '#e5e7eb';
+          }
         });
-      });
-      // Also hide selection rings
-      paperRef.current.querySelectorAll(".ring-2").forEach(el => {
-        const htmlEl = el as HTMLElement;
-        hiddenEls.push({ el: htmlEl, prev: htmlEl.style.boxShadow });
-        htmlEl.style.boxShadow = "none";
-      });
-      
+        // Hide UI elements
+        const hideSelectors = [
+          '[data-testid="canvas-grid-overlay"]',
+          '[data-testid="canvas-resize-handle"]',
+          '[data-testid="canvas-sequence-resize-handle"]',
+          '[data-testid="canvas-edit-text-button"]',
+          '[data-testid="canvas-print-page-count"]',
+          '[data-testid="canvas-print-page-sequence"]',
+        ];
+        hideSelectors.forEach(sel => {
+          clonedDoc.querySelectorAll(sel).forEach(el => {
+            (el as HTMLElement).style.display = 'none';
+          });
+        });
+        // Hide selection rings
+        clonedDoc.querySelectorAll('.ring-2').forEach(el => {
+          (el as HTMLElement).style.boxShadow = 'none';
+        });
+      };
       const canvasElement = await html2canvas(paperRef.current, {
         backgroundColor: "#ffffff",
         scale: 2,
         useCORS: true,
         logging: false,
+        onclone,
       });
-      
-      // Restore all hidden elements
-      hiddenEls.forEach(({ el, prev }) => {
-        if (el.style.boxShadow === "none" && prev !== "none") {
-          el.style.boxShadow = prev;
-        } else {
-          el.style.display = prev;
-        }
-      });
-      
+
       const link = document.createElement("a");
       link.download = `${canvas.name || "template"}.png`;
       link.href = canvasElement.toDataURL("image/png");
@@ -743,7 +756,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     } catch (err) {
       console.error("PNG export failed:", err);
       setPngStatus("error");
-      setTimeout(() => setPngStatus("idle"), 3000);
+      setSaveMessage(`导出失败: ${err instanceof Error ? err.message : "未知错误"}`);
+      setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 3000);
     }
   }, [canvas.name, pngStatus]);
 
@@ -806,11 +820,17 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         page-break-after: always;
         break-after: page;
       }
+      /* Last page: no page-break to avoid extra blank page */
+      [data-testid="canvas-print-page"]:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
       [data-testid="canvas-paper"] {
         box-shadow: none !important;
       }
       /* Hide page count indicators in print */
-      [data-testid="canvas-print-page-count"] {
+      [data-testid="canvas-print-page-count"],
+      [data-testid="canvas-print-page-sequence"] {
         display: none !important;
       }
       /* Hide ring selection indicator */
