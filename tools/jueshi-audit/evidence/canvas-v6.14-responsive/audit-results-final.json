@@ -1,0 +1,143 @@
+[
+  {
+    "id": "TS-CANVAS-SCHEMA-NORMALIZE-ELEMENTS",
+    "name": "Schema normalize elements",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "1 element(s) normalized with id",
+    "evidence": "[{\"id\":\"el-1782627376151-48acz5vc2\",\"tag\":\"DIV\",\"hasContent\":true}]"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-NO-MISSING-ID",
+    "name": "Save no missing id",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "All 0 element(s) have id"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-NO-MISSING-TOOLKEY",
+    "name": "Save no missing toolKey",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "All 0 element(s) have type"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-FIELDS-COLUMNS-ARRAY",
+    "name": "Save fields columns array",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Elements is array, count=1, hasTable=true"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-HAS-STYLE-CONFIG",
+    "name": "Save has style config",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "All 1 element(s) have style config"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-SUCCESS-REAL",
+    "name": "Save success feedback",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Save feedback: \"✓ 已保存 2:16:26 PM\""
+  },
+  {
+    "id": "TS-CANVAS-SAVE-REOPEN-RESTORE-REAL",
+    "name": "Draft restore after reload",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Draft banner=true, elements=0"
+  },
+  {
+    "id": "TS-CANVAS-PNG-EXPORT-WORKS-AFTER-SCHEMA",
+    "name": "PNG export functional",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "PNG button exists, text: \"导出 PNG\""
+  },
+  {
+    "id": "TS-CANVAS-PRINT-ONLY-CANVAS-NO-UI",
+    "name": "Print only canvas",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Print CSS exists hiding editor UI"
+  },
+  {
+    "id": "TS-CANVAS-IPAD-LAYOUT-1024",
+    "name": "iPad 1024 layout",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "No overflow, editor visible, scrollW=1024"
+  },
+  {
+    "id": "TS-CANVAS-IPAD-LAYOUT-768",
+    "name": "iPad 768 layout",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "No overflow, editor visible"
+  },
+  {
+    "id": "TS-CANVAS-SEQUENCE-MULTIPAGE-SELECTABLE",
+    "name": "Sequence selectable multipage",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Sequence element selectable on page 1"
+  },
+  {
+    "id": "TS-CANVAS-SEQUENCE-MULTIPAGE-DRAGGABLE",
+    "name": "Sequence draggable multipage",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Sequence element is draggable on page 1"
+  },
+  {
+    "id": "TS-CANVAS-SEQUENCE-TOGGLE-OFF-HIDES",
+    "name": "Sequence toggle off hides",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Sequence hidden, 10 hidden marker(s)"
+  },
+  {
+    "id": "TS-CANVAS-GRID-OVERLAY-VISIBLE-PC",
+    "name": "Grid overlay visible PC",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Grid overlay visible with 104 lines"
+  },
+  {
+    "id": "TS-CANVAS-SNAP-GRID-CHANGES-COORDS",
+    "name": "Snap grid changes coords",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "X=20.0 snapped to grid=5"
+  },
+  {
+    "id": "TS-CANVAS-FONT-SELECT-NOT-REGRESSED",
+    "name": "Font select not regressed",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "4 fonts: [\"系统字体\",\"无衬线\",\"衬线\",\"等宽\"]"
+  },
+  {
+    "id": "TS-CANVAS-UNDO-REDO-NOT-REGRESSED",
+    "name": "Undo/redo not regressed",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Undo/redo one step at a time verified"
+  },
+  {
+    "id": "TS-CANVAS-PRODUCT-TABLE-NO-CRASH",
+    "name": "Product table no crash",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Table added without crash, empty msg=true"
+  },
+  {
+    "id": "TS-CANVAS-END-TO-END-LABEL-FLOW",
+    "name": "E2E label flow",
+    "status": "PASS",
+    "severity": "P0",
+    "message": "Full flow: 10x15+text+font+table+seq+grid — no crash, all buttons present"
+  }
+]

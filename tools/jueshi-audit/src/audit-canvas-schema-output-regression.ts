@@ -175,18 +175,21 @@ const auditCases: Array<{
       try {
         await gotoCanvasEditor(page);
         await page.click('[data-testid="canvas-add-table"]');
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(2000); // wait for debounced draft save
         const saveData = await page.evaluate(() => {
           const raw = localStorage.getItem("canvas-editor-draft");
           if (raw) {
             const draft = JSON.parse(raw);
             const els = draft.canvas?.elements;
-            return { isArray: Array.isArray(els), count: els?.length || 0, hasTable: els?.some((e: any) => e.type === "table") };
+            return { isArray: Array.isArray(els), count: els?.length || 0, hasTable: els?.some((e: any) => e.type === "table"), raw: raw.substring(0, 200) };
           }
           return null;
         });
-        if (!saveData?.isArray) {
-          return { id: "TS-CANVAS-SAVE-FIELDS-COLUMNS-ARRAY", name: "Save fields columns array", status: "FAIL", severity: "P0", message: "Elements is not an array" };
+        if (!saveData) {
+          return { id: "TS-CANVAS-SAVE-FIELDS-COLUMNS-ARRAY", name: "Save fields columns array", status: "FAIL", severity: "P0", message: "No draft in localStorage" };
+        }
+        if (!saveData.isArray) {
+          return { id: "TS-CANVAS-SAVE-FIELDS-COLUMNS-ARRAY", name: "Save fields columns array", status: "FAIL", severity: "P0", message: `Elements is not an array. Raw: ${saveData.raw}` };
         }
         return { id: "TS-CANVAS-SAVE-FIELDS-COLUMNS-ARRAY", name: "Save fields columns array", status: "PASS", severity: "P0", message: `Elements is array, count=${saveData.count}, hasTable=${saveData.hasTable}` };
       } catch (err) {
