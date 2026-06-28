@@ -562,7 +562,7 @@ const auditCases: Array<{
   // TS-CANVAS-FONT-SELECT-NOT-REGRESSED
   {
     id: "TS-CANVAS-FONT-SELECT-NOT-REGRESSED",
-    name: "Font selection not regressed — 4 fonts with clear labels",
+    name: "Font selection not regressed — at least 8 fonts with clear labels",
     severity: "P0",
     run: async (page) => {
       try {
@@ -577,11 +577,11 @@ const auditCases: Array<{
           return { id: "TS-CANVAS-FONT-SELECT-NOT-REGRESSED", name: "Font select not regressed", status: "FAIL", severity: "P0", message: "Font select not found" };
         }
         const options = await fontSelect.$$("option");
-        if (options.length < 4) {
-          return { id: "TS-CANVAS-FONT-SELECT-NOT-REGRESSED", name: "Font select not regressed", status: "FAIL", severity: "P0", message: `Only ${options.length} font options` };
+        if (options.length < 8) {
+          return { id: "TS-CANVAS-FONT-SELECT-NOT-REGRESSED", name: "Font select not regressed", status: "FAIL", severity: "P1", message: `Only ${options.length} font options (spec requires at least 8)` };
         }
         const labels = await Promise.all(options.map(o => o.textContent()));
-        const hasExpected = labels.some(l => l?.includes("系统字体")) && labels.some(l => l?.includes("无衬线"));
+        const hasExpected = labels.some(l => l?.includes("系统字体")) && labels.some(l => l?.includes("等宽"));
         if (!hasExpected) {
           return { id: "TS-CANVAS-FONT-SELECT-NOT-REGRESSED", name: "Font select not regressed", status: "FAIL", severity: "P0", message: `Font labels: ${JSON.stringify(labels)}` };
         }
