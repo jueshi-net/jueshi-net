@@ -83,10 +83,14 @@ interface ProductList {
 
 const DRAFT_KEY = "canvas-editor-draft";
 const FONT_FAMILIES = [
-  { label: "系统字体", value: "system-ui, -apple-system, sans-serif" },
-  { label: "无衬线", value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
-  { label: "衬线", value: "'Noto Serif SC', 'SimSun', serif" },
-  { label: "等宽", value: "'Courier New', monospace" },
+  { label: "系统字体", value: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' },
+  { label: "微软雅黑", value: '"Microsoft YaHei", "PingFang SC", "Helvetica Neue", sans-serif' },
+  { label: "苹方", value: '"PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif' },
+  { label: "黑体", value: '"Heiti SC", "SimHei", "Microsoft YaHei", sans-serif' },
+  { label: "宋体", value: '"Songti SC", "SimSun", "Noto Serif SC", serif' },
+  { label: "楷体", value: '"Kaiti SC", "KaiTi", "STKaiti", serif' },
+  { label: "仿宋", value: '"FangSong", "STFangsong", "Noto Serif SC", serif' },
+  { label: "等宽", value: '"Courier New", "SF Mono", "Menlo", monospace' },
 ];
 
 // ============================================================
@@ -365,6 +369,37 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     setCanvas(newCanvas);
     pushHistory(newCanvas);
     setSelectedElementId(newElement.id);
+    setSaveStatus("idle");
+  }, [canvas, pushHistory]);
+
+  const insertCompanyBlock = useCallback(() => {
+    const baseZ = getNextZIndex(canvas.elements);
+    const companyFields = [
+      { binding: "company.companyName", label: "公司名称", y: 5 },
+      { binding: "company.contactName", label: "联系人", y: 12 },
+      { binding: "company.phone", label: "电话", y: 19 },
+      { binding: "company.address", label: "地址", y: 26 },
+    ];
+    const newElements: CanvasElement[] = companyFields.map((f, i) => {
+      const el = defaultCanvasElement("field");
+      el.id = `el-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
+      el.x = 5;
+      el.y = f.y;
+      el.width = 80;
+      el.height = 6;
+      el.zIndex = baseZ + i;
+      el.binding = f.binding;
+      el.style = { ...el.style, fontSize: 10 };
+      return el;
+    });
+    const newCanvas = {
+      ...canvas,
+      elements: [...canvas.elements, ...newElements],
+      updatedAt: new Date().toISOString(),
+    };
+    setCanvas(newCanvas);
+    pushHistory(newCanvas);
+    setSelectedElementId(newElements[0]?.id || null);
     setSaveStatus("idle");
   }, [canvas, pushHistory]);
 
@@ -944,9 +979,8 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       } else {
         const pName = safeProduct?.name ?? "—";
         const pSku = safeProduct?.sku ?? "—";
-        const pPrice = typeof safeProduct?.unitPrice === "number" 
-          ? safeProduct.unitPrice.toFixed(2) 
-          : "0.00";
+        const tableQty = (element as any).tableOverrides?.quantity ?? 1;
+        const tablePrice = (element as any).tableOverrides?.unitPrice ?? (typeof safeProduct?.unitPrice === "number" ? safeProduct.unitPrice.toFixed(2) : "0.00");
         
         content = (
           <div className="w-full h-full overflow-auto" data-testid="canvas-product-table">
@@ -963,8 +997,32 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
                 <tr data-testid="canvas-product-table-row">
                   <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-name">{pName}</td>
                   <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-sku">{pSku}</td>
-                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-qty">1</td>
-                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-price">{pPrice}</td>
+                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-qty">
+                    <input
+                      type="number"
+                      min="1"
+                      value={tableQty}
+                      onChange={e => {
+                        const val = parseInt(e.target.value) || 1;
+                        updateElement(element.id, { tableOverrides: { ...(element as any).tableOverrides, quantity: val } } as any);
+                      }}
+                      className="w-12 text-right border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 px-0 py-0"
+                      data-testid="canvas-table-quantity-input"
+                    />
+                  </td>
+                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-price">
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={tablePrice}
+                      onChange={e => {
+                        const val = parseFloat(e.target.value) || 0;
+                        updateElement(element.id, { tableOverrides: { ...(element as any).tableOverrides, unitPrice: val.toFixed(2) } } as any);
+                      }}
+                      className="w-16 text-right border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-blue-400 px-0 py-0"
+                      data-testid="canvas-table-unit-price-input"
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -1238,6 +1296,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           >
             + 表格
           </button>
+          <button
+            onClick={insertCompanyBlock}
+            className="w-full px-3 py-2 bg-indigo-50 text-indigo-700 rounded hover:bg-indigo-100 text-sm"
+            data-testid="canvas-insert-company-block"
+          >
+            + 公司信息块
+          </button>
           {/* Seal button hidden (option B) — real stamp generation is NEXT */}
         </div>
 
@@ -1488,9 +1553,16 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
                   data-testid="canvas-font-family-select"
                 >
                   {FONT_FAMILIES.map(f => (
-                    <option key={f.value} value={f.value}>{f.label}</option>
+                    <option key={f.value} value={f.value} data-testid="canvas-font-family-option" data-font-label={f.label}>{f.label}</option>
                   ))}
                 </select>
+                <div
+                  className="mt-1 px-2 py-1 border rounded text-sm bg-gray-50"
+                  data-testid="canvas-font-preview"
+                  style={{ fontFamily: selectedElement.style.fontFamily || FONT_FAMILIES[0].value }}
+                >
+                  字体预览 ABC abc 123
+                </div>
               </div>
             )}
             
