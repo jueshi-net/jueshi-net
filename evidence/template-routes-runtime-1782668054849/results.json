@@ -1,0 +1,48 @@
+{
+  "results": [
+    {
+      "id": "TS-TOOLS-HAS-REAL-CTA-BANNER",
+      "name": "/tools has real CTA banner",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Banner with title, subtitle, and 3 CTAs found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782668054849/tools-banner.png"
+    },
+    {
+      "id": "TS-TEMPLATE-STUDIO-PAGE-LOADS",
+      "name": "/tools/template-studio loads",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "Cannot login to test"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-UNAUTH-HANDLED",
+      "name": "/workspace/templates unauth handled",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Redirected to login",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782668054849/workspace-templates-unauth.png"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-AUTH-LOADS",
+      "name": "/workspace/templates auth loads",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "Cannot login to test"
+    },
+    {
+      "id": "TS-CTA-MOBILE-NO-BREAK",
+      "name": "CTA mobile doesn't break",
+      "status": "PASS",
+      "severity": "P1",
+      "message": "CTA container wraps correctly on mobile",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782668054849/tools-mobile.png"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "blocked": 2,
+    "total": 5
+  }
+}

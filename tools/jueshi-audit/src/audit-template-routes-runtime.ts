@@ -1,19 +1,15 @@
 #!/usr/bin/env tsx
 /**
- * Template Routes Runtime Audit
- * v1.20.42.18.6.16.6.30
+ * Template Routes Runtime Audit v2
+ * v1.20.42.18.6.16.6.31
  *
- * Tests template routes runtime behavior:
- * - /tools has real CTA banner
- * - /tools/template-studio loads
- * - /workspace/templates handles unauth
- * - /workspace/templates loads when authed
- * - Saved canvas appears in templates
- * - Edit link doesn't crash
- * - Mobile CTA doesn't break
+ * FIXED: Use separate browser contexts for authenticated vs unauthenticated tests
+ * - Unauthenticated tests use isolated context
+ * - Authenticated tests use separate context with fresh login
+ * - No cookie pollution between test cases
  */
 
-import { chromium, type Page, type Browser } from "playwright";
+import { chromium, type Page, type Browser, type BrowserContext } from "playwright";
 import fs from "fs";
 import path from "path";
 
@@ -40,27 +36,65 @@ interface AuditResult {
 }
 
 // ============================================================
-// Helper: Login
+// Helper: Login in isolated context
 // ============================================================
 
-async function login(page: Page): Promise<boolean> {
+async function loginInContext(context: BrowserContext): Promise<boolean> {
+  const page = await context.newPage();
   try {
-    await page.goto(`${BASE_URL}/login`);
+    await page.goto(`${BASE_URL}/login`, { waitUntil: "networkidle", timeout: 30000 });
     await page.waitForSelector('input[type="email"]', { timeout: 10000 });
     await page.fill('input[type="email"]', TEST_EMAIL);
     const pwd = fs.readFileSync(TEST_PASSWORD_FILE, "utf-8").trim();
     await page.fill('input[type="password"]', pwd);
+    
+    // Accept cookies if present
     try {
-      const cookieBtn = await page.$('button:has-text("Accept"), button:has-text("接受")');
-      if (cookieBtn) await cookieBtn.click();
+      const cookieBtn = await page.$('button:has-text("Accept"), button:has-text("接受"), button:has-text("我知道了")');
+      if (cookieBtn) await cookieBtn.click({ timeout: 2000 });
     } catch { /* ignore */ }
+    
     await page.click('button[type="submit"]');
     await page.waitForURL("**/tools**", { timeout: 15000 });
+    await page.waitForLoadState("networkidle", { timeout: 10000 });
+    await page.waitForTimeout(2000);
+    
+    // Verify we're logged in by checking we're on /tools page and no error
+    const currentUrl = page.url();
+    const hasError = await page.$('text="请先登录"');
+    if (hasError || !currentUrl.includes("/tools")) {
+      console.error("Login failed - still on login page or error shown");
+      console.error("Current URL:", currentUrl);
+      await page.screenshot({ path: `${EVIDENCE_DIR}/login-debug.png` });
+      return false;
+    }
+    
     return true;
   } catch (err) {
     console.error("Login failed:", err);
     return false;
+  } finally {
+    await page.close();
   }
+}
+
+// ============================================================
+// Helper: Check for error messages
+// ============================================================
+
+async function hasErrorMessage(page: Page): Promise<string | null> {
+  const errorTexts = [
+    "this page couldn't load",
+    "页面加载失败",
+    "工作台暂时无法加载",
+    "请先登录",
+  ];
+  
+  for (const errorText of errorTexts) {
+    const found = await page.$(`text="${errorText}"`);
+    if (found) return errorText;
+  }
+  return null;
 }
 
 // ============================================================
@@ -77,41 +111,48 @@ async function runAudit(): Promise<AuditResult[]> {
     console.log(`Evidence directory: ${EVIDENCE_DIR}`);
 
     browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
-    const page = await context.newPage();
 
     // ============================================================
-    // TEST 1: /tools has real CTA banner
+    // TEST 1: /tools has real CTA banner (no auth needed)
     // ============================================================
-    await page.goto(`${BASE_URL}/tools`, { timeout: 60000 });
-    await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-    await page.waitForTimeout(2000);
+    console.log("\n=== TEST 1: /tools banner (unauthenticated) ===");
+    const unauthContext1 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    const page1 = await unauthContext1.newPage();
+    
+    await page1.goto(`${BASE_URL}/tools`, { waitUntil: "networkidle", timeout: 60000 });
+    await page1.waitForTimeout(2000);
 
-    const hasBannerTitle = await page.$('h1:has-text("工具中心"), h2:has-text("工具中心")');
-    const hasBannerSubtitle = await page.$('p:has-text("实用工具"), p:has-text("出海")');
-    const hasDocumentsCTA = await page.$('a[href="/tools/documents"]');
-    const hasTemplateStudioCTA = await page.$('a[href="/tools/template-studio"]');
-    const hasMyTemplatesCTA = await page.$('a[href="/workspace/templates"]');
+    const hasBannerTitle = await page1.$('h1:has-text("工具中心"), h2:has-text("工具中心")');
+    const hasBannerSubtitle = await page1.$('p:has-text("实用工具"), p:has-text("出海"), p:has-text("一站式")');
+    const hasDocumentsCTA = await page1.$('a[href="/tools/documents"]');
+    const hasTemplateStudioCTA = await page1.$('a[href="/tools/template-studio"]');
+    const hasMyTemplatesCTA = await page1.$('a[href="/workspace/templates"]');
 
+    const bannerPass = !!(hasBannerTitle && hasBannerSubtitle && hasDocumentsCTA && hasTemplateStudioCTA && hasMyTemplatesCTA);
+    
     results.push({
       id: "TS-TOOLS-HAS-REAL-CTA-BANNER",
       name: "/tools has real CTA banner",
-      status: hasBannerTitle && hasBannerSubtitle && hasDocumentsCTA && hasTemplateStudioCTA && hasMyTemplatesCTA ? "PASS" : "FAIL",
+      status: bannerPass ? "PASS" : "FAIL",
       severity: "P0",
-      message: hasBannerTitle && hasBannerSubtitle && hasDocumentsCTA && hasTemplateStudioCTA && hasMyTemplatesCTA
+      message: bannerPass
         ? "Banner with title, subtitle, and 3 CTAs found"
         : `Banner incomplete: title=${!!hasBannerTitle}, subtitle=${!!hasBannerSubtitle}, docs=${!!hasDocumentsCTA}, studio=${!!hasTemplateStudioCTA}, templates=${!!hasMyTemplatesCTA}`,
       evidence: `${EVIDENCE_DIR}/tools-banner.png`,
     });
 
-    await page.screenshot({ path: `${EVIDENCE_DIR}/tools-banner.png`, fullPage: false });
+    await page1.screenshot({ path: `${EVIDENCE_DIR}/tools-banner.png`, fullPage: false });
+    await page1.close();
+    await unauthContext1.close();
 
     // ============================================================
-    // TEST 2: /tools/template-studio loads
+    // TEST 2: /tools/template-studio loads (authenticated)
     // ============================================================
-    // Login first since this page requires auth
-    const loggedInForTest2 = await login(page);
-    if (!loggedInForTest2) {
+    console.log("\n=== TEST 2: /tools/template-studio (authenticated) ===");
+    const authContext2 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    const loggedIn2 = await loginInContext(authContext2);
+    
+    if (!loggedIn2) {
       results.push({
         id: "TS-TEMPLATE-STUDIO-PAGE-LOADS",
         name: "/tools/template-studio loads",
@@ -120,60 +161,73 @@ async function runAudit(): Promise<AuditResult[]> {
         message: "Cannot login to test",
       });
     } else {
-      await page.goto(`${BASE_URL}/tools/template-studio`, { timeout: 60000 });
-      await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-      await page.waitForTimeout(3000);
+      const page2 = await authContext2.newPage();
+      await page2.goto(`${BASE_URL}/tools/template-studio`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page2.waitForTimeout(3000);
 
-      const hasStartDesign = await page.$('a:has-text("开始设计"), button:has-text("开始设计")');
-      const hasMyTemplates = await page.$('a:has-text("我的模板")');
-      const hasError = await page.$('text="this page couldn\'t load"');
+      const error = await hasErrorMessage(page2);
+      const hasStartDesign = await page2.$('a:has-text("开始设计"), button:has-text("开始设计")');
+      const hasMyTemplates = await page2.$('a:has-text("我的模板"), a:has-text("我的模板")');
+      const hasTemplateStudioList = await page2.$('[data-testid="template-studio-list"], h1:has-text("模板工作室")');
 
+      const pagePass = !error && hasStartDesign && hasMyTemplates && hasTemplateStudioList;
+      
       results.push({
         id: "TS-TEMPLATE-STUDIO-PAGE-LOADS",
         name: "/tools/template-studio loads",
-        status: !hasError && hasStartDesign && hasMyTemplates ? "PASS" : "FAIL",
+        status: pagePass ? "PASS" : "FAIL",
         severity: "P0",
-        message: !hasError && hasStartDesign && hasMyTemplates
+        message: pagePass
           ? "Page loaded with '开始设计' and '我的模板'"
-          : hasError ? "Page shows 'this page couldn't load'" : `Missing: startDesign=${!!hasStartDesign}, myTemplates=${!!hasMyTemplates}`,
+          : error ? `Error found: ${error}` : `Missing: startDesign=${!!hasStartDesign}, myTemplates=${!!hasMyTemplates}, list=${!!hasTemplateStudioList}`,
         evidence: `${EVIDENCE_DIR}/template-studio.png`,
       });
 
-      await page.screenshot({ path: `${EVIDENCE_DIR}/template-studio.png`, fullPage: false });
+      await page2.screenshot({ path: `${EVIDENCE_DIR}/template-studio.png`, fullPage: false });
+      await page2.close();
     }
+    await authContext2.close();
 
     // ============================================================
-    // TEST 3: /workspace/templates unauth handled
+    // TEST 3: /workspace/templates unauth handled (unauthenticated)
     // ============================================================
-    // Clear cookies to simulate unauth
-    await context.clearCookies();
-    await page.goto(`${BASE_URL}/workspace/templates`, { timeout: 60000 });
-    await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-    await page.waitForTimeout(3000);
+    console.log("\n=== TEST 3: /workspace/templates (unauthenticated) ===");
+    const unauthContext3 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    const page3 = await unauthContext3.newPage();
+    
+    await page3.goto(`${BASE_URL}/workspace/templates`, { waitUntil: "networkidle", timeout: 60000 });
+    await page3.waitForTimeout(3000);
 
-    const currentUrl = page.url();
+    const currentUrl = page3.url();
     const isRedirectedToLogin = currentUrl.includes("/login");
-    const hasLoginPrompt = await page.$('input[type="email"]') || await page.$('input[type="password"]') || await page.$('text="请先登录"');
-    const hasLoadError = await page.$('text="工作台暂时无法加载"');
+    const hasLoginPrompt = await page3.$('input[type="email"]') || await page3.$('input[type="password"]') || await page3.$('text="请先登录"');
+    const hasLoadError = await page3.$('text="工作台暂时无法加载"');
 
+    const unauthPass = (isRedirectedToLogin || !!hasLoginPrompt) && !hasLoadError;
+    
     results.push({
       id: "TS-WORKSPACE-TEMPLATES-UNAUTH-HANDLED",
       name: "/workspace/templates unauth handled",
-      status: (isRedirectedToLogin || hasLoginPrompt) && !hasLoadError ? "PASS" : "FAIL",
+      status: unauthPass ? "PASS" : "FAIL",
       severity: "P0",
-      message: (isRedirectedToLogin || hasLoginPrompt) && !hasLoadError
+      message: unauthPass
         ? isRedirectedToLogin ? "Redirected to login" : "Shows login prompt"
         : hasLoadError ? "Shows '工作台暂时无法加载'" : "No login prompt or redirect",
       evidence: `${EVIDENCE_DIR}/workspace-templates-unauth.png`,
     });
 
-    await page.screenshot({ path: `${EVIDENCE_DIR}/workspace-templates-unauth.png`, fullPage: false });
+    await page3.screenshot({ path: `${EVIDENCE_DIR}/workspace-templates-unauth.png`, fullPage: false });
+    await page3.close();
+    await unauthContext3.close();
 
     // ============================================================
-    // TEST 4: /workspace/templates auth loads
+    // TEST 4: /workspace/templates auth loads (authenticated)
     // ============================================================
-    const loggedIn = await login(page);
-    if (!loggedIn) {
+    console.log("\n=== TEST 4: /workspace/templates (authenticated) ===");
+    const authContext4 = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    const loggedIn4 = await loginInContext(authContext4);
+    
+    if (!loggedIn4) {
       results.push({
         id: "TS-WORKSPACE-TEMPLATES-AUTH-LOADS",
         name: "/workspace/templates auth loads",
@@ -182,57 +236,61 @@ async function runAudit(): Promise<AuditResult[]> {
         message: "Cannot login to test",
       });
     } else {
-      await page.goto(`${BASE_URL}/workspace/templates`, { timeout: 60000 });
-      await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-      await page.waitForTimeout(3000);
+      const page4 = await authContext4.newPage();
+      await page4.goto(`${BASE_URL}/workspace/templates`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page4.waitForTimeout(3000);
 
-      const hasTitle = await page.$('h1:has-text("我的模板")');
-      const hasLoadError2 = await page.$('text="工作台暂时无法加载"');
+      const error = await hasErrorMessage(page4);
+      const hasTitle = await page4.$('h1:has-text("我的模板")');
+      const hasTemplatesPage = await page4.$('[data-testid="workspace-templates-page"]');
 
+      const authPass = !error && hasTitle && hasTemplatesPage;
+      
       results.push({
         id: "TS-WORKSPACE-TEMPLATES-AUTH-LOADS",
         name: "/workspace/templates auth loads",
-        status: hasTitle && !hasLoadError2 ? "PASS" : "FAIL",
+        status: authPass ? "PASS" : "FAIL",
         severity: "P0",
-        message: hasTitle && !hasLoadError2
+        message: authPass
           ? "Page loaded with title '我的模板'"
-          : hasLoadError2 ? "Shows '工作台暂时无法加载'" : "No title found",
+          : error ? `Error found: ${error}` : `Missing: title=${!!hasTitle}, page=${!!hasTemplatesPage}`,
         evidence: `${EVIDENCE_DIR}/workspace-templates-auth.png`,
       });
 
-      await page.screenshot({ path: `${EVIDENCE_DIR}/workspace-templates-auth.png`, fullPage: false });
+      await page4.screenshot({ path: `${EVIDENCE_DIR}/workspace-templates-auth.png`, fullPage: false });
+      await page4.close();
 
       // ============================================================
-      // TEST 5: Saved canvas appears in templates
+      // TEST 5: Saved canvas appears in templates (authenticated, same context)
       // ============================================================
-      // Go to canvas editor and save a template
-      await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { timeout: 60000 });
-      await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-      await page.waitForTimeout(3000);
+      console.log("\n=== TEST 5: Save canvas and verify in templates ===");
+      const page5 = await authContext4.newPage();
+      await page5.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page5.waitForTimeout(3000);
 
       // Add a text element
-      const addTextBtn = await page.$('button:has-text("文本"), button:has-text("添加文本")');
+      const addTextBtn = await page5.$('button:has-text("文本"), button:has-text("添加文本")');
       if (addTextBtn) {
         await addTextBtn.click();
-        await page.waitForTimeout(1000);
+        await page5.waitForTimeout(1000);
       }
 
       // Save the template
-      const saveBtn = await page.$('[data-testid="canvas-save-button"]');
+      const saveBtn = await page5.$('[data-testid="canvas-save-button"]');
       if (saveBtn) {
         await saveBtn.click();
-        await page.waitForTimeout(3000);
+        await page5.waitForTimeout(3000);
 
         // Check for "查看我的模板" link
-        const viewMyTemplatesLink = await page.$('a:has-text("查看我的模板"), a:has-text("我的模板")');
+        const viewMyTemplatesLink = await page5.$('a:has-text("查看我的模板"), a:has-text("我的模板")');
         
         if (viewMyTemplatesLink) {
           await viewMyTemplatesLink.click();
-          await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-          await page.waitForTimeout(3000);
+          await page5.waitForLoadState("domcontentloaded", { timeout: 30000 });
+          await page5.waitForTimeout(3000);
 
           // Check if the template appears in the list
-          const hasTemplateCard = await page.$('[data-testid^="workspace-template-card-"]');
+          const hasTemplateCard = await page5.$('[data-testid^="workspace-template-card-"]');
           
           results.push({
             id: "TS-SAVED-CANVAS-APPEARS-IN-TEMPLATES",
@@ -243,32 +301,35 @@ async function runAudit(): Promise<AuditResult[]> {
             evidence: `${EVIDENCE_DIR}/saved-template-in-list.png`,
           });
 
-          await page.screenshot({ path: `${EVIDENCE_DIR}/saved-template-in-list.png`, fullPage: false });
+          await page5.screenshot({ path: `${EVIDENCE_DIR}/saved-template-in-list.png`, fullPage: false });
 
           // ============================================================
           // TEST 6: Template edit link doesn't crash
           // ============================================================
-          const editLink = await page.$('a:has-text("编辑")');
+          console.log("\n=== TEST 6: Template edit link ===");
+          const editLink = await page5.$('a:has-text("编辑")');
           if (editLink) {
             await editLink.click();
-            await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-            await page.waitForTimeout(3000);
+            await page5.waitForLoadState("domcontentloaded", { timeout: 30000 });
+            await page5.waitForTimeout(3000);
 
-            const hasEditError = await page.$('text="this page couldn\'t load"');
-            const hasEditor = await page.$('[data-testid="canvas-editor-root"], [data-testid="template-studio-edit"]');
+            const editError = await hasErrorMessage(page5);
+            const hasEditor = await page5.$('[data-testid="canvas-editor-root"], [data-testid="template-studio-edit"], h1:has-text("编辑")');
 
+            const editPass = !editError && hasEditor;
+            
             results.push({
               id: "TS-TEMPLATE-EDIT-LINK-NO-CRASH",
               name: "Template edit link doesn't crash",
-              status: !hasEditError && hasEditor ? "PASS" : "FAIL",
+              status: editPass ? "PASS" : "FAIL",
               severity: "P0",
-              message: !hasEditError && hasEditor
+              message: editPass
                 ? "Edit page loaded successfully"
-                : hasEditError ? "Page shows 'this page couldn't load'" : "Editor not found",
+                : editError ? `Error found: ${editError}` : "Editor not found",
               evidence: `${EVIDENCE_DIR}/template-edit.png`,
             });
 
-            await page.screenshot({ path: `${EVIDENCE_DIR}/template-edit.png`, fullPage: false });
+            await page5.screenshot({ path: `${EVIDENCE_DIR}/template-edit.png`, fullPage: false });
           } else {
             results.push({
               id: "TS-TEMPLATE-EDIT-LINK-NO-CRASH",
@@ -310,36 +371,44 @@ async function runAudit(): Promise<AuditResult[]> {
           message: "Cannot test - no template saved",
         });
       }
+      await page5.close();
     }
+    await authContext4.close();
 
     // ============================================================
-    // TEST 7: CTA mobile doesn't break
+    // TEST 7: CTA mobile doesn't break (unauthenticated)
     // ============================================================
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto(`${BASE_URL}/tools`, { timeout: 60000 });
-    await page.waitForLoadState("domcontentloaded", { timeout: 60000 });
-    await page.waitForTimeout(2000);
+    console.log("\n=== TEST 7: CTA mobile (unauthenticated) ===");
+    const unauthContext7 = await browser.newContext({ viewport: { width: 375, height: 667 } });
+    const page7 = await unauthContext7.newPage();
+    
+    await page7.goto(`${BASE_URL}/tools`, { waitUntil: "networkidle", timeout: 60000 });
+    await page7.waitForTimeout(2000);
 
-    const ctaContainer = await page.$('.flex.items-center.gap-2.flex-wrap');
-    const hasOverflow = await page.evaluate(() => {
+    const ctaContainer = await page7.$('.flex.items-center.gap-2.flex-wrap');
+    const hasOverflow = await page7.evaluate(() => {
       const container = document.querySelector('.flex.items-center.gap-2.flex-wrap');
       if (!container) return false;
       const rect = container.getBoundingClientRect();
       return rect.width > window.innerWidth;
     });
 
+    const mobilePass = !!ctaContainer && !hasOverflow;
+    
     results.push({
       id: "TS-CTA-MOBILE-NO-BREAK",
       name: "CTA mobile doesn't break",
-      status: ctaContainer && !hasOverflow ? "PASS" : "FAIL",
+      status: mobilePass ? "PASS" : "FAIL",
       severity: "P1",
-      message: ctaContainer && !hasOverflow
+      message: mobilePass
         ? "CTA container wraps correctly on mobile"
         : hasOverflow ? "CTA overflows on mobile" : "CTA container not found",
       evidence: `${EVIDENCE_DIR}/tools-mobile.png`,
     });
 
-    await page.screenshot({ path: `${EVIDENCE_DIR}/tools-mobile.png`, fullPage: false });
+    await page7.screenshot({ path: `${EVIDENCE_DIR}/tools-mobile.png`, fullPage: false });
+    await page7.close();
+    await unauthContext7.close();
 
     // Cleanup
     await browser.close();
@@ -364,7 +433,7 @@ async function runAudit(): Promise<AuditResult[]> {
 // ============================================================
 
 async function main() {
-  console.log("=== Template Routes Runtime Audit ===");
+  console.log("=== Template Routes Runtime Audit v2 ===");
   console.log(`Target: ${BASE_URL}`);
   console.log(`Time: ${new Date().toISOString()}`);
   console.log("");
