@@ -80,7 +80,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           </p>
           {/* Documents hub CTA — only on default view */}
           {!query && !category && (
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <Link
                 href="/tools/documents"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-100 transition-colors border border-purple-200"
@@ -96,6 +96,15 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
               >
                 <Wrench className="w-3.5 h-3.5" />
                 模板设计器
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link
+                href="/workspace/templates"
+                data-testid="tools-my-templates-card"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors border border-green-200"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                我的模板
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>

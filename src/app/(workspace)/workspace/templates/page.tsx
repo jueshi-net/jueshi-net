@@ -30,9 +30,12 @@ export default function WorkspaceTemplatesPage() {
       if (res.ok) {
         const data: TemplateListResponse = await res.json();
         setTemplates(data.data || []);
+      } else if (res.status === 401) {
+        // Not logged in - redirect to login
+        window.location.href = "/login?callbackUrl=/workspace/templates";
       }
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error("Failed to fetch templates:", err);
     }
     setLoading(false);
   }, []);
