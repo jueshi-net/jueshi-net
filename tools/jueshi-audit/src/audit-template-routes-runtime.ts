@@ -314,7 +314,7 @@ async function runAudit(): Promise<AuditResult[]> {
             await page5.waitForTimeout(3000);
 
             const editError = await hasErrorMessage(page5);
-            const hasEditor = await page5.$('[data-testid="canvas-editor-root"], [data-testid="template-studio-edit"], h1:has-text("编辑")');
+            const hasEditor = await page5.$('[data-testid="canvas-editor-root"], [data-testid="template-studio-edit"], [data-testid="template-studio-editor"], h1:has-text("编辑")');
 
             const editPass = !editError && hasEditor;
             
