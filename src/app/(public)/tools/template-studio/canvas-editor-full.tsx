@@ -105,6 +105,10 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [editingElementId, setEditingElementId] = useState<string | null>(null);
   
+  // History for undo/redo
+  const [history, setHistory] = useState<CanvasTemplate[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRef = useRef<HTMLDivElement>(null);
   const printRootRef = useRef<HTMLDivElement>(null);
@@ -202,16 +206,48 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   // Element Operations
   // ============================================================
 
+  // Push current state to history
+  const pushHistory = useCallback((newCanvas: CanvasTemplate) => {
+    setHistory(prev => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(newCanvas);
+      // Keep only last 50 states
+      if (newHistory.length > 50) {
+        newHistory.shift();
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  }, [historyIndex]);
+
+  const undo = useCallback(() => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setCanvas(prevState);
+      setHistoryIndex(prev => prev - 1);
+    }
+  }, [history, historyIndex]);
+
+  const redo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setCanvas(nextState);
+      setHistoryIndex(prev => prev + 1);
+    }
+  }, [history, historyIndex]);
+
   const addElement = useCallback((type: CanvasElementType) => {
     const newElement = defaultCanvasElement(type);
     newElement.zIndex = getNextZIndex(canvas.elements);
-    setCanvas(prev => ({
-      ...prev,
-      elements: [...prev.elements, newElement],
+    const newCanvas = {
+      ...canvas,
+      elements: [...canvas.elements, newElement],
       updatedAt: new Date().toISOString(),
-    }));
+    };
+    pushHistory(newCanvas);
+    setCanvas(newCanvas);
     setSelectedElementId(newElement.id);
-  }, [canvas.elements]);
+  }, [canvas, pushHistory]);
 
   const updateElement = useCallback((id: string, updates: Partial<CanvasElement>) => {
     setCanvas(prev => ({
@@ -572,7 +608,39 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       const resolved = resolveBinding(element.binding);
       content = <div className="w-full h-full overflow-hidden">{resolved || `[${element.binding || "未绑定"}]`}</div>;
     } else if (element.type === "table") {
-      content = <span className="text-xs text-gray-500">商品表格</span>;
+      // Real product table
+      const hasProduct = productData && selectedProductId;
+      
+      if (!hasProduct) {
+        content = (
+          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 p-2" data-testid="canvas-product-table-empty">
+            暂无商品，请先选择商品
+          </div>
+        );
+      } else {
+        content = (
+          <div className="w-full h-full overflow-auto" data-testid="canvas-product-table">
+            <table className="w-full text-xs border-collapse">
+              <thead data-testid="canvas-product-table-header">
+                <tr className="bg-gray-100 border-b">
+                  <th className="border px-1 py-0.5 text-left font-semibold">商品名</th>
+                  <th className="border px-1 py-0.5 text-left font-semibold">SKU</th>
+                  <th className="border px-1 py-0.5 text-right font-semibold">数量</th>
+                  <th className="border px-1 py-0.5 text-right font-semibold">单价</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-testid="canvas-product-table-row">
+                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-name">{productData.name}</td>
+                  <td className="border px-1 py-0.5" data-testid="canvas-product-table-cell-sku">{productData.sku || "-"}</td>
+                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-qty">1</td>
+                  <td className="border px-1 py-0.5 text-right" data-testid="canvas-product-table-cell-price">{productData.unitPrice?.toFixed(2) || "0.00"}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        );
+      }
     } else if (element.type === "seal") {
       content = <span className="text-xs">印章</span>;
     } else if (element.type === "sequence") {
@@ -663,6 +731,29 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       {showLeftPanel && (
         <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto print:hidden absolute lg:relative z-40 h-full shadow-lg lg:shadow-none">
         <h2 className="text-lg font-bold mb-4">工具</h2>
+        
+        {/* Undo/Redo Buttons */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={undo}
+            disabled={historyIndex <= 0}
+            className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="canvas-undo-button"
+          >
+            ↶ 撤销
+          </button>
+          <button
+            onClick={redo}
+            disabled={historyIndex >= history.length - 1}
+            className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="canvas-redo-button"
+          >
+            ↷ 重做
+          </button>
+        </div>
+        <div className="text-xs text-gray-500 mb-4" data-testid="canvas-history-state">
+          历史: {historyIndex + 1}/{history.length}
+        </div>
         
         {/* Company Selector */}
         <div className="mb-4">
