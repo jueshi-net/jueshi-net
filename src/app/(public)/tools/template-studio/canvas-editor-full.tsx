@@ -833,19 +833,23 @@ ${styleElements}
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+  body {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
   /* Canvas pages: page break after each */
-  [data-testid="canvas-print-page"] {
+  [data-testid="canvas-print-page"],
+  [data-testid="canvas-paper"] {
     box-shadow: none !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     page-break-after: always;
     break-after: page;
   }
-  [data-testid="canvas-print-page"]:last-child {
+  [data-testid="canvas-print-page"]:last-child,
+  [data-testid="canvas-paper"]:last-child {
     page-break-after: auto !important;
     break-after: auto !important;
-  }
-  [data-testid="canvas-paper"] {
-    box-shadow: none !important;
   }
   /* Remove selection ring */
   .ring-2 {
