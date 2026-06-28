@@ -146,8 +146,9 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     } catch { /* ignore */ }
   }, []);
 
-  // Debounced draft save
+  // Debounced draft save — skip while restore banner is showing to prevent overwriting existing draft
   useEffect(() => {
+    if (hasDraft) return; // Don't overwrite existing draft while restore banner is showing
     const timer = setTimeout(() => {
       try {
         localStorage.setItem(DRAFT_KEY, JSON.stringify({
@@ -159,7 +160,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       } catch { /* ignore */ }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [canvas, selectedCompanyId, selectedProductId]);
+  }, [canvas, selectedCompanyId, selectedProductId, hasDraft]);
 
   // Warn before leaving with unsaved changes
   useEffect(() => {
