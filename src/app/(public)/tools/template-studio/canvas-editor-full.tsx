@@ -1232,7 +1232,7 @@ ${pagesHTML}
             color: element.style.color || "#000000",
           }}
         >
-          {resolved || `[${element.binding || "未绑定"}]`}
+          {resolved || <span className="print:hidden">[{element.binding || "未绑定"}]</span>}
         </div>
       );
     } else if (element.type === "company-info") {
@@ -1252,7 +1252,7 @@ ${pagesHTML}
             return (
               <div key={idx} className="mb-1" data-testid={`canvas-company-field-${field.binding}`}>
                 <span className="font-semibold">{field.label}：</span>
-                <span>{resolved || `[${field.binding}]`}</span>
+                <span>{resolved || <span className="print:hidden">[{field.binding}]</span>}</span>
               </div>
             );
           })}

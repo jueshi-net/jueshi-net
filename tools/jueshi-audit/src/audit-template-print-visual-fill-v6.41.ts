@@ -680,16 +680,45 @@ async function main() {
     await page.click('[data-testid="canvas-insert-company-block"]');
     await page.waitForTimeout(500);
 
-    // Measure design bbox (BEFORE triggering print)
+    // Measure design bbox (BEFORE triggering print) - measure actual elements relative to paper
     const designBBox = await page.evaluate(() => {
+      // Find the paper element
       const paper = document.querySelector('[data-testid="canvas-paper"]');
       if (!paper) return null;
-      const rect = paper.getBoundingClientRect();
+      const paperRect = paper.getBoundingClientRect();
+      
+      // Find actual canvas elements in design mode (exclude toggle buttons)
+      const elements = Array.from(document.querySelectorAll('[data-testid="canvas-text-element"], [data-testid="canvas-company-info-block"], [data-testid="canvas-product-table"], [data-testid^="canvas-company-field-"]'))
+        .filter(el => !el.getAttribute('data-testid')?.includes('toggle'));
+      if (elements.length === 0) return null;
+
+      const elementDetails: any[] = [];
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        // Convert to paper-relative coordinates
+        const relLeft = rect.left - paperRect.left;
+        const relTop = rect.top - paperRect.top;
+        elementDetails.push({
+          testId: el.getAttribute('data-testid'),
+          rect: { width: rect.width, height: rect.height, left: relLeft, top: relTop }
+        });
+        minX = Math.min(minX, relLeft);
+        minY = Math.min(minY, relTop);
+        maxX = Math.max(maxX, relLeft + rect.width);
+        maxY = Math.max(maxY, relTop + rect.height);
+      });
+
+      if (minX === Infinity) return null;
       return {
-        x: rect.x, y: rect.y,
-        width: rect.width, height: rect.height,
-        top: rect.top, right: rect.right,
-        bottom: rect.bottom, left: rect.left
+        x: minX, y: minY,
+        width: maxX - minX, height: maxY - minY,
+        top: minY, right: maxX,
+        bottom: maxY, left: minX,
+        paperWidth: paperRect.width,
+        paperHeight: paperRect.height,
+        elementDetails
       };
     });
     log(`Design bbox: ${JSON.stringify(designBBox)}`);
