@@ -1347,6 +1347,12 @@ ${pagesHTML}
     );
   };
 
+  // v6.39: Use unscaled paper dimensions for print to avoid shrinkage
+  const printPaperDimensions = {
+    width: mmToPx(canvas.paper.widthMm),
+    height: mmToPx(canvas.paper.heightMm),
+  };
+  
   // Page component — used for both single and repeat mode
   const renderPage = (pageIndex?: number) => {
     const isRepeat = canvas.batch?.outputMode === "repeat";
@@ -1363,11 +1369,30 @@ ${pagesHTML}
         }}
         data-testid={isRepeat ? "canvas-print-page" : "canvas-paper"}
       >
-        {/* Grid overlay — on every page */}
-        {renderGridOverlay()}
+        {/* Print-only version with correct unscaled dimensions */}
+        <div 
+          className="hidden print:block absolute inset-0"
+          style={{
+            width: `${printPaperDimensions.width}px`,
+            height: `${printPaperDimensions.height}px`,
+          }}
+          data-testid="canvas-print-unscaled-paper"
+        >
+          {/* Grid overlay — on every page */}
+          {renderGridOverlay()}
 
-        {/* Elements */}
-        {canvas.elements.map(element => renderElement(element, pageIndex))}
+          {/* Elements */}
+          {canvas.elements.map(element => renderElement(element, pageIndex))}
+        </div>
+        
+        {/* Screen-only version with scaled dimensions */}
+        <div className="print:hidden w-full h-full relative">
+          {/* Grid overlay — on every page */}
+          {renderGridOverlay()}
+
+          {/* Elements */}
+          {canvas.elements.map(element => renderElement(element, pageIndex))}
+        </div>
 
         {/* Page count indicator — only when showSequence is ON */}
         {showPageIndicator && (
@@ -1596,6 +1621,9 @@ ${pagesHTML}
           >
             打印
           </button>
+          <p className="text-xs text-gray-500 mt-2" data-testid="canvas-print-margin-tip">
+            💡 打印提示：在打印设置中选择"无边距"或"实际大小"以获得最佳效果
+          </p>
         </div>
 
         {/* Paper Size Selector */}
