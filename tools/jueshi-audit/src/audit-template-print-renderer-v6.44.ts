@@ -111,17 +111,23 @@ async function runAudit(): Promise<AuditResult[]> {
     await page.waitForTimeout(3000);
 
     // Add a text element
-    const addTextBtn = await page.$('[data-testid="canvas-add-text-button"]');
+    const addTextBtn = await page.$('[data-testid="canvas-add-text"]');
+    console.log(`Add text button found: ${!!addTextBtn}`);
     if (addTextBtn) {
       await addTextBtn.click();
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(2000);
+      
+      // Verify element was added
+      const elementCount = await page.$$eval('[data-testid="canvas-text-element"], [data-testid^="canvas-element-"]', els => els.length);
+      console.log(`Elements in canvas: ${elementCount}`);
     }
 
     // Click print button
     const printBtn = await page.$('[data-testid="canvas-print-button"]');
+    console.log(`Print button found: ${!!printBtn}`);
     if (printBtn) {
       await printBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
     }
 
     // Check iframe HTML for data-driven markers

@@ -1,0 +1,77 @@
+{
+  "results": [
+    {
+      "id": "TS-PRINT-RENDERER-DATA_DRIVEN",
+      "name": "Data-driven print renderer",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Data-driven markers missing: elementId=false, elementType=false, pageIndex=true, noClonePreview=true, noCloneGrid=true, noCloneResize=true",
+      "evidence": "/Users/chq/xixiong-saas/evidence/print-renderer-v6.44-1782741713838/print-dom.html"
+    },
+    {
+      "id": "TS-PRINT-PARITY-COORDINATES",
+      "name": "Coordinate parity (design vs print)",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "All element coordinates within 3% tolerance (0 elements checked)",
+      "evidence": "/Users/chq/xixiong-saas/evidence/print-renderer-v6.44-1782741713838/position-delta.json"
+    },
+    {
+      "id": "TS-PRINT-REPEAT-ONLY_SEQUENCE_VALUE_CHANGES",
+      "name": "Multi-page layout stable (10 pages)",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Expected 10 pages, got 1",
+      "evidence": "/Users/chq/xixiong-saas/evidence/print-renderer-v6.44-1782741713838/multi-page.json"
+    },
+    {
+      "id": "TS-PRINT-NO_RAW_COMPANY_TOKEN",
+      "name": "No raw company tokens",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "No raw [company.*] or [product.*] tokens found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/print-renderer-v6.44-1782741713838/token-check.txt"
+    },
+    {
+      "id": "TS-PRINT-NO_NAV_FOOTER",
+      "name": "No nav/footer in print",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "No nav/footer/header elements in print DOM"
+    },
+    {
+      "id": "TS-PRINT-SINGLE_LAYER_ONLY",
+      "name": "Single print layer",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Multiple layers: 1 pages, 0 papers"
+    },
+    {
+      "id": "TS-SAVED-CANVAS-EDIT-NO-REGRESSION",
+      "name": "Saved edit no regression",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Saved edit page loads without error"
+    },
+    {
+      "id": "TS-COMPANY-BLOCK-NO-REGRESSION",
+      "name": "Company block no regression",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "Company button not found"
+    },
+    {
+      "id": "TS-PNG-GUARD-NO-REGRESSION",
+      "name": "PNG guard no regression",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "Export button not found"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 3,
+    "blocked": 2,
+    "total": 9
+  }
+}

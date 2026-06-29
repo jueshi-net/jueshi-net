@@ -1033,7 +1033,7 @@ ${pagesHTML}
     } else {
       triggerPrint();
     }
-  }, [canvas.paper.widthMm, canvas.paper.heightMm]);
+  }, [canvas.paper.widthMm, canvas.paper.heightMm, canvas.elements, canvas.batch, companyData, productData]);
 
   // ============================================================
   // Render
