@@ -580,14 +580,20 @@ async function testCompanyBlockNoRegression(page: Page): Promise<AuditResult> {
     
     const companyBtn = freshPage.locator('[data-testid="canvas-insert-company-block"]');
     if (await companyBtn.isVisible()) {
+      // Check how many company blocks exist BEFORE clicking
+      const companyBlocksBefore = await freshPage.locator('[data-testid="canvas-company-info-block"]').count();
+      
       await companyBtn.click();
       await freshPage.waitForTimeout(1000);
       
-      const companyBlocks = await freshPage.locator('[data-testid="canvas-company-info-block"]').count();
+      const companyBlocksAfter = await freshPage.locator('[data-testid="canvas-company-info-block"]').count();
       
       await freshContext.close();
       
-      if (companyBlocks === 1) {
+      // If there was already 1 block before clicking, and still 1 after, that's correct
+      // If there were 0 before and 1 after, that's also correct
+      // If there are 2 after, that's a bug
+      if (companyBlocksAfter === 1) {
         return {
           testId,
           testName,
@@ -599,7 +605,7 @@ async function testCompanyBlockNoRegression(page: Page): Promise<AuditResult> {
           testId,
           testName,
           status: 'FAIL',
-          message: `Expected 1 company block, got ${companyBlocks}`
+          message: `Expected 1 company block after click, got ${companyBlocksAfter} (before: ${companyBlocksBefore})`
         };
       }
     } else {

@@ -86,7 +86,7 @@
     "testId": "TS-COMPANY-BLOCK-NO-REGRESSION",
     "testName": "Company block no regression",
     "status": "FAIL",
-    "message": "Expected 1 company block, got 2"
+    "message": "Expected 1 company block after click, got 2 (before: 0)"
   },
   {
     "testId": "TS-PNG-GUARD-NO-REGRESSION",
