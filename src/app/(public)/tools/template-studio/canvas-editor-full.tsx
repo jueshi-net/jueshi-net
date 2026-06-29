@@ -413,6 +413,15 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas, pushHistory]);
 
   const insertCompanyBlock = useCallback(() => {
+    // Check if a company-info block already exists
+    const existingCompanyBlock = canvas.elements.find(el => el.type === "company-info");
+    
+    if (existingCompanyBlock) {
+      // If exists, just select it instead of adding a new one
+      setSelectedElementId(existingCompanyBlock.id);
+      return;
+    }
+    
     const baseZ = getNextZIndex(canvas.elements);
     const el = defaultCanvasElement("company-info");
     el.id = `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

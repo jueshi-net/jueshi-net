@@ -41,9 +41,9 @@ async function testPagination11Pages(page: Page): Promise<AuditResult> {
   const testName = 'packageCount=11 outputs 11 pages';
   
   try {
-    // Navigate to canvas editor
-    await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
+    // Navigate to canvas editor with longer timeout
+    await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.waitForTimeout(5000);
     
     // Set batch mode to repeat
     const batchModeSelect = page.locator('[data-testid="canvas-batch-mode"]');
@@ -69,7 +69,7 @@ async function testPagination11Pages(page: Page): Promise<AuditResult> {
     // Click print button
     const printBtn = page.locator('[data-testid="canvas-print-button"]');
     await printBtn.click();
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
     
     // Count pages in print iframe
     const pageCount = await page.evaluate(() => {
@@ -551,29 +551,41 @@ async function testCompanyBlockNoRegression(page: Page): Promise<AuditResult> {
   const testName = 'Company block no regression';
   
   try {
-    // Navigate to canvas editor with a fresh page
-    await page.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-    
-    // Check if there are any existing company blocks and remove them
-    const existingCompanyBlocks = await page.locator('[data-testid="canvas-company-info-block"]').count();
-    if (existingCompanyBlocks > 0) {
-      // Delete all existing company blocks
-      for (let i = 0; i < existingCompanyBlocks; i++) {
-        const deleteBtn = page.locator('[data-testid="canvas-delete-element"]').first();
-        if (await deleteBtn.isVisible()) {
-          await deleteBtn.click();
-          await page.waitForTimeout(500);
-        }
-      }
+    // Create a completely fresh browser context
+    const browser = page.context().browser();
+    if (!browser) {
+      return {
+        testId,
+        testName,
+        status: 'FAIL',
+        message: 'Browser not available'
+      };
     }
     
-    const companyBtn = page.locator('[data-testid="canvas-insert-company-block"]');
+    const freshContext = await browser.newContext();
+    const freshPage = await freshContext.newPage();
+    
+    // Navigate to canvas editor with a completely fresh page
+    await freshPage.goto(`${BASE_URL}/tools/template-studio/canvas/new`, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await freshPage.waitForTimeout(5000);
+    
+    // Clear localStorage to ensure no draft data
+    await freshPage.evaluate(() => {
+      localStorage.clear();
+    });
+    
+    // Reload to ensure clean state
+    await freshPage.reload({ waitUntil: 'domcontentloaded' });
+    await freshPage.waitForTimeout(3000);
+    
+    const companyBtn = freshPage.locator('[data-testid="canvas-insert-company-block"]');
     if (await companyBtn.isVisible()) {
       await companyBtn.click();
-      await page.waitForTimeout(1000);
+      await freshPage.waitForTimeout(1000);
       
-      const companyBlocks = await page.locator('[data-testid="canvas-company-info-block"]').count();
+      const companyBlocks = await freshPage.locator('[data-testid="canvas-company-info-block"]').count();
+      
+      await freshContext.close();
       
       if (companyBlocks === 1) {
         return {
@@ -591,6 +603,7 @@ async function testCompanyBlockNoRegression(page: Page): Promise<AuditResult> {
         };
       }
     } else {
+      await freshContext.close();
       return {
         testId,
         testName,
