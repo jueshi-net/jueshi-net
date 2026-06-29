@@ -899,17 +899,13 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
 
     // v6.26 fix: Use large enough iframe to render full page content without clipping
     // Position off-screen but give it the actual paper dimensions in pixels
-    const paperWidthMm = canvas.paper.widthMm;
-    const paperHeightMm = canvas.paper.heightMm;
-    const paperWidthPx = Math.ceil(paperWidthMm * 3.7795275591); // mm to px at 96 DPI
-    const paperHeightPx = Math.ceil(paperHeightMm * 3.7795275591);
     const iframe = document.createElement("iframe");
     iframe.id = "canvas-print-iframe";
     iframe.style.position = "fixed";
     iframe.style.left = "-9999px";
     iframe.style.top = "-9999px";
     iframe.style.width = `${paperWidthPx + 20}px`;
-    iframe.style.height = `${paperHeightPx * Math.max(pages.length, 1) + 20}px`;
+    iframe.style.height = `${paperHeightPx * Math.max(pageCount, 1) + 20}px`;
     iframe.style.border = "0";
     iframe.style.visibility = "hidden";
     iframe.style.overflow = "visible";
