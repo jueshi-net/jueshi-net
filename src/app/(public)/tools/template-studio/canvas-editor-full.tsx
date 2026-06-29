@@ -396,32 +396,28 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
 
   const insertCompanyBlock = useCallback(() => {
     const baseZ = getNextZIndex(canvas.elements);
-    const companyFields = [
-      { binding: "company.companyName", label: "公司名称", y: 5 },
-      { binding: "company.contactName", label: "联系人", y: 12 },
-      { binding: "company.phone", label: "电话", y: 19 },
-      { binding: "company.address", label: "地址", y: 26 },
+    const el = defaultCanvasElement("company-info");
+    el.id = `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    el.x = 5;
+    el.y = 5;
+    el.width = 80;
+    el.height = 30;
+    el.zIndex = baseZ;
+    el.companyFields = [
+      { binding: "company.companyName", label: "公司名称", visible: true },
+      { binding: "company.contactName", label: "联系人", visible: true },
+      { binding: "company.phone", label: "电话", visible: true },
+      { binding: "company.address", label: "地址", visible: true },
     ];
-    const newElements: CanvasElement[] = companyFields.map((f, i) => {
-      const el = defaultCanvasElement("field");
-      el.id = `el-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
-      el.x = 5;
-      el.y = f.y;
-      el.width = 80;
-      el.height = 6;
-      el.zIndex = baseZ + i;
-      el.binding = f.binding;
-      el.style = { ...el.style, fontSize: 10 };
-      return el;
-    });
+    el.style = { ...el.style, fontSize: 10 };
     const newCanvas = {
       ...canvas,
-      elements: [...canvas.elements, ...newElements],
+      elements: [...canvas.elements, el],
       updatedAt: new Date().toISOString(),
     };
     setCanvas(newCanvas);
     pushHistory(newCanvas);
-    setSelectedElementId(newElements[0]?.id || null);
+    setSelectedElementId(el.id);
     setSaveStatus("idle");
   }, [canvas, pushHistory]);
 
@@ -713,6 +709,15 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
 
   const handleExportPng = useCallback(async () => {
     if (pngStatus === "exporting") return;
+    
+    // Check if in multipage/repeat mode
+    if (canvas.batch?.outputMode === "repeat" && canvas.batch.packageCount > 1) {
+      setPngStatus("error");
+      setSaveMessage("当前仅支持单页模式导出 PNG；批量 PNG 导出开发中，请切换到单页输出模式后导出。");
+      setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 5000);
+      return;
+    }
+    
     if (!paperRef.current) {
       setPngStatus("error");
       setSaveMessage("导出失败: 画布未就绪，请先添加内容");
@@ -1168,6 +1173,29 @@ ${pagesHTML}
           }}
         >
           {resolved || `[${element.binding || "未绑定"}]`}
+        </div>
+      );
+    } else if (element.type === "company-info") {
+      const fields = element.companyFields || [];
+      content = (
+        <div 
+          className="w-full h-full overflow-hidden"
+          style={{ 
+            fontFamily: element.style.fontFamily || undefined,
+            fontSize: `${element.style.fontSize || 10}px`,
+            color: element.style.color || "#000000",
+          }}
+          data-testid="canvas-company-info-block"
+        >
+          {fields.filter(f => f.visible).map((field, idx) => {
+            const resolved = resolveBinding(field.binding);
+            return (
+              <div key={idx} className="mb-1" data-testid={`canvas-company-field-${field.binding}`}>
+                <span className="font-semibold">{field.label}：</span>
+                <span>{resolved || `[${field.binding}]`}</span>
+              </div>
+            );
+          })}
         </div>
       );
     } else if (element.type === "table") {
@@ -1759,6 +1787,31 @@ ${pagesHTML}
                   data-testid="canvas-text-content-input"
                 />
                 <p className="text-xs text-gray-500 mt-1">支持多行文本，换行将保留</p>
+              </div>
+            )}
+            
+            {/* Company Info Field Visibility (for company-info elements) */}
+            {selectedElement.type === "company-info" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">显示字段</label>
+                <div className="space-y-2">
+                  {(selectedElement.companyFields || []).map((field, idx) => (
+                    <label key={idx} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={field.visible}
+                        onChange={e => {
+                          const newFields = [...(selectedElement.companyFields || [])];
+                          newFields[idx] = { ...newFields[idx], visible: e.target.checked };
+                          updateElement(selectedElement.id, { companyFields: newFields });
+                        }}
+                        className="rounded"
+                        data-testid={`canvas-company-field-toggle-${field.binding}`}
+                      />
+                      <span>{field.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
             

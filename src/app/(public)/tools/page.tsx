@@ -73,24 +73,28 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
       <div className="max-w-7xl mx-auto px-4 pt-6">
         {/* Template Studio CTA Banner */}
         {!query && !category && (
-          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6" data-testid="tools-template-cta-banner">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">模板工作室</h2>
-            <p className="text-sm text-gray-600 mb-4">创建自定义单据模板，快速生成专业单据</p>
-            <div className="flex gap-3 flex-wrap">
-              <Link
-                href="/tools/template-studio"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Wrench className="w-4 h-4" />
-                开始设计
-              </Link>
-              <Link
-                href="/workspace/templates"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors"
-              >
-                <FileText className="w-4 h-4" />
-                我的模板
-              </Link>
+          <div className="mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-8 shadow-lg" data-testid="tools-template-cta-banner">
+            <div className="max-w-3xl">
+              <h2 className="text-3xl font-bold text-white mb-3">免费自定义你的单据模板</h2>
+              <p className="text-lg text-white/90 mb-6">自由拖拽设计报价单、发票、装箱单、商品标签，支持批量打印与导出 PNG。免费注册，限时免费使用。</p>
+              <div className="flex gap-4 flex-wrap">
+                <Link
+                  href="/tools/template-studio/canvas/new"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 text-base font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
+                  data-testid="tools-template-cta-create"
+                >
+                  <Wrench className="w-5 h-5" />
+                  立即创建模板
+                </Link>
+                <Link
+                  href="/workspace/templates"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white text-base font-semibold rounded-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
+                  data-testid="tools-template-cta-my-templates"
+                >
+                  <FileText className="w-5 h-5" />
+                  查看我的模板
+                </Link>
+              </div>
             </div>
           </div>
         )}

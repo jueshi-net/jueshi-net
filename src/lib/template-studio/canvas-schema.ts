@@ -80,7 +80,8 @@ export type CanvasElementType =
   | "rect" 
   | "qrcode" 
   | "barcode"
-  | "sequence";
+  | "sequence"
+  | "company-info";
 
 export interface CanvasElement {
   /** Unique element ID */
@@ -107,6 +108,12 @@ export interface CanvasElement {
   binding?: string;
   /** Static text content (for text elements) */
   text?: string;
+  /** Company info fields (for company-info type) */
+  companyFields?: Array<{
+    binding: string;
+    label: string;
+    visible: boolean;
+  }>;
   /** Element style */
   style: CanvasElementStyle;
 }
