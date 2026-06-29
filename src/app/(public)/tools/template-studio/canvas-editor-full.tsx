@@ -1507,9 +1507,16 @@ ${pagesHTML}
             <p className="text-xs text-red-600" data-testid="canvas-save-error">{saveMessage}</p>
           )}
           {saveStatus === "saved" && (
-            <a href="/workspace/templates" className="text-xs text-blue-600 hover:underline" data-testid="canvas-view-my-templates-link">
-              📋 查看我的模板
-            </a>
+            <div className="flex flex-col gap-1 mt-2">
+              <a href="/workspace/templates" className="text-xs text-blue-600 hover:underline" data-testid="canvas-view-my-templates-link">
+                📋 查看我的模板
+              </a>
+              {currentTemplateId && (
+                <a href={`/tools/template-studio/${currentTemplateId}/edit`} className="text-xs text-blue-600 hover:underline" data-testid="canvas-open-saved-template-link">
+                  🔗 打开已保存模板
+                </a>
+              )}
+            </div>
           )}
           {lastSavedAt && (
             <p className="text-xs text-gray-500" data-testid="canvas-last-saved-at">上次保存: {lastSavedAt}</p>
@@ -1527,6 +1534,11 @@ ${pagesHTML}
           >
             {pngStatus === "exporting" ? "正在生成..." : pngStatus === "done" ? "✓ 已导出" : pngStatus === "error" ? "导出失败" : "导出 PNG"}
           </button>
+          {canvas.batch?.outputMode === "repeat" && canvas.batch.packageCount > 1 && (
+            <p className="text-xs text-amber-600 mt-1" data-testid="canvas-multipage-png-notice">
+              ⚠️ 批量 PNG 导出开发中，当前仅导出第 1 页
+            </p>
+          )}
           <button
             onClick={handlePrint}
             className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm"

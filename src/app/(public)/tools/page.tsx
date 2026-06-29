@@ -71,6 +71,30 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
+        {/* Template Studio CTA Banner */}
+        {!query && !category && (
+          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-6" data-testid="tools-template-cta-banner">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">模板工作室</h2>
+            <p className="text-sm text-gray-600 mb-4">创建自定义单据模板，快速生成专业单据</p>
+            <div className="flex gap-3 flex-wrap">
+              <Link
+                href="/tools/template-studio"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Wrench className="w-4 h-4" />
+                开始设计
+              </Link>
+              <Link
+                href="/workspace/templates"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                我的模板
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {query ? `搜索结果: "${query}"` : '工具中心'}
