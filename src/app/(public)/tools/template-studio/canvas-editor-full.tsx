@@ -855,6 +855,15 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
           }
         }
         
+        // Handle sequence element type (even without binding)
+        if (element.type === "sequence") {
+          const total = canvas.batch?.packageCount || 1;
+          const idx = pageIndex + 1;
+          content = canvas.batch?.sequenceFormat === "of"
+            ? `${idx} of ${total}`
+            : `${idx}/${total}`;
+        }
+        
         // Handle company-info block
         if (element.type === "company-info" && element.companyFields) {
           let fieldsHTML = "";
