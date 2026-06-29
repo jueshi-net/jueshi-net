@@ -938,6 +938,10 @@ ${styleElements}
     display: block !important;
     visibility: visible !important;
   }
+  /* Hide binding placeholders in print */
+  .print\\:hidden {
+    display: none !important;
+  }
   /* Remove selection ring */
   .ring-2 {
     box-shadow: none !important;
