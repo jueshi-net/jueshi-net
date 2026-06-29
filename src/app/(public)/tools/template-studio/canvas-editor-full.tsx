@@ -915,13 +915,28 @@ ${styleElements}
     page-break-after: auto !important;
     break-after: auto !important;
   }
-  /* Inner unscaled paper div */
+  /* Inner unscaled paper div - force visible and positioned */
   [data-testid="canvas-print-unscaled-paper"] {
+    display: block !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  /* Force all children to be visible */
+  [data-testid="canvas-print-unscaled-paper"] * {
+    display: revert !important;
+  }
+  /* Ensure canvas elements are visible */
+  [data-testid^="canvas-element"],
+  [data-testid="canvas-text-element"],
+  [data-testid="canvas-company-info-block"],
+  [data-testid^="canvas-company-field-"] {
+    display: block !important;
+    visibility: visible !important;
   }
   /* Remove selection ring */
   .ring-2 {
