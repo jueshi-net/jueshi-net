@@ -832,6 +832,12 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
         // Remove selection ring
         clone.querySelectorAll(".ring-2").forEach(el => el.classList.remove("ring-2"));
+        // Remove hidden sequence elements (v6.42 fix: prevent duplicate sequences)
+        clone.querySelectorAll("[data-testid=\"canvas-sequence-hidden\"]").forEach(el => el.remove());
+        // Remove page count and sequence indicators
+        clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
+        // Remove any elements with print:hidden class
+        clone.querySelectorAll(".print\\:hidden").forEach(el => el.remove());
         pagesHTML += `<div class="print-page-wrapper" style="position: relative; width: ${printPaperDimensions.width}px; height: ${printPaperDimensions.height}px;">${clone.outerHTML}</div>`;
       } else {
         // Fallback: use the page itself but remove scale
@@ -926,20 +932,17 @@ ${styleElements}
     width: 100% !important;
     height: 100% !important;
   }
-  /* Force all children to be visible */
-  [data-testid="canvas-print-unscaled-paper"] * {
-    display: revert !important;
+  /* Hide elements marked for print (page indicators, UI elements) */
+  .print\:hidden {
+    display: none !important;
   }
-  /* Ensure canvas elements are visible */
-  [data-testid^="canvas-element"],
-  [data-testid="canvas-text-element"],
-  [data-testid="canvas-company-info-block"],
-  [data-testid^="canvas-company-field-"] {
-    display: block !important;
-    visibility: visible !important;
+  /* Hide hidden sequence elements */
+  [data-testid="canvas-sequence-hidden"] {
+    display: none !important;
   }
-  /* Hide binding placeholders in print */
-  .print\\:hidden {
+  /* Hide page count and sequence indicators */
+  [data-testid="canvas-print-page-count"],
+  [data-testid="canvas-print-page-sequence"] {
     display: none !important;
   }
   /* Remove selection ring */
