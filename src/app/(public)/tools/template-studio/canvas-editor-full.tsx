@@ -317,7 +317,25 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         .then(data => {
           if (data.success && data.data) {
             const loadedTemplate = data.data;
-            setCanvas(loadedTemplate);
+            
+            // Check if this is a canvas template (has paper/elements)
+            // If not, it's a structured template or corrupted — use default canvas
+            const hasCanvasData = loadedTemplate.paper && loadedTemplate.elements;
+            
+            if (hasCanvasData) {
+              // Valid canvas template — load it
+              setCanvas(loadedTemplate);
+            } else {
+              // Not a canvas template — start with default canvas
+              // but preserve the name and ID
+              const defaultCanvas = defaultCanvasTemplate();
+              setCanvas({
+                ...defaultCanvas,
+                name: loadedTemplate.name || "未命名模板",
+              });
+              console.warn("Template is not a canvas template, starting with default canvas");
+            }
+            
             setCurrentTemplateId(loadedTemplate.id);
             if (loadedTemplate.selectedCompanyId) {
               setSelectedCompanyId(loadedTemplate.selectedCompanyId);
