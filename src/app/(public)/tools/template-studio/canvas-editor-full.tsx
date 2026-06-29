@@ -889,20 +889,28 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         }
         
         // Generate element HTML
+        // Note: fontSize is in pt (points), not px
+        // 1pt = 1.333px at 96 DPI
+        const fontSizePx = (element.style.fontSize || 14) * 1.333;
+        const paddingPx = (element.style.padding || 0) * 3.7795275591; // mm to px
+        const borderWidthPx = (element.style.borderWidth || 0) * 3.7795275591; // mm to px
+        const borderRadiusPx = (element.style.borderRadius || 0) * 3.7795275591; // mm to px
+        
         const styleCSS = `
           position: absolute;
           left: ${xPx}px;
           top: ${yPx}px;
           width: ${widthPx}px;
           height: ${heightPx}px;
-          font-size: ${element.style.fontSize || 14}px;
+          font-size: ${fontSizePx}px;
           font-family: ${element.style.fontFamily || 'system-ui, sans-serif'};
+          font-weight: ${element.style.fontWeight || 'normal'};
           color: ${element.style.color || '#000000'};
           text-align: ${element.style.textAlign || 'left'};
           background-color: ${element.style.backgroundColor || 'transparent'};
-          border: ${element.style.borderWidth ? `${element.style.borderWidth}px solid ${element.style.borderColor || '#000'}` : 'none'};
-          border-radius: ${element.style.borderRadius || 0}px;
-          padding: ${element.style.padding || 0}px;
+          border: ${borderWidthPx ? `${borderWidthPx}px solid ${element.style.borderColor || '#000'}` : 'none'};
+          border-radius: ${borderRadiusPx}px;
+          padding: ${paddingPx}px;
           opacity: ${element.style.opacity ?? 1};
           overflow: hidden;
           box-sizing: border-box;
