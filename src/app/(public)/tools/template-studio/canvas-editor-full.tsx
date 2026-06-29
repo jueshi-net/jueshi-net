@@ -809,25 +809,45 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return;
     }
 
-    // v6.25 fix: Only clone canvas-print-page elements, not the wrapper div
+    // v6.39 fix: Extract unscaled print content to avoid shrinkage
+    // Each page has a wrapper with scaled dimensions, but inside is a print-only div with unscaled dimensions
     const pages = printRoot.querySelectorAll("[data-testid=\"canvas-print-page\"], [data-testid=\"canvas-paper\"]");
     if (pages.length === 0) {
       console.error("No print pages found in print root");
       return;
     }
 
-    // v6.25 fix: Build pages HTML by cloning only the page elements
-    // and stripping page-count/sequence indicators to prevent duplicate 1/10
+    // v6.39 fix: Build pages HTML by extracting the unscaled print content
     let pagesHTML = "";
     pages.forEach((page) => {
-      const clone = page.cloneNode(true) as HTMLElement;
-      // Remove page-count and page-sequence indicators from clone
-      clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
-      // Remove grid overlays
-      clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
-      // Remove resize handles and edit buttons
-      clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
-      pagesHTML += clone.outerHTML;
+      // Find the unscaled print-only div inside this page
+      const unscaledDiv = page.querySelector("[data-testid=\"canvas-print-unscaled-paper\"]");
+      
+      if (unscaledDiv) {
+        // Use the unscaled content
+        const clone = unscaledDiv.cloneNode(true) as HTMLElement;
+        // Remove grid overlays
+        clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
+        // Remove resize handles and edit buttons
+        clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
+        // Remove selection ring
+        clone.querySelectorAll(".ring-2").forEach(el => el.classList.remove("ring-2"));
+        pagesHTML += `<div class="print-page-wrapper" style="position: relative; width: ${printPaperDimensions.width}px; height: ${printPaperDimensions.height}px;">${clone.outerHTML}</div>`;
+      } else {
+        // Fallback: use the page itself but remove scale
+        const clone = page.cloneNode(true) as HTMLElement;
+        // Remove page-count and page-sequence indicators
+        clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
+        // Remove grid overlays
+        clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
+        // Remove resize handles and edit buttons
+        clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
+        // Reset dimensions to unscaled
+        clone.style.width = `${printPaperDimensions.width}px`;
+        clone.style.height = `${printPaperDimensions.height}px`;
+        clone.style.transform = "none";
+        pagesHTML += clone.outerHTML;
+      }
     });
 
     // v6.26 fix: Use large enough iframe to render full page content without clipping
@@ -883,18 +903,25 @@ ${styleElements}
     flex-direction: column !important;
     align-items: center !important;
   }
-  /* Canvas pages: page break after each */
-  [data-testid="canvas-print-page"],
-  [data-testid="canvas-paper"] {
+  /* Print page wrappers: page break after each */
+  .print-page-wrapper {
+    position: relative !important;
     box-shadow: none !important;
     margin: 0 auto !important;
     page-break-after: always;
     break-after: page;
   }
-  [data-testid="canvas-print-page"]:last-child,
-  [data-testid="canvas-paper"]:last-child {
+  .print-page-wrapper:last-child {
     page-break-after: auto !important;
     break-after: auto !important;
+  }
+  /* Inner unscaled paper div */
+  [data-testid="canvas-print-unscaled-paper"] {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
   }
   /* Remove selection ring */
   .ring-2 {
@@ -1640,7 +1667,7 @@ ${pagesHTML}
             打印
           </button>
           <p className="text-xs text-gray-500 mt-2" data-testid="canvas-print-margin-tip">
-            💡 打印提示：在打印设置中选择"无边距"或"实际大小"以获得最佳效果
+            💡 打印提示：如果打印预览仍有白边，请在浏览器打印设置中选择：边距=无，缩放=100% 或实际大小。
           </p>
         </div>
 
