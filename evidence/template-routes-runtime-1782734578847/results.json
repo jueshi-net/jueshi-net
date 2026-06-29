@@ -1,0 +1,66 @@
+{
+  "results": [
+    {
+      "id": "TS-TOOLS-HAS-REAL-CTA-BANNER",
+      "name": "/tools has real CTA banner",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Banner with title, subtitle, and 3 CTAs found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/tools-banner.png"
+    },
+    {
+      "id": "TS-TEMPLATE-STUDIO-PAGE-LOADS",
+      "name": "/tools/template-studio loads",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Page loaded with '开始设计' and '我的模板'",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/template-studio.png"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-UNAUTH-HANDLED",
+      "name": "/workspace/templates unauth handled",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Redirected to login",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/workspace-templates-unauth.png"
+    },
+    {
+      "id": "TS-WORKSPACE-TEMPLATES-AUTH-LOADS",
+      "name": "/workspace/templates auth loads",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Page loaded with title '我的模板'",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/workspace-templates-auth.png"
+    },
+    {
+      "id": "TS-SAVED-CANVAS-APPEARS-IN-TEMPLATES",
+      "name": "Saved canvas appears in templates",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Saved template appears in list",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/saved-template-in-list.png"
+    },
+    {
+      "id": "TS-TEMPLATE-EDIT-LINK-NO-CRASH",
+      "name": "Template edit link doesn't crash",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Edit page loaded successfully",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/template-edit.png"
+    },
+    {
+      "id": "TS-CTA-MOBILE-NO-BREAK",
+      "name": "CTA mobile doesn't break",
+      "status": "PASS",
+      "severity": "P1",
+      "message": "CTA container wraps correctly on mobile",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782734578847/tools-mobile.png"
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "blocked": 0,
+    "total": 7
+  }
+}
