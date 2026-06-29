@@ -798,63 +798,104 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.name, pngStatus]);
 
   // ============================================================
-  // Print — iframe-based print-only (v18.6.16.6.25 runtime fix)
-  // Isolates canvas labels from site layout (header/footer/nav)
+  // Print — Data-driven print renderer (v18.6.16.6.44 rewrite)
+  // Generates print DOM directly from canvas.elements data
+  // No longer clones preview DOM — pure data-driven rendering
   // ============================================================
 
   const handlePrint = useCallback(() => {
-    const printRoot = printRootRef.current;
-    if (!printRoot) {
-      console.error("Print root not found");
-      return;
-    }
-
-    // v6.39 fix: Extract unscaled print content to avoid shrinkage
-    // Each page has a wrapper with scaled dimensions, but inside is a print-only div with unscaled dimensions
-    const pages = printRoot.querySelectorAll("[data-testid=\"canvas-print-page\"], [data-testid=\"canvas-paper\"]");
-    if (pages.length === 0) {
-      console.error("No print pages found in print root");
-      return;
-    }
-
-    // v6.39 fix: Build pages HTML by extracting the unscaled print content
+    // v6.44: Data-driven print renderer — generate DOM from canvas.elements
+    const paperWidthMm = canvas.paper.widthMm;
+    const paperHeightMm = canvas.paper.heightMm;
+    const paperWidthPx = Math.ceil(paperWidthMm * 3.7795275591); // mm to px at 96 DPI
+    const paperHeightPx = Math.ceil(paperHeightMm * 3.7795275591);
+    
+    // Determine number of pages based on batch config
+    const pageCount = canvas.batch?.outputMode === "repeat" 
+      ? Math.max(1, canvas.batch.packageCount || 1)
+      : 1;
+    
+    // Generate pages HTML from data
     let pagesHTML = "";
-    pages.forEach((page) => {
-      // Find the unscaled print-only div inside this page
-      const unscaledDiv = page.querySelector("[data-testid=\"canvas-print-unscaled-paper\"]");
+    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+      let elementsHTML = "";
       
-      if (unscaledDiv) {
-        // Use the unscaled content
-        const clone = unscaledDiv.cloneNode(true) as HTMLElement;
-        // Remove grid overlays
-        clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
-        // Remove resize handles and edit buttons
-        clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
-        // Remove selection ring
-        clone.querySelectorAll(".ring-2").forEach(el => el.classList.remove("ring-2"));
-        // Remove hidden sequence elements (v6.42 fix: prevent duplicate sequences)
-        clone.querySelectorAll("[data-testid=\"canvas-sequence-hidden\"]").forEach(el => el.remove());
-        // Remove page count and sequence indicators
-        clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
-        // Remove any elements with print:hidden class
-        clone.querySelectorAll(".print\\:hidden").forEach(el => el.remove());
-        pagesHTML += `<div class="print-page-wrapper" style="position: relative; width: ${printPaperDimensions.width}px; height: ${printPaperDimensions.height}px;">${clone.outerHTML}</div>`;
-      } else {
-        // Fallback: use the page itself but remove scale
-        const clone = page.cloneNode(true) as HTMLElement;
-        // Remove page-count and page-sequence indicators
-        clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
-        // Remove grid overlays
-        clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
-        // Remove resize handles and edit buttons
-        clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
-        // Reset dimensions to unscaled
-        clone.style.width = `${printPaperDimensions.width}px`;
-        clone.style.height = `${printPaperDimensions.height}px`;
-        clone.style.transform = "none";
-        pagesHTML += clone.outerHTML;
+      // Render each element from data
+      for (const element of canvas.elements) {
+        if (!element.visible) continue;
+        
+        // Skip UI-only elements
+        if (element.type === "line" || element.type === "rect") continue;
+        
+        // Calculate position in pixels
+        const xPx = element.x * 3.7795275591;
+        const yPx = element.y * 3.7795275591;
+        const widthPx = element.width * 3.7795275591;
+        const heightPx = element.height * 3.7795275591;
+        
+        // Resolve binding or use static text
+        let content = element.text || "";
+        if (element.binding) {
+          if (element.binding.startsWith("company.")) {
+            const field = element.binding.replace("company.", "");
+            if (companyData && field in companyData) {
+              content = String((companyData as any)[field] || "");
+            }
+          } else if (element.binding.startsWith("product.")) {
+            const field = element.binding.replace("product.", "");
+            if (productData && field in productData) {
+              content = String((productData as any)[field] || "");
+            }
+          } else if (element.binding === "batch.sequence") {
+            const total = canvas.batch?.packageCount || 1;
+            const idx = pageIndex + 1;
+            content = canvas.batch?.sequenceFormat === "of"
+              ? `${idx} of ${total}`
+              : `${idx}/${total}`;
+          }
+        }
+        
+        // Handle company-info block
+        if (element.type === "company-info" && element.companyFields) {
+          let fieldsHTML = "";
+          for (const field of element.companyFields) {
+            if (!field.visible) continue;
+            let fieldValue = "";
+            if (field.binding.startsWith("company.") && companyData) {
+              const key = field.binding.replace("company.", "");
+              fieldValue = String((companyData as any)[key] || "");
+            }
+            fieldsHTML += `<div style="margin-bottom: 4px;"><span style="font-weight: 600;">${field.label}：</span><span>${fieldValue}</span></div>`;
+          }
+          content = fieldsHTML;
+        }
+        
+        // Generate element HTML
+        const styleCSS = `
+          position: absolute;
+          left: ${xPx}px;
+          top: ${yPx}px;
+          width: ${widthPx}px;
+          height: ${heightPx}px;
+          font-size: ${element.style.fontSize || 14}px;
+          font-family: ${element.style.fontFamily || 'system-ui, sans-serif'};
+          color: ${element.style.color || '#000000'};
+          text-align: ${element.style.textAlign || 'left'};
+          background-color: ${element.style.backgroundColor || 'transparent'};
+          border: ${element.style.borderWidth ? `${element.style.borderWidth}px solid ${element.style.borderColor || '#000'}` : 'none'};
+          border-radius: ${element.style.borderRadius || 0}px;
+          padding: ${element.style.padding || 0}px;
+          opacity: ${element.style.opacity ?? 1};
+          overflow: hidden;
+          box-sizing: border-box;
+        `.replace(/\n\s+/g, ' ').trim();
+        
+        elementsHTML += `<div data-element-id="${element.id}" data-element-type="${element.type}" style="${styleCSS}">${content}</div>`;
       }
-    });
+      
+      // Wrap in page container
+      pagesHTML += `<div class="print-page-wrapper" data-page-index="${pageIndex}" style="position: relative; width: ${paperWidthPx}px; height: ${paperHeightPx}px; page-break-after: always;">${elementsHTML}</div>`;
+    }
 
     // v6.26 fix: Use large enough iframe to render full page content without clipping
     // Position off-screen but give it the actual paper dimensions in pixels
@@ -884,7 +925,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .map((el) => el.outerHTML)
       .join("\n");
 
-    // v6.26: iframe CSS for print pages
+    // v6.44: iframe CSS for data-driven print pages
     const iframeHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -920,34 +961,6 @@ ${styleElements}
   .print-page-wrapper:last-child {
     page-break-after: auto !important;
     break-after: auto !important;
-  }
-  /* Inner unscaled paper div - force visible and positioned */
-  [data-testid="canvas-print-unscaled-paper"] {
-    display: block !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  /* Hide elements marked for print (page indicators, UI elements) */
-  .print\:hidden {
-    display: none !important;
-  }
-  /* Hide hidden sequence elements */
-  [data-testid="canvas-sequence-hidden"] {
-    display: none !important;
-  }
-  /* Hide page count and sequence indicators */
-  [data-testid="canvas-print-page-count"],
-  [data-testid="canvas-print-page-sequence"] {
-    display: none !important;
-  }
-  /* Remove selection ring */
-  .ring-2 {
-    box-shadow: none !important;
   }
   /* Ensure colors print correctly */
   * {
