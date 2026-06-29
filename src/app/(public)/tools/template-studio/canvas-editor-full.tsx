@@ -307,6 +307,28 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [selectedProductId]);
 
   // ============================================================
+  // Load template by ID (for edit mode)
+  // ============================================================
+
+  useEffect(() => {
+    if (templateId && !template) {
+      fetch(`/api/template-studio/templates/${templateId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.data) {
+            const loadedTemplate = data.data;
+            setCanvas(loadedTemplate);
+            setCurrentTemplateId(loadedTemplate.id);
+            if (loadedTemplate.selectedCompanyId) {
+              setSelectedCompanyId(loadedTemplate.selectedCompanyId);
+            }
+          }
+        })
+        .catch(err => console.error("Failed to load template:", err));
+    }
+  }, [templateId, template]);
+
+  // ============================================================
   // Scale
   // ============================================================
 
@@ -1512,7 +1534,7 @@ ${pagesHTML}
                 📋 查看我的模板
               </a>
               {currentTemplateId && (
-                <a href={`/tools/template-studio/${currentTemplateId}/edit`} className="text-xs text-blue-600 hover:underline" data-testid="canvas-open-saved-template-link">
+                <a href={`/tools/template-studio/canvas/${currentTemplateId}/edit`} className="text-xs text-blue-600 hover:underline" data-testid="canvas-open-saved-template-link">
                   🔗 打开已保存模板
                 </a>
               )}

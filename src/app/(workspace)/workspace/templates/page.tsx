@@ -135,7 +135,7 @@ export default function WorkspaceTemplatesPage() {
                 <div className="flex gap-2">
                   {hasId ? (
                     <a
-                      href={`/tools/template-studio/${t.id}/edit`}
+                      href={`/tools/template-studio/canvas/${t.id}/edit`}
                       className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
                       data-testid={`workspace-edit-${t.id}`}
                     >
