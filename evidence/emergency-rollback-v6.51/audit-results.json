@@ -1,0 +1,56 @@
+[
+  {
+    "testId": "TS-SAVE-THEN-VIEW-MY_TEMPLATES",
+    "testName": "Login, save, view my templates",
+    "status": "PASS",
+    "message": "Login, save, view my templates works"
+  },
+  {
+    "testId": "TS-OPEN_SAVED_TEMPLATE-WORKS",
+    "testName": "Open saved template works",
+    "status": "WARN",
+    "message": "No templates to open or cannot open"
+  },
+  {
+    "testId": "TS-PNG-SINGLE_PAGE-NOT_BLANK",
+    "testName": "Single page PNG is not blank",
+    "status": "PASS",
+    "message": "Single page PNG export works and not blank"
+  },
+  {
+    "testId": "TS-PNG-MULTIPAGE-GUARD",
+    "testName": "Multi-page PNG shows guard message",
+    "status": "PASS",
+    "message": "Multi-page PNG guard message visible"
+  },
+  {
+    "testId": "TS-COMPANY_BLOCK-COMBO",
+    "testName": "Company info block is combo block",
+    "status": "PASS",
+    "message": "Company info block is combo block"
+  },
+  {
+    "testId": "TS-TOOLS_BANNER-EXISTS",
+    "testName": "/tools banner exists",
+    "status": "PASS",
+    "message": "/tools banner exists"
+  },
+  {
+    "testId": "TS-PDF_DISABLED_OR_REMOVED",
+    "testName": "PDF export is disabled/isolated",
+    "status": "PASS",
+    "message": "PDF export button not found (disabled/removed)"
+  },
+  {
+    "testId": "TS-NO_PDF_SHARED_RUNTIME_SIDE_EFFECTS",
+    "testName": "PDF doesn't affect main pipeline",
+    "status": "PASS",
+    "message": "PDF doesn't affect main pipeline (save works)"
+  },
+  {
+    "testId": "TS-WORKSPACE_TEMPLATES-WORKS",
+    "testName": "/workspace/templates works",
+    "status": "PASS",
+    "message": "/workspace/templates works"
+  }
+]

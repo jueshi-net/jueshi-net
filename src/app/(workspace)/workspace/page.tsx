@@ -302,6 +302,15 @@ export default async function WorkspacePage() {
           href="/workspace/company-profiles"
         />
         </div>
+        <div data-testid="workspace-template-studio-entry">
+        <ActionCard
+          title="模板设计器"
+          description="自定义报价单、发票、标签纸模板"
+          icon={<FileText className="w-6 h-6" />}
+          href="/tools/template-studio"
+          badge="新"
+        />
+        </div>
       </div>
 
       {/* ===== D. 核心数据卡 ===== */}
@@ -409,7 +418,7 @@ export default async function WorkspacePage() {
           subtitle="邀请好友获得会员天数"
           action={<Link href="/workspace/invites" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
         >
-          <div className="space-y-3">
+          <div data-testid="invitation-card" className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">已邀请</span>
               <span className="text-lg font-bold text-teal-700">{inviteCount} 人</span>
@@ -433,8 +442,8 @@ export default async function WorkspacePage() {
           subtitle={isMember ? "会员生效中" : "免费版"}
           action={<Link href="/workspace/member" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
         >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+          <div data-testid="membership-benefits-card" className="space-y-3">
+            <div data-testid="entitlement-status" className="flex items-center justify-between">
               <span className="text-sm text-gray-600">会员状态</span>
               <span className={`text-sm font-bold ${isMember ? "text-amber-600" : "text-gray-400"}`}>
                 {isMember ? "会员" : "免费版"}
@@ -464,7 +473,7 @@ export default async function WorkspacePage() {
           subtitle="申请使用广告资源"
           action={<Link href="/workspace/ad-entitlements" className="text-xs text-teal-600 hover:underline">查看详情</Link>}
         >
-          <div className="space-y-3">
+          <div data-testid="ad-benefits-card" className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">可用天数</span>
               <span className="text-lg font-bold text-teal-700">0 天</span>

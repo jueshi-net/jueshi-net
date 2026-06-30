@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "id": "TS-TOOLS-HAS-REAL-CTA-BANNER",
+      "name": "/tools has real CTA banner",
+      "status": "PASS",
+      "severity": "P0",
+      "message": "Banner with title, subtitle, and 3 CTAs found",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664562506/tools-banner.png"
+    },
+    {
+      "id": "TS-TEMPLATE-STUDIO-PAGE-LOADS",
+      "name": "/tools/template-studio loads",
+      "status": "FAIL",
+      "severity": "P0",
+      "message": "Missing: startDesign=false, myTemplates=false",
+      "evidence": "/Users/chq/xixiong-saas/evidence/template-routes-runtime-1782664562506/template-studio.png"
+    },
+    {
+      "id": "AUDIT-ERROR",
+      "name": "Audit execution error",
+      "status": "BLOCKED",
+      "severity": "P0",
+      "message": "Error: page.$: Unexpected token \"=\" while parsing css selector \"input[type=\"email\"], input[type=\"password\"], text=\"请先登录\"\". Did you mean to CSS.escape it?"
+    }
+  ],
+  "summary": {
+    "passed": 1,
+    "failed": 1,
+    "blocked": 1,
+    "total": 3
+  }
+}

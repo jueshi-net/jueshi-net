@@ -37,12 +37,22 @@ async function getActiveCategories() {
   }
 }
 
-export default async function NewPostPage() {
+export default async function NewPostPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await auth();
 
   if (!session?.user) {
     redirect("/login?callbackUrl=/bbs/new");
   }
+
+  const params = await searchParams;
+  const initialTitle = typeof params.title === "string" ? params.title : "";
+  const initialContent = typeof params.body === "string" ? params.body : "";
+  const initialCategoryKey = typeof params.category === "string" ? params.category : "";
+  const toolContext = typeof params.toolContext === "string" ? params.toolContext : "";
 
   const categories = await getActiveCategories();
 
@@ -92,7 +102,13 @@ export default async function NewPostPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
           {/* Main form area */}
           <div className="bg-white rounded-xl border border-gray-200 p-5 md:p-7 shadow-sm">
-            <PostForm categories={categories} />
+            <PostForm 
+              categories={categories}
+              initialTitle={initialTitle}
+              initialContent={initialContent}
+              initialCategoryKey={initialCategoryKey}
+              toolContext={toolContext}
+            />
           </div>
 
           {/* Sidebar: posting rules */}

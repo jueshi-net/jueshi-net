@@ -1,61 +1,57 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
 
-/**
- * GET /api/workspace/products
- * 获取当前用户的商品列表
- */
+export const dynamic = "force-dynamic";
+
+// GET - list user's products (supports search & isActive filtering)
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(req.url);
-  const search = searchParams.get('search') || '';
-  const isActive = searchParams.get('isActive');
-
   try {
-    const where: any = { userId: session.user.id };
-    
-    if (isActive !== null) {
-      where.isActive = isActive === 'true';
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
-    
+
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search")?.trim() || "";
+    const isActiveParam = searchParams.get("isActive");
+
+    // Build where clause — field names match the Prisma ProductItem model
+    // (model uses `name`, not nameZh/nameEn)
+    const where: Prisma.ProductItemWhereInput = { userId: session.user.id };
+    if (isActiveParam === "true") where.isActive = true;
+    if (isActiveParam === "false") where.isActive = false;
+
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { sku: { contains: search, mode: 'insensitive' } },
-        { hsCode: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { sku: { contains: search, mode: "insensitive" } },
+        { hsCode: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
       ];
     }
 
     const products = await prisma.productItem.findMany({
       where,
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: "desc" },
       take: 100,
     });
 
     return NextResponse.json({ success: true, products });
-  } catch (error) {
-    console.error('GET /api/workspace/products error:', error);
-    return NextResponse.json({ error: '获取商品列表失败' }, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
 }
 
-/**
- * POST /api/workspace/products
- * 创建新商品
- */
+// POST - create a product (persists all ProductItem fields)
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: '未登录' }, { status: 401 });
-  }
-
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const {
       name,
@@ -73,36 +69,37 @@ export async function POST(req: NextRequest) {
       originCountry,
       material,
       usage,
+      isActive,
     } = body;
 
-    if (!name || name.trim().length === 0) {
-      return NextResponse.json({ error: '商品名称不能为空' }, { status: 400 });
+    if (!name || !String(name).trim()) {
+      return NextResponse.json({ success: false, error: "Product name is required" }, { status: 400 });
     }
 
     const product = await prisma.productItem.create({
       data: {
         userId: session.user.id,
-        name: name.trim(),
-        sku: sku?.trim() || null,
-        description: description?.trim() || null,
-        hsCode: hsCode?.trim() || null,
-        unit: unit || 'PCS',
+        name: String(name).trim(),
+        sku: sku ? String(sku).trim() : null,
+        description: description ? String(description).trim() : null,
+        hsCode: hsCode ? String(hsCode).trim() : null,
+        unit: unit || "PCS",
         unitPrice: unitPrice ? parseFloat(unitPrice) : null,
-        currency: currency || 'USD',
+        currency: currency || "USD",
         netWeight: netWeight ? parseFloat(netWeight) : null,
         grossWeight: grossWeight ? parseFloat(grossWeight) : null,
         length: length ? parseFloat(length) : null,
         width: width ? parseFloat(width) : null,
         height: height ? parseFloat(height) : null,
-        originCountry: originCountry?.trim() || null,
-        material: material?.trim() || null,
-        usage: usage?.trim() || null,
+        originCountry: originCountry ? String(originCountry).trim() : null,
+        material: material ? String(material).trim() : null,
+        usage: usage ? String(usage).trim() : null,
+        isActive: typeof isActive === "boolean" ? isActive : true,
       },
     });
 
     return NextResponse.json({ success: true, product });
-  } catch (error) {
-    console.error('POST /api/workspace/products error:', error);
-    return NextResponse.json({ error: '创建商品失败' }, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json({ success: false, error: e.message }, { status: 500 });
   }
 }

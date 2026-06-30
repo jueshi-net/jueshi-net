@@ -1,0 +1,17 @@
+{
+  "paper": {
+    "width": 377.9375,
+    "height": 377.9375,
+    "style": "width: 377.953px; height: 377.953px;"
+  },
+  "element": {
+    "width": 0,
+    "height": 0,
+    "left": 0,
+    "top": 0,
+    "style": "left: 75.5906px; top: 75.5906px; width: 188.976px; height: 37.7953px; font-size: 12pt; font-family: Arial, sans-serif; font-weight: normal; color: rgb(0, 0, 0); text-align: left; background-color: transparent; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; border-radius: 0mm; padding: 2mm; opacity: 1; z-index: 1;",
+    "computedFontSize": "16px",
+    "computedWidth": "188.976px",
+    "computedHeight": "37.7953px"
+  }
+}

@@ -71,6 +71,34 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 pt-6">
+        {/* Template Studio CTA Banner */}
+        {!query && !category && (
+          <div className="mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-8 shadow-lg" data-testid="tools-template-cta-banner">
+            <div className="max-w-3xl">
+              <h2 className="text-3xl font-bold text-white mb-3">免费自定义你的单据模板</h2>
+              <p className="text-lg text-white/90 mb-6">自由拖拽设计报价单、发票、装箱单、商品标签，支持批量打印与导出 PNG。免费注册，限时免费使用。</p>
+              <div className="flex gap-4 flex-wrap">
+                <Link
+                  href="/tools/template-studio/canvas/new"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 text-base font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
+                  data-testid="tools-template-cta-create"
+                >
+                  <Wrench className="w-5 h-5" />
+                  立即创建模板
+                </Link>
+                <Link
+                  href="/workspace/templates"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white text-base font-semibold rounded-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
+                  data-testid="tools-template-cta-my-templates"
+                >
+                  <FileText className="w-5 h-5" />
+                  查看我的模板
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {query ? `搜索结果: "${query}"` : '工具中心'}
@@ -80,13 +108,31 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           </p>
           {/* Documents hub CTA — only on default view */}
           {!query && !category && (
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <Link
                 href="/tools/documents"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-100 transition-colors border border-purple-200"
               >
                 <FileText className="w-3.5 h-3.5" />
                 外贸单据模板中心
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link
+                href="/tools/template-studio"
+                data-testid="tools-template-studio-card"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
+              >
+                <Wrench className="w-3.5 h-3.5" />
+                模板设计器
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+              <Link
+                href="/workspace/templates"
+                data-testid="tools-my-templates-card"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors border border-green-200"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                我的模板
                 <ArrowRight className="w-3 h-3" />
               </Link>
             </div>

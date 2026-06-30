@@ -140,6 +140,47 @@
 - artifacts/screenshots/P1-POSTAL-WEBKIT-CA.png
 - artifacts/screenshots/P1-POSTAL-WEBKIT-JP.png
 - artifacts/screenshots/P1-POSTAL-WEBKIT-US.png
+- artifacts/screenshots/P1-WORD-EXPORT-AUTH-CONSISTENCY-dynamic.png
+- artifacts/screenshots/P1-WORD-EXPORT-AUTH-CONSISTENCY-quote-sheet.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMMERCIAL-INVOICE-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMMERCIAL-INVOICE-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMMERCIAL-INVOICE-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMMERCIAL-INVOICE-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-A-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-A-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-A-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-A-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-B-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-B-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-B-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-COMPANY-SWITCH-B-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-DYNAMIC-DOCUMENTS-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-DYNAMIC-DOCUMENTS-no-button.png
+- artifacts/screenshots/P1-WORD-EXPORT-DYNAMIC-DOCUMENTS-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-DYNAMIC-DOCUMENTS-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-DYNAMIC-DOCUMENTS-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-EXPRESS-DECLARATION-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-EXPRESS-DECLARATION-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-EXPRESS-DECLARATION-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-EXPRESS-DECLARATION-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-FREE-LIMIT-MESSAGE.png
+- artifacts/screenshots/P1-WORD-EXPORT-MEMBER-BYPASS-LIMIT.png
+- artifacts/screenshots/P1-WORD-EXPORT-NO-BROKEN-DOWNLOADS.png
+- artifacts/screenshots/P1-WORD-EXPORT-PACKING-LIST-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-PACKING-LIST-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-PACKING-LIST-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-PACKING-LIST-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-PROFORMA-INVOICE-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-PROFORMA-INVOICE-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-PROFORMA-INVOICE-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-PROFORMA-INVOICE-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-QUOTE-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-QUOTE-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-QUOTE-pre-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-SALES-CONTRACT-blocked.png
+- artifacts/screenshots/P1-WORD-EXPORT-SALES-CONTRACT-no-download.png
+- artifacts/screenshots/P1-WORD-EXPORT-SALES-CONTRACT-post-export.png
+- artifacts/screenshots/P1-WORD-EXPORT-SALES-CONTRACT-pre-export.png
 - artifacts/screenshots/P1-postal-initial.png
 - artifacts/screenshots/P2-001-admin-login.png
 - artifacts/screenshots/P2-002-dashboard.png
@@ -186,4 +227,4 @@
 - artifacts/storage-state/admin-session.json (NOT committed to git)
 - artifacts/storage-state/user-session.json (NOT committed to git)
 
-**Total screenshots:** 178
+**Total screenshots:** 219

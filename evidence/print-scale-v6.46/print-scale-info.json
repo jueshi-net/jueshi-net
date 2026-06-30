@@ -1,0 +1,20 @@
+{
+  "iframeDimensions": {
+    "width": 398,
+    "height": 398,
+    "style": "position: fixed; left: -9999px; top: -9999px; width: 398px; height: 398px; border: 0px; visibility: hidden; overflow: visible;"
+  },
+  "pageWrapper": {
+    "width": 378,
+    "height": 378,
+    "style": "position: relative; width: 378px; height: 378px; page-break-after: always;"
+  },
+  "firstElement": {
+    "width": 188.96875,
+    "height": 37.78125,
+    "left": 85.578125,
+    "top": 75.578125,
+    "style": "position: absolute; left: 75.590551182px; top: 75.590551182px; width: 188.976377955px; height: 37.795275591px; font-size: 12px; font-family: Arial, sans-serif; color: #000000; text-align: left; background-color: transparent; border: none; border-radius: 0px; padding: 2px; opacity: 1; overflow: hidden; box-sizing: border-box;"
+  },
+  "pageCSS": "\n  @page {\n    size: 100mm 100mm;\n    margin: 0;\n  }\n  html, body {\n    margin: 0 !important;\n    padding: 0 !important;\n    overflow: visible !important;\n    background: white !important;\n    -webkit-print-color-adjust: exact !important;\n    print-color-adjust: exact !important;\n  }\n  body {\n    display: flex !important;\n    flex-direction: column !important;\n    align-items: center !important;\n  }\n  /* Print page wrappers: page break after each */\n  .print-page-wrapper {\n    position: relative !important;\n    box-shadow: none !important;\n    margin: 0 auto !important;\n    page-break-after: always;\n    break-after: page;\n  }\n  .print-page-wrapper:last-child {\n    page-break-after: auto !important;\n    break-after: auto !important;\n  }\n  /* Ensure colors print correctly */\n  * {\n    -webkit-print-color-adjust: exact !important;\n    print-color-adjust: exact !important;\n  }\n"
+}

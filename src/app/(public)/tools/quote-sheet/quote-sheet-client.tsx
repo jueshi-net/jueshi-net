@@ -19,6 +19,8 @@ import { QuoteSheetData, QuoteSheetLine, defaultQuoteSheetData, serialize, deser
 import QuoteSheetPreview from "./quote-sheet-preview";
 import DocumentToolLayout from "@/components/document-tools/document-tool-layout";
 import DocumentToolStatusAlerts from "@/components/document-tools/document-tool-status-alerts";
+import ToolContentSection from "@/components/document-tools/tool-content-section";
+import BbsToolLinkage from "@/components/document-tools/bbs-tool-linkage";
 import { trackEvent } from "@/lib/tracking";
 
 export default function QuoteSheetClient({ draftId }: { draftId: string | null }) {
@@ -295,6 +297,7 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
             <button
               onClick={handleSave}
               disabled={saving}
+              data-testid="document-save-draft-button"
               className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 min-h-[44px]"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -412,6 +415,12 @@ export default function QuoteSheetClient({ draftId }: { draftId: string | null }
           <QuoteSheetPreview data={data} innerRef={previewRef} />
         }
       />
+
+      {/* v1.20.42.18.6.14.1: Tool content + BBS linkage for quotation */}
+      <div className="max-w-7xl mx-auto px-4 mt-8 space-y-6">
+        <ToolContentSection toolSlug="quotation" toolName="报价单" />
+        <BbsToolLinkage toolSlug="quotation" toolName="报价单" />
+      </div>
     </div>
   );
 }

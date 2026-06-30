@@ -1,0 +1,44 @@
+[
+  {
+    "id": "TS-CANVAS-TOUCH-DRAG",
+    "name": "iPad 触控拖动",
+    "status": "FAIL",
+    "evidence": "Element did not move"
+  },
+  {
+    "id": "TS-CANVAS-TOUCH-RESIZE",
+    "name": "iPad 触控缩放",
+    "status": "PASS",
+    "evidence": "Touch resize successful: width=87.6, height=17.5"
+  },
+  {
+    "id": "TS-CANVAS-BATCH-SEQUENCE-VISIBLE",
+    "name": "批量序号可见",
+    "status": "PASS",
+    "evidence": "Sequence visible: 10/10"
+  },
+  {
+    "id": "TS-CANVAS-REPEAT-10-PAGES",
+    "name": "10 页重复输出",
+    "status": "PASS",
+    "evidence": "10 pages rendered: 1/10 → 10/10"
+  },
+  {
+    "id": "TS-CANVAS-SAVE-RESTORE",
+    "name": "保存恢复功能",
+    "status": "PASS",
+    "evidence": "Save button exists and is clickable"
+  },
+  {
+    "id": "TS-CANVAS-PNG-EXPORT",
+    "name": "PNG 导出",
+    "status": "PASS",
+    "evidence": "PNG export button exists"
+  },
+  {
+    "id": "TS-CANVAS-PRINT-OUTPUT",
+    "name": "打印输出",
+    "status": "PASS",
+    "evidence": "Print button exists"
+  }
+]

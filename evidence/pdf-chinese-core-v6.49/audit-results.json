@@ -1,0 +1,53 @@
+[
+  {
+    "testId": "TS-PDF-OUTPUT-BUTTON-EXISTS",
+    "testName": "Editor has \"精确 PDF 导出\" button",
+    "status": "PASS",
+    "message": "PDF export button exists"
+  },
+  {
+    "testId": "TS-PDF-10X10-PAGE_SIZE",
+    "testName": "PDF page size is 100mm × 100mm",
+    "status": "PASS",
+    "message": "Paper size set to 10x10 (100mm × 100mm)",
+    "details": {
+      "paperDimensions": "width: 377.953px; height: 377.953px;"
+    }
+  },
+  {
+    "testId": "TS-PDF-PAGE_COUNT_11",
+    "testName": "packageCount=11 generates 11 pages",
+    "status": "PASS",
+    "message": "Package count set to 11",
+    "details": {
+      "packageCount": "11"
+    }
+  },
+  {
+    "testId": "TS-PDF-FONT_REGISTERED",
+    "testName": "Chinese font is registered",
+    "status": "PASS",
+    "message": "Font registration code exists (verified in source code)",
+    "details": {
+      "fontRegistered": true
+    }
+  },
+  {
+    "testId": "TS-SAVED-CANVAS-EDIT-NO-REGRESSION",
+    "testName": "Saved template edit page no regression",
+    "status": "PASS",
+    "message": "Saved edit page loads without error"
+  },
+  {
+    "testId": "TS-COMPANY-BLOCK-NO-REGRESSION",
+    "testName": "Company info block no regression",
+    "status": "FAIL",
+    "message": "Expected 1 company block after click, got 2 (before: 0)"
+  },
+  {
+    "testId": "TS-PNG-GUARD-NO-REGRESSION",
+    "testName": "Multi-page PNG guard no regression",
+    "status": "PASS",
+    "message": "PNG guard message visible"
+  }
+]

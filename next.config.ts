@@ -80,6 +80,8 @@ const nextConfig: NextConfig = {
 
   async headers() {
     return [
+      // SEO: Only apply noindex to staging (i.jueshi.net)
+      // Production (jueshi.net) should be indexed by Google
       {
         source: "/:path*",
         headers: [
@@ -91,22 +93,7 @@ const nextConfig: NextConfig = {
         has: [
           {
             type: "host",
-            value: "jueshi.net",
-          },
-        ],
-      },
-      {
-        source: "/:path*",
-        headers: [
-          {
-            key: "X-Robots-Tag",
-            value: "noindex, nofollow",
-          },
-        ],
-        has: [
-          {
-            type: "host",
-            value: "www.jueshi.net",
+            value: "i.jueshi.net",
           },
         ],
       },

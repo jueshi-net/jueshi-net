@@ -16,14 +16,24 @@ type ForumCategory = {
 
 interface PostFormProps {
   categories: ForumCategory[];
+  initialTitle?: string;
+  initialContent?: string;
+  initialCategoryKey?: string;
+  toolContext?: string;
 }
 
-export default function PostForm({ categories }: PostFormProps) {
+export default function PostForm({ categories, initialTitle = "", initialContent = "", initialCategoryKey = "", toolContext = "" }: PostFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [title, setTitle] = useState(initialTitle);
+  const [content, setContent] = useState(initialContent);
+  const [categoryId, setCategoryId] = useState(() => {
+    if (initialCategoryKey) {
+      const cat = categories.find((c) => c.key === initialCategoryKey);
+      if (cat) return cat.id;
+    }
+    return "";
+  });
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [errors, setErrors] = useState<{
@@ -94,6 +104,7 @@ export default function PostForm({ categories }: PostFormProps) {
             content: content.trim(),
             categoryId,
             tags: tags.length > 0 ? tags : undefined,
+            relatedTool: toolContext || undefined,
           }),
         });
 
@@ -119,6 +130,15 @@ export default function PostForm({ categories }: PostFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Tool context badge */}
+      {toolContext && (
+        <div data-testid="bbs-compose-tool-context" className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+          <span className="text-sm text-blue-600">🔗 关联工具：</span>
+          <Link href={`/tools/documents/${toolContext}`} className="text-sm text-blue-700 font-medium hover:underline">
+            {toolContext}
+          </Link>
+        </div>
+      )}
       {/* Category selection — visual cards */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -161,6 +181,7 @@ export default function PostForm({ categories }: PostFormProps) {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="请输入帖子标题（5-80字）"
           maxLength={80}
+          data-testid="bbs-compose-title"
           className={cnInput(!!errors.title)}
         />
         <div className="flex items-center justify-between mt-1">
@@ -261,7 +282,7 @@ export default function PostForm({ categories }: PostFormProps) {
 
       {/* Submit button */}
       <div className="flex items-center gap-3 pt-2">
-        <BaseButton type="submit" variant="primary" size="lg" loading={isPending} disabled={isPending}>
+        <BaseButton type="submit" variant="primary" size="lg" loading={isPending} disabled={isPending} data-testid="bbs-compose-submit">
           {isPending ? "发布中..." : "🚀 发布帖子"}
         </BaseButton>
         <Link

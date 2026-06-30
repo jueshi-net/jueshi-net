@@ -1,0 +1,97 @@
+[
+  {
+    "testId": "TS-PRINT-PAGINATION-11_PAGES",
+    "testName": "packageCount=11 outputs 11 pages",
+    "status": "PASS",
+    "message": "Correctly output 11 pages",
+    "details": {
+      "pageCount": 11
+    }
+  },
+  {
+    "testId": "TS-PRINT-SEQUENCE-1_TO_11",
+    "testName": "Sequence from 1/11 to 11/11",
+    "status": "PASS",
+    "message": "All sequences correct: 1/11 to 11/11",
+    "details": {
+      "sequences": [
+        "1/11",
+        "2/11",
+        "3/11",
+        "4/11",
+        "5/11",
+        "6/11",
+        "7/11",
+        "8/11",
+        "9/11",
+        "10/11",
+        "11/11"
+      ]
+    }
+  },
+  {
+    "testId": "TS-PRINT-NO_PAGE_MERGE",
+    "testName": "No multiple labels merged into one page",
+    "status": "PASS",
+    "message": "Each page has exactly one element",
+    "details": {
+      "pageElementCounts": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "testId": "TS-PRINT-SAFARI_PAGE_BREAK_CSS",
+    "testName": "Safari-friendly break CSS",
+    "status": "PASS",
+    "message": "Safari-friendly break CSS found",
+    "details": {
+      "hasBreakAfter": true,
+      "hasPageBreakInside": false
+    }
+  },
+  {
+    "testId": "TS-PRINT-FORMAT-NOT_BROKEN",
+    "testName": "Title/sequence don't overlap, single layer",
+    "status": "PASS",
+    "message": "No overlap, single layer",
+    "details": {
+      "hasOverlap": false,
+      "layerCount": 1
+    }
+  },
+  {
+    "testId": "TS-PRINT-NO_RAW_COMPANY_TOKEN",
+    "testName": "No raw company tokens",
+    "status": "PASS",
+    "message": "No raw company tokens"
+  },
+  {
+    "testId": "TS-PRINT-NO_NAV_FOOTER",
+    "testName": "No nav/footer",
+    "status": "PASS",
+    "message": "No nav/footer"
+  },
+  {
+    "testId": "TS-SAVED-CANVAS-EDIT-NO-REGRESSION",
+    "testName": "Saved edit no regression",
+    "status": "PASS",
+    "message": "Saved edit page loads without error"
+  },
+  {
+    "testId": "TS-COMPANY-BLOCK-NO-REGRESSION",
+    "testName": "Company block no regression",
+    "status": "FAIL",
+    "message": "Expected 1 company block after click, got 2 (before: 0)"
+  },
+  {
+    "testId": "TS-PNG-GUARD-NO-REGRESSION",
+    "testName": "PNG guard no regression",
+    "status": "PASS",
+    "message": "PNG guard message visible"
+  }
+]

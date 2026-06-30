@@ -261,7 +261,7 @@ export default function ProductsPage() {
       key: 'name',
       header: '商品名称',
       render: (row: ProductItem) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" data-testid="product-card">
           <span className="font-medium text-gray-900">{row.name}</span>
           {row.sku && (
             <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded font-mono">{row.sku}</span>
@@ -363,6 +363,7 @@ export default function ProductsPage() {
             </button>
             <button
               onClick={handleNew}
+              data-testid="product-create-button"
               className="flex items-center gap-1.5 px-3 py-2 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700 transition-colors"
             >
               <Plus className="w-4 h-4" /> 新增
@@ -402,6 +403,7 @@ export default function ProductsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="搜索商品名称、SKU、HS Code..."
+                data-testid="product-search"
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
@@ -696,6 +698,7 @@ export default function ProductsPage() {
                 <button
                   onClick={handleSave}
                   disabled={saving}
+                  data-testid="product-save-button"
                   className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" /> {saving ? '保存中...' : '保存'}

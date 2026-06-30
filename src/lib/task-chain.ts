@@ -42,6 +42,13 @@ export interface TaskChainContext {
   totalGrossWeight?: number;
   totalNetWeight?: number;
   totalVolume?: number;
+  // v1.20.42.18.6.14: Company profile carried through chain
+  companyProfileId?: string;
+  companyName?: string;
+  companyNameEn?: string;
+  companyAddress?: string;
+  companyPhone?: string;
+  companyEmail?: string;
 }
 
 // v1.20.42.13.1: Document chain definition

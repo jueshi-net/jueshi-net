@@ -1,0 +1,43 @@
+/* Canvas Template Print Styles */
+
+@media print {
+  /* Hide all editor UI */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Reset page margins */
+  @page {
+    margin: 0;
+  }
+
+  /* Remove body margins */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Canvas paper should fill the page */
+  [data-testid="canvas-paper"],
+  [data-testid="canvas-print-page"] {
+    page-break-after: always;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Last page should not have page break after */
+  [data-testid="canvas-print-page"]:last-child {
+    page-break-after: auto;
+  }
+
+  /* Ensure elements are visible */
+  [data-testid="canvas-element"] {
+    page-break-inside: avoid;
+  }
+
+  /* Remove ring selection indicators */
+  .ring-2 {
+    box-shadow: none !important;
+  }
+}

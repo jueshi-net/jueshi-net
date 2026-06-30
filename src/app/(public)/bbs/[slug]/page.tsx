@@ -222,6 +222,29 @@ export default async function PostDetailPage({
                 </div>
               )}
 
+              {/* Related tool card — v1.20.42.18.6.14 */}
+              {post.relatedTool && (
+                <div data-testid="bbs-post-related-tool" className="mt-4 p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                  <div data-testid="bbs-related-tool-card" className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-blue-600 mb-1">🔗 本帖关联工具</p>
+                      <Link
+                        href={`/tools/documents/${post.relatedTool}`}
+                        className="text-sm font-semibold text-blue-700 hover:underline"
+                      >
+                        {post.relatedTool.replace(/-/g, ' ')} →
+                      </Link>
+                    </div>
+                    <Link
+                      href={`/tools/documents/${post.relatedTool}`}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-white border border-blue-200 text-blue-600 hover:bg-blue-50"
+                    >
+                      打开工具
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               {/* Action bar */}
               <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-gray-100">
                 <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-slate-600 hover:bg-brand/5 hover:text-brand transition-colors border border-slate-200">

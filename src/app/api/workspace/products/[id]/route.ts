@@ -5,6 +5,34 @@ import { prisma } from '@/lib/prisma';
 type Params = { params: Promise<{ id: string }> };
 
 /**
+ * GET /api/workspace/products/[id]
+ * 获取单个商品详情
+ */
+export async function GET(req: NextRequest, { params }: Params) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: '未登录' }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const product = await prisma.productItem.findFirst({
+      where: { id, userId: session.user.id },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: '商品不存在' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, product });
+  } catch (error) {
+    console.error('GET /api/workspace/products/[id] error:', error);
+    return NextResponse.json({ error: '获取商品失败' }, { status: 500 });
+  }
+}
+
+/**
  * PATCH /api/workspace/products/[id]
  * 更新商品
  */

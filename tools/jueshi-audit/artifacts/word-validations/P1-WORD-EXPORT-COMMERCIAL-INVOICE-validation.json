@@ -1,0 +1,23 @@
+{
+  "file": "/Users/chq/xixiong-saas/tools/jueshi-audit/artifacts/word/P1-WORD-EXPORT-COMMERCIAL-INVOICE-CI-CI-2024-001-2026-06-24.docx",
+  "timestamp": "2026-06-24T15:22:41.941Z",
+  "checks": {
+    "fileExists": true,
+    "fileSizeGreaterThanZero": true,
+    "fileSizeBytes": 3946,
+    "pkHeader": true,
+    "firstBytesHex": "50 4b 03 04",
+    "unzipTest": true,
+    "unzipOutput": "         OK\n    testing: docProps/                OK\n    testing: docProps/core.xml        OK\n    testing: docProps/app.xml         OK\nNo errors detected in compressed data of /Users/chq/xixiong-saas/tools/jueshi-audit/artifacts/word/P1-WORD-EXPORT-COMMERCIAL-INVOICE-CI-CI-2024-001-2026-06-24.docx.\n",
+    "hasContentTypesXml": true,
+    "hasWordDocumentXml": true,
+    "companyNameFound": true,
+    "companyNameValue": "QS Test Company",
+    "noHtmlErrorPage": true,
+    "noJsonError": true,
+    "libreOfficeConvert": true,
+    "libreOfficeOutput": "SKIPPED (--skip-libreoffice flag)"
+  },
+  "overall": "PASS",
+  "errors": []
+}
