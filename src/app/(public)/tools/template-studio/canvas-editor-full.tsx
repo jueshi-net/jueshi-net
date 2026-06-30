@@ -718,66 +718,31 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return;
     }
     
-    if (!paperRef.current) {
-      setPngStatus("error");
-      setSaveMessage("导出失败: 画布未就绪，请先添加内容");
-      setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 3000);
-      return;
-    }
-    
     setPngStatus("exporting");
     try {
-      // Dynamically import html-to-image (avoids SSR issues).
-      // html-to-image natively supports lab()/oklch() color functions
-      // used by Tailwind CSS v4 — no onclone color-replacement hack needed.
-      const { toPng } = await import("html-to-image");
-
-      // Temporarily hide selection rings via a <style> tag
-      const styleId = "png-export-ring-hide";
-      const styleEl = document.createElement("style");
-      styleEl.id = styleId;
-      styleEl.textContent = ".ring-2{box-shadow:none!important}";
-      document.head.appendChild(styleEl);
-
-      // Filter out UI elements that should not appear in the export
-      const hideTestIds = new Set([
-        "canvas-grid-overlay",
-        "canvas-resize-handle",
-        "canvas-sequence-resize-handle",
-        "canvas-edit-text-button",
-        "canvas-print-page-count",
-        "canvas-print-page-sequence",
-      ]);
-      const filter = (node: HTMLElement) => {
-        const testid =
-          node?.dataset?.testid ?? node?.getAttribute?.("data-testid") ?? "";
-        return !hideTestIds.has(testid);
-      };
-
-      const dataUrl = await toPng(paperRef.current, {
+      // v6.54: Use data-driven PNG renderer (Canvas API)
+      // No DOM screenshot - pure data-driven rendering
+      const { renderCanvasToPng } = await import("@/lib/template-studio/canvas-png-renderer");
+      
+      const result = await renderCanvasToPng(canvas, {
         pixelRatio: 2,
         backgroundColor: "#ffffff",
-        filter,
+        pageIndex: 0,
       });
-
-      // Clean up temporary style
-      styleEl.remove();
 
       const link = document.createElement("a");
       link.download = `${canvas.name || "template"}.png`;
-      link.href = dataUrl;
+      link.href = result.dataUrl;
       link.click();
       setPngStatus("done");
       setTimeout(() => setPngStatus("idle"), 2000);
     } catch (err) {
-      // Ensure temp style is removed on error too
-      document.getElementById("png-export-ring-hide")?.remove();
       console.error("PNG export failed:", err);
       setPngStatus("error");
       setSaveMessage(`导出失败: ${err instanceof Error ? err.message : "未知错误"}`);
       setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 3000);
     }
-  }, [canvas.name, pngStatus]);
+  }, [canvas, pngStatus]);
 
   // ============================================================
   // Print — iframe-based print-only (v18.6.16.6.25 runtime fix)
