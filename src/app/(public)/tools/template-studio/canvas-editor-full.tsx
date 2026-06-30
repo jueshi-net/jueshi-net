@@ -413,9 +413,21 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     setSaveStatus("idle");
   }, [canvas, pushHistory]);
 
+  // Ref to track if company block is being added (prevents duplicate adds)
+  const isAddingCompanyBlock = useRef(false);
+  
   const insertCompanyBlock = useCallback(() => {
-    // Check if a company-info block already exists
+    console.log('[DEBUG] insertCompanyBlock called, isAdding:', isAddingCompanyBlock.current);
+    
+    // Prevent duplicate adds
+    if (isAddingCompanyBlock.current) {
+      console.log('[DEBUG] Already adding, returning');
+      return;
+    }
+    
+    // First, check if a company-info block already exists
     const existingCompanyBlock = canvas.elements.find(el => el.type === "company-info");
+    console.log('[DEBUG] Existing company block:', existingCompanyBlock ? 'found' : 'not found');
     
     if (existingCompanyBlock) {
       // If exists, just select it instead of adding a new one
@@ -423,6 +435,11 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       return;
     }
     
+    // Mark as adding
+    isAddingCompanyBlock.current = true;
+    console.log('[DEBUG] Creating new company block');
+    
+    // Create new company block
     const baseZ = getNextZIndex(canvas.elements);
     const el = defaultCanvasElement("company-info");
     el.id = `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -438,15 +455,25 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       { binding: "company.address", label: "地址", visible: true },
     ];
     el.style = { ...el.style, fontSize: 10 };
+    
     const newCanvas = {
       ...canvas,
       elements: [...canvas.elements, el],
       updatedAt: new Date().toISOString(),
     };
+    
+    console.log('[DEBUG] New canvas elements count:', newCanvas.elements.length);
+    
     setCanvas(newCanvas);
     pushHistory(newCanvas);
     setSelectedElementId(el.id);
     setSaveStatus("idle");
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      isAddingCompanyBlock.current = false;
+      console.log('[DEBUG] Reset isAdding flag');
+    }, 500);
   }, [canvas, pushHistory]);
 
   const updateElement = useCallback((id: string, updates: Partial<CanvasElement>) => {
@@ -1334,7 +1361,7 @@ ${pagesHTML}
           {fields.filter(f => f.visible).map((field, idx) => {
             const resolved = resolveBinding(field.binding);
             return (
-              <div key={idx} className="mb-1" data-testid={`canvas-company-field-${field.binding}`}>
+              <div key={idx} className="mb-1">
                 <span className="font-semibold">{field.label}：</span>
                 <span>{resolved}</span>
               </div>
