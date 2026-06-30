@@ -1,8 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import ResourceDirectoryClient from "./resource-directory-client";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://jueshi.net/resources" },
+};
 
 /**
  * Featured resources use the isFeatured field with optional time-based scheduling.

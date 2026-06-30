@@ -18,6 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return {
     title,
     description,
+    alternates: { canonical: "https://jueshi.net/tools" },
     openGraph: {
       title,
       description,

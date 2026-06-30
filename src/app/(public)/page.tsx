@@ -9,6 +9,11 @@ import PremiumSection from "@/components/home/premium-section";
 import SEOSection from "@/components/home/seo-section";
 import PartnerLogos from "@/components/home/partner-logos";
 import { AD_SLOTS } from "@/lib/ad-slots";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "https://jueshi.net/" },
+};
 
 async function getRealStats() {
   try {
