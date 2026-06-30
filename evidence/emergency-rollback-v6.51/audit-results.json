@@ -44,13 +44,13 @@
   {
     "testId": "TS-NO_PDF_SHARED_RUNTIME_SIDE_EFFECTS",
     "testName": "PDF doesn't affect main pipeline",
-    "status": "PASS",
-    "message": "PDF doesn't affect main pipeline (save works)"
+    "status": "FAIL",
+    "message": "Error: Error: page.waitForTimeout: Target page, context or browser has been closed"
   },
   {
     "testId": "TS-WORKSPACE_TEMPLATES-WORKS",
     "testName": "/workspace/templates works",
-    "status": "PASS",
-    "message": "/workspace/templates works"
+    "status": "FAIL",
+    "message": "Error: Error: page.goto: Target page, context or browser has been closed"
   }
 ]

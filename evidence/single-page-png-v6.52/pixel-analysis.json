@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-06-30T05:29:53.352Z",
+  "exportStatus": "导出 PNG",
+  "pixelAnalysis": {
+    "totalPixels": 1159680,
+    "nonWhitePixels": 27981,
+    "nonWhitePercentage": 2.4128207781456954,
+    "width": 906,
+    "height": 1280
+  },
+  "multipageGuardVisible": true,
+  "pngPath": "/Users/chq/xixiong-saas/evidence/single-page-png-v6.52/exported.png",
+  "screenshotPath": "/Users/chq/xixiong-saas/evidence/single-page-png-v6.52/before-export.png"
+}
