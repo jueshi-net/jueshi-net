@@ -113,6 +113,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveMessage, setSaveMessage] = useState<string>("");
   const [pngStatus, setPngStatus] = useState<"idle" | "exporting" | "done" | "error">("idle");
+  const [pdfStatus, setPdfStatus] = useState<"idle" | "exporting" | "done" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
@@ -805,6 +806,47 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       setTimeout(() => { setPngStatus("idle"); setSaveMessage(""); }, 3000);
     }
   }, [canvas.name, pngStatus]);
+
+  // ============================================================
+  // Precise PDF Export — v18.6.16.6.48
+  // Generates PDF from template data, not DOM
+  // ============================================================
+
+  const handleExportPdf = useCallback(async () => {
+    if (pdfStatus === "exporting") return;
+    
+    setPdfStatus("exporting");
+    try {
+      // Dynamic import to avoid SSR issues and reduce bundle size
+      const { generatePdfBlob } = await import("@/lib/template-studio/pdf/render-label-pdf");
+      
+      // Generate PDF from template data
+      const blob = await generatePdfBlob({
+        template: canvas,
+        companyData,
+        productData,
+      });
+      
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.download = `${canvas.name || "template"}-${timestamp}.pdf`;
+      link.href = url;
+      link.click();
+      
+      // Cleanup
+      URL.revokeObjectURL(url);
+      
+      setPdfStatus("done");
+      setTimeout(() => setPdfStatus("idle"), 2000);
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      setPdfStatus("error");
+      setSaveMessage(`PDF 导出失败: ${err instanceof Error ? err.message : "未知错误"}`);
+      setTimeout(() => { setPdfStatus("idle"); setSaveMessage(""); }, 3000);
+    }
+  }, [canvas, companyData, productData, pdfStatus]);
 
   // ============================================================
   // Print — Data-driven print renderer (v18.6.16.6.44 rewrite)
@@ -1717,12 +1759,31 @@ ${pagesHTML}
             </p>
           )}
           <button
+            onClick={handleExportPdf}
+            className={`w-full px-3 py-2 rounded text-sm text-white ${
+              pdfStatus === "exporting" ? "bg-purple-400 cursor-wait" :
+              pdfStatus === "done" ? "bg-green-600" :
+              pdfStatus === "error" ? "bg-red-600" :
+              "bg-purple-600 hover:bg-purple-700"
+            }`}
+            data-testid="canvas-precise-pdf-export-button"
+            disabled={pdfStatus === "exporting"}
+          >
+            {pdfStatus === "exporting" ? "正在生成 PDF..." : pdfStatus === "done" ? "✓ PDF 已导出" : pdfStatus === "error" ? "PDF 导出失败" : "精确 PDF 导出"}
+          </button>
+          <p className="text-xs text-gray-500 mt-1" data-testid="canvas-precise-pdf-export-tip">
+            💡 推荐用于正式标签打印。PDF 按实际纸张尺寸生成，适合 Safari/macOS 打印。
+          </p>
+          <button
             onClick={handlePrint}
             className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm"
             data-testid="canvas-print-button"
           >
-            打印
+            普通浏览器打印
           </button>
+          <p className="text-xs text-gray-500 mt-1" data-testid="canvas-browser-print-compat-tip">
+            ⚠️ 普通浏览器打印可能受 Safari/浏览器边距影响；正式标签建议使用"精确 PDF 导出"。
+          </p>
           <p className="text-xs text-gray-500 mt-2" data-testid="canvas-print-margin-tip">
             💡 打印提示：如果打印预览仍有白边，请在浏览器打印设置中选择：边距=无，缩放=100% 或实际大小。
           </p>
