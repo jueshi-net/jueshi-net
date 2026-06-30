@@ -39,7 +39,7 @@
     "testId": "TS-PDF_DISABLED_OR_REMOVED",
     "testName": "PDF export is disabled/isolated",
     "status": "PASS",
-    "message": "PDF export is isolated with proper tip"
+    "message": "PDF export button not found (disabled/removed)"
   },
   {
     "testId": "TS-NO_PDF_SHARED_RUNTIME_SIDE_EFFECTS",

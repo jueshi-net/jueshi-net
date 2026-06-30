@@ -331,9 +331,9 @@ async function testCompanyBlockCombo(page: Page): Promise<AuditResult> {
       await page.waitForTimeout(3000); // Wait for state to update
       
       // Check if company-info block was added
-      // Only count screen version (print:hidden), not print version
-      const companyBlocksAfter = await page.locator('.print\\:hidden [data-testid="canvas-company-info-block"]').count();
-      console.log(`Company blocks after click (screen only): ${companyBlocksAfter}`);
+      // Try both selectors: v6.38 (no print:hidden wrapper) and v6.51 (with print:hidden wrapper)
+      let companyBlocksAfter = await page.locator('[data-testid="canvas-company-info-block"]').count();
+      console.log(`Company blocks after click (all): ${companyBlocksAfter}`);
       
       // If still 2, try clicking again to see if it adds more
       if (companyBlocksAfter === 2) {

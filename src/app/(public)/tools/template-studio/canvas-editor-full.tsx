@@ -113,7 +113,6 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveMessage, setSaveMessage] = useState<string>("");
   const [pngStatus, setPngStatus] = useState<"idle" | "exporting" | "done" | "error">("idle");
-  const [pdfStatus, setPdfStatus] = useState<"idle" | "exporting" | "done" | "error">("idle");
   const [currentTemplateId, setCurrentTemplateId] = useState<string | undefined>(templateId);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
@@ -318,25 +317,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
         .then(data => {
           if (data.success && data.data) {
             const loadedTemplate = data.data;
-            
-            // Check if this is a canvas template (has paper/elements)
-            // If not, it's a structured template or corrupted — use default canvas
-            const hasCanvasData = loadedTemplate.paper && loadedTemplate.elements;
-            
-            if (hasCanvasData) {
-              // Valid canvas template — load it
-              setCanvas(loadedTemplate);
-            } else {
-              // Not a canvas template — start with default canvas
-              // but preserve the name and ID
-              const defaultCanvas = defaultCanvasTemplate();
-              setCanvas({
-                ...defaultCanvas,
-                name: loadedTemplate.name || "未命名模板",
-              });
-              console.warn("Template is not a canvas template, starting with default canvas");
-            }
-            
+            setCanvas(loadedTemplate);
             setCurrentTemplateId(loadedTemplate.id);
             if (loadedTemplate.selectedCompanyId) {
               setSelectedCompanyId(loadedTemplate.selectedCompanyId);
@@ -413,33 +394,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
     setSaveStatus("idle");
   }, [canvas, pushHistory]);
 
-  // Ref to track if company block is being added (prevents duplicate adds)
-  const isAddingCompanyBlock = useRef(false);
-  
   const insertCompanyBlock = useCallback(() => {
-    console.log('[DEBUG] insertCompanyBlock called, isAdding:', isAddingCompanyBlock.current);
-    
-    // Prevent duplicate adds
-    if (isAddingCompanyBlock.current) {
-      console.log('[DEBUG] Already adding, returning');
-      return;
-    }
-    
-    // First, check if a company-info block already exists
-    const existingCompanyBlock = canvas.elements.find(el => el.type === "company-info");
-    console.log('[DEBUG] Existing company block:', existingCompanyBlock ? 'found' : 'not found');
-    
-    if (existingCompanyBlock) {
-      // If exists, just select it instead of adding a new one
-      setSelectedElementId(existingCompanyBlock.id);
-      return;
-    }
-    
-    // Mark as adding
-    isAddingCompanyBlock.current = true;
-    console.log('[DEBUG] Creating new company block');
-    
-    // Create new company block
     const baseZ = getNextZIndex(canvas.elements);
     const el = defaultCanvasElement("company-info");
     el.id = `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -455,25 +410,15 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       { binding: "company.address", label: "地址", visible: true },
     ];
     el.style = { ...el.style, fontSize: 10 };
-    
     const newCanvas = {
       ...canvas,
       elements: [...canvas.elements, el],
       updatedAt: new Date().toISOString(),
     };
-    
-    console.log('[DEBUG] New canvas elements count:', newCanvas.elements.length);
-    
     setCanvas(newCanvas);
     pushHistory(newCanvas);
     setSelectedElementId(el.id);
     setSaveStatus("idle");
-    
-    // Reset flag after a short delay
-    setTimeout(() => {
-      isAddingCompanyBlock.current = false;
-      console.log('[DEBUG] Reset isAdding flag');
-    }, 500);
   }, [canvas, pushHistory]);
 
   const updateElement = useCallback((id: string, updates: Partial<CanvasElement>) => {
@@ -835,172 +780,51 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
   }, [canvas.name, pngStatus]);
 
   // ============================================================
-  // Precise PDF Export — v18.6.16.6.48
-  // Generates PDF from template data, not DOM
-  // ============================================================
-
-  const handleExportPdf = useCallback(async () => {
-    if (pdfStatus === "exporting") return;
-    
-    setPdfStatus("exporting");
-    try {
-      // Dynamic import to avoid SSR issues and reduce bundle size
-      const { generatePdfBlob } = await import("@/lib/template-studio/pdf/render-label-pdf");
-      
-      // Generate PDF from template data
-      const blob = await generatePdfBlob({
-        template: canvas,
-        companyData,
-        productData,
-      });
-      
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      const timestamp = new Date().toISOString().slice(0, 10);
-      link.download = `${canvas.name || "template"}-${timestamp}.pdf`;
-      link.href = url;
-      link.click();
-      
-      // Cleanup
-      URL.revokeObjectURL(url);
-      
-      setPdfStatus("done");
-      setTimeout(() => setPdfStatus("idle"), 2000);
-    } catch (err) {
-      console.error("PDF export failed:", err);
-      setPdfStatus("error");
-      setSaveMessage(`PDF 导出失败: ${err instanceof Error ? err.message : "未知错误"}`);
-      setTimeout(() => { setPdfStatus("idle"); setSaveMessage(""); }, 3000);
-    }
-  }, [canvas, companyData, productData, pdfStatus]);
-
-  // ============================================================
-  // Print — Data-driven print renderer (v18.6.16.6.44 rewrite)
-  // Generates print DOM directly from canvas.elements data
-  // No longer clones preview DOM — pure data-driven rendering
+  // Print — iframe-based print-only (v18.6.16.6.25 runtime fix)
+  // Isolates canvas labels from site layout (header/footer/nav)
   // ============================================================
 
   const handlePrint = useCallback(() => {
-    // v6.44: Data-driven print renderer — generate DOM from canvas.elements
+    const printRoot = printRootRef.current;
+    if (!printRoot) {
+      console.error("Print root not found");
+      return;
+    }
+
+    // v6.25 fix: Only clone canvas-print-page elements, not the wrapper div
+    const pages = printRoot.querySelectorAll("[data-testid=\"canvas-print-page\"], [data-testid=\"canvas-paper\"]");
+    if (pages.length === 0) {
+      console.error("No print pages found in print root");
+      return;
+    }
+
+    // v6.25 fix: Build pages HTML by cloning only the page elements
+    // and stripping page-count/sequence indicators to prevent duplicate 1/10
+    let pagesHTML = "";
+    pages.forEach((page) => {
+      const clone = page.cloneNode(true) as HTMLElement;
+      // Remove page-count and page-sequence indicators from clone
+      clone.querySelectorAll("[data-testid=\"canvas-print-page-count\"], [data-testid=\"canvas-print-page-sequence\"]").forEach(el => el.remove());
+      // Remove grid overlays
+      clone.querySelectorAll("[data-testid=\"canvas-grid-overlay\"]").forEach(el => el.remove());
+      // Remove resize handles and edit buttons
+      clone.querySelectorAll("[data-testid=\"canvas-resize-handle\"], [data-testid=\"canvas-sequence-resize-handle\"], [data-testid=\"canvas-edit-text-button\"]").forEach(el => el.remove());
+      pagesHTML += clone.outerHTML;
+    });
+
+    // v6.26 fix: Use large enough iframe to render full page content without clipping
+    // Position off-screen but give it the actual paper dimensions in pixels
     const paperWidthMm = canvas.paper.widthMm;
     const paperHeightMm = canvas.paper.heightMm;
     const paperWidthPx = Math.ceil(paperWidthMm * 3.7795275591); // mm to px at 96 DPI
     const paperHeightPx = Math.ceil(paperHeightMm * 3.7795275591);
-    
-    // Determine number of pages based on batch config
-    const pageCount = canvas.batch?.outputMode === "repeat" 
-      ? Math.max(1, canvas.batch.packageCount || 1)
-      : 1;
-    
-    // Generate pages HTML from data
-    let pagesHTML = "";
-    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-      let elementsHTML = "";
-      
-      // Render each element from data
-      for (const element of canvas.elements) {
-        if (!element.visible) continue;
-        
-        // Skip UI-only elements
-        if (element.type === "line" || element.type === "rect") continue;
-        
-        // Calculate position in pixels
-        const xPx = element.x * 3.7795275591;
-        const yPx = element.y * 3.7795275591;
-        const widthPx = element.width * 3.7795275591;
-        const heightPx = element.height * 3.7795275591;
-        
-        // Resolve binding or use static text
-        let content = element.text || "";
-        if (element.binding) {
-          if (element.binding.startsWith("company.")) {
-            const field = element.binding.replace("company.", "");
-            if (companyData && field in companyData) {
-              content = String((companyData as any)[field] || "");
-            }
-          } else if (element.binding.startsWith("product.")) {
-            const field = element.binding.replace("product.", "");
-            if (productData && field in productData) {
-              content = String((productData as any)[field] || "");
-            }
-          } else if (element.binding === "batch.sequence") {
-            const total = canvas.batch?.packageCount || 1;
-            const idx = pageIndex + 1;
-            content = canvas.batch?.sequenceFormat === "of"
-              ? `${idx} of ${total}`
-              : `${idx}/${total}`;
-          }
-        }
-        
-        // Handle sequence element type (even without binding)
-        if (element.type === "sequence") {
-          const total = canvas.batch?.packageCount || 1;
-          const idx = pageIndex + 1;
-          content = canvas.batch?.sequenceFormat === "of"
-            ? `${idx} of ${total}`
-            : `${idx}/${total}`;
-        }
-        
-        // Handle company-info block
-        if (element.type === "company-info" && element.companyFields) {
-          let fieldsHTML = "";
-          for (const field of element.companyFields) {
-            if (!field.visible) continue;
-            let fieldValue = "";
-            if (field.binding.startsWith("company.") && companyData) {
-              const key = field.binding.replace("company.", "");
-              fieldValue = String((companyData as any)[key] || "");
-            }
-            fieldsHTML += `<div style="margin-bottom: 4px;"><span style="font-weight: 600;">${field.label}：</span><span>${fieldValue}</span></div>`;
-          }
-          content = fieldsHTML;
-        }
-        
-        // Generate element HTML
-        // Note: fontSize is in pt (points), not px
-        // 1pt = 1.333px at 96 DPI
-        const fontSizePx = (element.style.fontSize || 14) * 1.333;
-        const paddingPx = (element.style.padding || 0) * 3.7795275591; // mm to px
-        const borderWidthPx = (element.style.borderWidth || 0) * 3.7795275591; // mm to px
-        const borderRadiusPx = (element.style.borderRadius || 0) * 3.7795275591; // mm to px
-        
-        const styleCSS = `
-          position: absolute;
-          left: ${xPx}px;
-          top: ${yPx}px;
-          width: ${widthPx}px;
-          height: ${heightPx}px;
-          font-size: ${fontSizePx}px;
-          font-family: ${element.style.fontFamily || 'system-ui, sans-serif'};
-          font-weight: ${element.style.fontWeight || 'normal'};
-          color: ${element.style.color || '#000000'};
-          text-align: ${element.style.textAlign || 'left'};
-          background-color: ${element.style.backgroundColor || 'transparent'};
-          border: ${borderWidthPx ? `${borderWidthPx}px solid ${element.style.borderColor || '#000'}` : 'none'};
-          border-radius: ${borderRadiusPx}px;
-          padding: ${paddingPx}px;
-          opacity: ${element.style.opacity ?? 1};
-          overflow: hidden;
-          box-sizing: border-box;
-        `.replace(/\n\s+/g, ' ').trim();
-        
-        elementsHTML += `<div data-element-id="${element.id}" data-element-type="${element.type}" style="${styleCSS}">${content}</div>`;
-      }
-      
-      // Wrap in page container
-      pagesHTML += `<div class="print-page-wrapper" data-page-index="${pageIndex}" style="position: relative; width: ${paperWidthPx}px; height: ${paperHeightPx}px; page-break-after: always;">${elementsHTML}</div>`;
-    }
-
-    // v6.26 fix: Use large enough iframe to render full page content without clipping
-    // Position off-screen but give it the actual paper dimensions in pixels
     const iframe = document.createElement("iframe");
     iframe.id = "canvas-print-iframe";
     iframe.style.position = "fixed";
     iframe.style.left = "-9999px";
     iframe.style.top = "-9999px";
     iframe.style.width = `${paperWidthPx + 20}px`;
-    iframe.style.height = `${paperHeightPx * Math.max(pageCount, 1) + 20}px`;
+    iframe.style.height = `${paperHeightPx * Math.max(pages.length, 1) + 20}px`;
     iframe.style.border = "0";
     iframe.style.visibility = "hidden";
     iframe.style.overflow = "visible";
@@ -1016,7 +840,7 @@ export default function CanvasEditorFull({ template, templateId, companyId }: Ca
       .map((el) => el.outerHTML)
       .join("\n");
 
-    // v6.44: iframe CSS for data-driven print pages
+    // v6.26: iframe CSS for print pages
     const iframeHTML = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1041,17 +865,22 @@ ${styleElements}
     flex-direction: column !important;
     align-items: center !important;
   }
-  /* Print page wrappers: page break after each */
-  .print-page-wrapper {
-    position: relative !important;
+  /* Canvas pages: page break after each */
+  [data-testid="canvas-print-page"],
+  [data-testid="canvas-paper"] {
     box-shadow: none !important;
     margin: 0 auto !important;
     page-break-after: always;
     break-after: page;
   }
-  .print-page-wrapper:last-child {
+  [data-testid="canvas-print-page"]:last-child,
+  [data-testid="canvas-paper"]:last-child {
     page-break-after: auto !important;
     break-after: auto !important;
+  }
+  /* Remove selection ring */
+  .ring-2 {
+    box-shadow: none !important;
   }
   /* Ensure colors print correctly */
   * {
@@ -1128,7 +957,7 @@ ${pagesHTML}
     } else {
       triggerPrint();
     }
-  }, [canvas.paper.widthMm, canvas.paper.heightMm, canvas.elements, canvas.batch, companyData, productData]);
+  }, [canvas.paper.widthMm, canvas.paper.heightMm]);
 
   // ============================================================
   // Render
@@ -1343,7 +1172,7 @@ ${pagesHTML}
             color: element.style.color || "#000000",
           }}
         >
-          {resolved}
+          {resolved || `[${element.binding || "未绑定"}]`}
         </div>
       );
     } else if (element.type === "company-info") {
@@ -1361,9 +1190,9 @@ ${pagesHTML}
           {fields.filter(f => f.visible).map((field, idx) => {
             const resolved = resolveBinding(field.binding);
             return (
-              <div key={idx} className="mb-1">
+              <div key={idx} className="mb-1" data-testid={`canvas-company-field-${field.binding}`}>
                 <span className="font-semibold">{field.label}：</span>
-                <span>{resolved}</span>
+                <span>{resolved || `[${field.binding}]`}</span>
               </div>
             );
           })}
@@ -1518,12 +1347,6 @@ ${pagesHTML}
     );
   };
 
-  // v6.39: Use unscaled paper dimensions for print to avoid shrinkage
-  const printPaperDimensions = {
-    width: mmToPx(canvas.paper.widthMm),
-    height: mmToPx(canvas.paper.heightMm),
-  };
-  
   // Page component — used for both single and repeat mode
   const renderPage = (pageIndex?: number) => {
     const isRepeat = canvas.batch?.outputMode === "repeat";
@@ -1540,30 +1363,11 @@ ${pagesHTML}
         }}
         data-testid={isRepeat ? "canvas-print-page" : "canvas-paper"}
       >
-        {/* Print-only version with correct unscaled dimensions */}
-        <div 
-          className="hidden print:block absolute inset-0"
-          style={{
-            width: `${printPaperDimensions.width}px`,
-            height: `${printPaperDimensions.height}px`,
-          }}
-          data-testid="canvas-print-unscaled-paper"
-        >
-          {/* Grid overlay — on every page */}
-          {renderGridOverlay()}
+        {/* Grid overlay — on every page */}
+        {renderGridOverlay()}
 
-          {/* Elements */}
-          {canvas.elements.map(element => renderElement(element, pageIndex))}
-        </div>
-        
-        {/* Screen-only version with scaled dimensions */}
-        <div className="print:hidden w-full h-full relative">
-          {/* Grid overlay — on every page */}
-          {renderGridOverlay()}
-
-          {/* Elements */}
-          {canvas.elements.map(element => renderElement(element, pageIndex))}
-        </div>
+        {/* Elements */}
+        {canvas.elements.map(element => renderElement(element, pageIndex))}
 
         {/* Page count indicator — only when showSequence is ON */}
         {showPageIndicator && (
@@ -1786,34 +1590,12 @@ ${pagesHTML}
             </p>
           )}
           <button
-            onClick={handleExportPdf}
-            className={`w-full px-3 py-2 rounded text-sm text-white ${
-              pdfStatus === "exporting" ? "bg-purple-400 cursor-wait" :
-              pdfStatus === "done" ? "bg-green-600" :
-              pdfStatus === "error" ? "bg-red-600" :
-              "bg-purple-600 hover:bg-purple-700"
-            }`}
-            data-testid="canvas-precise-pdf-export-button"
-            disabled={pdfStatus === "exporting"}
-          >
-            {pdfStatus === "exporting" ? "正在生成 PDF..." : pdfStatus === "done" ? "✓ PDF 已导出" : pdfStatus === "error" ? "PDF 导出失败" : "精确 PDF 导出"}
-          </button>
-          <p className="text-xs text-gray-500 mt-1" data-testid="canvas-precise-pdf-export-tip">
-            💡 推荐用于正式标签打印。PDF 按实际纸张尺寸生成，适合 Safari/macOS 打印。
-          </p>
-          <button
             onClick={handlePrint}
             className="w-full px-3 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 text-sm"
             data-testid="canvas-print-button"
           >
-            普通浏览器打印
+            打印
           </button>
-          <p className="text-xs text-gray-500 mt-1" data-testid="canvas-browser-print-compat-tip">
-            ⚠️ 普通浏览器打印可能受 Safari/浏览器边距影响；正式标签建议使用"精确 PDF 导出"。
-          </p>
-          <p className="text-xs text-gray-500 mt-2" data-testid="canvas-print-margin-tip">
-            💡 打印提示：如果打印预览仍有白边，请在浏览器打印设置中选择：边距=无，缩放=100% 或实际大小。
-          </p>
         </div>
 
         {/* Paper Size Selector */}
