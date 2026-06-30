@@ -14,19 +14,28 @@
 import React from 'react';
 import { Document, Page, View, Text, StyleSheet, Font } from '@react-pdf/renderer';
 import type { CanvasTemplate, CanvasElement } from '../canvas-schema';
-import type { PdfRenderOptions, NormalizedElement, PdfDocument, PdfPage, CompanyData, ProductData } from './pdf-types';
+import type { PdfRenderOptions, NormalizedElement, PdfDocument, PdfPage, CompanyData, ProductData, ProductItem } from './pdf-types';
 import { getPaperSpec, mmToPt } from './paper-spec';
 import { normalizeElementForPdf } from './coordinate';
 import { resolveElementContent, resolveTokens } from './token-resolver';
 
-// Register Chinese font (using system font or embedded font)
-// Note: For production, you may need to register a specific Chinese font
-// Font.register({
-//   family: 'ChineseFont',
-//   fonts: [
-//     { src: '/path/to/chinese-font.ttf', fontWeight: 'normal' },
-//   ]
-// });
+// Register Chinese font - use Noto Sans SC from Google Fonts
+// This is an open-source font that supports Chinese characters
+Font.register({
+  family: 'NotoSansSC',
+  fonts: [
+    {
+      src: 'https://fonts.gstatic.com/s/notosanssc/v36/k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG9_FnYxNbPzS5HE.ttf',
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+    },
+    {
+      src: 'https://fonts.gstatic.com/s/notosanssc/v36/k3kCo84MPvpLmixcA63oeAL7Iqp5IZJF9bmaG9_FnYxNbPzS5HE.ttf',
+      fontWeight: 'bold',
+      fontStyle: 'normal',
+    },
+  ],
+});
 
 /**
  * Create PDF document structure from template
@@ -68,7 +77,8 @@ function renderElement(
   pageIndex: number,
   totalPages: number,
   companyData?: CompanyData | null,
-  productData?: ProductData | null
+  productData?: ProductData | null,
+  products?: ProductItem[] | null
 ) {
   const context = {
     companyData,
@@ -77,27 +87,19 @@ function renderElement(
     totalPages,
   };
   
-  // Resolve content
-  let content = resolveElementContent(element, context);
-  
-  // Handle company-info block specially
+  // Handle different element types
   if (element.type === 'company-info' && element.companyFields) {
-    const fields = element.companyFields
-      .filter(field => field.visible)
-      .map(field => {
-        let value = '';
-        if (field.binding.startsWith('company.') && companyData) {
-          const key = field.binding.replace('company.', '');
-          value = String((companyData as any)[key] || '');
-        }
-        return `${field.label}: ${value}`;
-      })
-      .join('\n');
-    
-    content = fields;
+    return renderCompanyInfoBlock(element, companyData);
   }
   
-  // Create styles
+  if (element.type === 'product-table' && products) {
+    return renderProductTable(element, products);
+  }
+  
+  // Resolve content for text/sequence elements
+  let content = resolveElementContent(element, context);
+  
+  // Create styles with Chinese font support
   const elementStyle = {
     position: 'absolute' as const,
     left: mmToPt(element.xMm),
@@ -105,7 +107,7 @@ function renderElement(
     width: mmToPt(element.widthMm),
     height: mmToPt(element.heightMm),
     fontSize: element.fontSizePt,
-    fontFamily: 'Helvetica', // Use Helvetica for better Chinese support
+    fontFamily: 'NotoSansSC', // Use Chinese font
     fontWeight: element.fontWeight,
     color: element.color,
     textAlign: element.textAlign as any,
@@ -126,6 +128,113 @@ function renderElement(
 }
 
 /**
+ * Render company-info block
+ */
+function renderCompanyInfoBlock(
+  element: NormalizedElement,
+  companyData?: CompanyData | null
+) {
+  if (!element.companyFields || !companyData) {
+    return null;
+  }
+  
+  const fields = element.companyFields
+    .filter(field => field.visible)
+    .map(field => {
+      let value = '';
+      if (field.binding.startsWith('company.') && companyData) {
+        const key = field.binding.replace('company.', '');
+        value = String((companyData as any)[key] || '');
+      }
+      return `${field.label}: ${value}`;
+    });
+  
+  const elementStyle = {
+    position: 'absolute' as const,
+    left: mmToPt(element.xMm),
+    top: mmToPt(element.yMm),
+    width: mmToPt(element.widthMm),
+    height: mmToPt(element.heightMm),
+    fontSize: element.fontSizePt,
+    fontFamily: 'NotoSansSC',
+    fontWeight: element.fontWeight,
+    color: element.color,
+    padding: mmToPt(element.paddingMm),
+    opacity: element.opacity,
+  };
+  
+  return (
+    <View key={element.id} style={elementStyle}>
+      {fields.map((field, idx) => (
+        <Text key={idx} style={{ marginBottom: 2 }}>
+          {field}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+/**
+ * Render product table
+ */
+function renderProductTable(
+  element: NormalizedElement,
+  products: ProductItem[]
+) {
+  const elementStyle = {
+    position: 'absolute' as const,
+    left: mmToPt(element.xMm),
+    top: mmToPt(element.yMm),
+    width: mmToPt(element.widthMm),
+    height: mmToPt(element.heightMm),
+    fontSize: element.fontSizePt,
+    fontFamily: 'NotoSansSC',
+    padding: mmToPt(element.paddingMm),
+    opacity: element.opacity,
+    borderColor: '#000000',
+    borderWidth: 0.5,
+  };
+  
+  const headerStyle = {
+    flexDirection: 'row' as const,
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+    paddingBottom: 2,
+    marginBottom: 2,
+    fontWeight: 'bold' as const,
+  };
+  
+  const rowStyle = {
+    flexDirection: 'row' as const,
+    marginBottom: 2,
+  };
+  
+  return (
+    <View key={element.id} style={elementStyle}>
+      {/* Table header */}
+      <View style={headerStyle}>
+        <Text style={{ width: '40%' }}>商品名称</Text>
+        <Text style={{ width: '20%' }}>SKU</Text>
+        <Text style={{ width: '20%' }}>数量</Text>
+        <Text style={{ width: '20%' }}>单价</Text>
+      </View>
+      
+      {/* Table rows */}
+      {products.map((product, idx) => (
+        <View key={idx} style={rowStyle}>
+          <Text style={{ width: '40%' }}>{product.name}</Text>
+          <Text style={{ width: '20%' }}>{product.sku || '-'}</Text>
+          <Text style={{ width: '20%' }}>{product.quantity || 0}</Text>
+          <Text style={{ width: '20%' }}>
+            {product.unitPrice ? `¥${product.unitPrice.toFixed(2)}` : '-'}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/**
  * Render a single page
  */
 function renderPage(
@@ -134,14 +243,15 @@ function renderPage(
   paperWidthMm: number,
   paperHeightMm: number,
   companyData?: CompanyData | null,
-  productData?: ProductData | null
+  productData?: ProductData | null,
+  products?: ProductItem[] | null
 ) {
   const pageSize = [mmToPt(paperWidthMm), mmToPt(paperHeightMm)] as [number, number];
   
   return (
     <Page key={page.pageIndex} size={pageSize} style={styles.page}>
       {page.elements.map(element =>
-        renderElement(element, page.pageIndex, totalPages, companyData, productData)
+        renderElement(element, page.pageIndex, totalPages, companyData, productData, products)
       )}
     </Page>
   );
@@ -152,7 +262,7 @@ function renderPage(
  */
 export function LabelPdfDocument(options: PdfRenderOptions) {
   const pdfDoc = createPdfDocument(options);
-  const { companyData, productData } = options;
+  const { companyData, productData, products } = options;
   
   return (
     <Document>
@@ -163,7 +273,8 @@ export function LabelPdfDocument(options: PdfRenderOptions) {
           pdfDoc.paperWidthMm,
           pdfDoc.paperHeightMm,
           companyData,
-          productData
+          productData,
+          products
         )
       )}
     </Document>

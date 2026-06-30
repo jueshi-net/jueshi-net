@@ -10,6 +10,7 @@ export interface PdfRenderOptions {
   template: CanvasTemplate;
   companyData?: CompanyData | null;
   productData?: ProductData | null;
+  products?: ProductItem[] | null;
 }
 
 export interface CompanyData {
@@ -28,6 +29,14 @@ export interface ProductData {
   unitPrice?: number;
   currency?: string;
   unit?: string;
+}
+
+export interface ProductItem {
+  name: string;
+  sku?: string;
+  quantity?: number;
+  unitPrice?: number;
+  totalPrice?: number;
 }
 
 export interface NormalizedElement {
