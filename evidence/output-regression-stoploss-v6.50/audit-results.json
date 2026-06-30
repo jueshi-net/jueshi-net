@@ -1,0 +1,56 @@
+[
+  {
+    "testId": "TS-SAVE-SINGLE_PAGE",
+    "testName": "Save works for single page",
+    "status": "FAIL",
+    "message": "Save failed: 请先登录后再保存"
+  },
+  {
+    "testId": "TS-SAVE-AFTER_SAVE_VIEW",
+    "testName": "Can view templates after save",
+    "status": "FAIL",
+    "message": "Cannot view templates after save"
+  },
+  {
+    "testId": "TS-SAVE-OPEN_SAVED",
+    "testName": "Can open saved template",
+    "status": "WARN",
+    "message": "No templates to open or cannot open"
+  },
+  {
+    "testId": "TS-PNG-SINGLE_PAGE_NOT_BLANK",
+    "testName": "Single page PNG is not blank",
+    "status": "FAIL",
+    "message": "Single page PNG export failed"
+  },
+  {
+    "testId": "TS-PNG-MULTIPAGE-GUARD",
+    "testName": "Multi-page PNG shows guard message",
+    "status": "PASS",
+    "message": "Multi-page PNG guard message visible"
+  },
+  {
+    "testId": "TS-COMPANY_BLOCK-NO_REGRESSION",
+    "testName": "Company info block is combo block",
+    "status": "FAIL",
+    "message": "Expected 1 company block after click, got 2 (before: 0)"
+  },
+  {
+    "testId": "TS-TOOLS_BANNER-NO_REGRESSION",
+    "testName": "/tools banner exists",
+    "status": "PASS",
+    "message": "/tools banner exists"
+  },
+  {
+    "testId": "TS-PDF_DISABLED_OR_ISOLATED",
+    "testName": "PDF export is isolated",
+    "status": "PASS",
+    "message": "PDF export is isolated with proper tip"
+  },
+  {
+    "testId": "TS-WORKSPACE_TEMPLATES-NO_REGRESSION",
+    "testName": "/workspace/templates works",
+    "status": "PASS",
+    "message": "/workspace/templates works"
+  }
+]
