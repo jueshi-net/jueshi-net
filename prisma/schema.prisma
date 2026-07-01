@@ -1096,6 +1096,7 @@ model Topic {
   publishedAt        DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   items    TopicItem[]
   sections TopicSection[]
@@ -1783,6 +1784,7 @@ model Guide {
   publishedAt        DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   @@index([status])
   @@index([category])
@@ -1811,6 +1813,7 @@ model Checklist {
   publishedAt        DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   @@index([status])
   @@index([slug])

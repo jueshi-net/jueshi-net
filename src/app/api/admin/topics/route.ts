@@ -17,6 +17,7 @@ export async function GET() {
         id: true, slug: true, title: true, subtitle: true,
         status: true, templateType: true, coverEmoji: true,
         youtubeUrl: true, publishedAt: true, createdAt: true, updatedAt: true,
+        metadataJson: true, // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
         _count: { select: { items: true, sections: true } },
       },
     });
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { slug, title, subtitle, summary, status, templateType, coverEmoji, seoTitle, seoDescription, youtubeUrl } = body;
+    const { slug, title, subtitle, summary, status, templateType, coverEmoji, seoTitle, seoDescription, youtubeUrl, metadataJson } = body;
 
     if (!slug || !title) {
       return NextResponse.json({ success: false, error: "slug 和 title 必填" }, { status: 400 });
@@ -47,6 +48,7 @@ export async function POST(req: Request) {
         coverEmoji: coverEmoji || null, seoTitle: seoTitle || null,
         seoDescription: seoDescription || null, youtubeUrl: youtubeUrl || null,
         youtubeVideoId: youtubeVideoId || null,
+        metadataJson: metadataJson || null, // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
         publishedAt: status === "published" ? new Date() : null,
       },
     });
