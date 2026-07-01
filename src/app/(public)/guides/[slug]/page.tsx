@@ -30,6 +30,7 @@ function getRelatedTools(relatedTools: unknown): Array<{ name: string; route: st
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /** Extract TOC headings from HTML content */
@@ -72,19 +73,23 @@ function addHeadingIds(html: string): { html: string; toc: TocItem[] } {
 }
 
 // v1.20.42.18.4.7: Guide model support — check Guide first, fallback to Article
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
 
   // 1. Check Guide model first
   try {
     const guide = await prisma.guide.findUnique({ where: { slug } });
-    if (guide && guide.status === "published") {
+    if (guide && (previewMode || guide.status === "published")) {
       const desc = guide.seoDescription || guide.summary || guide.body.replace(/<[^>]*>/g, "").slice(0, 150);
+      const isDraft = guide.status === "draft";
       return {
         title: `${guide.seoTitle || guide.title} | 绝世百宝箱`,
         description: desc,
         alternates: guide.canonicalUrl ? { canonical: guide.canonicalUrl } : { canonical: `https://jueshi.net/guides/${slug}` },
-        robots: guide.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined,
+        // Preview mode or draft: noindex, nofollow
+        robots: (previewMode || isDraft) ? { index: false, follow: false } : (guide.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined),
         openGraph: {
           title: guide.title,
           description: desc,
@@ -129,22 +134,37 @@ const CATEGORY_LABELS: Record<string, string> = {
   "出海经营": "出海经营",
 };
 
-export default async function ArticlePage({ params }: Props) {
+export default async function ArticlePage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
 
   // v1.20.42.18.4.7: Check Guide model first
   try {
     const guide = await prisma.guide.findUnique({ where: { slug } });
-    if (guide && guide.status === "published") {
+    if (guide && (previewMode || guide.status === "published")) {
       const guideTools = getRelatedTools(guide.relatedTools);
       const readingTime = Math.max(1, Math.ceil(guide.body.replace(/<[^>]*>/g, "").length / 500));
       const { html: processedContent, toc } = addHeadingIds(guide.body);
       const publishDate = guide.publishedAt || guide.createdAt;
+      const isDraft = guide.status === "draft";
 
       return (
         <ArticleLayoutClient toc={toc}>
           <div className="min-h-screen bg-gray-50">
             <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+              {/* Preview Mode Banner */}
+              {(previewMode || isDraft) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6">
+                  <p className="text-yellow-800 font-medium">
+                    🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+                  </p>
+                  <p className="text-yellow-600 text-sm mt-1">
+                    状态: {guide.status} | slug: {guide.slug}
+                  </p>
+                </div>
+              )}
+
               <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6" aria-label="面包屑导航">
                 <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
                   <Home className="w-4 h-4" /><span>首页</span>

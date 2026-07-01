@@ -338,10 +338,151 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
               <textarea value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm" rows={2} placeholder="留空则使用简介" />
             </div>
           </div>
-          <button onClick={saveBasic} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[48px]">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "保存中..." : "保存"}
-          </button>
+          <div className="flex gap-2">
+            <button onClick={saveBasic} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[48px]">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? "保存中..." : "保存"}
+            </button>
+            {form.status === "draft" && (
+              <a
+                href={`/topics/${form.slug}?preview=true`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[48px]"
+                title="在新窗口预览草稿（不会发布内容）"
+              >
+                <Eye className="w-4 h-4" />
+                预览草稿
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ContentOps Metadata Display */}
+      {topic.metadataJson?.contentOps && activeTab === "basic" && (
+        <div className="bg-white rounded-xl border p-6 space-y-4">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">ContentOps 元数据（只读）</h2>
+          <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+            {/* Quality Score */}
+            {topic.metadataJson.contentOps.qualityScore !== undefined && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">质量评分：</span>
+                <span className={`text-sm font-semibold ${
+                  topic.metadataJson.contentOps.qualityScore >= 80 ? 'text-green-600' : 'text-orange-600'
+                }`}>
+                  {topic.metadataJson.contentOps.qualityScore}/100
+                </span>
+                {topic.metadataJson.contentOps.qualityScore < 80 && (
+                  <span className="ml-2 text-xs text-orange-600">⚠️ 低于 80 分，建议优化后再发布</span>
+                )}
+              </div>
+            )}
+
+            {/* Primary Keyword */}
+            {topic.metadataJson.contentOps.primaryKeyword && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">主关键词：</span>
+                <span className="text-sm text-gray-900">{topic.metadataJson.contentOps.primaryKeyword}</span>
+              </div>
+            )}
+
+            {/* Secondary Keywords */}
+            {topic.metadataJson.contentOps.secondaryKeywords?.length > 0 && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">次要关键词：</span>
+                <span className="text-sm text-gray-700">
+                  {topic.metadataJson.contentOps.secondaryKeywords.join(', ')}
+                </span>
+              </div>
+            )}
+
+            {/* FAQ Count */}
+            {topic.metadataJson.contentOps.faq?.length > 0 && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">FAQ：</span>
+                <span className="text-sm text-gray-900">{topic.metadataJson.contentOps.faq.length} 个问题</span>
+                {topic.metadataJson.contentOps.faq.length < 3 && (
+                  <span className="ml-2 text-xs text-orange-600">⚠️ 建议至少 3 个 FAQ</span>
+                )}
+              </div>
+            )}
+
+            {/* Internal Links Count */}
+            {topic.metadataJson.contentOps.internalLinks?.length > 0 && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">内链：</span>
+                <span className="text-sm text-gray-900">{topic.metadataJson.contentOps.internalLinks.length} 个链接</span>
+                {topic.metadataJson.contentOps.internalLinks.length < 3 && (
+                  <span className="ml-2 text-xs text-orange-600">⚠️ 建议至少 3 个内链</span>
+                )}
+              </div>
+            )}
+
+            {/* GEO Answer Block */}
+            {topic.metadataJson.contentOps.geoAnswerBlock && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">GEO 答案块：</span>
+                <span className="text-sm text-gray-700">
+                  {topic.metadataJson.contentOps.geoAnswerBlock.directAnswer?.substring(0, 100)}
+                  {topic.metadataJson.contentOps.geoAnswerBlock.directAnswer?.length > 100 && '...'}
+                </span>
+              </div>
+            )}
+
+            {/* Video Pack */}
+            {topic.metadataJson.contentOps.videoPack && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">视频包：</span>
+                <span className="text-sm text-gray-700">
+                  {topic.metadataJson.contentOps.videoPack.youtubeTitle?.substring(0, 80)}
+                  {topic.metadataJson.contentOps.videoPack.youtubeTitle?.length > 80 && '...'}
+                </span>
+              </div>
+            )}
+
+            {/* Structured Data */}
+            {topic.metadataJson.contentOps.structuredData && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">结构化数据：</span>
+                <span className="text-sm text-gray-700">
+                  {topic.metadataJson.contentOps.structuredData['@type']} (JSON-LD)
+                </span>
+              </div>
+            )}
+
+            {/* Social Media Prompts */}
+            {topic.metadataJson.contentOps.socialMediaPrompts && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">社交媒体文案：</span>
+                <span className="text-sm text-gray-700">
+                  {Object.keys(topic.metadataJson.contentOps.socialMediaPrompts).join(', ')}
+                </span>
+              </div>
+            )}
+
+            {/* Publish Checklist */}
+            {topic.metadataJson.contentOps.publishChecklist?.length > 0 && (
+              <div>
+                <span className="text-xs font-medium text-gray-500">发布检查清单：</span>
+                <div className="mt-1 space-y-1">
+                  {topic.metadataJson.contentOps.publishChecklist.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm">
+                      <span className={item.checked ? 'text-green-600' : 'text-gray-400'}>
+                        {item.checked ? '✓' : '○'}
+                      </span>
+                      <span className={item.checked ? 'text-gray-900' : 'text-gray-500'}>
+                        {item.item}
+                      </span>
+                      {item.note && (
+                        <span className="text-xs text-gray-500">({item.note})</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

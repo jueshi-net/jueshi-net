@@ -59,13 +59,17 @@ async function getTopicBySlug(slug: string) {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
   const topic = await getTopicBySlug(slug);
 
-  if (!topic || topic.status !== "published") {
+  if (!topic || (!previewMode && topic.status !== "published")) {
     return { title: "专题不存在" };
   }
 
@@ -73,6 +77,7 @@ export async function generateMetadata({
   const description =
     topic.seoDescription || topic.summary || topic.subtitle || "";
   const url = `https://jueshi.net/topics/${topic.slug}`;
+  const isDraft = topic.status === "draft";
 
   const ogImage = topic.youtubeVideoId
     ? getYouTubeThumbnail(topic.youtubeVideoId)
@@ -82,6 +87,8 @@ export async function generateMetadata({
     title: `${title} — 绝世百宝箱`,
     description,
     alternates: { canonical: url },
+    // Preview mode or draft: noindex, nofollow
+    robots: (previewMode || isDraft) ? { index: false, follow: false } : undefined,
     openGraph: {
       title,
       description,
@@ -230,20 +237,24 @@ function CmsTopicPage({ cmsTopic }: { cmsTopic: import("@/lib/cms-utils").Parsed
 
 export default async function TopicSlugPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
   const topic = await getTopicBySlug(slug);
   const cmsTopic = getCmsTopicBySlug(slug);
 
   // CMS-only fallback when no DB topic exists
-  if ((!topic || topic.status !== "published") && cmsTopic) {
+  if ((!topic || (!previewMode && topic.status !== "published")) && cmsTopic) {
     return <CmsTopicPage cmsTopic={cmsTopic} />;
   }
 
   // Not found / not published
-  if (!topic || topic.status !== "published") {
+  if (!topic || (!previewMode && topic.status !== "published")) {
     notFound();
   }
 
@@ -258,6 +269,7 @@ export default async function TopicSlugPage({
 
   const items = topic.items;
   const sections = topic.sections;
+  const isDraft = topic.status === "draft";
 
   // Parse data fields
   const suitableFor = (topic.suitableFor as string[] | null) || [];
@@ -293,6 +305,18 @@ export default async function TopicSlugPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Preview Mode Banner */}
+      {(previewMode || isDraft) && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6 mx-4 mt-4">
+          <p className="text-yellow-800 font-medium">
+            🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+          </p>
+          <p className="text-yellow-600 text-sm mt-1">
+            状态: {topic.status} | slug: {topic.slug}
+          </p>
+        </div>
+      )}
+
       {/* VideoObject JSON-LD */}
       {youtubeVideoId && (
         <VideoObjectJsonLd

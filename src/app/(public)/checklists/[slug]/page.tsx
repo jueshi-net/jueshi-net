@@ -9,15 +9,18 @@ import TaskChainCta from "@/components/content/task-chain-cta";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // v1.20.42.18.4.7: Check Checklist model first, fallback to LandingPage
-async function getChecklistFromModel(slug: string) {
+async function getChecklistFromModel(slug: string, previewMode: boolean = false) {
   try {
     const checklist = await prisma.checklist.findUnique({
-      where: { slug, status: "published" },
+      where: { slug, status: previewMode ? undefined : "published" },
     });
     if (!checklist) return null;
+    // In preview mode, allow draft; otherwise only published
+    if (!previewMode && checklist.status !== "published") return null;
     return { source: "model" as const, checklist };
   } catch {
     return null; // Checklist table may not exist during build
@@ -44,18 +47,22 @@ async function getChecklist(slug: string) {
   return { ...page, relatedArticlesData: articles };
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
 
   // v1.20.42.18.4.7: Check Checklist model first
-  const modelChecklist = await getChecklistFromModel(slug);
+  const modelChecklist = await getChecklistFromModel(slug, previewMode);
   if (modelChecklist) {
-    const c = modelChecklist.checklist;
+    const c = modelChecklist.checklist as any;
+    const isDraft = c.status === "draft";
     return {
       title: c.seoTitle || c.title,
       description: c.seoDescription || c.summary || "",
       alternates: c.canonicalUrl ? { canonical: c.canonicalUrl } : { canonical: `https://jueshi.net/checklists/${c.slug}` },
-      robots: c.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined,
+      // Preview mode or draft: noindex, nofollow
+      robots: (previewMode || isDraft) ? { index: false, follow: false } : (c.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined),
     };
   }
 
@@ -72,13 +79,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const dynamic = "force-dynamic";
 
-export default async function ChecklistPage({ params }: Props) {
+export default async function ChecklistPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const previewMode = sp.preview === "true";
 
   // v1.20.42.18.4.7: Check Checklist model first
-  const modelChecklist = await getChecklistFromModel(slug);
+  const modelChecklist = await getChecklistFromModel(slug, previewMode);
   if (modelChecklist) {
-    const c = modelChecklist.checklist;
+    const c = modelChecklist.checklist as any;
+    const isDraft = c.status === "draft";
     const steps = (c.steps as any[]) || [];
     const TOOL_MAP: Record<string, { name: string; route: string; icon: string }> = {
       "hs-code": { name: "HS编码查询", route: "/tools/hs-code", icon: "📋" },
@@ -90,6 +100,18 @@ export default async function ChecklistPage({ params }: Props) {
 
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+        {/* Preview Mode Banner */}
+        {(previewMode || isDraft) && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+            <p className="text-yellow-800 font-medium">
+              🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+            </p>
+            <p className="text-yellow-600 text-sm mt-1">
+              状态: {c.status === "draft" ? "草稿" : c.status} | slug: {c.slug}
+            </p>
+          </div>
+        )}
+
         <Breadcrumb />
 
         <section className="text-center space-y-4">
