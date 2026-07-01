@@ -10,6 +10,7 @@ type Guide = {
   relatedTools: string[]; relatedTopics: string[]; relatedChecklists: string[];
   relatedGuides: string[]; seoTitle: string | null; seoDescription: string | null;
   canonicalUrl: string | null; robots: string;
+  metadataJson: any;
 };
 
 const CATEGORIES = [
@@ -69,6 +70,29 @@ export default function GuideEditClient({ guide }: { guide: Guide }) {
     if (!form.title.trim()) { setError("标题为必填项"); return; }
     if (!form.slug.trim()) { setError("slug 为必填项"); return; }
     if (!form.body.trim()) { setError("正文为必填项"); return; }
+
+    // Publish validation warnings
+    if (form.status === "published" && guide.metadataJson?.contentOps) {
+      const ops = guide.metadataJson.contentOps;
+      const warnings: string[] = [];
+      
+      if (ops.qualityScore !== undefined && ops.qualityScore < 80) {
+        warnings.push(`质量评分 ${ops.qualityScore} 低于 80`);
+      }
+      if (ops.faq?.length > 0 && ops.faq.length < 3) {
+        warnings.push(`FAQ 只有 ${ops.faq.length} 个，建议至少 3 个`);
+      }
+      if (ops.internalLinks?.length > 0 && ops.internalLinks.length < 3) {
+        warnings.push(`内链只有 ${ops.internalLinks.length} 个，建议至少 3 个`);
+      }
+      
+      if (warnings.length > 0) {
+        const confirmed = window.confirm(
+          `发布警告：\n${warnings.join('\n')}\n\n确定要继续发布吗？`
+        );
+        if (!confirmed) return;
+      }
+    }
 
     setSaving(true);
     try {
@@ -219,6 +243,133 @@ export default function GuideEditClient({ guide }: { guide: Guide }) {
               className={inputCls} placeholder="逗号分隔的指南 slug" />
           </div>
         </div>
+
+        {/* ContentOps Metadata Display */}
+        {guide.metadataJson?.contentOps && (
+          <div className="border-t pt-4">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">ContentOps 元数据（只读）</h2>
+            <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+              {/* Quality Score */}
+              {guide.metadataJson.contentOps.qualityScore !== undefined && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">质量评分：</span>
+                  <span className={`text-sm font-semibold ${
+                    guide.metadataJson.contentOps.qualityScore >= 80 ? 'text-green-600' : 'text-orange-600'
+                  }`}>
+                    {guide.metadataJson.contentOps.qualityScore}/100
+                  </span>
+                  {guide.metadataJson.contentOps.qualityScore < 80 && (
+                    <span className="ml-2 text-xs text-orange-600">⚠️ 低于 80 分，建议优化后再发布</span>
+                  )}
+                </div>
+              )}
+
+              {/* Primary Keyword */}
+              {guide.metadataJson.contentOps.primaryKeyword && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">主关键词：</span>
+                  <span className="text-sm text-gray-900">{guide.metadataJson.contentOps.primaryKeyword}</span>
+                </div>
+              )}
+
+              {/* Secondary Keywords */}
+              {guide.metadataJson.contentOps.secondaryKeywords?.length > 0 && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">次要关键词：</span>
+                  <span className="text-sm text-gray-700">
+                    {guide.metadataJson.contentOps.secondaryKeywords.join(', ')}
+                  </span>
+                </div>
+              )}
+
+              {/* FAQ Count */}
+              {guide.metadataJson.contentOps.faq?.length > 0 && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">FAQ：</span>
+                  <span className="text-sm text-gray-900">{guide.metadataJson.contentOps.faq.length} 个问题</span>
+                  {guide.metadataJson.contentOps.faq.length < 3 && (
+                    <span className="ml-2 text-xs text-orange-600">⚠️ 建议至少 3 个 FAQ</span>
+                  )}
+                </div>
+              )}
+
+              {/* Internal Links Count */}
+              {guide.metadataJson.contentOps.internalLinks?.length > 0 && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">内链：</span>
+                  <span className="text-sm text-gray-900">{guide.metadataJson.contentOps.internalLinks.length} 个链接</span>
+                  {guide.metadataJson.contentOps.internalLinks.length < 3 && (
+                    <span className="ml-2 text-xs text-orange-600">⚠️ 建议至少 3 个内链</span>
+                  )}
+                </div>
+              )}
+
+              {/* GEO Answer Block */}
+              {guide.metadataJson.contentOps.geoAnswerBlock && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">GEO 答案块：</span>
+                  <span className="text-sm text-gray-700">
+                    {guide.metadataJson.contentOps.geoAnswerBlock.directAnswer?.substring(0, 100)}
+                    {guide.metadataJson.contentOps.geoAnswerBlock.directAnswer?.length > 100 && '...'}
+                  </span>
+                </div>
+              )}
+
+              {/* Video Pack */}
+              {guide.metadataJson.contentOps.videoPack && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">视频包：</span>
+                  <span className="text-sm text-gray-700">
+                    {guide.metadataJson.contentOps.videoPack.youtubeTitle?.substring(0, 80)}
+                    {guide.metadataJson.contentOps.videoPack.youtubeTitle?.length > 80 && '...'}
+                  </span>
+                </div>
+              )}
+
+              {/* Structured Data */}
+              {guide.metadataJson.contentOps.structuredData && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">结构化数据：</span>
+                  <span className="text-sm text-gray-700">
+                    {guide.metadataJson.contentOps.structuredData['@type']} (JSON-LD)
+                  </span>
+                </div>
+              )}
+
+              {/* Social Media Prompts */}
+              {guide.metadataJson.contentOps.socialMediaPrompts && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">社交媒体文案：</span>
+                  <span className="text-sm text-gray-700">
+                    {Object.keys(guide.metadataJson.contentOps.socialMediaPrompts).join(', ')}
+                  </span>
+                </div>
+              )}
+
+              {/* Publish Checklist */}
+              {guide.metadataJson.contentOps.publishChecklist?.length > 0 && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">发布检查清单：</span>
+                  <div className="mt-1 space-y-1">
+                    {guide.metadataJson.contentOps.publishChecklist.map((item: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-2 text-sm">
+                        <span className={item.checked ? 'text-green-600' : 'text-gray-400'}>
+                          {item.checked ? '✓' : '○'}
+                        </span>
+                        <span className={item.checked ? 'text-gray-900' : 'text-gray-500'}>
+                          {item.item}
+                        </span>
+                        {item.note && (
+                          <span className="text-xs text-gray-500">({item.note})</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t">

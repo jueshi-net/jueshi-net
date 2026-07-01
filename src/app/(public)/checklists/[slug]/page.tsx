@@ -141,6 +141,67 @@ export default async function ChecklistPage({ params }: Props) {
           description="使用工具生成发票/装箱单草稿，一步步完成跨境发货。"
           buttonText="开始跨境发货任务链"
         />
+
+        {/* ContentOps Metadata Rendering */}
+        {c.metadataJson?.contentOps && (
+          <>
+            {/* GEO Answer Block */}
+            {c.metadataJson.contentOps.geoAnswerBlock?.directAnswer && (
+              <section className="bg-green-50 border border-green-200 rounded-xl p-6">
+                <h2 className="font-semibold text-green-800 mb-2">💡 快速答案</h2>
+                <p className="text-green-700">{c.metadataJson.contentOps.geoAnswerBlock.directAnswer}</p>
+                {c.metadataJson.contentOps.geoAnswerBlock.targetAudience && (
+                  <p className="text-sm text-green-600 mt-2">
+                    适合：{c.metadataJson.contentOps.geoAnswerBlock.targetAudience}
+                  </p>
+                )}
+              </section>
+            )}
+
+            {/* FAQ from metadataJson */}
+            {c.metadataJson.contentOps.faq && c.metadataJson.contentOps.faq.length > 0 && (
+              <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">❓ 常见问题</h2>
+                <div className="space-y-4">
+                  {c.metadataJson.contentOps.faq.map((faq: any, i: number) => (
+                    <details key={i} className="group bg-gray-50 rounded-lg">
+                      <summary className="cursor-pointer p-4 font-medium text-gray-900 flex items-center justify-between list-none">
+                        {faq.question}
+                        <span className="transition-transform group-open:rotate-180">▼</span>
+                      </summary>
+                      <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Internal Links */}
+            {c.metadataJson.contentOps.internalLinks && c.metadataJson.contentOps.internalLinks.length > 0 && (
+              <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">🔗 相关内容</h2>
+                <div className="space-y-2">
+                  {c.metadataJson.contentOps.internalLinks.map((link: any, i: number) => (
+                    <a key={i} href={link.url} className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="font-medium text-gray-900">{link.title}</div>
+                      {link.reason && <div className="text-sm text-gray-500 mt-1">{link.reason}</div>}
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* JSON-LD Structured Data */}
+            {c.metadataJson.contentOps.structuredData && (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                  __html: JSON.stringify(c.metadataJson.contentOps.structuredData)
+                }}
+              />
+            )}
+          </>
+        )}
       </div>
     );
   }
