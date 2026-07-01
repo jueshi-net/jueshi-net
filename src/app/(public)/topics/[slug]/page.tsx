@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import {
   ArrowLeft,
   ExternalLink,
@@ -245,6 +246,15 @@ export default async function TopicSlugPage({
   const { slug } = await params;
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
+
+  // v1.20.42.18.6.16.6.74: Preview auth hardening - require admin session for draft preview
+  if (previewMode) {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "admin") {
+      notFound();
+    }
+  }
+
   const topic = await getTopicBySlug(slug);
   const cmsTopic = getCmsTopicBySlug(slug);
 

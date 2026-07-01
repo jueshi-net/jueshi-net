@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 import ChecklistClient from "./checklist-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ChecklistViewTracker } from "./checklist-view-tracker";
@@ -83,6 +84,15 @@ export default async function ChecklistPage({ params, searchParams }: Props) {
   const { slug } = await params;
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
+
+  // v1.20.42.18.6.16.6.74: Preview auth hardening - require admin session for draft preview
+  if (previewMode) {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "admin") {
+      // Not admin - treat as not found for security
+      notFound();
+    }
+  }
 
   // v1.20.42.18.4.7: Check Checklist model first
   const modelChecklist = await getChecklistFromModel(slug, previewMode);

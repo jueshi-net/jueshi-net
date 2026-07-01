@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { auth } from "@/auth";
 import { CalendarDays, Eye, Clock, ArrowLeft, Wrench, ArrowRight, BookOpen, Home } from "lucide-react";
 import Link from "next/link";
 import TaskChainCta from "@/components/content/task-chain-cta";
@@ -138,6 +139,14 @@ export default async function ArticlePage({ params, searchParams }: Props) {
   const { slug } = await params;
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
+
+  // v1.20.42.18.6.16.6.74: Preview auth hardening - require admin session for draft preview
+  if (previewMode) {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "admin") {
+      notFound();
+    }
+  }
 
   // v1.20.42.18.4.7: Check Guide model first
   try {
