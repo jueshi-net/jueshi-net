@@ -1,0 +1,185 @@
+metadata:
+  title: 留学生出国前准备清单
+  slug: student-pre-departure-checklist
+  type: checklist
+  status: draft
+  reviewRequired: true
+
+content:
+  summary: 出国前必做事项清单：从签证到报到，一步步帮你做好准备。
+  steps:
+    - title: 确认签证
+      description: 检查签证有效期，确认入境要求。打印签证页备份。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 预订机票
+      description: 比较价格，选择合适航班。建议提前 1-2 个月预订。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 安排住宿
+      description: 学校宿舍或校外租房。确认入住日期和地址。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 准备行李
+      description: 根据目的地气候准备衣物。注意航空公司行李限额。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 开通国际银行服务
+      description: 办理双币信用卡，了解境外取现政策。
+      completed: false
+      optional: false
+      tool_link: /tools/exchange-rate
+    - title: 购买手机卡
+      description: 开通国际漫游或购买当地手机卡。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 下载必备 APP
+      description: WhatsApp、Google Maps、Wise 等必备应用。
+      completed: false
+      optional: false
+      tool_link: /topics/must-have-apps
+    - title: 购买保险
+      description: 学校保险或私人保险。确认覆盖范围。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 准备重要文件
+      description: 护照、签证、录取通知书、成绩单、照片。
+      completed: false
+      optional: false
+      tool_link: null
+    - title: 兑换外币
+      description: 提前兑换少量外币，用于初期开销。
+      completed: false
+      optional: false
+      tool_link: /tools/exchange-rate
+  related_tools:
+    - exchange-rate
+    - shipping-calculator
+  related_guides:
+    - how-to-apply-student-visa
+    - how-to-pack-for-study-abroad
+  related_topics:
+    - must-have-apps
+    - student-life-guide
+
+seo:
+  title: 留学生出国前准备清单 | 必做 15 件事
+  description: 出国前清单：从签证到报到，一步步帮你做好准备。包含签证、机票、住宿、行李、银行、手机卡等关键步骤。
+  canonical: https://jueshi.net/checklists/student-pre-departure-checklist
+  keywords:
+    primary: 留学出国清单
+    secondary:
+      - 出国准备
+      - 留学行前
+      - 出国留学清单
+
+geo:
+  directAnswer:
+    question: 留学生出国前要准备什么？
+    answer: 留学生出国前必须准备：1) 签证和护照；2) 机票和住宿；3) 行李和衣物；4) 银行卡和外币；5) 手机卡和必备 APP；6) 保险；7) 重要文件备份。建议提前 3 个月开始准备。
+  geographicTargeting:
+    primaryCountries:
+      - CA
+      - US
+      - UK
+      - AU
+  faq:
+    questions:
+      - q: 出国前要提前多久准备？
+        a: 建议提前 3 个月开始准备，至少提前 1 个月完成所有事项。
+      - q: 行李有限制吗？
+        a: 大多数航空公司允许 2 件行李，每件 23kg。建议提前确认航空公司政策。
+      - q: 需要带多少现金？
+        a: 建议携带 1000-2000 等值外币现金，用于初期开销。大部分地方可刷卡。
+
+videoPack:
+  youtube:
+    title: 留学生出国前必做 15 件事 | 行前准备完整清单
+    duration: "10:00"
+    script: |
+      [Hook 0:00-0:30]
+      即将出国留学？别慌！今天分享 15 件出国前必做的事，帮你做好万全准备。
+      
+      [TOC 0:30-0:45]
+      我们会从签证、机票、住宿、行李、银行、手机卡、APP、保险等方面来讲。
+      
+      [Point 1: 签证 0:45-1:30]
+      第一件：确认签证。检查有效期，确认入境要求。打印签证页备份。
+      
+      [Point 2: 机票 1:30-2:15]
+      第二件：预订机票。建议提前 1-2 个月，比较价格。
+      
+      [Summary 8:00-9:00]
+      以上就是出国前必做的 15 件事。记住，提前 3 个月开始准备！
+      
+      [CTA 9:00-10:00]
+      完整清单在我们网站，链接在描述栏。觉得有用就点赞订阅！
+  shorts:
+    title: 留学出国前必做 5 件事 #shorts
+    duration: "60"
+    script: |
+      [Hook 0:00-0:05]
+      即将留学？这 5 件事必做！
+      
+      [Point 1 0:05-0:15]
+      1. 确认签证 - 检查有效期
+      
+      [Point 2 0:15-0:25]
+      2. 订机票 - 提前 1-2 个月
+      
+      [Point 3 0:25-0:35]
+      3. 安排住宿 - 宿舍或租房
+      
+      [Point 4 0:35-0:45]
+      4. 准备行李 - 注意限重
+      
+      [Point 5 0:45-0:55]
+      5. 下载 APP - WhatsApp, Maps, Wise
+      
+      [CTA 0:55-1:00]
+      完整清单在主页链接！
+
+qualityScore:
+  total: 88
+  seo: 23
+  content: 24
+  userValue: 19
+  technical: 13
+  geo: 9
+
+publishChecklist:
+  seo:
+    - true
+    - true
+    - true
+    - true
+    - true
+  content:
+    - true
+    - true
+    - true
+    - true
+    - true
+  technical:
+    - true
+    - true
+    - true
+  video:
+    - true
+    - true
+    - true
+  platforms:
+    - true
+    - true
+    - true
+  review:
+    - true
+    - true
+    - true
+  status: READY_TO_PUBLISH
