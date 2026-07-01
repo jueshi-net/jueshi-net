@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import ChecklistClient from "./checklist-client";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { ChecklistViewTracker } from "./checklist-view-tracker";

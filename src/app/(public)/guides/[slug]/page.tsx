@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { auth } from "@/auth";
+import { auth } from "@/lib/auth";
 import { CalendarDays, Eye, Clock, ArrowLeft, Wrench, ArrowRight, BookOpen, Home } from "lucide-react";
 import Link from "next/link";
 import TaskChainCta from "@/components/content/task-chain-cta";
