@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertCircle, Eye } from "lucide-react";
 
 type Guide = {
   id: string; slug: string; title: string; summary: string | null;
@@ -378,6 +378,18 @@ export default function GuideEditClient({ guide }: { guide: Guide }) {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {saving ? "保存中..." : "保存"}
           </button>
+          {form.status === "draft" && (
+            <a
+              href={`/guides/${form.slug}?preview=true`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[44px]"
+              title="在新窗口预览草稿（不会发布内容）"
+            >
+              <Eye className="w-4 h-4" />
+              预览草稿
+            </a>
+          )}
           <Link href="/admin/content/guides"
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 min-h-[44px]">
             取消

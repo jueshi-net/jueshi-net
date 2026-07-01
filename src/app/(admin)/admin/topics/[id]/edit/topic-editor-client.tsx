@@ -338,10 +338,24 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
               <textarea value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm" rows={2} placeholder="留空则使用简介" />
             </div>
           </div>
-          <button onClick={saveBasic} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[48px]">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "保存中..." : "保存"}
-          </button>
+          <div className="flex gap-2">
+            <button onClick={saveBasic} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[48px]">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? "保存中..." : "保存"}
+            </button>
+            {form.status === "draft" && (
+              <a
+                href={`/topics/${form.slug}?preview=true`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 min-h-[48px]"
+                title="在新窗口预览草稿（不会发布内容）"
+              >
+                <Eye className="w-4 h-4" />
+                预览草稿
+              </a>
+            )}
+          </div>
         </div>
       )}
 
