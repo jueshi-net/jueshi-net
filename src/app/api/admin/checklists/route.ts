@@ -37,6 +37,7 @@ interface ChecklistCreateBody {
   robots?: string;
   sortOrder?: number;
   publishedAt?: string | null;
+  metadataJson?: any; // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 }
 
 // GET /api/admin/checklists — list checklists with optional status filter
@@ -68,6 +69,7 @@ export async function GET(req: NextRequest) {
         canonicalUrl: true, robots: true, sortOrder: true, publishedAt: true,
         createdAt: true, updatedAt: true,
         relatedTools: true, relatedTaskChain: true, relatedGuides: true, relatedTopics: true,
+        metadataJson: true, // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
       },
     });
     return NextResponse.json(checklists);
@@ -111,6 +113,7 @@ export async function POST(req: NextRequest) {
         canonicalUrl: body.canonicalUrl || null,
         robots: body.robots || "index,follow",
         sortOrder: body.sortOrder ?? 0,
+        metadataJson: body.metadataJson || null, // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
         // When status is "published", set publishedAt to now() if not already set
         ...(body.status === "published" && !body.publishedAt && { publishedAt: new Date() }),
       },

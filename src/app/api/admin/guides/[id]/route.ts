@@ -31,6 +31,7 @@ interface GuideUpdateBody {
   robots?: string;
   sortOrder?: number;
   publishedAt?: string | null;
+  metadataJson?: any; // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 }
 
 // GET /api/admin/guides/[id] — single guide
@@ -105,6 +106,7 @@ export async function PUT(
         ...(body.canonicalUrl !== undefined && { canonicalUrl: body.canonicalUrl }),
         ...(body.robots !== undefined && { robots: body.robots }),
         ...(body.sortOrder !== undefined && { sortOrder: body.sortOrder }),
+        ...(body.metadataJson !== undefined && { metadataJson: body.metadataJson }),
         ...(publishedAtValue && { publishedAt: publishedAtValue }),
       },
     });

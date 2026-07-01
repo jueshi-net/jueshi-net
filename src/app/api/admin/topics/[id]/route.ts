@@ -36,7 +36,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const body = await req.json();
-    const { title, subtitle, summary, status, templateType, coverEmoji, seoTitle, seoDescription, youtubeUrl, heroBadges, suitableFor, tags } = body;
+    const { title, subtitle, summary, status, templateType, coverEmoji, seoTitle, seoDescription, youtubeUrl, heroBadges, suitableFor, tags, metadataJson } = body;
 
     const existing = await prisma.topic.findUnique({ where: { id } });
     if (!existing) {
@@ -65,6 +65,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         heroBadges: heroBadges ?? undefined,
         suitableFor: suitableFor ?? undefined,
         tags: tags ?? undefined,
+        metadataJson: metadataJson ?? undefined, // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
         publishedAt,
       },
     });
