@@ -68,6 +68,14 @@ export async function generateMetadata({
   const { slug } = await params;
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
+
+  // v1.20.42.18.6.16.6.74: Preview auth hardening in metadata
+  if (previewMode) {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "admin") {
+      return { title: "专题不存在" };
+    }
+  }
   const topic = await getTopicBySlug(slug);
 
   if (!topic || (!previewMode && topic.status !== "published")) {

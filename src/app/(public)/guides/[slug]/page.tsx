@@ -79,6 +79,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
 
+  // v1.20.42.18.6.16.6.74: Preview auth hardening in metadata
+  if (previewMode) {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "admin") {
+      return { title: "未找到指南" };
+    }
+  }
+
   // 1. Check Guide model first
   try {
     const guide = await prisma.guide.findUnique({ where: { slug } });
