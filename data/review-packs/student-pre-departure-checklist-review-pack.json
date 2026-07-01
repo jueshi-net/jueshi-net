@@ -1,0 +1,118 @@
+{
+  "draftId": "cmr1prod000000000000001",
+  "slug": "student-pre-departure-checklist",
+  "title": "留学生出国前准备清单",
+  "status": "draft",
+  "createdAt": "2026-07-01T02:05:26.394Z",
+  "reviewPack": {
+    "primaryKeyword": "留学生出国前准备",
+    "secondaryKeywords": [
+      "留学清单",
+      "出国准备",
+      "留学生必备",
+      "签证准备",
+      "留学行李清单"
+    ],
+    "qualityScore": 85,
+    "faq": [
+      {
+        "question": "留学生出国前需要准备哪些文件？",
+        "answer": "护照、签证、录取通知书、成绩单、照片、保险单、机票行程单、住宿确认信。建议扫描备份并打印纸质版。"
+      },
+      {
+        "question": "留学生需要带多少行李？",
+        "answer": "建议按季节准备 1-2 周换洗衣物，到达后购买日用品。重点携带重要文件、常用药品、电子设备。避免超重。"
+      },
+      {
+        "question": "留学生如何开通当地银行账户？",
+        "answer": "携带护照、学生签证、学校录取通知书、地址证明到学校附近银行开户。部分银行支持线上预约开户。"
+      },
+      {
+        "question": "留学生需要购买什么保险？",
+        "answer": "医疗保险（必须）、意外险（推荐）、财产险（可选）。部分学校要求购买学校指定保险。"
+      },
+      {
+        "question": "留学生出国前需要下载哪些 APP？",
+        "answer": "地图（Google Maps）、翻译（Google Translate）、银行 APP、学校 APP、社交媒体（WhatsApp/WeChat）、交通（当地公交 APP）。"
+      }
+    ],
+    "structuredData": {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "留学生出国前准备清单",
+      "description": "出国前必做事项清单：从签证到报到，一步步帮你做好准备。",
+      "stepCount": 15,
+      "totalTime": "P30D",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "确认签证",
+          "text": "检查签证有效期，确认入境要求。打印签证页备份。"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "购买机票",
+          "text": "确认航班时间、行李额度。打印电子行程单。"
+        }
+      ]
+    },
+    "videoPack": {
+      "youtubeScript": {
+        "title": "留学生出国前准备清单 | 15 件必做事项",
+        "description": "准留学生必看！出国前需要准备什么？从签证到报到，一步步帮你做好准备。",
+        "tags": ["留学", "出国准备", "留学清单", "签证", "行李"],
+        "script": [
+          "开场：准留学生们，出国前你准备好了吗？",
+          "第一部分：文件准备（护照、签证、录取通知书）",
+          "第二部分：行李打包（衣物、日用品、电子设备）",
+          "第三部分：金融准备（银行卡、货币兑换）",
+          "第四部分：通讯准备（手机卡、常用 APP）",
+          "结尾：祝你留学顺利！"
+        ]
+      },
+      "thumbnailPrompt": "留学生拉着行李箱，背景是机场出发大厅，标题文字'出国前准备清单'，明亮色调，专业风格"
+    },
+    "internalLinks": [
+      {
+        "text": "汇率换算",
+        "url": "/tools/exchange-rate",
+        "context": "兑换货币时查看实时汇率"
+      },
+      {
+        "text": "运费计算",
+        "url": "/tools/shipping-calculator",
+        "context": "计算行李托运费用"
+      },
+      {
+        "text": "如何申请学生签证",
+        "url": "/guides/how-to-apply-student-visa",
+        "context": "详细签证申请指南"
+      },
+      {
+        "text": "如何打包留学行李",
+        "url": "/guides/how-to-pack-for-study-abroad",
+        "context": "行李打包技巧"
+      }
+    ],
+    "geoAnswerBlock": {
+      "targetCountries": ["加拿大", "美国", "英国", "澳洲"],
+      "answerBoxes": [
+        {
+          "question": "留学生出国前需要准备什么？",
+          "answer": "15 件必做事项：签证、机票、住宿、行李、银行卡、手机卡、保险、APP、文件、通知家人、兑换货币、接机、退宿、日用品、报到。"
+        }
+      ]
+    },
+    "socialMediaPrompts": {
+      "twitter": "准留学生必看！出国前准备清单 📋 从签证到报到，15 件必做事项帮你做好准备 ✈️ #留学 #出国准备",
+      "facebook": "留学生出国前准备清单 🎓 包含签证、机票、住宿、行李、银行卡、手机卡、保险、常用 APP 等 15 件必做事项。",
+      "instagram": "准留学生们，出国前你准备好了吗？📋 15 件必做事项清单已更新！链接在 bio ✈️ #留学 #出国准备 #留学生活"
+    }
+  },
+  "metadata": {
+    "generatedAt": "2026-07-01T02:05:26.394Z",
+    "generatedBy": "Hermes Agent v1.20.42.18.6.16.6.70",
+    "model": "qwen3.7-plus",
+    "provider": "alibaba"
+  }
+}
