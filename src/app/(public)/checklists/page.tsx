@@ -19,7 +19,8 @@ export const metadata: Metadata = {
 
 async function getChecklists() {
   try {
-    const checklists = await prisma.landingPage.findMany({
+    // Get checklists from both landingPage and checklist tables
+    const landingChecklists = await prisma.landingPage.findMany({
       where: {
         status: "published",
         pageType: "checklist",
@@ -35,7 +36,51 @@ async function getChecklists() {
         updatedAt: true,
       },
     });
-    return checklists;
+
+    const modelChecklists = await prisma.checklist.findMany({
+      where: {
+        status: "published",
+      },
+      orderBy: [{ publishedAt: "desc" }, { updatedAt: "desc" }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        seoDescription: true,
+        summary: true,
+        publishedAt: true,
+        updatedAt: true,
+      },
+    });
+
+    // Merge and deduplicate by slug
+    const allChecklists = new Map<string, any>();
+    
+    // Add landingPage checklists
+    landingChecklists.forEach((cl) => {
+      allChecklists.set(cl.slug, {
+        ...cl,
+        source: "landingPage",
+      });
+    });
+
+    // Add checklist model checklists (override if duplicate)
+    modelChecklists.forEach((cl) => {
+      if (!allChecklists.has(cl.slug)) {
+        allChecklists.set(cl.slug, {
+          id: cl.id,
+          slug: cl.slug,
+          title: cl.title,
+          seoDescription: cl.seoDescription || cl.summary,
+          heroSection: null, // checklist model doesn't have heroSection
+          publishedAt: cl.publishedAt,
+          updatedAt: cl.updatedAt,
+          source: "checklist",
+        });
+      }
+    });
+
+    return Array.from(allChecklists.values());
   } catch {
     return [];
   }
