@@ -159,16 +159,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    // Published Checklists
-    const checklists = await prisma.landingPage.findMany({
+    // Published Checklists (from both landingPage and checklist tables)
+    const landingChecklists = await prisma.landingPage.findMany({
       where: { status: "published", pageType: "checklist" },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
     });
 
-    checklistPages = checklists.map((c) => ({
-      url: `${BASE_URL}/checklists/${c.slug}`,
-      lastModified: c.updatedAt,
+    const modelChecklists = await prisma.checklist.findMany({
+      where: { status: "published" },
+      select: { slug: true, updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    // Merge and deduplicate
+    const allChecklistSlugs = new Map<string, Date>();
+    landingChecklists.forEach((c) => allChecklistSlugs.set(c.slug, c.updatedAt));
+    modelChecklists.forEach((c) => {
+      if (!allChecklistSlugs.has(c.slug) || c.updatedAt > allChecklistSlugs.get(c.slug)!) {
+        allChecklistSlugs.set(c.slug, c.updatedAt);
+      }
+    });
+
+    checklistPages = Array.from(allChecklistSlugs.entries()).map(([slug, updatedAt]) => ({
+      url: `${BASE_URL}/checklists/${slug}`,
+      lastModified: updatedAt,
       changeFrequency: "weekly" as const,
       priority: 0.6,
     }));
