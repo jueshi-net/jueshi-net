@@ -231,52 +231,119 @@ export default async function ArticlePage({ params, searchParams }: Props) {
               {/* Task Chain CTA */}
               <TaskChainCta />
 
-              {/* ContentOps Metadata Rendering */}
+              {/* ContentOps Metadata Rendering - 优化版 */}
               {guide.metadataJson?.contentOps && (
                 <>
-                  {/* GEO Answer Block */}
+                  {/* GEO Answer Block - 增强版 */}
                   {guide.metadataJson.contentOps.geoAnswerBlock?.directAnswer && (
-                    <section className="bg-green-50 border border-green-200 rounded-xl p-6 mt-6">
-                      <h2 className="font-semibold text-green-800 mb-2">💡 快速答案</h2>
-                      <p className="text-green-700">{guide.metadataJson.contentOps.geoAnswerBlock.directAnswer}</p>
+                    <section className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl p-6 mt-6 shadow-sm">
+                      <h2 className="text-xl font-bold text-green-900 mb-3 flex items-center gap-2">
+                        <span className="text-2xl">💡</span>
+                        快速答案
+                      </h2>
+                      <p className="text-green-800 text-lg leading-relaxed mb-4">
+                        {guide.metadataJson.contentOps.geoAnswerBlock.directAnswer}
+                      </p>
                       {guide.metadataJson.contentOps.geoAnswerBlock.targetAudience && (
-                        <p className="text-sm text-green-600 mt-2">
-                          适合：{guide.metadataJson.contentOps.geoAnswerBlock.targetAudience}
-                        </p>
+                        <div className="bg-white/60 rounded-lg p-3 mb-3">
+                          <p className="text-sm font-medium text-green-900">
+                            👥 适用人群：{guide.metadataJson.contentOps.geoAnswerBlock.targetAudience}
+                          </p>
+                        </div>
+                      )}
+                      {guide.metadataJson.contentOps.geoAnswerBlock.targetCountries && guide.metadataJson.contentOps.geoAnswerBlock.targetCountries.length > 0 && (
+                        <div className="bg-white/60 rounded-lg p-3 mb-3">
+                          <p className="text-sm font-medium text-green-900 mb-2">
+                            🌍 适用国家/地区：
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {guide.metadataJson.contentOps.geoAnswerBlock.targetCountries.map((country: string, i: number) => (
+                              <span key={i} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                                {country}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </section>
                   )}
 
-                  {/* FAQ from metadataJson */}
+                  {/* FAQ from metadataJson - 前 3 条默认展开 */}
                   {guide.metadataJson.contentOps.faq && guide.metadataJson.contentOps.faq.length > 0 && (
-                    <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-4">❓ 常见问题</h2>
+                    <section className="bg-white rounded-xl shadow-sm border-2 border-blue-200 p-6 mt-6">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <span className="text-3xl">❓</span>
+                        常见问题
+                      </h2>
                       <div className="space-y-4">
                         {guide.metadataJson.contentOps.faq.map((faq: any, i: number) => (
-                          <details key={i} className="group bg-gray-50 rounded-lg">
-                            <summary className="cursor-pointer p-4 font-medium text-gray-900 flex items-center justify-between list-none">
-                              {faq.question}
-                              <span className="transition-transform group-open:rotate-180">▼</span>
+                          <details key={i} className="group bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200" open={i < 3}>
+                            <summary className="cursor-pointer p-4 font-semibold text-gray-900 flex items-center justify-between list-none text-lg">
+                              <span>{faq.question}</span>
+                              <span className="transition-transform group-open:rotate-180 text-blue-600">▼</span>
                             </summary>
-                            <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                            <div className="px-4 pb-4 text-gray-700 leading-relaxed text-base">{faq.answer}</div>
                           </details>
                         ))}
                       </div>
                     </section>
                   )}
 
-                  {/* Internal Links */}
+                  {/* Internal Links - 分组显示 */}
                   {guide.metadataJson.contentOps.internalLinks && guide.metadataJson.contentOps.internalLinks.length > 0 && (
                     <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
-                      <h2 className="text-xl font-bold text-gray-900 mb-4">🔗 相关内容</h2>
-                      <div className="space-y-2">
-                        {guide.metadataJson.contentOps.internalLinks.map((link: any, i: number) => (
-                          <a key={i} href={link.url} className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                            <div className="font-medium text-gray-900">{link.title}</div>
-                            {link.reason && <div className="text-sm text-gray-500 mt-1">{link.reason}</div>}
-                          </a>
-                        ))}
+                      <h2 className="text-xl font-bold text-gray-900 mb-4">🔗 相关内容推荐</h2>
+                      <div className="space-y-4">
+                        {(() => {
+                          const grouped = guide.metadataJson.contentOps.internalLinks.reduce((acc: any, link: any) => {
+                            const category = link.reason || '其他';
+                            if (!acc[category]) acc[category] = [];
+                            acc[category].push(link);
+                            return acc;
+                          }, {});
+                          
+                          return Object.entries(grouped).map(([category, links]: [string, any]) => (
+                            <div key={category}>
+                              <h3 className="text-lg font-semibold text-gray-800 mb-3">{category}</h3>
+                              <div className="space-y-2">
+                                {(links as any[]).map((link: any, i: number) => (
+                                  <a key={i} href={link.url} className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                                    <div className="font-medium text-gray-900 text-base">{link.title}</div>
+                                    {link.reason && <div className="text-sm text-gray-500 mt-1">{link.reason}</div>}
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          ));
+                        })()}
                       </div>
+                    </section>
+                  )}
+
+                  {/* Video Pack Preview */}
+                  {guide.metadataJson.contentOps.videoPack && (
+                    <section className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-6 mt-6">
+                      <h2 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">🎬</span>
+                        视频讲解脚本
+                      </h2>
+                      {guide.metadataJson.contentOps.videoPack.youtubeTitle && (
+                        <div className="bg-white/70 rounded-lg p-4 mb-3">
+                          <p className="text-sm font-medium text-purple-900 mb-2">📺 YouTube 标题：</p>
+                          <p className="text-purple-800 font-semibold">{guide.metadataJson.contentOps.videoPack.youtubeTitle}</p>
+                        </div>
+                      )}
+                      {guide.metadataJson.contentOps.videoPack.youtubeUrl && (
+                        <div className="bg-white/70 rounded-lg p-4">
+                          <p className="text-sm font-medium text-purple-900 mb-2">🔗 视频链接：</p>
+                          <a href={guide.metadataJson.contentOps.videoPack.youtubeUrl} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline break-all">
+                            {guide.metadataJson.contentOps.videoPack.youtubeUrl}
+                          </a>
+                        </div>
+                      )}
+                      <p className="text-sm text-purple-700 mt-4 italic">
+                        💡 此视频脚本可用于后续 YouTube/Shorts 内容制作
+                      </p>
                     </section>
                   )}
 
