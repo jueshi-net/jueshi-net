@@ -101,3 +101,6 @@ tools/jueshi-audit/node_modules/
 
 # Audit evidence (generated test artifacts, not source code)
 tools/jueshi-audit/evidence/
+
+# ContentOps logs (may contain sensitive data)
+logs/
