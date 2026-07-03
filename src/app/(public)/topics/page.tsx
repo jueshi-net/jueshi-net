@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "专题 - 绝世百宝箱",
   description: "精选专题内容：出海必装 APP 评级、实用工具指南、生活攻略。帮助你快速适应海外生活。",
+  keywords: "专题,出海专题,海外生活专题,APP评级,工具指南,生活攻略,海外华人专题,留学专题,跨境专题,实用专题",
   alternates: { canonical: "https://jueshi.net/topics" },
   openGraph: {
     title: "专题 - 绝世百宝箱",

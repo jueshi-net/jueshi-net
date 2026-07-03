@@ -66,9 +66,45 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (modelChecklist) {
     const c = modelChecklist.checklist as any;
     const isDraft = c.status === "draft";
+    
+    // v1.20.42.18.6.16.6.80: Extract keywords from metadataJson
+    let keywords = "";
+    if (c.metadataJson) {
+      try {
+        const meta = typeof c.metadataJson === "string" ? JSON.parse(c.metadataJson) : c.metadataJson;
+        const contentOps = meta.contentOps || {};
+        const keywordSet = new Set<string>();
+        
+        // Primary keyword
+        if (contentOps.primaryKeyword) {
+          keywordSet.add(contentOps.primaryKeyword);
+        }
+        
+        // Secondary keywords
+        if (Array.isArray(contentOps.secondaryKeywords)) {
+          contentOps.secondaryKeywords.forEach((kw: string) => keywordSet.add(kw));
+        }
+        
+        // Page type keyword
+        keywordSet.add("清单");
+        
+        // Limit to 15 keywords
+        const keywordArray = Array.from(keywordSet).slice(0, 15);
+        keywords = keywordArray.join(",");
+      } catch (e) {
+        // Fallback to empty
+      }
+    }
+    
+    // Fallback keywords if metadataJson not available
+    if (!keywords) {
+      keywords = `${c.title},清单,出国清单,留学清单,checklist`;
+    }
+    
     return {
       title: c.seoTitle || c.title,
       description: c.seoDescription || c.summary || "",
+      keywords,
       alternates: c.canonicalUrl ? { canonical: c.canonicalUrl } : { canonical: `https://jueshi.net/checklists/${c.slug}` },
       // Preview mode or draft: noindex, nofollow
       robots: (previewMode || isDraft) ? { index: false, follow: false } : (c.robots === "noindex,nofollow" ? { index: false, follow: false } : undefined),

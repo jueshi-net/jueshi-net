@@ -6,6 +6,8 @@ import { FileText, CalendarDays, Eye, Clock, ChevronRight, BookOpen, TrendingUp,
 export const metadata: Metadata = {
   title: '海外实用指南 - 跨境寄送、海外生活、出海经营',
   description: '面向出海商家、海外华人、留学生的工具教程、避坑指南与实操经验。',
+  keywords: "指南,海外指南,跨境指南,出海指南,留学指南,外贸指南,教程,避坑指南,实操经验,海外华人指南",
+  alternates: { canonical: "https://jueshi.net/guides" },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {

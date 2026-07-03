@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "清单 - 绝世百宝箱",
   description: "实用的出海行动清单：留学生行李准备、集运发货核对、多伦多租房看房避坑。",
+  keywords: "清单,出国清单,留学清单,集运清单,租房清单,行李清单,发货清单,checklist,出海清单,海外生活清单",
   alternates: { canonical: "https://jueshi.net/checklists" },
   openGraph: {
     title: "清单 - 绝世百宝箱",

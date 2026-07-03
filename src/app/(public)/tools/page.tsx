@@ -18,6 +18,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   return {
     title,
     description,
+    keywords: "工具中心,跨境工具,外贸工具,海外华人工具,实用工具,在线工具,免费工具,跨境电商工具,物流工具,单据工具",
     alternates: { canonical: "https://jueshi.net/tools" },
     openGraph: {
       title,

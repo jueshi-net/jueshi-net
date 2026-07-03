@@ -4,6 +4,7 @@ import { softwareApplicationJsonLd, buildCanonical } from '@/lib/seo';
 export const metadata: Metadata = {
   title: '海外换汇与多币种报价助手 - 绝世百宝箱',
   description: '查询常用货币汇率，估算换汇金额、跨境成本和外贸报价。支持多币种报价表生成、成本估算与建议售价计算。适用于海外生活、跨境收款、外贸报价和电商成本核算。',
+  keywords: "汇率换算,换汇工具,货币汇率,跨境换汇,外贸报价,汇率查询,多币种报价,成本估算,海外换汇,电商成本核算",
   alternates: { canonical: buildCanonical('/tools/exchange-rate') },
   openGraph: {
     title: '海外换汇与多币种报价助手 - 绝世百宝箱',
