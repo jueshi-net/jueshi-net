@@ -67,30 +67,38 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const c = modelChecklist.checklist as any;
     const isDraft = c.status === "draft";
     
-    // v1.20.42.18.6.16.6.80: Extract keywords from metadataJson
+    // v1.20.42.18.6.16.6.81: Extract keywords from metadataJson
     let keywords = "";
     if (c.metadataJson) {
       try {
         const meta = typeof c.metadataJson === "string" ? JSON.parse(c.metadataJson) : c.metadataJson;
         const contentOps = meta.contentOps || {};
-        const keywordSet = new Set<string>();
         
-        // Primary keyword
-        if (contentOps.primaryKeyword) {
-          keywordSet.add(contentOps.primaryKeyword);
+        // v1.20.42.18.6.16.6.81: Priority 1 - Use admin-editable metaKeywords from seo
+        if (contentOps.seo?.metaKeywords) {
+          keywords = contentOps.seo.metaKeywords;
         }
-        
-        // Secondary keywords
-        if (Array.isArray(contentOps.secondaryKeywords)) {
-          contentOps.secondaryKeywords.forEach((kw: string) => keywordSet.add(kw));
+        // Priority 2 - Generate from primaryKeyword + secondaryKeywords
+        else if (contentOps.primaryKeyword) {
+          const keywordSet = new Set<string>();
+          
+          // Primary keyword
+          if (contentOps.primaryKeyword) {
+            keywordSet.add(contentOps.primaryKeyword);
+          }
+          
+          // Secondary keywords
+          if (Array.isArray(contentOps.secondaryKeywords)) {
+            contentOps.secondaryKeywords.forEach((kw: string) => keywordSet.add(kw));
+          }
+          
+          // Page type keyword
+          keywordSet.add("清单");
+          
+          // Limit to 15 keywords
+          const keywordArray = Array.from(keywordSet).slice(0, 15);
+          keywords = keywordArray.join(",");
         }
-        
-        // Page type keyword
-        keywordSet.add("清单");
-        
-        // Limit to 15 keywords
-        const keywordArray = Array.from(keywordSet).slice(0, 15);
-        keywords = keywordArray.join(",");
       } catch (e) {
         // Fallback to empty
       }

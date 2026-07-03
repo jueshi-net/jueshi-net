@@ -73,6 +73,15 @@ export default function ChecklistEditClient({ checklist }: { checklist: Checklis
     relatedTaskChain: checklist.relatedTaskChain || "",
     relatedGuides: (checklist.relatedGuides || []).join(", "),
     relatedTopics: (checklist.relatedTopics || []).join(", "),
+    // v1.20.42.18.6.16.6.81: SEO/GEO fields from metadataJson.contentOps.seo
+    metaKeywords: checklist.metadataJson?.contentOps?.seo?.metaKeywords || "",
+    primaryKeyword: checklist.metadataJson?.contentOps?.primaryKeyword || "",
+    secondaryKeywords: (checklist.metadataJson?.contentOps?.secondaryKeywords || []).join(", "),
+    searchIntent: checklist.metadataJson?.contentOps?.seo?.searchIntent || "informational",
+    targetAudience: checklist.metadataJson?.contentOps?.seo?.targetAudience || "",
+    audienceStage: checklist.metadataJson?.contentOps?.seo?.audienceStage || "准备出国阶段",
+    targetCountries: (checklist.metadataJson?.contentOps?.seo?.targetCountries || []).join(", "),
+    targetSearchEngines: (checklist.metadataJson?.contentOps?.seo?.targetSearchEngines || ["Google", "Baidu", "Bing"]).join(", "),
   });
   const [steps, setSteps] = useState<Step[]>(initialSteps);
 
@@ -128,6 +137,32 @@ export default function ChecklistEditClient({ checklist }: { checklist: Checklis
 
     setSaving(true);
     try {
+      // v1.20.42.18.6.16.6.81: Build metadataJson.contentOps.seo from form
+      const existingMetadata = checklist.metadataJson || {};
+      const existingContentOps = existingMetadata.contentOps || {};
+      
+      const seoData = {
+        metaKeywords: form.metaKeywords.trim() || undefined,
+        searchIntent: form.searchIntent || undefined,
+        targetAudience: form.targetAudience.trim() || undefined,
+        audienceStage: form.audienceStage || undefined,
+        targetCountries: form.targetCountries.split(",").map(s => s.trim()).filter(Boolean),
+        targetSearchEngines: form.targetSearchEngines.split(",").map(s => s.trim()).filter(Boolean),
+      };
+      
+      const updatedMetadataJson = {
+        ...existingMetadata,
+        contentOps: {
+          ...existingContentOps,
+          primaryKeyword: form.primaryKeyword.trim() || existingContentOps.primaryKeyword,
+          secondaryKeywords: form.secondaryKeywords.split(",").map(s => s.trim()).filter(Boolean),
+          seo: {
+            ...existingContentOps.seo,
+            ...seoData,
+          },
+        },
+      };
+      
       const payload: any = {
         title: form.title.trim(),
         slug: form.slug.trim(),
@@ -145,6 +180,7 @@ export default function ChecklistEditClient({ checklist }: { checklist: Checklis
         relatedTaskChain: form.relatedTaskChain.trim() || null,
         relatedGuides: form.relatedGuides.split(",").map((s) => s.trim()).filter(Boolean),
         relatedTopics: form.relatedTopics.split(",").map((s) => s.trim()).filter(Boolean),
+        metadataJson: updatedMetadataJson,
       };
 
       const res = await fetch(`/api/admin/checklists/${checklist.id}`, {
@@ -299,6 +335,80 @@ export default function ChecklistEditClient({ checklist }: { checklist: Checklis
               <input value={form.relatedTopics} onChange={(e) => set("relatedTopics", e.target.value)}
                 className={inputCls} placeholder="逗号分隔的专题 slug" />
             </div>
+          </div>
+        </div>
+
+        {/* v1.20.42.18.6.16.6.81: SEO / GEO 设置 */}
+        <div className="border-t pt-4 space-y-4">
+          <h2 className="text-sm font-semibold text-gray-700">SEO / GEO 设置</h2>
+          
+          <div>
+            <label className={labelCls}>Meta Keywords</label>
+            <input value={form.metaKeywords} onChange={(e) => set("metaKeywords", e.target.value)}
+              className={inputCls} placeholder="逗号分隔，5-15 个关键词" />
+            <div className="flex items-center justify-between mt-1">
+              <span className="text-xs text-gray-500">逗号分隔，5-15 个关键词</span>
+              {form.metaKeywords && (
+                <span className={`text-xs ${form.metaKeywords.split(",").filter(Boolean).length > 15 ? 'text-red-600' : 'text-gray-500'}`}>
+                  ⚠️ 当前 {form.metaKeywords.split(",").filter(Boolean).length} 个关键词
+                  {form.metaKeywords.split(",").filter(Boolean).length > 15 && ' — 超过 15 个'}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Primary Keyword</label>
+              <input value={form.primaryKeyword} onChange={(e) => set("primaryKeyword", e.target.value)}
+                className={inputCls} placeholder="主关键词" />
+            </div>
+            <div>
+              <label className={labelCls}>Search Intent</label>
+              <select value={form.searchIntent} onChange={(e) => set("searchIntent", e.target.value)} className={inputCls}>
+                <option value="informational">informational</option>
+                <option value="navigational">navigational</option>
+                <option value="transactional">transactional</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Secondary Keywords</label>
+            <input value={form.secondaryKeywords} onChange={(e) => set("secondaryKeywords", e.target.value)}
+              className={inputCls} placeholder="逗号分隔，5-10 个关键词" />
+            <span className="text-xs text-gray-500 mt-1 block">逗号分隔，5-10 个关键词</span>
+          </div>
+
+          <div>
+            <label className={labelCls}>Target Audience</label>
+            <input value={form.targetAudience} onChange={(e) => set("targetAudience", e.target.value)}
+              className={inputCls} placeholder="如：即将出国留学的学生和家长" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Audience Stage</label>
+              <select value={form.audienceStage} onChange={(e) => set("audienceStage", e.target.value)} className={inputCls}>
+                <option value="未出海了解阶段">未出海了解阶段</option>
+                <option value="准备出国阶段">准备出国阶段</option>
+                <option value="已在海外阶段">已在海外阶段</option>
+                <option value="家长/亲属关注阶段">家长/亲属关注阶段</option>
+                <option value="跨境经营阶段">跨境经营阶段</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Target Countries</label>
+              <input value={form.targetCountries} onChange={(e) => set("targetCountries", e.target.value)}
+                className={inputCls} placeholder="逗号分隔，如：加拿大,美国,英国" />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Target Search Engines</label>
+            <input value={form.targetSearchEngines} onChange={(e) => set("targetSearchEngines", e.target.value)}
+              className={inputCls} placeholder="逗号分隔，如：Google,Baidu,Bing" />
+            <span className="text-xs text-gray-500 mt-1 block">逗号分隔，如：Google,Baidu,Bing,360,Sogou</span>
           </div>
         </div>
 
