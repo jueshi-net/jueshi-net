@@ -52,6 +52,15 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
     youtubeUrl: topic.youtubeUrl || "",
     seoTitle: topic.seoTitle || "",
     seoDescription: topic.seoDescription || "",
+    // v1.20.42.18.6.16.6.81: SEO/GEO fields from metadataJson.contentOps.seo
+    metaKeywords: topic.metadataJson?.contentOps?.seo?.metaKeywords || "",
+    primaryKeyword: topic.metadataJson?.contentOps?.primaryKeyword || "",
+    secondaryKeywords: (topic.metadataJson?.contentOps?.secondaryKeywords || []).join(", "),
+    searchIntent: topic.metadataJson?.contentOps?.seo?.searchIntent || "informational",
+    targetAudience: topic.metadataJson?.contentOps?.seo?.targetAudience || "",
+    audienceStage: topic.metadataJson?.contentOps?.seo?.audienceStage || "未出海了解阶段",
+    targetCountries: (topic.metadataJson?.contentOps?.seo?.targetCountries || []).join(", "),
+    targetSearchEngines: (topic.metadataJson?.contentOps?.seo?.targetSearchEngines || ["Google", "Baidu", "Bing"]).join(", "),
   });
 
   // Items state
@@ -74,6 +83,33 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
     setMessage({ type: "", text: "" });
     try {
       const youtubeVideoId = parseYouTubeUrl(form.youtubeUrl);
+      
+      // v1.20.42.18.6.16.6.81: Build metadataJson.contentOps.seo from form
+      const existingMetadata = topic.metadataJson || {};
+      const existingContentOps = existingMetadata.contentOps || {};
+      
+      const seoData = {
+        metaKeywords: form.metaKeywords.trim() || undefined,
+        searchIntent: form.searchIntent || undefined,
+        targetAudience: form.targetAudience.trim() || undefined,
+        audienceStage: form.audienceStage || undefined,
+        targetCountries: form.targetCountries.split(",").map(s => s.trim()).filter(Boolean),
+        targetSearchEngines: form.targetSearchEngines.split(",").map(s => s.trim()).filter(Boolean),
+      };
+      
+      const updatedMetadataJson = {
+        ...existingMetadata,
+        contentOps: {
+          ...existingContentOps,
+          primaryKeyword: form.primaryKeyword.trim() || existingContentOps.primaryKeyword,
+          secondaryKeywords: form.secondaryKeywords.split(",").map(s => s.trim()).filter(Boolean),
+          seo: {
+            ...existingContentOps.seo,
+            ...seoData,
+          },
+        },
+      };
+      
       const res = await fetch(`/api/admin/topics/${topic.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -83,6 +119,7 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
           suitableFor: topic.suitableFor,
           tags: topic.tags,
           heroBadges: topic.heroBadges,
+          metadataJson: updatedMetadataJson,
         }),
       });
       const data = await res.json();
@@ -338,6 +375,81 @@ export default function TopicEditorClient({ topic }: { topic: Topic }) {
               <textarea value={form.seoDescription} onChange={e => setForm(f => ({ ...f, seoDescription: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm" rows={2} placeholder="留空则使用简介" />
             </div>
           </div>
+
+          {/* v1.20.42.18.6.16.6.81: SEO / GEO 设置 */}
+          <div className="border-t pt-4 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-700">SEO / GEO 设置</h2>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+              <input value={form.metaKeywords} onChange={e => setForm(f => ({ ...f, metaKeywords: e.target.value }))}
+                className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="逗号分隔，5-15 个关键词" />
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xs text-gray-500">逗号分隔，5-15 个关键词</span>
+                {form.metaKeywords && (
+                  <span className={`text-xs ${form.metaKeywords.split(",").filter(Boolean).length > 15 ? 'text-red-600' : 'text-gray-500'}`}>
+                    ⚠️ 当前 {form.metaKeywords.split(",").filter(Boolean).length} 个关键词
+                    {form.metaKeywords.split(",").filter(Boolean).length > 15 && ' — 超过 15 个'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Primary Keyword</label>
+                <input value={form.primaryKeyword} onChange={e => setForm(f => ({ ...f, primaryKeyword: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="主关键词" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Search Intent</label>
+                <select value={form.searchIntent} onChange={e => setForm(f => ({ ...f, searchIntent: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="informational">informational</option>
+                  <option value="navigational">navigational</option>
+                  <option value="transactional">transactional</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Secondary Keywords</label>
+              <input value={form.secondaryKeywords} onChange={e => setForm(f => ({ ...f, secondaryKeywords: e.target.value }))}
+                className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="逗号分隔，5-10 个关键词" />
+              <span className="text-xs text-gray-500 mt-1 block">逗号分隔，5-10 个关键词</span>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+              <input value={form.targetAudience} onChange={e => setForm(f => ({ ...f, targetAudience: e.target.value }))}
+                className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="如：准备出国的留学生和家长" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Audience Stage</label>
+                <select value={form.audienceStage} onChange={e => setForm(f => ({ ...f, audienceStage: e.target.value }))} className="w-full px-3 py-2 border rounded-lg text-sm">
+                  <option value="未出海了解阶段">未出海了解阶段</option>
+                  <option value="准备出国阶段">准备出国阶段</option>
+                  <option value="已在海外阶段">已在海外阶段</option>
+                  <option value="家长/亲属关注阶段">家长/亲属关注阶段</option>
+                  <option value="跨境经营阶段">跨境经营阶段</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Target Countries</label>
+                <input value={form.targetCountries} onChange={e => setForm(f => ({ ...f, targetCountries: e.target.value }))}
+                  className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="逗号分隔，如：加拿大,美国,英国" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Target Search Engines</label>
+              <input value={form.targetSearchEngines} onChange={e => setForm(f => ({ ...f, targetSearchEngines: e.target.value }))}
+                className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="逗号分隔，如：Google,Baidu,Bing" />
+              <span className="text-xs text-gray-500 mt-1 block">逗号分隔，如：Google,Baidu,Bing,360,Sogou</span>
+            </div>
+          </div>
+
           <div className="flex gap-2">
             <button onClick={saveBasic} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 min-h-[48px]">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
