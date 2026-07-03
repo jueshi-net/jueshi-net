@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { isAdmin } from "@/lib/admin-auth";
 import { CalendarDays, Eye, Clock, ArrowLeft, Wrench, ArrowRight, BookOpen, Home } from "lucide-react";
 import Link from "next/link";
 import TaskChainCta from "@/components/content/task-chain-cta";
@@ -79,10 +79,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
 
-  // v1.20.42.18.6.16.6.74: Preview auth hardening in metadata
+  // v1.20.42.18.6.16.6.84.3.17: Use unified admin auth helper
   if (previewMode) {
-    const session = await auth();
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAdminUser = await isAdmin();
+    if (!isAdminUser) {
       return { title: "未找到指南" };
     }
   }
@@ -148,10 +148,10 @@ export default async function ArticlePage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const previewMode = sp.preview === "true";
 
-  // v1.20.42.18.6.16.6.74: Preview auth hardening - require admin session for draft preview
+  // v1.20.42.18.6.16.6.84.3.17: Use unified admin auth helper for draft preview
   if (previewMode) {
-    const session = await auth();
-    if (!session || (session.user as any)?.role !== "admin") {
+    const isAdminUser = await isAdmin();
+    if (!isAdminUser) {
       notFound();
     }
   }

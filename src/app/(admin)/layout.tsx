@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { auth } from "@/lib/auth";
+import { isAdmin } from "@/lib/admin-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -88,10 +88,10 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await import("@/lib/auth").then(m => m.auth());
   if (!session?.user) redirect("/login?reason=no-session");
-  const role = (session.user as any).role || "";
-  if (!["管理员", "ADMIN", "admin"].includes(role)) {
+  const isAdminUser = await isAdmin();
+  if (!isAdminUser) {
     redirect("/dashboard?error=not-admin");
   }
 
