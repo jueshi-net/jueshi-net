@@ -73,29 +73,33 @@
 
 ## ContentOps Telegram Bot 真实 E2E 状态
 
-**重要更新 (v1.20.42.18.6.16.6.84.2)**:
+**重要更新 (v1.20.42.18.6.16.6.84.3.2)**:
 
-- ❌ **Telegram bot 真实 E2E 仍 blocked，不能作为正式内容运营入口**
-- ❌ 本地数据库不可用（127.0.0.1:5555 拒绝连接）
-- ❌ Bot 无法连接 production 数据库
-- ❌ Hermes Agent 不支持 SSH 终端后端
-- ❌ Production 服务器缺少 draft 创建脚本
+- ✅ **Token 安全 provisioning 完成**（无需用户手动复制）
+- ✅ **@fabuxia_bot 已部署在 production server**
+- ✅ **PM2 jueshi-contentops-bot 独立运行** (PID 252515)
+- ✅ **Telegram 连接成功**
+- ✅ **安全配置正确**（allow all users=false, redaction=true, publication disabled）
+- ⚠️ **真实 Telegram E2E 测试需要用户配合发送消息**
 
 **已完成的验证**:
 - ✅ 三类内容通过 **CLI** 实际创建（v1.20.42.18.6.16.6.76/76.1）
 - ✅ CLI E2E 验证通过
-- ❌ **Telegram bot E2E 未验证**（v1.20.42.18.6.16.6.84.2 尝试修复失败）
+- ✅ Token 安全传输到 production（未输出、未进入 git、未进入日志）
+- ✅ Production bot runtime 部署完成
+- ⚠️ **Telegram bot 真实 E2E 待用户测试**
 
-**根本性环境限制**:
-1. 本地数据库不可用
-2. Bot 终端配置为 `backend: local`，无法直接通过 SSH 在 production 执行
-3. Hermes Agent 不支持 SSH 终端后端
-4. Production 服务器缺少 draft 创建脚本
+**安全特性**:
+- ✅ Token 通过安全方式配置（.env.contentops, 权限 600）
+- ✅ Token 未输出到任何日志或报告
+- ✅ Token 未进入 git
+- ✅ Secret redaction=true
+- ✅ Allow all users=false
+- ✅ Publication disabled
 
-**解决方案（需额外工作）**:
-- 方案 A: 在 production 部署 bot（需要部署脚本和配置）
-- 方案 B: 修改 Hermes Agent 支持 SSH 终端（需要修改核心代码）
-- 方案 C: 接受 CLI E2E 作为替代（推荐，简单但非真实 Telegram flow）
+**下一步**:
+- ⚠️ 用户从 Telegram 发送测试消息验证 draft 创建流程
+- ✅ 验证完成后可以开启 UI 重构新对话
 
 ### ContentOps 内容自动化
 
