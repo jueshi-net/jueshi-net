@@ -24,9 +24,9 @@
 - ✅ scripts/create-contentops-draft.ts 实现
 - ✅ scripts/validate-contentops-draft.ts 实现
 - ✅ scripts/list-contentops-drafts.ts 实现
-- ✅ Checklist draft 创建 E2E 验证通过
-- ✅ Guide draft 创建 E2E 验证通过
-- ✅ Topic draft 创建 E2E 验证通过
+- ✅ Checklist draft 创建 CLI E2E 验证通过（v1.20.42.18.6.16.6.76）
+- ✅ Guide draft 创建 CLI E2E 验证通过（v1.20.42.18.6.16.6.76.1）
+- ✅ Topic draft 创建 CLI E2E 验证通过（v1.20.42.18.6.16.6.76.1）
 
 ### ContentOps Telegram Bot
 
@@ -71,11 +71,31 @@
 
 ## 未完成节点
 
-### ContentOps Telegram Bot 实际 E2E
+## ContentOps Telegram Bot 真实 E2E 状态
 
-- ⚠️ 由于本地数据库不可用，@fabuxia_bot 实际创建 draft 的 E2E 验证被阻塞
-- ⚠️ 需要用户手动从 Telegram 发送消息测试
-- ⚠️ 或通过 SSH 连接 production 数据库测试
+**重要更新 (v1.20.42.18.6.16.6.84.2)**:
+
+- ❌ **Telegram bot 真实 E2E 仍 blocked，不能作为正式内容运营入口**
+- ❌ 本地数据库不可用（127.0.0.1:5555 拒绝连接）
+- ❌ Bot 无法连接 production 数据库
+- ❌ Hermes Agent 不支持 SSH 终端后端
+- ❌ Production 服务器缺少 draft 创建脚本
+
+**已完成的验证**:
+- ✅ 三类内容通过 **CLI** 实际创建（v1.20.42.18.6.16.6.76/76.1）
+- ✅ CLI E2E 验证通过
+- ❌ **Telegram bot E2E 未验证**（v1.20.42.18.6.16.6.84.2 尝试修复失败）
+
+**根本性环境限制**:
+1. 本地数据库不可用
+2. Bot 终端配置为 `backend: local`，无法直接通过 SSH 在 production 执行
+3. Hermes Agent 不支持 SSH 终端后端
+4. Production 服务器缺少 draft 创建脚本
+
+**解决方案（需额外工作）**:
+- 方案 A: 在 production 部署 bot（需要部署脚本和配置）
+- 方案 B: 修改 Hermes Agent 支持 SSH 终端（需要修改核心代码）
+- 方案 C: 接受 CLI E2E 作为替代（推荐，简单但非真实 Telegram flow）
 
 ### ContentOps 内容自动化
 
@@ -174,8 +194,19 @@ bot 禁止命令仍被拒绝: ✓
 - ❌ 批量创建内容
 - ❌ 创建超过指定数量的 draft
 
-### 严格限制
+### Bot 操作边界
 
+**Bot 默认行为**:
+- ✅ 默认只 dry-run（生成 payload 但不实际创建）
+- ✅ Production draft 默认关闭
+- ✅ 每次创建 draft 必须用户确认
+- ✅ 创建后立即关闭 production draft
+- ✅ 公开发布必须后台人工审核
+- ✅ Bot 不自动发布
+- ✅ Bot 不提交搜索引擎
+- ✅ Bot 不执行开发/部署命令
+
+**Bot 严格限制**:
 - ⚠️ Production draft 创建需要用户明确批准
 - ⚠️ 每次最多创建指定数量 draft（默认 1 篇）
 - ⚠️ 创建后立即关闭 production draft 开关
@@ -255,11 +286,19 @@ bot 禁止命令仍被拒绝: ✓
 Jueshi ContentOps 项目基线已冻结：
 
 - ✅ 已完成节点：ContentOps 基础设施、Draft Creator CLI、Telegram Bot、安全锁定、Publishing SOP、内容发布
-- ⚠️ 未完成节点：Telegram Bot 实际 E2E、内容自动化、内容质量、内容审核
+- ❌ 未完成节点：**三类内容未通过真实 Telegram bot E2E 创建**（CLI E2E 已完成，但 Telegram bot E2E 被阻塞）
 - ✅ 当前安全状态：安全锁定完成
 - ✅ 当前发布能力边界：明确定义
 - ✅ 禁止事项：明确定义
+- ✅ Bot 操作边界：明确定义（默认只 dry-run，production draft 默认关闭）
 - ✅ 下一阶段 UI 重构规划：另开新对话
+
+**重要说明**:
+- ✅ 三类内容通过 **CLI** 实际创建（v1.20.42.18.6.16.6.76/76.1）
+- ❌ 三类内容**未通过 @fabuxia_bot** 实际创建（v1.20.42.18.6.16.6.84.2 尝试修复失败）
+- ❌ CLI E2E ≠ Telegram bot E2E
+- ❌ **Telegram bot 真实 E2E 仍 blocked，不能作为正式内容运营入口**
+- ⚠️ 需要在 production 部署 bot 或修改 Hermes Agent 才能实现真实 Telegram flow E2E
 
 **状态**: BASELINE FROZEN  
 **最后更新**: 2026-07-03

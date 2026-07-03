@@ -1,6 +1,6 @@
 # ContentOps Publishing SOP (Standard Operating Procedure)
 
-**版本**: v1.20.42.18.6.16.6.84  
+**版本**: v1.20.42.18.6.16.6.84.2  
 **日期**: 2026-07-03  
 **状态**: FROZEN
 
@@ -9,6 +9,39 @@
 ## 概述
 
 本文档定义了 ContentOps Telegram Bot 的发布标准操作流程（SOP）。所有操作必须严格遵循本 SOP，不得违反。
+
+---
+
+## Telegram Bot 真实 E2E 状态
+
+**重要更新 (v1.20.42.18.6.16.6.84.2)**:
+
+- ❌ **Telegram bot 真实 E2E 仍 blocked，不能作为正式内容运营入口**
+- ❌ 本地数据库不可用（127.0.0.1:5555 拒绝连接）
+- ❌ Bot 无法连接 production 数据库
+- ❌ Hermes Agent 不支持 SSH 终端后端
+- ❌ Production 服务器缺少 draft 创建脚本
+
+**已完成的验证**:
+- ✅ 三类内容通过 **CLI** 实际创建（v1.20.42.18.6.16.6.76/76.1）
+- ✅ CLI E2E 验证通过
+- ❌ **Telegram bot E2E 未验证**（v1.20.42.18.6.16.6.84.2 尝试修复失败）
+
+**根本性环境限制**:
+1. 本地数据库不可用
+2. Bot 终端配置为 `backend: local`，无法直接通过 SSH 在 production 执行
+3. Hermes Agent 不支持 SSH 终端后端
+4. Production 服务器缺少 draft 创建脚本
+
+**解决方案（需额外工作）**:
+- 方案 A: 在 production 部署 bot（需要部署脚本和配置）
+- 方案 B: 修改 Hermes Agent 支持 SSH 终端（需要修改核心代码）
+- 方案 C: 接受 CLI E2E 作为替代（推荐，简单但非真实 Telegram flow）
+
+**操作建议**:
+- ⚠️ 在 Telegram bot 真实 E2E 验证通过之前，不建议将 bot 作为正式内容运营入口
+- ✅ 可以使用 CLI 创建 draft，然后在后台审核和发布
+- ⚠️ 如需实现真实 Telegram flow E2E，需要先解决上述环境限制
 
 ---
 
