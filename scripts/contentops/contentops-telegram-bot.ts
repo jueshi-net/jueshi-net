@@ -226,14 +226,19 @@ function extractTitle(text: string, mode: InputMode): string {
 
     // Priority 2.5: For reference_rewrite, detect category lists and generate SEO-friendly titles
     if (mode === 'reference_rewrite') {
-      // Detect if content is a comma-separated category list (e.g., "出行、支付、住宿、吃饭、学习、社交、安全")
-      const categoryListMatch = text.match(/^[\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}/);
-      if (categoryListMatch) {
-        // Check if it's APP/tool related
-        if (/APP|app|应用|工具|软件/i.test(text)) {
+      // Check if content is APP/tool related (anywhere in text)
+      const isAppRelated = /APP|app|应用|工具|软件/i.test(text);
+      
+      // Detect if content contains a comma-separated category list (e.g., "出行、支付、住宿、吃饭、学习、社交、安全")
+      // Search anywhere in text, not just at the beginning
+      const categoryListMatch = text.match(/[\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}/);
+      
+      if (categoryListMatch || isAppRelated) {
+        // If APP/tool related, return SEO-friendly title
+        if (isAppRelated) {
           return '海外必备 APP 推荐指南';
         }
-        // Check if it's lifestyle/daily life related
+        // If lifestyle/daily life category list
         if (/生活|日常|出行|支付|住宿|吃饭|社交|安全/i.test(text)) {
           return '海外生活实用指南';
         }
