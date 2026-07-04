@@ -12,7 +12,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { createHash } from 'crypto';
 import { execSync } from 'child_process';
-import { analyzeAndPlan, modifyPlan, AIPlan, InputMode as AIInputMode } from './hermes-ai-adapter';
+import { analyzeAndPlan, modifyPlan, HermesRunResult, InputMode as GatewayInputMode } from './hermes-gateway-client';
 
 // ============================================================================
 // Configuration
@@ -112,7 +112,7 @@ interface PendingDraft {
   createdAt: number;
   confirmed: boolean;
   // AI Plan (optional, for AI-powered planning)
-  aiPlan?: any;
+  hermesPlan?: HermesRunResult;
 }
 
 // ============================================================================
@@ -749,18 +749,18 @@ class CommandRouterV2 {
     const { mode, contentType: detectedType } = classifyInput(text);
 
     // Try AI-powered planning first
-    let aiPlan: AIPlan | null = null;
+    let hermesPlan: HermesRunResult | null = null;
     try {
-      aiPlan = await analyzeAndPlan(text, mode as AIInputMode);
+      hermesPlan = await analyzeAndPlan(text, mode as GatewayInputMode);
       
-      if (aiPlan && aiPlan.aiPlanningUsed && !aiPlan.fallbackUsed) {
+      if (hermesPlan && hermesPlan.planningUsed && !hermesPlan.fallbackUsed) {
         // AI planning succeeded
-        return this.handleAIPlan(chatId, aiPlan, mode);
+        return this.handleHermesPlan(chatId, hermesPlan, mode);
       }
     } catch (error: any) {
-      console.error('AI planning failed, falling back to rules:', error.message);
+      console.error('Hermes planning failed, falling back to rules:', error.message);
       writeAuditLog({
-        action: 'ai_planning_failed',
+        action: 'hermes_planning_failed',
         chatId,
         error: error.message,
         fallback: true,
@@ -771,77 +771,78 @@ class CommandRouterV2 {
     return this.handleRuleBasedProcessing(chatId, text, mode, detectedType!);
   }
 
-  private async handleAIPlan(chatId: string, aiPlan: AIPlan, mode: InputMode): Promise<{ success: boolean; message: string }> {
-    const traceId = aiPlan.traceId;
+  private async handleHermesPlan(chatId: string, hermesPlan: HermesRunResult, mode: InputMode): Promise<{ success: boolean; message: string }> {
+    const traceId = hermesPlan.hermesRunId;
     
-    // Build pending draft from AI plan
+    // Build pending draft from Hermes plan
     const pending: PendingDraft = {
       traceId,
       inputMode: mode,
-      contentType: aiPlan.contentType,
-      title: aiPlan.title,
-      slug: aiPlan.seo.slug || generateSlug(aiPlan.title, aiPlan.contentType),
-      targetAudience: aiPlan.targetAudience,
-      targetCountries: aiPlan.targetCountries,
-      audienceStage: aiPlan.audienceStage,
-      searchIntent: aiPlan.searchIntent,
-      primaryKeyword: aiPlan.seo.primaryKeyword,
-      secondaryKeywords: aiPlan.seo.secondaryKeywords,
-      metaKeywords: aiPlan.seo.metaKeywords.join(', '),
-      summary: (aiPlan.content as any).intro || '',
-      steps: (aiPlan.content as any).steps,
-      body: (aiPlan.content as any).body,
-      faq: (aiPlan.content as any).faq || [],
-      pitfalls: (aiPlan.content as any).pitfalls || [],
-      internalLinks: ((aiPlan.content as any).internalLinks || []).map((l: any) => l.url),
-      relatedTools: (aiPlan.content as any).relatedTools || [],
-      qualityScore: aiPlan.qualityGate.score,
-      qualityGate: aiPlan.qualityGate,
-      sourceFactsCount: aiPlan.sourceFacts.length,
-      rewrittenStructure: mode === 'reference_rewrite' ? 'AI 基于参考资料重组结构' : 'AI 原创生成',
-      estimatedWordCount: ((aiPlan.content as any).intro || '').length,
-      originalityNotice: mode === 'reference_rewrite' ? 'AI 已基于资料重组，不会逐句照搬' : 'AI 原创内容',
+      contentType: hermesPlan.contentType,
+      title: hermesPlan.title,
+      slug: hermesPlan.seo.slug || generateSlug(hermesPlan.title, hermesPlan.contentType),
+      targetAudience: hermesPlan.targetAudience,
+      targetCountries: hermesPlan.targetCountries,
+      audienceStage: hermesPlan.audienceStage,
+      searchIntent: hermesPlan.searchIntent,
+      primaryKeyword: hermesPlan.seo.primaryKeyword,
+      secondaryKeywords: hermesPlan.seo.secondaryKeywords,
+      metaKeywords: hermesPlan.seo.metaKeywords.join(', '),
+      summary: (hermesPlan.content as any).intro || '',
+      steps: (hermesPlan.content as any).steps,
+      body: (hermesPlan.content as any).body,
+      faq: (hermesPlan.content as any).faq || [],
+      pitfalls: (hermesPlan.content as any).pitfalls || [],
+      internalLinks: ((hermesPlan.content as any).internalLinks || []).map((l: any) => l.url),
+      relatedTools: (hermesPlan.content as any).relatedTools || [],
+      qualityScore: hermesPlan.qualityGate.score,
+      qualityGate: hermesPlan.qualityGate,
+      sourceFactsCount: hermesPlan.sourceFacts.length,
+      rewrittenStructure: mode === 'reference_rewrite' ? 'Hermes 基于参考资料重组结构' : 'Hermes 原创生成',
+      estimatedWordCount: ((hermesPlan.content as any).intro || '').length,
+      originalityNotice: mode === 'reference_rewrite' ? 'Hermes 已基于资料重组，不会逐句照搬' : 'Hermes 原创内容',
       createdAt: Date.now(),
       confirmed: false,
-      // Store AI plan for later use
-      aiPlan: aiPlan,
+      // Store Hermes plan for later use
+      hermesPlan: hermesPlan,
     };
 
     this.pendingDrafts.set(chatId, pending);
 
     writeAuditLog({
-      action: 'ai_dry_run',
+      action: 'hermes_dry_run',
       chatId,
       traceId,
       inputMode: mode,
-      contentType: aiPlan.contentType,
-      title: aiPlan.title,
-      qualityScore: aiPlan.qualityGate.score,
-      qualityPass: aiPlan.qualityGate.pass,
-      aiPlanningUsed: true,
-      fallbackUsed: false,
+      contentType: hermesPlan.contentType,
+      title: hermesPlan.title,
+      qualityScore: hermesPlan.qualityGate.score,
+      qualityPass: hermesPlan.qualityGate.pass,
+      hermesGatewayUsed: hermesPlan.gatewayUsed,
+      planningUsed: hermesPlan.planningUsed,
+      fallbackUsed: hermesPlan.fallbackUsed,
     });
 
     return { success: true, message: formatDryRunV2(pending) };
   }
 
   private async handleModification(chatId: string, modificationText: string, currentPlan: PendingDraft): Promise<{ success: boolean; message: string }> {
-    if (!currentPlan.aiPlan) {
-      return { success: false, message: '❌ 当前 draft 不支持 AI 修改，请重新发送内容。' };
+    if (!currentPlan.hermesPlan) {
+      return { success: false, message: '❌ 当前 draft 不支持 Hermes 修改，请重新发送内容。' };
     }
 
     try {
-      const modifiedPlan = await modifyPlan(currentPlan.aiPlan, modificationText);
+      const modifiedPlan = await modifyPlan(currentPlan.hermesPlan, modificationText);
       
       if (modifiedPlan.fallbackUsed) {
-        return { success: false, message: '❌ AI 修改失败，请重试或重新发送内容。' };
+        return { success: false, message: '❌ Hermes 修改失败，请重试或重新发送内容。' };
       }
 
       // Update pending draft with modified plan
-      return this.handleAIPlan(chatId, modifiedPlan, currentPlan.inputMode);
+      return this.handleHermesPlan(chatId, modifiedPlan, currentPlan.inputMode);
     } catch (error: any) {
-      console.error('AI modification failed:', error.message);
-      return { success: false, message: `❌ AI 修改失败：${error.message}` };
+      console.error('Hermes modification failed:', error.message);
+      return { success: false, message: `❌ Hermes 修改失败：${error.message}` };
     }
   }
 
@@ -922,7 +923,8 @@ class CommandRouterV2 {
       title,
       qualityScore: qualityGate.score,
       qualityPass: qualityGate.pass,
-      aiPlanningUsed: false,
+      hermesGatewayUsed: false,
+      planningUsed: false,
       fallbackUsed: true,
     });
 
