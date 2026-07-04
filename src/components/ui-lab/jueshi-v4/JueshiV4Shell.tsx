@@ -7,11 +7,14 @@ import JueshiV4Hero from './JueshiV4Hero';
 import JueshiV4ScenarioSection from './JueshiV4ScenarioSection';
 import JueshiV4ToolGrid from './JueshiV4ToolGrid';
 import JueshiV4ContentSection from './JueshiV4ContentSection';
-import JueshiV4RightRail from './JueshiV4RightRail';
+import JueshiV4ProfileRail from './JueshiV4ProfileRail';
+import JueshiV4BottomNav from './JueshiV4BottomNav';
+import JueshiV4MobileProfileCard from './JueshiV4MobileProfileCard';
 
 export default function JueshiV4Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('home');
+  const [activeTab, setActiveTab] = useState('home');
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
@@ -23,7 +26,7 @@ export default function JueshiV4Shell() {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - desktop only */}
       <JueshiV4Sidebar
         activeNav={activeNav}
         onNavChange={setActiveNav}
@@ -39,8 +42,11 @@ export default function JueshiV4Shell() {
         {/* Content area with optional right rail */}
         <div className="flex">
           {/* Main content */}
-          <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8">
+          <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
             <div className="max-w-[1180px] mx-auto">
+              {/* Mobile profile card */}
+              <JueshiV4MobileProfileCard />
+
               {/* Hero */}
               <JueshiV4Hero />
 
@@ -55,14 +61,17 @@ export default function JueshiV4Shell() {
             </div>
           </main>
 
-          {/* Right rail - only visible on wide screens */}
+          {/* Right rail - Profile center, only visible on wide screens */}
           <aside className="hidden xl:block w-80 flex-shrink-0 p-6 border-l border-[#E8ECF3]">
             <div className="sticky top-20">
-              <JueshiV4RightRail />
+              <JueshiV4ProfileRail />
             </div>
           </aside>
         </div>
       </div>
+
+      {/* Bottom navigation - mobile only */}
+      <JueshiV4BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }
