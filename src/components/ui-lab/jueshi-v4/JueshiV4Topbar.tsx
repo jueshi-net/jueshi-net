@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Bell, User, Menu } from "lucide-react";
+import { Search, Bell, Menu } from "lucide-react";
 
 interface JueshiV4TopbarProps {
   onMenuClick: () => void;

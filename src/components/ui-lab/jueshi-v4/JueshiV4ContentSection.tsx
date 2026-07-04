@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Clock, Eye } from "lucide-react";
 
 const articles = [
@@ -46,15 +47,15 @@ export default function JueshiV4ContentSection() {
           <h2 className="text-2xl font-bold text-white">推荐内容</h2>
           <p className="text-sm text-gray-400 mt-1">留学指南、物流攻略、生活技巧</p>
         </div>
-        <a href="/guides" className="text-sm text-[#6c5dd3] hover:text-[#ab99ff] transition-colors">
+        <Link href="/guides" className="text-sm text-[#6c5dd3] hover:text-[#ab99ff] transition-colors">
           查看全部 →
-        </a>
+        </Link>
       </div>
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {articles.map((article) => (
-          <a
+          <Link
             key={article.title}
             href="/guides"
             className="group bg-[#2a2d35] border border-[#3a3e45] rounded-xl overflow-hidden hover:border-[#6c5dd3]/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300"
@@ -93,7 +94,7 @@ export default function JueshiV4ContentSection() {
                 </span>
               </div>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
