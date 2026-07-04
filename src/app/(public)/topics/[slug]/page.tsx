@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { parseYouTubeUrl, getYouTubeEmbedUrl, getYouTubeThumbnail } from "@/lib/youtube";
-import { getTopicBySlug as getCmsTopicBySlug, getAllTopicSlugs } from "@/lib/cms-utils";
+import { getTopicBySlug as getCmsTopicBySlug } from "@/lib/cms-utils";
 import SmartRelatedLinks from "@/components/smart-related-links";
 import TaskChainCta from "@/components/content/task-chain-cta";
 
@@ -33,11 +33,10 @@ import {
 
 const RATING_ORDER = ["S", "A", "B", "C", "D"] as const;
 
-// ─── Static params from CMS topics ───
-export function generateStaticParams() {
-  const cmsSlugs = getAllTopicSlugs();
-  return cmsSlugs.map(slug => ({ slug }));
-}
+// v1.20.42.18.6.16.6.84.3.21: Removed generateStaticParams to fix
+// "Page changed from static to dynamic at runtime" error caused by
+// await searchParams (preview mode). All topic pages are now dynamic.
+export const dynamic = "force-dynamic";
 
 // ===== Data fetching =====
 
@@ -285,9 +284,75 @@ export default async function TopicSlugPage({
     notFound();
   }
 
-  const items = topic.items;
-  const sections = topic.sections;
+  const items = topic.items || [];
+  const sections = topic.sections || [];
   const isDraft = topic.status === "draft";
+
+  // v1.20.42.18.6.16.6.84.3.21: If rating_list template has no items (e.g. draft from bot),
+  // show a simple preview page with metadataJson content instead of crashing.
+  if (items.length === 0 && previewMode) {
+    const contentOps = (topic.metadataJson as any)?.contentOps;
+    const faq = contentOps?.faq || [];
+    const pitfalls = contentOps?.pitfalls || [];
+    const internalLinks = contentOps?.internalLinks || [];
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6 mx-4 mt-4">
+          <p className="text-yellow-800 font-medium">
+            🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+          </p>
+          <p className="text-yellow-600 text-sm mt-1">
+            状态: {topic.status} | slug: {topic.slug} | items: 0 (草稿尚未填充 APP 数据)
+          </p>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 pb-16 space-y-6">
+          <div className="bg-white rounded-xl border p-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">{topic.title}</h1>
+            {topic.subtitle && <p className="text-gray-600 mb-4">{topic.subtitle}</p>}
+            {topic.summary && <p className="text-gray-700 leading-relaxed">{topic.summary}</p>}
+          </div>
+          {faq.length > 0 && (
+            <div className="bg-white rounded-xl border p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">常见问题</h2>
+              <div className="space-y-3">
+                {faq.map((item: any, i: number) => (
+                  <div key={i}>
+                    <p className="font-medium text-gray-900">Q: {item.question}</p>
+                    <p className="text-gray-600 text-sm mt-1">A: {item.answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {pitfalls.length > 0 && (
+            <div className="bg-white rounded-xl border p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">避坑提醒</h2>
+              <ul className="space-y-2">
+                {pitfalls.map((item: string, i: number) => (
+                  <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
+                    <span className="text-orange-500 mt-0.5">⚠️</span> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {internalLinks.length > 0 && (
+            <div className="bg-white rounded-xl border p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">相关链接</h2>
+              <ul className="space-y-2">
+                {internalLinks.map((link: string, i: number) => (
+                  <li key={i}>
+                    <Link href={link} className="text-sm text-teal-600 hover:underline">{link}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   // Parse data fields
   const suitableFor = (topic.suitableFor as string[] | null) || [];
