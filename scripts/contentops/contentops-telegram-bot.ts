@@ -187,7 +187,14 @@ function classifyInput(text: string): { mode: InputMode; contentType: ContentTyp
   // Infer from input mode
   if (!contentType) {
     if (mode === 'messy_notes') contentType = 'checklist';
-    else if (mode === 'reference_rewrite') contentType = 'guide';
+    else if (mode === 'reference_rewrite') {
+      // For reference_rewrite, check if content is about recommendations/tools/apps
+      if (/推荐|清单|合集|盘点|工具|APP|app|软件|应用/i.test(trimmed)) {
+        contentType = 'topic';
+      } else {
+        contentType = 'guide';
+      }
+    }
     else if (mode === 'long_text') contentType = 'guide';
     else contentType = 'checklist'; // default
   }
