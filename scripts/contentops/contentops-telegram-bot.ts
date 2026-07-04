@@ -12,6 +12,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { createHash } from 'crypto';
 import { execSync } from 'child_process';
+import { analyzeAndPlan, modifyPlan, AIPlan, InputMode as AIInputMode } from './hermes-ai-adapter';
 
 // ============================================================================
 // Configuration
@@ -76,6 +77,7 @@ interface QualityResult {
   failures: string[];
   warnings: string[];
 }
+}
 
 interface PendingDraft {
   traceId: string;
@@ -110,6 +112,8 @@ interface PendingDraft {
   // Metadata
   createdAt: number;
   confirmed: boolean;
+  // AI Plan (optional, for AI-powered planning)
+  aiPlan?: any;
 }
 
 // ============================================================================
@@ -735,20 +739,125 @@ class CommandRouterV2 {
       return { success: false, message: '⛔ 未授权访问。' };
     }
 
-    // Classify input
-    const { mode, contentType: detectedType, confidence } = classifyInput(text);
+    // Check if this is a modification request for pending draft
+    const existingPending = this.pendingDrafts.get(chatId);
+    if (existingPending && !/^(确认创建|取消)$/.test(text.trim())) {
+      // This is a modification request
+      return this.handleModification(chatId, text, existingPending);
+    }
 
-    // Extract metadata
+    // Classify input mode (legacy fallback)
+    const { mode, contentType: detectedType } = classifyInput(text);
+
+    // Try AI-powered planning first
+    let aiPlan: AIPlan | null = null;
+    try {
+      aiPlan = await analyzeAndPlan(text, mode as AIInputMode);
+      
+      if (aiPlan && aiPlan.aiPlanningUsed && !aiPlan.fallbackUsed) {
+        // AI planning succeeded
+        return this.handleAIPlan(chatId, aiPlan, mode);
+      }
+    } catch (error: any) {
+      console.error('AI planning failed, falling back to rules:', error.message);
+      writeAuditLog({
+        action: 'ai_planning_failed',
+        chatId,
+        error: error.message,
+        fallback: true,
+      });
+    }
+
+    // Fallback to rule-based processing
+    return this.handleRuleBasedProcessing(chatId, text, mode, detectedType!);
+  }
+
+  private async handleAIPlan(chatId: string, aiPlan: AIPlan, mode: InputMode): Promise<{ success: boolean; message: string }> {
+    const traceId = aiPlan.traceId;
+    
+    // Build pending draft from AI plan
+    const pending: PendingDraft = {
+      traceId,
+      inputMode: mode,
+      contentType: aiPlan.contentType,
+      title: aiPlan.title,
+      slug: aiPlan.seo.slug || generateSlug(aiPlan.title, aiPlan.contentType),
+      targetAudience: aiPlan.targetAudience,
+      targetCountries: aiPlan.targetCountries,
+      audienceStage: aiPlan.audienceStage,
+      searchIntent: aiPlan.searchIntent,
+      primaryKeyword: aiPlan.seo.primaryKeyword,
+      secondaryKeywords: aiPlan.seo.secondaryKeywords,
+      metaKeywords: aiPlan.seo.metaKeywords.join(', '),
+      summary: (aiPlan.content as any).intro || '',
+      steps: (aiPlan.content as any).steps,
+      body: (aiPlan.content as any).body,
+      faq: (aiPlan.content as any).faq || [],
+      pitfalls: (aiPlan.content as any).pitfalls || [],
+      internalLinks: ((aiPlan.content as any).internalLinks || []).map((l: any) => l.url),
+      relatedTools: (aiPlan.content as any).relatedTools || [],
+      qualityScore: aiPlan.qualityGate.score,
+      qualityGate: aiPlan.qualityGate,
+      sourceFactsCount: aiPlan.sourceFacts.length,
+      rewrittenStructure: mode === 'reference_rewrite' ? 'AI 基于参考资料重组结构' : 'AI 原创生成',
+      estimatedWordCount: ((aiPlan.content as any).intro || '').length,
+      originalityNotice: mode === 'reference_rewrite' ? 'AI 已基于资料重组，不会逐句照搬' : 'AI 原创内容',
+      createdAt: Date.now(),
+      confirmed: false,
+      // Store AI plan for later use
+      aiPlan: aiPlan,
+    };
+
+    this.pendingDrafts.set(chatId, pending);
+
+    writeAuditLog({
+      action: 'ai_dry_run',
+      chatId,
+      traceId,
+      inputMode: mode,
+      contentType: aiPlan.contentType,
+      title: aiPlan.title,
+      qualityScore: aiPlan.qualityGate.score,
+      qualityPass: aiPlan.qualityGate.pass,
+      aiPlanningUsed: true,
+      fallbackUsed: false,
+    });
+
+    return { success: true, message: formatDryRunV2(pending) };
+  }
+
+  private async handleModification(chatId: string, modificationText: string, currentPlan: PendingDraft): Promise<{ success: boolean; message: string }> {
+    if (!currentPlan.aiPlan) {
+      return { success: false, message: '❌ 当前 draft 不支持 AI 修改，请重新发送内容。' };
+    }
+
+    try {
+      const modifiedPlan = await modifyPlan(currentPlan.aiPlan, modificationText);
+      
+      if (modifiedPlan.fallbackUsed) {
+        return { success: false, message: '❌ AI 修改失败，请重试或重新发送内容。' };
+      }
+
+      // Update pending draft with modified plan
+      return this.handleAIPlan(chatId, modifiedPlan, currentPlan.inputMode);
+    } catch (error: any) {
+      console.error('AI modification failed:', error.message);
+      return { success: false, message: `❌ AI 修改失败：${error.message}` };
+    }
+  }
+
+  private handleRuleBasedProcessing(chatId: string, text: string, mode: InputMode, detectedType: ContentType): { success: boolean; message: string } {
+    // Legacy rule-based processing
     const title = extractTitle(text, mode);
     const audience = extractTargetAudience(text);
     const countries = extractCountries(text);
     const stage = extractAudienceStage(text);
-    const slug = generateSlug(title, detectedType!);
+    const slug = generateSlug(title, detectedType);
 
     // Extract source facts (for long text / reference / messy)
     let facts: SourceFacts | null = null;
     if (mode === 'long_text' || mode === 'reference_rewrite' || mode === 'messy_notes') {
-      facts = extractSourceFacts(text, detectedType!);
+      facts = extractSourceFacts(text, detectedType);
     }
 
     // Generate content
@@ -767,7 +876,7 @@ class CommandRouterV2 {
     const metaKeywords = [primaryKeyword, ...secondaryKeywords].join(', ');
 
     // Quality gate
-    const qualityGate = validateQuality(detectedType!, { ...content, primaryKeyword });
+    const qualityGate = validateQuality(detectedType, { ...content, primaryKeyword });
 
     // Build pending draft
     const traceId = createHash('sha256').update(`${chatId}-${Date.now()}-${Math.random()}`).digest('hex').substring(0, 12);
@@ -776,7 +885,7 @@ class CommandRouterV2 {
     const pending: PendingDraft = {
       traceId,
       inputMode: mode,
-      contentType: detectedType!,
+      contentType: detectedType,
       title,
       slug,
       targetAudience: audience,
@@ -814,6 +923,8 @@ class CommandRouterV2 {
       title,
       qualityScore: qualityGate.score,
       qualityPass: qualityGate.pass,
+      aiPlanningUsed: false,
+      fallbackUsed: true,
     });
 
     return { success: true, message: formatDryRunV2(pending) };
