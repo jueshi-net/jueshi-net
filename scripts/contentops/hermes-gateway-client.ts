@@ -271,121 +271,114 @@ export async function modifyPlan(
   const hermesRunId = generateHermesRunId();
   const timestamp = new Date().toISOString();
 
-  const systemPrompt = `You are a content modification AI.
-The user has a content plan and wants to modify it based on their request.
-You must respond with valid JSON only, no markdown, no explanation.
-
-Return the modified plan with the same structure as the original.`;
-
-  const prompt = `Current plan:
-${JSON.stringify(currentPlan, null, 2)}
-
-User modification request:
-${modificationRequest}
-
-Please modify the plan according to the user's request.
-Remember to respond with valid JSON only.`;
-
-  let gatewayUsed = false;
-  let planningUsed = false;
-  let fallbackUsed = false;
-  let aiResponse: string;
-
-  // Try Hermes Gateway first
-  if (GATEWAY_CONFIG.enabled) {
-    try {
-      const gatewayResult = await callHermesGateway(prompt, systemPrompt);
-      gatewayUsed = true;
-      planningUsed = true;
-      fallbackUsed = false;
-      aiResponse = gatewayResult.result;
-    } catch (error: any) {
-      console.error('[HermesGateway] Gateway modification failed:', error.message);
-      
-      // Fallback to direct DeepSeek
-      try {
-        aiResponse = await callDeepSeekDirect(prompt, systemPrompt);
-        gatewayUsed = false;
-        planningUsed = true;
-        fallbackUsed = false;
-      } catch (fallbackError: any) {
-        console.error('[HermesGateway] Direct modification also failed:', fallbackError.message);
-        gatewayUsed = false;
-        planningUsed = false;
-        fallbackUsed = true;
-        
-        return {
-          ...currentPlan,
-          hermesRunId,
-          timestamp,
-          qualityGate: {
-            pass: false,
-            score: currentPlan.qualityGate.score,
-            failures: [...currentPlan.qualityGate.failures, `AI modification failed: ${fallbackError.message}`],
-            warnings: currentPlan.qualityGate.warnings || [],
-          },
-        };
-      }
-    }
-  } else {
-    // Gateway not enabled, use direct DeepSeek
-    try {
-      aiResponse = await callDeepSeekDirect(prompt, systemPrompt);
-      gatewayUsed = false;
-      planningUsed = true;
-      fallbackUsed = false;
-    } catch (error: any) {
-      console.error('[HermesGateway] Direct modification failed:', error.message);
-      gatewayUsed = false;
-      planningUsed = false;
-      fallbackUsed = true;
-      
-      return {
-        ...currentPlan,
-        hermesRunId,
-        timestamp,
-        qualityGate: {
-          pass: false,
-          score: currentPlan.qualityGate.score,
-          failures: [...currentPlan.qualityGate.failures, `AI modification failed: ${error.message}`],
-          warnings: currentPlan.qualityGate.warnings || [],
-        },
-      };
-    }
-  }
-
-  // Parse AI response
-  let modifiedPlan: any;
-  try {
-    const cleaned = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    modifiedPlan = JSON.parse(cleaned);
-  } catch (parseError) {
-    console.error('[HermesGateway] Failed to parse modification response:', aiResponse);
+  // Check if Hermes Job Bridge is enabled
+  if (!GATEWAY_CONFIG.enabled) {
+    console.log('[HermesGateway] Hermes Job Bridge not enabled for modification, returning unavailable');
     return {
       ...currentPlan,
       hermesRunId,
+      gatewayUsed: false,
+      planningUsed: false,
+      fallbackUsed: true,
       timestamp,
       qualityGate: {
         pass: false,
         score: currentPlan.qualityGate.score,
-        failures: [...currentPlan.qualityGate.failures, 'AI modification response is not valid JSON'],
+        failures: [...currentPlan.qualityGate.failures, 'Hermes Job Bridge not enabled'],
         warnings: currentPlan.qualityGate.warnings || [],
       },
     };
   }
 
-  // Rebuild quality gate
-  const qualityGate = buildQualityGate(modifiedPlan, modifiedPlan.content);
+  // Check bridge health
+  const health = checkBridgeHealth();
+  if (!health.healthy) {
+    console.log('[HermesGateway] Hermes Job Bridge unhealthy for modification:', health.message);
+    return {
+      ...currentPlan,
+      hermesRunId,
+      gatewayUsed: false,
+      planningUsed: false,
+      fallbackUsed: true,
+      timestamp,
+      qualityGate: {
+        pass: false,
+        score: currentPlan.qualityGate.score,
+        failures: [...currentPlan.qualityGate.failures, `Hermes Job Bridge unhealthy: ${health.message}`],
+        warnings: currentPlan.qualityGate.warnings || [],
+      },
+    };
+  }
 
-  return {
-    ...modifiedPlan,
-    hermesRunId,
-    gatewayUsed,
-    planningUsed,
-    fallbackUsed,
-    qualityGate,
-    timestamp,
-  };
+  // Submit modification job to Hermes
+  let jobId: string;
+  try {
+    jobId = submitJob('contentops_modify', currentPlan.inputMode, modificationRequest, currentPlan);
+    console.log('[HermesGateway] Modification job submitted:', jobId);
+  } catch (error: any) {
+    console.error('[HermesGateway] Failed to submit modification job:', error.message);
+    return {
+      ...currentPlan,
+      hermesRunId,
+      gatewayUsed: false,
+      planningUsed: false,
+      fallbackUsed: true,
+      timestamp,
+      qualityGate: {
+        pass: false,
+        score: currentPlan.qualityGate.score,
+        failures: [...currentPlan.qualityGate.failures, `Failed to submit modification job: ${error.message}`],
+        warnings: currentPlan.qualityGate.warnings || [],
+      },
+    };
+  }
+
+  // Poll for result
+  try {
+    const result = await pollJobResult(jobId);
+    
+    if (!result) {
+      return {
+        ...currentPlan,
+        hermesRunId,
+        gatewayUsed: false,
+        planningUsed: false,
+        fallbackUsed: true,
+        timestamp,
+        qualityGate: {
+          pass: false,
+          score: currentPlan.qualityGate.score,
+          failures: [...currentPlan.qualityGate.failures, 'Modification job returned empty result'],
+          warnings: currentPlan.qualityGate.warnings || [],
+        },
+      };
+    }
+
+    console.log('[HermesGateway] Modification job completed successfully');
+    return {
+      ...result,
+      hermesRunId,
+      gatewayUsed: true,
+      planningUsed: true,
+      fallbackUsed: false,
+    };
+  } catch (error: any) {
+    console.error('[HermesGateway] Modification job failed:', error.message);
+    return {
+      ...currentPlan,
+      hermesRunId,
+      gatewayUsed: false,
+      planningUsed: false,
+      fallbackUsed: true,
+      timestamp,
+      qualityGate: {
+        pass: false,
+        score: currentPlan.qualityGate.score,
+        failures: [...currentPlan.qualityGate.failures, `Modification job failed: ${error.message}`],
+        warnings: currentPlan.qualityGate.warnings || [],
+      },
+    };
+  }
 }
 
 // ============================================================================
