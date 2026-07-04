@@ -113,6 +113,8 @@ interface PendingDraft {
   confirmed: boolean;
   // AI Plan (optional, for AI-powered planning)
   hermesPlan?: HermesRunResult;
+  // Whether draft creation is allowed (requires Hermes to be available)
+  createAllowed?: boolean;
 }
 
 // ============================================================================
@@ -774,6 +776,9 @@ class CommandRouterV2 {
   private async handleHermesPlan(chatId: string, hermesPlan: HermesRunResult, mode: InputMode): Promise<{ success: boolean; message: string }> {
     const traceId = hermesPlan.hermesRunId;
     
+    // Check if Hermes is available
+    const createAllowed = hermesPlan.gatewayUsed && !hermesPlan.fallbackUsed;
+    
     // Build pending draft from Hermes plan
     const pending: PendingDraft = {
       traceId,
@@ -805,6 +810,8 @@ class CommandRouterV2 {
       confirmed: false,
       // Store Hermes plan for later use
       hermesPlan: hermesPlan,
+      // Mark if creation is allowed
+      createAllowed: createAllowed,
     };
 
     this.pendingDrafts.set(chatId, pending);
@@ -821,9 +828,19 @@ class CommandRouterV2 {
       hermesGatewayUsed: hermesPlan.gatewayUsed,
       planningUsed: hermesPlan.planningUsed,
       fallbackUsed: hermesPlan.fallbackUsed,
+      createAllowed: createAllowed,
     });
 
-    return { success: true, message: formatDryRunV2(pending) };
+    // Build message with createAllowed status
+    let message = formatDryRunV2(pending);
+    
+    if (!createAllowed) {
+      message += '\n\n⚠️ **内容生成服务未就绪**\n';
+      message += 'Hermes Agent 未启用或不可用，无法创建 draft。\n';
+      message += '请联系管理员配置 Hermes Job Bridge。';
+    }
+
+    return { success: true, message };
   }
 
   private async handleModification(chatId: string, modificationText: string, currentPlan: PendingDraft): Promise<{ success: boolean; message: string }> {
@@ -950,6 +967,15 @@ class CommandRouterV2 {
     if (Date.now() - pending.createdAt > CONFIG.pendingExpiryMs) {
       this.pendingDrafts.delete(chatId);
       return { success: false, message: '⏰ 草稿已过期（超过10分钟）。请重新描述您要创建的内容。' };
+    }
+
+    // Check if creation is allowed (requires Hermes to be available)
+    if (pending.createAllowed === false) {
+      writeAuditLog({ action: 'create_blocked', chatId, reason: 'hermes_unavailable' });
+      return {
+        success: false,
+        message: '⚠️ **内容生成服务未就绪**\n\nHermes Agent 未启用或不可用，无法创建 draft。\n请联系管理员配置 Hermes Job Bridge。\n\n当前状态：\n- hermesGatewayUsed: false\n- fallbackUsed: true\n- createAllowed: false',
+      };
     }
 
     // Check duplicate

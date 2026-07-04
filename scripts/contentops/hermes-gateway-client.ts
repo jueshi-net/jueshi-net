@@ -9,6 +9,7 @@
  */
 
 import { createHash } from 'crypto';
+import { submitJob, pollJobResult, checkBridgeHealth, HermesJobResult as BridgeJobResult } from './hermes-job-bridge';
 
 // ============================================================================
 // Configuration
@@ -201,7 +202,10 @@ async function callDeepSeekDirect(prompt: string, systemPrompt: string): Promise
 }
 
 // ============================================================================
-// Content Analysis & Planning
+// Hermes Job Bridge Client
+// 
+// Bot only calls Hermes Job Bridge, never directly calls model APIs.
+// If Hermes is unavailable, returns fallbackUsed=true and createAllowed=false.
 // ============================================================================
 
 export async function analyzeAndPlan(
@@ -211,75 +215,49 @@ export async function analyzeAndPlan(
   const hermesRunId = generateHermesRunId();
   const timestamp = new Date().toISOString();
 
-  const systemPrompt = buildSystemPrompt();
-  const prompt = buildPrompt(text, inputMode);
-
-  let gatewayUsed = false;
-  let planningUsed = false;
-  let fallbackUsed = false;
-  let aiResponse: string;
-
-  // Try Hermes Gateway first
-  if (GATEWAY_CONFIG.enabled) {
-    try {
-      console.log('[HermesGateway] Attempting to call Hermes Gateway...');
-      const gatewayResult = await callHermesGateway(prompt, systemPrompt);
-      
-      gatewayUsed = true;
-      planningUsed = true;
-      fallbackUsed = false;
-      aiResponse = gatewayResult.result;
-      
-      console.log('[HermesGateway] Gateway call successful');
-    } catch (error: any) {
-      console.error('[HermesGateway] Gateway call failed:', error.message);
-      console.log('[HermesGateway] Falling back to direct DeepSeek API...');
-      
-      // Fallback to direct DeepSeek
-      try {
-        aiResponse = await callDeepSeekDirect(prompt, systemPrompt);
-        gatewayUsed = false;
-        planningUsed = true;
-        fallbackUsed = false;
-      } catch (fallbackError: any) {
-        console.error('[HermesGateway] Direct API also failed:', fallbackError.message);
-        gatewayUsed = false;
-        planningUsed = false;
-        fallbackUsed = true;
-        
-        return buildFallbackResult(hermesRunId, timestamp, inputMode, fallbackError.message);
-      }
-    }
-  } else {
-    // Gateway not enabled, use direct DeepSeek
-    console.log('[HermesGateway] Gateway not enabled, using direct DeepSeek API...');
-    try {
-      aiResponse = await callDeepSeekDirect(prompt, systemPrompt);
-      gatewayUsed = false;
-      planningUsed = true;
-      fallbackUsed = false;
-    } catch (error: any) {
-      console.error('[HermesGateway] Direct API failed:', error.message);
-      gatewayUsed = false;
-      planningUsed = false;
-      fallbackUsed = true;
-      
-      return buildFallbackResult(hermesRunId, timestamp, inputMode, error.message);
-    }
+  // Check if Hermes Job Bridge is enabled
+  if (!GATEWAY_CONFIG.enabled) {
+    console.log('[HermesGateway] Hermes Job Bridge not enabled, returning unavailable');
+    return buildUnavailableResult(hermesRunId, timestamp, inputMode, 'Hermes Job Bridge not enabled');
   }
 
-  // Parse AI response
-  let plan: any;
+  // Check bridge health
+  const health = checkBridgeHealth();
+  if (!health.healthy) {
+    console.log('[HermesGateway] Hermes Job Bridge unhealthy:', health.message);
+    return buildUnavailableResult(hermesRunId, timestamp, inputMode, health.message);
+  }
+
+  // Submit job to Hermes
+  let jobId: string;
   try {
-    const cleaned = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-    plan = JSON.parse(cleaned);
-  } catch (parseError) {
-    console.error('[HermesGateway] Failed to parse AI response as JSON:', aiResponse);
-    return buildFallbackResult(hermesRunId, timestamp, inputMode, 'AI response is not valid JSON');
+    jobId = submitJob('contentops_generate', inputMode, text);
+    console.log('[HermesGateway] Job submitted:', jobId);
+  } catch (error: any) {
+    console.error('[HermesGateway] Failed to submit job:', error.message);
+    return buildUnavailableResult(hermesRunId, timestamp, inputMode, `Failed to submit job: ${error.message}`);
   }
 
-  // Validate and build result
-  return validateAndBuildResult(plan, hermesRunId, timestamp, inputMode, gatewayUsed, planningUsed, fallbackUsed);
+  // Poll for result
+  try {
+    const result = await pollJobResult(jobId);
+    
+    if (!result) {
+      return buildUnavailableResult(hermesRunId, timestamp, inputMode, 'Job returned empty result');
+    }
+
+    console.log('[HermesGateway] Job completed successfully');
+    return {
+      ...result,
+      hermesRunId,
+      gatewayUsed: true,
+      planningUsed: true,
+      fallbackUsed: false,
+    };
+  } catch (error: any) {
+    console.error('[HermesGateway] Job failed:', error.message);
+    return buildUnavailableResult(hermesRunId, timestamp, inputMode, error.message);
+  }
 }
 
 // ============================================================================
@@ -777,4 +755,64 @@ function generateHermesRunId(): string {
   const timestamp = Date.now().toString(36);
   const random = Math.random().toString(36).substring(2, 8);
   return `hermes-${timestamp}-${random}`;
+}
+
+function buildUnavailableResult(
+  hermesRunId: string,
+  timestamp: string,
+  inputMode: InputMode,
+  errorMessage: string
+): HermesRunResult {
+  return {
+    hermesRunId,
+    gatewayUsed: false,
+    planningUsed: false,
+    fallbackUsed: true,
+    inputMode,
+    contentType: 'guide',
+    schemaType: 'guide',
+    title: '内容生成服务未就绪',
+    targetAudience: '海外华人和留学生',
+    targetCountries: [],
+    audienceStage: 'beginner',
+    searchIntent: 'informational',
+    sourceFacts: [],
+    content: {
+      intro: `Hermes 内容生成服务未就绪：${errorMessage}。请联系管理员配置 Hermes Agent。`,
+      steps: [],
+      tips: [],
+      warnings: [],
+      faq: [],
+      pitfalls: [],
+      internalLinks: [],
+      relatedTools: [],
+    },
+    seo: {
+      primaryKeyword: '',
+      secondaryKeywords: [],
+      metaTitle: '',
+      metaDescription: '',
+      metaKeywords: [],
+      slug: '',
+    },
+    geo: {
+      targetAudience: '海外华人和留学生',
+      targetCountries: [],
+      audienceStage: 'beginner',
+      searchIntent: 'informational',
+    },
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      name: '',
+      description: '',
+    },
+    qualityGate: {
+      pass: false,
+      score: 0,
+      failures: [`Hermes unavailable: ${errorMessage}`],
+      warnings: ['内容生成服务未就绪，无法创建 draft'],
+    },
+    timestamp,
+  };
 }
