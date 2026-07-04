@@ -991,88 +991,42 @@ class CommandRouterV2 {
       };
     }
 
-    // Create draft in DB
+    // Create draft via production bridge (no direct DB access)
     try {
-      const { PrismaClient } = await import('@prisma/client');
-      const { PrismaPg } = await import('@prisma/adapter-pg');
+      const { createDraftViaBridge } = await import('./draft-bridge-client');
 
-      const databaseUrl = process.env.DATABASE_URL;
-      if (!databaseUrl) throw new Error('DATABASE_URL not set');
-
-      const adapter = new PrismaPg({ connectionString: databaseUrl });
-      const prisma = new PrismaClient({ adapter });
-
-      const metadataJson = {
-        contentOps: {
-          seo: {
-            metaKeywords: pending.metaKeywords,
-            searchIntent: pending.searchIntent,
-            targetAudience: pending.targetAudience,
-            audienceStage: pending.audienceStage,
-            targetCountries: pending.targetCountries,
-            targetSearchEngines: ['Google', 'Baidu', 'Bing'],
-          },
-          primaryKeyword: pending.primaryKeyword,
-          secondaryKeywords: pending.secondaryKeywords,
-          faq: pending.faq,
-          pitfalls: pending.pitfalls,
-          internalLinks: pending.internalLinks,
-          relatedTools: pending.relatedTools,
-          qualityScore: pending.qualityScore,
-          sourceFactsCount: pending.sourceFactsCount,
-          rewrittenStructure: pending.rewrittenStructure,
-          originalityNotice: pending.originalityNotice,
-          traceId: pending.traceId,
-          v2Mvp: true,
+      // Prepare bridge request
+      const bridgeRequest = {
+        traceId: pending.traceId,
+        localHermesRunId: pending.localHermesRunId || pending.traceId,
+        gatewayLocation: 'local_mac' as const,
+        planningUsed: true as const,
+        fallbackUsed: false as const,
+        contentType: pending.contentType,
+        schemaType: pending.contentType,
+        title: pending.title,
+        slug: pending.slug,
+        summary: pending.summary,
+        content: {
+          intro: pending.summary,
+          categories: pending.categories || [],
+          resources: pending.resources || [],
+          scenarioMap: pending.scenarioMap || [],
+          comparisonTable: pending.comparisonTable || null,
+          ratingTierExplanation: pending.ratingTierExplanation || '',
+          faq: pending.faq || [],
+          pitfalls: pending.pitfalls || [],
+          internalLinks: pending.internalLinks || [],
+          relatedTools: pending.relatedTools || [],
         },
+        qualityGate: pending.qualityGate,
       };
 
-      let draft: any;
-      if (pending.contentType === 'checklist') {
-        draft = await prisma.checklist.create({
-          data: {
-            title: pending.title,
-            slug: pending.slug,
-            summary: pending.summary,
-            steps: pending.steps || [],
-            metadataJson,
-            status: 'draft',
-            publishedAt: null,
-            robots: 'noindex,nofollow',
-            relatedTools: pending.relatedTools,
-          },
-        });
-      } else if (pending.contentType === 'guide') {
-        draft = await prisma.guide.create({
-          data: {
-            title: pending.title,
-            slug: pending.slug,
-            summary: pending.summary,
-            body: pending.body || '',
-            metadataJson,
-            status: 'draft',
-            publishedAt: null,
-            robots: 'noindex,nofollow',
-            relatedTools: pending.relatedTools,
-          },
-        });
-      } else {
-        draft = await prisma.topic.create({
-          data: {
-            title: pending.title,
-            slug: pending.slug,
-            summary: pending.summary,
-            metadataJson,
-            status: 'draft',
-            publishedAt: null,
-            templateType: 'general',
-          },
-        });
+      const result = await createDraftViaBridge(bridgeRequest);
+
+      if (!result.success) {
+        throw new Error(result.error || 'Bridge returned success=false');
       }
-
-      await prisma.$disconnect();
-
-      if (!draft) throw new Error('Draft creation returned null');
 
       this.confirmedSlugs.add(pending.slug);
       this.pendingDrafts.delete(chatId);
@@ -1081,22 +1035,18 @@ class CommandRouterV2 {
         action: 'v2_draft_created',
         chatId,
         traceId: pending.traceId,
-        draftId: draft.id,
+        draftId: result.draftId,
         contentType: pending.contentType,
         title: pending.title,
         slug: pending.slug,
         qualityScore: pending.qualityScore,
       });
 
-      const baseUrl = 'https://jueshi.net';
-      const adminEditUrl = `${baseUrl}/admin/content/${pending.contentType}s/${draft.id}/edit`;
-      const previewUrl = `${baseUrl}/${pending.contentType}s/${pending.slug}?preview=true`;
-
       const typeLabel = { checklist: '📋 清单', guide: '📖 指南', topic: '📑 专题' }[pending.contentType];
 
       return {
         success: true,
-        message: `✅ Draft 创建成功！\n\n━━━━━━━━━━━━━━━━━━━\n\n🆔 Draft ID: ${draft.id}\n📌 类型: ${typeLabel}\n📝 标题: ${pending.title}\n🔗 Slug: ${pending.slug}\n⭐ Quality Score: ${pending.qualityScore}/100\n🔍 Trace ID: ${pending.traceId}\n\n🔗 Admin Edit: ${adminEditUrl}\n👁️ Admin Preview: ${previewUrl}\n\n━━━━━━━━━━━━━━━━━━━\n\n⚠️ 草稿尚未发布。\n🔒 预览链接需要 admin 登录。\n📱 请用普通浏览器打开，不建议 Telegram 内置浏览器。`,
+        message: `✅ Draft 创建成功！\n\n━━━━━━━━━━━━━━━━━━━\n\n🆔 Draft ID: ${result.draftId}\n📌 类型: ${typeLabel}\n📝 标题: ${pending.title}\n🔗 Slug: ${result.slug}\n⭐ Quality Score: ${pending.qualityScore}/100\n🔍 Trace ID: ${pending.traceId}\n🌐 Gateway: ${result.gatewayLocation || 'local_mac'}\n\n🔗 Admin Edit: ${result.adminEditUrl}\n👁️ Admin Preview: ${result.adminPreviewUrl}\n\n━━━━━━━━━━━━━━━━━━━\n\n⚠️ 草稿尚未发布。\n🔒 预览链接需要 admin 登录。\n📱 请用普通浏览器打开，不建议 Telegram 内置浏览器。`,
       };
     } catch (error: any) {
       const errorType = error.code || error.name || 'UNKNOWN_ERROR';
