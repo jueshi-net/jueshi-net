@@ -1,8 +1,8 @@
 # ContentOps Publishing SOP (Standard Operating Procedure)
 
-**版本**: v1.20.42.18.6.16.6.84.2  
-**日期**: 2026-07-03  
-**状态**: FROZEN
+**版本**: v1.20.42.18.6.16.6.84.3.21  
+**日期**: 2026-07-04  
+**状态**: V1_READY — 三类 draft 创建通过，冻结运营基线
 
 ---
 
@@ -393,5 +393,52 @@ ContentOps Publishing SOP 核心要求：
 - ✅ 测试 draft 不得 SQL 删除，只能保留或归档
 - ✅ Dev Hermes 与 ContentOps Hermes 分离
 
-**状态**: FROZEN  
-**最后更新**: 2026-07-03
+**状态**: V1_READY  
+**最后更新**: 2026-07-04
+
+---
+
+## v1.20.42.18.6.16.6.84.3.21 — ContentOps Auto Draft Workflow V1 完成
+
+### 三类 Draft 创建状态
+
+| 类型 | Draft ID | Slug | Admin Edit | Admin Preview | Public URL | Sitemap |
+|------|----------|------|-----------|---------------|-----------|---------|
+| Checklist | cmr528thk0000lb2p9b39oqbb | checklist-18779a15 | ✅ 200 | ✅ 需登录 | ✅ 隐藏 | ✅ 排除 |
+| Guide | cmr4zk2720001e32poismdx7n | guide-501deffc | ✅ 200 | ✅ 需登录 | ✅ 隐藏 | ✅ 排除 |
+| Topic | cmr4zlxl30002e32plkv89ntq | topic-22996ad5 | ✅ 200 | ✅ 需登录 | ✅ 隐藏 | ✅ 排除 |
+
+### 路由真实路径
+
+- **Checklist Admin Edit**: `/admin/content/checklists/[id]/edit`
+- **Guide Admin Edit**: `/admin/content/guides/[id]/edit`
+- **Topic Admin Edit**: `/admin/content/topics/[id]/edit` (v1.20.42.18.6.16.6.84.3.21 新增)
+- **Public Preview**: `/[type]/[slug]?preview=true` (需 admin 登录)
+
+### 关键修复
+
+1. **Topic 页面 500 修复**: 移除 `generateStaticParams()`，改为 `export const dynamic = "force-dynamic"`，解决 static-to-dynamic 冲突 500 错误
+2. **Topic Admin Edit 页面**: 新增 `src/app/(admin)/admin/content/topics/[id]/edit/` 页面
+3. **Topic 空 items 预览**: 添加 empty-items preview fallback，当 rating_list 模板无 items 时显示 metadataJson 内容
+4. **Preview Auth 统一**: 三类页面统一使用 `isAdmin()` helper，支持 "管理员"/"ADMIN"/"admin" 多种 role 格式
+
+### 自动发布定义
+
+"自动发布"在当前阶段定义为"自动创建 production draft"，不是自动公开发布。
+
+### 运营基线
+
+- ✅ Checklist/Guide/Topic 三类自然语言创建 draft 均通过
+- ✅ Admin edit 和 admin preview 均通过
+- ✅ Draft 不公开、不进 sitemap、不进列表
+- ✅ 发布必须人工后台审核
+- ✅ 用户不需要 JSON
+- ✅ 仅自然语言入口为主
+- ✅ `CONTENTOPS_DRAFT_ALLOW_PRODUCTION=false` (当前冻结)
+- ✅ `CONTENTOPS_PUBLICATION_ALLOWED=false`
+
+### 后续待办
+
+- ⏳ Monitor 探针后续只在原有基础上完善，不重复造轮子
+- ⏳ ContentOps v2 后续再做（质量门槛、长文本/文件处理、洗稿安全规则）
+- ⏳ UI 重构可开新对话
