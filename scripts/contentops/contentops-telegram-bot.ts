@@ -1173,6 +1173,8 @@ async function main() {
   }
 
   console.log(`Starting ContentOps Bot V2-MVP...`);
+  console.log(`LOCAL_HERMES_ENABLED=${process.env.LOCAL_HERMES_ENABLED}`);
+  console.log(`LOCAL_HERMES_PATH=${process.env.LOCAL_HERMES_PATH}`);
   console.log(`Production draft: ${CONFIG.allowProduction ? 'ENABLED' : 'DISABLED'}`);
   console.log(`Allowed chatIds: ${CONFIG.allowedChatIds.join(', ') || 'ALL'}`);
 
