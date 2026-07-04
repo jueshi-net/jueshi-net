@@ -1,8 +1,8 @@
 # ContentOps Publishing SOP (Standard Operating Procedure)
 
-**版本**: v1.20.42.18.6.16.6.84.3.21  
+**版本**: v1.20.42.18.6.16.6.84.4.0  
 **日期**: 2026-07-04  
-**状态**: V1_READY — 三类 draft 创建通过，冻结运营基线
+**状态**: V2-MVP_READY — 长文本/改写/质量门槛已上线
 
 ---
 
@@ -442,3 +442,50 @@ ContentOps Publishing SOP 核心要求：
 - ⏳ Monitor 探针后续只在原有基础上完善，不重复造轮子
 - ⏳ ContentOps v2 后续再做（质量门槛、长文本/文件处理、洗稿安全规则）
 - ⏳ UI 重构可开新对话
+
+---
+
+## v1.20.42.18.6.16.6.84.4.0 — ContentOps V2-MVP 升级
+
+### V2-MVP 已支持的能力
+
+- ✅ 长文本粘贴输入 (>500 字)
+- ✅ 竞品/参考资料粘贴改写
+- ✅ 混乱笔记提炼归纳
+- ✅ 内容类型自动判断 (checklist/guide/topic)
+- ✅ 标题/目标用户/国家/阶段自动提炼
+- ✅ 原创改写和结构重组 (不逐句照搬)
+- ✅ SEO/GEO 增强 (metaKeywords, primaryKeyword, searchIntent 等)
+- ✅ FAQ/pitfalls/internalLinks/relatedTools 自动生成
+- ✅ 质量门槛校验 (qualityGate)
+- ✅ Dry-run v2 完整摘要
+- ✅ 用户确认后创建 production draft
+- ✅ Admin edit + admin preview 链接
+
+### V2-MVP 不做
+
+- ⏳ 文件上传解析 (V2.1)
+- ⏳ 外部 URL 抓取 (V2.1)
+- ⏳ 自动发布 (禁止)
+- ⏳ 监控探针 (后续待办)
+- ⏳ UI 重构 (可开新对话)
+
+### 质量门槛
+
+| 类型 | 最低要求 |
+|------|---------|
+| Checklist | intro>=150字, groups>=4, items>=12, FAQ>=5, pitfalls>=5, links>=5, tools>=3, score>=75 |
+| Guide | body>=1500字, sections>=6, FAQ>=5, pitfalls>=5, links>=5, tools>=3, score>=75 |
+| Topic | intro>=100字, FAQ>=5, pitfalls>=5, links>=5, tools>=3, score>=75 |
+
+质量不达标时不创建 draft，返回缺失项列表。
+
+### 用户操作方式
+
+用户可以直接粘贴长文本或竞品资料，bot 会自动：
+1. 识别输入模式和类型
+2. 提炼关键信息
+3. 生成完整内容 (不逐句照搬)
+4. 校验质量门槛
+5. 返回 dry-run v2 摘要
+6. 等待用户确认后创建 draft
