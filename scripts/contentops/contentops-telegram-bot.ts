@@ -648,11 +648,20 @@ function formatDryRunV2(pending: PendingDraft): string {
   msg += `🔒 原创声明: ${pending.originalityNotice}\n\n`;
   msg += `━━━━━━━━━━━━━━━━━━━\n`;
   
-  // Quality gate behavior: only allow confirm if PASS
-  if (pending.qualityGate.pass) {
+  // Check if draft creation is enabled
+  const createEnabled = CONFIG.allowProduction;
+  
+  // Quality gate behavior: only allow confirm if PASS AND createEnabled
+  if (pending.qualityGate.pass && createEnabled) {
     msg += `⏳ 将创建 production draft: 否，等待确认\n\n`;
     msg += `请回复:\n`;
     msg += `  ✅ "确认创建" — 创建 draft\n`;
+    msg += `  ✏️ "修改标题为 XXX" — 调整标题\n`;
+    msg += `  🔄 "改成指南/清单/专题" — 切换类型\n`;
+    msg += `  ❌ "取消" — 放弃`;
+  } else if (pending.qualityGate.pass && !createEnabled) {
+    msg += `🔧 当前创建通道处于维护模式，只能预览 dry-run，暂不能创建 draft。\n\n`;
+    msg += `请回复:\n`;
     msg += `  ✏️ "修改标题为 XXX" — 调整标题\n`;
     msg += `  🔄 "改成指南/清单/专题" — 切换类型\n`;
     msg += `  ❌ "取消" — 放弃`;
