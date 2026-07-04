@@ -212,7 +212,6 @@ export async function POST(request: NextRequest) {
           metadataJson,
           status: 'draft',
           publishedAt: null,
-          robots: 'noindex,nofollow',
         },
       });
     } else if (data.contentType === 'guide') {
