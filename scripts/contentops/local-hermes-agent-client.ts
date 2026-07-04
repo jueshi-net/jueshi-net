@@ -35,7 +35,7 @@ export type SchemaType = 'checklist' | 'guide' | 'topic';
 
 export interface LocalHermesRunResult {
   localHermesRunId: string;
-  gatewayLocation: 'local';
+  gatewayLocation: 'local_mac';
   planningUsed: boolean;
   fallbackUsed: boolean;
   inputMode: InputMode;
@@ -70,16 +70,28 @@ export async function callLocalHermesAgent(
   // Build the full prompt with system instruction
   const fullPrompt = `${systemPrompt}\n\n${prompt}`;
 
-  // Escape single quotes in prompt for shell
-  const escapedPrompt = fullPrompt.replace(/'/g, "'\\''");
+  // Use Python subprocess to avoid shell argument length limits
+  const pythonScript = `
+import subprocess
+import sys
 
-  const command = `${LOCAL_HERMES_CONFIG.hermesPath} chat -q '${escapedPrompt}' -Q --max-turns ${LOCAL_HERMES_CONFIG.maxTurns}`;
+prompt = sys.stdin.read()
+result = subprocess.run(
+    ['${LOCAL_HERMES_CONFIG.hermesPath}', 'chat', '-q', prompt, '-Q', '--max-turns', '${LOCAL_HERMES_CONFIG.maxTurns}'],
+    capture_output=True,
+    text=True,
+    timeout=${LOCAL_HERMES_CONFIG.timeoutMs / 1000}
+)
+print(result.stdout)
+if result.stderr:
+    print(result.stderr, file=sys.stderr)
+`;
 
-  console.log('[LocalHermes] Executing:', command.substring(0, 100) + '...');
+  console.log('[LocalHermes] Executing via Python subprocess...');
 
   try {
-    const { stdout, stderr } = await execAsync(command, {
-      timeout: LOCAL_HERMES_CONFIG.timeoutMs,
+    const { stdout, stderr } = await execAsync(`python3 -c '${pythonScript.replace(/'/g, "'\\''")}' <<< ${JSON.stringify(fullPrompt)}`, {
+      timeout: LOCAL_HERMES_CONFIG.timeoutMs + 5000,
       maxBuffer: 10 * 1024 * 1024, // 10MB
     });
 
@@ -130,12 +142,18 @@ export async function analyzeAndPlanLocal(
     // Parse JSON response
     let plan: any;
     try {
-      // Try to extract JSON from response
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      // Try to extract JSON from response - look for the outermost { }
+      const jsonMatch = response.match(/\{[\s\S]*\}(?=\s*$)/);
       if (jsonMatch) {
         plan = JSON.parse(jsonMatch[0]);
       } else {
-        throw new Error('No JSON found in response');
+        // Try to find any JSON object in the response
+        const anyJsonMatch = response.match(/\{[\s\S]{100,}\}/);
+        if (anyJsonMatch) {
+          plan = JSON.parse(anyJsonMatch[0]);
+        } else {
+          throw new Error('No JSON found in response');
+        }
       }
     } catch (parseError: any) {
       console.error('[LocalHermes] Failed to parse JSON:', parseError.message);
@@ -173,7 +191,7 @@ export async function modifyPlanLocal(
     return {
       ...currentPlan,
       localHermesRunId,
-      gatewayLocation: 'local' as const,
+      gatewayLocation: 'local_mac' as const,
       planningUsed: false,
       fallbackUsed: true,
       timestamp,
@@ -219,7 +237,7 @@ export async function modifyPlanLocal(
     return {
       ...currentPlan,
       localHermesRunId,
-      gatewayLocation: 'local' as const,
+      gatewayLocation: 'local_mac' as const,
       planningUsed: false,
       fallbackUsed: true,
       timestamp,
@@ -252,7 +270,7 @@ function buildUnavailableResult(
 ): LocalHermesRunResult {
   return {
     localHermesRunId,
-    gatewayLocation: 'local',
+    gatewayLocation: 'local_mac',
     planningUsed: false,
     fallbackUsed: true,
     inputMode,
@@ -422,7 +440,7 @@ function validateAndBuildResult(
 
   return {
     localHermesRunId,
-    gatewayLocation: 'local',
+    gatewayLocation: 'local_mac',
     planningUsed: true,
     fallbackUsed: false,
     inputMode,
