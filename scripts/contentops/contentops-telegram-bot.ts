@@ -126,7 +126,7 @@ function classifyInput(text: string): { mode: InputMode; contentType: ContentTyp
   let mode: InputMode = 'title';
   let confidence = 0.5;
 
-  // Mode D: Reference rewrite (explicit reference language + rewrite instruction)
+  // Priority 1: Reference rewrite (explicit reference language + rewrite instruction)
   const refPatterns = [
     /参考.*?(改写|重写|改成)/,
     /改写.*?(参考|根据|基于)/,
@@ -139,8 +139,9 @@ function classifyInput(text: string): { mode: InputMode; contentType: ContentTyp
     mode = 'reference_rewrite';
     confidence = 0.9;
   }
-  // Mode C: Long text (many characters, multiple lines)
-  else if (charCount > 500 || lineCount > 5) {
+  // Priority 2: Long text (MUST check before brief!)
+  // If text is long (>300 chars) or has multiple lines (>3), it's likely long_text
+  else if (charCount > 300 || lineCount > 3) {
     // Check if it looks like messy notes (short lines, bullet-like)
     const shortLines = trimmed.split('\n').filter(l => l.trim().length < 50).length;
     const bulletLines = trimmed.split('\n').filter(l => /^[-•*·]\s/.test(l.trim()) || /^\d+\.\s/.test(l.trim())).length;
@@ -152,12 +153,12 @@ function classifyInput(text: string): { mode: InputMode; contentType: ContentTyp
       confidence = 0.85;
     }
   }
-  // Mode B: Brief (has target audience / country / stage info)
+  // Priority 3: Brief (short text with target audience/country info)
   else if (/目标用户|目标国家|受众|适合|面向|写给/.test(trimmed)) {
     mode = 'brief';
     confidence = 0.8;
   }
-  // Mode A: Title (short, simple request)
+  // Priority 4: Title (short, simple request)
   else {
     mode = 'title';
     confidence = 0.7;
@@ -199,30 +200,42 @@ function classifyInput(text: string): { mode: InputMode; contentType: ContentTyp
 // ============================================================================
 
 function extractTitle(text: string, mode: InputMode): string {
-  // Priority 1: Quoted content
+  // Priority 1: Quoted content (explicit title)
   const quotedMatch = text.match(/['""\u201c\u201d]([^'""\u201c\u201d]+?)['""\u201c\u201d]/);
   if (quotedMatch) return quotedMatch[1].trim();
 
-  // Priority 2: "帮我创建/写一个 XXX" pattern
-  const createMatch = text.match(/(?:帮我|请)?(?:创建|写|做|整理|生成)(?:一个|一篇|一份)?(?:关于)?['""\u201c\u201d]?([^'""\u201c\u201d\n。！？，,]+?)['""\u201c\u201d]?(?:的|。|！|？|$)/);
-  if (createMatch && createMatch[1].trim().length > 2) return createMatch[1].trim();
-
-  // Priority 3: First meaningful line (for long text)
+  // Priority 2: For long_text/reference_rewrite, extract from content topic
   if (mode === 'long_text' || mode === 'reference_rewrite' || mode === 'messy_notes') {
-    const lines = text.split('\n').filter(l => l.trim().length > 5);
+    // Look for explicit topic mention in first sentence
+    const firstSentence = text.split(/[：:\n]/)[0].trim();
+    
+    // Pattern: "以下是我整理的XXX资料" -> extract XXX
+    const topicMatch = firstSentence.match(/(?:整理的|关于|有关)([^，,。\n]{2,30}?)(?:资料|内容|信息|指南)/);
+    if (topicMatch) return topicMatch[1].trim() + '指南';
+
+    // Pattern: "XXX申请指南" or "XXX清单"
+    const directMatch = text.match(/([\u4e00-\u9fa5]{2,20}(?:申请|办理|准备|使用)?(?:指南|清单|攻略|教程))/);
+    if (directMatch) return directMatch[1].trim();
+
+    // Fallback: extract core topic from first meaningful line
+    const lines = text.split('\n').filter(l => l.trim().length > 10);
     if (lines.length > 0) {
-      const firstLine = lines[0].replace(/^[-•*·#\d.、\s]+/, '').trim();
-      if (firstLine.length > 3 && firstLine.length < 50) return firstLine;
+      const firstLine = lines[0].replace(/^[-•*·#\d.、)\]）】]+\s*/, '').trim();
+      // Extract topic from first line (avoid instruction text)
+      const topicFromLine = firstLine.match(/([\u4e00-\u9fa5]{2,20}(?:签证|留学|申请|生活|工作|移民))/);
+      if (topicFromLine) return topicFromLine[1] + '指南';
     }
   }
 
-  // Priority 4: Extract topic from text
-  const topicMatch = text.match(/(?:关于|有关|关于)([^，。,.\n]{2,20})/);
-  if (topicMatch) return topicMatch[1].trim();
+  // Priority 3: "帮我创建/写一个 XXX" pattern (for title/brief mode)
+  const createMatch = text.match(/(?:帮我|请)?(?:创建|写|做|整理|生成)(?:一个|一篇|一份)?(?:关于)?['""\u201c\u201d]?([^'""\u201c\u201d\n。！？，,]+?)['""\u201c\u201d]?(?:的|。|！|？|$)/);
+  if (createMatch && createMatch[1].trim().length > 2 && createMatch[1].trim().length < 30) {
+    return createMatch[1].trim();
+  }
 
   // Fallback
   const sentences = text.split(/[。！？.!?]/);
-  return sentences[0].replace(/^(帮我|请|创建|一个|一篇)/, '').trim().substring(0, 40) || '未命名内容';
+  return sentences[0].replace(/^(帮我|请|创建|一个|一篇)/, '').trim().substring(0, 30) || '未命名内容';
 }
 
 function extractTargetAudience(text: string): string {
@@ -619,12 +632,23 @@ function formatDryRunV2(pending: PendingDraft): string {
 
   msg += `🔒 原创声明: ${pending.originalityNotice}\n\n`;
   msg += `━━━━━━━━━━━━━━━━━━━\n`;
-  msg += `⏳ 将创建 production draft: 否，等待确认\n\n`;
-  msg += `请回复:\n`;
-  msg += `  ✅ "确认创建" — 创建 draft\n`;
-  msg += `  ✏️ "修改标题为 XXX" — 调整标题\n`;
-  msg += `  🔄 "改成指南/清单/专题" — 切换类型\n`;
-  msg += `  ❌ "取消" — 放弃`;
+  
+  // Quality gate behavior: only allow confirm if PASS
+  if (pending.qualityGate.pass) {
+    msg += `⏳ 将创建 production draft: 否，等待确认\n\n`;
+    msg += `请回复:\n`;
+    msg += `  ✅ "确认创建" — 创建 draft\n`;
+    msg += `  ✏️ "修改标题为 XXX" — 调整标题\n`;
+    msg += `  🔄 "改成指南/清单/专题" — 切换类型\n`;
+    msg += `  ❌ "取消" — 放弃`;
+  } else {
+    msg += `❌ 质量门槛未通过，无法创建 draft\n\n`;
+    msg += `请回复:\n`;
+    msg += `  📝 "继续扩写" — 尝试生成更完整内容\n`;
+    msg += `  📄 补充更多资料后重新发送\n`;
+    msg += `  🔄 "改成指南/清单/专题" — 切换类型（可能降低门槛）\n`;
+    msg += `  ❌ "取消" — 放弃`;
+  }
 
   return msg;
 }
@@ -998,11 +1022,51 @@ async function main() {
     await bot.sendMessage(msg.chat.id, '❌ 已取消。');
   });
 
+  // Continue expand (when quality gate fails)
+  bot.onText(/^继续扩写$/, async (msg: any) => {
+    const chatId = msg.chat.id.toString();
+    const pending = (router as any).pendingDrafts.get(chatId) as PendingDraft;
+    if (!pending) {
+      await bot.sendMessage(chatId, '❓ 没有待扩写的草稿。请重新描述您要创建的内容。');
+      return;
+    }
+
+    // Try to generate more complete content
+    const emptyFacts: SourceFacts = { coreTopic: pending.title, targetPeople: [], countries: pending.targetCountries, stages: [], keyFacts: [], steps: [], warnings: [], risks: [], faqCandidates: [], actionItems: [], toolHints: [], uncertainItems: [] };
+    
+    let content: any = {};
+    if (pending.contentType === 'checklist') {
+      content = generateChecklistContent(pending.title, emptyFacts, pending.targetAudience, pending.targetCountries);
+    } else if (pending.contentType === 'guide') {
+      content = generateGuideContent(pending.title, emptyFacts, pending.targetAudience, pending.targetCountries);
+    } else {
+      content = generateTopicContent(pending.title, emptyFacts, pending.targetAudience, pending.targetCountries);
+    }
+
+    // Update pending draft
+    pending.summary = content.summary || pending.summary;
+    if (content.steps) pending.steps = content.steps;
+    if (content.body) pending.body = content.body;
+    pending.faq = content.faq || pending.faq;
+    pending.pitfalls = content.pitfalls || pending.pitfalls;
+    pending.internalLinks = content.internalLinks || pending.internalLinks;
+    pending.relatedTools = content.relatedTools || pending.relatedTools;
+
+    // Re-validate
+    const qualityContent = { summary: pending.summary, steps: pending.steps, body: pending.body, faq: pending.faq, pitfalls: pending.pitfalls, internalLinks: pending.internalLinks, relatedTools: pending.relatedTools, primaryKeyword: pending.primaryKeyword };
+    pending.qualityGate = validateQuality(pending.contentType, qualityContent);
+    pending.qualityScore = pending.qualityGate.score;
+
+    writeAuditLog({ action: 'v2_expand_attempted', chatId, traceId: pending.traceId, newScore: pending.qualityScore });
+
+    await bot.sendMessage(chatId, `📝 已尝试扩写内容\n\n${formatDryRunV2(pending)}`);
+  });
+
   // Natural language (fallback)
   bot.on('message', async (msg: any) => {
     if (!msg.text) return;
     if (msg.text.startsWith('/')) return;
-    if (/^(确认创建|取消)$/.test(msg.text)) return;
+    if (/^(确认创建|取消|继续扩写)$/.test(msg.text)) return;
     if (/^修改标题/.test(msg.text)) return;
     if (/^改成(清单|指南|专题)$/.test(msg.text)) return;
 
