@@ -1,115 +1,106 @@
-"use client";
+'use client';
 
-import { Map, FileText, Calculator, Ship, GraduationCap, Globe, Phone, CreditCard } from "lucide-react";
+import React from 'react';
+import Link from 'next/link';
 
 const tools = [
   {
-    icon: Map,
-    title: "邮编查询",
-    description: "全球邮政编码快速查询",
-    href: "/tools/postal-code",
-    color: "from-blue-500 to-cyan-500",
-    viewers: "12.5K",
+    id: 'shipping-calc',
+    icon: '🚚',
+    title: '运费计算器',
+    description: '快速计算国际快递运费，支持多家物流商比价',
+    category: '物流',
+    color: 'from-orange-400 to-red-400',
   },
   {
-    icon: FileText,
-    title: "商业发票",
-    description: "外贸单据在线生成",
-    href: "/tools/commercial-invoice",
-    color: "from-purple-500 to-pink-500",
-    viewers: "8.3K",
+    id: 'hs-code',
+    icon: '📦',
+    title: 'HS编码查询',
+    description: '查询商品海关编码，了解关税税率和监管条件',
+    category: '外贸',
+    color: 'from-blue-400 to-indigo-400',
   },
   {
-    icon: Calculator,
-    title: "汇率换算",
-    description: "实时汇率计算工具",
-    href: "/tools/exchange-rate",
-    color: "from-green-500 to-emerald-500",
-    viewers: "15.2K",
+    id: 'currency',
+    icon: '💱',
+    title: '汇率换算',
+    description: '实时汇率查询，支持多种货币换算和历史走势',
+    category: '金融',
+    color: 'from-green-400 to-teal-400',
   },
   {
-    icon: Ship,
-    title: "运费估算",
-    description: "国际物流费用计算",
-    href: "/tools/shipping-estimator",
-    color: "from-orange-500 to-red-500",
-    viewers: "6.7K",
+    id: 'postcode',
+    icon: '📮',
+    title: '邮编查询',
+    description: '全球邮编查询，快速定位地址对应邮编',
+    category: '地址',
+    color: 'from-purple-400 to-pink-400',
   },
   {
-    icon: GraduationCap,
-    title: "留学清单",
-    description: "出国必备物品清单",
-    href: "/tools/checklist",
-    color: "from-indigo-500 to-purple-500",
-    viewers: "9.1K",
+    id: 'invoice',
+    icon: '📄',
+    title: '发票生成',
+    description: '快速生成商业发票、形式发票等外贸单据',
+    category: '单据',
+    color: 'from-cyan-400 to-blue-400',
   },
   {
-    icon: Globe,
-    title: "HS 编码查询",
-    description: "海关编码快速检索",
-    href: "/tools/hs-code",
-    color: "from-teal-500 to-cyan-500",
-    viewers: "4.8K",
+    id: 'translate',
+    icon: '🌐',
+    title: '多语翻译',
+    description: '支持多种语言互译，专业术语准确翻译',
+    category: '语言',
+    color: 'from-pink-400 to-rose-400',
   },
   {
-    icon: Phone,
-    title: "国际区号",
-    description: "全球电话区号查询",
-    href: "/tools/country-code",
-    color: "from-pink-500 to-rose-500",
-    viewers: "3.2K",
+    id: 'address',
+    icon: '📍',
+    title: '地址解析',
+    description: '智能解析地址格式，标准化国际地址',
+    category: '地址',
+    color: 'from-indigo-400 to-purple-400',
   },
   {
-    icon: CreditCard,
-    title: "二维码生成",
-    description: "免费二维码生成器",
-    href: "/tools/qrcode",
-    color: "from-amber-500 to-orange-500",
-    viewers: "11.4K",
+    id: 'unit',
+    icon: '📏',
+    title: '单位换算',
+    description: '长度、重量、体积等单位换算，支持英制公制',
+    category: '工具',
+    color: 'from-yellow-400 to-orange-400',
   },
 ];
 
 export default function JueshiV4ToolGrid() {
   return (
-    <section className="px-6 lg:px-12 py-8">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white">热门工具</h2>
-          <p className="text-sm text-gray-400 mt-1">海外华人最常用的实用工具</p>
-        </div>
-        <a href="/tools" className="text-sm text-[#6c5dd3] hover:text-[#ab99ff] transition-colors">
-          查看全部 →
-        </a>
+    <section className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-[#11142D]">高频工具</h2>
+        <Link href="/tools" className="text-sm text-[#6C5DD3] hover:underline">
+          查看全部
+        </Link>
       </div>
-
-      {/* Tool Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {tools.map((tool) => (
-          <a
-            key={tool.title}
-            href={tool.href}
-            className="group bg-[#2a2d35] border border-[#3a3e45] rounded-xl p-5 hover:border-[#6c5dd3]/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300"
+          <Link
+            key={tool.id}
+            href={`/tools/${tool.id}`}
+            className="group bg-white rounded-2xl p-5 border border-[#E8ECF3] hover:shadow-lg hover:border-[#6C5DD3]/20 transition-all"
           >
-            {/* Icon */}
-            <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-              <tool.icon className="w-6 h-6 text-white" />
+            <div className={`w-12 h-12 flex items-center justify-center bg-gradient-to-br ${tool.color} rounded-xl text-white text-xl mb-3`}>
+              {tool.icon}
             </div>
-
-            {/* Content */}
-            <h3 className="font-semibold text-white mb-1 group-hover:text-[#ab99ff] transition-colors">
-              {tool.title}
-            </h3>
-            <p className="text-sm text-gray-400 mb-3 line-clamp-2">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-[#11142D] group-hover:text-[#6C5DD3] transition-colors">
+                {tool.title}
+              </h3>
+              <span className="text-xs px-2 py-0.5 bg-[#F3F5FA] text-[#808191] rounded-full">
+                {tool.category}
+              </span>
+            </div>
+            <p className="text-sm text-[#808191] line-clamp-2">
               {tool.description}
             </p>
-
-            {/* Meta */}
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span className="w-2 h-2 bg-red-500 rounded-full" />
-              <span>{tool.viewers} 次使用</span>
-            </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>

@@ -1,47 +1,45 @@
-"use client";
+'use client';
 
-import { Map, FileText, Calculator, Ship, GraduationCap, Globe, Phone, CreditCard, Briefcase, Home } from "lucide-react";
+import React from 'react';
+import Link from 'next/link';
 
 const scenarios = [
-  { icon: Map, label: "地图导航", color: "from-blue-500 to-cyan-500" },
-  { icon: FileText, label: "单据生成", color: "from-purple-500 to-pink-500" },
-  { icon: Calculator, label: "汇率换算", color: "from-green-500 to-emerald-500" },
-  { icon: Ship, label: "物流查询", color: "from-orange-500 to-red-500" },
-  { icon: GraduationCap, label: "留学指南", color: "from-indigo-500 to-purple-500" },
-  { icon: Globe, label: "官方资源", color: "from-teal-500 to-cyan-500" },
-  { icon: Phone, label: "通讯联络", color: "from-pink-500 to-rose-500" },
-  { icon: CreditCard, label: "支付金融", color: "from-amber-500 to-orange-500" },
-  { icon: Briefcase, label: "工作求职", color: "from-slate-500 to-gray-500" },
-  { icon: Home, label: "租房安居", color: "from-lime-500 to-green-500" },
+  { id: 'map', icon: '🗺️', label: '地图导航', color: 'bg-blue-50 text-blue-500' },
+  { id: 'docs', icon: '📄', label: '单据生成', color: 'bg-purple-50 text-purple-500' },
+  { id: 'currency', icon: '💱', label: '汇率换算', color: 'bg-green-50 text-green-500' },
+  { id: 'logistics', icon: '📦', label: '物流查询', color: 'bg-orange-50 text-orange-500' },
+  { id: 'study', icon: '🎓', label: '留学指南', color: 'bg-pink-50 text-pink-500' },
+  { id: 'address', icon: '📍', label: '地址查询', color: 'bg-indigo-50 text-indigo-500' },
+  { id: 'translate', icon: '🌐', label: '翻译工具', color: 'bg-teal-50 text-teal-500' },
+  { id: 'calc', icon: '🧮', label: '计算器', color: 'bg-yellow-50 text-yellow-600' },
 ];
 
 export default function JueshiV4ScenarioSection() {
   return (
-    <section className="px-6 lg:px-12 py-8 border-t border-[#3a3e45]">
-      {/* Section Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">常用场景</h2>
-        <p className="text-sm text-gray-400 mt-1">按使用场景快速找到所需工具</p>
-      </div>
-
-      {/* Scenario Icons - Horizontal Scroll */}
-      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-        {scenarios.map((scenario) => (
-          <a
-            key={scenario.label}
-            href="/tools"
-            className="flex-shrink-0 flex flex-col items-center gap-2 group"
-          >
-            {/* Circular Icon */}
-            <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${scenario.color} flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg`}>
-              <scenario.icon className="w-7 h-7 text-white" />
-            </div>
-            {/* Label */}
-            <span className="text-xs text-gray-300 group-hover:text-white transition-colors whitespace-nowrap">
-              {scenario.label}
-            </span>
-          </a>
-        ))}
+    <section className="mb-8">
+      <div className="bg-white rounded-2xl p-6 border border-[#E8ECF3]">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-[#11142D]">常用场景</h2>
+          <Link href="/scenarios" className="text-sm text-[#6C5DD3] hover:underline">
+            查看全部
+          </Link>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {scenarios.map((scenario) => (
+            <Link
+              key={scenario.id}
+              href={`/scenarios/${scenario.id}`}
+              className="flex flex-col items-center gap-2 min-w-[72px] group"
+            >
+              <div className={`w-14 h-14 flex items-center justify-center rounded-2xl ${scenario.color} group-hover:scale-105 transition-transform`}>
+                <span className="text-2xl">{scenario.icon}</span>
+              </div>
+              <span className="text-xs text-[#808191] group-hover:text-[#11142D] transition-colors whitespace-nowrap">
+                {scenario.label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

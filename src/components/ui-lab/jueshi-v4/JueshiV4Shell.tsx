@@ -1,61 +1,54 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import JueshiV4Sidebar from "./JueshiV4Sidebar";
-import JueshiV4Topbar from "./JueshiV4Topbar";
-import JueshiV4Hero from "./JueshiV4Hero";
-import JueshiV4ToolGrid from "./JueshiV4ToolGrid";
-import JueshiV4ScenarioSection from "./JueshiV4ScenarioSection";
-import JueshiV4ContentSection from "./JueshiV4ContentSection";
+import React, { useState } from 'react';
+import JueshiV4Sidebar from './JueshiV4Sidebar';
+import JueshiV4Topbar from './JueshiV4Topbar';
+import JueshiV4Hero from './JueshiV4Hero';
+import JueshiV4ScenarioSection from './JueshiV4ScenarioSection';
+import JueshiV4ToolGrid from './JueshiV4ToolGrid';
+import JueshiV4ContentSection from './JueshiV4ContentSection';
 
 export default function JueshiV4Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeNav, setActiveNav] = useState('home');
 
   return (
-    <div className="min-h-screen bg-[#1b1d21] text-white">
-      {/* Mobile Sidebar Overlay */}
+    <div className="min-h-screen bg-[#F6F8FC]">
+      {/* Mobile menu overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <JueshiV4Sidebar
-        isOpen={sidebarOpen}
-        isCollapsed={sidebarCollapsed}
-        onClose={() => setSidebarOpen(false)}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        activeNav={activeNav}
+        onNavChange={setActiveNav}
+        mobileOpen={sidebarOpen}
+        onMobileClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main Content */}
-      <div
-        className={`transition-all duration-300 ${
-          sidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
-        }`}
-      >
+      {/* Main content */}
+      <div className="lg:pl-60">
         {/* Topbar */}
-        <JueshiV4Topbar
-          onMenuClick={() => setSidebarOpen(true)}
-          sidebarCollapsed={sidebarCollapsed}
-          onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
+        <JueshiV4Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-        {/* Page Content */}
-        <main className="pb-20">
+        {/* Content */}
+        <main className="p-6 lg:p-8 max-w-[1400px] mx-auto">
+          {/* Hero */}
           <JueshiV4Hero />
+
+          {/* Scenario shortcuts */}
           <JueshiV4ScenarioSection />
+
+          {/* Tool grid */}
           <JueshiV4ToolGrid />
+
+          {/* Content section */}
           <JueshiV4ContentSection />
         </main>
-
-        {/* Footer */}
-        <footer className="border-t border-[#3a3e45] py-8 px-6 text-center text-sm text-gray-400">
-          <p>© 2026 绝世百宝箱 - 海外华人的实用工具箱</p>
-          <p className="mt-2 text-xs">UI V4 预览版 - 红色赛博小螃蟹主题</p>
-        </footer>
       </div>
     </div>
   );
