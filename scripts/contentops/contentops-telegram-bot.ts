@@ -12,7 +12,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { appendFileSync, existsSync, mkdirSync } from 'fs';
 import { createHash } from 'crypto';
 import { execSync } from 'child_process';
-import { analyzeAndPlan, modifyPlan, HermesRunResult, InputMode as GatewayInputMode } from './hermes-gateway-client';
+import { analyzeAndPlanLocal, modifyPlanLocal, LocalHermesRunResult } from './local-hermes-agent-client';
 
 // ============================================================================
 // Configuration
@@ -112,7 +112,7 @@ interface PendingDraft {
   createdAt: number;
   confirmed: boolean;
   // AI Plan (optional, for AI-powered planning)
-  hermesPlan?: HermesRunResult;
+  hermesPlan?: LocalHermesRunResult;
   // Whether draft creation is allowed (requires Hermes to be available)
   createAllowed?: boolean;
 }
@@ -751,9 +751,9 @@ class CommandRouterV2 {
     const { mode, contentType: detectedType } = classifyInput(text);
 
     // Try AI-powered planning first
-    let hermesPlan: HermesRunResult | null = null;
+    let hermesPlan: LocalHermesRunResult | null = null;
     try {
-      hermesPlan = await analyzeAndPlan(text, mode as GatewayInputMode);
+      hermesPlan = await analyzeAndPlanLocal(text, mode);
       
       if (hermesPlan && hermesPlan.planningUsed && !hermesPlan.fallbackUsed) {
         // AI planning succeeded
@@ -773,11 +773,11 @@ class CommandRouterV2 {
     return this.handleRuleBasedProcessing(chatId, text, mode, detectedType!);
   }
 
-  private async handleHermesPlan(chatId: string, hermesPlan: HermesRunResult, mode: InputMode): Promise<{ success: boolean; message: string }> {
-    const traceId = hermesPlan.hermesRunId;
+  private async handleHermesPlan(chatId: string, hermesPlan: LocalHermesRunResult, mode: InputMode): Promise<{ success: boolean; message: string }> {
+    const traceId = hermesPlan.localHermesRunId;
     
-    // Check if Hermes is available
-    const createAllowed = hermesPlan.gatewayUsed && !hermesPlan.fallbackUsed;
+    // Check if Hermes was actually used (not fallback)
+    const createAllowed = !hermesPlan.fallbackUsed && hermesPlan.planningUsed;
     
     // Build pending draft from Hermes plan
     const pending: PendingDraft = {
@@ -825,7 +825,7 @@ class CommandRouterV2 {
       title: hermesPlan.title,
       qualityScore: hermesPlan.qualityGate.score,
       qualityPass: hermesPlan.qualityGate.pass,
-      hermesGatewayUsed: hermesPlan.gatewayUsed,
+      hermesGatewayUsed: false, // Local Hermes doesn't use gateway
       planningUsed: hermesPlan.planningUsed,
       fallbackUsed: hermesPlan.fallbackUsed,
       createAllowed: createAllowed,
@@ -849,7 +849,7 @@ class CommandRouterV2 {
     }
 
     try {
-      const modifiedPlan = await modifyPlan(currentPlan.hermesPlan, modificationText);
+      const modifiedPlan = await modifyPlanLocal(currentPlan.hermesPlan!, modificationText);
       
       if (modifiedPlan.fallbackUsed) {
         return { success: false, message: '❌ Hermes 修改失败，请重试或重新发送内容。' };
