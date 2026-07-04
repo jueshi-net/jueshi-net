@@ -217,6 +217,24 @@ function extractTitle(text: string, mode: InputMode): string {
     const directMatch = text.match(/([\u4e00-\u9fa5]{2,20}(?:申请|办理|准备|使用)?(?:指南|清单|攻略|教程))/);
     if (directMatch) return directMatch[1].trim();
 
+    // Priority 2.5: For reference_rewrite, detect category lists and generate SEO-friendly titles
+    if (mode === 'reference_rewrite') {
+      // Detect if content is a comma-separated category list (e.g., "出行、支付、住宿、吃饭、学习、社交、安全")
+      const categoryListMatch = text.match(/^[\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}[，,、][\u4e00-\u9fa5]{2,10}/);
+      if (categoryListMatch) {
+        // Check if it's APP/tool related
+        if (/APP|app|应用|工具|软件/i.test(text)) {
+          return '海外必备 APP 推荐指南';
+        }
+        // Check if it's lifestyle/daily life related
+        if (/生活|日常|出行|支付|住宿|吃饭|社交|安全/i.test(text)) {
+          return '海外生活实用指南';
+        }
+        // Generic category list
+        return '海外必备工具与场景指南';
+      }
+    }
+
     // Fallback: extract core topic from first meaningful line
     const lines = text.split('\n').filter(l => l.trim().length > 10);
     if (lines.length > 0) {
