@@ -21,7 +21,7 @@ const execAsync = promisify(exec);
 const LOCAL_HERMES_CONFIG = {
   enabled: process.env.LOCAL_HERMES_ENABLED === 'true',
   hermesPath: process.env.LOCAL_HERMES_PATH || 'hermes',
-  timeoutMs: 60000, // 60 seconds for complex content generation
+  timeoutMs: 180000, // 3 minutes for complex content generation
   maxTurns: 1,
 };
 
@@ -99,9 +99,24 @@ if result.stderr:
       console.warn('[LocalHermes] stderr:', stderr);
     }
 
-    // Extract the response (skip session_id line)
+    // Extract the response (skip session_id line and banner)
     const lines = stdout.split('\n');
-    const responseLines = lines.filter(line => !line.startsWith('session_id:'));
+    
+    // Find the first line that looks like JSON (starts with {)
+    let jsonStartIndex = -1;
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim().startsWith('{')) {
+        jsonStartIndex = i;
+        break;
+      }
+    }
+    
+    if (jsonStartIndex === -1) {
+      throw new Error('No JSON found in response (no line starts with {)');
+    }
+    
+    // Extract from JSON start to end
+    const responseLines = lines.slice(jsonStartIndex);
     const response = responseLines.join('\n').trim();
 
     if (!response) {
@@ -142,18 +157,32 @@ export async function analyzeAndPlanLocal(
     // Parse JSON response
     let plan: any;
     try {
-      // Try to extract JSON from response - look for the outermost { }
-      const jsonMatch = response.match(/\{[\s\S]*\}(?=\s*$)/);
-      if (jsonMatch) {
-        plan = JSON.parse(jsonMatch[0]);
-      } else {
-        // Try to find any JSON object in the response
-        const anyJsonMatch = response.match(/\{[\s\S]{100,}\}/);
-        if (anyJsonMatch) {
-          plan = JSON.parse(anyJsonMatch[0]);
-        } else {
-          throw new Error('No JSON found in response');
+      // Try to extract JSON from response - find the outermost { }
+      // Use a more robust approach: find matching braces
+      let braceCount = 0;
+      let jsonStart = -1;
+      let jsonEnd = -1;
+      
+      for (let i = 0; i < response.length; i++) {
+        if (response[i] === '{') {
+          if (braceCount === 0) {
+            jsonStart = i;
+          }
+          braceCount++;
+        } else if (response[i] === '}') {
+          braceCount--;
+          if (braceCount === 0 && jsonStart !== -1) {
+            jsonEnd = i + 1;
+            break;
+          }
         }
+      }
+      
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        const jsonString = response.substring(jsonStart, jsonEnd);
+        plan = JSON.parse(jsonString);
+      } else {
+        throw new Error('No complete JSON object found in response');
       }
     } catch (parseError: any) {
       console.error('[LocalHermes] Failed to parse JSON:', parseError.message);
