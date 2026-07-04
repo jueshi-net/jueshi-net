@@ -7,64 +7,62 @@ import JueshiV4Hero from './JueshiV4Hero';
 import JueshiV4ScenarioSection from './JueshiV4ScenarioSection';
 import JueshiV4ToolGrid from './JueshiV4ToolGrid';
 import JueshiV4ContentSection from './JueshiV4ContentSection';
+import JueshiV4RightRail from './JueshiV4RightRail';
 
 export default function JueshiV4Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeNav, setActiveNav] = useState('home');
 
   return (
-    <>
-      {/* Hide original site header/footer */}
-      <style jsx global>{`
-        body:has(.jueshi-v4-root) > header,
-        body:has(.jueshi-v4-root) > main > header,
-        body:has(.jueshi-v4-root) > footer,
-        body:has(.jueshi-v4-root) > main > footer {
-          display: none !important;
-        }
-        body:has(.jueshi-v4-root) {
-          overflow-x: hidden;
-        }
-      `}</style>
-
-      <div className="jueshi-v4-root fixed inset-0 z-[9999] bg-[#F6F8FC] overflow-hidden">
-        {/* Mobile menu overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar */}
-        <JueshiV4Sidebar
-          activeNav={activeNav}
-          onNavChange={setActiveNav}
-          mobileOpen={sidebarOpen}
-          onMobileClose={() => setSidebarOpen(false)}
+    <div className="min-h-screen bg-[#F6F8FC]">
+      {/* Mobile menu overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
         />
+      )}
 
-        {/* Main content */}
-        <div className="lg:pl-60 h-full overflow-y-auto">
-          {/* Topbar */}
-          <JueshiV4Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      {/* Sidebar */}
+      <JueshiV4Sidebar
+        activeNav={activeNav}
+        onNavChange={setActiveNav}
+        mobileOpen={sidebarOpen}
+        onMobileClose={() => setSidebarOpen(false)}
+      />
 
-          {/* Content */}
-          <main className="p-4 md:p-6 lg:p-8 max-w-[1200px] mx-auto">
-            {/* Hero */}
-            <JueshiV4Hero />
+      {/* Main layout */}
+      <div className="lg:pl-60 xl:pl-60">
+        {/* Topbar */}
+        <JueshiV4Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-            {/* Scenario shortcuts */}
-            <JueshiV4ScenarioSection />
+        {/* Content area with optional right rail */}
+        <div className="flex">
+          {/* Main content */}
+          <main className="flex-1 min-w-0 p-4 md:p-6 lg:p-8">
+            <div className="max-w-[1180px] mx-auto">
+              {/* Hero */}
+              <JueshiV4Hero />
 
-            {/* Tool grid */}
-            <JueshiV4ToolGrid />
+              {/* Scenario shortcuts */}
+              <JueshiV4ScenarioSection />
 
-            {/* Content section */}
-            <JueshiV4ContentSection />
+              {/* Tool grid */}
+              <JueshiV4ToolGrid />
+
+              {/* Content section */}
+              <JueshiV4ContentSection />
+            </div>
           </main>
+
+          {/* Right rail - only visible on wide screens */}
+          <aside className="hidden xl:block w-80 flex-shrink-0 p-6 border-l border-[#E8ECF3]">
+            <div className="sticky top-20">
+              <JueshiV4RightRail />
+            </div>
+          </aside>
         </div>
       </div>
-    </>
+    </div>
   );
 }

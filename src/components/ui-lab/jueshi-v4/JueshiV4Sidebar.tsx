@@ -2,7 +2,37 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, Wrench, ListChecks, BookOpen, Compass, Briefcase, Sparkles } from 'lucide-react';
+import {
+  Home,
+  Sparkles,
+  Clock,
+  Mail,
+  Package,
+  RefreshCw,
+  MapPin,
+  Truck,
+  FileText,
+  Receipt,
+  Container,
+  ListChecks,
+  BookOpen,
+  Layers,
+  TrendingUp,
+  Landmark,
+  CreditCard,
+  ShoppingBag,
+  Globe,
+  Coffee,
+  GraduationCap,
+  Briefcase,
+  Heart,
+  Award,
+  Users,
+  Bell,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react';
 
 interface SidebarProps {
   activeNav: string;
@@ -11,16 +41,84 @@ interface SidebarProps {
   onMobileClose: () => void;
 }
 
-const navItems = [
-  { id: 'home', label: '首页总览', icon: Home },
-  { id: 'tools', label: '高频工具', icon: Wrench },
-  { id: 'checklist', label: '清单任务', icon: ListChecks },
-  { id: 'guides', label: '指南专题', icon: BookOpen },
-  { id: 'resources', label: '资源导航', icon: Compass },
-  { id: 'workspace', label: '我的工作台', icon: Briefcase },
+interface NavItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+}
+
+interface NavGroup {
+  title: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    title: '总览',
+    items: [
+      { id: 'home', label: '首页总览', icon: Home },
+      { id: 'today', label: '今日推荐', icon: Sparkles },
+      { id: 'recent', label: '最近使用', icon: Clock },
+    ],
+  },
+  {
+    title: '高频工具',
+    items: [
+      { id: 'postcode', label: '邮编查询', icon: Mail },
+      { id: 'hs-code', label: 'HS 编码', icon: Package },
+      { id: 'currency', label: '汇率换算', icon: RefreshCw },
+      { id: 'address', label: '地址格式化', icon: MapPin },
+      { id: 'shipping', label: '运费计算', icon: Truck },
+      { id: 'invoice', label: '商业发票', icon: FileText },
+      { id: 'quote', label: '报价单', icon: Receipt },
+      { id: 'container', label: '集装箱尺寸', icon: Container },
+    ],
+  },
+  {
+    title: '内容与任务',
+    items: [
+      { id: 'checklist', label: '清单任务', icon: ListChecks },
+      { id: 'guides', label: '指南文章', icon: BookOpen },
+      { id: 'topics', label: '专题聚合', icon: Layers },
+      { id: 'task-chains', label: '热门任务链', icon: TrendingUp },
+    ],
+  },
+  {
+    title: '资源导航',
+    items: [
+      { id: 'official', label: '官方机构', icon: Landmark },
+      { id: 'payment', label: '支付收款', icon: CreditCard },
+      { id: 'ecommerce', label: '跨境电商', icon: ShoppingBag },
+      { id: 'logistics', label: '物流查询', icon: Truck },
+      { id: 'overseas', label: '海外生活', icon: Coffee },
+      { id: 'education', label: '留学教育', icon: GraduationCap },
+    ],
+  },
+  {
+    title: '用户',
+    items: [
+      { id: 'workspace', label: '我的工作台', icon: Briefcase },
+      { id: 'favorites', label: '我的收藏', icon: Heart },
+      { id: 'checkin', label: '签到中心', icon: Award },
+      { id: 'badges', label: '等级勋章', icon: Award },
+    ],
+  },
+  {
+    title: '平台',
+    items: [
+      { id: 'community', label: '社区', icon: Users },
+      { id: 'notifications', label: '通知', icon: Bell },
+      { id: 'settings', label: '设置', icon: Settings },
+    ],
+  },
 ];
 
-export default function JueshiV4Sidebar({ activeNav, onNavChange, mobileOpen, onMobileClose }: SidebarProps) {
+export default function JueshiV4Sidebar({
+  activeNav,
+  onNavChange,
+  mobileOpen,
+  onMobileClose,
+}: SidebarProps) {
   return (
     <aside
       className={`
@@ -41,30 +139,39 @@ export default function JueshiV4Sidebar({ activeNav, onNavChange, mobileOpen, on
       </div>
 
       {/* Navigation */}
-      <nav className="p-3 space-y-0.5">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeNav === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => {
-                onNavChange(item.id);
-                onMobileClose();
-              }}
-              className={`
-                w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all
-                ${isActive
-                  ? 'bg-[#6C5DD3]/8 text-[#6C5DD3]'
-                  : 'text-[#808191] hover:bg-[#F3F5FA] hover:text-[#11142D]'
-                }
-              `}
-            >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-[#6C5DD3]' : ''}`} strokeWidth={isActive ? 2.2 : 1.8} />
-              <span className={`text-sm ${isActive ? 'font-medium' : 'font-normal'}`}>{item.label}</span>
-            </button>
-          );
-        })}
+      <nav className="overflow-y-auto h-[calc(100vh-14rem)] py-3 px-3">
+        {navGroups.map((group) => (
+          <div key={group.title} className="mb-4">
+            <div className="px-3 py-1.5 text-[11px] font-semibold text-[#808191] uppercase tracking-wider">
+              {group.title}
+            </div>
+            <div className="space-y-0.5">
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeNav === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onNavChange(item.id);
+                      onMobileClose();
+                    }}
+                    className={`
+                      w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all
+                      ${isActive
+                        ? 'bg-[#6C5DD3]/8 text-[#6C5DD3]'
+                        : 'text-[#808191] hover:bg-[#F3F5FA] hover:text-[#11142D]'
+                      }
+                    `}
+                  >
+                    <Icon className={`w-4.5 h-4.5 flex-shrink-0 ${isActive ? 'text-[#6C5DD3]' : ''}`} strokeWidth={isActive ? 2.2 : 1.8} />
+                    <span className={`text-sm truncate ${isActive ? 'font-medium' : 'font-normal'}`}>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* Bottom CTA */}
