@@ -146,6 +146,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // If validateOnly=true, skip schema validation and database creation
+    if (data.validateOnly === true) {
+      console.log('[DraftBridge] Validate-only request:', {
+        contentType: data.contentType,
+        traceId: data.traceId,
+        localHermesRunId: data.localHermesRunId,
+      });
+      
+      return NextResponse.json({
+        success: true,
+        validateOnly: true,
+        contentType: data.contentType,
+        traceId: data.traceId,
+        localHermesRunId: data.localHermesRunId,
+        message: 'Validation passed (validate-only mode)',
+      });
+    }
+
     // Validate schema-specific fields
     let schemaValidation: { valid: boolean; errors: string[] };
     
