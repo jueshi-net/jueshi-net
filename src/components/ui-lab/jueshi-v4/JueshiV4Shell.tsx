@@ -13,43 +13,58 @@ export default function JueshiV4Shell() {
   const [activeNav, setActiveNav] = useState('home');
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC]">
-      {/* Mobile menu overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+    <>
+      {/* Hide original site header/footer */}
+      <style jsx global>{`
+        body:has(.jueshi-v4-root) > header,
+        body:has(.jueshi-v4-root) > main > header,
+        body:has(.jueshi-v4-root) > footer,
+        body:has(.jueshi-v4-root) > main > footer {
+          display: none !important;
+        }
+        body:has(.jueshi-v4-root) {
+          overflow-x: hidden;
+        }
+      `}</style>
+
+      <div className="jueshi-v4-root fixed inset-0 z-[9999] bg-[#F6F8FC] overflow-hidden">
+        {/* Mobile menu overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <JueshiV4Sidebar
+          activeNav={activeNav}
+          onNavChange={setActiveNav}
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
         />
-      )}
 
-      {/* Sidebar */}
-      <JueshiV4Sidebar
-        activeNav={activeNav}
-        onNavChange={setActiveNav}
-        mobileOpen={sidebarOpen}
-        onMobileClose={() => setSidebarOpen(false)}
-      />
+        {/* Main content */}
+        <div className="lg:pl-60 h-full overflow-y-auto">
+          {/* Topbar */}
+          <JueshiV4Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
-      {/* Main content */}
-      <div className="lg:pl-60">
-        {/* Topbar */}
-        <JueshiV4Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          {/* Content */}
+          <main className="p-4 md:p-6 lg:p-8 max-w-[1200px] mx-auto">
+            {/* Hero */}
+            <JueshiV4Hero />
 
-        {/* Content */}
-        <main className="p-6 lg:p-8 max-w-[1400px] mx-auto">
-          {/* Hero */}
-          <JueshiV4Hero />
+            {/* Scenario shortcuts */}
+            <JueshiV4ScenarioSection />
 
-          {/* Scenario shortcuts */}
-          <JueshiV4ScenarioSection />
+            {/* Tool grid */}
+            <JueshiV4ToolGrid />
 
-          {/* Tool grid */}
-          <JueshiV4ToolGrid />
-
-          {/* Content section */}
-          <JueshiV4ContentSection />
-        </main>
+            {/* Content section */}
+            <JueshiV4ContentSection />
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
