@@ -281,7 +281,8 @@ function extractAudienceStage(text: string): string {
 // ============================================================================
 
 function extractSourceFacts(text: string, contentType: ContentType): SourceFacts {
-  const lines = text.split('\n').filter(l => l.trim());
+  // Split by sentences (Chinese/English punctuation) instead of lines
+  const sentences = text.split(/[。！？!?\n]+/).filter(s => s.trim().length >= 5);
   const facts: SourceFacts = {
     coreTopic: '',
     targetPeople: [],
@@ -300,18 +301,18 @@ function extractSourceFacts(text: string, contentType: ContentType): SourceFacts
   // Extract core topic
   facts.coreTopic = extractTitle(text, 'long_text');
 
-  // Extract key facts (sentences with data, numbers, specifics)
-  for (const line of lines) {
-    const trimmed = line.trim().replace(/^[-•*·#\d.、)\]）】]+\s*/, '');
+  // Extract facts from each sentence
+  for (const sentence of sentences) {
+    const trimmed = sentence.trim();
     if (trimmed.length < 5) continue;
 
     // Steps / action items
-    if (/^(第?[一二三四五六七八九十\d]+[步阶段点项条]|先|然后|接着|最后|步骤|需要|必须|应该)/.test(trimmed)) {
+    if (/^(第?[一二三四五六七八九十\d]+[步阶段点项条]|先|然后|接着|最后|步骤|需要|必须|应该|建议)/.test(trimmed)) {
       facts.steps.push(trimmed);
       facts.actionItems.push(trimmed);
     }
     // Warnings / risks
-    else if (/注意|小心|避免|不要|别|风险|坑|危险|警告|禁止|不能|切勿|千万别/.test(trimmed)) {
+    else if (/注意|小心|避免|不要|别|风险|坑|危险|警告|禁止|不能|切勿|千万别|容易|导致|问题|错误|失败|拒绝|质疑/.test(trimmed)) {
       facts.warnings.push(trimmed);
       facts.risks.push(trimmed);
     }
@@ -321,15 +322,16 @@ function extractSourceFacts(text: string, contentType: ContentType): SourceFacts
       facts.faqCandidates.push({ q, a: generateAnswerForQuestion(q, text) });
     }
     // Key facts (sentences with numbers or specifics)
-    else if (/\d/.test(trimmed) || /约|大概|通常|一般|平均/.test(trimmed)) {
+    else if (/\d/.test(trimmed) || /约|大概|通常|一般|平均|最好|最好能|不应该|要说明|要注意|要对应|要检查/.test(trimmed)) {
       facts.keyFacts.push(trimmed);
     }
     // Tool hints
-    else if (/工具|软件|APP|平台|网站|服务/.test(trimmed)) {
+    else if (/工具|软件|APP|平台|网站|服务|清单|列表/.test(trimmed)) {
       facts.toolHints.push(trimmed);
+      facts.keyFacts.push(trimmed); // Also add to keyFacts
     }
-    // General facts
-    else if (trimmed.length > 10) {
+    // General facts (longer sentences)
+    else if (trimmed.length > 15) {
       facts.keyFacts.push(trimmed);
     }
   }
@@ -437,12 +439,25 @@ function generateGuideContent(title: string, facts: SourceFacts, audience: strin
   ].filter(Boolean).join('');
 
   // Body (>= 1500 chars, >= 6 sections)
+  // Use source facts to expand content
+  const factDetails = facts.keyFacts.length > 0 
+    ? `\n\n根据实际经验，以下要点需要特别注意：\n${facts.keyFacts.slice(0, 5).map(f => `- ${f}`).join('\n')}`
+    : '';
+
+  const stepDetails = facts.steps.length > 0
+    ? facts.steps.slice(0, 8).map((s, i) => `**步骤${i + 1}**: ${s}`).join('\n\n')
+    : '**步骤1**: 确定目标和要求 — 明确你的目的地、学习/工作目标。\n\n**步骤2**: 准备必要文件 — 包括护照、申请表、照片、资金证明等。\n\n**步骤3**: 提交申请 — 按照官方要求提交完整的申请材料。\n\n**步骤4**: 等待审批 — 通常需要数周时间，请耐心等待。\n\n**步骤5**: 完成后续安排 — 包括机票、住宿、保险等。\n\n**步骤6**: 出发前检查 — 确认所有文件和安排就绪。';
+
+  const warningDetails = facts.warnings.length > 0
+    ? facts.warnings.slice(0, 6).map(w => `- ⚠️ ${w}`).join('\n')
+    : '- ⚠️ 不要拖延，时间规划是关键\n- ⚠️ 不要忽略目标国家的具体要求和法规\n- ⚠️ 不要只依赖单一信息来源\n- ⚠️ 不要忘记备份所有重要文件\n- ⚠️ 不要忽略保险和安全问题\n- ⚠️ 不要轻信非官方渠道的信息';
+
   const sections = [
-    { heading: '概述', content: `${title}是每位${audience}都需要深入了解的重要内容。本文将详细介绍整个流程和注意事项，帮助你顺利完成各项准备工作。无论你是第一次出海还是已经有经验，这份指南都能为你提供有价值的参考。\n\n在开始之前，请先了解：不同国家和地区的要求可能有所不同，建议以目标国家的官方信息为准。本指南提供的是通用性建议，具体情况请结合实际情况调整。` },
-    { heading: '前期准备', content: `在开始之前，你需要明确自己的目标和时间安排。建议至少提前6个月开始准备，包括了解目标国家的基本要求、准备必要的文件和资金。\n\n关键准备工作包括：\n- 确定目标国家和学校/项目\n- 了解签证类型和申请要求\n- 准备语言考试（如需要）\n- 估算总费用并准备资金证明\n- 收集必要的个人文件（护照、照片、成绩单等）\n\n${facts.keyFacts.length > 0 ? '根据你的资料，以下关键信息值得注意：\n' + facts.keyFacts.slice(0, 3).map(f => `- ${f}`).join('\n') : ''}` },
-    { heading: '详细步骤', content: `整个流程可以分为以下几个关键步骤：\n\n${facts.steps.length > 0 ? facts.steps.slice(0, 6).map((s, i) => `**步骤${i + 1}**: ${s}\n`).join('\n') : '**步骤1**: 确定目标和要求 — 明确你的目的地、学习/工作目标。\n\n**步骤2**: 准备必要文件 — 包括护照、申请表、照片、资金证明等。\n\n**步骤3**: 提交申请 — 按照官方要求提交完整的申请材料。\n\n**步骤4**: 等待审批 — 通常需要数周时间，请耐心等待。\n\n**步骤5**: 完成后续安排 — 包括机票、住宿、保险等。\n\n**步骤6**: 出发前检查 — 确认所有文件和安排就绪。'}` },
-    { heading: '常见问题', content: `在准备过程中，很多人会遇到各种疑问。以下是最常见的问题和解答：\n\n${facts.faqCandidates.length > 0 ? facts.faqCandidates.slice(0, 3).map(f => `**Q: ${f.q}**\nA: ${f.a}\n`).join('\n') : '**Q: 整个过程需要多长时间？**\nA: 根据目标国家和具体情况，一般需要1-6个月不等。\n\n**Q: 费用大概是多少？**\nA: 费用因国家和项目而异，建议提前了解并准备充足预算。\n\n**Q: 遇到问题应该找谁帮助？**\nA: 可以联系目标国家的官方机构、中国大使馆或使用绝世百宝箱的相关工具。'}` },
-    { heading: '注意事项与风险', content: `在整个过程中，有一些常见的陷阱需要避免：\n\n${facts.warnings.length > 0 ? facts.warnings.slice(0, 5).map(w => `- ⚠️ ${w}`).join('\n') : '- ⚠️ 不要拖延，时间规划是关键\n- ⚠️ 不要忽略目标国家的具体要求和法规\n- ⚠️ 不要只依赖单一信息来源\n- ⚠️ 不要忘记备份所有重要文件\n- ⚠️ 不要忽略保险和安全问题'}\n\n记住：提前准备、多方核实、保持耐心是成功的关键。` },
+    { heading: '概述', content: `${title}是每位${audience}都需要深入了解的重要内容。本文将详细介绍整个流程和注意事项，帮助你顺利完成各项准备工作。无论你是第一次出海还是已经有经验，这份指南都能为你提供有价值的参考。\n\n在开始之前，请先了解：不同国家和地区的要求可能有所不同，建议以目标国家的官方信息为准。本指南提供的是通用性建议，具体情况请结合实际情况调整。${factDetails}` },
+    { heading: '前期准备', content: `在开始之前，你需要明确自己的目标和时间安排。建议至少提前6个月开始准备，包括了解目标国家的基本要求、准备必要的文件和资金。\n\n关键准备工作包括：\n- 确定目标国家和学校/项目\n- 了解签证类型和申请要求\n- 准备语言考试（如需要）\n- 估算总费用并准备资金证明\n- 收集必要的个人文件（护照、照片、成绩单等）\n\n时间规划建议：\n- 6个月前：确定目标，开始准备语言考试\n- 4个月前：提交申请，准备签证材料\n- 2个月前：等待审批，安排住宿和机票\n- 1个月前：最终检查，准备行李` },
+    { heading: '详细步骤', content: `整个流程可以分为以下几个关键步骤：\n\n${stepDetails}` },
+    { heading: '常见问题', content: `在准备过程中，很多人会遇到各种疑问。以下是最常见的问题和解答：\n\n**Q: 整个过程需要多长时间？**\nA: 根据目标国家和具体情况，一般需要1-6个月不等。建议提前规划，预留充足时间处理意外情况。\n\n**Q: 费用大概是多少？**\nA: 费用因国家和项目而异，建议提前了解并准备充足预算。主要包括申请费、签证费、机票、住宿和生活费等。\n\n**Q: 遇到问题应该找谁帮助？**\nA: 可以联系目标国家的官方机构、中国大使馆或使用绝世百宝箱的相关工具。也可以加入相关社群获取经验分享。` },
+    { heading: '注意事项与风险', content: `在整个过程中，有一些常见的陷阱需要避免：\n\n${warningDetails}\n\n记住：提前准备、多方核实、保持耐心是成功的关键。遇到不确定的情况，宁可多问一句也不要自作主张。` },
     { heading: '实用工具推荐', content: `绝世百宝箱提供了多种实用工具，可以帮助你更高效地完成准备：\n\n- **HS编码查询** — 跨境寄送必备，快速查询商品编码\n- **国际邮编查询** — 填写地址时必备，确保邮件准确送达\n- **唛头生成器** — 物流标记必备，规范包装标识\n- **更多工具** — 访问绝世百宝箱工具中心发现更多实用功能\n\n这些工具都是免费的，建议提前熟悉使用方法。` },
     { heading: '总结与下一步', content: `${title}虽然涉及多个环节，但只要提前规划、按步骤执行，就能顺利完成。\n\n建议你现在就开始行动：\n1. 收藏本指南，随时查阅\n2. 使用绝世百宝箱的相关清单工具，确保不遗漏\n3. 关注目标国家的最新政策变化\n4. 加入相关社群，获取第一手信息\n\n祝你一切顺利！如有更多问题，欢迎使用绝世百宝箱的相关工具和指南。` },
   ];
