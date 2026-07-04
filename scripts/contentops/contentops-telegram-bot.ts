@@ -77,7 +77,6 @@ interface QualityResult {
   failures: string[];
   warnings: string[];
 }
-}
 
 interface PendingDraft {
   traceId: string;
