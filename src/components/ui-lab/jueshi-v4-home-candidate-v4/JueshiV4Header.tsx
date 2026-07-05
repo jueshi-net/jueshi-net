@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import { Search, Bell, Menu, X, Sparkles } from 'lucide-react';
 import { DEFAULT_BUTTONS, type NavItemConfig, type ButtonConfig } from './homepageConfig';
 
@@ -21,6 +22,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default function JueshiV4Header({ onMenuClick, menuOpen }: HeaderProps) {
   const [activeNav, setActiveNav] = useState('home');
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated' && !!session?.user;
+  const displayName = session?.user?.name || session?.user?.email || '用户';
   
   // 从配置读取
   const config = DEFAULT_BUTTONS;
@@ -134,15 +138,29 @@ export default function JueshiV4Header({ onMenuClick, menuOpen }: HeaderProps) {
                 </Link>
               )}
 
-              {/* Login */}
-              {loginButton.enabled && (
+              {/* Login / User Info */}
+              {isLoggedIn ? (
+                /* 已登录：显示用户头像 + 用户名 + 工作台 */
                 <Link
-                  href={loginButton.href}
-                  data-tracking={loginButton.trackingKey}
-                  className="hidden sm:flex items-center px-4 py-2 bg-[#6C5DD3] text-white rounded-lg text-sm font-medium hover:bg-[#5A4FBF] transition-colors"
+                  href="/workspace"
+                  className="hidden sm:flex items-center gap-2 px-3 py-2 hover:bg-[#F3F5FA] rounded-lg transition-colors"
                 >
-                  {loginButton.label}
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">{displayName.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <span className="text-sm font-medium text-[#11142D] max-w-[100px] truncate">{displayName}</span>
                 </Link>
+              ) : (
+                /* 未登录：显示登录按钮 */
+                loginButton.enabled && (
+                  <Link
+                    href={loginButton.href}
+                    data-tracking={loginButton.trackingKey}
+                    className="hidden sm:flex items-center px-4 py-2 bg-[#6C5DD3] text-white rounded-lg text-sm font-medium hover:bg-[#5A4FBF] transition-colors"
+                  >
+                    {loginButton.label}
+                  </Link>
+                )
               )}
 
               {/* Mobile menu button */}
