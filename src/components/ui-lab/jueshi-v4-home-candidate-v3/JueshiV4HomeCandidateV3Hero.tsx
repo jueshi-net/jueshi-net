@@ -6,12 +6,12 @@ import Image from 'next/image';
 import { Mail, Package, RefreshCw, Truck, FileText, CheckSquare, ArrowRight, TrendingUp, Compass, Bookmark, Search, Zap, Clock, Award, Sparkles, Heart } from 'lucide-react';
 
 const quickTools = [
-  { icon: Mail, label: '邮编查询', color: 'from-blue-400 to-blue-500' },
-  { icon: Package, label: 'HS编码', color: 'from-purple-400 to-purple-500' },
-  { icon: RefreshCw, label: '汇率换算', color: 'from-green-400 to-green-500' },
-  { icon: Truck, label: '运费计算', color: 'from-orange-400 to-orange-500' },
-  { icon: FileText, label: '单据生成', color: 'from-cyan-400 to-blue-400' },
-  { icon: CheckSquare, label: '清单任务', color: 'from-pink-400 to-rose-400' },
+  { icon: Mail, label: '邮编查询', color: 'from-blue-400 to-blue-500', href: '/tools/postal-code', testId: 'home-hero-tool-postal-code' },
+  { icon: Package, label: 'HS编码', color: 'from-purple-400 to-purple-500', href: '/tools/hs-code', testId: 'home-hero-tool-hs-code' },
+  { icon: RefreshCw, label: '汇率换算', color: 'from-green-400 to-green-500', href: '/tools/exchange-rate', testId: 'home-hero-tool-exchange-rate' },
+  { icon: Truck, label: '运费计算', color: 'from-orange-400 to-orange-500', href: '/tools/shipping-calculator', testId: 'home-hero-tool-shipping-calculator' },
+  { icon: FileText, label: '单据生成', color: 'from-cyan-400 to-blue-400', href: '/tools/commercial-invoice', testId: 'home-hero-tool-document' },
+  { icon: CheckSquare, label: '清单任务', color: 'from-pink-400 to-rose-400', href: '/checklists', testId: 'home-hero-tool-checklist' },
 ];
 
 const trustStats = [
@@ -29,9 +29,9 @@ const hotSearches = [
 ];
 
 const quickTasks = [
-  { label: '寄国际包裹', icon: '📦' },
-  { label: '做外贸报价', icon: '💰' },
-  { label: '准备出国留学', icon: '🎓' },
+  { label: '寄国际包裹', icon: '📦', href: '/tools/shipping-calculator', testId: 'home-hero-task-ship-international' },
+  { label: '做外贸报价', icon: '💰', href: '/tools/quote', testId: 'home-hero-task-quote' },
+  { label: '准备出国留学', icon: '🎓', href: '/checklists/student-first-abroad', testId: 'home-hero-task-study-abroad' },
 ];
 
 const recentUpdates = [
@@ -272,9 +272,11 @@ export default function JueshiV4HomeCandidateV3Hero() {
                   {quickTools.map((tool, i) => {
                     const Icon = tool.icon;
                     return (
-                      <div
+                      <Link
                         key={i}
-                        className="flex flex-col items-center gap-1.5 p-2.5 bg-gradient-to-br from-[#F8F9FC] to-[#F3F5FA] rounded-xl border border-[#E8ECF3] hover:shadow-md hover:border-[#6C5DD3]/20 transition-all cursor-pointer group"
+                        href={tool.href}
+                        data-testid={tool.testId}
+                        className="flex flex-col items-center gap-1.5 p-2.5 bg-gradient-to-br from-[#F8F9FC] to-[#F3F5FA] rounded-xl border border-[#E8ECF3] hover:shadow-md hover:border-[#6C5DD3]/20 transition-all group"
                       >
                         <div className={`w-9 h-9 flex items-center justify-center bg-gradient-to-br ${tool.color} rounded-lg shadow-sm group-hover:scale-105 transition-transform`}>
                           <Icon className="w-4.5 h-4.5 text-white" strokeWidth={2} />
@@ -282,7 +284,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                         <span className="text-[11px] font-medium text-[#11142D] group-hover:text-[#6C5DD3] transition-colors">
                           {tool.label}
                         </span>
-                      </div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -310,10 +312,15 @@ export default function JueshiV4HomeCandidateV3Hero() {
                   </div>
                   <div className="flex gap-1.5">
                     {quickTasks.map((task, i) => (
-                      <div key={i} className="flex-1 flex items-center gap-1 p-1.5 bg-white rounded-lg border border-[#E8ECF3]">
+                      <Link 
+                        key={i} 
+                        href={task.href}
+                        data-testid={task.testId}
+                        className="flex-1 flex items-center gap-1 p-1.5 bg-white rounded-lg border border-[#E8ECF3] hover:border-[#6C5DD3]/20 hover:shadow-sm transition-all"
+                      >
                         <span className="text-xs">{task.icon}</span>
                         <span className="text-[11px] text-[#11142D] font-medium">{task.label}</span>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
