@@ -140,7 +140,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                       </div>
                       <div>
                         <div className="text-base font-bold text-[#11142D]">{stat.label}</div>
-                        <div className="text-[10px] text-[#808191]">{stat.desc}</div>
+                        <div className="text-[11px] text-[#808191]">{stat.desc}</div>
                       </div>
                     </div>
                   );
@@ -157,17 +157,17 @@ export default function JueshiV4HomeCandidateV3Hero() {
                         <span className="text-base">🦀</span>
                       </div>
                       <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#FF754C] rounded-full flex items-center justify-center border-2 border-white">
-                        <span className="text-[9px] text-white font-bold">{user.level}</span>
+                        <span className="text-[11px] text-white font-bold">{user.level}</span>
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <h4 className="text-sm font-bold text-[#11142D] truncate">{user.nickname}</h4>
-                        <span className="text-[10px] px-1.5 py-0.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded font-medium">
+                        <span className="text-[11px] px-1.5 py-0.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded font-medium">
                           Lv.{user.level}
                         </span>
                       </div>
-                      <p className="text-[10px] text-[#808191] mb-1">{user.title}</p>
+                      <p className="text-[11px] text-[#808191] mb-1">{user.title}</p>
                       <div className="flex items-center gap-2">
                         <div className="flex-1 h-1.5 bg-[#E8ECF3] rounded-full overflow-hidden">
                           <div
@@ -175,7 +175,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                             style={{ width: `${expProgress}%` }}
                           />
                         </div>
-                        <span className="text-[9px] text-[#808191] whitespace-nowrap">
+                        <span className="text-[11px] text-[#808191] whitespace-nowrap">
                           {user.currentExp}/{user.nextLevelExp}
                         </span>
                       </div>
@@ -188,7 +188,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                     <div className="p-2 bg-[#F8F9FC] rounded-lg">
                       <div className="flex items-center gap-1 mb-1.5">
                         <Zap className="w-3 h-3 text-[#FF754C]" />
-                        <span className="text-[10px] font-semibold text-[#11142D]">今日任务</span>
+                        <span className="text-[11px] font-semibold text-[#11142D]">今日任务</span>
                       </div>
                       <div className="space-y-1">
                         {user.todayTasks.slice(0, 2).map((task) => (
@@ -196,9 +196,9 @@ export default function JueshiV4HomeCandidateV3Hero() {
                             <div className={`w-3 h-3 rounded border flex items-center justify-center ${
                               task.done ? 'bg-[#6C5DD3] border-[#6C5DD3]' : 'border-[#E8ECF3]'
                             }`}>
-                              {task.done && <span className="text-white text-[8px]">✓</span>}
+                              {task.done && <span className="text-white text-[11px]">✓</span>}
                             </div>
-                            <span className={`text-[10px] ${task.done ? 'text-[#808191] line-through' : 'text-[#11142D]'} truncate`}>
+                            <span className={`text-[11px] ${task.done ? 'text-[#808191] line-through' : 'text-[#11142D]'} truncate`}>
                               {task.name}
                             </span>
                           </div>
@@ -210,12 +210,12 @@ export default function JueshiV4HomeCandidateV3Hero() {
                     <div className="p-2 bg-[#F8F9FC] rounded-lg">
                       <div className="flex items-center gap-1 mb-1.5">
                         <CheckSquare className="w-3 h-3 text-[#6C5DD3]" />
-                        <span className="text-[10px] font-semibold text-[#11142D]">未完成清单</span>
+                        <span className="text-[11px] font-semibold text-[#11142D]">未完成清单</span>
                       </div>
                       <div className="space-y-1.5">
                         {user.pendingChecklists.map((checklist) => (
                           <div key={checklist.id}>
-                            <div className="flex items-center justify-between text-[10px] mb-0.5">
+                            <div className="flex items-center justify-between text-[11px] mb-0.5">
                               <span className="text-[#11142D] truncate flex-1">{checklist.name}</span>
                               <span className="text-[#808191] ml-1">{checklist.progress}%</span>
                             </div>
@@ -261,7 +261,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                     </div>
                     <h3 className="text-xs font-bold text-[#11142D]">今日常用工具</h3>
                   </div>
-                  <span className="text-[10px] text-[#808191]">6 个工具</span>
+                  <span className="text-[11px] text-[#808191]">6 个工具</span>
                 </div>
 
                 {/* Tool grid */}
@@ -276,7 +276,7 @@ export default function JueshiV4HomeCandidateV3Hero() {
                         <div className={`w-9 h-9 flex items-center justify-center bg-gradient-to-br ${tool.color} rounded-lg shadow-sm group-hover:scale-105 transition-transform`}>
                           <Icon className="w-4.5 h-4.5 text-white" strokeWidth={2} />
                         </div>
-                        <span className="text-[10px] font-medium text-[#11142D] group-hover:text-[#6C5DD3] transition-colors">
+                        <span className="text-[11px] font-medium text-[#11142D] group-hover:text-[#6C5DD3] transition-colors">
                           {tool.label}
                         </span>
                       </div>
@@ -288,11 +288,11 @@ export default function JueshiV4HomeCandidateV3Hero() {
                 <div className="mb-3 p-2.5 bg-[#F8F9FC] rounded-xl">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Search className="w-3 h-3 text-[#6C5DD3]" />
-                    <span className="text-[10px] font-semibold text-[#11142D]">今日热门搜索</span>
+                    <span className="text-[11px] font-semibold text-[#11142D]">今日热门搜索</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {hotSearches.map((search, i) => (
-                      <span key={i} className="text-[9px] px-1.5 py-0.5 bg-white text-[#808191] rounded border border-[#E8ECF3]">
+                      <span key={i} className="text-[11px] px-1.5 py-0.5 bg-white text-[#808191] rounded border border-[#E8ECF3]">
                         {search}
                       </span>
                     ))}
@@ -303,13 +303,13 @@ export default function JueshiV4HomeCandidateV3Hero() {
                 <div className="mb-3 p-2.5 bg-[#F8F9FC] rounded-xl">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Zap className="w-3 h-3 text-[#FF754C]" />
-                    <span className="text-[10px] font-semibold text-[#11142D]">快捷任务</span>
+                    <span className="text-[11px] font-semibold text-[#11142D]">快捷任务</span>
                   </div>
                   <div className="flex gap-1.5">
                     {quickTasks.map((task, i) => (
                       <div key={i} className="flex-1 flex items-center gap-1 p-1.5 bg-white rounded-lg border border-[#E8ECF3]">
                         <span className="text-xs">{task.icon}</span>
-                        <span className="text-[9px] text-[#11142D] font-medium">{task.label}</span>
+                        <span className="text-[11px] text-[#11142D] font-medium">{task.label}</span>
                       </div>
                     ))}
                   </div>
@@ -319,13 +319,13 @@ export default function JueshiV4HomeCandidateV3Hero() {
                 <div className="p-2.5 bg-[#F8F9FC] rounded-xl">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <Clock className="w-3 h-3 text-[#3F8CFF]" />
-                    <span className="text-[10px] font-semibold text-[#11142D]">最近更新</span>
+                    <span className="text-[11px] font-semibold text-[#11142D]">最近更新</span>
                   </div>
                   <div className="space-y-1">
                     {recentUpdates.map((update, i) => (
                       <div key={i} className="flex items-center justify-between">
-                        <span className="text-[9px] text-[#11142D]">{update.label}</span>
-                        <span className="text-[8px] text-[#808191]">{update.time}</span>
+                        <span className="text-[11px] text-[#11142D]">{update.label}</span>
+                        <span className="text-[11px] text-[#808191]">{update.time}</span>
                       </div>
                     ))}
                   </div>
@@ -338,8 +338,8 @@ export default function JueshiV4HomeCandidateV3Hero() {
                   <span className="text-sm">🦀</span>
                 </div>
                 <div>
-                  <div className="text-[10px] font-medium text-[#11142D]">绝世百宝箱</div>
-                  <div className="text-[8px] text-[#808191]">您的海外生活助手</div>
+                  <div className="text-[11px] font-medium text-[#11142D]">绝世百宝箱</div>
+                  <div className="text-[11px] text-[#808191]">您的海外生活助手</div>
                 </div>
               </div>
             </div>

@@ -82,7 +82,7 @@ export default function JueshiV4AdSlot({
       {/* 广告标识 */}
       <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 bg-white/80 backdrop-blur-sm border border-[#E8ECF3] rounded-md">
         <Megaphone className="w-3 h-3 text-[#808191]" />
-        <span className="text-[10px] font-medium text-[#808191]">广告</span>
+        <span className="text-[11px] font-medium text-[#808191]">广告</span>
       </div>
 
       {/* 广告内容 */}
@@ -99,7 +99,7 @@ export default function JueshiV4AdSlot({
       </div>
 
       {/* UI Lab 提示（仅开发环境） */}
-      <div className="absolute bottom-2 right-3 text-[9px] text-[#808191]/60">
+      <div className="absolute bottom-2 right-3 text-[11px] text-[#808191]/60">
         slotKey: {slotKey}
       </div>
     </div>

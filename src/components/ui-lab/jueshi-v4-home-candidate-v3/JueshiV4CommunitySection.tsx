@@ -127,7 +127,7 @@ export default function JueshiV4CommunitySection() {
               {categories.map((cat) => (
                 <span
                   key={cat.name}
-                  className={`text-[10px] px-2 py-1 rounded-md font-medium ${cat.color}`}
+                  className={`text-[11px] px-2 py-1 rounded-md font-medium ${cat.color}`}
                 >
                   {cat.name}
                 </span>
@@ -147,7 +147,7 @@ export default function JueshiV4CommunitySection() {
         <div className="bg-white rounded-xl border border-[#E8ECF3] p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-[#11142D]">热门讨论</h3>
-            <Link href="/community" className="text-[10px] text-[#6C5DD3] hover:underline">
+            <Link href="/community" className="text-[11px] text-[#6C5DD3] hover:underline">
               查看更多
             </Link>
           </div>
@@ -166,12 +166,12 @@ export default function JueshiV4CommunitySection() {
                     <h4 className="text-sm font-medium text-[#11142D] group-hover:text-[#6C5DD3] transition-colors line-clamp-1">
                       {post.title}
                     </h4>
-                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium whitespace-nowrap ${tagStyle.color}`}>
+                    <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap ${tagStyle.color}`}>
                       <TagIcon className="w-2.5 h-2.5" />
                       {post.tag}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-[10px] text-[#808191]">
+                  <div className="flex items-center gap-3 text-[11px] text-[#808191]">
                     <span className={`px-1.5 py-0.5 rounded font-medium ${categories.find(c => c.name === post.category)?.color || 'bg-gray-50 text-gray-500'}`}>
                       {post.category}
                     </span>
