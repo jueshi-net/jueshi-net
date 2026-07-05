@@ -134,14 +134,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
   const [activeTab, setActiveTab] = useState('home');
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC]">
-      {/* Dev marker - show in staging environment */}
-      {process.env.NEXT_PUBLIC_APP_ENV !== 'production' && (
-        <div className="bg-yellow-400 text-black text-center py-1 text-xs font-bold">
-          DEV MODE · restored-original-v4 · 7b307c0
-        </div>
-      )}
-      
+    <div className="min-h-screen bg-[#F6F8FC]" data-build-info="restored-original-v4-16fc819">
       {/* Header - V4 专属，消费配置 */}
       <JueshiV4Header
         onMenuClick={() => setMenuOpen(!menuOpen)}

@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
-import { Mail, Package, RefreshCw, Truck, FileText, CheckSquare, ArrowRight, TrendingUp, Compass, Bookmark, Search, Zap, Clock, Award, Sparkles, Heart } from 'lucide-react';
+import { Mail, Package, RefreshCw, Truck, FileText, CheckSquare, ArrowRight, TrendingUp, Compass, Bookmark, Search, Zap, Clock, Award, Sparkles, Heart, CheckCircle } from 'lucide-react';
 
 const quickTools = [
   { icon: Mail, label: '邮编查询', color: 'from-blue-400 to-blue-500', href: '/tools/postal-code', testId: 'home-hero-tool-postal-code' },
@@ -47,6 +47,55 @@ export default function JueshiV4HomeCandidateV3Hero() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated' && !!session?.user;
   const displayName = session?.user?.name || session?.user?.email || '用户';
+  
+  // 签到状态
+  const [checkedInToday, setCheckedInToday] = useState(false);
+  const [userPoints, setUserPoints] = useState(0);
+  const [checkinStreak, setCheckinStreak] = useState(0);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  
+  // 获取用户签到状态
+  useEffect(() => {
+    if (isLoggedIn) {
+      // 从 session 或 API 获取用户积分和签到状态
+      fetch('/api/user/stats')
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data) {
+            setUserPoints(data.points || 0);
+            setCheckinStreak(data.checkinStreak || 0);
+            setCheckedInToday(data.checkedInToday || false);
+          }
+        })
+        .catch(() => {
+          // API 不存在时使用默认值
+        });
+    }
+  }, [isLoggedIn]);
+  
+  // 签到处理
+  const handleCheckin = async () => {
+    if (!isLoggedIn || checkedInToday || isCheckingIn) return;
+    
+    setIsCheckingIn(true);
+    try {
+      const res = await fetch('/api/checkin', { method: 'POST' });
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        setCheckedInToday(true);
+        setUserPoints(data.totalPoints || userPoints + data.points);
+        setCheckinStreak(data.streak || checkinStreak + 1);
+      } else if (res.status === 409) {
+        // 今日已签到
+        setCheckedInToday(true);
+      }
+    } catch (error) {
+      console.error('签到失败:', error);
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
 
   return (
     <section className="mb-6 md:mb-8">
@@ -142,15 +191,39 @@ export default function JueshiV4HomeCandidateV3Hero() {
                     </div>
                   </div>
 
+                  {/* Stats row - 真实数据 */}
+                  <div className="flex items-center gap-3 mb-3 p-2.5 bg-gradient-to-r from-[#F8F9FC] to-[#F3F5FA] rounded-xl">
+                    <div className="flex-1 text-center">
+                      <div className="text-base font-bold text-[#6C5DD3]">{userPoints}</div>
+                      <div className="text-[10px] text-[#808191]">积分</div>
+                    </div>
+                    <div className="w-px h-8 bg-[#E8ECF3]"></div>
+                    <div className="flex-1 text-center">
+                      <div className="text-base font-bold text-[#FF754C]">{checkinStreak}</div>
+                      <div className="text-[10px] text-[#808191]">连续签到</div>
+                    </div>
+                  </div>
+
                   {/* CTA row */}
                   <div className="flex items-center gap-2">
-                    <Link
-                      href="/workspace"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      每日签到
-                    </Link>
+                    {checkedInToday ? (
+                      <button
+                        disabled
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#E8ECF3] text-[#808191] rounded-lg text-[11px] font-medium cursor-not-allowed"
+                      >
+                        <CheckCircle className="w-3 h-3" />
+                        今日已签到
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleCheckin}
+                        disabled={isCheckingIn}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all disabled:opacity-50"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        {isCheckingIn ? '签到中...' : '每日签到'}
+                      </button>
+                    )}
                     <Link
                       href="/workspace"
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F3F5FA] text-[#6C5DD3] rounded-lg text-[11px] font-medium hover:bg-[#6C5DD3]/8 transition-colors"
