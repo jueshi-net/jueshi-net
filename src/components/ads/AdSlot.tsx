@@ -108,44 +108,58 @@ export function AdSlot({ placement, country, className = '' }: AdSlotProps) {
 
   // DIRECT: Image + link ad
   if (ad.adType === 'DIRECT') {
+    const hasTargetUrl = ad.targetUrl && ad.targetUrl !== '#';
+    
+    const content = (
+      <>
+        {ad.imageUrl && (
+          <img
+            src={ad.imageUrl}
+            alt={ad.title}
+            className="w-full object-cover max-h-48"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        )}
+        <div className="p-4 flex items-start gap-3">
+          <Megaphone className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className={`font-medium ${hasTargetUrl ? 'text-gray-900 group-hover:text-blue-600' : 'text-gray-700'} transition-colors`}>
+              {ad.title}
+            </p>
+            {hasTargetUrl && (
+              <div className="flex items-center gap-1 mt-1 text-xs text-blue-500">
+                <ExternalLink className="w-3 h-3" /> 了解详情
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+
     return (
       <div className={`bg-white border border-gray-100 rounded-xl overflow-hidden relative ${className}`}>
         <span className="absolute top-2 right-3 z-10 inline-flex items-center px-1.5 py-0.5 bg-amber-50 text-amber-600 text-xs rounded font-medium">
           推广
         </span>
-        <a
-          href={ad.targetUrl || '#'}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => {
-            fetch(`/api/ads/${ad.id}/click`, { method: 'POST' }).catch(() => {});
-          }}
-          className="block group"
-        >
-          {ad.imageUrl && (
-            <img
-              src={ad.imageUrl}
-              alt={ad.title}
-              className="w-full object-cover max-h-48"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          )}
-          <div className="p-4 flex items-start gap-3">
-            <Megaphone className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                {ad.title}
-              </p>
-              {ad.targetUrl && (
-                <div className="flex items-center gap-1 mt-1 text-xs text-blue-500">
-                  <ExternalLink className="w-3 h-3" /> 了解详情
-                </div>
-              )}
-            </div>
+        {hasTargetUrl ? (
+          <a
+            href={ad.targetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              fetch(`/api/ads/${ad.id}/click`, { method: 'POST' }).catch(() => {});
+            }}
+            className="block group"
+          >
+            {content}
+          </a>
+        ) : (
+          <div className="block cursor-default">
+            {content}
           </div>
-        </a>
+        )}
       </div>
     );
   }
