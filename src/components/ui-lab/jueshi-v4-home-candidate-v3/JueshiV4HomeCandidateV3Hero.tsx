@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import { Mail, Package, RefreshCw, Truck, FileText, CheckSquare, ArrowRight, TrendingUp, Compass, Bookmark, Search, Zap, Clock, Award, Sparkles, Heart } from 'lucide-react';
 
 const quickTools = [
@@ -40,35 +41,12 @@ const recentUpdates = [
   { label: '资源导航扩展', time: '3天前' },
 ];
 
-// Mock 用户数据（工作台卡）
-const mockUser = {
-  isLoggedIn: true,
-  nickname: '绝世工具玩家',
-  title: '跨境探索者',
-  level: 3,
-  currentExp: 1280,
-  nextLevelExp: 2000,
-  checkinStreak: 7,
-  badges: [
-    { id: 1, name: '邮编达人', icon: '📮' },
-    { id: 2, name: '汇率快手', icon: '💱' },
-    { id: 3, name: '清单收藏家', icon: '📋' },
-    { id: 4, name: '外贸新手', icon: '📦' },
-  ],
-  todayTasks: [
-    { id: 1, name: '完成每日签到', done: true },
-    { id: 2, name: '使用运费计算器', done: false },
-    { id: 3, name: '查看新清单', done: false },
-  ],
-  pendingChecklists: [
-    { id: 1, name: '留学准备清单', progress: 68 },
-    { id: 2, name: '集运发货清单', progress: 42 },
-  ],
-};
+// Mock 用户数据已删除 — 使用 NextAuth session 获取真实用户数据
 
 export default function JueshiV4HomeCandidateV3Hero() {
-  const user = mockUser;
-  const expProgress = (user.currentExp / user.nextLevelExp) * 100;
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated' && !!session?.user;
+  const displayName = session?.user?.name || session?.user?.email || '用户';
 
   return (
     <section className="mb-6 md:mb-8">
@@ -147,8 +125,9 @@ export default function JueshiV4HomeCandidateV3Hero() {
                 })}
               </div>
 
-              {/* Embedded Workbench Card - V3 新增 */}
-              {user.isLoggedIn && (
+              {/* Embedded Workbench Card - 使用真实 session 数据 */}
+              {isLoggedIn ? (
+                /* 已登录态：显示真实用户信息 */
                 <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-[#E8ECF3]/60 shadow-lg p-4">
                   {/* User info row */}
                   <div className="flex items-center gap-3 mb-3">
@@ -156,78 +135,10 @@ export default function JueshiV4HomeCandidateV3Hero() {
                       <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center border-2 border-white shadow-md">
                         <span className="text-base">🦀</span>
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#FF754C] rounded-full flex items-center justify-center border-2 border-white">
-                        <span className="text-[11px] text-white font-bold">{user.level}</span>
-                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <h4 className="text-sm font-bold text-[#11142D] truncate">{user.nickname}</h4>
-                        <span className="text-[11px] px-1.5 py-0.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded font-medium">
-                          Lv.{user.level}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#808191] mb-1">{user.title}</p>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-[#E8ECF3] rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] rounded-full"
-                            style={{ width: `${expProgress}%` }}
-                          />
-                        </div>
-                        <span className="text-[11px] text-[#808191] whitespace-nowrap">
-                          {user.currentExp}/{user.nextLevelExp}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Compact content */}
-                  <div className="grid grid-cols-2 gap-2 mb-3">
-                    {/* Today tasks */}
-                    <div className="p-2 bg-[#F8F9FC] rounded-lg">
-                      <div className="flex items-center gap-1 mb-1.5">
-                        <Zap className="w-3 h-3 text-[#FF754C]" />
-                        <span className="text-[11px] font-semibold text-[#11142D]">今日任务</span>
-                      </div>
-                      <div className="space-y-1">
-                        {user.todayTasks.slice(0, 2).map((task) => (
-                          <div key={task.id} className="flex items-center gap-1.5">
-                            <div className={`w-3 h-3 rounded border flex items-center justify-center ${
-                              task.done ? 'bg-[#6C5DD3] border-[#6C5DD3]' : 'border-[#E8ECF3]'
-                            }`}>
-                              {task.done && <span className="text-white text-[11px]">✓</span>}
-                            </div>
-                            <span className={`text-[11px] ${task.done ? 'text-[#808191] line-through' : 'text-[#11142D]'} truncate`}>
-                              {task.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Pending checklists */}
-                    <div className="p-2 bg-[#F8F9FC] rounded-lg">
-                      <div className="flex items-center gap-1 mb-1.5">
-                        <CheckSquare className="w-3 h-3 text-[#6C5DD3]" />
-                        <span className="text-[11px] font-semibold text-[#11142D]">未完成清单</span>
-                      </div>
-                      <div className="space-y-1.5">
-                        {user.pendingChecklists.map((checklist) => (
-                          <div key={checklist.id}>
-                            <div className="flex items-center justify-between text-[11px] mb-0.5">
-                              <span className="text-[#11142D] truncate flex-1">{checklist.name}</span>
-                              <span className="text-[#808191] ml-1">{checklist.progress}%</span>
-                            </div>
-                            <div className="w-full h-1 bg-[#E8ECF3] rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] rounded-full"
-                                style={{ width: `${checklist.progress}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <h4 className="text-sm font-bold text-[#11142D] truncate">{displayName}</h4>
+                      <p className="text-[11px] text-[#808191]">欢迎回来</p>
                     </div>
                   </div>
 
@@ -238,13 +149,41 @@ export default function JueshiV4HomeCandidateV3Hero() {
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all"
                     >
                       <Sparkles className="w-3 h-3" />
-                      签到 ({user.checkinStreak}天)
+                      每日签到
                     </Link>
                     <Link
                       href="/workspace"
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F3F5FA] text-[#6C5DD3] rounded-lg text-[11px] font-medium hover:bg-[#6C5DD3]/8 transition-colors"
                     >
                       查看工作台
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                /* 未登录态：显示登录引导 */
+                <div className="bg-white/85 backdrop-blur-md rounded-2xl border border-[#E8ECF3]/60 shadow-lg p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center border-2 border-white shadow-md flex-shrink-0">
+                      <span className="text-base">🦀</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-bold text-[#11142D]">登录后保存你的工具记录</h4>
+                      <p className="text-[11px] text-[#808191]">收藏常用工具、保存清单进度、解锁等级勋章</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/login"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all"
+                    >
+                      立即登录
+                    </Link>
+                    <Link
+                      href="/tools"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F3F5FA] text-[#6C5DD3] rounded-lg text-[11px] font-medium hover:bg-[#6C5DD3]/8 transition-colors"
+                    >
+                      浏览工具
                       <ArrowRight className="w-3 h-3" />
                     </Link>
                   </div>
