@@ -8,11 +8,10 @@ import JueshiV4HomeCandidateV2ResourceNav from '../jueshi-v4-home-candidate-v2/J
 import JueshiV4ScenarioSection from '../jueshi-v4/JueshiV4ScenarioSection';
 import JueshiV4RecommendedContent from '../jueshi-v4-topnav/JueshiV4RecommendedContent';
 import JueshiV4CommunitySection from '../jueshi-v4-home-candidate-v3/JueshiV4CommunitySection';
-import JueshiV4AdInventoryGroup from './JueshiV4AdInventoryGroup';
+import JueshiV4AdPlacementGrid from './JueshiV4AdPlacementGrid';
 import JueshiV4Header from './JueshiV4Header';
 import JueshiV4BottomTab from './JueshiV4BottomTab';
 import JueshiV4Footer from './JueshiV4Footer';
-import { mockAdInventory } from './adInventory';
 
 // 轻量工作台提示条
 function WorkbenchPrompt() {
@@ -45,21 +44,9 @@ function WorkbenchPrompt() {
   );
 }
 
-// Get ad group by key
-function getAdGroup(groupKey: string) {
-  return mockAdInventory.find((g) => g.groupKey === groupKey);
-}
-
 export default function JueshiV4HomeCandidateV4Shell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-
-  // Get ad groups
-  const afterHeroAd = getAdGroup('home_after_hero_ad_group');
-  const afterToolsAd = getAdGroup('home_after_tools_ad_group');
-  const afterTaskChainAd = getAdGroup('home_after_task_chain_ad_group');
-  const communityAd = getAdGroup('home_community_ad_group');
-  const beforeFooterAd = getAdGroup('home_before_footer_ad_group');
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
@@ -75,12 +62,15 @@ export default function JueshiV4HomeCandidateV4Shell() {
           {/* 1. Hero - 工作台嵌入左侧 */}
           <JueshiV4HomeCandidateV3Hero />
 
-          {/* 2. 广告组：Hero 下方 */}
-          {afterHeroAd && afterHeroAd.enabled && (
-            <div className="mb-8">
-              <JueshiV4AdInventoryGroup group={afterHeroAd} />
-            </div>
-          )}
+          {/* 2. 广告组：Hero 下方 - 调用现有广告系统 */}
+          <div className="mb-8">
+            <JueshiV4AdPlacementGrid
+              placements={['home-hero', 'home-after-tools']}
+              columns={2}
+              title="推荐服务"
+              description="精选跨境服务推荐"
+            />
+          </div>
 
           {/* 3. 常用场景 */}
           <JueshiV4ScenarioSection />
@@ -88,48 +78,50 @@ export default function JueshiV4HomeCandidateV4Shell() {
           {/* 4. 高频工具 */}
           <JueshiV4HomeCandidateV2ToolGrid />
 
-          {/* 5. 广告组：工具区后 */}
-          {afterToolsAd && afterToolsAd.enabled && (
-            <div className="mb-10">
-              <JueshiV4AdInventoryGroup group={afterToolsAd} />
-            </div>
-          )}
+          {/* 5. 广告组：工具区后 - 调用现有广告系统 */}
+          <div className="mb-10">
+            <JueshiV4AdPlacementGrid
+              placements={['home-after-tools', 'tool-bottom']}
+              columns={2}
+              title="工具服务推荐"
+              description="提升工作效率的专业工具"
+            />
+          </div>
 
           {/* 6. 热门任务链 */}
           <JueshiV4HomeCandidateV2TaskChains />
 
-          {/* 7. 广告组：任务链后 */}
-          {afterTaskChainAd && afterTaskChainAd.enabled && (
-            <div className="mb-10">
-              <JueshiV4AdInventoryGroup group={afterTaskChainAd} />
-            </div>
-          )}
+          {/* 7. 广告组：任务链后 - 调用现有广告系统 */}
+          <div className="mb-10">
+            <JueshiV4AdPlacementGrid
+              placements={['home-before-footer', 'footer']}
+              columns={2}
+              title="流程服务推荐"
+              description="集运、留学、外贸全流程服务"
+            />
+          </div>
 
           {/* 8. 社区论坛 */}
           <JueshiV4CommunitySection />
 
-          {/* 9. 广告组：社区旁 */}
-          {communityAd && communityAd.enabled && (
-            <div className="mb-10">
-              <JueshiV4AdInventoryGroup group={communityAd} />
-            </div>
-          )}
-
-          {/* 10. 推荐内容 */}
+          {/* 9. 推荐内容 */}
           <JueshiV4RecommendedContent />
 
-          {/* 11. 资源导航 */}
+          {/* 10. 资源导航 */}
           <JueshiV4HomeCandidateV2ResourceNav />
 
-          {/* 12. 轻量工作台提示条 */}
+          {/* 11. 轻量工作台提示条 */}
           <WorkbenchPrompt />
 
-          {/* 13. 广告组：Footer 前 */}
-          {beforeFooterAd && beforeFooterAd.enabled && (
-            <div className="mb-10">
-              <JueshiV4AdInventoryGroup group={beforeFooterAd} />
-            </div>
-          )}
+          {/* 12. 广告组：Footer 前 - 调用现有广告系统 */}
+          <div className="mb-10">
+            <JueshiV4AdPlacementGrid
+              placements={['home-before-footer', 'footer']}
+              columns={2}
+              title="商业合作与会员"
+              description="会员特权与商业合作机会"
+            />
+          </div>
         </div>
       </main>
 
