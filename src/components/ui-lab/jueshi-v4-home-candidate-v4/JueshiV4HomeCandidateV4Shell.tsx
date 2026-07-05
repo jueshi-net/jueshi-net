@@ -135,6 +135,13 @@ export default function JueshiV4HomeCandidateV4Shell() {
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
+      {/* Dev marker - only in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-400 text-black text-center py-1 text-xs font-bold">
+          DEV MODE · restored-original-v4 · c84ec6b
+        </div>
+      )}
+      
       {/* Header - V4 专属，消费配置 */}
       <JueshiV4Header
         onMenuClick={() => setMenuOpen(!menuOpen)}
