@@ -9,7 +9,7 @@ const toolCategories = [
   { label: '邮编查询', href: '/tools/postal-code' },
   { label: 'HS 编码', href: '/tools/hs-code' },
   { label: '汇率换算', href: '/tools/exchange-rate' },
-  { label: '地址格式化', href: '/tools/address-format' },
+  { label: '地址格式化', href: '/tools/address-formatter' },
   { label: '运费计算', href: '/tools/shipping-calculator' },
   { label: '商业发票', href: '/tools/invoice' },
   { label: '报价单', href: '/tools/quote' },

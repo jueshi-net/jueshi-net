@@ -61,7 +61,7 @@ const tools = [
     related: '报价单',
   },
   {
-    id: 'address-format',
+    id: 'address-formatter',
     icon: MapPin,
     title: '地址格式化',
     description: '智能解析地址格式，标准化国际地址',
