@@ -44,6 +44,91 @@ function WorkbenchPrompt() {
   );
 }
 
+// V4 广告矩阵 placement 定义
+const AD_PLACEMENTS = {
+  // Hero 后：6 个文字广告 + 4 个图片广告
+  afterHeroText: [
+    'home_v4_after_hero_text_1',
+    'home_v4_after_hero_text_2',
+    'home_v4_after_hero_text_3',
+    'home_v4_after_hero_text_4',
+    'home_v4_after_hero_text_5',
+    'home_v4_after_hero_text_6',
+  ],
+  afterHeroImage: [
+    'home_v4_after_hero_image_1',
+    'home_v4_after_hero_image_2',
+    'home_v4_after_hero_image_3',
+    'home_v4_after_hero_image_4',
+  ],
+  
+  // 工具区后：12 个文字广告 + 4 个图片广告
+  afterToolsText: [
+    'home_v4_after_tools_text_1',
+    'home_v4_after_tools_text_2',
+    'home_v4_after_tools_text_3',
+    'home_v4_after_tools_text_4',
+    'home_v4_after_tools_text_5',
+    'home_v4_after_tools_text_6',
+    'home_v4_after_tools_text_7',
+    'home_v4_after_tools_text_8',
+    'home_v4_after_tools_text_9',
+    'home_v4_after_tools_text_10',
+    'home_v4_after_tools_text_11',
+    'home_v4_after_tools_text_12',
+  ],
+  afterToolsImage: [
+    'home_v4_after_tools_image_1',
+    'home_v4_after_tools_image_2',
+    'home_v4_after_tools_image_3',
+    'home_v4_after_tools_image_4',
+  ],
+  
+  // 任务链后：12 个文字广告 + 4 个图片广告
+  afterTasksText: [
+    'home_v4_after_tasks_text_1',
+    'home_v4_after_tasks_text_2',
+    'home_v4_after_tasks_text_3',
+    'home_v4_after_tasks_text_4',
+    'home_v4_after_tasks_text_5',
+    'home_v4_after_tasks_text_6',
+    'home_v4_after_tasks_text_7',
+    'home_v4_after_tasks_text_8',
+    'home_v4_after_tasks_text_9',
+    'home_v4_after_tasks_text_10',
+    'home_v4_after_tasks_text_11',
+    'home_v4_after_tasks_text_12',
+  ],
+  afterTasksImage: [
+    'home_v4_after_tasks_image_1',
+    'home_v4_after_tasks_image_2',
+    'home_v4_after_tasks_image_3',
+    'home_v4_after_tasks_image_4',
+  ],
+  
+  // Footer 前：12 个文字广告 + 4 个图片广告
+  beforeFooterText: [
+    'home_v4_before_footer_text_1',
+    'home_v4_before_footer_text_2',
+    'home_v4_before_footer_text_3',
+    'home_v4_before_footer_text_4',
+    'home_v4_before_footer_text_5',
+    'home_v4_before_footer_text_6',
+    'home_v4_before_footer_text_7',
+    'home_v4_before_footer_text_8',
+    'home_v4_before_footer_text_9',
+    'home_v4_before_footer_text_10',
+    'home_v4_before_footer_text_11',
+    'home_v4_before_footer_text_12',
+  ],
+  beforeFooterImage: [
+    'home_v4_before_footer_image_1',
+    'home_v4_before_footer_image_2',
+    'home_v4_before_footer_image_3',
+    'home_v4_before_footer_image_4',
+  ],
+};
+
 export default function JueshiV4HomeCandidateV4Shell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
@@ -62,64 +147,120 @@ export default function JueshiV4HomeCandidateV4Shell() {
           {/* 1. Hero - 工作台嵌入左侧 */}
           <JueshiV4HomeCandidateV3Hero />
 
-          {/* 2. 广告组：Hero 下方 - 调用现有广告系统 */}
-          <div className="mb-8">
+          {/* 2. Hero 后广告矩阵：文字广告（6 个，2 行 x 3 列） */}
+          <div className="mb-6">
             <JueshiV4AdPlacementGrid
-              placements={['home-hero', 'home-after-tools']}
-              columns={2}
+              placements={AD_PLACEMENTS.afterHeroText}
+              columns={6}
+              rows={1}
+              variant="text"
               title="推荐服务"
               description="精选跨境服务推荐"
             />
           </div>
 
-          {/* 3. 常用场景 */}
+          {/* 3. Hero 后广告矩阵：图片广告（4 个，1 行 x 4 列） */}
+          <div className="mb-8">
+            <JueshiV4AdPlacementGrid
+              placements={AD_PLACEMENTS.afterHeroImage}
+              columns={4}
+              rows={1}
+              variant="image"
+              title="精选商家"
+              description="优质服务商推荐"
+            />
+          </div>
+
+          {/* 4. 常用场景 */}
           <JueshiV4ScenarioSection />
 
-          {/* 4. 高频工具 */}
+          {/* 5. 高频工具 */}
           <JueshiV4HomeCandidateV2ToolGrid />
 
-          {/* 5. 广告组：工具区后 - 调用现有广告系统 */}
-          <div className="mb-10">
+          {/* 6. 工具区后广告矩阵：文字广告（12 个，2 行 x 6 列） */}
+          <div className="mt-10 mb-6">
             <JueshiV4AdPlacementGrid
-              placements={['home-after-tools', 'tool-bottom']}
-              columns={2}
+              placements={AD_PLACEMENTS.afterToolsText}
+              columns={6}
+              rows={2}
+              variant="text"
               title="工具服务推荐"
               description="提升工作效率的专业工具"
             />
           </div>
 
-          {/* 6. 热门任务链 */}
-          <JueshiV4HomeCandidateV2TaskChains />
-
-          {/* 7. 广告组：任务链后 - 调用现有广告系统 */}
+          {/* 7. 工具区后广告矩阵：图片广告（4 个，1 行 x 4 列） */}
           <div className="mb-10">
             <JueshiV4AdPlacementGrid
-              placements={['home-before-footer', 'footer']}
-              columns={2}
+              placements={AD_PLACEMENTS.afterToolsImage}
+              columns={4}
+              rows={1}
+              variant="image"
+              title="合作伙伴"
+              description="优质合作伙伴推荐"
+            />
+          </div>
+
+          {/* 8. 热门任务链 */}
+          <JueshiV4HomeCandidateV2TaskChains />
+
+          {/* 9. 任务链后广告矩阵：文字广告（12 个，2 行 x 6 列） */}
+          <div className="mt-10 mb-6">
+            <JueshiV4AdPlacementGrid
+              placements={AD_PLACEMENTS.afterTasksText}
+              columns={6}
+              rows={2}
+              variant="text"
               title="流程服务推荐"
               description="集运、留学、外贸全流程服务"
             />
           </div>
 
-          {/* 8. 社区论坛 */}
-          <JueshiV4CommunitySection />
-
-          {/* 9. 推荐内容 */}
-          <JueshiV4RecommendedContent />
-
-          {/* 10. 资源导航 */}
-          <JueshiV4HomeCandidateV2ResourceNav />
-
-          {/* 11. 轻量工作台提示条 */}
-          <WorkbenchPrompt />
-
-          {/* 12. 广告组：Footer 前 - 调用现有广告系统 */}
+          {/* 10. 任务链后广告矩阵：图片广告（4 个，1 行 x 4 列） */}
           <div className="mb-10">
             <JueshiV4AdPlacementGrid
-              placements={['home-before-footer', 'footer']}
-              columns={2}
+              placements={AD_PLACEMENTS.afterTasksImage}
+              columns={4}
+              rows={1}
+              variant="image"
+              title="服务商推荐"
+              description="专业服务提供商"
+            />
+          </div>
+
+          {/* 11. 社区论坛 */}
+          <JueshiV4CommunitySection />
+
+          {/* 12. 推荐内容 */}
+          <JueshiV4RecommendedContent />
+
+          {/* 13. 资源导航 */}
+          <JueshiV4HomeCandidateV2ResourceNav />
+
+          {/* 14. 轻量工作台提示条 */}
+          <WorkbenchPrompt />
+
+          {/* 15. Footer 前广告矩阵：文字广告（12 个，2 行 x 6 列） */}
+          <div className="mt-10 mb-6">
+            <JueshiV4AdPlacementGrid
+              placements={AD_PLACEMENTS.beforeFooterText}
+              columns={6}
+              rows={2}
+              variant="text"
               title="商业合作与会员"
               description="会员特权与商业合作机会"
+            />
+          </div>
+
+          {/* 16. Footer 前广告矩阵：图片广告（4 个，1 行 x 4 列） */}
+          <div className="mb-10">
+            <JueshiV4AdPlacementGrid
+              placements={AD_PLACEMENTS.beforeFooterImage}
+              columns={4}
+              rows={1}
+              variant="image"
+              title="精选推荐"
+              description="优质资源推荐"
             />
           </div>
         </div>
