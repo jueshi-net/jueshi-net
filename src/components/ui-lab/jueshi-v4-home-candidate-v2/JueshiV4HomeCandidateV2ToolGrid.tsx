@@ -6,7 +6,7 @@ import { Mail, Package, RefreshCw, MapPin, Truck, FileText, Receipt, Container, 
 
 const tools = [
   {
-    id: 'shipping-calc',
+    id: 'shipping-calculator',
     icon: Truck,
     title: '运费计算器',
     description: '快速计算国际快递运费，支持多家物流商比价',
@@ -28,7 +28,7 @@ const tools = [
     related: '商业发票',
   },
   {
-    id: 'currency',
+    id: 'exchange-rate',
     icon: RefreshCw,
     title: '汇率换算',
     description: '实时汇率查询，支持多种货币换算和历史走势',
@@ -39,7 +39,7 @@ const tools = [
     related: '外贸报价',
   },
   {
-    id: 'postcode',
+    id: 'postal-code',
     icon: Mail,
     title: '邮编查询',
     description: '全球邮编查询，快速定位地址对应邮编',
@@ -61,7 +61,7 @@ const tools = [
     related: '报价单',
   },
   {
-    id: 'translate',
+    id: 'address-format',
     icon: MapPin,
     title: '地址格式化',
     description: '智能解析地址格式，标准化国际地址',
