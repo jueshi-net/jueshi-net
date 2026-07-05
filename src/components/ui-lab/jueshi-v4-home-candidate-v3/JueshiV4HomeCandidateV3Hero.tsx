@@ -233,14 +233,13 @@ export default function JueshiV4HomeCandidateV3Hero() {
 
                   {/* CTA row */}
                   <div className="flex items-center gap-2">
-                    <button 
-                      disabled 
-                      title="功能开发中"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium opacity-60 cursor-not-allowed"
+                    <Link
+                      href="/workspace"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-[11px] font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all"
                     >
                       <Sparkles className="w-3 h-3" />
                       签到 ({user.checkinStreak}天)
-                    </button>
+                    </Link>
                     <Link
                       href="/workspace"
                       className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#F3F5FA] text-[#6C5DD3] rounded-lg text-[11px] font-medium hover:bg-[#6C5DD3]/8 transition-colors"
