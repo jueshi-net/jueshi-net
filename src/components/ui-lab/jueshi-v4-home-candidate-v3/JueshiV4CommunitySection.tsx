@@ -159,7 +159,7 @@ export default function JueshiV4CommunitySection() {
               return (
                 <Link
                   key={post.id}
-                  href={`/community/posts/${post.id}`}
+                  href="/community"
                   className="group block p-3 bg-[#F8F9FC] rounded-lg hover:bg-[#F3F5FA] transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">

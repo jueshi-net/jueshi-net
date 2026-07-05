@@ -539,7 +539,7 @@ function HomeLiveCommunitySection() {
               const tagStyle = tagStyles[post.tag] || tagStyles['热门讨论'];
               const TagIcon = tagStyle.icon;
               return (
-                <Link key={post.id} href={`/community/posts/${post.id}`} className="group block p-3 bg-[#F8F9FC] rounded-lg hover:bg-[#F3F5FA] transition-colors">
+                <Link key={post.id} href="/community" className="group block p-3 bg-[#F8F9FC] rounded-lg hover:bg-[#F3F5FA] transition-colors">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <h4 className="text-sm font-medium text-[#11142D] group-hover:text-[#6C5DD3] transition-colors line-clamp-1">{post.title}</h4>
                     <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap ${tagStyle.color}`}>
