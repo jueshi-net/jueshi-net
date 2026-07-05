@@ -1,4 +1,4 @@
-import JueshiV4HomeCandidateV4Shell from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell';
+import HomeLivePage from '@/components/home-live/HomeLivePage';
 
 export const metadata = {
   title: '绝世百宝箱 - 海外华人的实用工具箱',
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  return <JueshiV4HomeCandidateV4Shell />;
+  return <HomeLivePage />;
 }
