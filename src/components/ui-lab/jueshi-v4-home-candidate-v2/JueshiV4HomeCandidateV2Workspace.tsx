@@ -212,7 +212,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                   </Link>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  {user.badges.slice(0, 6).map((badge) => (
+                  {user.badges.slice(0, 4).map((badge) => (
                     <div
                       key={badge.id}
                       className="flex flex-col items-center p-2 bg-[#F8F9FC] rounded-lg"

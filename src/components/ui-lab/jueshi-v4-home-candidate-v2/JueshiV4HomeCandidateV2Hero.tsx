@@ -76,7 +76,7 @@ export default function JueshiV4HomeCandidateV2Hero() {
               </div>
 
               <h1 className="text-3xl md:text-4xl lg:text-[44px] font-bold text-[#11142D] mb-4 leading-tight">
-                海外华人的
+                海外华人
                 <span className="bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] bg-clip-text text-transparent">实用工具箱</span>
               </h1>
               <p className="text-[#808191] text-base md:text-lg mb-6 max-w-lg leading-relaxed">
@@ -121,7 +121,7 @@ export default function JueshiV4HomeCandidateV2Hero() {
             {/* Right visual panel - Enhanced toolbox */}
             <div className="relative hidden lg:block">
               {/* Main panel */}
-              <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl border border-[#E8ECF3] shadow-xl p-6">
+              <div className="relative bg-white/80 backdrop-blur-md rounded-3xl border border-[#E8ECF3]/60 shadow-lg p-6">
                 {/* Panel header */}
                 <div className="flex items-center justify-between mb-5">
                   <div className="flex items-center gap-2">

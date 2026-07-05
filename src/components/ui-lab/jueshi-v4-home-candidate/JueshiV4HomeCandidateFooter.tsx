@@ -77,13 +77,15 @@ export default function JueshiV4HomeCandidateFooter() {
           {/* Brand section */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block mb-4">
-              <Image
-                src="/images/brand/jueshi-logo-crab.jpg"
-                alt="绝世百宝箱"
-                width={140}
-                height={38}
-                className="h-[38px] w-auto object-contain brightness-0 invert"
-              />
+              <div className="inline-flex items-center justify-center bg-white rounded-lg px-3 py-2 shadow-sm">
+                <Image
+                  src="/images/brand/jueshi-logo-crab.jpg"
+                  alt="绝世百宝箱"
+                  width={120}
+                  height={32}
+                  className="h-[32px] w-auto object-contain"
+                />
+              </div>
             </Link>
             <p className="text-sm text-white/60 mb-4 leading-relaxed">
               海外华人与跨境业务的一站式实用工具箱，提供邮编、HS 编码、汇率、单据、清单、指南与资源导航。

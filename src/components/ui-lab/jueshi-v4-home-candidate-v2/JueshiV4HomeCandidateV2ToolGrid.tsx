@@ -116,18 +116,26 @@ export default function JueshiV4HomeCandidateV2ToolGrid() {
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {tools.map((tool) => {
+        {tools.map((tool, index) => {
           const Icon = tool.icon;
           const StatusIcon = statusIcons[tool.status as keyof typeof statusIcons];
+          const isPrimary = index < 4; // 前 4 个为核心工具
+          
           return (
             <Link
               key={tool.id}
               href={`/tools/${tool.id}`}
-              className="group bg-white rounded-xl p-5 border border-[#E8ECF3] hover:shadow-[0_18px_45px_rgba(17,20,45,0.10)] hover:border-[#6C5DD3]/20 transition-all"
+              className={`group bg-white rounded-xl border border-[#E8ECF3] transition-all ${
+                isPrimary 
+                  ? 'p-5 hover:shadow-[0_18px_45px_rgba(17,20,45,0.10)] hover:border-[#6C5DD3]/20' 
+                  : 'p-4 hover:shadow-md hover:border-[#6C5DD3]/10'
+              }`}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className={`w-12 h-12 flex items-center justify-center bg-gradient-to-br ${tool.color} rounded-xl shadow-sm`}>
-                  <Icon className="w-6 h-6 text-white" strokeWidth={2} />
+                <div className={`flex items-center justify-center bg-gradient-to-br ${tool.color} rounded-xl shadow-sm ${
+                  isPrimary ? 'w-12 h-12' : 'w-10 h-10'
+                }`}>
+                  <Icon className={`text-white ${isPrimary ? 'w-6 h-6' : 'w-5 h-5'}`} strokeWidth={2} />
                 </div>
                 <div className={`flex items-center gap-1 px-2 py-1 ${tool.statusColor} rounded-md`}>
                   <StatusIcon className="w-3 h-3" />
@@ -135,21 +143,27 @@ export default function JueshiV4HomeCandidateV2ToolGrid() {
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-semibold text-[#11142D] text-sm group-hover:text-[#6C5DD3] transition-colors">
+                <h3 className={`font-semibold text-[#11142D] group-hover:text-[#6C5DD3] transition-colors ${
+                  isPrimary ? 'text-sm' : 'text-xs'
+                }`}>
                   {tool.title}
                 </h3>
                 <span className="text-[10px] px-1.5 py-0.5 bg-[#F3F5FA] text-[#808191] rounded font-medium">
                   {tool.category}
                 </span>
               </div>
-              <p className="text-xs text-[#808191] mb-3 line-clamp-2 leading-relaxed">
+              <p className={`text-[#808191] mb-3 leading-relaxed ${
+                isPrimary ? 'text-xs line-clamp-2' : 'text-[11px] line-clamp-1'
+              }`}>
                 {tool.description}
               </p>
-              <div className="flex items-center justify-between pt-3 border-t border-[#E8ECF3]">
+              <div className={`flex items-center justify-between ${isPrimary ? 'pt-3 border-t border-[#E8ECF3]' : 'pt-2'}`}>
                 <span className="text-[10px] text-[#808191]">
                   相关：<span className="text-[#6C5DD3]">{tool.related}</span>
                 </span>
-                <span className="text-xs text-[#6C5DD3] font-medium group-hover:underline">
+                <span className={`text-[#6C5DD3] font-medium group-hover:underline ${
+                  isPrimary ? 'text-xs' : 'text-[11px]'
+                }`}>
                   立即使用 →
                 </span>
               </div>

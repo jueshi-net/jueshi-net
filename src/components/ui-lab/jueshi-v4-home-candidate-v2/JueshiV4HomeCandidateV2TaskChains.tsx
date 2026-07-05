@@ -93,8 +93,9 @@ export default function JueshiV4HomeCandidateV2TaskChains() {
         </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {taskChains.map((chain) => {
+        {taskChains.map((chain, index) => {
           const Icon = chain.icon;
+          const isPrimary = index < 2; // 前 2 个为核心任务链
           return (
             <Link
               key={chain.id}
@@ -164,11 +165,18 @@ export default function JueshiV4HomeCandidateV2TaskChains() {
                   ))}
                 </div>
 
-                {/* CTA */}
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-xs font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all group-hover:shadow-md">
-                  <Zap className="w-3.5 h-3.5" />
-                  开始任务
-                </button>
+                {/* CTA - Primary or Light */}
+                {isPrimary ? (
+                  <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-[#6C5DD3] to-[#3F8CFF] text-white rounded-lg text-xs font-medium hover:shadow-lg hover:shadow-[#6C5DD3]/20 transition-all group-hover:shadow-md">
+                    <Zap className="w-3.5 h-3.5" />
+                    开始任务
+                  </button>
+                ) : (
+                  <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#F3F5FA] text-[#6C5DD3] rounded-lg text-xs font-medium hover:bg-[#6C5DD3]/8 transition-all">
+                    <ArrowRight className="w-3.5 h-3.5" />
+                    查看详情
+                  </button>
+                )}
               </div>
             </Link>
           );

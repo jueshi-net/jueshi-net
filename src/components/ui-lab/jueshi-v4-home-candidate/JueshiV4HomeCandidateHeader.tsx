@@ -11,13 +11,13 @@ interface HeaderProps {
 }
 
 const navItems = [
-  { id: 'home', label: '首页', href: '/' },
-  { id: 'tools', label: '工具', href: '/tools' },
-  { id: 'checklist', label: '清单', href: '/checklists' },
-  { id: 'guides', label: '指南', href: '/guides' },
-  { id: 'topics', label: '专题', href: '/topics' },
-  { id: 'resources', label: '资源', href: '/resources' },
-  { id: 'community', label: '社区', href: '/community' },
+  { id: 'home', label: '首页', href: '/', priority: 'core' },
+  { id: 'tools', label: '工具', href: '/tools', priority: 'core' },
+  { id: 'checklist', label: '清单', href: '/checklists', priority: 'core' },
+  { id: 'guides', label: '指南', href: '/guides', priority: 'core' },
+  { id: 'topics', label: '专题', href: '/topics', priority: 'extended' },
+  { id: 'resources', label: '资源', href: '/resources', priority: 'core' },
+  { id: 'community', label: '社区', href: '/community', priority: 'extended' },
 ];
 
 export default function JueshiV4HomeCandidateHeader({ onMenuClick, menuOpen }: HeaderProps) {
@@ -42,15 +42,35 @@ export default function JueshiV4HomeCandidateHeader({ onMenuClick, menuOpen }: H
                 />
               </Link>
 
-              {/* Desktop Nav */}
+              {/* Desktop Nav - Core items (always visible on lg) */}
               <nav className="hidden lg:flex items-center gap-1">
-                {navItems.map((item) => (
+                {navItems.filter(item => item.priority === 'core').map((item) => (
                   <Link
                     key={item.id}
                     href={item.href}
                     onClick={() => setActiveNav(item.id)}
                     className={`
-                      px-4 py-2 rounded-lg text-sm font-medium transition-all
+                      px-3 py-2 rounded-lg text-sm font-medium transition-all
+                      ${activeNav === item.id
+                        ? 'text-[#6C5DD3] bg-[#6C5DD3]/8'
+                        : 'text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]'
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+              
+              {/* Desktop Nav - Extended items (only on 2xl) */}
+              <nav className="hidden 2xl:flex items-center gap-1">
+                {navItems.filter(item => item.priority === 'extended').map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    onClick={() => setActiveNav(item.id)}
+                    className={`
+                      px-3 py-2 rounded-lg text-sm font-medium transition-all
                       ${activeNav === item.id
                         ? 'text-[#6C5DD3] bg-[#6C5DD3]/8'
                         : 'text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]'
