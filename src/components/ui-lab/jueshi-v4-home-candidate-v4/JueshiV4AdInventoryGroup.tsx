@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import type { AdGroup, AdItem } from './adInventory';
+import type { AdGroup, AdSlot, AdCreative } from './adInventory';
 
 /** Pre-defined gradient palettes for image ad placeholders */
 const imageGradients = [
@@ -21,19 +21,40 @@ interface JueshiV4AdInventoryGroupProps {
 }
 
 export default function JueshiV4AdInventoryGroup({ group }: JueshiV4AdInventoryGroupProps) {
-  // Hide entire group if disabled
+  // 1. Hide entire group if disabled
   if (group.enabled === false) return null;
 
-  // Filter out disabled ads
-  const enabledTextAds = (group.textAds || []).filter((ad) => ad.enabled !== false);
-  const enabledImageAds = (group.imageAds || []).filter((ad) => ad.enabled !== false);
+  // 2. Filter enabled slots
+  const enabledSlots = group.slots.filter(slot => slot.enabled);
+  
+  // 3. Separate text and image slots
+  const textSlots = enabledSlots.filter(slot => slot.type === 'text');
+  const imageSlots = enabledSlots.filter(slot => slot.type === 'image');
 
-  // Apply row limits for text ads
+  // 4. Get enabled creatives from text slots
+  const textCreatives: AdCreative[] = [];
+  textSlots.forEach(slot => {
+    const enabledCreatives = slot.creatives
+      .filter(creative => creative.enabled)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+    textCreatives.push(...enabledCreatives);
+  });
+
+  // 5. Apply row limits for text ads
   const maxTextItems = group.maxTextRows * group.textColumns;
-  const limitedTextAds = enabledTextAds.slice(0, maxTextItems);
+  const limitedTextCreatives = textCreatives.slice(0, maxTextItems);
 
-  // Empty groups render nothing
-  if (limitedTextAds.length === 0 && enabledImageAds.length === 0) return null;
+  // 6. Get enabled creatives from image slots
+  const imageCreatives: AdCreative[] = [];
+  imageSlots.forEach(slot => {
+    const enabledCreatives = slot.creatives
+      .filter(creative => creative.enabled)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+    imageCreatives.push(...enabledCreatives);
+  });
+
+  // 7. Empty groups render nothing (no blank space)
+  if (limitedTextCreatives.length === 0 && imageCreatives.length === 0) return null;
 
   return (
     <section className="relative bg-gradient-to-br from-[#FAFBFE] to-[#F6F8FC] border border-[#E8ECF3] rounded-2xl p-5 md:p-6">
@@ -53,30 +74,30 @@ export default function JueshiV4AdInventoryGroup({ group }: JueshiV4AdInventoryG
       </div>
 
       {/* Text ads grid */}
-      {limitedTextAds.length > 0 && (
+      {limitedTextCreatives.length > 0 && (
         <div className="mb-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-2.5">
-            {limitedTextAds.map((ad) => (
-              <TextAdItem key={ad.slotKey} ad={ad} />
+            {limitedTextCreatives.map((creative, idx) => (
+              <TextAdItem key={creative.creativeKey} creative={creative} />
             ))}
           </div>
         </div>
       )}
 
       {/* Image ads grid */}
-      {enabledImageAds.length > 0 && (
+      {imageCreatives.length > 0 && (
         <div>
           {/* Desktop/tablet: grid layout */}
           <div className="hidden sm:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-3">
-            {enabledImageAds.map((ad, idx) => (
-              <ImageAdItem key={ad.slotKey} ad={ad} index={idx} />
+            {imageCreatives.map((creative, idx) => (
+              <ImageAdItem key={creative.creativeKey} creative={creative} index={idx} />
             ))}
           </div>
           {/* Mobile: horizontal scroll */}
           <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
-            {enabledImageAds.map((ad, idx) => (
-              <div key={ad.slotKey} className="flex-shrink-0 w-[180px]">
-                <ImageAdItem ad={ad} index={idx} />
+            {imageCreatives.map((creative, idx) => (
+              <div key={creative.creativeKey} className="flex-shrink-0 w-[180px]">
+                <ImageAdItem creative={creative} index={idx} />
               </div>
             ))}
           </div>
@@ -88,12 +109,13 @@ export default function JueshiV4AdInventoryGroup({ group }: JueshiV4AdInventoryG
 
 /* ─── Text Ad Item ──────────────────────────────────────────── */
 
-function TextAdItem({ ad }: { ad: AdItem }) {
-  const relProps = ad.nofollow ? { rel: 'nofollow sponsored' } : {};
+function TextAdItem({ creative }: { creative: AdCreative }) {
+  const relProps = creative.nofollow ? { rel: 'nofollow sponsored' } : {};
 
   return (
     <Link
-      href={ad.href}
+      href={creative.href}
+      data-tracking={creative.trackingKey}
       className="group relative bg-white rounded-xl p-2.5 border border-[#E8ECF3] hover:border-[#6C5DD3]/20 hover:shadow-sm transition-all block"
       {...relProps}
     >
@@ -104,22 +126,22 @@ function TextAdItem({ ad }: { ad: AdItem }) {
 
       <div className="pr-5">
         <h4 className="text-[11px] font-bold text-[#11142D] line-clamp-1 group-hover:text-[#6C5DD3] transition-colors">
-          {ad.title}
+          {creative.title}
         </h4>
-        {ad.subtitle && (
-          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{ad.subtitle}</p>
+        {creative.subtitle && (
+          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{creative.subtitle}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between mt-1.5">
-        {ad.tag && (
+        {creative.tag && (
           <span className="text-[9px] bg-[#6C5DD3]/8 text-[#6C5DD3] px-1.5 py-0.5 rounded font-medium">
-            {ad.tag}
+            {creative.tag}
           </span>
         )}
-        {ad.ctaText && (
+        {creative.ctaText && (
           <span className="text-[#6C5DD3] text-[10px] font-medium ml-auto">
-            {ad.ctaText} →
+            {creative.ctaText} →
           </span>
         )}
       </div>
@@ -129,13 +151,14 @@ function TextAdItem({ ad }: { ad: AdItem }) {
 
 /* ─── Image Ad Item ─────────────────────────────────────────── */
 
-function ImageAdItem({ ad, index }: { ad: AdItem; index: number }) {
-  const relProps = ad.nofollow ? { rel: 'nofollow sponsored' } : {};
+function ImageAdItem({ creative, index }: { creative: AdCreative; index: number }) {
+  const relProps = creative.nofollow ? { rel: 'nofollow sponsored' } : {};
   const gradient = imageGradients[index % imageGradients.length];
 
   return (
     <Link
-      href={ad.href}
+      href={creative.href}
+      data-tracking={creative.trackingKey}
       className="group bg-white rounded-xl overflow-hidden border border-[#E8ECF3] hover:shadow-md transition-all block"
       {...relProps}
     >
@@ -145,9 +168,9 @@ function ImageAdItem({ ad, index }: { ad: AdItem; index: number }) {
         <span className="absolute top-1.5 right-1.5 bg-black/20 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded">
           广告
         </span>
-        {ad.tag && (
+        {creative.tag && (
           <span className="absolute bottom-1.5 left-1.5 bg-white/80 backdrop-blur-sm text-[#11142D] text-[9px] px-1.5 py-0.5 rounded font-medium">
-            {ad.tag}
+            {creative.tag}
           </span>
         )}
       </div>
@@ -155,14 +178,14 @@ function ImageAdItem({ ad, index }: { ad: AdItem; index: number }) {
       {/* Content */}
       <div className="p-2.5">
         <h4 className="text-[11px] font-bold text-[#11142D] line-clamp-1 group-hover:text-[#6C5DD3] transition-colors">
-          {ad.title}
+          {creative.title}
         </h4>
-        {ad.description && (
-          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{ad.description}</p>
+        {creative.description && (
+          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{creative.description}</p>
         )}
-        {ad.ctaText && (
+        {creative.ctaText && (
           <span className="inline-block mt-1.5 text-[#6C5DD3] text-[10px] font-medium">
-            {ad.ctaText} →
+            {creative.ctaText} →
           </span>
         )}
       </div>

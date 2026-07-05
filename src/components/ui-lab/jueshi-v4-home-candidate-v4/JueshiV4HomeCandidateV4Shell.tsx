@@ -1,17 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import JueshiV4HomeCandidateHeader from '../jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader';
 import JueshiV4HomeCandidateV3Hero from '../jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Hero';
 import JueshiV4HomeCandidateV2ToolGrid from '../jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ToolGrid';
 import JueshiV4HomeCandidateV2TaskChains from '../jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2TaskChains';
 import JueshiV4HomeCandidateV2ResourceNav from '../jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ResourceNav';
-import JueshiV4HomeCandidateV2BottomTab from '../jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2BottomTab';
-import JueshiV4HomeCandidateFooter from '../jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter';
 import JueshiV4ScenarioSection from '../jueshi-v4/JueshiV4ScenarioSection';
 import JueshiV4RecommendedContent from '../jueshi-v4-topnav/JueshiV4RecommendedContent';
 import JueshiV4CommunitySection from '../jueshi-v4-home-candidate-v3/JueshiV4CommunitySection';
 import JueshiV4AdInventoryGroup from './JueshiV4AdInventoryGroup';
+import JueshiV4Header from './JueshiV4Header';
+import JueshiV4BottomTab from './JueshiV4BottomTab';
+import JueshiV4Footer from './JueshiV4Footer';
 import { mockAdInventory } from './adInventory';
 
 // 轻量工作台提示条
@@ -63,8 +63,8 @@ export default function JueshiV4HomeCandidateV4Shell() {
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
-      {/* Header */}
-      <JueshiV4HomeCandidateHeader
+      {/* Header - V4 专属，消费配置 */}
+      <JueshiV4Header
         onMenuClick={() => setMenuOpen(!menuOpen)}
         menuOpen={menuOpen}
       />
@@ -76,7 +76,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
           <JueshiV4HomeCandidateV3Hero />
 
           {/* 2. 广告组：Hero 下方 */}
-          {afterHeroAd && (
+          {afterHeroAd && afterHeroAd.enabled && (
             <div className="mb-8">
               <JueshiV4AdInventoryGroup group={afterHeroAd} />
             </div>
@@ -89,7 +89,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
           <JueshiV4HomeCandidateV2ToolGrid />
 
           {/* 5. 广告组：工具区后 */}
-          {afterToolsAd && (
+          {afterToolsAd && afterToolsAd.enabled && (
             <div className="mb-10">
               <JueshiV4AdInventoryGroup group={afterToolsAd} />
             </div>
@@ -99,7 +99,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
           <JueshiV4HomeCandidateV2TaskChains />
 
           {/* 7. 广告组：任务链后 */}
-          {afterTaskChainAd && (
+          {afterTaskChainAd && afterTaskChainAd.enabled && (
             <div className="mb-10">
               <JueshiV4AdInventoryGroup group={afterTaskChainAd} />
             </div>
@@ -109,7 +109,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
           <JueshiV4CommunitySection />
 
           {/* 9. 广告组：社区旁 */}
-          {communityAd && (
+          {communityAd && communityAd.enabled && (
             <div className="mb-10">
               <JueshiV4AdInventoryGroup group={communityAd} />
             </div>
@@ -125,7 +125,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
           <WorkbenchPrompt />
 
           {/* 13. 广告组：Footer 前 */}
-          {beforeFooterAd && (
+          {beforeFooterAd && beforeFooterAd.enabled && (
             <div className="mb-10">
               <JueshiV4AdInventoryGroup group={beforeFooterAd} />
             </div>
@@ -133,11 +133,11 @@ export default function JueshiV4HomeCandidateV4Shell() {
         </div>
       </main>
 
-      {/* Footer */}
-      <JueshiV4HomeCandidateFooter />
+      {/* Footer - V4 专属，消费配置 */}
+      <JueshiV4Footer />
 
-      {/* Bottom navigation */}
-      <JueshiV4HomeCandidateV2BottomTab activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Bottom navigation - V4 专属，消费配置 */}
+      <JueshiV4BottomTab activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 }
