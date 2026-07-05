@@ -164,7 +164,7 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
     { key: 'nav_community', label: '社区', href: '/community', enabled: true, external: false, sortOrder: 70, trackingKey: 'header_nav_community', priority: 'extended' },
   ],
   headerSearchPlaceholder: '搜索工具、指南、资源、国家、城市...',
-  headerCheckinButton: { key: 'header_checkin', label: '签到', href: '/checkin', enabled: true, variant: 'ghost', icon: 'Sparkles', external: false, sortOrder: 10, trackingKey: 'header_checkin' },
+  headerCheckinButton: { key: 'header_checkin', label: '签到', href: '/workspace', enabled: true, variant: 'ghost', icon: 'Sparkles', external: false, sortOrder: 10, trackingKey: 'header_checkin' },
   headerLoginButton: { key: 'header_login', label: '登录', href: '/login', enabled: true, variant: 'primary', external: false, sortOrder: 20, trackingKey: 'header_login' },
   headerNotificationButton: { key: 'header_notification', label: '通知', href: '/notifications', enabled: true, variant: 'ghost', icon: 'Bell', external: false, sortOrder: 30, trackingKey: 'header_notification' },
   headerMenuButton: { key: 'header_menu', label: '菜单', href: '#menu', enabled: true, variant: 'ghost', icon: 'Menu', external: false, sortOrder: 40, trackingKey: 'header_menu' },
@@ -173,16 +173,16 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
   heroPrimaryCta: { key: 'hero_primary_cta', label: '浏览全部工具', href: '/tools', enabled: true, variant: 'primary', icon: 'ArrowRight', external: false, sortOrder: 10, trackingKey: 'home_hero_primary_tools' },
   heroSecondaryCta: { key: 'hero_secondary_cta', label: '查看清单指南', href: '/checklists', enabled: true, variant: 'secondary', external: false, sortOrder: 20, trackingKey: 'home_hero_secondary_checklists' },
   heroToolboxButtons: [
-    { key: 'hero_tool_postcode', label: '邮编查询', href: '/tools/postcode', enabled: true, variant: 'link', icon: 'Mail', external: false, sortOrder: 10, trackingKey: 'hero_tool_postcode' },
+    { key: 'hero_tool_postcode', label: '邮编查询', href: '/tools/postal-code', enabled: true, variant: 'link', icon: 'Mail', external: false, sortOrder: 10, trackingKey: 'hero_tool_postcode' },
     { key: 'hero_tool_hscode', label: 'HS编码', href: '/tools/hs-code', enabled: true, variant: 'link', icon: 'Package', external: false, sortOrder: 20, trackingKey: 'hero_tool_hscode' },
-    { key: 'hero_tool_currency', label: '汇率换算', href: '/tools/currency', enabled: true, variant: 'link', icon: 'RefreshCw', external: false, sortOrder: 30, trackingKey: 'hero_tool_currency' },
-    { key: 'hero_tool_shipping', label: '运费计算', href: '/tools/shipping', enabled: true, variant: 'link', icon: 'Truck', external: false, sortOrder: 40, trackingKey: 'hero_tool_shipping' },
+    { key: 'hero_tool_currency', label: '汇率换算', href: '/tools/exchange-rate', enabled: true, variant: 'link', icon: 'RefreshCw', external: false, sortOrder: 30, trackingKey: 'hero_tool_currency' },
+    { key: 'hero_tool_shipping', label: '运费计算', href: '/tools/shipping-calculator', enabled: true, variant: 'link', icon: 'Truck', external: false, sortOrder: 40, trackingKey: 'hero_tool_shipping' },
     { key: 'hero_tool_invoice', label: '单据生成', href: '/tools/invoice', enabled: true, variant: 'link', icon: 'FileText', external: false, sortOrder: 50, trackingKey: 'hero_tool_invoice' },
     { key: 'hero_tool_checklist', label: '清单任务', href: '/tools/checklist', enabled: true, variant: 'link', icon: 'CheckSquare', external: false, sortOrder: 60, trackingKey: 'hero_tool_checklist' },
   ],
 
   // 工作台
-  workbenchCheckinButton: { key: 'workbench_checkin', label: '签到', href: '/checkin', enabled: true, variant: 'primary', icon: 'Sparkles', external: false, sortOrder: 10, trackingKey: 'workbench_checkin' },
+  workbenchCheckinButton: { key: 'workbench_checkin', label: '签到', href: '/workspace', enabled: true, variant: 'primary', icon: 'Sparkles', external: false, sortOrder: 10, trackingKey: 'workbench_checkin' },
   workbenchViewButton: { key: 'workbench_view', label: '查看工作台', href: '/workspace', enabled: true, variant: 'secondary', icon: 'ArrowRight', external: false, sortOrder: 20, trackingKey: 'workbench_view' },
 
   // 工具卡

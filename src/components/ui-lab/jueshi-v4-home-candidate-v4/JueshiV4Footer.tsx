@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { DEFAULT_BUTTONS } from './homepageConfig';
 
 const toolCategories = [
-  { label: '邮编查询', href: '/tools/postcode' },
+  { label: '邮编查询', href: '/tools/postal-code' },
   { label: 'HS 编码', href: '/tools/hs-code' },
-  { label: '汇率换算', href: '/tools/currency' },
-  { label: '地址格式化', href: '/tools/address' },
-  { label: '运费计算', href: '/tools/shipping' },
+  { label: '汇率换算', href: '/tools/exchange-rate' },
+  { label: '地址格式化', href: '/tools/address-format' },
+  { label: '运费计算', href: '/tools/shipping-calculator' },
   { label: '商业发票', href: '/tools/invoice' },
   { label: '报价单', href: '/tools/quote' },
   { label: '集装箱尺寸', href: '/tools/container' },
@@ -37,7 +37,7 @@ const resourceLinks = [
 const userLinks = [
   { label: '我的工作台', href: '/workspace' },
   { label: '我的收藏', href: '/favorites' },
-  { label: '签到中心', href: '/checkin' },
+  { label: '签到中心', href: '/workspace' },
   { label: '等级勋章', href: '/badges' },
   { label: '通知', href: '/notifications' },
   { label: '社区', href: '/community' },
