@@ -46,7 +46,7 @@ export default function JueshiV4HomeCandidateV2BottomTab({ activeTab, onTabChang
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 </div>
-                <span className="text-[10px] font-medium text-[#6C5DD3] mt-0.5">
+                <span className="text-[11px] font-medium text-[#6C5DD3] mt-0.5">
                   {tab.label}
                 </span>
               </Link>

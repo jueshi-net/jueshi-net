@@ -50,7 +50,7 @@ export default function JueshiV4AdPlacementGrid({
     <section className="relative bg-gradient-to-br from-[#FAFBFE] to-[#F6F8FC] border border-[#E8ECF3] rounded-2xl p-5 md:p-6">
       {/* 推广标识 */}
       {showLabel && (
-        <span className="absolute top-3 right-3 bg-[#FF754C]/10 text-[#FF754C] text-[10px] px-2 py-0.5 rounded font-medium z-10">
+        <span className="absolute top-3 right-3 bg-[#FF754C]/10 text-[#FF754C] text-[11px] px-2 py-0.5 rounded font-medium z-10">
           推广
         </span>
       )}

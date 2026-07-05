@@ -139,7 +139,7 @@ export default function JueshiV4HomeCandidateV2ToolGrid() {
                 </div>
                 <div className={`flex items-center gap-1 px-2 py-1 ${tool.statusColor} rounded-md`}>
                   <StatusIcon className="w-3 h-3" />
-                  <span className="text-[10px] font-medium">{tool.status}</span>
+                  <span className="text-[11px] font-medium">{tool.status}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-2">
@@ -148,7 +148,7 @@ export default function JueshiV4HomeCandidateV2ToolGrid() {
                 }`}>
                   {tool.title}
                 </h3>
-                <span className="text-[10px] px-1.5 py-0.5 bg-[#F3F5FA] text-[#808191] rounded font-medium">
+                <span className="text-[11px] px-1.5 py-0.5 bg-[#F3F5FA] text-[#808191] rounded font-medium">
                   {tool.category}
                 </span>
               </div>
@@ -158,7 +158,7 @@ export default function JueshiV4HomeCandidateV2ToolGrid() {
                 {tool.description}
               </p>
               <div className={`flex items-center justify-between ${isPrimary ? 'pt-3 border-t border-[#E8ECF3]' : 'pt-2'}`}>
-                <span className="text-[10px] text-[#808191]">
+                <span className="text-[11px] text-[#808191]">
                   相关：<span className="text-[#6C5DD3]">{tool.related}</span>
                 </span>
                 <span className={`text-[#6C5DD3] font-medium group-hover:underline ${

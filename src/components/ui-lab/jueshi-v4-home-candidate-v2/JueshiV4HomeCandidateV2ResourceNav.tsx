@@ -96,7 +96,7 @@ export default function JueshiV4HomeCandidateV2ResourceNav() {
                 </div>
               </div>
               <div className="flex items-center justify-between pt-3 border-t border-[#E8ECF3]">
-                <span className="text-[10px] text-[#808191]">
+                <span className="text-[11px] text-[#808191]">
                   共 {resource.count} 个资源
                 </span>
                 <span className="text-xs text-[#6C5DD3] font-medium group-hover:underline">

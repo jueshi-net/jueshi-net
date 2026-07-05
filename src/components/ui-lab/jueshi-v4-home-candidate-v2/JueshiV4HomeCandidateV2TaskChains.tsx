@@ -122,7 +122,7 @@ export default function JueshiV4HomeCandidateV2TaskChains() {
                 </div>
 
                 {/* Meta info */}
-                <div className="flex items-center gap-3 mb-3 text-[10px] text-[#808191]">
+                <div className="flex items-center gap-3 mb-3 text-[11px] text-[#808191]">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     <span>预计 {chain.time}</span>
@@ -138,7 +138,7 @@ export default function JueshiV4HomeCandidateV2TaskChains() {
                   <div className="flex items-center gap-1 flex-wrap">
                     {chain.steps.slice(0, 4).map((step, i) => (
                       <React.Fragment key={i}>
-                        <span className="text-[10px] text-[#808191] bg-white px-2 py-1 rounded border border-[#E8ECF3]">
+                        <span className="text-[11px] text-[#808191] bg-white px-2 py-1 rounded border border-[#E8ECF3]">
                           {step}
                         </span>
                         {i < 3 && i < chain.steps.length - 1 && (
@@ -147,18 +147,18 @@ export default function JueshiV4HomeCandidateV2TaskChains() {
                       </React.Fragment>
                     ))}
                     {chain.steps.length > 4 && (
-                      <span className="text-[10px] text-[#808191]">+{chain.steps.length - 4}</span>
+                      <span className="text-[11px] text-[#808191]">+{chain.steps.length - 4}</span>
                     )}
                   </div>
                 </div>
 
                 {/* Tools */}
                 <div className="flex items-center gap-1.5 flex-wrap mb-4">
-                  <span className="text-[10px] text-[#808191]">相关工具：</span>
+                  <span className="text-[11px] text-[#808191]">相关工具：</span>
                   {chain.tools.map((tool) => (
                     <span
                       key={tool}
-                      className="text-[10px] px-2 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
+                      className="text-[11px] px-2 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
                     >
                       {tool}
                     </span>

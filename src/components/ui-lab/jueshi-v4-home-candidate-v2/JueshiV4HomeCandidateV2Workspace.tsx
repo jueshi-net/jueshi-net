@@ -111,7 +111,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                     <span className="text-xl">🦀</span>
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FF754C] rounded-full flex items-center justify-center border-2 border-white">
-                    <span className="text-[10px] text-white font-bold">{user.level}</span>
+                    <span className="text-[11px] text-white font-bold">{user.level}</span>
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -124,7 +124,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                         style={{ width: `${expProgress}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-[#808191] whitespace-nowrap">
+                    <span className="text-[11px] text-[#808191] whitespace-nowrap">
                       {user.currentExp}/{user.nextLevelExp}
                     </span>
                   </div>
@@ -136,17 +136,17 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                 <div className="flex flex-col items-center p-2 bg-[#F8F9FC] rounded-lg">
                   <Heart className="w-4 h-4 text-[#FF754C] mb-1" />
                   <span className="text-sm font-bold text-[#11142D]">{user.stats.favorites}</span>
-                  <span className="text-[10px] text-[#808191]">收藏</span>
+                  <span className="text-[11px] text-[#808191]">收藏</span>
                 </div>
                 <div className="flex flex-col items-center p-2 bg-[#F8F9FC] rounded-lg">
                   <CheckSquare className="w-4 h-4 text-[#6C5DD3] mb-1" />
                   <span className="text-sm font-bold text-[#11142D]">{user.stats.checklists}</span>
-                  <span className="text-[10px] text-[#808191]">清单</span>
+                  <span className="text-[11px] text-[#808191]">清单</span>
                 </div>
                 <div className="flex flex-col items-center p-2 bg-[#F8F9FC] rounded-lg">
                   <Award className="w-4 h-4 text-[#3F8CFF] mb-1" />
                   <span className="text-sm font-bold text-[#11142D]">{user.stats.badges}</span>
-                  <span className="text-[10px] text-[#808191]">勋章</span>
+                  <span className="text-[11px] text-[#808191]">勋章</span>
                 </div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                       <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
                         task.done ? 'bg-[#6C5DD3] border-[#6C5DD3]' : 'border-[#E8ECF3]'
                       }`}>
-                        {task.done && <span className="text-white text-[10px]">✓</span>}
+                        {task.done && <span className="text-white text-[11px]">✓</span>}
                       </div>
                       <span className={`text-xs ${task.done ? 'text-[#808191] line-through' : 'text-[#11142D]'}`}>
                         {task.name}
@@ -190,7 +190,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                           <Icon className="w-3.5 h-3.5 text-[#6C5DD3]" />
                           <span className="text-xs text-[#11142D]">{tool.name}</span>
                         </div>
-                        <span className="text-[10px] text-[#808191]">{tool.time}</span>
+                        <span className="text-[11px] text-[#808191]">{tool.time}</span>
                       </div>
                     );
                   })}
@@ -207,7 +207,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                     <Award className="w-3.5 h-3.5 text-[#6C5DD3]" />
                     <span className="text-xs font-semibold text-[#11142D]">荣誉勋章</span>
                   </div>
-                  <Link href="/badges" className="text-[10px] text-[#6C5DD3] hover:underline">
+                  <Link href="/badges" className="text-[11px] text-[#6C5DD3] hover:underline">
                     查看全部
                   </Link>
                 </div>
@@ -219,7 +219,7 @@ export default function JueshiV4HomeCandidateV2Workspace() {
                       title={badge.name}
                     >
                       <span className="text-lg mb-0.5">{badge.icon}</span>
-                      <span className="text-[9px] text-[#808191] text-center line-clamp-1">{badge.name}</span>
+                      <span className="text-[11px] text-[#808191] text-center line-clamp-1">{badge.name}</span>
                     </div>
                   ))}
                 </div>

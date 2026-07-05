@@ -161,7 +161,7 @@ export default function JueshiV4HomeCandidateV2Hero() {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {hotSearches.map((search, i) => (
-                      <span key={i} className="text-[10px] px-2 py-1 bg-white text-[#808191] rounded-md border border-[#E8ECF3]">
+                      <span key={i} className="text-[11px] px-2 py-1 bg-white text-[#808191] rounded-md border border-[#E8ECF3]">
                         {search}
                       </span>
                     ))}
@@ -178,7 +178,7 @@ export default function JueshiV4HomeCandidateV2Hero() {
                     {quickTasks.map((task, i) => (
                       <div key={i} className="flex-1 flex items-center gap-1.5 p-2 bg-white rounded-lg border border-[#E8ECF3]">
                         <span className="text-sm">{task.icon}</span>
-                        <span className="text-[10px] text-[#11142D] font-medium">{task.label}</span>
+                        <span className="text-[11px] text-[#11142D] font-medium">{task.label}</span>
                       </div>
                     ))}
                   </div>
@@ -193,8 +193,8 @@ export default function JueshiV4HomeCandidateV2Hero() {
                   <div className="space-y-1.5">
                     {recentUpdates.map((update, i) => (
                       <div key={i} className="flex items-center justify-between">
-                        <span className="text-[10px] text-[#11142D]">{update.label}</span>
-                        <span className="text-[9px] text-[#808191]">{update.time}</span>
+                        <span className="text-[11px] text-[#11142D]">{update.label}</span>
+                        <span className="text-[11px] text-[#808191]">{update.time}</span>
                       </div>
                     ))}
                   </div>
@@ -220,7 +220,7 @@ export default function JueshiV4HomeCandidateV2Hero() {
                 </div>
                 <div>
                   <div className="text-xs font-medium text-[#11142D]">绝世百宝箱</div>
-                  <div className="text-[10px] text-[#808191]">您的海外生活助手</div>
+                  <div className="text-[11px] text-[#808191]">您的海外生活助手</div>
                 </div>
               </div>
             </div>

@@ -60,7 +60,7 @@ export default function JueshiV4AdInventoryGroup({ group }: JueshiV4AdInventoryG
     <section className="relative bg-gradient-to-br from-[#FAFBFE] to-[#F6F8FC] border border-[#E8ECF3] rounded-2xl p-5 md:p-6">
       {/* Ad label badge */}
       {group.showLabel && (
-        <span className="absolute top-3 right-3 bg-[#FF754C]/10 text-[#FF754C] text-[10px] px-2 py-0.5 rounded font-medium z-10">
+        <span className="absolute top-3 right-3 bg-[#FF754C]/10 text-[#FF754C] text-[11px] px-2 py-0.5 rounded font-medium z-10">
           推广
         </span>
       )}
@@ -120,7 +120,7 @@ function TextAdItem({ creative }: { creative: AdCreative }) {
       {...relProps}
     >
       {/* 广告 micro label */}
-      <span className="absolute top-1.5 right-1.5 text-[8px] text-[#808191]/50 font-normal">
+      <span className="absolute top-1.5 right-1.5 text-[11px] text-[#808191]/50 font-normal">
         广告
       </span>
 
@@ -129,18 +129,18 @@ function TextAdItem({ creative }: { creative: AdCreative }) {
           {creative.title}
         </h4>
         {creative.subtitle && (
-          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{creative.subtitle}</p>
+          <p className="text-[11px] text-[#808191] mt-0.5 line-clamp-1">{creative.subtitle}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between mt-1.5">
         {creative.tag && (
-          <span className="text-[9px] bg-[#6C5DD3]/8 text-[#6C5DD3] px-1.5 py-0.5 rounded font-medium">
+          <span className="text-[11px] bg-[#6C5DD3]/8 text-[#6C5DD3] px-1.5 py-0.5 rounded font-medium">
             {creative.tag}
           </span>
         )}
         {creative.ctaText && (
-          <span className="text-[#6C5DD3] text-[10px] font-medium ml-auto">
+          <span className="text-[#6C5DD3] text-[11px] font-medium ml-auto">
             {creative.ctaText} →
           </span>
         )}
@@ -165,11 +165,11 @@ function ImageAdItem({ creative, index }: { creative: AdCreative; index: number 
       {/* Gradient placeholder */}
       <div className={`relative h-20 bg-gradient-to-br ${gradient}`}>
         {/* 广告 badge on image */}
-        <span className="absolute top-1.5 right-1.5 bg-black/20 backdrop-blur-sm text-white text-[8px] px-1.5 py-0.5 rounded">
+        <span className="absolute top-1.5 right-1.5 bg-black/20 backdrop-blur-sm text-white text-[11px] px-1.5 py-0.5 rounded">
           广告
         </span>
         {creative.tag && (
-          <span className="absolute bottom-1.5 left-1.5 bg-white/80 backdrop-blur-sm text-[#11142D] text-[9px] px-1.5 py-0.5 rounded font-medium">
+          <span className="absolute bottom-1.5 left-1.5 bg-white/80 backdrop-blur-sm text-[#11142D] text-[11px] px-1.5 py-0.5 rounded font-medium">
             {creative.tag}
           </span>
         )}
@@ -181,10 +181,10 @@ function ImageAdItem({ creative, index }: { creative: AdCreative; index: number 
           {creative.title}
         </h4>
         {creative.description && (
-          <p className="text-[9px] text-[#808191] mt-0.5 line-clamp-1">{creative.description}</p>
+          <p className="text-[11px] text-[#808191] mt-0.5 line-clamp-1">{creative.description}</p>
         )}
         {creative.ctaText && (
-          <span className="inline-block mt-1.5 text-[#6C5DD3] text-[10px] font-medium">
+          <span className="inline-block mt-1.5 text-[#6C5DD3] text-[11px] font-medium">
             {creative.ctaText} →
           </span>
         )}

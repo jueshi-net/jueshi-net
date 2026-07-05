@@ -54,7 +54,7 @@ export default function JueshiV4BottomTab({ activeTab, onTabChange }: BottomTabP
                     <span className="text-white text-xl">🦀</span>
                   )}
                 </div>
-                <span className={`text-[10px] mt-1 font-medium ${isActive ? 'text-[#6C5DD3]' : 'text-[#808191]'}`}>
+                <span className={`text-[11px] mt-1 font-medium ${isActive ? 'text-[#6C5DD3]' : 'text-[#808191]'}`}>
                   {tab.label}
                 </span>
               </Link>
@@ -72,7 +72,7 @@ export default function JueshiV4BottomTab({ activeTab, onTabChange }: BottomTabP
               className="flex flex-col items-center justify-center flex-1 py-2"
             >
               {Icon && <Icon className={`w-5 h-5 ${isActive ? 'text-[#6C5DD3]' : 'text-[#808191]'}`} />}
-              <span className={`text-[10px] mt-1 ${isActive ? 'text-[#6C5DD3] font-medium' : 'text-[#808191]'}`}>
+              <span className={`text-[11px] mt-1 ${isActive ? 'text-[#6C5DD3] font-medium' : 'text-[#808191]'}`}>
                 {tab.label}
               </span>
             </Link>
