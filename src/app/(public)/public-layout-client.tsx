@@ -7,8 +7,9 @@ import FooterNew from '@/components/layout/footer-new';
 export function PublicLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isUILab = pathname.startsWith('/ui-lab');
+  const isV4Home = pathname === '/';
 
-  if (isUILab) {
+  if (isUILab || isV4Home) {
     return <>{children}</>;
   }
 
