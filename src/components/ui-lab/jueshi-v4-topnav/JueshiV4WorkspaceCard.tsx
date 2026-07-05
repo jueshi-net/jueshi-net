@@ -108,7 +108,7 @@ export default function JueshiV4WorkspaceCard() {
                       style={{ width: `${expProgress}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-[#808191] whitespace-nowrap">
+                  <span className="text-[11px] text-[#808191] whitespace-nowrap">
                     {user.currentExp}/{user.nextLevelExp}
                   </span>
                 </div>

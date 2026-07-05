@@ -103,7 +103,7 @@ export default function JueshiV4TaskChains() {
                 <div className="flex items-center gap-1 flex-wrap">
                   {chain.steps.slice(0, 4).map((step, i) => (
                     <React.Fragment key={i}>
-                      <span className="text-[10px] text-[#808191] bg-[#F3F5FA] px-1.5 py-0.5 rounded">
+                      <span className="text-[11px] text-[#808191] bg-[#F3F5FA] px-1.5 py-0.5 rounded">
                         {step}
                       </span>
                       {i < 3 && i < chain.steps.length - 1 && (
@@ -112,18 +112,18 @@ export default function JueshiV4TaskChains() {
                     </React.Fragment>
                   ))}
                   {chain.steps.length > 4 && (
-                    <span className="text-[10px] text-[#808191]">+{chain.steps.length - 4}</span>
+                    <span className="text-[11px] text-[#808191]">+{chain.steps.length - 4}</span>
                   )}
                 </div>
               </div>
 
               {/* Tools */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] text-[#808191]">相关工具：</span>
+                <span className="text-[11px] text-[#808191]">相关工具：</span>
                 {chain.tools.map((tool) => (
                   <span
                     key={tool}
-                    className="text-[10px] px-1.5 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
+                    className="text-[11px] px-1.5 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
                   >
                     {tool}
                   </span>

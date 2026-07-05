@@ -109,7 +109,7 @@ export default function JueshiV4RecommendedContent() {
               </p>
               {/* Progress */}
               <div className="mb-3">
-                <div className="flex items-center justify-between text-[10px] text-[#808191] mb-1">
+                <div className="flex items-center justify-between text-[11px] text-[#808191] mb-1">
                   <span>进度</span>
                   <span>{item.progress}%</span>
                 </div>
@@ -125,13 +125,13 @@ export default function JueshiV4RecommendedContent() {
                   {item.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] px-1.5 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
+                      className="text-[11px] px-1.5 py-0.5 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded font-medium"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <span className="text-[10px] text-[#808191]">{item.updated}</span>
+                <span className="text-[11px] text-[#808191]">{item.updated}</span>
               </div>
             </Link>
           ))}
@@ -168,13 +168,13 @@ export default function JueshiV4RecommendedContent() {
                   {item.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-[10px] px-1.5 py-0.5 bg-[#F3F5FA] text-[#808191] rounded font-medium"
+                      className="text-[11px] px-1.5 py-0.5 bg-[#F3F5FA] text-[#808191] rounded font-medium"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <span className="text-[10px] text-[#808191]">{item.readTime}</span>
+                <span className="text-[11px] text-[#808191]">{item.readTime}</span>
               </div>
             </Link>
           ))}
