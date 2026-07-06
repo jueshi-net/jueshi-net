@@ -110,14 +110,14 @@ export default function WorkspaceSidebar({
   isMember,
 }: WorkspaceSidebarProps) {
   return (
-    <aside className="fixed top-0 left-0 h-full w-60 bg-white border-r border-[#E8ECF3] z-50 hidden lg:block">
+    <aside className="h-screen bg-white border-r border-[#E8ECF3] overflow-y-auto">
       {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-[#E8ECF3]">
         <Link href="/" className="flex items-center gap-2.5">
           <img 
-            src="/brand/jueshi-logo-small.png" 
+            src="/brand/jueshi-logo.png" 
             alt="绝世百宝箱" 
-            className="w-8 h-8 rounded-lg"
+            className="h-8 w-auto"
           />
           <span className="font-semibold text-[#11142D] text-base">绝世百宝箱</span>
         </Link>
