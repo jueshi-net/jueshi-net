@@ -115,22 +115,22 @@ export default function WorkspaceSidebar({
       {/* User Info */}
       <div className="p-4 border-b border-[#E8ECF3]">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center text-white font-semibold">
+          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center text-white font-semibold text-base shadow-sm">
             {displayName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[#11142D] truncate">{displayName}</p>
+            <p className="text-sm font-semibold text-[#11142D] truncate">{displayName}</p>
             <p className="text-xs text-[#808191] truncate">{user?.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <div className="flex items-center gap-1 bg-[#6C5DD3]/8 text-[#6C5DD3] rounded px-2 py-1">
-            <Star className="w-3 h-3" />
-            <span className="font-medium">{levelLabel}</span>
+          <div className="flex items-center gap-1.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded-md px-2.5 py-1.5">
+            <Star className="w-3.5 h-3.5" />
+            <span className="font-medium text-xs">{levelLabel}</span>
           </div>
-          <div className="flex items-center gap-1 bg-[#3F8CFF]/8 text-[#3F8CFF] rounded px-2 py-1">
-            <Calendar className="w-3 h-3" />
-            <span className="font-medium">{todayChecked ? '已签到' : '未签到'}</span>
+          <div className="flex items-center gap-1.5 bg-[#FF754C]/10 text-[#FF754C] rounded-md px-2.5 py-1.5">
+            <Calendar className="w-3.5 h-3.5" />
+            <span className="font-medium text-xs">{todayChecked ? '已签到' : '未签到'}</span>
           </div>
         </div>
       </div>
@@ -138,8 +138,8 @@ export default function WorkspaceSidebar({
       {/* Navigation */}
       <nav className="overflow-y-auto h-[calc(100vh-18rem)] py-3 px-3">
         {navGroups.map((group) => (
-          <div key={group.title} className="mb-4">
-            <div className="px-3 py-1.5 text-[11px] font-semibold text-[#808191] uppercase tracking-wider">
+          <div key={group.title} className="mb-3">
+            <div className="px-3 py-1 text-[11px] font-semibold text-[#808191] uppercase tracking-wider">
               {group.title}
             </div>
             <div className="space-y-0.5">
@@ -151,8 +151,8 @@ export default function WorkspaceSidebar({
                     href={item.href}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all text-[#808191] hover:bg-[#F3F5FA] hover:text-[#11142D]"
                   >
-                    <Icon className="w-4.5 h-4.5 flex-shrink-0" strokeWidth={1.8} />
-                    <span className="text-sm font-normal truncate">{item.label}</span>
+                    <Icon className="w-[18px] h-[18px] flex-shrink-0" strokeWidth={1.8} />
+                    <span className="text-[13px] font-normal truncate">{item.label}</span>
                   </Link>
                 );
               })}
