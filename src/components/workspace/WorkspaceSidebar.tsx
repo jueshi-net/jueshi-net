@@ -31,6 +31,7 @@ import {
   Settings,
   Star,
   Calendar,
+  Crown,
 } from 'lucide-react';
 import CheckinButton from '@/components/user/CheckinButton';
 
@@ -40,6 +41,10 @@ interface WorkspaceSidebarProps {
   levelLabel: string;
   todayChecked: boolean;
   userId: string;
+  points: number;
+  growthValue: number;
+  checkinStreak: number;
+  isMember: boolean;
 }
 
 interface NavItem {
@@ -99,15 +104,21 @@ export default function WorkspaceSidebar({
   levelLabel,
   todayChecked,
   userId,
+  points,
+  growthValue,
+  checkinStreak,
+  isMember,
 }: WorkspaceSidebarProps) {
   return (
     <aside className="fixed top-0 left-0 h-full w-60 bg-white border-r border-[#E8ECF3] z-50 hidden lg:block">
       {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-[#E8ECF3]">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">绝</span>
-          </div>
+          <img 
+            src="/brand/jueshi-logo-small.png" 
+            alt="绝世百宝箱" 
+            className="w-8 h-8 rounded-lg"
+          />
           <span className="font-semibold text-[#11142D] text-base">绝世百宝箱</span>
         </Link>
       </div>
@@ -123,14 +134,30 @@ export default function WorkspaceSidebar({
             <p className="text-xs text-[#808191] truncate">{user?.email}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2 text-xs mb-2">
           <div className="flex items-center gap-1.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded-md px-2.5 py-1.5">
             <Star className="w-3.5 h-3.5" />
             <span className="font-medium text-xs">{levelLabel}</span>
           </div>
-          <div className="flex items-center gap-1.5 bg-[#FF754C]/10 text-[#FF754C] rounded-md px-2.5 py-1.5">
-            <Calendar className="w-3.5 h-3.5" />
-            <span className="font-medium text-xs">{todayChecked ? '已签到' : '未签到'}</span>
+          {isMember && (
+            <div className="flex items-center gap-1.5 bg-[#FF754C]/10 text-[#FF754C] rounded-md px-2.5 py-1.5">
+              <Crown className="w-3.5 h-3.5" />
+              <span className="font-medium text-xs">会员</span>
+            </div>
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-1 text-center">
+          <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+            <p className="text-[13px] font-bold text-[#11142D]">{points}</p>
+            <p className="text-[10px] text-[#808191]">积分</p>
+          </div>
+          <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+            <p className="text-[13px] font-bold text-[#11142D]">{growthValue}</p>
+            <p className="text-[10px] text-[#808191]">成长值</p>
+          </div>
+          <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+            <p className="text-[13px] font-bold text-[#11142D]">{checkinStreak}</p>
+            <p className="text-[10px] text-[#808191]">连续签到</p>
           </div>
         </div>
       </div>

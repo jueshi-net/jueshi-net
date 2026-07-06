@@ -139,6 +139,10 @@ export default async function WorkspacePage() {
           levelLabel={levelLabel}
           todayChecked={todayChecked}
           userId={userId}
+          points={user?.points || 0}
+          growthValue={user?.growthValue || 0}
+          checkinStreak={user?.checkinStreak || 0}
+          isMember={isMember}
         />
 
         {/* Content area: main + right rail in same flex */}
