@@ -130,7 +130,7 @@ export default async function WorkspacePage() {
 
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
-      {/* Three-column layout based on UI Lab V4 */}
+      {/* Three-column layout: sidebar + content grid (main + right rail) */}
       <div className="flex">
         {/* Left Sidebar - Fixed */}
         <WorkspaceSidebar
@@ -141,40 +141,42 @@ export default async function WorkspacePage() {
           userId={userId}
         />
 
-        {/* Main Content Area */}
-        <div className="flex-1 lg:pl-60">
-          {/* Top Bar */}
-          <header className="sticky top-0 z-30 bg-white border-b border-[#E8ECF3] h-14 flex items-center px-4 md:px-6">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-                  <Menu className="w-5 h-5" />
-                </button>
-                <h1 className="text-lg font-semibold text-[#11142D]">工作台</h1>
-              </div>
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/workspace/notifications"
-                  className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Bell className="w-5 h-5 text-[#808191]" />
-                  {unreadNotifs > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                  )}
-                </Link>
-                <Link
-                  href="/workspace/settings"
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <Settings className="w-5 h-5 text-[#808191]" />
-                </Link>
-              </div>
-            </div>
-          </header>
-
+        {/* Content area: main + right rail in same flex */}
+        <div className="flex-1 lg:pl-60 flex">
           {/* Main Content */}
-          <main className="p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
-            <div className="max-w-[1180px] mx-auto space-y-5">
+          <div className="flex-1 min-w-0">
+            {/* Top Bar */}
+            <header className="sticky top-0 z-30 bg-white border-b border-[#E8ECF3] h-14 flex items-center px-4 md:px-6">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
+                    <Menu className="w-5 h-5" />
+                  </button>
+                  <h1 className="text-lg font-semibold text-[#11142D]">工作台</h1>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/workspace/notifications"
+                    className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Bell className="w-5 h-5 text-[#808191]" />
+                    {unreadNotifs > 0 && (
+                      <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                    )}
+                  </Link>
+                  <Link
+                    href="/workspace/settings"
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <Settings className="w-5 h-5 text-[#808191]" />
+                  </Link>
+                </div>
+              </div>
+            </header>
+
+            {/* Main Content - NO max-width, fills available space */}
+            <main className="p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
+              <div className="space-y-5">
               {/* Welcome Section - compressed */}
               <section className="bg-gradient-to-br from-[#6C5DD3] via-[#5b4fc4] to-[#3F8CFF] rounded-2xl p-5 md:p-6 text-white shadow-lg">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
