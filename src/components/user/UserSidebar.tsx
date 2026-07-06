@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home, Target, Crown, FileText, Building2, Heart, Settings, Bell, StickyNote, Package,
-  ArrowLeft, Gift, Megaphone, GitBranch,
+  Gift, Megaphone, GitBranch, Star, Zap, Calendar, TrendingUp,
 } from 'lucide-react';
 import { useUserPreferences, getTheme } from './UserPreferencesContext';
 
@@ -42,23 +42,94 @@ const LABELS: Record<string, string> = {
   settings: '账号设置',
 };
 
-export function UserNavSidebar({ className }: { className?: string }) {
+const levelLabels: Record<string, string> = {
+  lv1: 'Lv.1 新手',
+  lv2: 'Lv.2 进阶',
+  lv3: 'Lv.3 精英',
+  lv4: 'Lv.4 大师',
+  lv5: 'Lv.5 传奇',
+};
+
+interface UserAssetData {
+  displayName: string;
+  email: string;
+  levelLabel: string;
+  points: number;
+  growthValue: number;
+  checkinStreak: number;
+  isMember: boolean;
+}
+
+export function UserNavSidebar({ className, userAsset }: { className?: string; userAsset?: UserAssetData }) {
   const { workspaceTitle } = useUserPreferences();
   const pathname = usePathname();
   const theme = getTheme();
 
+  // Use props if provided, otherwise fallback defaults
+  const displayName = userAsset?.displayName || '用户';
+  const email = userAsset?.email || '';
+  const levelLabel = userAsset?.levelLabel || 'Lv.1 新手';
+  const points = userAsset?.points ?? 0;
+  const growthValue = userAsset?.growthValue ?? 0;
+  const checkinStreak = userAsset?.checkinStreak ?? 0;
+  const isMember = userAsset?.isMember ?? false;
+
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-60 bg-white border-r border-gray-100/80 h-full p-4 flex-shrink-0`}>
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> 返回首页
-        </Link>
+      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-60 bg-white border-r border-gray-100/80 h-full flex-shrink-0`}>
+        {/* Brand Logo */}
+        <div className="h-14 flex items-center px-5 border-b border-gray-100/80">
+          <Link href="/" className="flex items-center gap-2.5">
+            <img 
+              src="/brand/jueshi-logo-header.png" 
+              alt="绝世百宝箱" 
+              className="h-8 w-auto"
+            />
+          </Link>
+        </div>
 
-        <nav className="space-y-1 flex-1">
+        {/* User Asset Card */}
+        <div className="p-4 border-b border-gray-100/80">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center text-white font-semibold text-base shadow-sm">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-[#11142D] truncate">{displayName}</p>
+              <p className="text-xs text-[#808191] truncate">{email}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs mb-2">
+            <div className="flex items-center gap-1.5 bg-[#6C5DD3]/10 text-[#6C5DD3] rounded-md px-2.5 py-1.5">
+              <Star className="w-3.5 h-3.5" />
+              <span className="font-medium text-xs">{levelLabel}</span>
+            </div>
+            {isMember && (
+              <div className="flex items-center gap-1.5 bg-[#FF754C]/10 text-[#FF754C] rounded-md px-2.5 py-1.5">
+                <Crown className="w-3.5 h-3.5" />
+                <span className="font-medium text-xs">会员</span>
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-center">
+            <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+              <p className="text-[13px] font-bold text-[#11142D]">{points}</p>
+              <p className="text-[10px] text-[#808191]">积分</p>
+            </div>
+            <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+              <p className="text-[13px] font-bold text-[#11142D]">{growthValue}</p>
+              <p className="text-[10px] text-[#808191]">成长值</p>
+            </div>
+            <div className="bg-[#F6F8FC] rounded-md py-1.5 px-1">
+              <p className="text-[13px] font-bold text-[#11142D]">{checkinStreak}</p>
+              <p className="text-[10px] text-[#808191]">连续签到</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="space-y-1 flex-1 overflow-y-auto p-4">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -81,7 +152,7 @@ export function UserNavSidebar({ className }: { className?: string }) {
           })}
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-gray-100">
+        <div className="mt-auto pt-4 border-t border-gray-100 px-4">
           <p className="text-[10px] text-gray-300 text-center">绝世百宝箱 v1.20.42.6.6</p>
         </div>
       </aside>
