@@ -17,7 +17,7 @@ export default function WorkspaceRightRail({
   userId,
 }: WorkspaceRightRailProps) {
   return (
-    <aside className="hidden xl:block w-[300px] flex-shrink-0 border-l border-[#E8ECF3] bg-white">
+    <aside className="w-[300px] border-l border-[#E8ECF3] bg-white">
       <div className="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-5 space-y-4">
         {/* Notifications */}
         <section className="bg-[#F6F8FC] rounded-xl p-4">

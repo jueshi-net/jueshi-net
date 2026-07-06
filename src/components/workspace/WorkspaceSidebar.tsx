@@ -110,7 +110,7 @@ export default function WorkspaceSidebar({
   isMember,
 }: WorkspaceSidebarProps) {
   return (
-    <aside className="h-screen bg-white border-r border-[#E8ECF3] overflow-y-auto">
+    <aside className="relative h-screen bg-white border-r border-[#E8ECF3] overflow-y-auto">
       {/* Logo */}
       <div className="h-14 flex items-center px-5 border-b border-[#E8ECF3]">
         <Link href="/" className="flex items-center gap-2.5">
