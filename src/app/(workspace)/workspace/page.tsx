@@ -10,8 +10,7 @@ import {
   Zap, Target, Gift, Star, CheckCircle2, Calendar,
   Search, User, Settings, TrendingUp, Users, Shield,
   BarChart3, Briefcase, Megaphone, BookOpen, Wrench,
-  Plus, ArrowRight, Flame, Trophy, CheckCircle, AlertCircle,
-  Bookmark, LayoutDashboard, LogOut, HelpCircle, MessageSquare
+  Plus, ArrowRight, Flame, Trophy, CheckCircle, AlertCircle
 } from "lucide-react";
 import DeleteDocButton from "@/components/workspace/DeleteDocButton";
 import { TaskChainList } from "@/components/workspace/TaskChainList";
@@ -118,353 +117,540 @@ export default async function WorkspacePage() {
   const companyCount = companyCountRes.status === "fulfilled" ? companyCountRes.value : 0;
   const inviteCount = inviteCountRes.status === "fulfilled" ? inviteCountRes.value : 0;
 
-  // v1.20.42.18.6.11.4: Use memberUntil for membership, not levelKey
-  const isMember = user?.memberUntil && new Date(user.memberUntil) > new Date();
-  const memberLevel = user?.role === "管理员" ? "管理员" : isMember ? "会员" : "免费版用户";
+  const memberLevel = user?.role === "管理员" ? "管理员" : user?.levelKey === "member" ? "会员" : "免费版用户";
   const displayName = user?.name?.split("@")[0] || user?.email?.split("@")[0] || "用户";
+  const isMember = user?.memberUntil && new Date(user.memberUntil) > new Date();
   const levelLabel = user?.levelKey && levelLabels[user.levelKey] ? levelLabels[user.levelKey] : "Lv.1 新手";
   const todayChecked = user?.lastCheckinDate === new Date().toISOString().split("T")[0];
 
   return (
-    <div className="min-h-screen bg-[#F6F8FC]">
-      {/* 三栏布局容器 */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] gap-6">
-          
-          {/* ===== 左栏：用户信息 + 快捷入口 ===== */}
-          <aside className="space-y-6">
-            {/* 用户信息卡 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                  {displayName.charAt(0).toUpperCase()}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-lg font-bold text-[#11142D] truncate">{displayName}</h2>
-                  <p className="text-sm text-gray-500 truncate">{user?.email}</p>
-                </div>
-              </div>
-              
-              {/* 等级和积分 */}
-              <div className="space-y-3 pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">等级</span>
-                  <span className="text-sm font-semibold text-[#6C5DD3]">{levelLabel}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">积分</span>
-                  <span className="text-sm font-semibold text-[#11142D]">{user?.points ?? 0}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">连续签到</span>
-                  <span className="text-sm font-semibold text-[#11142D]">{user?.checkinStreak ?? 0} 天</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">今日签到</span>
-                  <span className={`text-sm font-semibold ${todayChecked ? 'text-green-600' : 'text-gray-400'}`}>
-                    {todayChecked ? '已签到' : '未签到'}
-                  </span>
-                </div>
-              </div>
-
-              {/* 签到按钮 */}
-              <div className="mt-4">
-                <CheckinButton
-                  userId={userId}
-                  lastCheckinDate={user?.lastCheckinDate}
-                  checkinStreak={user?.checkinStreak || 0}
-                />
-              </div>
-            </div>
-
-            {/* 快捷入口 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-base font-bold text-[#11142D] mb-4">快捷入口</h3>
-              <nav className="space-y-2">
-                <Link 
-                  href="/tools" 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <Globe className="w-5 h-5 text-gray-400 group-hover:text-[#6C5DD3] transition-colors" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">我的工具</span>
-                </Link>
-                <Link 
-                  href="/checklists" 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <CheckCircle className="w-5 h-5 text-gray-400 group-hover:text-[#6C5DD3] transition-colors" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">我的清单</span>
-                </Link>
-                <Link 
-                  href="/workspace/favorites" 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <Bookmark className="w-5 h-5 text-gray-400 group-hover:text-[#6C5DD3] transition-colors" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">我的收藏</span>
-                </Link>
-                <Link 
-                  href="/workspace/settings" 
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <Settings className="w-5 h-5 text-gray-400 group-hover:text-[#6C5DD3] transition-colors" />
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">账号设置</span>
-                </Link>
-              </nav>
-            </div>
-          </aside>
-
-          {/* ===== 中栏：主内容区 ===== */}
-          <main className="space-y-6">
-            {/* 欢迎区 */}
-            <div className="bg-gradient-to-br from-[#6C5DD3] via-[#5b4fc4] to-[#3F8CFF] rounded-2xl p-8 text-white shadow-lg">
-              <h1 className="text-3xl font-bold mb-2">欢迎回来，{displayName} 👋</h1>
-              <p className="text-white/90 mb-6">今天也要加油哦！</p>
-              
-              {/* 核心数据卡片 */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileText className="w-5 h-5" />
-                    <span className="text-sm text-white/80">单据</span>
-                  </div>
-                  <p className="text-2xl font-bold">{docCount}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-5 h-5" />
-                    <span className="text-sm text-white/80">公司</span>
-                  </div>
-                  <p className="text-2xl font-bold">{companyCount}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Trophy className="w-5 h-5" />
-                    <span className="text-sm text-white/80">勋章</span>
-                  </div>
-                  <p className="text-2xl font-bold">{badgeCount}</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Gift className="w-5 h-5" />
-                    <span className="text-sm text-white/80">邀请</span>
-                  </div>
-                  <p className="text-2xl font-bold">{inviteCount}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 最近使用工具 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-[#11142D]">最近使用工具</h2>
-                <Link href="/tools" className="text-sm text-[#6C5DD3] hover:text-[#5b4fc4] font-medium flex items-center gap-1">
-                  查看全部 <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <RecentTools userId={userId} />
-            </div>
-
-            {/* 进行中的清单 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-[#11142D]">进行中的清单</h2>
-                <Link href="/checklists" className="text-sm text-[#6C5DD3] hover:text-[#5b4fc4] font-medium flex items-center gap-1">
-                  查看全部 <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              {tasks.length === 0 ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">暂无进行中的清单</p>
-                  <Link 
-                    href="/checklists" 
-                    className="inline-block mt-4 px-4 py-2 bg-[#6C5DD3] text-white rounded-lg text-sm font-medium hover:bg-[#5b4fc4] transition-colors"
-                  >
-                    浏览清单
-                  </Link>
-                </div>
-              ) : (
-                <TodayTasks initialTasks={tasks} />
-              )}
-            </div>
-
-            {/* 常用工具快捷入口 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-bold text-[#11142D] mb-4">常用工具</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Link 
-                  href="/tools/postal-code" 
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center group-hover:from-[#6C5DD3]/20 group-hover:to-[#3F8CFF]/20 transition-colors">
-                    <Globe className="w-6 h-6 text-[#6C5DD3]" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 text-center">邮编查询</span>
-                </Link>
-                <Link 
-                  href="/tools/hs-code" 
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center group-hover:from-[#6C5DD3]/20 group-hover:to-[#3F8CFF]/20 transition-colors">
-                    <BookOpen className="w-6 h-6 text-[#6C5DD3]" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 text-center">HS编码</span>
-                </Link>
-                <Link 
-                  href="/tools/exchange-rate" 
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center group-hover:from-[#6C5DD3]/20 group-hover:to-[#3F8CFF]/20 transition-colors">
-                    <TrendingUp className="w-6 h-6 text-[#6C5DD3]" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 text-center">汇率换算</span>
-                </Link>
-                <Link 
-                  href="/tools/shipping-calculator" 
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center group-hover:from-[#6C5DD3]/20 group-hover:to-[#3F8CFF]/20 transition-colors">
-                    <Package className="w-6 h-6 text-[#6C5DD3]" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 text-center">运费计算</span>
-                </Link>
-              </div>
-            </div>
-          </main>
-
-          {/* ===== 右栏：通知 + 勋章 + 推荐 ===== */}
-          <aside className="space-y-6">
-            {/* 通知/提醒 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-[#11142D]">通知提醒</h3>
-                {unreadNotifs > 0 && (
-                  <span className="px-2 py-1 bg-[#FF754C] text-white text-xs font-semibold rounded-full">
-                    {unreadNotifs}
-                  </span>
-                )}
-              </div>
-              {unreadNotifs === 0 ? (
-                <div className="text-center py-6">
-                  <Bell className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">暂无新通知</p>
-                </div>
-              ) : (
-                <Link 
-                  href="/workspace/notifications" 
-                  className="block w-full text-center py-3 bg-[#F6F8FC] text-[#6C5DD3] rounded-xl text-sm font-medium hover:bg-[#6C5DD3]/10 transition-colors"
-                >
-                  查看 {unreadNotifs} 条未读通知
-                </Link>
-              )}
-            </div>
-
-            {/* 勋章/成长路径 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-[#11142D]">成长路径</h3>
-                <Link href="/workspace/member" className="text-xs text-[#6C5DD3] hover:text-[#5b4fc4] font-medium">
-                  查看全部
-                </Link>
-              </div>
-              <div className="text-center py-4">
-                <Trophy className="w-12 h-12 text-[#FF754C] mx-auto mb-3" />
-                <p className="text-2xl font-bold text-[#11142D] mb-1">{badgeCount}</p>
-                <p className="text-sm text-gray-500 mb-4">已获勋章</p>
-                {badgeCount === 0 ? (
-                  <p className="text-xs text-gray-400">继续签到和使用工具来获取勋章吧！</p>
-                ) : (
-                  <Link 
-                    href="/workspace/member" 
-                    className="inline-block px-4 py-2 bg-[#6C5DD3] text-white rounded-lg text-sm font-medium hover:bg-[#5b4fc4] transition-colors"
-                  >
-                    查看勋章详情
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* 推荐工具 */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-base font-bold text-[#11142D] mb-4">推荐工具</h3>
-              <div className="space-y-3">
-                <Link 
-                  href="/tools/commercial-invoice" 
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-[#6C5DD3]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">商业发票</p>
-                    <p className="text-xs text-gray-500">快速生成专业发票</p>
-                  </div>
-                </Link>
-                <Link 
-                  href="/tools/container" 
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#6C5DD3]/10 to-[#3F8CFF]/10 flex items-center justify-center flex-shrink-0">
-                    <Package className="w-5 h-5 text-[#6C5DD3]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 group-hover:text-[#6C5DD3] transition-colors">集装箱计算</p>
-                    <p className="text-xs text-gray-500">计算装柜方案</p>
-                  </div>
-                </Link>
-                <Link 
-                  href="/tools/template-studio" 
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#F6F8FC] transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#FF754C]/10 to-[#FF754C]/20 flex items-center justify-center flex-shrink-0">
-                    <Wrench className="w-5 h-5 text-[#FF754C]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-700 group-hover:text-[#FF754C] transition-colors">模板设计器</p>
-                    <p className="text-xs text-gray-500">自定义单据模板</p>
-                  </div>
-                </Link>
-              </div>
-            </div>
-
-            {/* 新手任务/下一步建议 */}
-            <div className="bg-gradient-to-br from-[#FF754C] to-[#FF754C]/80 rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5" />
-                <h3 className="text-base font-bold">下一步建议</h3>
-              </div>
-              <div className="space-y-3">
-                {!todayChecked && (
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">完成今日签到，获取积分和成长值</p>
-                  </div>
-                )}
-                {docCount === 0 && (
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">创建第一份单据，体验工具功能</p>
-                  </div>
-                )}
-                {companyCount === 0 && (
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">添加公司资料，快速填充单据</p>
-                  </div>
-                )}
-                {inviteCount === 0 && (
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm">邀请好友，获取会员天数</p>
-                  </div>
-                )}
-                {todayChecked && docCount > 0 && companyCount > 0 && inviteCount > 0 && (
-                  <p className="text-sm">继续保持，解锁更多勋章和权益！</p>
-                )}
-              </div>
-            </div>
-          </aside>
+    <div className="max-w-7xl mx-auto space-y-6 px-4 sm:px-6">
+      {/* ===== A. 顶部全局栏 ===== */}
+      <div className="flex items-center justify-between gap-4 py-3">
+        {/* 搜索 */}
+        <div className="flex-1 max-w-md">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="搜索工具、单据、公司..."
+              className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            />
+          </div>
         </div>
+        {/* 快捷入口 */}
+        <div className="hidden md:flex items-center gap-1">
+          <Link href="/tools" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
+            <Globe className="w-4 h-4" />
+            <span>工具</span>
+          </Link>
+          <Link href="/workspace/documents" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
+            <FileText className="w-4 h-4" />
+            <span>单据</span>
+          </Link>
+          <Link href="/workspace/company-profiles" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
+            <Building2 className="w-4 h-4" />
+            <span>公司</span>
+          </Link>
+        </div>
+        {/* 通知 + 用户 */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/workspace/notifications"
+            className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title="通知中心"
+          >
+            <Bell className="w-5 h-5 text-gray-500" />
+            {unreadNotifs > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+            )}
+          </Link>
+          <Link
+            href="/workspace/settings"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            title="设置"
+          >
+            <Settings className="w-5 h-5 text-gray-500" />
+          </Link>
+          <Link
+            href="/workspace/member"
+            className="flex items-center gap-2 pl-2 pr-3 py-1.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-xs font-bold">
+              {displayName.charAt(0).toUpperCase()}
+            </div>
+            <span className="text-sm font-medium text-gray-700 hidden sm:block">{displayName}</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* ===== B. 用户身份横幅 ===== */}
+      <section className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-30" />
+        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-xl font-bold">欢迎回来，{displayName} 👋</h1>
+              {user?.role === "管理员" && (
+                <span className="px-2 py-0.5 bg-violet-500/20 text-violet-100 text-xs rounded-full border border-violet-400/30">
+                  管理员
+                </span>
+              )}
+              {isMember && (
+                <span className="px-2 py-0.5 bg-amber-500/20 text-amber-100 text-xs rounded-full border border-amber-400/30 flex items-center gap-1">
+                  <Crown className="w-3 h-3" />
+                  会员
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-teal-50 mb-3">{user?.email}</p>
+
+            {/* 身份指标行 */}
+            <div className="flex flex-wrap items-center gap-4 text-sm">
+              <div className="flex items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1">
+                <Star className="w-4 h-4 text-amber-300" />
+                <span className="font-semibold">{levelLabel}</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1">
+                <TrendingUp className="w-4 h-4 text-emerald-300" />
+                <span className="font-semibold">{user?.growthValue ?? 0}</span>
+                <span className="text-teal-100">成长值</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1">
+                <Zap className="w-4 h-4 text-amber-300" />
+                <span className="font-semibold">{user?.points ?? 0}</span>
+                <span className="text-teal-100">积分</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-white/10 rounded-lg px-2.5 py-1">
+                <Calendar className="w-4 h-4 text-teal-200" />
+                <span className="font-semibold">{todayChecked ? "已签到" : "未签到"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 签到按钮 */}
+          <div className="flex-shrink-0">
+            <CheckinButton
+              userId={userId}
+              lastCheckinDate={user?.lastCheckinDate}
+              checkinStreak={user?.checkinStreak || 0}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== C. CTA 按钮区 ===== */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <ActionCard
+          title="今日签到"
+          description={todayChecked ? "已完成今日签到" : "签到获得积分和成长值"}
+          icon={<Calendar className="w-6 h-6" />}
+          href="/workspace/member"
+          badge={todayChecked ? "已完成" : "待完成"}
+        />
+        <ActionCard
+          title="新建单据"
+          description="快速创建发票、装箱单等"
+          icon={<FileText className="w-6 h-6" />}
+          href="/tools/documents"
+        />
+        <ActionCard
+          title="添加公司资料"
+          description="管理公司信息，一键填充"
+          icon={<Building2 className="w-6 h-6" />}
+          href="/workspace/company-profiles"
+        />
+        <ActionCard
+          title="升级会员"
+          description="解锁更多功能和额度"
+          icon={<Crown className="w-6 h-6" />}
+          href="/workspace/member"
+          badge={!isMember ? "推荐" : undefined}
+        />
+      </div>
+
+      {/* ===== D. 核心数据卡 ===== */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <Link href="/workspace/documents">
+          <MetricCard
+            label="我的单据"
+            value={docCount}
+            icon={<FileText className="w-5 h-5" />}
+          />
+        </Link>
+        <Link href="/workspace/company-profiles">
+          <MetricCard
+            label="公司资料"
+            value={companyCount}
+            icon={<Building2 className="w-5 h-5" />}
+          />
+        </Link>
+        <Link href="/workspace/member">
+          <MetricCard
+            label="成长值"
+            value={user?.growthValue ?? 0}
+            icon={<TrendingUp className="w-5 h-5" />}
+          />
+        </Link>
+        <Link href="/workspace/member">
+          <MetricCard
+            label="勋章"
+            value={badgeCount}
+            icon={<Award className="w-5 h-5" />}
+          />
+        </Link>
+        <Link href="/workspace/invites">
+          <MetricCard
+            label="邀请奖励"
+            value={inviteCount}
+            icon={<Gift className="w-5 h-5" />}
+          />
+        </Link>
+      </div>
+
+      {/* ===== E. 成长运营区 ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* 今日签到 */}
+        <SectionCard title="今日签到" subtitle={`连续 ${user?.checkinStreak || 0} 天`}>
+          <div className="text-center py-2">
+            <CheckinButton
+              userId={userId}
+              lastCheckinDate={user?.lastCheckinDate}
+              checkinStreak={user?.checkinStreak || 0}
+            />
+            <p className="text-xs text-gray-500 mt-3">每日签到可获得 5 积分 + 2 成长值</p>
+          </div>
+        </SectionCard>
+
+        {/* 成长等级 */}
+        <SectionCard title="成长等级" subtitle={levelLabel}>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">当前等级</span>
+              <span className="font-semibold text-teal-700">{levelLabel}</span>
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all"
+                style={{ width: `${Math.min(((user?.growthValue ?? 0) % 100), 100)}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              距离下一级还需 {100 - ((user?.growthValue ?? 0) % 100)} 成长值
+            </p>
+          </div>
+        </SectionCard>
+
+        {/* 我的勋章 */}
+        <SectionCard
+          title="我的勋章"
+          action={<Link href="/workspace/member" className="text-xs text-teal-600 hover:underline">查看全部</Link>}
+        >
+          <div className="flex items-center justify-center py-2">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-8 h-8 text-amber-500" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{badgeCount}</p>
+                <p className="text-xs text-gray-500">已获勋章</p>
+              </div>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 今日任务 */}
+        <SectionCard
+          title="今日任务"
+          action={<Link href="/workspace/tasks" className="text-xs text-teal-600 hover:underline">全部</Link>}
+        >
+          <TodayTasks initialTasks={tasks} />
+        </SectionCard>
+      </div>
+
+      {/* ===== F. 最近工作区 ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 最近单据 */}
+        <SectionCard
+          title="最近单据"
+          action={
+            docs.length > 0 ? (
+              <Link href="/workspace/documents" className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+                全部 <ArrowRight className="w-3 h-3" />
+              </Link>
+            ) : undefined
+          }
+        >
+          {docs.length === 0 ? (
+            <div className="text-center py-6">
+              <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 mb-1">还没有单据记录</p>
+              <p className="text-xs text-gray-400 mb-3">使用单据工具填写后，点击"保存到工作台"即可存档</p>
+              <Link
+                href="/tools?cat=documents"
+                className="inline-flex items-center gap-1 px-4 py-2 bg-teal-600 text-white rounded-lg text-xs hover:bg-teal-700"
+              >
+                使用单据工具 <ExternalLink className="w-3 h-3" />
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-50 -mt-2">
+              {docs.slice(0, 4).map((doc) => (
+                <div key={doc.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {doc.documentNo || "未编号"}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded">
+                        {docTypeLabels[doc.documentType] || doc.documentType}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(doc.createdAt).toLocaleDateString("zh-CN")}
+                      </span>
+                    </div>
+                  </div>
+                  <Link
+                    href={`/tools/documents/${doc.documentType}?historyId=${doc.id}`}
+                    className="flex-shrink-0 text-xs text-teal-600 hover:text-teal-700 hover:underline"
+                  >
+                    查看
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* 公司资料摘要 */}
+        <SectionCard
+          title="公司资料"
+          action={
+            <Link href="/workspace/company-profiles" className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+              管理 <ArrowRight className="w-3 h-3" />
+            </Link>
+          }
+        >
+          {profiles.length === 0 ? (
+            <Link
+              href="/workspace/company-profiles"
+              className="block text-center py-6 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <Building2 className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 mb-1">还没有公司资料</p>
+              <p className="text-xs text-gray-400">创建公司资料，快速生成单据</p>
+            </Link>
+          ) : (
+            <div className="space-y-3">
+              {profiles.slice(0, 3).map((profile) => (
+                <div key={profile.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {profile.companyName || profile.companyNameEn || "未命名公司"}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {profile.contactName || profile.email || "无联系方式"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* 常用工具 */}
+        <SectionCard
+          title="常用工具"
+          action={
+            <Link href="/tools" className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+              工具中心 <ArrowRight className="w-3 h-3" />
+            </Link>
+          }
+        >
+          <RecentTools userId={userId} />
+        </SectionCard>
+
+        {/* 商品资料库 */}
+        <SectionCard
+          title="商品资料库"
+          action={
+            <Link href="/workspace/products" className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+              管理 <ArrowRight className="w-3 h-3" />
+            </Link>
+          }
+        >
+          <div className="text-center py-4">
+            <Package className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500 mb-1">管理你的商品信息</p>
+            <p className="text-xs text-gray-400 mb-3">添加商品后可快速填充到单据中</p>
+            <Link
+              href="/workspace/products"
+              className="inline-flex items-center gap-1 px-4 py-2 bg-teal-600 text-white rounded-lg text-xs hover:bg-teal-700"
+            >
+              <Plus className="w-3 h-3" /> 添加商品
+            </Link>
+          </div>
+        </SectionCard>
+      </div>
+
+      {/* ===== G. 动态区 ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* 通知时间线 */}
+        <SectionCard
+          title="通知"
+          action={
+            unreadNotifs > 0 ? (
+              <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">{unreadNotifs} 未读</span>
+            ) : (
+              <Link href="/workspace/notifications" className="text-xs text-teal-600 hover:underline">全部</Link>
+            )
+          }
+        >
+          <Link
+            href="/workspace/notifications"
+            className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <div className="w-9 h-9 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <Bell className="w-5 h-5 text-orange-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900">
+                {unreadNotifs > 0 ? `${unreadNotifs} 条未读通知` : "暂无新通知"}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">点击查看通知详情</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          </Link>
+        </SectionCard>
+
+        {/* 备忘录 */}
+        <SectionCard
+          title="备忘录"
+          action={
+            <Link href="/workspace/memos" className="text-xs text-teal-600 hover:underline flex items-center gap-1">
+              全部 <ArrowRight className="w-3 h-3" />
+            </Link>
+          }
+        >
+          {recentMemos.length === 0 ? (
+            <Link
+              href="/workspace/memos"
+              className="block text-center py-4 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <StickyNote className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-500 mb-1">还没有备忘录</p>
+              <p className="text-xs text-gray-400">记录重要事项和灵感</p>
+            </Link>
+          ) : (
+            <div className="space-y-2">
+              {recentMemos.slice(0, 3).map((memo) => (
+                <Link
+                  key={memo.id}
+                  href="/workspace/memos"
+                  className="block p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <div className="text-sm font-medium text-gray-900 truncate">{memo.title}</div>
+                  <div className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                    {memo.content || "无内容"}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+
+        {/* 会员权益 Banner */}
+        <SectionCard title="会员权益">
+          <div className="text-center py-2">
+            {isMember ? (
+              <>
+                <Crown className="w-10 h-10 text-amber-500 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900 mb-1">会员权益生效中</p>
+                <p className="text-xs text-gray-500">
+                  到期时间：{new Date(user!.memberUntil!).toLocaleDateString("zh-CN")}
+                </p>
+                <Link
+                  href="/workspace/member"
+                  className="inline-flex items-center gap-1 mt-3 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium hover:bg-amber-100 transition-colors"
+                >
+                  查看权益 <ArrowRight className="w-3 h-3" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-2">
+                  <Crown className="w-6 h-6 text-white" />
+                </div>
+                <p className="text-sm font-medium text-gray-900 mb-1">升级会员，解锁全部功能</p>
+                <p className="text-xs text-gray-500 mb-3">无限单据、高级模板、优先客服</p>
+                <Link
+                  href="/workspace/member"
+                  className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-xs font-medium hover:from-amber-600 hover:to-orange-600 transition-colors"
+                >
+                  立即升级 <ArrowRight className="w-3 h-3" />
+                </Link>
+              </>
+            )}
+          </div>
+        </SectionCard>
+      </div>
+
+      {/* ===== H. 跨境发货任务 ===== */}
+      <SectionCard
+        title="跨境发货任务"
+        subtitle="跟踪你的物流进度"
+      >
+        <TaskChainList />
+      </SectionCard>
+
+      {/* ===== I. 推荐工具 & 快速入口 ===== */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <SectionCard title="推荐工具" subtitle="根据你的使用习惯推荐">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "运费计算器", href: "/tools/shipping-calculator", icon: <BarChart3 className="w-5 h-5" /> },
+              { label: "物流追踪", href: "/tracking", icon: <Package className="w-5 h-5" /> },
+              { label: "HS 编码查询", href: "/tools/hs-code", icon: <BookOpen className="w-5 h-5" /> },
+              { label: "汇率换算", href: "/tools/exchange-rate", icon: <TrendingUp className="w-5 h-5" /> },
+            ].map((tool) => (
+              <Link
+                key={tool.href}
+                href={tool.href}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all"
+              >
+                <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-teal-600">
+                  {tool.icon}
+                </div>
+                <span className="text-sm font-medium text-gray-700">{tool.label}</span>
+              </Link>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="快速入口">
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "去工具中心", href: "/tools", icon: <Globe className="w-5 h-5" /> },
+              { label: "创建公司资料", href: "/workspace/company-profiles", icon: <Building2 className="w-5 h-5" /> },
+              { label: "查看我的单据", href: "/workspace/documents", icon: <FileText className="w-5 h-5" /> },
+              { label: "邀请好友", href: "/workspace/invites", icon: <Users className="w-5 h-5" /> },
+              { label: "提交反馈", href: "/feedback", icon: <Megaphone className="w-5 h-5" /> },
+              { label: "帮助中心", href: "/topics", icon: <BookOpen className="w-5 h-5" /> },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-teal-50 hover:border-teal-200 border border-transparent transition-all"
+              >
+                <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-teal-600">
+                  {link.icon}
+                </div>
+                <span className="text-sm font-medium text-gray-700">{link.label}</span>
+              </Link>
+            ))}
+          </div>
+        </SectionCard>
       </div>
     </div>
   );
