@@ -3,19 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { MessageSquare, ArrowRight } from "lucide-react";
 
 export async function RelatedDiscussions({ tool, limit = 3 }: { tool: string; limit?: number }) {
-  const posts = await prisma.forumPost.findMany({
-    where: {
-      status: "published",
-      relatedTool: tool,
-    },
-    include: {
-      user: { select: { name: true, image: true } },
-      category: true,
-      _count: { select: { comments: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: limit,
-  });
+  let posts = [];
+  try {
+    posts = await prisma.forumPost.findMany({
+      where: {
+        status: "published",
+        relatedTool: tool,
+      },
+      include: {
+        user: { select: { name: true, image: true } },
+        category: true,
+        _count: { select: { comments: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  } catch (error) {
+    // Database not available during build or runtime error
+    console.error('Failed to fetch related discussions:', error);
+  }
 
   if (posts.length === 0) {
     return (
