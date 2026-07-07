@@ -2,9 +2,10 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator } from 'lucide-react';
+import { ExternalLink, Globe, Search, Sparkles, Tag, Wrench, DollarSign, Hash, FileText, ListChecks, Truck, Briefcase, Home, GraduationCap, MapPin, Calculator, BookOpen } from 'lucide-react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { getCategoryInfo } from '@/lib/resources/category-config';
+import FavoriteButton from '@/components/favorite-button';
 
 interface Resource {
   id: string;
@@ -82,10 +83,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
   const catInfo = getCategoryInfo(resource.category);
 
   return (
-    <a
-      href={resource.url}
-      target={resource.url.startsWith('http') ? '_blank' : undefined}
-      rel={resource.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+    <div
       className="group relative bg-white rounded-2xl border border-gray-100 p-4 shadow-sm shadow-gray-100/50 hover:shadow-lg hover:border-purple-200 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
     >
       {/* 广告标签 */}
@@ -145,7 +143,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
       )}
 
       {/* 底部：分类 + 外部网站标识 */}
-      <div className="mt-auto flex items-center justify-between">
+      <div className="mt-auto flex items-center justify-between mb-3">
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${categoryColors[resource.category] || 'bg-gray-50 text-gray-500 border-gray-200'}`}>
           {catInfo.label}
         </span>
@@ -156,7 +154,40 @@ function ResourceCard({ resource }: { resource: Resource }) {
           </span>
         )}
       </div>
-    </a>
+
+      {/* 操作按钮区域 */}
+      <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+        {/* 收藏按钮 */}
+        <FavoriteButton
+          resourceUrl={resource.url}
+          title={resource.name}
+          resourceType="url"
+          size="sm"
+        />
+
+        {/* 网站介绍按钮 */}
+        <Link
+          href={`/resources/${resource.category}`}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-600 border border-gray-200 hover:border-purple-200 transition-colors min-h-[32px]"
+          title="查看网站介绍"
+        >
+          <BookOpen className="w-4 h-4" />
+          <span className="hidden sm:inline">介绍</span>
+        </Link>
+
+        {/* 访问网站按钮 */}
+        <a
+          href={resource.url}
+          target={resource.url.startsWith('http') ? '_blank' : undefined}
+          rel={resource.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-purple-50 text-purple-600 hover:bg-purple-100 border border-purple-200 transition-colors min-h-[32px] ml-auto"
+          title="访问网站"
+        >
+          <ExternalLink className="w-4 h-4" />
+          <span className="hidden sm:inline">访问</span>
+        </a>
+      </div>
+    </div>
   );
 }
 
