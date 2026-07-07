@@ -10,7 +10,7 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isV4Home = pathname === '/';
   const isResources = pathname === '/resources';
 
-  // Skip public header/footer for pages that have their own V4 shell
+  // 首页、UI Lab、资源页使用各自的 shell，跳过公共 Header/Footer
   if (isUILab || isV4Home || isResources) {
     return <>{children}</>;
   }

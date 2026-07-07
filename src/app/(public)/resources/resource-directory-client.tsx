@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { ExternalLink, Globe, Search, Sparkles, Tag, BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { getCategoryInfo } from '@/lib/resources/category-config';
 import FavoriteButton from '@/components/favorite-button';
-import JueshiV4Header from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header';
-import JueshiV4Footer from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer';
 
 interface Resource {
   id: string;
@@ -313,9 +311,7 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
   const hasMore = displayCount < filtered.length;
 
   return (
-    <>
-      <JueshiV4Header />
-      <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
         {/* Compact Hero */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
           <div className="max-w-[1480px] mx-auto px-4 py-8">
@@ -451,8 +447,6 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
             </div>
           </div>
         </div>
-      </div>
-      <JueshiV4Footer />
-    </>
+    </div>
   );
 }
