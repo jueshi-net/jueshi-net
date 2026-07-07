@@ -94,40 +94,34 @@ else
 fi
 echo ""
 
-# ─── 5. Top 20 PIDs by FD count ───
-info "Top 20 PIDs by FD count:"
+# ─── 5. Top FD consumers (only check known relevant PIDs on macOS) ───
+info "FD count for relevant processes:"
 echo "───────────────────────────────────────────────"
-if [ -d /proc ]; then
-  # Linux: count /proc/*/fd
-  for pid_dir in /proc/[0-9]*; do
-    pid=$(basename "$pid_dir")
-    if [ -d "$pid_dir/fd" ]; then
-      count=$(ls "$pid_dir/fd" 2>/dev/null | wc -l | tr -d ' ')
-      cmd=$(cat "$pid_dir/comm" 2>/dev/null || echo "?")
-      echo "$count $pid $cmd"
-    fi
-  done 2>/dev/null | sort -rn | head -20 | while read -r cnt pid cmd; do
-    if [ "$cnt" -gt "$FD_CRITICAL" ] 2>/dev/null; then
-      crit "  PID=$pid FD=$cnt CMD=$cmd"
-    elif [ "$cnt" -gt "$FD_WARNING" ] 2>/dev/null; then
-      warn "  PID=$pid FD=$cnt CMD=$cmd"
+RELEVANT_PIDS=$(ps -eo pid,comm 2>/dev/null | grep -iE '(hermes|claude|node|tsserver|python)' | awk '{print $1}' || true)
+if [ -n "$RELEVANT_PIDS" ]; then
+  for pid in $RELEVANT_PIDS; do
+    CMD=$(ps -p "$pid" -o comm= 2>/dev/null || echo "?")
+    if [ -d "/proc/$pid/fd" ]; then
+      FD_COUNT=$(ls "/proc/$pid/fd" 2>/dev/null | wc -l | tr -d ' ')
+    elif command -v lsof >/dev/null 2>&1; then
+      FD_COUNT=$(lsof -p "$pid" 2>/dev/null | wc -l | tr -d ' ')
     else
-      echo "  PID=$pid FD=$cnt CMD=$cmd"
+      FD_COUNT="N/A"
     fi
-  done
-elif command -v lsof >/dev/null 2>&1; then
-  # macOS: use lsof
-  lsof 2>/dev/null | awk '{print $1, $2}' | sort | uniq -c | sort -rn | head -20 | while read -r cnt cmd pid; do
-    if [ "$cnt" -gt "$FD_CRITICAL" ] 2>/dev/null; then
-      crit "  PID=$pid FD=$cnt CMD=$cmd"
-    elif [ "$cnt" -gt "$FD_WARNING" ] 2>/dev/null; then
-      warn "  PID=$pid FD=$cnt CMD=$cmd"
+    if [ "$FD_COUNT" != "N/A" ]; then
+      if [ "$FD_COUNT" -gt "$FD_CRITICAL" ] 2>/dev/null; then
+        crit "  PID=$pid FD=$FD_COUNT CMD=$CMD"
+      elif [ "$FD_COUNT" -gt "$FD_WARNING" ] 2>/dev/null; then
+        warn "  PID=$pid FD=$FD_COUNT CMD=$CMD"
+      else
+        echo "  PID=$pid FD=$FD_COUNT CMD=$CMD"
+      fi
     else
-      echo "  PID=$pid FD=$cnt CMD=$cmd"
+      echo "  PID=$pid FD=N/A CMD=$CMD"
     fi
   done
 else
-  warn "Cannot enumerate FDs (no /proc, no lsof)"
+  ok "No relevant processes found"
 fi
 echo ""
 
