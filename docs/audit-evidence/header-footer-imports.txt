@@ -1,0 +1,4 @@
+src/app/(public)/layout.tsx:1:import Header from '@/components/layout/header';
+src/app/(public)/layout.tsx:2:import FooterNew from '@/components/layout/footer-new';
+src/app/(public)/public-layout-client.tsx:4:import Header from '@/components/layout/header';
+src/app/(public)/public-layout-client.tsx:5:import FooterNew from '@/components/layout/footer-new';
