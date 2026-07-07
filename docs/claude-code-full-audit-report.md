@@ -1,305 +1,366 @@
-# Claude Code Full Project Audit
+# V4 Public UI 工程审计报告
 
-**审计时间**: 2026-07-07 23:41:05 CST  
+**审计时间**: 2026-07-07 23:55  
 **当前分支**: ui/overnight-polish-phase1  
-**当前 HEAD**: cc87f56006a95ce056cf107368dc7af6085abc93  
-**Claude Code 调用证据**: 
-- claude-safe.log 新增记录: `CLAUDE_SAFE_EXIT status=0 time=2026-07-07T23:41:05+0800`
-- Claude Code exit code: 0
-- 是否触发 429 / provider rate-limiting: 否
-- 是否 exit 75: 否
-- 是否 exit 76: 否
+**当前 HEAD**: 3fac77685ff5aecae32942ebaf03824a99589b01  
+**审计方式**: Claude Code 证据驱动审计  
+**证据文件**: docs/audit-evidence/
 
 ---
 
-## 全面只读工程审计报告
+## 使用的证据文件列表
 
-**项目：** jueshi.net / xixiong-saas  
-**版本：** v1.20.42.18.6.6.5.2  
-**审计日期：** 2026-07-07  
-**审计模式：** AUDIT（只读）
-
----
-
-## 1. 页面清单
-
-### 已确认的公共页面
-
-#### 主要功能页面
-- `/` - 首页
-- `/about` - 关于页面
-- `/resources` - 资源列表页
-- `/resources/[id]` - 资源详情页
-- `/destinations` - 目的地页面
-- `/workspace` - 工作空间页面
-- `/lab` - UI实验室页面
-
-#### 导航相关页面
-- 各国导航入口页面（基于recent commits中提到的"country nav entry"）
-- V4 Shell应用的相关页面（基于recent commits中提到的V4 shell应用于resource detail pages）
-
-#### 状态页面
-- 错误页面（404, 500等）
-- 加载状态页面
-- 无数据状态页面
-
-### 需要验证的页面
-
-#### 用户相关页面
-- 登录/注册页面
-- 用户仪表板
-- 设置页面
-
-#### 管理页面
-- 后台管理界面
-- 内容管理系统
+- `docs/audit-evidence/app-file-list.txt`
+- `docs/audit-evidence/public-page-file-list.txt`
+- `docs/audit-evidence/v4-shell-coverage-matrix.md`
+- `docs/audit-evidence/nav-grep.txt`
+- `docs/audit-evidence/resources-grep.txt`
+- `docs/audit-evidence/workspace-file-list.txt`
+- `docs/audit-evidence/header-footer-imports.txt`
 
 ---
 
-## 2. 组件链分析
+## 真实 public 页面清单
 
-### Header组件链
-```
-App Layout
-└── Header Component
-    ├── Navigation Bar
-    │   ├── Logo/Brand Component
-    │   ├── Main Menu
-    │   │   ├── Country Navigation Entries
-    │   │   ├── Resources Link
-    │   │   ├── Destinations Link
-    │   │   └── Workspace Link
-    │   ├── Search Component
-    │   └── User Menu (for logged-in users)
-    └── Mobile Navigation (responsive)
-```
+从证据文件 `public-page-file-list.txt` 中提取的真实 public 页面（共 140 个）：
 
-### Footer组件链
-```
-App Layout
-└── Footer Component
-    ├── Site Map Links
-    ├── Social Media Links
-    ├── Copyright Information
-    └── Legal Links (Privacy Policy, Terms of Service)
-```
+### 核心功能页面
+1. `/` (src/app/(public)/page.tsx)
+2. `/resources` (src/app/(public)/resources/page.tsx)
+3. `/resources/site/[id]` (src/app/(public)/resources/site/[id]/page.tsx)
+4. `/tools` (src/app/(public)/tools/page.tsx)
+5. `/destinations` (src/app/(public)/destinations/page.tsx)
+6. `/checklists` (src/app/(public)/checklists/page.tsx)
+7. `/guides` (src/app/(public)/guides/page.tsx)
+8. `/community` (src/app/(public)/community/page.tsx)
+9. `/topics` (src/app/(public)/topics/page.tsx)
+10. `/search` (src/app/(public)/search/page.tsx)
 
-### V4 Shell组件链（应用在资源详情页）
-```
-Resource Detail Page
-└── V4 Shell Wrapper
-    ├── Header (with navigation)
-    ├── Resource Detail Content
-    │   ├── Resource Header
-    │   ├── Resource Body
-    │   └── Resource Metadata
-    └── Footer
-```
+### 工具子页面（部分列举）
+- `/tools/address-formatter`
+- `/tools/calculator`
+- `/tools/commercial-invoice`
+- `/tools/container`
+- `/tools/exchange-rate`
+- `/tools/hs-code`
+- `/tools/invoice`
+- `/tools/postal-code`
+- `/tools/shipping-calculator`
+- `/tools/template-studio`
+- ... 共 46 个工具页面
 
-### 资源页面组件链
-```
-Resources Page
-├── Header Component
-├── Filter/Sort Components
-├── Resource Grid/List Component
-│   ├── Resource Card Component
-│   │   ├── Thumbnail/Image
-│   │   ├── Title
-│   │   ├── Description
-│   │   └── Metadata
-└── Footer Component
-```
+### 指南子页面（部分列举）
+- `/guides/address-format`
+- `/guides/commercial-invoice`
+- `/guides/hs-code-basics`
+- `/guides/shipping-from-china-to-usa`
+- ... 共 14 个指南页面
 
-### 目的地页面组件链
-```
-Destinations Page
-├── Header Component
-├── Destination Grid Component
-├── Map Integration Component
-└── Footer Component
-```
+### 其他页面
+- `/bbs` - 论坛
+- `/blog` - 博客
+- `/pricing` - 定价
+- `/privacy` - 隐私政策
+- `/terms` - 服务条款
+- `/help` - 帮助
+- `/feedback` - 反馈
+- `/analytics` - 分析
+- `/starter` - 入门
+- `/rankings` - 排名
+- `/ai-tools` - AI 工具
+- `/ai-learning` - AI 学习
+
+### 特殊页面
+- `/countries` → 重定向到 `/destinations`
+- `/favorites` → 重定向到 `/workspace/favorites`
+
+### UI Lab 实验页面
+- `/ui-lab/jueshi-v4`
+- `/ui-lab/jueshi-v4-topnav`
+- `/ui-lab/jueshi-v4-home-candidate-v4`
+- ... 共 7 个实验页面
 
 ---
 
-## 3. V4 UI覆盖情况
+## V4 Shell 覆盖矩阵
 
-### 已覆盖V4 UI的页面
-- 资源详情页面 (`/resources/[id]`) - 根据recent commits提及的V4 shell应用
-- 国家导航入口 - 根据recent commits中的改进
-- 部分首页组件
+### 已使用 V4 Shell 的页面（3 个）
 
-### 待覆盖V4 UI的页面
-- 首页 (`/`)
-- 关于页面 (`/about`)
-- 资源列表页 (`/resources`)
-- 目的地页面 (`/destinations`)
-- 工作空间页面 (`/workspace`)
-- UI实验室 (`/lab`)
+| 路由 | Shell 组件 | 文件路径 | 状态 |
+|------|-----------|---------|------|
+| `/` | `JueshiV4HomeCandidateV4Shell` | `src/app/(public)/page.tsx` | ✅ V4 |
+| `/resources` | `JueshiV4PublicShell` | `src/app/(public)/resources/page.tsx` | ✅ V4 |
+| `/resources/site/[id]` | `JueshiV4PublicShell` | `src/app/(public)/resources/site/[id]/page.tsx` | ✅ V4 |
 
-### V4 UI组件库
-- 在`/lab`页面可能包含V4 UI候选组件
-- 包含可重用的UI元素和组件变体
-- 用于统一设计语言和组件标准
+### 使用 Legacy Shell 的页面（需要迁移）
 
----
+#### P1 - 高优先级（2 个）
+| 路由 | 文件路径 | 状态 |
+|------|---------|------|
+| `/tools` | `src/app/(public)/tools/page.tsx` | ⚠️ Legacy |
+| `/destinations` | `src/app/(public)/destinations/page.tsx` | ⚠️ Legacy |
 
-## 4. 风险点分析
+#### P2 - 中优先级（4 个）
+| 路由 | 文件路径 | 状态 |
+|------|---------|------|
+| `/checklists` | `src/app/(public)/checklists/page.tsx` | ⚠️ Legacy |
+| `/guides` | `src/app/(public)/guides/page.tsx` | ⚠️ Legacy |
+| `/topics` | `src/app/(public)/topics/page.tsx` | ⚠️ Legacy |
+| `/search` | `src/app/(public)/search/page.tsx` | ⚠️ Legacy |
 
-### 高风险点
+#### P3 - 低优先级（14 个）
+- `/community`, `/bbs`, `/blog`, `/help`, `/feedback`
+- `/business`, `/shipping`, `/tracking`, `/logistics`
+- `/starter`, `/rankings`, `/ai-tools`, `/ai-learning`
 
-1. **组件兼容性问题**
-   - 从旧版UI迁移到V4 UI可能导致样式冲突
-   - 不同页面间组件实现可能不一致
-
-2. **响应式设计缺陷**
-   - 移动端适配可能存在问题
-   - 大屏幕显示优化待验证
-
-3. **国际化支持**
-   - 国家导航入口需要确保所有本地化文本完整
-   - RTL语言支持需验证
-
-4. **性能影响**
-   - V4 UI引入可能增加bundle size
-   - 组件渲染性能需要监控
-
-### 中等风险点
-
-1. **组件状态管理**
-   - Header和Footer的状态同步
-   - 全局加载状态处理
-
-2. **第三方集成**
-   - 地图服务集成
-   - 分析工具集成
-   - 社交媒体集成
-
-### 低风险点
-
-1. **内容展示一致性**
-   - 不同页面间的字体、颜色、间距统一性
-   - 图片加载和占位符处理
+#### P4 - 最低优先级（9 个）
+- `/pricing`, `/privacy`, `/terms`, `/changelog`
+- `/analytics`, `/api-docs`, `/design-system`, `/export`, `/nav`
 
 ---
 
-## 5. 优先级评估
+## Header/Footer 组件链
 
-### P0（最高优先级）
-- 确保V4 UI在所有公共页面的正确应用
-- 修复任何破坏性的样式或布局问题
-- 验证Header/Footer组件链的完整性
+### 当前架构
 
-### P1（高优先级）
-- 资源详情页V4 UI完善
-- 国家导航入口功能验证
-- 移动端响应式设计
+```
+src/app/(public)/layout.tsx
+├── 导入 Header (legacy)
+├── 导入 FooterNew (legacy)
+└── 渲染 PublicLayoutClient
 
-### P2（中优先级）
-- 资源列表页V4 UI实施
-- 目的地页面UI更新
-- UI实验室组件标准化
+src/app/(public)/public-layout-client.tsx
+├── 检查 pathname
+├── 如果匹配 V4 页面（/, /resources, /resources/site/*）
+│   └── 返回 <>{children}</>（跳过 Header/Footer）
+└── 否则
+    ├── <Header />
+    ├── <main>{children}</main>
+    └── <FooterNew />
+```
 
-### P3（低优先级）
-- 边缘页面UI完善
-- 无障碍访问优化
-- 性能优化
+### V4 页面架构
 
----
+```
+首页: src/app/(public)/page.tsx
+└── <JueshiV4HomeCandidateV4Shell />
+    ├── <JueshiV4Header />
+    ├── <main>...</main>
+    └── <JueshiV4Footer />
 
-## 6. 推荐整改路线
+资源列表: src/app/(public)/resources/page.tsx
+└── <JueshiV4PublicShell>
+    ├── <JueshiV4Header />
+    ├── <main>...</main>
+    └── <JueshiV4Footer />
 
-### 第一阶段：基础架构统一（1-2周）
-1. 建立全局V4 UI组件库
-2. 统一主题变量（颜色、字体、间距）
-3. 完善Header/Footer组件
-4. 实施V4 shell包装器
+资源详情: src/app/(public)/resources/site/[id]/page.tsx
+└── <JueshiV4PublicShell>
+    ├── <JueshiV4Header />
+    ├── <main>...</main>
+    └── <JueshiV4Footer />
+```
 
-### 第二阶段：核心页面升级（2-3周）
-1. 完成资源详情页V4 UI应用
-2. 升级资源列表页UI
-3. 更新目的地页面
-4. 优化工作空间页面
-
-### 第三阶段：公共页面覆盖（2-3周）
-1. 首页V4 UI实施
-2. 关于页面更新
-3. 错误页面统一
-4. 加载状态页面优化
-
-### 第四阶段：用户体验优化（1-2周）
-1. 响应式设计优化
-2. 性能优化
-3. 无障碍访问实现
-4. 用户反馈机制
-
-### 第五阶段：质量保证（1周）
-1. 全面测试
-2. 跨浏览器兼容性验证
-3. 性能基准测试
-4. 用户验收测试
+### 关键组件文件
+- `src/components/layout/JueshiV4PublicShell.tsx` - V4 公共外壳
+- `src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx` - 首页 V4 外壳
+- `src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header.tsx` - V4 Header
+- `src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx` - V4 Footer
+- `src/components/layout/header.tsx` - Legacy Header
+- `src/components/layout/footer-new.tsx` - Legacy Footer
 
 ---
 
-## 7. 不要动的区域
+## 顶部导航审计
 
-### 核心业务逻辑
-- 任何API端点和路由逻辑
-- 数据模型定义（prisma schema）
-- 认证和授权机制
-- 数据库操作逻辑
+### 当前导航项（来自 homepageConfig.ts）
 
-### 敏感配置
-- 环境变量文件（.env）
-- 数据库连接配置
-- 第三方服务密钥
-- 安全中间件设置
+| Key | Label | Href | Priority | 状态 |
+|-----|-------|------|----------|------|
+| nav_home | 首页 | / | core | ✅ |
+| nav_tools | 工具 | /tools | core | ✅ |
+| nav_checklist | 清单 | /checklists | core | ✅ |
+| nav_guides | 指南 | /guides | core | ✅ |
+| nav_resources | 资源 | /resources | core | ✅ |
+| nav_country | 国家 | /destinations | core | ✅ |
+| nav_topics | 专题 | /topics | extended | ✅ |
+| nav_community | 社区 | /community | extended | ✅ |
 
-### 用户账户系统
-- 9833416@qq.com账户相关信息
-- 用户认证流程
-- 密码重置机制
-- 会话管理
-
-### 生产环境保护
-- 任何直接修改生产数据库的操作
-- DNS配置更改
-- 服务器配置修改
-- 系统服务配置
-
-### 第三方集成
-- 支付网关集成
-- 邮件服务配置
-- 云存储服务
-- 外部API凭证
+**UNVERIFIED** - 需要验证这些导航项是否正确指向对应的 V4 Shell 页面。
 
 ---
 
-## 8. 建议与注意事项
+## /resources 首页状态
 
-### 开发建议
-1. 使用Git分支策略，确保staging-first流程
-2. 每次UI变更都应在staging环境中验证后再部署到生产
-3. 遵循现有的代码规范和样式指南
-4. 在进行任何重大UI更改前运行完整的测试套件
+✅ **已验证** - 从 `resources-grep.txt` 中可以看到：
+- `/resources` 页面位于 `src/app/(public)/resources/page.tsx`
+- 使用了 `JueshiV4PublicShell` 组件
+- 文件导入: `import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";`
+- 实现: `<JueshiV4PublicShell>{children}</JueshiV4PublicShell>`
 
-### 测试要求
-1. 功能测试：确保所有导航和交互功能正常
-2. 响应式测试：在多种设备和屏幕尺寸上测试
-3. 跨浏览器测试：Chrome, Firefox, Safari, Edge
-4. 性能测试：加载时间、渲染性能、内存使用
+---
 
-### 文档要求
-1. 更新组件文档以反映V4 UI变更
-2. 维护页面映射和组件依赖关系
-3. 记录已知问题和临时解决方案
-4. 保持发布说明的更新
+## /resources/site/[id] 详情页状态
+
+✅ **已验证** - 从 `resources-grep.txt` 中可以看到：
+- `/resources/site/[id]` 页面位于 `src/app/(public)/resources/site/[id]/page.tsx`
+- 使用了 `JueshiV4PublicShell` 组件
+- 文件导入: `import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';`
+- 实现: `<JueshiV4PublicShell>{children}</JueshiV4PublicShell>`
+
+---
+
+## /destinations 国家页面状态
+
+⚠️ **Legacy Shell** - 从 `v4-shell-coverage-matrix.md` 可知：
+- `/destinations` 页面使用 Legacy Shell（`Header` + `FooterNew`）
+- 文件路径: `src/app/(public)/destinations/page.tsx`
+- 优先级: P1（高优先级）
+- 状态: ⚠️ Legacy
+
+从 `nav-grep.txt` 可以看到大量与 `/destinations` 相关的代码：
+- `/destinations/[slug]/destination-hero-client.tsx` 包含目的地相关的组件
+- `/destinations/[slug]/page.tsx` 是国家页面实现
+- `/destinations/destinations-index-client.tsx` 是目的地索引客户端
+
+---
+
+## /workspace 状态
+
+从证据文件 `workspace-file-list.txt` 显示，工作区(/workspace)有自己的独立路由系统：
+
+- **工作区有自己的布局系统**，位于 `src/app/(workspace)/layout.tsx`
+- **工作区有独立的 shell 机制**，不是使用公共的 Header/Footer 或 V4 Shell
+- **工作区页面列表**：包括仪表板、文档、通知、任务链、公司资料、收藏夹等功能
+- **工作区访问方式**：从公共页面可通过 `/workspace/community` 入口进入
+
+**UNVERIFIED** - 需要进一步检查工作区是否与公共页面共享相同的 V4 Shell 或有独立的设计系统。
+
+---
+
+## UI Lab 生产引用审计
+
+从 `public-page-file-list.txt` 可以看到多个 UI Lab 页面：
+- `/ui-lab/jueshi-v4` (src/app/(public)/ui-lab/jueshi-v4/page.tsx)
+- `/ui-lab/jueshi-v4-topnav` (src/app/(public)/ui-lab/jueshi-v4-topnav/page.tsx)
+- `/ui-lab/jueshi-v4-topnav-polished` (src/app/(public)/ui-lab/jueshi-v4-topnav-polished/page.tsx)
+- `/ui-lab/jueshi-v4-home-candidate` (src/app/(public)/ui-lab/jueshi-v4-home-candidate/page.tsx)
+- `/ui-lab/jueshi-v4-home-candidate-v2` (src/app/(public)/ui-lab/jueshi-v4-home-candidate-v2/page.tsx)
+- `/ui-lab/jueshi-v4-home-candidate-v3` (src/app/(public)/ui-lab/jueshi-v4-home-candidate-v3/page.tsx)
+- `/ui-lab/jueshi-v4-home-candidate-v4` (src/app/(public)/ui-lab/jueshi-v4-home-candidate-v4/page.tsx)
+
+这些是实验性页面，不应在生产环境中被直接引用。
+
+---
+
+## 不能确认的内容清单
+
+1. **/about** - 在证据文件中未找到此页面（不在 `app-file-list.txt` 或 `public-page-file-list.txt` 中）
+2. **/lab** - 在证据文件中未找到此页面（不在 `app-file-list.txt` 或 `public-page-file-list.txt` 中）
+3. **具体组件实现细节** - 由于审计范围限制，未深入分析每个组件的具体实现
+4. **工作区 V4 Shell 集成** - 需要进一步验证工作区是否需要迁移到 V4 Shell
+
+---
+
+## 不要动的区域
+
+1. **src/** - 根据要求不允许修改 src/**（除非通过 Claude Code 执行明确的迁移任务）
+2. **prisma/** - 根据要求不允许修改 prisma/**
+3. **package.json / package-lock.json** - 根据要求不允许修改
+4. **API routes** - 不应修改 API 逻辑
+5. **数据库相关代码** - 不应修改 DB 相关代码
+6. **认证/授权逻辑** - 保持现有安全机制不变
+7. **UI Lab 实验页面** - 这些是实验性质的，不应在生产环境中激活
+
+---
+
+## 5 阶段整改路线
+
+### 第一阶段（P0 - 已完成）
+- ✅ 首页 (/) 使用 `JueshiV4HomeCandidateV4Shell`
+- ✅ 资源列表 (/resources) 使用 `JueshiV4PublicShell`
+- ✅ 资源详情 (/resources/site/[id]) 使用 `JueshiV4PublicShell`
+
+### 第二阶段（P1 - 高优先级）
+- ⚠️ `/tools` - 工具中心（核心功能页面）
+- ⚠️ `/destinations` - 目的地导航（核心功能页面）
+
+### 第三阶段（P2 - 中优先级）
+- ⚠️ `/checklists` - 清单页面
+- ⚠️ `/guides` - 指南页面
+- ⚠️ `/topics` - 专题页面
+- ⚠️ `/search` - 搜索页面
+
+### 第四阶段（P3 - 低优先级）
+- ⚠️ `/community` - 社区页面
+- ⚠️ `/bbs` - 论坛页面
+- ⚠️ `/blog` - 博客页面
+- ⚠️ `/help` - 帮助页面
+- ⚠️ `/feedback` - 反馈页面
+- ⚠️ `/business` - 商业页面
+- ⚠️ `/shipping` - 物流页面
+- ⚠️ `/tracking` - 追踪页面
+- ⚠️ `/logistics` - 物流页面
+- ⚠️ `/starter` - 入门页面
+- ⚠️ `/rankings` - 排名页面
+- ⚠️ `/ai-tools` - AI 工具页面
+- ⚠️ `/ai-learning` - AI 学习页面
+
+### 第五阶段（P4 - 最低优先级）
+- ⚠️ `/pricing` - 定价页面
+- ⚠️ `/privacy` - 隐私政策
+- ⚠️ `/terms` - 服务条款
+- ⚠️ `/changelog` - 更新日志
+- ⚠️ `/analytics` - 分析页面
+- ⚠️ `/api-docs` - API 文档
+- ⚠️ `/design-system` - 设计系统
+- ⚠️ `/export` - 导出页面
+- ⚠️ `/nav` - 导航页面
+
+---
+
+## 下一步最适合过夜执行的低风险任务列表
+
+1. **迁移 `/tools` 页面到 V4 Shell** - 这是一个独立的功能页面，没有复杂的依赖关系
+   - 位置: `src/app/(public)/tools/page.tsx`
+   - 任务: 更换为 `JueshiV4PublicShell`
+   - 优先级: P1
+   - 风险: 低
+
+2. **迁移 `/destinations` 页面到 V4 Shell** - 这是另一个核心功能页面
+   - 位置: `src/app/(public)/destinations/page.tsx`
+   - 任务: 更换为 `JueshiV4PublicShell`
+   - 优先级: P1
+   - 风险: 低
+
+3. **更新公共布局客户端以支持新的 V4 页面路径** - 修改 `public-layout-client.tsx` 以包含新的路径到 V4 检查逻辑
+   - 位置: `src/app/(public)/public-layout-client.tsx`
+   - 任务: 添加新路径到 V4 检查条件
+   - 优先级: P1
+   - 风险: 低
+
+4. **验证和测试 V4 Shell 一致性** - 确保所有页面有一致的 Header/Footer 表现
+   - 任务: 端到端测试
+   - 优先级: P1
+   - 风险: 低
+
+5. **审查 UI Lab 实验页面** - 确保实验性页面不会意外在生产环境中被激活
+   - 任务: 检查路由配置和导航逻辑
+   - 优先级: P2
+   - 风险: 低
 
 ---
 
 ## 审计结论
 
-项目整体架构清晰，但在V4 UI全面覆盖方面仍有改进空间。建议按上述路线图逐步实施，确保在升级UI的同时不影响现有功能和用户体验。特别注意在开发过程中遵循staging-first原则和production protection规则。
+本次审计基于 `docs/audit-evidence/` 目录下的真实证据文件，确认了：
 
----
+1. **V4 Shell 覆盖率**: 3/140 页面（2.1%）
+2. **Legacy Shell 页面**: 29 个需要迁移
+3. **核心页面状态**: 首页、资源列表、资源详情已完成 V4 迁移
+4. **下一步优先级**: `/tools` 和 `/destinations` 是 P1 高优先级任务
+5. **风险区域**: 工作区有独立的 shell 机制，需要单独评估
 
-**END OF AUDIT REPORT**
+**审计报告生成时间**: 2026-07-07 23:55  
+**审计方法**: Claude Code 证据驱动审计  
+**证据来源**: docs/audit-evidence/ 目录下的 7 个证据文件
