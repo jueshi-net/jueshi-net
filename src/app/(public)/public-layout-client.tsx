@@ -9,9 +9,10 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isUILab = pathname.startsWith('/ui-lab');
   const isV4Home = pathname === '/';
   const isResources = pathname === '/resources';
+  const isResourcesSite = pathname.startsWith('/resources/site/');
 
   // 首页、UI Lab、资源页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources) {
+  if (isUILab || isV4Home || isResources || isResourcesSite) {
     return <>{children}</>;
   }
 

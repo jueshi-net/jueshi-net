@@ -7,6 +7,7 @@ import {
   Eye, MessageCircle, ThumbsUp, TrendingUp, Link2,
 } from 'lucide-react';
 import FavoriteButton from '@/components/favorite-button';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -71,6 +72,7 @@ export default async function ResourceDetailPage({ params }: Props) {
   const initial = resource.name.charAt(0).toUpperCase();
 
   return (
+    <JueshiV4PublicShell>
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}
       <div className="bg-white border-b border-gray-200">
@@ -483,6 +485,7 @@ export default async function ResourceDetailPage({ params }: Props) {
         </div>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }
 

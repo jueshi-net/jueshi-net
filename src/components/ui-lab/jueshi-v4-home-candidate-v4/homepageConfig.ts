@@ -160,6 +160,7 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
     { key: 'nav_checklist', label: '清单', href: '/checklists', enabled: true, external: false, sortOrder: 30, trackingKey: 'header_nav_checklist', priority: 'core' },
     { key: 'nav_guides', label: '指南', href: '/guides', enabled: true, external: false, sortOrder: 40, trackingKey: 'header_nav_guides', priority: 'core' },
     { key: 'nav_resources', label: '资源', href: '/resources', enabled: true, external: false, sortOrder: 50, trackingKey: 'header_nav_resources', priority: 'core' },
+    { key: 'nav_country', label: '国家', href: '/destinations', enabled: true, external: false, sortOrder: 55, trackingKey: 'header_nav_country', priority: 'core' },
     { key: 'nav_topics', label: '专题', href: '/topics', enabled: true, external: false, sortOrder: 60, trackingKey: 'header_nav_topics', priority: 'extended' },
     { key: 'nav_community', label: '社区', href: '/community', enabled: true, external: false, sortOrder: 70, trackingKey: 'header_nav_community', priority: 'extended' },
   ],
