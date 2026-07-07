@@ -263,8 +263,51 @@ git grep "HomeLivePage\|JueshiV4\|WorkspaceSidebar"
 
 | 功能 | 状态 | 备注 |
 |------|------|------|
-| **常用网址/高频网址** | ❌ 暂未实现 | 无独立数据模型，可考虑基于 UserFavorite 或新增 `FrequentUrl` 模型 |
-| **网址导航收藏** | ❌ 暂未实现 | 与 /resources 页面相关，等待用户提供样例图 |
+| **网址导航收藏** | 与 /resources 页面相关，等待用户提供样例图 | 见下方补审结论 |
+
+### 补审结论：资源导航收藏链路（2026-07-07 修正）
+
+> **上一轮错误结论**："常用网址/网址导航收藏未实现，需要新增数据模型"
+> **修正后结论**：资源导航收藏链路**基础设施已完整存在**，仅 `/resources` 页面 ResourceCard 未集成 FavoriteButton 组件。
+
+#### 完整链路审计表
+
+| 链路节点 | 是否存在 | 文件/API/模型 | 说明 |
+|---------|---------|-------------|------|
+| `/resources` 页面 | ✅ 存在 | `src/app/(public)/resources/resource-directory-client.tsx` | 完整的资源导航大厅，支持分类筛选、搜索 |
+| 资源卡片组件 | ✅ 存在 | `ResourceCard` 组件（同上文件内） | 显示 Logo、名称、标签、描述、分类 |
+| **收藏按钮** | ✅ 组件存在 | `src/components/favorite-button.tsx` | Heart 图标，支持收藏/取消收藏，调用 `/api/user/favorites` |
+| **收藏按钮是否集成到 ResourceCard** | ❌ 未集成 | — | ResourceCard 当前只有外链跳转，**未渲染 FavoriteButton** |
+| 收藏 API（POST） | ✅ 存在 | `src/app/api/user/favorites/route.ts` | 创建收藏：resourceType + resourceUrl + title |
+| 取消收藏 API（DELETE） | ✅ 存在 | 同上 | 按 resourceUrl 删除 |
+| 获取收藏列表 API（GET） | ✅ 存在 | 同上 | 返回用户所有收藏 |
+| 用户收藏模型 | ✅ 存在 | `UserFavorite` (prisma/schema.prisma:1487) | userId, resourceType (tool/topic/article), resourceUrl, title |
+| 工具收藏模型 | ✅ 存在 | `ToolFavorite` (prisma/schema.prisma:1014) | userId, toolKey |
+| workspace 展示页面 | ✅ 存在 | `src/app/(workspace)/workspace/favorites/favorites-client.tsx` | 完整 UI：总收藏数、工具收藏、网址收藏、搜索、筛选 |
+| workspace 入口 | ✅ 存在 | 左侧栏导航 "我的收藏" → `/workspace/favorites` | 已接入 UserNavSidebar |
+| 是否完整流转 | ⚠️ **前台缺最后一步** | — | 收藏基础设施完整，但 `/resources` 卡片未放收藏按钮 |
+
+#### 结论
+
+- **不需要新增模型**：`UserFavorite` 已支持 `resourceUrl` + `resourceType`，完全可以存储资源导航的网址收藏
+- **不需要新增 API**：`/api/user/favorites` 已支持 POST/DELETE/GET
+- **不需要新增组件**：`FavoriteButton` 已完整实现
+- **唯一缺失**：`/resources` 页面的 `ResourceCard` 组件需要集成 `<FavoriteButton resourceUrl={resource.url} title={resource.name} resourceType="url" />`
+- **workspace 已可展示**：`/workspace/favorites` 已有完整 UI，收藏后自动显示
+
+#### 接入方案（仅记录，本轮不执行）
+
+在 `resource-directory-client.tsx` 的 `ResourceCard` 组件中添加：
+```tsx
+import FavoriteButton from '@/components/favorite-button';
+
+// 在卡片右上角或底部添加
+<FavoriteButton 
+  resourceUrl={resource.url} 
+  title={resource.name} 
+  resourceType="url" 
+/>
+```
 
 ---
 
@@ -295,7 +338,7 @@ git grep "HomeLivePage\|JueshiV4\|WorkspaceSidebar"
 
 1. **今日工作台欢迎区**（压缩高度，显示日期 + 天气 + 签到状态）
 2. **今日待办任务**（从 /workspace/tasks 聚合，显示 top 3-5）
-3. **我的常用网址 / 高频网址**（待开发，或复用 UserFavorite）
+3. **我的常用网址 / 收藏网址**（从 /workspace/favorites 聚合，resourceType="url"，显示 top 5）
 4. **最近使用工具**（已有 RecentTools 组件）
 5. **我的清单进度**（从 /workspace/task-chains 聚合）
 6. **最近单据 / 公司资料**（已有数据）
