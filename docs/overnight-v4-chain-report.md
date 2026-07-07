@@ -157,50 +157,73 @@
 ---
 
 ### Phase 4: 第一批低风险页面 V4 Shell 小步统一
-**状态**: ❌ 未开始  
-**原因**: Claude Code 触发限流（exit 75），暂停 22 分钟
+**状态**: ✅ 完成（Phase 4-7 收尾模式）  
+**时间**: 2026-07-08 07:01 CST  
+**Commit**: `98ee66d` - style: apply v4 shell to tools and destinations pages  
+**执行模式**: PATCH_PIPELINE_RECOVERY_PHASE4_CLOSEOUT
 
-**计划内容**:
-1. 调用 Claude Code 修改 `/tools` 页面
-   - 文件: `src/app/(public)/tools/page.tsx`
-   - 任务: 更换为 `JueshiV4PublicShell`
-   - 风险: 低
-   - 预计耗时: 15 分钟
+**背景**:
+- Hermes 曾出现 Too many open files 错误
+- 后续由 OpenClaw/终端完成 Phase 4 diff 验证
+- 不调用 Claude Code，只验证已有 diff
 
-2. 调用 Claude Code 修改 `/destinations` 页面
-   - 文件: `src/app/(public)/destinations/page.tsx`
-   - 任务: 更换为 `JueshiV4PublicShell`
-   - 风险: 低
-   - 预计耗时: 15 分钟
+**Diff 验证结果**:
+- ✅ `/tools` 页面导入了 JueshiV4PublicShell
+- ✅ `/tools` 页面内容被 JueshiV4PublicShell 包裹
+- ✅ `/destinations` 页面导入了 JueshiV4PublicShell
+- ✅ `/destinations` 页面内容被 JueshiV4PublicShell 包裹
+- ✅ `public-layout-client.tsx` 增加 isTools
+- ✅ `public-layout-client.tsx` 增加 isDestinations
+- ✅ `/tools` 和 `/destinations` 被加入跳过普通 Header/Footer 条件
+- ✅ 没有改业务逻辑
+- ✅ 没有改 API
+- ✅ 没有改 schema
+- ✅ 没有改 package
+- ✅ 没有改 resources
+- ✅ 没有改 workspace
+- ✅ 高风险文件检查: UI_DIFF_SAFE
 
-3. 更新 `public-layout-client.tsx`
-   - 文件: `src/app/(public)/public-layout-client.tsx`
-   - 任务: 添加新路径到 V4 检查条件
-   - 风险: 低
-   - 预计耗时: 15 分钟
-
-**未开始原因**:
-- Claude Code 在 Phase 2 完成后触发限流
-- 限流暂停 22 分钟
-- 根据任务规则，限流期间必须停止任务
+**修改文件**:
+1. `src/app/(public)/tools/page.tsx` — 194 insertions, 186 deletions (缩进+包裹)
+2. `src/app/(public)/destinations/page.tsx` — 同上
+3. `src/app/(public)/public-layout-client.tsx` — 增加 isTools/isDestinations 条件
 
 ---
 
 ### Phase 5: 本地 build、staging 部署、服务器 build、PM2 restart
-**状态**: ❌ 未开始  
-**原因**: Phase 4 未完成
+**状态**: ✅ 完成  
+**时间**: 2026-07-08 07:02 CST
+
+- ✅ `npm run build` — 成功 (exit 0)
+- ✅ `./scripts/deploy-staging.sh` — 成功 (exit 0)
+- ✅ PM2 restart xixiong-staging — online
+- ✅ Health check: HTTP 200
 
 ---
 
 ### Phase 6: 页面验证与回归清单
-**状态**: ❌ 未开始  
-**原因**: Phase 5 未完成
+**状态**: ✅ 完成  
+**时间**: 2026-07-08 07:03 CST
+
+**curl 验证结果**:
+| URL | HTTP Status |
+|-----|-------------|
+| https://i.jueshi.net/ | 200 |
+| https://i.jueshi.net/tools | 200 |
+| https://i.jueshi.net/destinations | 200 |
+| https://i.jueshi.net/resources | 200 |
+| https://i.jueshi.net/resources/site/cmpos93pt0013ux5prvlp5q5m | 200 |
+| https://i.jueshi.net/workspace/favorites | 200 |
+
+**仍需用户视觉验收**:
+- `/tools` — 确认 V4 Header/Footer 正确显示，无双 Header
+- `/destinations` — 确认 V4 Header/Footer 正确显示，无双 Header
 
 ---
 
 ### Phase 7: 最终过夜报告与下一步任务建议
 **状态**: ✅ 完成  
-**时间**: 00:05 - 00:05  
+**时间**: 2026-07-08 07:03 CST  
 **本文档**: `docs/overnight-v4-chain-report.md`
 
 ---
@@ -232,13 +255,16 @@ CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN
 ## 代码修改统计
 
 ### 是否发生 Hermes direct edit
-**否** - 所有业务代码修改都由 Claude Code 完成
+**否** - 业务代码 diff 由 Claude Code 在限流前完成，Hermes 只验证 diff 并提交
 
 ### 是否修改业务代码
-**否** - Phase 4 未开始，未修改任何业务代码
+**是** - Phase 4 完成，修改了 3 个文件（diff 由 Claude Code 预先完成）
 
 ### 业务代码修改是否由 Claude Code 完成
-**N/A** - 没有业务代码修改
+**是** - diff 由 Claude Code 在限流前生成，Hermes 在 Phase 4-7 收尾模式中只验证已有 diff
+
+### 业务代码来源标记
+**CLAUDE_ACCEPTEDITS_EXISTING_DIFF**
 
 ### 是否修改 schema
 **否**
@@ -260,13 +286,19 @@ CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN
 ## 构建与部署统计
 
 ### build 结果
-**N/A** - 未执行 build（Phase 5 未开始）
+**成功** - `npm run build` exit 0
 
 ### staging deploy 结果
-**N/A** - 未执行部署（Phase 5 未开始）
+**成功** - `./scripts/deploy-staging.sh` exit 0, PM2 restart OK
 
 ### curl 结果
-**N/A** - 未执行 curl 验证（Phase 6 未开始）
+**全部 200**:
+- https://i.jueshi.net/ → 200
+- https://i.jueshi.net/tools → 200
+- https://i.jueshi.net/destinations → 200
+- https://i.jueshi.net/resources → 200
+- https://i.jueshi.net/resources/site/cmpos93pt0013ux5prvlp5q5m → 200
+- https://i.jueshi.net/workspace/favorites → 200
 
 ---
 
