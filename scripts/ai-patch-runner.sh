@@ -89,14 +89,29 @@ ok "Patch file exists: $PATCH_FILE"
 PATCH_SIZE=$(wc -c < "$PATCH_FILE" | tr -d ' ')
 info "Patch size: ${PATCH_SIZE} bytes"
 
-# ─── 2. Check git worktree is clean ───
+# ─── 2. Check git worktree for conflicts with patch files ───
+# Only check if files the patch will touch are dirty, not the entire worktree.
+# This allows pipeline state files (.hermes/pipeline/) to change during execution.
 cd "$REPO_ROOT"
-if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-  err "Git worktree is NOT clean. Commit or stash changes first."
+
+# Get list of files the patch will modify
+PATCH_TARGETS=$(grep '^+++ b/' "$PATCH_FILE" | sed 's|^+++ b/||' | sort -u)
+
+# Check if any of those specific files have uncommitted changes
+CONFLICTING_FILES=""
+for f in $PATCH_TARGETS; do
+  if git status --porcelain -- "$f" 2>/dev/null | grep -q .; then
+    CONFLICTING_FILES="$CONFLICTING_FILES $f"
+  fi
+done
+
+if [ -n "$CONFLICTING_FILES" ]; then
+  err "Git worktree has uncommitted changes to files the patch will modify:"
+  echo "$CONFLICTING_FILES" | tr ' ' '\n' | grep -v '^$' | sed 's/^/  /'
   echo "PIPELINE_INFRA_BLOCKED_DIRTY_WORKTREE"
   exit 1
 fi
-ok "Git worktree is clean"
+ok "No conflicts between patch targets and worktree changes"
 
 # ─── 3. Parse modified files from patch ───
 # Extract file paths from "diff --git a/... b/..." lines
