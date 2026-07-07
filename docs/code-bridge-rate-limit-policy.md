@@ -385,7 +385,65 @@ After each Claude Code call, verify:
 
 ---
 
-## 11. Contact & Support
+## 11. Protection Scope and Limitations
+
+### What claude-safe Protects
+
+✅ **claude-safe ONLY protects:**
+- Claude Code CLI calls through `claude` command
+- Calls routed through Code Bridge shim
+- Direct calls to `~/bin/claude-safe`
+
+### What claude-safe Does NOT Protect
+
+❌ **claude-safe does NOT protect:**
+- Hermes internal judge loop model calls
+- Hermes own LLM provider calls (alibaba/openrouter/etc)
+- Hermes self-improvement mechanism model calls
+- Any model calls that don't go through `claude` CLI
+
+### Critical: Hermes Judge Loop Rate Limit Handling
+
+**When Hermes judge loop receives RateLimitError:**
+
+1. ❌ MUST NOT continue `Continuing toward goal (N/20)`
+2. ❌ MUST NOT continue judge retry
+3. ❌ MUST NOT enter next goal round
+4. ❌ MUST NOT execute self-improvement
+5. ❌ MUST NOT patch SKILL.md automatically
+6. ❌ MUST NOT call Claude Code
+7. ❌ MUST NOT fallback to writing code directly
+8. ✅ MUST stop current goal immediately
+9. ✅ MUST report rate limit status
+10. ✅ MUST wait for user confirmation
+
+**Pause Duration:**
+- First rate limit: 22 minutes (1320 seconds)
+- Repeat rate limit (within 1 hour): 30 minutes (1800 seconds)
+
+### Self-Improvement Freeze During Rate Limit
+
+**During rate limit pause, self-improvement is FORBIDDEN:**
+
+- ❌ No automatic SKILL.md patching
+- ❌ No automatic skill file modification
+- ❌ No automatic skill creation
+- ❌ No automatic documentation updates
+- ❌ No automatic config changes
+
+**Only allowed during rate limit:**
+- ✅ Read-only audit (check files, logs, status)
+- ✅ Report status to user
+- ✅ Wait for user instruction
+- ✅ Execute read-only shell commands (ls, cat, grep)
+- ✅ Check process status (ps aux)
+- ✅ Check lock file status
+
+**See also:** `~/.hermes/policies/rate-limit-failsafe-policy.md` for detailed failsafe rules.
+
+---
+
+## 12. Contact & Support
 
 **Policy Owner:** Hermes Agent System  
 **Last Review:** 2026-07-07  
