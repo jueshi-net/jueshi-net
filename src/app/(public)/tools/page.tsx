@@ -5,6 +5,7 @@ import ToolFilterBar from '@/components/tools/tool-filter-bar';
 import ToolGrid from '@/components/tools/tool-grid';
 import Link from 'next/link';
 import { FileText, ArrowRight, Wrench, Sparkles, Zap } from 'lucide-react';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
   const params = await searchParams;
@@ -62,115 +63,117 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
     : tools;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pb-12">
-      {/* Sticky Filter Bar */}
-      <ToolFilterBar
-        currentQuery={query}
-        currentCategory={category}
-        currentSort={sort}
-        presentCategories={presentCategories}
-      />
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pb-12">
+        {/* Sticky Filter Bar */}
+        <ToolFilterBar
+          currentQuery={query}
+          currentCategory={category}
+          currentSort={sort}
+          presentCategories={presentCategories}
+        />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pt-6">
-        {/* Template Studio CTA Banner */}
-        {!query && !category && (
-          <div className="mb-8 relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-2xl shadow-purple-500/20" data-testid="tools-template-cta-banner">
-            {/* Animated background pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse delay-1000"></div>
-            </div>
-            
-            <div className="relative max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium text-white mb-4">
-                <Sparkles className="w-3.5 h-3.5" />
-                限时免费
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 pt-6">
+          {/* Template Studio CTA Banner */}
+          {!query && !category && (
+            <div className="mb-8 relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-8 shadow-2xl shadow-purple-500/20" data-testid="tools-template-cta-banner">
+              {/* Animated background pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse delay-1000"></div>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">免费自定义你的单据模板</h2>
-              <p className="text-lg text-white/90 mb-6 leading-relaxed">自由拖拽设计报价单、发票、装箱单、商品标签，支持批量打印与导出 PNG。免费注册，限时免费使用。</p>
-              <div className="flex gap-4 flex-wrap">
+
+              <div className="relative max-w-3xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium text-white mb-4">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  限时免费
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">免费自定义你的单据模板</h2>
+                <p className="text-lg text-white/90 mb-6 leading-relaxed">自由拖拽设计报价单、发票、装箱单、商品标签，支持批量打印与导出 PNG。免费注册，限时免费使用。</p>
+                <div className="flex gap-4 flex-wrap">
+                  <Link
+                    href="/tools/template-studio/canvas/new"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 text-base font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                    data-testid="tools-template-cta-create"
+                  >
+                    <Wrench className="w-5 h-5" />
+                    立即创建模板
+                  </Link>
+                  <Link
+                    href="/workspace/templates"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white text-base font-semibold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all hover:scale-105"
+                    data-testid="tools-template-cta-my-templates"
+                  >
+                    <FileText className="w-5 h-5" />
+                    查看我的模板
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
+                  {query ? `搜索结果: "${query}"` : '工具中心'}
+                </h1>
+                <p className="text-gray-500 text-sm mt-0.5">
+                  {tools.length} 个工具可用 {query ? `(共找到 ${tools.length} 个匹配项)` : ''}
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            {!query && !category && (
+              <div className="mt-4 flex items-center gap-2 flex-wrap">
                 <Link
-                  href="/tools/template-studio/canvas/new"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 text-base font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl hover:scale-105"
-                  data-testid="tools-template-cta-create"
+                  href="/tools/documents"
+                  className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-50 to-purple-100/50 text-purple-700 text-sm font-medium rounded-xl hover:from-purple-100 hover:to-purple-100 transition-all border border-purple-200/60 shadow-sm hover:shadow-md hover:scale-105"
                 >
-                  <Wrench className="w-5 h-5" />
-                  立即创建模板
+                  <FileText className="w-4 h-4" />
+                  外贸单据模板中心
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <Link
+                  href="/tools/template-studio"
+                  data-testid="tools-template-studio-card"
+                  className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100/50 text-blue-700 text-sm font-medium rounded-xl hover:from-blue-100 hover:to-blue-100 transition-all border border-blue-200/60 shadow-sm hover:shadow-md hover:scale-105"
+                >
+                  <Wrench className="w-4 h-4" />
+                  模板设计器
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
                 <Link
                   href="/workspace/templates"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white text-base font-semibold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all hover:scale-105"
-                  data-testid="tools-template-cta-my-templates"
+                  data-testid="tools-my-templates-card"
+                  className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-green-50 to-green-100/50 text-green-700 text-sm font-medium rounded-xl hover:from-green-100 hover:to-green-100 transition-all border border-green-200/60 shadow-sm hover:shadow-md hover:scale-105"
                 >
-                  <FileText className="w-5 h-5" />
-                  查看我的模板
+                  <FileText className="w-4 h-4" />
+                  我的模板
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
-            </div>
+            )}
           </div>
-        )}
 
-        {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-              <Zap className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                {query ? `搜索结果: "${query}"` : '工具中心'}
-              </h1>
-              <p className="text-gray-500 text-sm mt-0.5">
-                {tools.length} 个工具可用 {query ? `(共找到 ${tools.length} 个匹配项)` : ''}
-              </p>
-            </div>
-          </div>
-          
-          {/* Quick Links */}
-          {!query && !category && (
-            <div className="mt-4 flex items-center gap-2 flex-wrap">
-              <Link
-                href="/tools/documents"
-                className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-purple-50 to-purple-100/50 text-purple-700 text-sm font-medium rounded-xl hover:from-purple-100 hover:to-purple-100 transition-all border border-purple-200/60 shadow-sm hover:shadow-md hover:scale-105"
-              >
-                <FileText className="w-4 h-4" />
-                外贸单据模板中心
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <Link
-                href="/tools/template-studio"
-                data-testid="tools-template-studio-card"
-                className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100/50 text-blue-700 text-sm font-medium rounded-xl hover:from-blue-100 hover:to-blue-100 transition-all border border-blue-200/60 shadow-sm hover:shadow-md hover:scale-105"
-              >
-                <Wrench className="w-4 h-4" />
-                模板设计器
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <Link
-                href="/workspace/templates"
-                data-testid="tools-my-templates-card"
-                className="group inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-green-50 to-green-100/50 text-green-700 text-sm font-medium rounded-xl hover:from-green-100 hover:to-green-100 transition-all border border-green-200/60 shadow-sm hover:shadow-md hover:scale-105"
-              >
-                <FileText className="w-4 h-4" />
-                我的模板
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          )}
+          <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
+            {tools.length === 0 && query ? (
+              <EmptySearchState query={query} />
+            ) : tools.length === 0 && category && category !== 'all' ? (
+              <EmptyCategoryState category={category} />
+            ) : (
+              <ToolGrid tools={displayTools} query={query} />
+            )}
+          </Suspense>
         </div>
-
-        <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
-          {tools.length === 0 && query ? (
-            <EmptySearchState query={query} />
-          ) : tools.length === 0 && category && category !== 'all' ? (
-            <EmptyCategoryState category={category} />
-          ) : (
-            <ToolGrid tools={displayTools} query={query} />
-          )}
-        </Suspense>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }
 
