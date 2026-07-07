@@ -33,21 +33,26 @@
 | Code | Meaning | Action |
 |------|---------|--------|
 | 0 | Success | Continue |
-| 75 | Rate Limited (429) | STOP, report `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN` |
+| 75 | Rate Limited (429/Provider Rate Limit) | STOP, report `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN` or `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN` |
+| 76 | Cooldown Active or Concurrent Call Blocked | STOP, report `CLAUDE_CODE_COOLDOWN_ACTIVE` or `CLAUDE_CODE_CONCURRENT_CALL_BLOCKED` |
 | 1 | General Failure | STOP, report `CODE_BRIDGE_CALL_FAILED_NO_FALLBACK` |
 
 ### Throttling Parameters
-- **Minimum interval between calls:** 300 seconds (5 minutes)
-- **429 pause duration:** 1800 seconds (30 minutes)
+- **Minimum interval between calls:** 30 seconds (default)
+- **First rate limit pause:** 1320 seconds (22 minutes)
+- **Repeat rate limit pause (within 1 hour):** 1800 seconds (30 minutes)
 - **Rate limit exit code:** 75 (not 429, to avoid shell exit code issues)
+- **Cooldown/concurrent exit code:** 76
 
 ### State Files
 ```
 ~/.claude-code-bridge/
-├── claude-safe.log          # Call log
-├── last-call.ts             # Last call timestamp
-├── last-output.txt          # Last call output
-└── rate-limit.lock          # 429 lock file (contains unlock timestamp)
+├── claude-safe.log              # Call log
+├── last-call.ts                 # Last call timestamp
+├── last-output.txt              # Last call output
+├── rate-limit.lock              # 429 lock file (contains unlock timestamp)
+├── rate-limit-history.ts        # Last rate limit timestamp (for repeat detection)
+└── claude-safe-running.lock     # Running lock (prevents concurrent calls)
 ```
 
 ---
@@ -79,47 +84,109 @@ This ensures:
 `claude-safe` monitors output for:
 - `429`
 - `rate limit`
+- `rate-limiting`
 - `too many requests`
 - `quota`
 - `throttle`
+- `The model provider is rate-limiting requests`
+- `Please wait a moment and try again`
 
 ### Detection Logic
 ```bash
-if grep -Ei "429|rate limit|too many requests|quota|throttle" "$STATE_DIR/last-output.txt"; then
-  # Create lock file with 30-minute pause
-  pause_until=$(( $(date +%s) + 1800 ))
+if grep -Ei "429|rate limit|rate-limiting|too many requests|quota|throttle|The model provider is rate-limiting requests|Please wait a moment and try again" "$STATE_DIR/last-output.txt"; then
+  # Check if this is a repeat rate limit (within 1 hour)
+  if [ -f "$RATE_LIMIT_HISTORY_FILE" ]; then
+    last_rate_limit="$(cat "$RATE_LIMIT_HISTORY_FILE")"
+    time_since_last=$(( $(date +%s) - last_rate_limit ))
+    one_hour=3600
+    
+    if [ "$time_since_last" -lt "$one_hour" ]; then
+      # Repeat rate limit - pause 30 minutes
+      pause_duration=1800
+      rate_limit_type="repeat"
+      echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN" >> "$LOG_FILE"
+    else
+      # First rate limit - pause 22 minutes
+      pause_duration=1320
+      rate_limit_type="first"
+      echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN" >> "$LOG_FILE"
+    fi
+  else
+    # First rate limit - pause 22 minutes
+    pause_duration=1320
+    rate_limit_type="first"
+    echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN" >> "$LOG_FILE"
+  fi
+  
+  # Record this rate limit timestamp
+  date +%s > "$RATE_LIMIT_HISTORY_FILE"
+  
+  # Create lock file
+  pause_until=$(( $(date +%s) + pause_duration ))
   echo "$pause_until" > "$LOCK_FILE"
   
   # Log detection
-  echo "CLAUDE_CODE_RATE_LIMIT_DETECTED pause_seconds=1800" >> "$LOG_FILE"
-  echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN" >> "$LOG_FILE"
+  echo "CLAUDE_CODE_RATE_LIMIT_DETECTED pause_seconds=$pause_duration type=$rate_limit_type" >> "$LOG_FILE"
   
   # Exit with code 75
   exit 75
 fi
 ```
 
+### Tiered Rate Limit Strategy
+1. **First rate limit detected:**
+   - Pause for 22 minutes (1320 seconds)
+   - Output: `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN`
+   - Exit code: 75
+
+2. **Second rate limit within 1 hour:**
+   - Pause for 30 minutes (1800 seconds)
+   - Output: `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN`
+   - Exit code: 75
+
+3. **Third+ rate limit within 1 hour:**
+   - Continue with 30-minute pauses
+   - No further escalation
+
 ---
 
 ## 5. Failure Handling Rules
 
 ### Rule 1: No Fallback to Direct Code Writing
-**When Claude Code fails (exit code != 0 and != 75):**
+**When Claude Code fails (exit code != 0 and != 75 and != 76):**
 - ❌ Hermes MUST NOT fallback to writing code directly
 - ✅ Hermes MUST report: `CODE_BRIDGE_CALL_FAILED_NO_FALLBACK`
 - ✅ Hermes MUST stop and wait for user instruction
 
-### Rule 2: Rate Limit Handling
-**When Claude Code is rate limited (exit code = 75 or output contains `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN`):**
+### Rule 2: Rate Limit Handling (Exit Code 75)
+**When Claude Code is rate limited (exit code = 75):**
 - ❌ Hermes MUST NOT retry immediately
-- ✅ Hermes MUST report: `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN`
+- ✅ Hermes MUST check output for:
+  - `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN` → First rate limit, pause 22 minutes
+  - `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN` → Repeat rate limit, pause 30 minutes
+- ✅ Hermes MUST report the appropriate status
 - ✅ Hermes MUST stop and wait for user instruction
 
-### Rule 3: Success Handling
+### Rule 3: Cooldown/Concurrent Handling (Exit Code 76)
+**When claude-safe blocks due to cooldown or concurrent call (exit code = 76):**
+- ❌ Hermes MUST NOT retry immediately
+- ✅ Hermes MUST check output for:
+  - `CLAUDE_CODE_COOLDOWN_ACTIVE wait_left_seconds=X` → Normal cooldown, wait X seconds
+  - `CLAUDE_CODE_CONCURRENT_CALL_BLOCKED` → Another call is running
+- ✅ Hermes MUST report the appropriate status
+- ✅ Hermes MUST stop and wait for user instruction
+
+### Rule 4: Success Handling
 **When Claude Code succeeds (exit code = 0):**
 - ✅ Hermes MAY continue with the task
 - ✅ Hermes MUST verify the changes
 - ✅ Hermes MUST wait for user confirmation before next Claude Code call
+
+### Rule 5: Smart Cooldown Behavior
+**claude-safe implements intelligent cooldown:**
+- If remaining cooldown ≤ 10 seconds: sleep and proceed
+- If remaining cooldown > 10 seconds: exit 76 immediately (no long sleep)
+- This prevents Hermes from being blocked by long unnecessary sleeps
 
 ---
 
