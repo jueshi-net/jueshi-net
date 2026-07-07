@@ -1,0 +1,219 @@
+src/app/(workspace)/workspace/settings/settings-client.tsx:6:import { WorkspacePageHeader, SectionCard } from '@/components/saas';
+src/app/(workspace)/workspace/settings/settings-client.tsx:122:      <WorkspacePageHeader
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:14:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:133:      {/* Page Header */}
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:134:      <WorkspacePageHeader
+src/app/(workspace)/workspace/products/page.tsx:5:import { WorkspacePageHeader, CompactTable, SaasEmptyState, StatusBadge, SectionCard } from '@/components/saas';
+src/app/(workspace)/workspace/products/page.tsx:345:      <WorkspacePageHeader
+src/app/(workspace)/workspace/memos/memos-client.tsx:4:import { WorkspacePageHeader, SaasEmptyState, SectionCard, StatusBadge } from "@/components/saas";
+src/app/(workspace)/workspace/memos/memos-client.tsx:72:      <WorkspacePageHeader
+src/app/(workspace)/workspace/memos/memos-client.tsx:84:      <WorkspacePageHeader
+src/app/(workspace)/workspace/task-chains/shipping/new/shipping-new-client.tsx:10:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(workspace)/workspace/task-chains/shipping/new/shipping-new-client.tsx:69:      <WorkspacePageHeader
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:13:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:196:      <WorkspacePageHeader
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:262:          {/* Step Header */}
+src/app/(workspace)/workspace/task-chains/task-chains-client.tsx:11:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(workspace)/workspace/task-chains/task-chains-client.tsx:197:      <WorkspacePageHeader
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:9:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:69:      <WorkspacePageHeader
+src/app/(workspace)/workspace/member/member-client.tsx:11:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(workspace)/workspace/member/member-client.tsx:270:      {/* Page Header */}
+src/app/(workspace)/workspace/member/member-client.tsx:271:      <WorkspacePageHeader
+src/app/(workspace)/workspace/member/member-client.tsx:297:        {/* Section Header: 会员权益 */}
+src/app/(workspace)/workspace/documents/documents-client-inner.tsx:15:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(workspace)/workspace/documents/documents-client-inner.tsx:301:      <WorkspacePageHeader
+src/app/(workspace)/workspace/invites/page.tsx:5:import { WorkspacePageHeader, CompactTable, SaasEmptyState, StatusBadge, MetricCard, SectionCard } from '@/components/saas';
+src/app/(workspace)/workspace/invites/page.tsx:155:        <WorkspacePageHeader
+src/app/(workspace)/workspace/invites/page.tsx:168:      <WorkspacePageHeader
+src/app/(workspace)/workspace/notifications/notifications-client.tsx:8:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(workspace)/workspace/notifications/notifications-client.tsx:121:      {/* Page Header */}
+src/app/(workspace)/workspace/notifications/notifications-client.tsx:122:      <WorkspacePageHeader
+src/app/(workspace)/workspace/company-profiles/company-profiles-client.tsx:8:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(workspace)/workspace/company-profiles/company-profiles-client.tsx:237:      <WorkspacePageHeader
+src/app/(workspace)/workspace/company-profiles/company-profiles-client.tsx:314:                    {/* Header */}
+src/app/(workspace)/workspace/company-profiles/company-profiles-client.tsx:408:              {/* Header */}
+src/app/(public)starter/[slug]/scenario-client.tsx:228:      {/* Header */}
+src/app/(public)pricing/pricing-client.tsx:135:      {/* Header */}
+src/app/(public)tools/commercial-invoice/commercial-invoice-client.tsx:291:      {/* Header */}
+src/app/(public)tools/commercial-invoice/commercial-invoice-client.tsx:398:                {/* Header row */}
+src/app/(public)tools/commercial-invoice/commercial-invoice-client.tsx:454:                  {/* Header with Logo */}
+src/app/(public)tools/video-script-sop/video-script-sop-client.tsx:132:      {/* Header */}
+src/app/(public)tools/video-script-sop/video-script-sop-client.tsx:261:            {/* Result Header */}
+src/app/(public)tools/documents/shipping-label/label-maker-client.tsx:453:                        {/* Header: Logo + Label Title — side by side */}
+src/app/(public)tools/shipping-label/shipping-label-client.tsx:137:      {/* Header */}
+src/app/(public)resources/resource-directory-client.tsx:178:        {/* Header */}
+src/app/(public)favorites/favorites-client.tsx:89:      {/* Header */}
+src/app/(public)/ui-lab/jueshi-v4-home-candidate-v4/page.tsx:1:import JueshiV4HomeCandidateV4Shell from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell';
+src/app/(public)/ui-lab/jueshi-v4-home-candidate-v4/page.tsx:9:  return <JueshiV4HomeCandidateV4Shell />;
+src/app/(public)/tools/commercial-invoice/commercial-invoice-client.tsx:500:      {/* Header */}
+src/app/(public)/tools/commercial-invoice/commercial-invoice-client.tsx:619:                {/* Header row */}
+src/app/(public)/tools/commercial-invoice/commercial-invoice-client.tsx:675:                  {/* Header with Logo */}
+src/app/(public)/tools/video-script-sop/video-script-sop-client.tsx:132:      {/* Header */}
+src/app/(public)/tools/video-script-sop/video-script-sop-client.tsx:261:            {/* Result Header */}
+src/app/(public)/tools/customs-generator/page.tsx:161:        {/* Header */}
+src/app/(public)/tools/template-studio/template-studio-client.tsx:481:      style: { ...prev.style, primaryColor: color, tableHeaderBg: color },
+src/app/(public)/tools/template-studio/template-studio-client.tsx:868:      {/* Header */}
+src/app/(public)/tools/template-studio/template-studio-client.tsx:1327:                ["showHeader", "标题"],
+src/app/(public)/tools/handover-note/handover-note-client.tsx:71:      {/* Header */}
+src/app/(public)/tools/document-runtime-demo/page.tsx:173:        {/* Header */}
+src/app/(public)/tools/shipping-calculator/page.tsx:413:      {/* Header */}
+src/app/(public)/tools/shipping-calculator/page.tsx:667:          {/* Column Headers */}
+src/app/(public)/tools/container/page.tsx:597:            {/* Header */}
+src/app/(public)/tools/exchange-rate/page.tsx:582:        {/* Header */}
+src/app/(public)/tools/memo/page.tsx:367:      {/* Header */}
+src/app/(public)/tools/documents/shipping-label/label-maker-client.tsx:453:                        {/* Header: Logo + Label Title — side by side */}
+src/app/(public)/tools/documents/shipping-label/page.tsx:72:      {/* Header */}
+src/app/(public)/tools/shipping-label/shipping-label-client.tsx:137:      {/* Header */}
+src/app/(public)/tools/page.tsx:114:        {/* Header Section */}
+src/app/(public)/tools/quote-sheet/quote-sheet-client.tsx:274:      {/* Header */}
+src/app/(public)/tools/debit-note/debit-note-client.tsx:99:      {/* Header */}
+src/app/(public)/changelog/page.tsx:21:      { type: "feat", desc: "主题切换按钮（Header）" },
+src/app/(public)/changelog/page.tsx:26:      { type: "improve", desc: "Header/Footer 深色模式适配" },
+src/app/(public)/public-layout-client.tsx:4:import Header from '@/components/layout/header';
+src/app/(public)/public-layout-client.tsx:5:import FooterNew from '@/components/layout/footer-new';
+src/app/(public)/public-layout-client.tsx:14:  // 首页、UI Lab、资源页使用各自的 shell，跳过公共 Header/Footer
+src/app/(public)/public-layout-client.tsx:21:      <Header />
+src/app/(public)/public-layout-client.tsx:23:      <FooterNew />
+src/app/(public)/favorites/favorites-client.tsx:89:      {/* Header */}
+src/app/(public)/resources/site/[id]/page.tsx:10:import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+src/app/(public)/resources/site/[id]/page.tsx:75:    <JueshiV4PublicShell>
+src/app/(public)/resources/site/[id]/page.tsx:488:    </JueshiV4PublicShell>
+src/app/(public)/resources/page.tsx:3:import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+src/app/(public)/resources/page.tsx:75:    <JueshiV4PublicShell>
+src/app/(public)/resources/page.tsx:80:    </JueshiV4PublicShell>
+src/app/(public)/resources/[slug]/page.tsx:250:                    {/* Header: name + badge */}
+src/app/(public)/search/page.tsx:272:                {/* Header */}
+src/app/(public)/profile/page.tsx:42:      {/* Header */}
+src/app/(public)/starter/page.tsx:59:        {/* Header */}
+src/app/(public)/starter/apps/page.tsx:228:        {/* Header */}
+src/app/(public)/starter/[slug]/scenario-client.tsx:228:      {/* Header */}
+src/app/(public)/layout.tsx:1:import Header from '@/components/layout/header';
+src/app/(public)/layout.tsx:2:import FooterNew from '@/components/layout/footer-new';
+src/app/(public)/nav/page.tsx:92:          {/* Hero Header */}
+src/app/(public)/export/page.tsx:77:        {/* Header */}
+src/app/(public)/bbs/new/page.tsx:80:      {/* Header */}
+src/app/(public)/page.tsx:1:import JueshiV4HomeCandidateV4Shell from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell';
+src/app/(public)/page.tsx:11:  return <JueshiV4HomeCandidateV4Shell />;
+src/app/(public)/design-system/page.tsx:14:      {/* Header */}
+src/app/(public)/pricing/pricing-client.tsx:135:      {/* Header */}
+src/app/(public)/help/page.tsx:54:      {/* Header */}
+src/app/(public)/topics/[slug]/page.tsx:902:      {/* Header: Icon + Rating */}
+src/app/(public)/analytics/page.tsx:84:      {/* Header */}
+src/app/api/branding/route.ts:14:// GET /api/branding - 公开 API，供 Header 读取品牌配置
+src/app/api/events/stats/route.ts:15:    const authHeader = req.headers.get('authorization');
+src/app/api/events/stats/route.ts:16:    if (authHeader !== `Bearer ${process.env.ADMIN_SECRET}`) {
+src/app/(admin)/admin/beta/page.tsx:87:      {/* Header */}
+src/app/(admin)/admin/ads/page.tsx:330:      {/* Header */}
+src/app/(admin)/admin/destinations/page.tsx:78:      {/* Header */}
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:291:      {/* Header */}
+src/app/(admin)/admin/resources/import/page.tsx:118:      {/* Header */}
+src/app/(admin)/admin/resources/page.tsx:5:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(admin)/admin/resources/page.tsx:309:      {/* Header */}
+src/app/(admin)/admin/resources/page.tsx:310:      <WorkspacePageHeader
+src/app/(admin)/admin/content/checklists/new/page.tsx:114:      {/* Header */}
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:204:      {/* Header */}
+src/app/(admin)/admin/content/guides/new/page.tsx:92:      {/* Header */}
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:171:      {/* Header */}
+src/app/(admin)/admin/content/topics/[id]/edit/topic-edit-client.tsx:199:      {/* Header */}
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:5:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:533:      <WorkspacePageHeader
+src/app/(admin)/admin/growth-logs/growth-logs-client.tsx:88:      {/* Header */}
+src/app/(admin)/admin/ad-entitlements/ad-entitlements-client.tsx:6:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(admin)/admin/ad-entitlements/ad-entitlements-client.tsx:116:      <WorkspacePageHeader
+src/app/(admin)/admin/tool-reviews/page.tsx:78:      {/* Header */}
+src/app/(admin)/admin/forum/forum-admin-client.tsx:201:      {/* Header */}
+src/app/(admin)/admin/cms/page.tsx:174:      {/* Header */}
+src/app/(admin)/admin/import-bookmarks/page.tsx:100:      {/* Header */}
+src/app/(admin)/admin/users/page.tsx:193:      {/* Header */}
+src/app/(admin)/admin/invites/rewards/grants/page.tsx:5:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(admin)/admin/invites/rewards/grants/page.tsx:122:      <WorkspacePageHeader
+src/app/(admin)/admin/invites/rewards/page.tsx:6:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(admin)/admin/invites/rewards/page.tsx:180:      <WorkspacePageHeader
+src/app/(admin)/admin/invites/page.tsx:144:      {/* Header */}
+src/app/(admin)/admin/admin-dashboard-client.tsx:10:import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
+src/app/(admin)/admin/admin-dashboard-client.tsx:37:      <WorkspacePageHeader
+src/app/(admin)/admin/notifications/notifications-admin-client.tsx:200:      {/* Header */}
+src/app/(admin)/admin/topics/[id]/edit/topic-editor-client.tsx:274:      {/* Header */}
+src/app/(admin)/admin/analytics/task-chains/page.tsx:127:      {/* Header */}
+src/app/(admin)/admin/analytics/dashboard/page.tsx:9:import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
+src/app/(admin)/admin/analytics/dashboard/page.tsx:200:      <WorkspacePageHeader
+src/components/home/premium-section.tsx:30:        {/* Header */}
+src/components/home/starter-resources.tsx:17:        {/* Section Header */}
+src/components/home/starter-resources.tsx:59:              {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header.tsx:10:interface HeaderProps {
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header.tsx:23:export default function JueshiV4Header({ onMenuClick, menuOpen }: HeaderProps) {
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:46:export default function JueshiV4Footer() {
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:103:  // Header
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:156:  // Header
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:12:import JueshiV4Header from './JueshiV4Header';
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:14:import JueshiV4Footer from './JueshiV4Footer';
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:132:export default function JueshiV4HomeCandidateV4Shell() {
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:138:      {/* Header - V4 专属，消费配置 */}
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:139:      <JueshiV4Header
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell.tsx:270:      <JueshiV4Footer />
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Shell.tsx:4:import JueshiV4HomeCandidateHeader from '../jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader';
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Shell.tsx:57:      {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Shell.tsx:58:      <JueshiV4HomeCandidateHeader
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Workspace.tsx:90:          {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2TaskChains.tsx:109:                {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Shell.tsx:4:import JueshiV4HomeCandidateHeader from '../jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader';
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Shell.tsx:23:      {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Shell.tsx:24:      <JueshiV4HomeCandidateHeader
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TaskChains.tsx:86:              {/* Header */}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavShell.tsx:4:import JueshiV4TopNavHeader from './JueshiV4TopNavHeader';
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavShell.tsx:22:      {/* Header */}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavShell.tsx:23:      <JueshiV4TopNavHeader
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:7:interface TopNavHeaderProps {
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:22:export default function JueshiV4TopNavHeader({ onMenuClick, menuOpen }: TopNavHeaderProps) {
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateWorkspace.tsx:50:          {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:8:interface HeaderProps {
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:23:export default function JueshiV4HomeCandidateHeader({ onMenuClick, menuOpen }: HeaderProps) {
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateShell.tsx:4:import JueshiV4HomeCandidateHeader from './JueshiV4HomeCandidateHeader';
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateShell.tsx:23:      {/* Header */}
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateShell.tsx:24:      <JueshiV4HomeCandidateHeader
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:8:interface TopNavHeaderProps {
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:23:export default function JueshiV4TopNavPolishedHeader({ onMenuClick, menuOpen }: TopNavHeaderProps) {
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedWorkspaceCard.tsx:77:          {/* Header */}
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedShell.tsx:4:import JueshiV4TopNavPolishedHeader from './JueshiV4TopNavPolishedHeader';
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedShell.tsx:22:      {/* Header with real logo */}
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedShell.tsx:23:      <JueshiV4TopNavPolishedHeader
+src/components/tools/task-chain-next-step.tsx:194:      {/* Header */}
+src/components/tools/task-chain-select-dialog.tsx:68:        {/* Header */}
+src/components/tools/tool-card.tsx:79:      {/* Header */}
+src/components/tools/task-chain-generator-button.tsx:97:            {/* Header */}
+src/components/layout/footer-new.tsx:47:export default function FooterNew() {
+src/components/layout/JueshiV4PublicShell.tsx:4:import JueshiV4Header from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header';
+src/components/layout/JueshiV4PublicShell.tsx:5:import JueshiV4Footer from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer';
+src/components/layout/JueshiV4PublicShell.tsx:7:interface JueshiV4PublicShellProps {
+src/components/layout/JueshiV4PublicShell.tsx:12: * JueshiV4PublicShell - 统一的 V4 公共外壳组件
+src/components/layout/JueshiV4PublicShell.tsx:14: * 用于所有需要 V4 Header/Footer 的公共页面（如 /resources）
+src/components/layout/JueshiV4PublicShell.tsx:17:export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellProps) {
+src/components/layout/JueshiV4PublicShell.tsx:20:      <JueshiV4Header />
+src/components/layout/JueshiV4PublicShell.tsx:22:      <JueshiV4Footer />
+src/components/layout/header.tsx:34:export default function Header() {
+src/components/workspace/PageHeader.tsx:4:interface PageHeaderProps {
+src/components/workspace/PageHeader.tsx:12:export default function PageHeader({ icon, title, description, action, backHref }: PageHeaderProps) {
+src/components/navigation/category-section.tsx:7:interface CategoryHeaderProps {
+src/components/navigation/category-section.tsx:18:export function CategoryHeader({ category, isExpanded, onToggle }: CategoryHeaderProps) {
+src/components/navigation/category-section.tsx:119:      <CategoryHeader category={category} isExpanded={isExpanded} onToggle={toggle} />
+src/components/user/TodoWidget.tsx:82:      {/* Header */}
+src/components/country-info-section.tsx:23:      {/* Header */}
+src/components/community/user-trust-card.tsx:118:      {/* Header: avatar + name + title */}
+src/components/document-tools/document-tool-header.tsx:2: * Document Tool Header
+src/components/document-tools/document-tool-header.tsx:12: * <DocumentToolHeader
+src/components/document-tools/document-tool-header.tsx:34:interface DocumentToolHeaderProps {
+src/components/document-tools/document-tool-header.tsx:65:export default function DocumentToolHeader({
+src/components/document-tools/document-tool-header.tsx:80:}: DocumentToolHeaderProps) {
+src/components/saas/CompactTable.tsx:24:  stickyHeader?: boolean;
+src/components/saas/CompactTable.tsx:55:  stickyHeader = false,
+src/components/saas/CompactTable.tsx:67:              stickyHeader && 'sticky top-0 z-10'
+src/components/saas/WorkspacePageHeader.tsx:13:interface WorkspacePageHeaderProps {
+src/components/saas/WorkspacePageHeader.tsx:30: * WorkspacePageHeader — 工作区页面头部
+src/components/saas/WorkspacePageHeader.tsx:35:export function WorkspacePageHeader({
+src/components/saas/WorkspacePageHeader.tsx:44:}: WorkspacePageHeaderProps) {
+src/components/saas/index.ts:8: * - WorkspacePageHeader: 工作区页面头部（支持面包屑、标签页）
+src/components/saas/index.ts:16:export { WorkspacePageHeader } from './WorkspacePageHeader';
+src/components/home-live/HomeLivePage.tsx:135:// Header 组件
+src/components/home-live/HomeLivePage.tsx:136:function HomeLiveHeader() {
+src/components/home-live/HomeLivePage.tsx:818:      <HomeLiveHeader />

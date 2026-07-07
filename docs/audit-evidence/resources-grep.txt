@@ -1,0 +1,23 @@
+src/app/(public)/resources/resource-directory-client.tsx:7:import FavoriteButton from '@/components/favorite-button';
+src/app/(public)/resources/resource-directory-client.tsx:101:        <FavoriteButton resourceUrl={resource.url} title={resource.name} resourceType="url" size="sm" />
+src/app/(public)/resources/resource-directory-client.tsx:102:        <Link href={`/resources/site/${resource.id}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 hover:bg-purple-50 hover:text-purple-600 border border-gray-200 hover:border-purple-200 transition-colors" title="查看网站介绍">
+src/app/(public)/resources/resource-directory-client.tsx:189:              <Link key={resource.id} href={`/resources/site/${resource.id}`} className="flex items-center gap-3 group">
+src/app/(public)/resources/resource-directory-client.tsx:224:              <Link key={resource.id} href={`/resources/site/${resource.id}`} className="flex items-center gap-3 group">
+src/app/(public)/resources/resource-directory-client.tsx:382:                        <Link key={r.id} href={`/resources/site/${r.id}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+src/app/(public)/resources/resource-directory-client.tsx:422:                        <span>加载更多</span>
+src/app/(public)/resources/site/[id]/page.tsx:9:import FavoriteButton from '@/components/favorite-button';
+src/app/(public)/resources/site/[id]/page.tsx:10:import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+src/app/(public)/resources/site/[id]/page.tsx:75:    <JueshiV4PublicShell>
+src/app/(public)/resources/site/[id]/page.tsx:154:                    <FavoriteButton
+src/app/(public)/resources/site/[id]/page.tsx:320:                        href={`/resources/site/${r.id}`}
+src/app/(public)/resources/site/[id]/page.tsx:434:                      href={`/resources/site/${r.id}`}
+src/app/(public)/resources/site/[id]/page.tsx:462:                <FavoriteButton
+src/app/(public)/resources/site/[id]/page.tsx:488:    </JueshiV4PublicShell>
+src/app/(public)/resources/page.tsx:3:import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+src/app/(public)/resources/page.tsx:75:    <JueshiV4PublicShell>
+src/app/(public)/resources/page.tsx:80:    </JueshiV4PublicShell>
+src/components/favorite-button.tsx:5:interface FavoriteButtonProps {
+src/components/favorite-button.tsx:12:export default function FavoriteButton({ resourceUrl, title, resourceType = 'tool', size = 'sm' }: FavoriteButtonProps) {
+src/components/layout/JueshiV4PublicShell.tsx:7:interface JueshiV4PublicShellProps {
+src/components/layout/JueshiV4PublicShell.tsx:12: * JueshiV4PublicShell - 统一的 V4 公共外壳组件
+src/components/layout/JueshiV4PublicShell.tsx:17:export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellProps) {
