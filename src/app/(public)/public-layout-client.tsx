@@ -8,8 +8,10 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const isUILab = pathname.startsWith('/ui-lab');
   const isV4Home = pathname === '/';
+  const isResources = pathname === '/resources';
 
-  if (isUILab || isV4Home) {
+  // Skip public header/footer for pages that have their own V4 shell
+  if (isUILab || isV4Home || isResources) {
     return <>{children}</>;
   }
 

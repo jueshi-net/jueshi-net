@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ExternalLink, Globe, Search, Sparkles, Tag, BookOpen, TrendingUp, Clock, ArrowRight } from 'lucide-react';
 import { getCategoryInfo } from '@/lib/resources/category-config';
 import FavoriteButton from '@/components/favorite-button';
+import JueshiV4Header from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header';
+import JueshiV4Footer from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer';
 
 interface Resource {
   id: string;
@@ -311,142 +313,146 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
   const hasMore = displayCount < filtered.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Compact Hero */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <div className="max-w-[1480px] mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
-                <Globe className="w-6 h-6" />
-                网址导航
-              </h1>
-              <p className="text-sm text-white/80">精选 {resources.length} 个优质海外工具与服务</p>
+    <>
+      <JueshiV4Header />
+      <div className="min-h-screen bg-gray-50">
+        {/* Compact Hero */}
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+          <div className="max-w-[1480px] mx-auto px-4 py-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
+                  <Globe className="w-6 h-6" />
+                  网址导航
+                </h1>
+                <p className="text-sm text-white/80">精选 {resources.length} 个优质海外工具与服务</p>
+              </div>
             </div>
-          </div>
-          <div className="max-w-2xl relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              placeholder="搜索网址名称、描述或标签..."
-              className="w-full pl-12 pr-4 py-3 bg-white text-gray-900 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
-            />
+            <div className="max-w-2xl relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                value={search}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="搜索网址名称、描述或标签..."
+                className="w-full pl-12 pr-4 py-3 bg-white text-gray-900 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content: Three Column Layout */}
-      <div className="max-w-[1480px] mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          {/* Left Sidebar: Category Navigation */}
-          <div className="hidden lg:block w-56 shrink-0">
-            <LeftSidebar
-              categories={dynamicCategories}
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-              resourceCounts={resourceCounts}
-            />
-          </div>
-
-          {/* Center: Main Content */}
-          <div className="flex-1 min-w-0">
-            {/* Mobile Category Tabs */}
-            <div className="lg:hidden mb-4">
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                <button onClick={() => handleCategoryChange('all')} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${activeCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
-                  全部
-                </button>
-                {dynamicCategories.map((cat) => (
-                  <button key={cat.id} onClick={() => handleCategoryChange(cat.id)} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${activeCategory === cat.id ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
-                    {cat.label}
-                  </button>
-                ))}
-              </div>
+        {/* Main Content: Three Column Layout */}
+        <div className="max-w-[1480px] mx-auto px-4 py-6">
+          <div className="flex gap-6">
+            {/* Left Sidebar: Category Navigation */}
+            <div className="hidden lg:block w-56 shrink-0">
+              <LeftSidebar
+                categories={dynamicCategories}
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
+                resourceCounts={resourceCounts}
+              />
             </div>
 
-            {/* Hot Resources (only one horizontal section) */}
-            {activeCategory === 'all' && !search.trim() && (
-              <section className="mb-6 bg-white rounded-xl border border-gray-200 p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-orange-500" />
-                    <h2 className="text-base font-bold text-gray-900">热门网址</h2>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                  {hotResources.slice(0, 8).map((r) => {
-                    const logoSrc = r.iconUrl || r.favicon || null;
-                    const initial = r.name.charAt(0).toUpperCase();
-                    return (
-                      <Link key={r.id} href={`/resources/site/${r.id}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
-                        <div className="shrink-0 w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
-                          {logoSrc ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={logoSrc} alt={r.name} className="w-5 h-5 object-contain" />
-                          ) : (
-                            <span className="text-xs font-bold text-gray-400">{initial}</span>
-                          )}
-                        </div>
-                        <span className="flex-1 text-sm text-gray-700 truncate group-hover:text-purple-600">{r.name}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {/* Ad slot */}
-            {activeCategory === 'all' && !search.trim() && (
-              <div className="mb-6">
-                <SubtleAdSlot position="顶部横幅" />
-              </div>
-            )}
-
-            {/* Resource Grid */}
-            {filtered.length > 0 ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {displayedResources.map((r) => (
-                    <ResourceCard key={r.id} resource={r} />
+            {/* Center: Main Content */}
+            <div className="flex-1 min-w-0">
+              {/* Mobile Category Tabs */}
+              <div className="lg:hidden mb-4">
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  <button onClick={() => handleCategoryChange('all')} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${activeCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
+                    全部
+                  </button>
+                  {dynamicCategories.map((cat) => (
+                    <button key={cat.id} onClick={() => handleCategoryChange(cat.id)} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium ${activeCategory === cat.id ? 'bg-purple-600 text-white' : 'bg-white border border-gray-200 text-gray-600'}`}>
+                      {cat.label}
+                    </button>
                   ))}
                 </div>
-
-                {/* Load more button */}
-                {hasMore && (
-                  <div className="mt-8 flex justify-center">
-                    <button
-                      onClick={handleLoadMore}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition-colors shadow-sm"
-                    >
-                      <span>加载更多</span>
-                      <span className="text-xs text-gray-400">（已显示 {displayedResources.length} / {filtered.length}）</span>
-                    </button>
-                  </div>
-                )}
-
-                {/* All loaded indicator */}
-                {!hasMore && filtered.length > ITEMS_PER_PAGE && (
-                  <div className="mt-8 text-center text-sm text-gray-400">
-                    已显示全部 {filtered.length} 个资源
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-                <Search className="w-12 h-12 mb-3 text-gray-300" />
-                <p className="text-base font-medium text-gray-500 mb-1">未找到匹配的网址</p>
-                <p className="text-sm">尝试更换关键词或切换分类</p>
               </div>
-            )}
-          </div>
 
-          {/* Right Sidebar: Rankings */}
-          <div className="hidden xl:block w-64 shrink-0">
-            <RightSidebar resources={resources} />
+              {/* Hot Resources (only one horizontal section) */}
+              {activeCategory === 'all' && !search.trim() && (
+                <section className="mb-6 bg-white rounded-xl border border-gray-200 p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-orange-500" />
+                      <h2 className="text-base font-bold text-gray-900">热门网址</h2>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {hotResources.slice(0, 8).map((r) => {
+                      const logoSrc = r.iconUrl || r.favicon || null;
+                      const initial = r.name.charAt(0).toUpperCase();
+                      return (
+                        <Link key={r.id} href={`/resources/site/${r.id}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                          <div className="shrink-0 w-8 h-8 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
+                            {logoSrc ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={logoSrc} alt={r.name} className="w-5 h-5 object-contain" />
+                            ) : (
+                              <span className="text-xs font-bold text-gray-400">{initial}</span>
+                            )}
+                          </div>
+                          <span className="flex-1 text-sm text-gray-700 truncate group-hover:text-purple-600">{r.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* Ad slot */}
+              {activeCategory === 'all' && !search.trim() && (
+                <div className="mb-6">
+                  <SubtleAdSlot position="顶部横幅" />
+                </div>
+              )}
+
+              {/* Resource Grid */}
+              {filtered.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {displayedResources.map((r) => (
+                      <ResourceCard key={r.id} resource={r} />
+                    ))}
+                  </div>
+
+                  {/* Load more button */}
+                  {hasMore && (
+                    <div className="mt-8 flex justify-center">
+                      <button
+                        onClick={handleLoadMore}
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition-colors shadow-sm"
+                      >
+                        <span>加载更多</span>
+                        <span className="text-xs text-gray-400">（已显示 {displayedResources.length} / {filtered.length}）</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* All loaded indicator */}
+                  {!hasMore && filtered.length > ITEMS_PER_PAGE && (
+                    <div className="mt-8 text-center text-sm text-gray-400">
+                      已显示全部 {filtered.length} 个资源
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                  <Search className="w-12 h-12 mb-3 text-gray-300" />
+                  <p className="text-base font-medium text-gray-500 mb-1">未找到匹配的网址</p>
+                  <p className="text-sm">尝试更换关键词或切换分类</p>
+                </div>
+              )}
+            </div>
+
+            {/* Right Sidebar: Rankings */}
+            <div className="hidden xl:block w-64 shrink-0">
+              <RightSidebar resources={resources} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <JueshiV4Footer />
+    </>
   );
 }
