@@ -23,6 +23,12 @@
 /Users/chq/bin/claude-safe
 ```
 
+### Critical Requirements
+1. **settings.json 必须使用 env 结构** - 不支持旧的 apiKey/baseUrl 格式
+2. **claude-safe 必须调用真实 Claude 二进制绝对路径** - `/Users/chq/.hermes/node/bin/claude`
+3. **shim 只能用于拦截 Code Bridge 的 claude 命令** - 不能全局替换
+4. **防止递归** - shim → claude-safe → 真实 claude，不能 shim → claude-safe → shim
+
 ### Exit Codes
 | Code | Meaning | Action |
 |------|---------|--------|
@@ -150,9 +156,41 @@ Before any Claude Code call:
    - 0: Success, check output contains `CLAUDE_SAFE_BRIDGE_OK`
    - 75: Rate limited, STOP
    - Other: Failure, STOP
-3. Verify `claude-safe.log` has new entry
+3. **Verify `claude-safe.log` has new entry** - 必须确认日志有新增记录
 4. Verify `last-output.txt` contains expected output
 5. Verify no business files were modified
+
+### Smoke Test Validation
+```bash
+# 1. 执行 smoke test
+cd /tmp && PATH="/Users/chq/bin/claude-bridge-shim:$PATH" claude -p "只回答 CLAUDE_SAFE_BRIDGE_OK"
+
+# 2. 检查日志新增记录
+tail -1 ~/.claude-code-bridge/claude-safe.log
+# 必须看到新的 CLAUDE_SAFE_EXIT status=0 记录
+
+# 3. 检查输出
+cat ~/.claude-code-bridge/last-output.txt
+# 必须包含 CLAUDE_SAFE_BRIDGE_OK
+
+# 4. 检查无业务改动
+cd /Users/chq/xixiong-saas && git status --short
+# 必须为空
+```
+
+### Smoke Test Gate
+**未通过 smoke test 前禁止真实开发。**
+
+必须满足以下条件才能开始真实开发：
+- ✅ claude-safe.log 有新增记录
+- ✅ last-output.txt 包含 CLAUDE_SAFE_BRIDGE_OK
+- ✅ git status --short 为空
+- ✅ 退出码为 0
+
+如果任一条件不满足，必须停止并报告：
+- `CODE_BRIDGE_STILL_CALLS_RAW_CLAUDE` - 如果 Code Bridge 绕过 claude-safe
+- `CLAUDE_CODE_AUTH_STILL_NOT_READY` - 如果认证失败
+- `CLAUDE_SAFE_RECURSION_FOUND` - 如果出现递归
 
 ---
 
@@ -161,10 +199,38 @@ Before any Claude Code call:
 ### Issue: Claude Code Not Authenticated
 **Symptom:** `claude --version` returns error or requires login  
 **Solution:**
+
+**百炼模式（推荐）：**
+```bash
+# 1. 设置 ~/.claude.json 跳过 onboarding
+cat > ~/.claude.json <<EOF
+{
+  "hasCompletedOnboarding": true
+}
+EOF
+
+# 2. 设置 ~/.claude/settings.json 使用 env 结构
+cat > ~/.claude/settings.json <<EOF
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "YOUR_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
+    "ANTHROPIC_MODEL": "qwen3-coder-plus"
+  }
+}
+EOF
+
+# 3. 验证
+claude --version
+```
+
+**Anthropic 官方模式（不推荐）：**
 ```bash
 claude login
 # Follow authentication flow
 ```
+
+**注意：** 百炼模式下不要执行 `claude login`，会覆盖配置。
 
 ### Issue: Rate Limit Lock Stuck
 **Symptom:** All calls return exit code 75  
