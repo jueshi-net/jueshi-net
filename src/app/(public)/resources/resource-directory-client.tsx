@@ -167,7 +167,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
 
         {/* 网站介绍按钮 */}
         <Link
-          href={`/resources/${resource.category}`}
+          href={`/resources/site/${resource.id}`}
           className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-gray-50 text-gray-600 hover:bg-purple-50 hover:text-purple-600 border border-gray-200 hover:border-purple-200 transition-colors min-h-[32px]"
           title="查看网站介绍"
         >
