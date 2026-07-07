@@ -1,0 +1,65 @@
+```diff
+diff --git a/src/app/(public)/guides/page.tsx b/src/app/(public)/guides/page.tsx
+index 1234567..89abcdef 100644
+--- a/src/app/(public)/guides/page.tsx
++++ b/src/app/(public)/guides/page.tsx
+@@ -1,5 +1,7 @@
+ import { Metadata } from 'next';
++import { JueshiV4PublicShell } from '../public-layout-client';
+ 
+ export const metadata: Metadata = {
+   title: 'Guides - Jueshi',
+@@ -10,7 +12,9 @@ export default function GuidesPage() {
+   return (
+     <div className="guides-page">
+       {/* Page content */}
+-      <main>Guides content</main>
++      <JueshiV4PublicShell>
++        <main>Guides content</main>
++      </JueshiV4PublicShell>
+     </div>
+   );
+ }
+diff --git a/src/app/(public)/checklists/page.tsx b/src/app/(public)/checklists/page.tsx
+index abcdef1..2345678 100644
+--- a/src/app/(public)/checklists/page.tsx
++++ b/src/app/(public)/checklists/page.tsx
+@@ -1,5 +1,7 @@
+ import { Metadata } from 'next';
++import { JueshiV4PublicShell } from '../public-layout-client';
+ 
+ export const metadata: Metadata = {
+   title: 'Checklists - Jueshi',
+@@ -10,7 +12,9 @@ export default function ChecklistsPage() {
+   return (
+     <div className="checklists-page">
+       {/* Page content */}
+-      <main>Checklists content</main>
++      <JueshiV4PublicShell>
++        <main>Checklists content</main>
++      </JueshiV4PublicShell>
+     </div>
+   );
+ }
+diff --git a/src/app/(public)/public-layout-client.tsx b/src/app/(public)/public-layout-client.tsx
+index 56789ab..cdef123 100644
+--- a/src/app/(public)/public-layout-client.tsx
++++ b/src/app/(public)/public-layout-client.tsx
+@@ -1,6 +1,7 @@
+ 'use client';
+ 
+ import { usePathname } from 'next/navigation';
++import { ReactNode } from 'react';
+ 
+ export function JueshiV4PublicShell({ children }: { children: ReactNode }) {
+   const pathname = usePathname();
+@@ -8,6 +9,8 @@ export function JueshiV4PublicShell({ children }: { children: ReactNode }) {
+   const isHome = pathname === '/';
+   const isAbout = pathname === '/about';
+   const isContact = pathname === '/contact';
++  const isGuides = pathname === '/guides';
++  const isChecklists = pathname === '/checklists';
+ 
+   // Skip header/footer for specific pages
+   const skipLayout = isHome || isAbout || isContact || isGuides || isChecklists;
+```
