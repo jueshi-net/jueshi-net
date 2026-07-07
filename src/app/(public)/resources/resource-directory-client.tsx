@@ -339,6 +339,8 @@ function CategoryNav({ categories, activeCategory, onCategoryChange, resourceCou
 export default function ResourceDirectoryClient({ resources, featuredResources }: { resources: Resource[]; featuredResources: Resource[] }) {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [displayCount, setDisplayCount] = useState(30); // 初始显示 30 个
+  const ITEMS_PER_PAGE = 30; // 每次加载 30 个
 
   // 动态分类（按资源数量排序）
   const dynamicCategories = useMemo(() => {
@@ -388,6 +390,19 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
   // 分离广告和常规
   const adResources = filtered.filter((r) => r.isAd);
   const normalResources = filtered.filter((r) => !r.isAd);
+  
+  // 分页显示
+  const displayedResources = normalResources.slice(0, displayCount);
+  const hasMore = displayCount < normalResources.length;
+  
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + ITEMS_PER_PAGE);
+  };
+  
+  // 切换分类或搜索时重置显示数量
+  useEffect(() => {
+    setDisplayCount(30);
+  }, [activeCategory, search]);
 
   return (
     <div className="min-h-[calc(100dvh-3.5rem)] bg-gray-50/50 overflow-x-hidden">
@@ -546,12 +561,36 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
             )}
 
             {/* 常规资源卡片 */}
-            {normalResources.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {normalResources.map((r) => (
-                  <ResourceCard key={r.id} resource={r} />
-                ))}
-              </div>
+            {displayedResources.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {displayedResources.map((r) => (
+                    <ResourceCard key={r.id} resource={r} />
+                  ))}
+                </div>
+                
+                {/* 加载更多按钮 */}
+                {hasMore && (
+                  <div className="mt-8 flex justify-center">
+                    <button
+                      onClick={handleLoadMore}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium text-gray-700 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-700 transition-all shadow-sm"
+                    >
+                      <span>加载更多</span>
+                      <span className="text-xs text-gray-400">
+                        （已显示 {displayedResources.length} / {normalResources.length}）
+                      </span>
+                    </button>
+                  </div>
+                )}
+                
+                {/* 已加载完毕提示 */}
+                {!hasMore && normalResources.length > 30 && (
+                  <div className="mt-8 text-center text-sm text-gray-400">
+                    已显示全部 {normalResources.length} 个资源
+                  </div>
+                )}
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-gray-400">
                 <Search className="w-12 h-12 mb-3 text-gray-300" />
