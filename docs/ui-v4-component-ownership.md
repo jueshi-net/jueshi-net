@@ -224,5 +224,117 @@ git grep "HomeLivePage\|JueshiV4\|WorkspaceSidebar"
 
 ---
 
+## 八、工作台相关组件归属
+
+### 现役 Workspace 组件
+
+| 组件 | 路径 | 状态 | 备注 |
+|------|------|------|------|
+| **Workspace Layout** | `src/app/(workspace)/layout.tsx` | ✅ 现役 | 提供 UserNavSidebar + TopBar |
+| **UserNavSidebar** | `src/components/user/UserSidebar.tsx` | ✅ 现役 | 左侧栏（品牌 Logo + 用户资产卡 + 导航） |
+| **TopBar** | `src/app/(workspace)/topbar.tsx` | ✅ 现役 | 顶部面包屑导航 |
+| **WorkspaceRightRail** | `src/components/workspace/WorkspaceRightRail.tsx` | ✅ 现役 | 右侧栏（通知 + 成长路径 + 快捷统计） |
+| **RecentTools** | `src/components/user/RecentTools.tsx` | ✅ 现役 | 常用工具模块（调用 /api/workbench/recent-tools） |
+| **TodayTasks** | `src/components/user/TodayTasks.tsx` | ✅ 现役 | 今日任务模块 |
+| **Workspace Page** | `src/app/(workspace)/workspace/page.tsx` | ✅ 现役 | 工作台主页 |
+
+### 废弃候选 Workspace 组件
+
+| 组件 | 路径 | 状态 | 备注 |
+|------|------|------|------|
+| **WorkspaceSidebar** | `src/components/workspace/WorkspaceSidebar.tsx` | ⚠️ 废弃候选 | 旧版左侧栏，已被 UserNavSidebar 替代 |
+
+### 工作台核心功能原型（已存在）
+
+| 功能 | 页面路径 | 组件 | API | 数据模型 | 状态 |
+|------|---------|------|-----|---------|------|
+| **我的收藏** | `/workspace/favorites` | `favorites-client.tsx` | `/api/user/favorites` | `UserFavorite`, `Favorite`, `ToolFavorite` | ✅ 已有完整功能 |
+| **待办任务** | `/workspace/tasks` | `tasks-client.tsx` | `/api/growth-tasks/summary`, `/api/tasks` | `UserTask` | ✅ 已有完整功能 |
+| **备忘录/记事本** | `/workspace/memos` | `memos-client.tsx` | `/api/workspace/memos` | `Memo` | ✅ 已有完整功能 |
+| **最近使用工具** | workspace 主页内嵌 | `RecentTools.tsx` | `/api/workbench/recent-tools` | 基于浏览记录 | ✅ 已有完整功能 |
+| **任务链** | `/workspace/task-chains` | `task-chains-client.tsx` | `/api/task-chains` | `TaskChainDraft` | ✅ 已有完整功能 |
+| **我的单据** | `/workspace/documents` | `documents-client-inner.tsx` | `/api/user/documents` | `DocumentHistory` | ✅ 已有完整功能 |
+| **公司资料** | `/workspace/company-profiles` | `company-profiles-client.tsx` | `/api/me/company-profiles` | `UserCompanyProfile` | ✅ 已有完整功能 |
+| **商品资料** | `/workspace/products` | - | `/api/workspace/products` | `UserProduct` | ✅ 已有完整功能 |
+| **通知中心** | `/workspace/notifications` | `notifications-client.tsx` | `/api/me/notifications` | `Notification` | ✅ 已有完整功能 |
+| **会员权益** | `/workspace/member` | `member-client.tsx` | `/api/me/membership` | `User` (levelKey, growthValue) | ✅ 已有完整功能 |
+
+### 暂未实现功能（需后续开发）
+
+| 功能 | 状态 | 备注 |
+|------|------|------|
+| **常用网址/高频网址** | ❌ 暂未实现 | 无独立数据模型，可考虑基于 UserFavorite 或新增 `FrequentUrl` 模型 |
+| **网址导航收藏** | ❌ 暂未实现 | 与 /resources 页面相关，等待用户提供样例图 |
+
+---
+
+## 九、工作台新信息架构建议（个人效率门户定位）
+
+### 设计原则
+
+> 工作台 = 用户每天上班第一个打开的网站 = 个人效率门户
+
+### 建议左侧栏结构
+
+1. 品牌 Logo（`/images/brand/jueshi-logo-crab.jpg`）
+2. 用户资产卡（头像 + 姓名 + 等级 + 积分 + 成长值 + 连续签到）
+3. **工作台总览**（/workspace）
+4. **我的常用**（高频工具 + 常用网址 — 待开发）
+5. **我的网址**（收藏网址 — 已有 /workspace/favorites）
+6. **待办任务**（已有 /workspace/tasks）
+7. **记事本**（已有 /workspace/memos）
+8. 我的清单（已有 /workspace/task-chains）
+9. 我的工具（已有 /tools + RecentTools）
+10. 我的收藏（已有 /workspace/favorites）
+11. 我的单据（已有 /workspace/documents）
+12. 公司资料（已有 /workspace/company-profiles）
+13. 商品资料（已有 /workspace/products）
+14. 账号设置（已有 /workspace/settings）
+
+### 建议中间主区结构
+
+1. **今日工作台欢迎区**（压缩高度，显示日期 + 天气 + 签到状态）
+2. **今日待办任务**（从 /workspace/tasks 聚合，显示 top 3-5）
+3. **我的常用网址 / 高频网址**（待开发，或复用 UserFavorite）
+4. **最近使用工具**（已有 RecentTools 组件）
+5. **我的清单进度**（从 /workspace/task-chains 聚合）
+6. **最近单据 / 公司资料**（已有数据）
+7. **记事本快捷区**（从 /workspace/memos 聚合 top 3）
+8. **常用工具入口**（grid 布局，6-8 个高频工具）
+
+### 建议右侧栏结构
+
+1. **今日签到**（已有 CheckinButton）
+2. **通知提醒**（已有，显示未读数）
+3. **成长路径**（已有，显示等级进度）
+4. **快捷统计**（已有，单据/任务链/邀请数）
+5. **最近备忘录**（已有，显示 top 3）
+6. **推荐工具**（可基于用户行为推荐）
+
+---
+
+## 十、功能接入优先级
+
+### 可直接接入工作台（已有完整功能）
+
+| 功能 | 接入方式 | 工作量 |
+|------|---------|--------|
+| 待办任务 | 主页聚合 top 3-5 任务 | 低 |
+| 备忘录 | 主页聚合 top 3 备忘 | 低 |
+| 最近使用工具 | 已有 RecentTools 组件 | 无 |
+| 我的收藏 | 主页显示 top 5 收藏 | 低 |
+| 我的清单进度 | 主页显示进行中清单 | 低 |
+| 最近单据 | 已有数据 | 无 |
+
+### 需要后续开发
+
+| 功能 | 说明 | 工作量 |
+|------|------|--------|
+| 常用网址/高频网址 | 需新增数据模型或复用 UserFavorite | 中 |
+| 网址导航收藏 | 与 /resources 相关，等待样例图 | 高 |
+| 工作台小挂件配置 | schema 中已有字段但未实现 UI | 中 |
+
+---
+
 **文档维护**: 每次组件清理后更新此文档  
 **最后更新**: 2026-07-07
