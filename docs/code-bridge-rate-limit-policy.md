@@ -206,6 +206,22 @@ fi
 - ✅ Must generate new commit with proper message
 - ✅ Must verify commit is not a duplicate
 
+### Rule 4: Non-Claude-Code Operations
+The following operations do NOT require Claude Code calls and can be executed directly:
+- ✅ Shell verification commands (git status, git diff, etc.)
+- ✅ Build commands (npm run build, etc.)
+- ✅ HTTP requests (curl, wget, etc.)
+- ✅ Process management (PM2 restart, PM2 status, etc.)
+- ✅ File system operations (ls, cat, grep, etc.)
+- ✅ Database queries (read-only)
+- ✅ Log inspection
+
+**Only use Claude Code for:**
+- Code generation and modification
+- Complex debugging and analysis
+- Architecture design and planning
+- Code review and optimization
+
 ---
 
 ## 7. Smoke Test Requirements
