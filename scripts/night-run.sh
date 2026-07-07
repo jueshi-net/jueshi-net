@@ -172,7 +172,9 @@ q = json.load(open(sys.argv[1]))
 if not q:
     print("__EMPTY__")
 else:
-    print(q[0]["desc"])
+    task = q[0]
+    # Support both "desc" and "prompt" keys
+    print(task.get("prompt") or task.get("desc") or task.get("title", "__EMPTY__"))
 PYEOF
   )
 
@@ -322,8 +324,10 @@ json.dump(s, open(state_path, "w"), indent=2)
 
 # Dequeue
 q = json.load(open(queue_path))
-if q and q[0]["desc"] == task:
-    q.pop(0)
+if q:
+    task_desc = q[0].get("prompt") or q[0].get("desc") or q[0].get("title", "")
+    if task_desc == task:
+        q.pop(0)
 json.dump(q, open(queue_path, "w"), indent=2, ensure_ascii=False)
 
 # Add to completed
