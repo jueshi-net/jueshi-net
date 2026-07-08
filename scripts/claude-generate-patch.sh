@@ -162,6 +162,31 @@ CRITICAL INSTRUCTIONS:
 7. Do NOT add explanations, markdown code blocks, or commentary.
 8. Start your output directly with 'diff --git' — no preamble.
 
+JSX COMPONENT WRAPPING RULES:
+When wrapping a page with a component like <JueshiV4PublicShell>:
+- Find the return statement (e.g., 'return (')
+- Add the opening tag IMMEDIATELY AFTER the opening parenthesis: 'return (\n  <JueshiV4PublicShell>'
+- Add the closing tag BEFORE the closing parenthesis: '  </JueshiV4PublicShell>\n)'
+- Ensure proper indentation (typically 2 spaces per level)
+- The component should wrap the ENTIRE return content, not just part of it
+
+Example of CORRECT wrapping:
+BEFORE:
+  return (
+    <div className=\"page\">
+      ...content...
+    </div>
+  );
+
+AFTER:
+  return (
+    <JueshiV4PublicShell>
+      <div className=\"page\">
+        ...content...
+      </div>
+    </JueshiV4PublicShell>
+  );
+
 OUTPUT FORMAT (raw unified diff, nothing else):
 diff --git a/path/to/file b/path/to/file
 index abc1234..def5678 100644
