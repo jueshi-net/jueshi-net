@@ -241,6 +241,10 @@ echo "$POST_FILES" | sed 's/^/  /'
 # Re-check allowlist on actual diff
 POST_VIOLATION=false
 while IFS= read -r file; do
+  # Skip pipeline state files (modified by night-run.sh itself, not business code)
+  if [[ "$file" == .hermes/* ]]; then
+    continue
+  fi
   if check_hard_block "$file"; then
     err "POST-APPLY HARD BLOCKED: $file"
     POST_VIOLATION=true
