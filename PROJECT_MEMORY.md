@@ -11,12 +11,12 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Phase 4 进行中 → Night 4 完成 |
+| **当前阶段** | Phase 4 进行中 → Night 5 完成 |
 | **阶段目标** | V4 Shell 统一 + Design System 应用 |
-| **Phase 1** | ✅ V4 Shell 统一（9/221 页面，4.1%） |
+| **Phase 1** | ✅ V4 Shell 统一（11/221 页面，5.0%） |
 | **Phase 2** | ✅ Night Pipeline V3 建立 |
-| **Phase 3** | ✅ Design System V1 建立（14 组件，0% 应用） |
-| **Phase 4** | ⏳ 待开始：V4 Shell 扩展 + Design System 应用 |
+| **Phase 3** | ✅ Design System V1 建立（14 组件，0.9% 应用） |
+| **Phase 4** | ✅ V4 Shell 扩展 + Design System 应用（Night 5 完成） |
 
 ---
 
