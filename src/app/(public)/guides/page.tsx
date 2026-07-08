@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { FileText, CalendarDays, Eye, Clock, ChevronRight, BookOpen, TrendingUp, Sparkles } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { SectionHeader, ContentSection } from '@/components/design-system';
 
 export const metadata: Metadata = {
   title: '海外实用指南 - 跨境寄送、海外生活、出海经营',
@@ -151,12 +152,13 @@ export default async function GuidesPage({
           </div>
         </div>
 
-        {/* Scene Entry Cards */}
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            推荐阅读
-          </h2>
+        {/* Scene Entry Cards - 使用 Design System */}
+        <ContentSection className="max-w-6xl mx-auto px-4">
+          <SectionHeader
+            title="推荐阅读"
+            description="精选热门指南，快速上手"
+            icon={<Sparkles className="w-5 h-5 text-amber-500" />}
+          />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/guides" className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-xl">🌱</div>
@@ -174,13 +176,11 @@ export default async function GuidesPage({
               <p className="text-sm text-gray-500 mt-1">跨境合规、物流陷阱、平台规则变化提醒</p>
             </Link>
           </div>
-        </div>
+        </ContentSection>
 
-        {/* Article Cards */}
-        <div className="max-w-6xl mx-auto px-4 pb-16">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            {CATEGORY_LABELS[cat] || '全部指南'}
-          </h2>
+        {/* Article Cards - 使用 Design System */}
+        <ContentSection className="max-w-6xl mx-auto px-4 pb-16">
+          <SectionHeader title={CATEGORY_LABELS[cat] || '全部指南'} />
 
           {articles.length === 0 ? (
             <div className="bg-white border rounded-xl p-12 text-center">
@@ -232,7 +232,7 @@ export default async function GuidesPage({
               </Link>
             </div>
           )}
-        </div>
+        </ContentSection>
       </div>
     </JueshiV4PublicShell>
   );
