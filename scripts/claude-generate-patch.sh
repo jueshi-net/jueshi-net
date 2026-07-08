@@ -353,42 +353,6 @@ while i < len(result):
 Path(out_path).write_text('\n'.join(final_result), encoding="utf-8")
 print(f"Cleaned patch: {out_path}")
 PYEOF
-    
-    # Add missing "--- a/" lines after each "diff --git" line
-    # Pattern: diff --git a/X b/X\n+++ b/X → need to insert --- a/X
-    python3 - "${OUTPUT_PATCH}.clean" "$OUTPUT_PATCH" <<'PYEOF'
-import sys, re
-from pathlib import Path
-
-raw = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
-out = sys.argv[2]
-
-lines = raw.split('\n')
-result = []
-i = 0
-while i < len(lines):
-    line = lines[i]
-    result.append(line)
-    
-    # After "diff --git a/X b/X", check if next line is "+++ b/X" without "--- a/X"
-    if line.startswith('diff --git a/'):
-        # Extract path from "diff --git a/PATH b/PATH"
-        m = re.match(r'diff --git a/(.*) b/(.*)', line)
-        if m:
-            a_path = m.group(1)
-            # Look ahead
-            if i + 1 < len(lines):
-                next_line = lines[i + 1]
-                if next_line.startswith('+++ b/'):
-                    # Missing "--- a/" line, insert it
-                    result.append(f'--- a/{a_path}')
-    
-    i += 1
-
-# Write cleaned patch
-Path(out).write_text('\n'.join(result), encoding="utf-8")
-print(f"Cleaned patch: {out}")
-PYEOF
     rm -f "${OUTPUT_PATCH}.raw" "${OUTPUT_PATCH}.clean"
     
     # Validate patch is non-empty and has expected structure
