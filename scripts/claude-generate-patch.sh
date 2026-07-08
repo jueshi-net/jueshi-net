@@ -319,7 +319,7 @@ for line in lines:
         continue
     
     # Check if this is a diff line (starts with +, -, space, or @)
-    if line and line[0] in '+- @\\':
+    if line and line[0] in '+- @ \\':
         # This is diff content - keep as-is (may contain JSX)
         result.append(line)
     else:
