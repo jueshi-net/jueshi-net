@@ -285,9 +285,10 @@ fi
 # ─── 9. Final validation ───
 # Check patch has valid unified diff structure
 # Use grep -qF (fixed string) to avoid regex issues with +++ and ---
+# Use -- to prevent patterns starting with - from being treated as options
 REQUIRED_PATTERNS=("diff --git " "--- a/" "+++ b/" "@@ ")
 for pattern in "${REQUIRED_PATTERNS[@]}"; do
-  if ! grep -qF "$pattern" "$OUTPUT_PATCH"; then
+  if ! grep -qF -- "$pattern" "$OUTPUT_PATCH"; then
     err "Patch validation failed: missing '$pattern'"
     echo "PATCH_GENERATION_INVALID_OUTPUT"
     exit 125
