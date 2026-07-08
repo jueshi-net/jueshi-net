@@ -299,8 +299,35 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
     # Extract from first "diff --git" to end, then clean up
     sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "${OUTPUT_PATCH}.raw"
     
-    # Remove HTML tags and EOF markers that Claude sometimes outputs
-    sed -E 's/<[^>]*>//g; /^# EOF$/d; /^<!--.*-->$/d' "${OUTPUT_PATCH}.raw" > "${OUTPUT_PATCH}.clean"
+    # Remove HTML wrapper tags but preserve JSX in diff content
+    # Only strip tags that are NOT part of diff lines (lines starting with +, -, or space)
+    python3 - "${OUTPUT_PATCH}.raw" "$OUTPUT_PATCH" <<'PYEOF'
+import sys, re
+from pathlib import Path
+
+raw = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
+out = sys.argv[2]
+
+lines = raw.split('\n')
+result = []
+for line in lines:
+    # Skip EOF markers
+    if line.strip() == '# EOF':
+        continue
+    
+    # Check if this is a diff line (starts with +, -, space, or @)
+    if line and line[0] in '+- @\\':
+        # This is diff content - keep as-is (may contain JSX)
+        result.append(line)
+    else:
+        # Not a diff line - strip HTML wrapper tags
+        cleaned = re.sub(r'<[^>]+>', '', line)
+        if cleaned.strip():  # Only keep non-empty lines
+            result.append(cleaned)
+
+Path(out).write_text('\n'.join(result), encoding="utf-8")
+print(f"Cleaned patch: {out}")
+PYEOF
     
     # Add missing "--- a/" lines after each "diff --git" line
     # Pattern: diff --git a/X b/X\n+++ b/X → need to insert --- a/X
