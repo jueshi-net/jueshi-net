@@ -156,36 +156,56 @@ CRITICAL INSTRUCTIONS:
 1. FIRST: Use the Read tool to read each target file listed above. You MUST see the actual file contents before generating any patch.
 2. Analyze the real code structure, imports, and patterns.
 3. Generate a unified diff patch that implements the requested changes.
-4. The patch context lines MUST match the actual file contents you read.
+4. The patch context lines MUST match the actual file contents you read EXACTLY.
 5. Output ONLY the raw unified diff patch to stdout.
 6. Do NOT use Write, Edit, or any file-modification tools.
 7. Do NOT add explanations, markdown code blocks, or commentary.
 8. Start your output directly with 'diff --git' — no preamble.
 
-JSX COMPONENT WRAPPING RULES:
+JSX COMPONENT WRAPPING RULES (CRITICAL):
 When wrapping a page with a component like <JueshiV4PublicShell>:
-- Find the return statement (e.g., 'return (')
-- Add the opening tag IMMEDIATELY AFTER the opening parenthesis: 'return (\n  <JueshiV4PublicShell>'
-- Add the closing tag BEFORE the closing parenthesis: '  </JueshiV4PublicShell>\n)'
-- Ensure proper indentation (typically 2 spaces per level)
-- The component should wrap the ENTIRE return content, not just part of it
 
-Example of CORRECT wrapping:
-BEFORE:
+STEP 1: Find the return statement in the component function. It looks like:
   return (
-    <div className=\"page\">
+    <div className=\"...\">
       ...content...
     </div>
   );
 
-AFTER:
+STEP 2: Add the opening tag IMMEDIATELY AFTER 'return (' on a NEW LINE with proper indentation:
   return (
     <JueshiV4PublicShell>
-      <div className=\"page\">
-        ...content...
+      <div className=\"...\">
+
+STEP 3: Add the closing tag BEFORE the closing ')' on a NEW LINE with proper indentation:
       </div>
     </JueshiV4PublicShell>
   );
+
+STEP 4: Ensure ALL content between 'return (' and ')' is indented one level deeper (typically 2 more spaces).
+
+CRITICAL WARNINGS:
+- Do NOT duplicate the 'return (' statement
+- Do NOT remove any existing code
+- Do NOT change the structure of the JSX, only wrap it
+- The opening <JueshiV4PublicShell> must be on its own line after 'return ('
+- The closing </JueshiV4PublicShell> must be on its own line before ')'
+- All existing JSX content must be indented 2 more spaces
+
+Example of CORRECT patch:
+--- a/src/app/example.tsx
++++ b/src/app/example.tsx
+@@ -10,7 +10,9 @@
+   ];
+ 
+   return (
++    <JueshiV4PublicShell>
+       <div className=\"page\">
+         <h1>Title</h1>
+       </div>
++    </JueshiV4PublicShell>
+   );
+ }
 
 OUTPUT FORMAT (raw unified diff, nothing else):
 diff --git a/path/to/file b/path/to/file
@@ -275,12 +295,52 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
   esac
 
   # ─── 8. Extract patch from stdout ───
-  if grep -q '^diff --git ' "$STDOUT_LOG"; then
-    # Extract from first "diff --git" to end of file
-    sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "$OUTPUT_PATCH"
+  if grep -q '^diff --git' "$STDOUT_LOG"; then
+    # Extract from first "diff --git" to end, then clean up
+    sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "${OUTPUT_PATCH}.raw"
+    
+    # Remove HTML tags that Claude sometimes outputs
+    sed -E 's/<[^>]*>//g' "${OUTPUT_PATCH}.raw" > "${OUTPUT_PATCH}.clean"
+    
+    # Add missing "--- a/" lines after each "diff --git" line
+    # Pattern: diff --git a/X b/X\n+++ b/X → need to insert --- a/X
+    python3 - "${OUTPUT_PATCH}.clean" "$OUTPUT_PATCH" <<'PYEOF'
+import sys, re
+from pathlib import Path
 
+raw = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
+out = sys.argv[2]
+
+lines = raw.split('\n')
+result = []
+i = 0
+while i < len(lines):
+    line = lines[i]
+    result.append(line)
+    
+    # After "diff --git a/X b/X", check if next line is "+++ b/X" without "--- a/X"
+    if line.startswith('diff --git a/'):
+        # Extract path from "diff --git a/PATH b/PATH"
+        m = re.match(r'diff --git a/(.*) b/(.*)', line)
+        if m:
+            a_path = m.group(1)
+            # Look ahead
+            if i + 1 < len(lines):
+                next_line = lines[i + 1]
+                if next_line.startswith('+++ b/'):
+                    # Missing "--- a/" line, insert it
+                    result.append(f'--- a/{a_path}')
+    
+    i += 1
+
+# Write cleaned patch
+Path(out).write_text('\n'.join(result), encoding="utf-8")
+print(f"Cleaned patch: {out}")
+PYEOF
+    rm -f "${OUTPUT_PATCH}.raw" "${OUTPUT_PATCH}.clean"
+    
     # Validate patch is non-empty and has expected structure
-    if [ -s "$OUTPUT_PATCH" ] && grep -q '^+++ b/' "$OUTPUT_PATCH"; then
+    if [ -s "$OUTPUT_PATCH" ] && grep -qF -- "+++ b/" "$OUTPUT_PATCH"; then
       PATCH_SIZE=$(wc -c < "$OUTPUT_PATCH" | tr -d ' ')
       PATCH_FILES=$(grep '^diff --git ' "$OUTPUT_PATCH" | wc -l | tr -d ' ')
       ok "Patch extracted: $OUTPUT_PATCH (${PATCH_SIZE} bytes, ${PATCH_FILES} files)"
