@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "id": "night2-guides-checklists-v4-shell-v3",
+    "run_id": "night-20260708-130326",
+    "completed": "2026-07-08T13:07:41.353250",
+    "result": "PATCH_APPLIED_BUILD_OK"
+  }
+]

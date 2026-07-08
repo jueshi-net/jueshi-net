@@ -1,9 +1,9 @@
 {
-  "status": "RUNNING",
-  "current_task": "\u53ea\u8f93\u51fa unified diff patch\uff0c\u4e0d\u8981\u4fee\u6539\u6587\u4ef6\u3002\u76ee\u6807\uff1a1. \u4fee\u6539 src/app/(public)/guides/page.tsx\uff0c\u5bfc\u5165 JueshiV4PublicShell\uff0c\u5e76\u7528 <JueshiV4PublicShell> \u5305\u88f9\u539f\u9875\u9762\u5185\u5bb9\u30022. \u4fee\u6539 src/app/(public)/checklists/page.tsx\uff0c\u540c\u6837\u5bfc\u5165\u5e76\u5305\u88f9 JueshiV4PublicShell\u30023. \u4fee\u6539 src/app/(public)/public-layout-client.tsx\uff0c\u6dfb\u52a0 isGuides = pathname === '/guides' \u4e0e isChecklists = pathname === '/checklists'\uff0c\u5e76\u52a0\u5165\u8df3\u8fc7\u666e\u901a Header/Footer \u6761\u4ef6\u3002\u7981\u6b62\u4fee\u6539\u4e1a\u52a1\u903b\u8f91\u3001API\u3001schema\u3001package\u3001middleware\u3001resources\u3001workspace\u3002\u4e0d\u8981\u8f93\u51fa\u89e3\u91ca\uff0c\u53ea\u8f93\u51fa git unified diff patch\u3002",
-  "last_run": "2026-07-08T07:52:00.084972",
-  "last_result": "QUEUE_EMPTY",
+  "status": "COMPLETED",
+  "current_task": null,
+  "last_run": "2026-07-08T13:03:26.574220",
+  "last_result": "PATCH_APPLIED_BUILD_OK",
   "version": "1.0",
   "created": "2026-07-08T07:25:00+08:00",
-  "run_id": "night-20260708-075159"
+  "run_id": "night-20260708-130326"
 }

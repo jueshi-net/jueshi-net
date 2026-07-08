@@ -1,13 +1,1 @@
-[
-  {
-    "id": "night2-guides-checklists-v4-shell",
-    "title": "Apply V4 Shell to guides and checklists pages",
-    "mode": "patch",
-    "allowed_files": [
-      "src/app/(public)/guides/page.tsx",
-      "src/app/(public)/checklists/page.tsx",
-      "src/app/(public)/public-layout-client.tsx"
-    ],
-    "prompt": "只输出 unified diff patch，不要修改文件。目标：1. 修改 src/app/(public)/guides/page.tsx，导入 JueshiV4PublicShell，并用 <JueshiV4PublicShell> 包裹原页面内容。2. 修改 src/app/(public)/checklists/page.tsx，同样导入并包裹 JueshiV4PublicShell。3. 修改 src/app/(public)/public-layout-client.tsx，添加 isGuides = pathname === '/guides' 与 isChecklists = pathname === '/checklists'，并加入跳过普通 Header/Footer 条件。禁止修改业务逻辑、API、schema、package、middleware、resources、workspace。不要输出解释，只输出 git unified diff patch。"
-  }
-]
+[]

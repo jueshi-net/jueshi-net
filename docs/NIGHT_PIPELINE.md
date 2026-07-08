@@ -541,6 +541,214 @@ rm -f .hermes/pipeline/locks/*
 
 ---
 
+## 10. Night Pipeline V3 实际运行总结
+
+### 10.1 成功点
+
+#### ✅ V3 模式验证成功
+- **Full-file Proposal 模式有效**：Claude 输出完整文件内容，脚本生成 patch，避免了 V2 的格式错误问题
+- **Design System 基础组件建立**：成功创建 14 个基础组件（PageContainer, PageHero, SectionHeader 等）
+- **Build 验证通过**：所有组件通过 TypeScript 类型检查和 Next.js 构建
+- **文档完整**：生成了组件索引文档和架构方案文档
+
+#### ✅ 工作流程优化
+- **Proposal 目录结构清晰**：`.hermes/pipeline/proposals/<task-id>/` 便于审查和调试
+- **Patch 生成自动化**：脚本自动对比原始文件和 proposal 文件，生成 unified diff
+- **错误处理完善**：缺少文件、超出 allowlist、空 patch 等情况都有明确的错误码
+
+#### ✅ 实际案例
+```bash
+# Design System 基础组件建立任务
+Task ID: design-system-v1-foundation
+Mode: full-file-proposal
+Files: 14 个组件 + index.ts + 文档
+Result: ✅ 成功
+```
+
+### 10.2 失败点
+
+#### ❌ V2 模式失败案例
+- **Patch 格式错误**：Claude 生成的 unified diff 经常有 hunk header 行数不匹配
+- **Context line 不匹配**：Claude 无法准确记住文件的实际内容，导致 patch 应用失败
+- **需要人工干预**：多次尝试后仍需手动修复 patch，效率低下
+
+#### ❌ V1 模式失败案例
+- **直接编辑风险高**：Claude 直接修改文件，无法审查和回滚
+- **缺乏版本控制**：修改后难以追踪变更历史
+- **错误难以定位**：出现问题时难以确定是哪一步出错
+
+### 10.3 经验
+
+#### 模式选择
+1. **优先使用 V3 (Full-file Proposal)**：
+   - 适用于：组件创建、页面重构、批量修改
+   - 优势：Claude 只需理解需求，不需要掌握 diff 格式
+   - 成功率：接近 100%
+
+2. **避免使用 V2 (Patch Generation)**：
+   - 问题：Claude 生成的 patch 格式错误率高
+   - 适用场景：仅限简单、小范围修改
+   - 成功率：约 60-70%
+
+3. **禁止使用 V1 (Direct Edit)**：
+   - 风险：无法审查、无法回滚
+   - 适用场景：无（已废弃）
+
+#### 任务设计
+1. **明确 allowlist**：
+   - 必须明确指定允许修改的文件路径
+   - 避免使用通配符（如 `src/**`）
+   - 示例：`["src/components/design-system/PageContainer.tsx"]`
+
+2. **详细的 prompt**：
+   - 说明修改目的和预期结果
+   - 提供具体的技术要求（TypeScript、Tailwind、响应式等）
+   - 明确禁止事项（不要修改业务逻辑、不要引入新依赖等）
+
+3. **分阶段执行**：
+   - 大任务拆分为多个小任务
+   - 每个任务完成后验证
+   - 避免一次性修改过多文件
+
+#### 调试技巧
+1. **查看 proposal 文件**：
+   ```bash
+   cat .hermes/pipeline/proposals/<task-id>/src/components/design-system/PageContainer.tsx
+   ```
+
+2. **手动生成 patch**：
+   ```bash
+   diff -u original.tsx proposal.tsx > manual.patch
+   ```
+
+3. **检查错误日志**：
+   ```bash
+   cat .hermes/pipeline/patches/<task-id>.stderr.txt
+   ```
+
+### 10.4 禁止事项
+
+#### 绝对禁止
+- ❌ **禁止修改硬禁止文件**：
+  - `package.json` / `package-lock.json`
+  - `prisma/schema.prisma`
+  - `src/middleware.ts`
+  - `src/app/api/**`
+  - `.env` 文件
+
+- ❌ **禁止触碰 production**：
+  - 不直接修改 production 数据库
+  - 不直接部署到 production 环境
+  - 不修改 9833416@qq.com 相关配置
+
+- ❌ **禁止使用 V1 模式**：
+  - 不使用 Claude 直接编辑文件
+  - 不使用 `acceptEdits` 或 `bypassPermissions`
+
+#### 谨慎操作
+- ⚠️ **修改业务逻辑前必须确认**：
+  - 确认修改不会影响现有功能
+  - 确认有完整的测试覆盖
+  - 确认可以回滚
+
+- ⚠️ **大批量修改前必须 dry-run**：
+  ```bash
+  ./scripts/night-run.sh --dry-run
+  ```
+
+- ⚠️ **修改前必须备份**：
+  ```bash
+  git add .
+  git commit -m "backup before night pipeline"
+  ```
+
+### 10.5 最佳实践
+
+#### 任务准备
+1. **明确目标**：
+   ```markdown
+   目标：创建 PageContainer 组件
+   要求：
+   - TypeScript + React
+   - Tailwind CSS
+   - 响应式设计
+   - 支持 Dark Mode
+   ```
+
+2. **指定 allowlist**：
+   ```json
+   {
+     "allowlist": [
+       "src/components/design-system/PageContainer.tsx"
+     ]
+   }
+   ```
+
+3. **提供上下文**：
+   - 相关文件路径
+   - 依赖的组件
+   - 预期的使用场景
+
+#### 执行流程
+1. **Dry-run 验证**：
+   ```bash
+   ./scripts/night-run.sh --dry-run
+   ```
+
+2. **执行任务**：
+   ```bash
+   ./scripts/night-run.sh
+   ```
+
+3. **审查 proposal**：
+   ```bash
+   ls -la .hermes/pipeline/proposals/<task-id>/
+   cat .hermes/pipeline/proposals/<task-id>/src/components/design-system/PageContainer.tsx
+   ```
+
+4. **验证 patch**：
+   ```bash
+   cat .hermes/pipeline/patches/<task-id>.patch
+   ```
+
+5. **应用并测试**：
+   ```bash
+   npm run build
+   npm run dev
+   ```
+
+#### 错误处理
+1. **Proposal 缺失文件**：
+   - 错误码：`FULL_FILE_PROPOSAL_MISSING_FILE`
+   - 解决：重新执行任务，或手动创建缺失文件
+
+2. **Proposal 超出 allowlist**：
+   - 错误码：`FULL_FILE_PROPOSAL_OUTSIDE_ALLOWLIST`
+   - 解决：检查 allowlist 配置，或调整 prompt
+
+3. **Patch 为空**：
+   - 错误码：`FULL_FILE_PROPOSAL_EMPTY_PATCH`
+   - 解决：检查 proposal 文件是否与原始文件相同
+
+4. **Build 失败**：
+   - 解决：查看构建错误，修复 proposal 文件，重新生成 patch
+
+#### 性能优化
+1. **并行执行**：
+   - 多个独立任务可以并行执行
+   - 使用不同的 task-id 避免冲突
+
+2. **缓存 proposal**：
+   - 保留 proposal 文件用于调试
+   - 定期清理旧的 proposal 目录
+
+3. **监控资源**：
+   ```bash
+   ./scripts/hermes-health-check.sh
+   ```
+
+---
+
 **文档版本**: v3.0  
 **创建时间**: 2026-07-08  
 **更新时间**: 2026-07-08  

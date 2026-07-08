@@ -547,3 +547,300 @@ interface NavigationItem {
 ## 实施路线图总结
 
 Jueshi Design System v1 将通过渐进式方法实施，从基础组件开始，逐步扩展到高级组件和业务组件。该设计系统旨在提高开发效率、增强用户体验并确保 UI 一致性。通过分阶段实施和严格的迁移计划，我们可以在最小化风险的同时获得最大的效益。
+
+---
+
+## 17. Progress (进度)
+
+### 17.1 已完成阶段
+
+#### Phase 1: 架构审计 (✅ 完成)
+- ✅ 完成项目 UI 组件现状审计
+- ✅ 识别可复用组件和应废弃组件
+- ✅ 制定 Design System v1 组件清单
+- ✅ 定义核心组件规范 (PageHero, PageContainer, SectionHeader 等)
+- ✅ 输出完整架构方案文档
+
+#### Phase 2: 基础组件建立 (✅ 完成)
+- ✅ 创建 `src/components/design-system/` 目录
+- ✅ 实现 14 个基础组件:
+  - PageContainer
+  - PageHero
+  - SectionHeader
+  - ContentSection
+  - StatsGrid
+  - StatsCard
+  - ActionCard
+  - EmptyState
+  - PageCTA
+  - StickySidebar
+  - FilterToolbar
+  - BreadcrumbBar
+  - TagGroup
+  - StatusBadge
+- ✅ 创建 `index.ts` 统一导出
+- ✅ 生成组件索引文档 (`docs/DESIGN_SYSTEM_COMPONENT_INDEX.md`)
+- ✅ Build 验证通过
+
+### 17.2 当前状态
+
+- **Design System 版本**: v1.0 (Foundation)
+- **组件数量**: 14 个基础组件
+- **代码位置**: `src/components/design-system/`
+- **文档位置**: `docs/DESIGN_SYSTEM_COMPONENT_INDEX.md`
+- **Build 状态**: ✅ 通过
+
+---
+
+## 18. Current Coverage (当前覆盖)
+
+### 18.1 组件覆盖情况
+
+#### 已实现组件 (14 个)
+
+| 组件 | 状态 | 使用场景 |
+|------|------|----------|
+| PageContainer | ✅ 已实现 | 页面主容器 |
+| PageHero | ✅ 已实现 | 页面英雄区域 |
+| SectionHeader | ✅ 已实现 | 章节标题 |
+| ContentSection | ✅ 已实现 | 内容区块 |
+| StatsGrid | ✅ 已实现 | 统计数据网格 |
+| StatsCard | ✅ 已实现 | 统计卡片 |
+| ActionCard | ✅ 已实现 | 行动卡片 |
+| EmptyState | ✅ 已实现 | 空状态 |
+| PageCTA | ✅ 已实现 | 页面行动号召 |
+| StickySidebar | ✅ 已实现 | 粘性侧边栏 |
+| FilterToolbar | ✅ 已实现 | 筛选工具栏 |
+| BreadcrumbBar | ✅ 已实现 | 面包屑导航 |
+| TagGroup | ✅ 已实现 | 标签组 |
+| StatusBadge | ✅ 已实现 | 状态徽章 |
+
+### 18.2 页面覆盖情况
+
+#### 已使用 Design System 的页面 (0 个)
+
+目前 Design System 组件已建立但尚未应用到任何业务页面。
+
+#### 待迁移页面 (12 个)
+
+| 页面 | 优先级 | 预计使用组件 | 复杂度 |
+|------|--------|--------------|--------|
+| `/about` | P1 | PageContainer, PageHero, SectionHeader | 低 |
+| `/contact` | P1 | PageContainer, PageHero, ActionCard | 低 |
+| `/guides` | P2 | PageContainer, PageHero, FilterToolbar, StatsGrid | 中 |
+| `/checklists` | P2 | PageContainer, PageHero, FilterToolbar, StatsGrid | 中 |
+| `/resources` | P2 | PageContainer, PageHero, FilterToolbar | 中 |
+| `/tools` | P2 | PageContainer, PageHero, FilterToolbar | 中 |
+| `/destinations` | P2 | PageContainer, PageHero, FilterToolbar | 中 |
+| `/topics` | P3 | PageContainer, PageHero, FilterToolbar | 中 |
+| `/search` | P3 | PageContainer, PageHero, FilterToolbar | 中 |
+| `/resources/site/[id]` | P3 | PageContainer, BreadcrumbBar, StickySidebar | 高 |
+| `/workspace/*` | P4 | PageContainer, SectionHeader, ActionCard | 高 |
+| `/workspace/settings` | P4 | PageContainer, SectionHeader, StatusBadge | 高 |
+
+### 18.3 覆盖率统计
+
+- **组件实现率**: 14/14 (100%) - 基础组件全部完成
+- **页面覆盖率**: 0/12 (0%) - 尚未应用到业务页面
+- **总体进度**: 50% (组件完成，页面待迁移)
+
+---
+
+## 19. Remaining Coverage (剩余覆盖)
+
+### 19.1 待实现组件
+
+#### Phase 3: 表单组件 (预计 8 个)
+- [ ] Input - 输入框
+- [ ] Select - 选择器
+- [ ] Checkbox - 复选框
+- [ ] Radio - 单选框
+- [ ] Textarea - 文本域
+- [ ] Switch - 开关
+- [ ] DatePicker - 日期选择器
+- [ ] FileUpload - 文件上传
+
+#### Phase 4: 反馈组件 (预计 4 个)
+- [ ] Modal - 弹窗
+- [ ] Toast - 提示消息
+- [ ] Alert - 警告框
+- [ ] Tooltip - 工具提示
+
+#### Phase 5: 数据展示组件 (预计 4 个)
+- [ ] DataTable - 数据表格
+- [ ] Pagination - 分页
+- [ ] Tabs - 标签页
+- [ ] Accordion - 手风琴
+
+#### Phase 6: 导航组件 (预计 3 个)
+- [ ] Dropdown - 下拉菜单
+- [ ] Menu - 菜单
+- [ ] Sidebar - 侧边栏导航
+
+### 19.2 待迁移页面
+
+#### 高优先级 (P1) - 预计 2 个页面
+- [ ] `/about` - 关于我们
+- [ ] `/contact` - 联系我们
+
+#### 中优先级 (P2) - 预计 5 个页面
+- [ ] `/guides` - 指南列表
+- [ ] `/checklists` - 清单列表
+- [ ] `/resources` - 资源列表
+- [ ] `/tools` - 工具列表
+- [ ] `/destinations` - 目的地列表
+
+#### 低优先级 (P3) - 预计 3 个页面
+- [ ] `/topics` - 专题列表
+- [ ] `/search` - 搜索结果
+- [ ] `/resources/site/[id]` - 资源详情
+
+#### 最低优先级 (P4) - 预计 2 个页面
+- [ ] `/workspace/*` - 工作区页面
+- [ ] `/workspace/settings` - 设置页面
+
+### 19.3 剩余工作量估算
+
+| 阶段 | 工作内容 | 预计工时 | 风险等级 |
+|------|----------|----------|----------|
+| Phase 3 | 表单组件开发 | 16-20 小时 | 中 |
+| Phase 4 | 反馈组件开发 | 8-12 小时 | 低 |
+| Phase 5 | 数据展示组件 | 12-16 小时 | 高 |
+| Phase 6 | 导航组件开发 | 8-12 小时 | 中 |
+| P1 页面迁移 | 2 个简单页面 | 4-6 小时 | 低 |
+| P2 页面迁移 | 5 个中等页面 | 20-30 小时 | 中 |
+| P3 页面迁移 | 3 个复杂页面 | 15-20 小时 | 高 |
+| P4 页面迁移 | 2 个高复杂页面 | 20-30 小时 | 高 |
+| **总计** | **全部剩余工作** | **103-146 小时** | - |
+
+---
+
+## 20. Roadmap (路线图)
+
+### 20.1 Phase 3: 表单组件 (预计 2 周)
+
+**目标**: 完成表单相关组件，支持用户输入场景
+
+**关键组件**:
+- Input (文本输入)
+- Select (下拉选择)
+- Checkbox (复选框)
+- Radio (单选框)
+- Textarea (文本域)
+
+**验收标准**:
+- 所有组件支持 TypeScript 类型定义
+- 支持响应式设计
+- 支持 Dark Mode
+- 支持表单验证
+- 无障碍访问 (a11y) 支持
+
+**预计交付**: 第 3-4 周
+
+### 20.2 Phase 4: 反馈组件 (预计 1 周)
+
+**目标**: 完成用户反馈相关组件
+
+**关键组件**:
+- Modal (弹窗)
+- Toast (提示消息)
+- Alert (警告框)
+- Tooltip (工具提示)
+
+**验收标准**:
+- 支持动画效果
+- 支持自定义位置
+- 支持自动关闭
+- 支持键盘操作
+
+**预计交付**: 第 5 周
+
+### 20.3 Phase 5: 数据展示组件 (预计 2 周)
+
+**目标**: 完成复杂数据展示组件
+
+**关键组件**:
+- DataTable (数据表格)
+- Pagination (分页)
+- Tabs (标签页)
+- Accordion (手风琴)
+
+**验收标准**:
+- 支持大数据量渲染
+- 支持排序和筛选
+- 支持虚拟滚动
+- 支持自定义列
+
+**预计交付**: 第 6-7 周
+
+### 20.4 Phase 6: 导航组件 (预计 1 周)
+
+**目标**: 完成导航相关组件
+
+**关键组件**:
+- Dropdown (下拉菜单)
+- Menu (菜单)
+- Sidebar (侧边栏导航)
+
+**验收标准**:
+- 支持多级菜单
+- 支持键盘导航
+- 支持响应式折叠
+
+**预计交付**: 第 8 周
+
+### 20.5 页面迁移计划
+
+#### 第 9-10 周: P1 页面迁移
+- `/about` - 关于我们
+- `/contact` - 联系我们
+
+#### 第 11-14 周: P2 页面迁移
+- `/guides` - 指南列表
+- `/checklists` - 清单列表
+- `/resources` - 资源列表
+- `/tools` - 工具列表
+- `/destinations` - 目的地列表
+
+#### 第 15-18 周: P3 页面迁移
+- `/topics` - 专题列表
+- `/search` - 搜索结果
+- `/resources/site/[id]` - 资源详情
+
+#### 第 19-22 周: P4 页面迁移
+- `/workspace/*` - 工作区页面
+- `/workspace/settings` - 设置页面
+
+### 20.6 里程碑
+
+| 里程碑 | 目标 | 预计完成时间 |
+|--------|------|--------------|
+| M1 | Design System v1 基础组件完成 | ✅ 已完成 (2026-07-08) |
+| M2 | 表单组件完成 | 第 4 周末 |
+| M3 | 所有组件完成 | 第 8 周末 |
+| M4 | P1 页面迁移完成 | 第 10 周末 |
+| M5 | P2 页面迁移完成 | 第 14 周末 |
+| M6 | 所有页面迁移完成 | 第 22 周末 |
+| M7 | Design System v2 发布 | 第 24 周末 |
+
+### 20.7 长期目标
+
+#### Design System v2 (第 24 周)
+- 组件数量: 30+ 个
+- 页面覆盖率: 100%
+- 支持主题切换
+- 完整的文档和示例
+- 自动化测试覆盖
+
+#### Design System v3 (第 36 周)
+- 支持多品牌
+- 支持国际化
+- 性能优化
+- 无障碍访问优化
+- 移动端优化
+
+---
+
+**文档版本**: v1.0  
+**最后更新**: 2026-07-08  
+**维护者**: Jueshi Development Team
