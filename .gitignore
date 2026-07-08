@@ -104,3 +104,9 @@ tools/jueshi-audit/evidence/
 
 # ContentOps logs (may contain sensitive data)
 logs/
+
+# Night Pipeline runtime artifacts (generated per-run, not source code)
+.hermes/pipeline/patches/
+.hermes/pipeline/proposals/
+.hermes/pipeline/locks/
+.patch-backups/
