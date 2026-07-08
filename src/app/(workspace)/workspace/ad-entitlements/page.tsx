@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Megaphone, Calendar, CheckCircle2, AlertCircle, Plus } from "lucide-react";
-import { SectionCard, MetricCard, SaasEmptyState } from "@/components/saas";
+import { SectionCard, MetricCard } from "@/components/saas";
+import { EmptyState } from "@/components/design-system";
 
 export const metadata: Metadata = {
   title: "广告权益 — 绝世百宝箱",
@@ -152,7 +153,7 @@ export default async function AdEntitlementsPage() {
         }
       >
         {applications.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="暂无申请记录"
             description="您还没有提交过广告权益申请"

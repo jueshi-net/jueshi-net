@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Plus, Edit2, Search, X, Save, Loader2, Trash2, Eye, EyeOff, ExternalLink, AlertTriangle, ChevronDown, ChevronRight, ArrowUp, ArrowDown, Layout } from "lucide-react";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { StatusBadge } from "@/components/saas/StatusBadge";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
+import { EmptyState } from "@/components/design-system/EmptyState";
 import { CompactTable } from "@/components/saas/CompactTable";
 
 const PAGE_TYPES = ["country", "tool", "topic", "guide", "city", "postal", "landing", "checklist"];
@@ -791,7 +791,7 @@ export default function LandingPagesClient() {
             加载中...
           </div>
         ) : pages.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="暂无落地页配置"
             description="点击「新建落地页」创建第一个落地页"

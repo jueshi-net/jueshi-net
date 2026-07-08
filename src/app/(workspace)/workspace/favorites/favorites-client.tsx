@@ -5,10 +5,10 @@ import { Heart, ExternalLink, Star, Package, Truck, MapPin, FileText, Calculator
 import Link from "next/link";
 import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { ActionCard } from "@/components/saas/ActionCard";
+import { ActionCard } from "@/components/design-system/ActionCard";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
-import { StatusBadge } from "@/components/saas/StatusBadge";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
+import { EmptyState } from "@/components/design-system/EmptyState";
 
 const TAB_CONFIG = [
   { key: "all", label: "全部", emoji: "📋" },
@@ -164,14 +164,14 @@ export default function FavoritesClient({ favorites }: { favorites: any[] }) {
         {filtered.length === 0 ? (
           <>
             {searchTerm ? (
-              <SaasEmptyState
+              <EmptyState
                 variant="no-results"
                 title="未找到匹配的收藏"
                 description="尝试其他搜索关键词"
               />
             ) : (
               <>
-                <SaasEmptyState
+                <EmptyState
                   variant="no-data"
                   title={filter === "tool" ? "还没有收藏任何工具" : filter === "url" ? "还没有收藏任何网址" : "还没有收藏任何资源"}
                   description="浏览工具中心和专题库，点击收藏按钮即可添加"

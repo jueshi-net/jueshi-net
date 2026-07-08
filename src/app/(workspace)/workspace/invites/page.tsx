@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Copy, Check, Gift, Users, Calendar, Award } from 'lucide-react';
-import { WorkspacePageHeader, CompactTable, SaasEmptyState, StatusBadge, MetricCard, SectionCard } from '@/components/saas';
+import { WorkspacePageHeader, CompactTable, MetricCard, SectionCard } from '@/components/saas';
+import { StatusBadge } from '@/components/design-system';
+import { EmptyState } from '@/components/design-system';
 import { track } from '@/lib/analytics';
 
 interface InviteCode {
@@ -229,7 +231,7 @@ export default function InvitesPage() {
 
         {/* 邀请码列表 */}
         {inviteCodes.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="还没有邀请码"
             description="生成您的专属邀请码，邀请好友注册获得奖励"

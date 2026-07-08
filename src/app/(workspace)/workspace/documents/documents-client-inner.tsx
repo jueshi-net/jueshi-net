@@ -13,9 +13,9 @@ import {
 import { MetricCard } from '@/components/saas/MetricCard';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
-import { StatusBadge } from '@/components/saas/StatusBadge';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
 import { CompactTable } from '@/components/saas/CompactTable';
-import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
+import { EmptyState } from '@/components/design-system/EmptyState';
 
 const TOOL_KEY_LABELS: Record<string, string> = {
   commercial_invoice: '外贸发票',
@@ -287,7 +287,7 @@ export default function DocumentsClientInner() {
 
   if (loginRequired) {
     return (
-      <SaasEmptyState
+      <EmptyState
         variant="no-access"
         title="请先登录"
         description="查看和管理单据草稿需要登录后使用"
@@ -403,7 +403,7 @@ export default function DocumentsClientInner() {
 
         {/* Draft List - CompactTable */}
         {filteredByDate.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="暂无单据草稿"
             description="点击下方按钮选择单据类型开始创建"

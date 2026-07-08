@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Bell, CheckCircle, Clock, Loader2, ExternalLink, Mail, TrendingUp, AlertTriangle, Gift, Filter, Calendar, Zap, MessageCircle } from "lucide-react";
 import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { StatusBadge } from "@/components/saas/StatusBadge";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { EmptyState } from "@/components/design-system/EmptyState";
 
 const TYPE_CONFIG: Record<string, { label: string; emoji: string; color: string; variant: "info" | "success" | "warning" | "processing" | "neutral" | "danger" }> = {
   system: { label: "系统通知", emoji: "🔔", color: "bg-blue-50 text-blue-700 border-blue-200", variant: "info" },
@@ -217,7 +217,7 @@ export default function NotificationsClient() {
             <p className="text-gray-500 mt-2">加载通知...</p>
           </div>
         ) : filteredNotifications.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant={filter === "unread" ? "no-data" : "no-data"}
             title={filter === "unread" ? "太棒了！没有未读通知" : "暂无通知"}
             description={filter === "unread"

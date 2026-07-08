@@ -5,8 +5,8 @@ import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, D
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { MetricCard } from '@/components/saas/MetricCard';
-import { StatusBadge } from '@/components/saas/StatusBadge';
-import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
+import { EmptyState } from '@/components/design-system/EmptyState';
 
 interface ResourceItem {
   id: string;
@@ -424,7 +424,7 @@ export default function AdminResourcesPage() {
           <span className="text-sm text-gray-400">加载中...</span>
         </div>
       ) : resources.length === 0 ? (
-        <SaasEmptyState
+        <EmptyState
           variant="no-data"
           title="暂无网址"
           description="点击「添加网址」开始管理导航目录"

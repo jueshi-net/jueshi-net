@@ -22,7 +22,7 @@ import TodayTasks from "@/components/user/TodayTasks";
 import RecentTools from "@/components/user/RecentTools";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { MetricCard } from "@/components/saas/MetricCard";
-import { ActionCard } from "@/components/saas/ActionCard";
+import { ActionCard } from "@/components/design-system/ActionCard";
 import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
 
 export const metadata: Metadata = {

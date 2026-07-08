@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { ActionCard } from "@/components/saas/ActionCard";
-import { StatusBadge } from "@/components/saas/StatusBadge";
+import { ActionCard } from "@/components/design-system/ActionCard";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 
 interface TaskData {
