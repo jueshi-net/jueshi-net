@@ -305,11 +305,15 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
 import sys, re
 from pathlib import Path
 
-raw = Path(sys.argv[1]).read_text(encoding="utf-8", errors="ignore")
-out = sys.argv[2]
+raw_path = sys.argv[1]
+out_path = sys.argv[2]
+
+raw = Path(raw_path).read_text(encoding="utf-8", errors="ignore")
 
 lines = raw.split('\n')
 result = []
+
+# First pass: clean HTML tags from non-diff lines
 for line in lines:
     # Skip EOF markers
     if line.strip() == '# EOF':
@@ -325,8 +329,30 @@ for line in lines:
         if cleaned.strip():  # Only keep non-empty lines
             result.append(cleaned)
 
-Path(out).write_text('\n'.join(result), encoding="utf-8")
-print(f"Cleaned patch: {out}")
+# Second pass: add missing "--- a/" lines
+final_result = []
+i = 0
+while i < len(result):
+    line = result[i]
+    final_result.append(line)
+    
+    # After "diff --git a/X b/X", check if next line is "+++ b/X" without "--- a/X"
+    if line.startswith('diff --git a/'):
+        # Extract path from "diff --git a/PATH b/PATH"
+        m = re.match(r'diff --git a/(.*) b/(.*)', line)
+        if m:
+            a_path = m.group(1)
+            # Look ahead
+            if i + 1 < len(result):
+                next_line = result[i + 1]
+                if next_line.startswith('+++ b/') and not next_line.startswith('--- a/'):
+                    # Missing "--- a/" line, insert it
+                    final_result.append(f'--- a/{a_path}')
+    
+    i += 1
+
+Path(out_path).write_text('\n'.join(final_result), encoding="utf-8")
+print(f"Cleaned patch: {out_path}")
 PYEOF
     
     # Add missing "--- a/" lines after each "diff --git" line
