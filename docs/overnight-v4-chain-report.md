@@ -498,6 +498,82 @@ CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN
 
 ---
 
+## Night 2 执行记录（2026-07-08 09:00-10:20）
+
+### 任务目标
+将 V4 Shell 应用到 `/guides` 和 `/checklists` 页面，使用 Patch Pipeline V2（Readonly Claude Patch Mode）。
+
+### 执行结果
+**技术成功，视觉验收失败，已回滚**
+
+#### 技术执行
+- ✅ Patch Pipeline V2 脚本修复完成（macOS timeout 兼容、patch 格式清理）
+- ✅ Claude Code 成功生成 patch（只读模式，未直接修改文件）
+- ✅ `git apply --check` 验证通过
+- ✅ `npm run build` 成功
+- ✅ `deploy-staging.sh` 成功
+- ✅ PM2 restart 成功
+- ✅ curl 验证 HTTP 200
+
+#### 视觉验收
+- ❌ https://i.jueshi.net/guides 显示 "This page couldn't load"
+- ❌ https://i.jueshi.net/checklists 显示 "This page couldn't load"
+- ✅ https://i.jueshi.net/tools 正常
+- ✅ https://i.jueshi.net/destinations 正常
+- ✅ https://i.jueshi.net/resources 正常
+
+#### Runtime Error 诊断
+**PM2 日志错误**：
+```
+⨯ Error: Element type is invalid: expected a string (for built-in components) 
+or a class/function (for composite components) but got: undefined.
+```
+
+**根因分析**：
+- `JueshiV4PublicShell` 组件在运行时为 `undefined`
+- 可能原因：Server/Client boundary 问题
+- `/guides` 和 `/checklists` 是 async server page，`JueshiV4PublicShell` 可能包含 `'use client'` 指令
+- 需要进一步审计 Server/Client 边界
+
+#### 回滚操作
+- ✅ `git revert --no-edit f922472` 成功
+- ✅ 回滚 commit: `5e203ce` - Revert "feat: apply V4 shell to /guides and /checklists pages"
+- ✅ `npm run build` 成功
+- ✅ `deploy-staging.sh` 成功
+- ✅ 所有页面恢复正常
+
+#### 验证结果
+- ✅ https://i.jueshi.net/guides - 200，内容正常（"海外实用指南"）
+- ✅ https://i.jueshi.net/checklists - 200，内容正常（"实用清单"）
+- ✅ https://i.jueshi.net/tools - 200
+- ✅ https://i.jueshi.net/destinations - 200
+- ✅ https://i.jueshi.net/resources - 200
+
+### 经验教训
+1. **curl 200 不代表验收通过**：HTTP 200 只表示服务器响应正常，不代表页面内容正确渲染
+2. **Server/Client boundary 需要预先审计**：async server page 不能直接包裹包含 `'use client'` 的组件
+3. **视觉验收是必须的**：技术成功 ≠ 业务成功，必须有用户视觉验收环节
+
+### 下一步建议
+**改为先审计页面 Server/Client 边界，再单页 patch**
+
+1. 审计 `JueshiV4PublicShell` 是否包含 `'use client'` 指令
+2. 审计 `/guides` 和 `/checklists` 是否是 async server page
+3. 如果存在 Server/Client boundary 冲突，需要：
+   - 方案 A：创建 server-compatible 版本的 Shell 组件
+   - 方案 B：将页面改为 client page（不推荐，影响 SEO）
+   - 方案 C：使用 dynamic import + ssr: false（不推荐，影响首屏性能）
+4. 审计完成后再重新执行 Night 2 任务
+
+### Commit 记录
+- `f922472` - feat: apply V4 shell to /guides and /checklists pages（已回滚）
+- `5e203ce` - Revert "feat: apply V4 shell to /guides and /checklists pages"
+
+### 最终状态
+**NIGHT2_ROLLED_BACK_GUIDES_CHECKLISTS_RECOVERED**
+
+---
+
 **报告生成时间**: 2026-07-08 00:05:22 CST  
 **报告生成者**: Hermes  
 **任务状态**: CLAUDE_CODE_RATE_LIMITED_PAUSED  
