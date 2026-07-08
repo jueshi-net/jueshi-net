@@ -299,8 +299,8 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
     # Extract from first "diff --git" to end, then clean up
     sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "${OUTPUT_PATCH}.raw"
     
-    # Remove HTML tags that Claude sometimes outputs
-    sed -E 's/<[^>]*>//g' "${OUTPUT_PATCH}.raw" > "${OUTPUT_PATCH}.clean"
+    # Remove HTML tags and EOF markers that Claude sometimes outputs
+    sed -E 's/<[^>]*>//g; /^# EOF$/d; /^<!--.*-->$/d' "${OUTPUT_PATCH}.raw" > "${OUTPUT_PATCH}.clean"
     
     # Add missing "--- a/" lines after each "diff --git" line
     # Pattern: diff --git a/X b/X\n+++ b/X → need to insert --- a/X
