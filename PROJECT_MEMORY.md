@@ -11,9 +11,9 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Phase 3 完成 → 等待 Night 3 |
+| **当前阶段** | Phase 4 进行中 → Night 4 完成 |
 | **阶段目标** | V4 Shell 统一 + Design System 应用 |
-| **Phase 1** | ✅ V4 Shell 统一（7/221 页面，3.2%） |
+| **Phase 1** | ✅ V4 Shell 统一（9/221 页面，4.1%） |
 | **Phase 2** | ✅ Night Pipeline V3 建立 |
 | **Phase 3** | ✅ Design System V1 建立（14 组件，0% 应用） |
 | **Phase 4** | ⏳ 待开始：V4 Shell 扩展 + Design System 应用 |
@@ -66,7 +66,7 @@ ui/overnight-polish-phase1
 
 ## 5. 已完成页面
 
-### V4 Shell 统一 (7 个 Production 页面)
+### V4 Shell 统一 (9 个 Production 页面)
 
 | 页面 | Shell | 状态 |
 |------|-------|------|
@@ -77,6 +77,8 @@ ui/overnight-polish-phase1
 | `/destinations` | JueshiV4PublicShell | ✅ Production |
 | `/guides` | JueshiV4PublicShell | 🟡 Staging（待验收） |
 | `/checklists` | JueshiV4PublicShell | 🟡 Staging（待验收） |
+| `/topics` | JueshiV4PublicShell | ✅ Staging（Night 4 完成） |
+| `/search` | JueshiV4PublicShell | ✅ Staging（Night 4 完成） |
 
 ### 未统一页面 (214 个)
 

@@ -183,7 +183,7 @@
 
 | 指标 | 数值 | 目标 | 差距 |
 |------|------|------|------|
-| V4 Shell 覆盖率 | 3.6% | 80% | -76.4% |
+| V4 Shell 覆盖率 | 4.1% | 80% | -75.9% |
 | Design System 覆盖率 | 0% | 80% | -80% |
 | 测试覆盖率 | ~10% | 60% | -50% |
 
@@ -425,9 +425,38 @@
 
 ---
 
-**文档状态**: EXECUTIVE_SUMMARY_COMPLETED  
-**生成时间**: 2026-07-09 00:10 CST  
-**审计状态**: PROJECT_INVENTORY_AUDIT_COMPLETED
+### Night 4 完成报告 (2026-07-09)
+
+**任务**: V4 Shell 统一 - /topics 和 /search 页面
+
+**完成内容**:
+- ✅ /topics 页面已统一 V4 Shell
+- ✅ /search 页面已统一 V4 Shell
+- ✅ public-layout-client.tsx 已更新跳过逻辑
+
+**覆盖率变化**:
+- V4 Shell 覆盖率: 3.2% (7/221) → 4.1% (9/221)
+- Design System 覆盖率: 0% (未变化)
+
+**技术细节**:
+- Pipeline: Night Pipeline V3 (Full-file Proposal Mode)
+- Claude Code 生成 3 个 Proposal 文件
+- 生成 3 个 Patch 文件
+- Build 成功，部署到 staging
+- 所有页面 HTTP 200 验证通过
+
+**修改的文件**:
+1. `src/app/(public)/topics/page.tsx` - 包裹 JueshiV4PublicShell
+2. `src/app/(public)/search/page.tsx` - 包裹 JueshiV4PublicShell
+3. `src/app/(public)/public-layout-client.tsx` - 添加跳过条件
+
+**生成的文档**:
+- `docs/night4/NIGHT4_DESIGN_REVIEW.md` - 设计评审
+- `docs/night4/NIGHT4_REFACTOR_PLAN.md` - 重构计划
+
+**下一步**:
+- Night 5: Design System 试点（/about, /contact）
+- Night 6: 继续 V4 Shell 统一（/blog, /blog/[slug]）
 
 ---
 

@@ -152,18 +152,18 @@
 | 字段 | 值 |
 |------|-----|
 | **页面** | `/topics`, `/topics/[slug]` |
-| **Layout** | PublicLayoutClient（旧 Header/Footer） |
+| **Layout** | JueshiV4PublicShell（Night 4 统一） |
 | **API** | `/api/topics` |
 | **Database** | `Topic` |
 | **Admin** | `/admin/content/topics`, `/admin/content/topics/[id]/edit`, `/admin/topics` |
-| **Components** | 旧版 Header/Footer |
+| **Components** | JueshiV4PublicShell, TopicCard |
 | **Design System** | ❌ 未使用 |
 | **Dependencies** | Prisma |
-| **Status** | ✅ Production（未统一 V4 Shell） |
+| **Status** | ✅ Production（V4 Shell 已统一） |
 | **Owner** | 开发团队 |
 | **Priority** | P0 |
 | **Related Features** | Guides, Resources, Community |
-| **TODO** | V4 Shell 统一（Night 3 任务） |
+| **TODO** | ✅ V4 Shell 已统一（Night 4 完成） |
 
 ---
 
@@ -172,18 +172,18 @@
 | 字段 | 值 |
 |------|-----|
 | **页面** | `/search` |
-| **Layout** | PublicLayoutClient（旧 Header/Footer） |
+| **Layout** | JueshiV4PublicShell（Night 4 统一） |
 | **API** | `/api/search` |
 | **Database** | 全文搜索（跨多个 Model） |
 | **Admin** | 无 |
-| **Components** | 旧版 Header/Footer |
+| **Components** | JueshiV4PublicShell, SearchBar, SearchResults |
 | **Design System** | ❌ 未使用 |
 | **Dependencies** | Prisma (全文搜索) |
-| **Status** | ✅ Production（未统一 V4 Shell） |
+| **Status** | ✅ Production（V4 Shell 已统一） |
 | **Owner** | 开发团队 |
 | **Priority** | P0 |
 | **Related Features** | Tools, Resources, Guides |
-| **TODO** | V4 Shell 统一（Night 3 任务） |
+| **TODO** | ✅ V4 Shell 已统一（Night 4 完成） |
 
 ---
 

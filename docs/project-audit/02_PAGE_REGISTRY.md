@@ -22,12 +22,14 @@
 | 路由 | 文件 | Layout | Server | Client | Async | V4 Shell | 状态 |
 |------|------|--------|--------|--------|-------|----------|------|
 | `/` | `(public)/page.tsx` | Root | ✅ | ❌ | ❌ | ✅ V4HomeCandidateV4Shell | Production |
-| `/tools` | `(public)/tools/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Production |
-| `/resources` | `(public)/resources/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Production |
-| `/resources/site/[id]` | `(public)/resources/site/[id]/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Production |
-| `/destinations` | `(public)/destinations/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Production |
-| `/guides` | `(public)/guides/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Staging |
+| `/tools` | `src/app/(public)/tools/page.tsx` | Server | ✅ | ❌ | ✅ | Production |
+| `/resources` | `src/app/(public)/resources/page.tsx` | Server | ✅ | ❌ | ✅ | Production |
+| `/resources/site/[id]` | `src/app/(public)/resources/site/[id]/page.tsx` | Server | ✅ | ❌ | ✅ | Production |
+| `/destinations` | `src/app/(public)/destinations/page.tsx` | Server | ✅ | ❌ | ✅ | Production |
+| `/guides` | `src/app/(public)/guides/page.tsx` | Server | ✅ | ❌ | ✅ | Staging |
 | `/checklists` | `(public)/checklists/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Staging |
+| `/topics` | `(public)/topics/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4PublicShell | Staging |
+| `/search` | `(public)/search/page.tsx` | Public | ❌ | ✅ | ❌ | ✅ V4PublicShell | Staging |
 | `/ui-lab/jueshi-v4-home-candidate-v4` | `(public)/ui-lab/jueshi-v4-home-candidate-v4/page.tsx` | Public | ✅ | ❌ | ❌ | ✅ V4HomeCandidateV4Shell | Draft |
 
 ---
