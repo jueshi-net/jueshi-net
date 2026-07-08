@@ -12,9 +12,11 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isResourcesSite = pathname.startsWith('/resources/site/');
   const isTools = pathname === '/tools';
   const isDestinations = pathname === '/destinations';
+  const isGuides = pathname === '/guides';
+  const isChecklists = pathname === '/checklists';
 
-  // 首页、UI Lab、资源页、工具页、目的地页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations) {
+  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页使用各自的 shell，跳过公共 Header/Footer
+  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists) {
     return <>{children}</>;
   }
 

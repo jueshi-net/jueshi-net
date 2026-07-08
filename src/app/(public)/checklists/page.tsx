@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JueshiV4PublicShell } from '@/components/layout/JueshiV4PublicShell';
 import { ListChecks, Home, ChevronRight, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
@@ -91,9 +92,10 @@ export default async function ChecklistsPage() {
   const checklists = await getChecklists();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-green-700 text-white py-12 md:py-16">
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero */}
+        <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-green-700 text-white py-12 md:py-16">
         <div className="max-w-6xl mx-auto px-4">
           <nav className="flex items-center gap-1.5 text-sm text-teal-100 mb-6 min-h-[44px]">
             <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
@@ -191,6 +193,7 @@ export default async function ChecklistsPage() {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </JueshiV4PublicShell>
   );
 }

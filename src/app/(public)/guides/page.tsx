@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { JueshiV4PublicShell } from '@/components/layout/JueshiV4PublicShell';
 import { prisma } from '@/lib/prisma';
 import { FileText, CalendarDays, Eye, Clock, ChevronRight, BookOpen, TrendingUp, Sparkles } from 'lucide-react';
 
@@ -83,9 +84,10 @@ export default async function GuidesPage({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* Hero */}
+        <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
         <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
             <div className="flex-1">
@@ -231,7 +233,8 @@ export default async function GuidesPage({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </JueshiV4PublicShell>
   );
 }
 
