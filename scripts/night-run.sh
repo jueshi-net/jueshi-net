@@ -166,19 +166,27 @@ PYEOF
 
   # ─── Step 2: Dequeue next task ───
   step "2/7 Dequeue next task"
-  NEXT_TASK=$(python3 - "$QUEUE_FILE" <<'PYEOF'
-import json, sys
+  
+  # V2: Extract task-id, prompt, and allowed_files from queue
+  eval "$(python3 - "$QUEUE_FILE" <<'PYEOF'
+import json, sys, shlex
 q = json.load(open(sys.argv[1]))
 if not q:
-    print("__EMPTY__")
+    print('TASK_ID="__EMPTY__"')
+    print('TASK_PROMPT=""')
+    print('TASK_ALLOWED_FILES="[]"')
 else:
     task = q[0]
-    # Support both "desc" and "prompt" keys
-    print(task.get("prompt") or task.get("desc") or task.get("title", "__EMPTY__"))
+    task_id = task.get("id", f"task-{__import__('hashlib').md5(task.get('prompt','').encode()).hexdigest()[:8]}")
+    prompt = task.get("prompt") or task.get("desc") or task.get("title", "")
+    allowed_files = json.dumps(task.get("allowed_files", []))
+    print(f'TASK_ID={shlex.quote(task_id)}')
+    print(f'TASK_PROMPT={shlex.quote(prompt)}')
+    print(f'TASK_ALLOWED_FILES={shlex.quote(allowed_files)}')
 PYEOF
-  )
+  )"
 
-  if [ "$NEXT_TASK" = "__EMPTY__" ]; then
+  if [ "$TASK_ID" = "__EMPTY__" ]; then
     info "Queue is empty — nothing to do"
     python3 - "$STATE_FILE" <<'PYEOF'
 import json, sys
@@ -192,10 +200,12 @@ PYEOF
     exit 0
   fi
 
-  ok "Next task: $NEXT_TASK"
+  ok "Task ID: $TASK_ID"
+  ok "Task: ${TASK_PROMPT:0:100}..."
+  info "Allowed files: $TASK_ALLOWED_FILES"
 
   # Update state
-  python3 - "$STATE_FILE" "$NEXT_TASK" "$RUN_ID" <<'PYEOF'
+  python3 - "$STATE_FILE" "$TASK_ID" "$RUN_ID" <<'PYEOF'
 import json, sys
 s = json.load(open(sys.argv[1]))
 s["status"] = "RUNNING"
@@ -206,10 +216,12 @@ json.dump(s, open(sys.argv[1], "w"), indent=2)
 PYEOF
   echo ""
 
-  PATCH_FILE="$PATCH_DIR/${RUN_ID}.patch"
+  PATCH_FILE="$PATCH_DIR/${TASK_ID}.patch"
 
   if [ "$DRY_RUN" = "true" ]; then
-    info "DRY RUN: Would generate patch for: $NEXT_TASK"
+    info "DRY RUN: Would generate patch for task: $TASK_ID"
+    info "DRY RUN: Task prompt: ${TASK_PROMPT:0:100}..."
+    info "DRY RUN: Allowed files: $TASK_ALLOWED_FILES"
     info "DRY RUN: Would save to: $PATCH_FILE"
     info "DRY RUN: Would apply via ai-patch-runner.sh"
     info "DRY RUN: Would deploy staging"
@@ -218,10 +230,11 @@ PYEOF
     exit 0
   fi
 
-  # ─── Step 3: Generate patch ───
-  step "3/7 Generate patch"
+  # ─── Step 3: Generate patch (V2: Claude reads repo, outputs patch) ───
+  step "3/7 Generate patch (V2 readonly mode)"
   if [ -x "$SCRIPT_DIR/claude-generate-patch.sh" ]; then
-    bash "$SCRIPT_DIR/claude-generate-patch.sh" "$NEXT_TASK" "$PATCH_FILE"
+    # V2: Pass task-id, prompt, and allowed-files to claude-generate-patch.sh
+    bash "$SCRIPT_DIR/claude-generate-patch.sh" "$TASK_ID" "$TASK_PROMPT" "$TASK_ALLOWED_FILES"
     GEN_RC=$?
     if [ $GEN_RC -ne 0 ]; then
       err "Patch generation failed (exit=$GEN_RC)"
@@ -305,13 +318,13 @@ PYEOF
 
   # ─── Step 7: Update state ───
   step "7/7 Update state"
-  python3 - "$STATE_FILE" "$QUEUE_FILE" "$COMPLETED_FILE" "$NEXT_TASK" "$RUN_ID" <<'PYEOF'
+  python3 - "$STATE_FILE" "$QUEUE_FILE" "$COMPLETED_FILE" "$TASK_ID" "$RUN_ID" <<'PYEOF'
 import json, sys, datetime
 
 state_path = sys.argv[1]
 queue_path = sys.argv[2]
 completed_path = sys.argv[3]
-task = sys.argv[4]
+task_id = sys.argv[4]
 run_id = sys.argv[5]
 
 # Update state
@@ -325,22 +338,22 @@ json.dump(s, open(state_path, "w"), indent=2)
 # Dequeue
 q = json.load(open(queue_path))
 if q:
-    task_desc = q[0].get("prompt") or q[0].get("desc") or q[0].get("title", "")
-    if task_desc == task:
+    task_id_in_queue = q[0].get("id", "")
+    if task_id_in_queue == task_id:
         q.pop(0)
 json.dump(q, open(queue_path, "w"), indent=2, ensure_ascii=False)
 
 # Add to completed
 c = json.load(open(completed_path))
 c.append({
-    "desc": task,
+    "id": task_id,
     "run_id": run_id,
     "completed": datetime.datetime.now().isoformat(),
     "result": "PATCH_APPLIED_BUILD_OK"
 })
 json.dump(c, open(completed_path, "w"), indent=2, ensure_ascii=False)
 
-print(f"COMPLETED: {task}")
+print(f"COMPLETED: {task_id}")
 PYEOF
 
   echo ""

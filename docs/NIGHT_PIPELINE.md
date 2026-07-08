@@ -1,8 +1,9 @@
-# Night Pipeline v1
+# Night Pipeline v2
 
 > 夜间自动化 patch-based 长链路基础设施  
-> 版本: v1.0  
-> 创建时间: 2026-07-08
+> 版本: v2.0 (Readonly Claude Patch Mode)  
+> 创建时间: 2026-07-08  
+> 更新时间: 2026-07-08
 
 ---
 
@@ -12,11 +13,104 @@ Night Pipeline 是一个自动化的 patch-based 长链路执行系统，用于�
 
 ### 核心原则
 
-1. **Claude Code 只生成 patch** — 不直接写文件
+1. **Claude Code 只读仓库 + 输出 patch** — 自己读文件，但不写文件
 2. **Hermes 只验证和应用** — 通过 ai-patch-runner 确定性执行
 3. **安全优先** — 硬禁止文件永远不被修改
 4. **可重复执行** — 所有脚本幂等（idempotent）
 5. **失败自动回滚** — build 失败时 git reset --hard
+
+---
+
+## 1.1 V2: Readonly Claude Patch Mode
+
+### 为什么升级到 V2
+
+V1 的问题：Hermes 把文件内容转述给 Claude，导致：
+- Claude 无法看到真实代码结构，生成的 patch context lines 不匹配
+- `git apply --check` 拒绝无效 patch（corrupt patch at line X）
+- 无法处理复杂业务逻辑的页面
+
+V2 的解决方案：
+- **Claude Code 自己读仓库** — 使用 `-p` (headless) 模式，Claude 运行完整 agent loop
+- **Claude Code 使用 Read 工具** — 直接读取目标文件，看到真实代码
+- **Claude Code 只输出 patch** — 禁止 Write/Edit 工具，只允许只读工具
+- **Patch Runner 是唯一写入执行器** — ai-patch-runner.sh 负责 apply + build + rollback
+
+### Claude Code 能力边界
+
+| 能力 | V1 | V2 |
+|------|----|----|
+| 读取文件 | ❌ 由 Hermes 转述 | ✅ 自己用 Read 工具读 |
+| 生成 patch | ✅ 基于 Hermes 描述 | ✅ 基于真实文件内容 |
+| 写入文件 | ❌ 禁止 | ❌ 禁止 |
+| 执行命令 | ❌ 禁止 | ⚠️ 只允许只读命令 (git diff/status/show, cat, grep 等) |
+| 修改代码 | ❌ 禁止 | ❌ 禁止 |
+
+### V2 调用方式
+
+```bash
+# claude-generate-patch.sh 使用 -p 模式 + 只读工具
+claude -p \
+  --allowedTools "Read,Grep,Glob,ListDirectory,Bash(git diff:*),Bash(git status:*),Bash(git show:*),Bash(git log:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(grep:*),Bash(rg:*)" \
+  --disallowedTools "Write,Edit,MultiEdit,Bash(npm:*),Bash(git add:*),Bash(git commit:*),Bash(deploy-*)" \
+  "$PROMPT"
+```
+
+### V2 任务队列格式
+
+```json
+[
+  {
+    "id": "night2-guides-checklists-v4-shell",
+    "title": "Apply V4 Shell to guides and checklists pages",
+    "mode": "patch",
+    "allowed_files": [
+      "src/app/(public)/guides/page.tsx",
+      "src/app/(public)/checklists/page.tsx",
+      "src/app/(public)/public-layout-client.tsx"
+    ],
+    "prompt": "只输出 unified diff patch，不要修改文件。目标：1. 修改 src/app/(public)/guides/page.tsx，导入 JueshiV4PublicShell，并用 <JueshiV4PublicShell> 包裹原页面内容。..."
+  }
+]
+```
+
+### V2 流程
+
+```
+1. night-run.sh 从 queue.json 读取任务 (id, prompt, allowed_files)
+2. claude-generate-patch.sh 调用 Claude Code (-p 模式 + 只读工具)
+3. Claude Code 自己读取目标文件 (Read 工具)
+4. Claude Code 生成 unified diff patch (输出到 stdout)
+5. claude-generate-patch.sh 保存 patch 到 .hermes/pipeline/patches/<task-id>.patch
+6. ai-patch-runner.sh 验证 patch (allowlist, 硬禁止, git apply --check)
+7. ai-patch-runner.sh 应用 patch (git apply)
+8. ai-patch-runner.sh 构建验证 (npm run build)
+9. 如果 build 失败，自动回滚 (git reset --hard)
+10. night-run.sh 部署 staging (deploy-staging.sh)
+11. night-run.sh curl 验证 (HTTP 200)
+12. night-run.sh 更新状态 (state.json, completed.json)
+```
+
+### V2 状态码
+
+| 状态码 | 含义 |
+|--------|------|
+| `CLAUDE_GENERATED_PATCH` | Claude 成功生成 patch |
+| `HERMES_APPLIED_PATCH` | Hermes 成功应用 patch |
+| `PATCH_GENERATION_INVALID_OUTPUT` | Claude 输出不是有效 diff |
+| `CLAUDE_PATCH_GENERATION_BLOCKED` | Claude 调用被阻止 |
+| `CLAUDE_CODE_RATE_LIMITED_PAUSED` | Claude 触发 429 限流 |
+| `PATCH_APPLIED_BUILD_OK` | Patch 应用 + build 成功 |
+| `PATCH_BUILD_FAILED_ROLLED_BACK` | Build 失败，已自动回滚 |
+
+### V2 安全保证
+
+1. **Claude Code 不能写文件** — `--disallowedTools` 禁止 Write/Edit/MultiEdit
+2. **Claude Code 不能执行危险命令** — 禁止 npm/git add/git commit/deploy-*
+3. **Patch Runner 验证 allowlist** — 只允许修改指定路径
+4. **Patch Runner 硬禁止** — package/schema/API/middleware/SKILL.md 永远不被修改
+5. **Build 失败自动回滚** — git reset --hard 恢复到 patch 前状态
+6. **不自动 commit** — 由用户或上层脚本决定是否提交
 
 ---
 
