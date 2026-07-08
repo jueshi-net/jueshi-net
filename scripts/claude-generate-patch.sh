@@ -195,7 +195,10 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
   # -p = headless mode (full agent loop with tool access including Read)
   # --allowedTools = restrict to readonly tools only
   # NO --acceptEdits, NO --bypassPermissions
-  timeout "$TIMEOUT_SEC" "$CLAUDE_CMD" \
+  # macOS has no `timeout` command; use perl alarm as portable alternative
+  export TIMEOUT="$TIMEOUT_SEC"
+  perl -e 'alarm $ENV{TIMEOUT}; exec @ARGV' -- \
+    "$CLAUDE_CMD" \
     -p \
     --allowedTools "$READONLY_TOOLS" \
     --output-format text \
