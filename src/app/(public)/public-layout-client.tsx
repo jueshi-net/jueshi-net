@@ -16,9 +16,11 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isChecklists = pathname === '/checklists';
   const isTopics = pathname === '/topics';
   const isSearch = pathname === '/search';
+  const isStarter = pathname === '/starter';
+  const isPricing = pathname === '/pricing';
 
-  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页、专题页、搜索页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists || isTopics || isSearch) {
+  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页使用各自的 shell，跳过公共 Header/Footer
+  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing) {
     return <>{children}</>;
   }
 
