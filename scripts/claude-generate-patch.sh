@@ -299,8 +299,7 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
     # Extract from first "diff --git" to end, then clean up
     sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "${OUTPUT_PATCH}.raw"
     
-    # Remove HTML wrapper tags but preserve JSX in diff content
-    # Only strip tags that are NOT part of diff lines (lines starting with +, -, or space)
+    # Clean and fix patch in a single Python script
     python3 - "${OUTPUT_PATCH}.raw" "$OUTPUT_PATCH" <<'PYEOF'
 import sys, re
 from pathlib import Path
