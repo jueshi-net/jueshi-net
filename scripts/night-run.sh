@@ -230,10 +230,13 @@ PYEOF
     exit 0
   fi
 
-  # ─── Step 3: Generate patch (V2: Claude reads repo, outputs patch) ───
-  step "3/7 Generate patch (V2 readonly mode)"
+  # ─── Step 3: Generate patch (V3: Claude outputs full files, script generates patch) ───
+  step "3/7 Generate patch (V3 full-file proposal mode)"
+  PROPOSALS_DIR="$REPO_ROOT/.hermes/pipeline/proposals/$TASK_ID"
+  mkdir -p "$PROPOSALS_DIR"
   if [ -x "$SCRIPT_DIR/claude-generate-patch.sh" ]; then
-    # V2: Pass task-id, prompt, and allowed-files to claude-generate-patch.sh
+    # V3: Pass task-id, prompt, and allowed-files to claude-generate-patch.sh
+    # Claude will output complete file contents, script will generate patch
     bash "$SCRIPT_DIR/claude-generate-patch.sh" "$TASK_ID" "$TASK_PROMPT" "$TASK_ALLOWED_FILES"
     GEN_RC=$?
     if [ $GEN_RC -ne 0 ]; then

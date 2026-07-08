@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# claude-generate-patch.sh — V2: Claude Code reads repo, outputs patch to stdout
+# claude-generate-patch.sh — V3: Full-file proposal mode
 #
-# V2 Changes (readonly Claude patch mode):
-#   - Uses -p (headless) so Claude runs full agent loop with tool access
-#   - Claude reads actual files via Read tool (no more hallucinated content)
-#   - Claude is restricted to readonly tools only (no Write/Edit)
-#   - Patch output goes to stdout, saved by this script
-#   - ai-patch-runner.sh is the sole writer
+# V3 Changes (full-file proposal mode):
+#   - Claude outputs complete file contents, not patches
+#   - Format: <<<FILE:path/to/file>>> ... <<<END_FILE>>>
+#   - Script saves proposals to .hermes/pipeline/proposals/<task-id>/<path>
+#   - Script generates unified diff using diff -u
+#   - Eliminates corrupt patch issues from V2
 #
 # Usage:
 #   ./scripts/claude-generate-patch.sh <task-id> <task-description> <allowed-files-json>
@@ -26,6 +26,9 @@
 #   124 — timeout (CLAUDE_PATCH_GENERATION_TIMEOUT)
 #   125 — invalid output (PATCH_GENERATION_INVALID_OUTPUT)
 #   126 — blocked (CLAUDE_PATCH_GENERATION_BLOCKED)
+#   127 — missing file in proposal (FULL_FILE_PROPOSAL_MISSING_FILE)
+#   128 — file outside allowlist (FULL_FILE_PROPOSAL_OUTSIDE_ALLOWLIST)
+#   129 — empty patch (FULL_FILE_PROPOSAL_EMPTY_PATCH)
 
 set -euo pipefail
 
@@ -38,9 +41,9 @@ CLAUDE_BIN="${CLAUDE_BIN:-claude}"
 TIMEOUT_SEC="${CLAUDE_TIMEOUT:-300}"
 MAX_RETRIES="${CLAUDE_RETRIES:-2}"
 PIPELINE_DIR="$REPO_ROOT/.hermes/pipeline"
+PROPOSALS_DIR="$PIPELINE_DIR/proposals"
 
 # Readonly-only tools: Claude can read files but NOT write them
-# Format: comma-separated tool names for --allowedTools
 READONLY_TOOLS="Read,Grep,Glob,ListDirectory,Bash(git diff:*),Bash(git status:*),Bash(git show:*),Bash(git log:*),Bash(cat:*),Bash(head:*),Bash(tail:*),Bash(wc:*),Bash(find:*),Bash(sed -n:*),Bash(awk:*),Bash(grep:*),Bash(rg:*)"
 
 # ─── Colors ───
@@ -60,14 +63,19 @@ usage() {
   cat <<EOF
 Usage: $0 <task-id> <task-description> <allowed-files-json>
 
-V2 Readonly Claude Patch Mode:
-  Claude Code reads actual repo files via Read tool, then outputs
-  unified diff patch to stdout. No file writing. No acceptEdits.
+V3 Full-File Proposal Mode:
+  Claude Code reads actual repo files, then outputs complete file contents.
+  Script generates unified diff patch from proposals.
 
 Arguments:
   task-id              Unique task identifier (e.g. "night2-guides")
   task-description     What needs to be done
   allowed-files-json   JSON array of files Claude may modify
+
+Output Format (Claude must output):
+  <<<FILE:path/to/file>>>
+  [complete file content]
+  <<<END_FILE>>>
 
 Environment:
   CLAUDE_SAFE          Path to claude-safe wrapper (default: ~/bin/claude-safe)
@@ -141,84 +149,51 @@ mkdir -p "$PATCH_DIR"
 OUTPUT_PATCH="$PATCH_DIR/${TASK_ID}.patch"
 STDOUT_LOG="$PATCH_DIR/${TASK_ID}.stdout.txt"
 STDERR_LOG="$PATCH_DIR/${TASK_ID}.stderr.txt"
+TASK_PROPOSALS_DIR="$PROPOSALS_DIR/$TASK_ID"
 
-# ─── 6. Build prompt ───
-# Key V2 change: Claude MUST read actual files before generating patch
-PROMPT="You are a patch generator for a Next.js project.
+# ─── 6. Build prompt (V3: full-file proposal mode) ───
+PROMPT="You are a code modification assistant for a Next.js project.
 
 TASK:
 ${TASK_DESC}
 
-ALLOWED FILES TO MODIFY (only these files):
+ALLOWED FILES TO MODIFY (only these files, you must output ALL of them):
 ${ALLOWED_FILES_JSON}
 
 CRITICAL INSTRUCTIONS:
-1. FIRST: Use the Read tool to read each target file listed above. You MUST see the actual file contents before generating any patch.
+1. FIRST: Use the Read tool to read each target file listed above. You MUST see the actual file contents before generating any output.
 2. Analyze the real code structure, imports, and patterns.
-3. Generate a unified diff patch that implements the requested changes.
-4. The patch context lines MUST match the actual file contents you read EXACTLY.
-5. Output ONLY the raw unified diff patch to stdout.
-6. Do NOT use Write, Edit, or any file-modification tools.
-7. Do NOT add explanations, markdown code blocks, or commentary.
-8. Start your output directly with 'diff --git' — no preamble.
+3. Output the COMPLETE NEW CONTENT of each modified file using the exact format below.
+4. Do NOT use Write, Edit, or any file-modification tools.
+5. Do NOT output unified diff patches.
+6. Do NOT add explanations, markdown code blocks, or commentary outside the file markers.
 
-JSX COMPONENT WRAPPING RULES (CRITICAL):
+OUTPUT FORMAT (you MUST output every file in the allowed list):
+<<<FILE:path/to/file>>>
+[complete file content here — the entire file, not just changed parts]
+<<<END_FILE>>>
+
+<<<FILE:path/to/another/file>>>
+[complete file content here]
+<<<END_FILE>>>
+
+RULES:
+- You MUST output ALL files listed in ALLOWED FILES TO MODIFY.
+- Each file MUST be wrapped in <<<FILE:path>>> and <<<END_FILE>>> markers.
+- The path in <<<FILE:path>>> MUST exactly match one of the allowed files.
+- The content between markers MUST be the COMPLETE file content, not a partial diff.
+- Do NOT output any text outside of the <<<FILE>>> / <<<END_FILE>>> blocks.
+- Preserve all existing code that should not change.
+- Only make the modifications described in the TASK.
+
+JSX COMPONENT WRAPPING RULES (if task involves wrapping with a component):
 When wrapping a page with a component like <JueshiV4PublicShell>:
+- Add the import at the top: import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+- Wrap the return JSX: return ( <JueshiV4PublicShell> ... </JueshiV4PublicShell> );
+- Indent the existing JSX content inside the wrapper.
+- Do NOT duplicate return statements or closing braces.
 
-STEP 1: Find the return statement in the component function. It looks like:
-  return (
-    <div className=\"...\">
-      ...content...
-    </div>
-  );
-
-STEP 2: Add the opening tag IMMEDIATELY AFTER 'return (' on a NEW LINE with proper indentation:
-  return (
-    <JueshiV4PublicShell>
-      <div className=\"...\">
-
-STEP 3: Add the closing tag BEFORE the closing ')' on a NEW LINE with proper indentation:
-      </div>
-    </JueshiV4PublicShell>
-  );
-
-STEP 4: Ensure ALL content between 'return (' and ')' is indented one level deeper (typically 2 more spaces).
-
-CRITICAL WARNINGS:
-- Do NOT duplicate the 'return (' statement
-- Do NOT remove any existing code
-- Do NOT change the structure of the JSX, only wrap it
-- The opening <JueshiV4PublicShell> must be on its own line after 'return ('
-- The closing </JueshiV4PublicShell> must be on its own line before ')'
-- All existing JSX content must be indented 2 more spaces
-
-Example of CORRECT patch:
---- a/src/app/example.tsx
-+++ b/src/app/example.tsx
-@@ -10,7 +10,9 @@
-   ];
- 
-   return (
-+    <JueshiV4PublicShell>
-       <div className=\"page\">
-         <h1>Title</h1>
-       </div>
-+    </JueshiV4PublicShell>
-   );
- }
-
-OUTPUT FORMAT (raw unified diff, nothing else):
-diff --git a/path/to/file b/path/to/file
-index abc1234..def5678 100644
---- a/path/to/file
-+++ b/path/to/file
-@@ -line,count +line,count @@
- context line
--removed line
-+added line
- context line
-
-Remember: Read the files FIRST, then generate the patch based on what you actually see."
+Remember: Read the files FIRST, then output the complete modified file contents.\""
 
 # ─── 7. Call Claude with readonly tools ───
 info "Task ID: $TASK_ID"
@@ -294,79 +269,186 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
       ;;
   esac
 
-  # ─── 8. Extract patch from stdout ───
-  if grep -q '^diff --git' "$STDOUT_LOG"; then
-    # Extract from first "diff --git" to end, then clean up
-    sed -n '/^diff --git /,$p' "$STDOUT_LOG" > "${OUTPUT_PATCH}.raw"
+  # ─── 8. Extract proposals and generate patch (V3: full-file proposal mode) ───
+  if grep -q '^<<<FILE:' "$STDOUT_LOG"; then
+    # Clean proposals directory for this task
+    rm -rf "$TASK_PROPOSALS_DIR"
+    mkdir -p "$TASK_PROPOSALS_DIR"
     
-    # Clean and fix patch in a single Python script
-    python3 - "${OUTPUT_PATCH}.raw" "$OUTPUT_PATCH" <<'PYEOF'
-import sys, re
+    # Extract proposals using Python
+    python3 - "$STDOUT_LOG" "$TASK_PROPOSALS_DIR" "$ALLOWED_FILES_JSON" <<'PYEOF'
+import sys, re, json
 from pathlib import Path
 
-raw_path = sys.argv[1]
-out_path = sys.argv[2]
+stdout_path = sys.argv[1]
+proposals_dir = sys.argv[2]
+allowed_files_json = sys.argv[3]
 
-raw = Path(raw_path).read_text(encoding="utf-8", errors="ignore")
+# Parse allowed files
+allowed_files = set(json.loads(allowed_files_json))
 
-lines = raw.split('\n')
-result = []
+# Read stdout
+content = Path(stdout_path).read_text(encoding="utf-8", errors="ignore")
 
-# First pass: clean HTML tags from non-diff lines
-for line in lines:
-    # Skip EOF markers
-    if line.strip() == '# EOF':
+# Extract all <<<FILE:path>>> ... <<<END_FILE>>> blocks
+pattern = r'<<<FILE:([^>]+)>>>\s*\n(.*?)\n\s*<<<END_FILE>>>'
+matches = re.findall(pattern, content, re.DOTALL)
+
+if not matches:
+    print("ERROR: No <<<FILE:...>>> blocks found in output", file=sys.stderr)
+    sys.exit(1)
+
+# Track which files were output
+output_files = set()
+
+for file_path, file_content in matches:
+    file_path = file_path.strip()
+    output_files.add(file_path)
+    
+    # Check if file is in allowlist
+    if file_path not in allowed_files:
+        print(f"ERROR: File '{file_path}' is not in allowlist", file=sys.stderr)
+        print(f"FULL_FILE_PROPOSAL_OUTSIDE_ALLOWLIST")
+        sys.exit(128)
+    
+    # Save proposal file
+    proposal_path = Path(proposals_dir) / file_path
+    proposal_path.parent.mkdir(parents=True, exist_ok=True)
+    proposal_path.write_text(file_content, encoding="utf-8")
+    print(f"Saved proposal: {proposal_path}")
+
+# Check if all allowed files were output
+missing_files = allowed_files - output_files
+if missing_files:
+    print(f"ERROR: Missing proposals for files: {missing_files}", file=sys.stderr)
+    print(f"FULL_FILE_PROPOSAL_MISSING_FILE")
+    sys.exit(127)
+
+print(f"OK: All {len(allowed_files)} allowed files have proposals")
+PYEOF
+    
+    EXTRACT_RC=$?
+    if [ $EXTRACT_RC -ne 0 ]; then
+      if [ $EXTRACT_RC -eq 127 ]; then
+        err "Missing file proposals"
+        echo "FULL_FILE_PROPOSAL_MISSING_FILE"
+        exit 127
+      elif [ $EXTRACT_RC -eq 128 ]; then
+        err "File outside allowlist"
+        echo "FULL_FILE_PROPOSAL_OUTSIDE_ALLOWLIST"
+        exit 128
+      else
+        warn "Proposal extraction failed"
+        if [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; then
+          warn "Retrying in 5s..."
+          sleep 5
+          continue
+        fi
+      fi
+    else
+      # ─── 9. Generate unified diff from proposals ───
+      info "Generating unified diff from proposals"
+      
+      # Generate patch using diff -u
+      > "$OUTPUT_PATCH"
+      
+      # Read allowed files and generate diff for each
+      python3 - "$TASK_PROPOSALS_DIR" "$REPO_ROOT" "$ALLOWED_FILES_JSON" "$OUTPUT_PATCH" <<'PYEOF'
+import sys, json, subprocess
+from pathlib import Path
+
+proposals_dir = sys.argv[1]
+repo_root = sys.argv[2]
+allowed_files_json = sys.argv[3]
+output_patch = sys.argv[4]
+
+allowed_files = json.loads(allowed_files_json)
+patch_lines = []
+
+for file_path in allowed_files:
+    original_path = Path(repo_root) / file_path
+    proposal_path = Path(proposals_dir) / file_path
+    
+    if not proposal_path.exists():
+        print(f"WARNING: Proposal not found for {file_path}", file=sys.stderr)
         continue
     
-    # Check if this is a diff line (starts with +, -, space, or @)
-    if line and line[0] in '+- @ \\':
-        # This is diff content - keep as-is (may contain JSX)
-        result.append(line)
+    # Generate diff using diff -u
+    result = subprocess.run(
+        ['diff', '-u', str(original_path), str(proposal_path)],
+        capture_output=True,
+        text=True
+    )
+    
+    # diff returns 0 if no changes, 1 if differences, 2 if error
+    if result.returncode == 0:
+        # No changes to this file
+        continue
+    elif result.returncode == 1:
+        # Differences found - convert to git-style patch
+        diff_output = result.stdout
+        
+        # Convert diff output to git patch format
+        lines = diff_output.split('\n')
+        if len(lines) >= 3:
+            # Add git diff header
+            patch_lines.append(f"diff --git a/{file_path} b/{file_path}")
+            patch_lines.append(f"--- a/{file_path}")
+            patch_lines.append(f"+++ b/{file_path}")
+            
+            # Skip first 2 lines (--- and +++) from diff output, keep the rest
+            for line in lines[2:]:
+                patch_lines.append(line)
+            
+            patch_lines.append("")  # Empty line between files
     else:
-        # Not a diff line - strip HTML wrapper tags
-        cleaned = re.sub(r'<[^>]+>', '', line)
-        if cleaned.strip():  # Only keep non-empty lines
-            result.append(cleaned)
+        print(f"ERROR: diff failed for {file_path}: {result.stderr}", file=sys.stderr)
+        sys.exit(1)
 
-# Second pass: add missing "--- a/" lines
-final_result = []
-i = 0
-while i < len(result):
-    line = result[i]
-    final_result.append(line)
-    
-    # After "diff --git a/X b/X", check if next line is "+++ b/X" without "--- a/X"
-    if line.startswith('diff --git a/'):
-        # Extract path from "diff --git a/PATH b/PATH"
-        m = re.match(r'diff --git a/(.*) b/(.*)', line)
-        if m:
-            a_path = m.group(1)
-            # Look ahead
-            if i + 1 < len(result):
-                next_line = result[i + 1]
-                if next_line.startswith('+++ b/') and not next_line.startswith('--- a/'):
-                    # Missing "--- a/" line, insert it
-                    final_result.append(f'--- a/{a_path}')
-    
-    i += 1
+# Write patch file
+Path(output_patch).write_text('\n'.join(patch_lines), encoding="utf-8")
 
-Path(out_path).write_text('\n'.join(final_result), encoding="utf-8")
-print(f"Cleaned patch: {out_path}")
+# Check if patch is empty
+if not patch_lines or all(line.strip() == '' for line in patch_lines):
+    print("ERROR: Generated patch is empty", file=sys.stderr)
+    print("FULL_FILE_PROPOSAL_EMPTY_PATCH")
+    sys.exit(129)
+
+print(f"Generated patch: {output_patch} ({len(patch_lines)} lines)")
 PYEOF
-    rm -f "${OUTPUT_PATCH}.raw" "${OUTPUT_PATCH}.clean"
-    
-    # Validate patch is non-empty and has expected structure
-    if [ -s "$OUTPUT_PATCH" ] && grep -qF -- "+++ b/" "$OUTPUT_PATCH"; then
-      PATCH_SIZE=$(wc -c < "$OUTPUT_PATCH" | tr -d ' ')
-      PATCH_FILES=$(grep '^diff --git ' "$OUTPUT_PATCH" | wc -l | tr -d ' ')
-      ok "Patch extracted: $OUTPUT_PATCH (${PATCH_SIZE} bytes, ${PATCH_FILES} files)"
-      SUCCESS=true
-      break
-    else
-      warn "Patch extracted but invalid (missing +++ lines)"
+      
+      DIFF_RC=$?
+      if [ $DIFF_RC -eq 129 ]; then
+        err "Generated patch is empty"
+        echo "FULL_FILE_PROPOSAL_EMPTY_PATCH"
+        exit 129
+      elif [ $DIFF_RC -ne 0 ]; then
+        warn "Patch generation failed"
+        if [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; then
+          warn "Retrying in 5s..."
+          sleep 5
+          continue
+        fi
+      else
+        # Validate patch
+        if [ -s "$OUTPUT_PATCH" ] && grep -qF -- "+++ b/" "$OUTPUT_PATCH"; then
+          PATCH_SIZE=$(wc -c < "$OUTPUT_PATCH" | tr -d ' ')
+          PATCH_FILES=$(grep '^diff --git ' "$OUTPUT_PATCH" | wc -l | tr -d ' ')
+          ok "Patch generated: $OUTPUT_PATCH (${PATCH_SIZE} bytes, ${PATCH_FILES} files)"
+          SUCCESS=true
+          break
+        else
+          warn "Generated patch is invalid"
+          if [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; then
+            warn "Retrying in 5s..."
+            sleep 5
+            continue
+          fi
+        fi
+      fi
     fi
   else
-    warn "No 'diff --git' found in Claude output"
+    warn "No '<<<FILE:' markers found in Claude output"
     info "Stdout preview (first 500 chars):"
     head -c 500 "$STDOUT_LOG" | sed 's/^/  /'
   fi
