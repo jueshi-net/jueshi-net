@@ -13,6 +13,7 @@ import {
   Building2,
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 
 // Force SSR — DB not available during build time
 export const dynamic = "force-dynamic";
@@ -108,17 +109,18 @@ export default async function CityPage({ params }: Props) {
   const heroSubtitle = hero.subtitle || hero.summary || "";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap" aria-label="面包屑导航">
-          <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-            <Home className="w-4 h-4" />
-            <span>首页</span>
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
-          <span className="text-gray-900 font-medium truncate max-w-[200px]">{cityName}</span>
-        </nav>
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap" aria-label="面包屑导航">
+            <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
+              <Home className="w-4 h-4" />
+              <span>首页</span>
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+            <span className="text-gray-900 font-medium truncate max-w-[200px]">{cityName}</span>
+          </nav>
 
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-10 shadow-lg">
@@ -269,5 +271,6 @@ export default async function CityPage({ params }: Props) {
         </section>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }

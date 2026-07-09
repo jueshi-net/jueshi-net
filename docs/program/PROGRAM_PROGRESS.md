@@ -156,6 +156,34 @@
 
 ---
 
+## Night 8 (2026-07-09)
+
+**执行内容**: V4 Shell 统一 - Blog 和 Cities 页面
+**完成 Batch**: DS-03-B1
+**修改文件**: 2
+**状态**: ✅ 成功
+
+**完成的任务**:
+- ✅ /guides/[slug] 页面 V4 Shell 统一（实际 Blog 内容页面）
+- ✅ /cities/[city] 页面 V4 Shell 统一
+
+**关键发现**:
+- `/blog` 和 `/blog/[slug]` 是重定向页面，实际内容在 `/guides` 和 `/guides/[slug]`
+- `/countries` 和 `/countries/[country]` 是重定向页面，实际内容在 `/destinations` 和 `/destinations/[country]`
+- 因此实际迁移的是 `/guides/[slug]` 和 `/cities/[city]`
+
+**关键指标**:
+- V4 Shell 覆盖率: 5.9% → 6.8%
+- Design System 覆盖率: 0.9% → 0.9%（无变化）
+
+**技术实现**:
+- 导入 `JueshiV4PublicShell` 组件
+- 在页面根元素外层包裹 `<JueshiV4PublicShell>`
+- 保持原有页面结构和 SEO 不变
+- Build 验证通过
+
+---
+
 ## 进度统计
 
 ### 总体进度

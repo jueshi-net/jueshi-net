@@ -48,6 +48,7 @@
 
 ### 最近完成
 
+- ✅ Night 8: V4 Shell 统一 - Blog 和 Cities 页面（/guides/[slug], /cities/[city]）
 - ✅ Night 6: 组件整合（ActionCard, StatusBadge, EmptyState）
 - ✅ Night 5: V4 Shell 统一 + Design System 应用
 - ✅ Night 4: V4 Shell 统一（Core Pages）
