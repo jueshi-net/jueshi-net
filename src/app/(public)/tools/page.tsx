@@ -80,6 +80,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           <PageHero
             title={query ? `搜索结果: "${query}"` : '工具中心'}
             subtitle={query ? `共找到 ${tools.length} 个匹配项` : `${tools.length} 个工具可用 · 外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱`}
+            variant="gradient"
           />
 
           {/* Sticky Filter Bar - 必须在 Hero 之后 */}
@@ -133,7 +134,7 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           {/* Quick Links */}
           {!query && !category && (
             <ContentSection>
-              <SectionHeader title="快速入口" subtitle="常用工具和功能的快捷方式" />
+              <SectionHeader title="快速入口" />
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href="/tools/documents"

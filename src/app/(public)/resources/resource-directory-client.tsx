@@ -312,27 +312,23 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
 
   return (
     <div className="min-h-screen bg-gray-50">
-        {/* Compact Hero */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-          <div className="max-w-[1480px] mx-auto px-4 py-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
-                  <Globe className="w-6 h-6" />
-                  网址导航
-                </h1>
-                <p className="text-sm text-white/80">精选 {resources.length} 个优质海外工具与服务</p>
-              </div>
-            </div>
-            <div className="max-w-2xl relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder="搜索网址名称、描述或标签..."
-                className="w-full pl-12 pr-4 py-3 bg-white text-gray-900 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg"
-              />
-            </div>
+        {/* Unified Hero */}
+        <PageHero
+          title="网址导航"
+          subtitle={`精选 ${resources.length} 个优质海外工具与服务`}
+          variant="gradient"
+        />
+
+        {/* Search Bar */}
+        <div className="max-w-[1480px] mx-auto px-4 -mt-6 relative z-10">
+          <div className="max-w-2xl relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              value={search}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="搜索网址名称、描述或标签..."
+              className="w-full pl-12 pr-4 py-3 bg-white text-gray-900 border-0 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-lg"
+            />
           </div>
         </div>
 

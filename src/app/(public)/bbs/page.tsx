@@ -193,11 +193,12 @@ export default async function BBSPage({
           <PageHero
             title="社区论坛"
             subtitle={`交流出海工具、海外生活、物流经验 · ${stats.postCount} 帖 · ${stats.categoryCount} 分类`}
+            variant="gradient"
             actions={
               isLoggedIn ? (
                 <Link
                   href="/bbs/new"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white text-brand rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   发布帖子
@@ -205,7 +206,7 @@ export default async function BBSPage({
               ) : (
                 <Link
                   href="/login?callbackUrl=/bbs/new"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white text-brand rounded-lg text-sm font-bold hover:bg-gray-100 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   登录后发帖
