@@ -11,14 +11,14 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Program Manager V2 — SCRIPT_IMPLEMENTED |
+| **当前阶段** | Program Manager V2 — RATE_LIMIT_RESUME_READY |
 | **管理模式** | Program → Epic → Batch → Task |
-| **Pipeline 版本** | V3 Full-file Proposal Mode + Program Manager V2 Commands |
+| **Pipeline 版本** | V3.2 Full-file Proposal Mode + Rate Limit Resume |
 | **Design System** | V1 Foundation（14 组件，0.9% 应用） |
 
 ### Program Manager V2 状态
 
-**当前状态**: ✅ SCRIPT_IMPLEMENTED
+**当前状态**: ✅ RATE_LIMIT_RESUME_READY
 
 - ✅ 四层模型建立 (Program → Epic → Batch → Task)
 - ✅ Program Queue 规范建立
@@ -27,6 +27,8 @@
 - ✅ Batch/Task Registry 内置映射
 - ✅ `--dry-run` 组合支持
 - ✅ `--help` 已更新
+- ✅ Rate limit 自动暂停/恢复机制已实现
+- ✅ Cooldown (exit 76) 自动重试机制已实现
 
 ### Program 概览
 

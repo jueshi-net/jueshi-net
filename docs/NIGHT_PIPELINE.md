@@ -833,7 +833,189 @@ bash scripts/night-run.sh --help              # 显示帮助
 
 ---
 
-**文档版本**: v3.1  
+## 12. Rate Limit 自动恢复机制
+
+> 新增时间: 2026-07-09  
+> 版本: v3.2 (Rate Limit Resume)
+
+### 12.1 概述
+
+当 Claude Code 遇到 429 rate limit 或 provider rate limiting 时，Night Pipeline 会自动暂停并在一段时间后重试当前任务，而不是直接失败。
+
+### 12.2 触发条件
+
+`claude-generate-patch.sh` 会在以下情况下返回 `RATE_LIMITED` 状态：
+
+1. **Exit code 75** — Claude Code 明确返回的 rate limit 信号
+2. **输出包含 rate limit 关键词** — 即使 exit code 为 0，如果输出中包含以下关键词也会触发：
+   - `429`
+   - `rate limit` / `rate_limit`
+   - `provider rate`
+   - `too many request`
+   - `throttl`
+
+### 12.3 暂停策略
+
+**第一次 rate limit：**
+- 暂停时长：22 分钟（1320 秒）
+- 写入 `.hermes/pipeline/rate-limit.lock`
+- 更新 `state.json` 状态为 `RATE_LIMITED_PAUSED`
+
+**1 小时内第二次 rate limit：**
+- 暂停时长：30 分钟（1800 秒）
+- 视为连续 rate limit，使用更长的暂停时间
+
+**最大重试次数：**
+- 最多重试 3 次
+- 超过 3 次后输出 `PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED` 并停止
+
+### 12.4 rate-limit.lock 文件结构
+
+```json
+{
+  "task_id": "DS-02-B3",
+  "batch_id": "DS-02-B3",
+  "pause_seconds": 1320,
+  "retry_count": 1,
+  "resume_epoch": 1720523456,
+  "created": "2026-07-09T10:30:00"
+}
+```
+
+**字段说明：**
+- `task_id` — 当前正在执行的 Task ID
+- `batch_id` — 当前正在执行的 Batch ID
+- `pause_seconds` — 暂停时长（秒）
+- `retry_count` — 已重试次数
+- `resume_epoch` — 恢复时间的 Unix 时间戳
+- `created` — 锁文件创建时间
+
+### 12.5 恢复流程
+
+1. 暂停结束后，`night-run.sh` 检查 `rate-limit.lock`
+2. 如果当前时间 >= `resume_epoch`，删除锁文件
+3. 重新调用 `claude-generate-patch.sh` 执行同一个 Task
+4. 如果再次触发 rate limit，重复暂停流程（retry_count + 1）
+
+### 12.6 Cooldown 处理（Exit Code 76）
+
+当 Claude Code 返回 exit code 76（cooldown / concurrent block）时：
+
+- 等待 60 秒后重试
+- 最多重试 5 次
+- 超过 5 次后输出 `CLAUDE_CODE_COOLDOWN_MAX_RETRY` 并停止
+
+### 12.7 --status 显示 Rate Limit 信息
+
+运行 `bash scripts/night-run.sh --status` 时，如果存在 `rate-limit.lock`，会显示：
+
+```
+Rate Limit Status:
+  status: RATE_LIMITED
+  task_id: DS-02-B3
+  batch_id: DS-02-B3
+  retry_count: 1/3
+  pause_seconds: 1320
+  resume_time: 2026-07-09 11:00:00
+  remaining: 1800s (30m0s)
+  created: 2026-07-09T10:30:00
+```
+
+如果没有 rate limit，显示：
+
+```
+Rate Limit Status:
+  status: OK (no active rate limit)
+```
+
+### 12.8 Dry Run 行为
+
+使用 `--dry-run` 时，如果遇到 rate limit：
+
+- **不会真的 sleep**
+- 只输出将会暂停的时长和恢复时间
+- 输出 `NIGHT_DRY_RUN_RATE_LIMIT_SIMULATED`
+
+示例：
+
+```bash
+$ bash scripts/night-run.sh --batch DS-02-B3 --dry-run
+[INFO] DRY RUN: Would pause 1320s then retry task DS-02-B3
+[INFO] DRY RUN: Resume at: 2026-07-09 11:00:00
+[INFO] DRY RUN: Rate limit retry: 1/3
+NIGHT_DRY_RUN_RATE_LIMIT_SIMULATED
+```
+
+### 12.9 手动清除 Rate Limit Lock
+
+如果需要手动清除 rate limit lock（不推荐）：
+
+```bash
+rm -f .hermes/pipeline/rate-limit.lock
+```
+
+然后重新运行任务：
+
+```bash
+bash scripts/night-run.sh --batch DS-02-B3
+```
+
+### 12.10 状态码
+
+| 状态码 | 含义 |
+|--------|------|
+| `RATE_LIMITED` | Claude Code 触发 rate limit |
+| `RATE_LIMITED_PAUSED` | 已暂停，等待恢复 |
+| `PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED` | 超过最大重试次数，已停止 |
+| `CLAUDE_CODE_COOLDOWN_MAX_RETRY` | Cooldown 重试超过 5 次 |
+
+### 12.11 示例场景
+
+**场景 1：第一次 rate limit**
+
+```bash
+$ bash scripts/night-run.sh --batch DS-02-B3
+[STEP] 3/7 Generate patch (V3 full-file proposal mode)
+[WARN] RATE LIMITED: rate limit (attempt 1/3)
+[WARN] Pausing 1320s (22-30min). Resume at: 2026-07-09 11:00:00
+[WARN] Retry count: 1/3
+[INFO] Sleeping 1320s...
+# ... 22 分钟后 ...
+[INFO] Resumed. Retrying task DS-02-B3...
+[STEP] 3/7 Generate patch (V3 full-file proposal mode)
+[OK] Patch generated: .hermes/pipeline/patches/DS-02-B3.patch
+```
+
+**场景 2：连续 rate limit**
+
+```bash
+$ bash scripts/night-run.sh --batch DS-02-B3
+[STEP] 3/7 Generate patch (V3 full-file proposal mode)
+[WARN] RATE LIMITED: rate limit (attempt 1/3)
+[WARN] Pausing 1320s. Resume at: 2026-07-09 11:00:00
+# ... 22 分钟后 ...
+[INFO] Resumed. Retrying task DS-02-B3...
+[STEP] 3/7 Generate patch (V3 full-file proposal mode)
+[WARN] RATE LIMITED: consecutive rate limit (2x in 1h)
+[WARN] Pausing 1800s. Resume at: 2026-07-09 11:30:00
+# ... 30 分钟后 ...
+[INFO] Resumed. Retrying task DS-02-B3...
+[OK] Patch generated
+```
+
+**场景 3：超过最大重试次数**
+
+```bash
+$ bash scripts/night-run.sh --batch DS-02-B3
+# ... 3 次 rate limit 后 ...
+[ERROR] Rate limit retry count exceeded maximum (3)
+[ERROR] Task: DS-02-B3 | Batch: DS-02-B3
+PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED
+```
+
+---
+
+**文档版本**: v3.2  
 **创建时间**: 2026-07-08  
 **更新时间**: 2026-07-09  
 **关联脚本**: `scripts/night-run.sh`, `scripts/claude-generate-patch.sh`, `scripts/ai-patch-runner.sh`, `scripts/hermes-health-check.sh`

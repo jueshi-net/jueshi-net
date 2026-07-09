@@ -156,6 +156,32 @@ else:
   echo ""
   echo "Locks:"
   ls -la "$LOCKS_DIR/" 2>/dev/null | grep -v '^total' | sed 's/^/  /' || echo "  (none)"
+  echo ""
+
+  # Rate-limit status
+  RATE_LIMIT_LOCK="$PIPELINE_DIR/rate-limit.lock"
+  if [ -f "$RATE_LIMIT_LOCK" ]; then
+    echo "Rate Limit Status:"
+    python3 -c "
+import json, datetime
+lock = json.load(open('$RATE_LIMIT_LOCK'))
+resume_epoch = lock.get('resume_epoch', 0)
+now = int(__import__('time').time())
+remaining = max(0, resume_epoch - now)
+resume_dt = datetime.datetime.fromtimestamp(resume_epoch)
+print(f'  status: RATE_LIMITED')
+print(f'  task_id: {lock.get(\"task_id\", \"unknown\")}')
+print(f'  batch_id: {lock.get(\"batch_id\", \"unknown\")}')
+print(f'  retry_count: {lock.get(\"retry_count\", 0)}/3')
+print(f'  pause_seconds: {lock.get(\"pause_seconds\", 0)}')
+print(f'  resume_time: {resume_dt.strftime(\"%Y-%m-%d %H:%M:%S\")}')
+print(f'  remaining: {remaining}s ({remaining//60}m{remaining%60}s)')
+print(f'  created: {lock.get(\"created\", \"unknown\")}')
+" 2>/dev/null || cat "$RATE_LIMIT_LOCK" | sed 's/^/  /'
+  else
+    echo "Rate Limit Status:"
+    echo "  status: OK (no active rate limit)"
+  fi
 }
 
 cmd_enqueue() {
@@ -288,25 +314,177 @@ PYEOF
   fi
 
   # ─── Step 3: Generate patch (V3: Claude outputs full files, script generates patch) ───
+  # Rate-limit aware: auto-pause and retry on 429 / provider rate limit
   step "3/7 Generate patch (V3 full-file proposal mode)"
   PROPOSALS_DIR="$REPO_ROOT/.hermes/pipeline/proposals/$TASK_ID"
   mkdir -p "$PROPOSALS_DIR"
+
+  RATE_LIMIT_LOCK="$PIPELINE_DIR/rate-limit.lock"
+  RATE_LIMIT_MAX_RETRY=3
+  RATE_LIMIT_PAUSE_FIRST=1320   # 22 minutes
+  RATE_LIMIT_PAUSE_CONSECUTIVE=1800  # 30 minutes
+  COOLDOWN_MAX_RETRY=5
+  COOLDOWN_WAIT=60
+
+  # Check for existing rate-limit lock (resume from previous pause)
+  if [ -f "$RATE_LIMIT_LOCK" ]; then
+    info "Found existing rate-limit.lock — checking resume time..."
+    RESUME_TIME=$(python3 -c "import json; print(json.load(open('$RATE_LIMIT_LOCK')).get('resume_epoch', 0))" 2>/dev/null || echo 0)
+    NOW=$(date +%s)
+    if [ "$NOW" -lt "$RESUME_TIME" ]; then
+      WAIT_SECS=$((RESUME_TIME - NOW))
+      info "Rate limit still active. Resuming in ${WAIT_SECS}s ($(date -r "$RESUME_TIME" '+%H:%M:%S' 2>/dev/null || date -d "@$RESUME_TIME" '+%H:%M:%S' 2>/dev/null || echo 'unknown'))"
+      if [ "$DRY_RUN" = "true" ]; then
+        info "DRY RUN: Would wait ${WAIT_SECS}s then retry current task"
+      else
+        sleep "$WAIT_SECS"
+      fi
+    fi
+    rm -f "$RATE_LIMIT_LOCK"
+    info "Cleared rate-limit.lock, retrying task..."
+  fi
+
   if [ -x "$SCRIPT_DIR/claude-generate-patch.sh" ]; then
-    # V3: Pass task-id, prompt, and allowed-files to claude-generate-patch.sh
-    # Claude will output complete file contents, script will generate patch
-    bash "$SCRIPT_DIR/claude-generate-patch.sh" "$TASK_ID" "$TASK_PROMPT" "$TASK_ALLOWED_FILES"
-    GEN_RC=$?
-    if [ $GEN_RC -ne 0 ]; then
-      err "Patch generation failed (exit=$GEN_RC)"
-      python3 - "$STATE_FILE" "$GEN_RC" <<'PYEOF'
+    # Rate-limit retry loop
+    RL_RETRY_COUNT=0
+    COOLDOWN_RETRY_COUNT=0
+    FIRST_RL_TIME=0
+    PATCH_GENERATED=false
+
+    while [ "$PATCH_GENERATED" = "false" ]; do
+      # Capture output to detect RATE_LIMITED marker
+      GEN_OUTPUT=$(bash "$SCRIPT_DIR/claude-generate-patch.sh" "$TASK_ID" "$TASK_PROMPT" "$TASK_ALLOWED_FILES" 2>&1) || true
+      GEN_RC=$?
+
+      # Check for RATE_LIMITED marker in output
+      if echo "$GEN_OUTPUT" | grep -q "RATE_LIMITED"; then
+        RL_RETRY_COUNT=$((RL_RETRY_COUNT + 1))
+        NOW=$(date +%s)
+
+        # Track first rate-limit time for consecutive detection
+        if [ "$FIRST_RL_TIME" -eq 0 ]; then
+          FIRST_RL_TIME=$NOW
+        fi
+
+        # Determine pause duration
+        TIME_SINCE_FIRST=$((NOW - FIRST_RL_TIME))
+        if [ "$RL_RETRY_COUNT" -gt "$RATE_LIMIT_MAX_RETRY" ]; then
+          err "Rate limit retry count exceeded maximum ($RATE_LIMIT_MAX_RETRY)"
+          err "Task: $TASK_ID | Batch: ${BATCH_ID:-unknown}"
+          python3 - "$STATE_FILE" "$TASK_ID" <<'PYEOF'
+import json, sys
+s = json.load(open(sys.argv[1]))
+s["status"] = "RATE_LIMITED_MAX_RETRY"
+s["last_result"] = "PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED"
+json.dump(s, open(sys.argv[1], "w"), indent=2)
+PYEOF
+          echo "PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED"
+          exit 75
+        fi
+
+        if [ "$TIME_SINCE_FIRST" -lt 3600 ] && [ "$RL_RETRY_COUNT" -ge 2 ]; then
+          PAUSE_SECS=$RATE_LIMIT_PAUSE_CONSECUTIVE
+          PAUSE_REASON="consecutive rate limit (${RL_RETRY_COUNT}x in 1h)"
+        else
+          PAUSE_SECS=$RATE_LIMIT_PAUSE_FIRST
+          PAUSE_REASON="rate limit (attempt ${RL_RETRY_COUNT}/${RATE_LIMIT_MAX_RETRY})"
+        fi
+
+        RESUME_EPOCH=$((NOW + PAUSE_SECS))
+        RESUME_HUMAN=$(date -r "$RESUME_EPOCH" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -d "@$RESUME_EPOCH" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "in ${PAUSE_SECS}s")
+
+        warn "RATE LIMITED: $PAUSE_REASON"
+        warn "Pausing ${PAUSE_SECS}s (22-30min). Resume at: $RESUME_HUMAN"
+        warn "Retry count: ${RL_RETRY_COUNT}/${RATE_LIMIT_MAX_RETRY}"
+
+        # Write rate-limit lock
+        python3 - "$RATE_LIMIT_LOCK" "$TASK_ID" "${BATCH_ID:-}" "$PAUSE_SECS" "$RL_RETRY_COUNT" "$RESUME_EPOCH" <<'PYEOF'
+import json, sys
+lock_path = sys.argv[1]
+data = {
+    "task_id": sys.argv[2],
+    "batch_id": sys.argv[3],
+    "pause_seconds": int(sys.argv[4]),
+    "retry_count": int(sys.argv[5]),
+    "resume_epoch": int(sys.argv[6]),
+    "created": __import__("datetime").datetime.now().isoformat()
+}
+json.dump(data, open(lock_path, "w"), indent=2)
+PYEOF
+
+        # Update state
+        python3 - "$STATE_FILE" "$TASK_ID" "$RESUME_EPOCH" "$RL_RETRY_COUNT" <<'PYEOF'
+import json, sys
+s = json.load(open(sys.argv[1]))
+s["status"] = "RATE_LIMITED_PAUSED"
+s["current_task"] = sys.argv[2]
+s["rate_limit_resume_epoch"] = int(sys.argv[3])
+s["rate_limit_retry_count"] = int(sys.argv[4])
+s["last_result"] = "RATE_LIMITED"
+json.dump(s, open(sys.argv[1], "w"), indent=2)
+PYEOF
+
+        if [ "$DRY_RUN" = "true" ]; then
+          info "DRY RUN: Would pause ${PAUSE_SECS}s then retry task $TASK_ID"
+          info "DRY RUN: Resume at: $RESUME_HUMAN"
+          info "DRY RUN: Rate limit retry: ${RL_RETRY_COUNT}/${RATE_LIMIT_MAX_RETRY}"
+          echo "NIGHT_DRY_RUN_RATE_LIMIT_SIMULATED"
+          exit 0
+        fi
+
+        info "Sleeping ${PAUSE_SECS}s..."
+        sleep "$PAUSE_SECS"
+        rm -f "$RATE_LIMIT_LOCK"
+        info "Resumed. Retrying task $TASK_ID..."
+        continue
+      fi
+
+      # Check for exit 76 (cooldown / concurrent block)
+      if [ "$GEN_RC" -eq 76 ] || echo "$GEN_OUTPUT" | grep -q "CLAUDE_CODE_COOLDOWN_OR_CONCURRENT_BLOCKED"; then
+        COOLDOWN_RETRY_COUNT=$((COOLDOWN_RETRY_COUNT + 1))
+        if [ "$COOLDOWN_RETRY_COUNT" -gt "$COOLDOWN_MAX_RETRY" ]; then
+          err "Cooldown retry exceeded maximum ($COOLDOWN_MAX_RETRY)"
+          python3 - "$STATE_FILE" <<'PYEOF'
+import json, sys
+s = json.load(open(sys.argv[1]))
+s["status"] = "COOLDOWN_MAX_RETRY"
+s["last_result"] = "CLAUDE_CODE_COOLDOWN_MAX_RETRY"
+json.dump(s, open(sys.argv[1], "w"), indent=2)
+PYEOF
+          echo "CLAUDE_CODE_COOLDOWN_MAX_RETRY"
+          exit 76
+        fi
+
+        if [ "$DRY_RUN" = "true" ]; then
+          info "DRY RUN: Would wait ${COOLDOWN_WAIT}s for cooldown (retry ${COOLDOWN_RETRY_COUNT}/${COOLDOWN_MAX_RETRY})"
+          echo "NIGHT_DRY_RUN_COOLDOWN_SIMULATED"
+          exit 0
+        fi
+
+        warn "Cooldown/concurrent block detected. Waiting ${COOLDOWN_WAIT}s (retry ${COOLDOWN_RETRY_COUNT}/${COOLDOWN_MAX_RETRY})..."
+        sleep "$COOLDOWN_WAIT"
+        continue
+      fi
+
+      # Check for other failures
+      if [ "$GEN_RC" -ne 0 ]; then
+        err "Patch generation failed (exit=$GEN_RC)"
+        echo "$GEN_OUTPUT"
+        python3 - "$STATE_FILE" "$GEN_RC" <<'PYEOF'
 import json, sys
 s = json.load(open(sys.argv[1]))
 s["status"] = "PATCH_GENERATION_FAILED"
 s["last_result"] = f"EXIT_{sys.argv[2]}"
 json.dump(s, open(sys.argv[1], "w"), indent=2)
 PYEOF
-      exit $GEN_RC
-    fi
+        exit "$GEN_RC"
+      fi
+
+      # Success
+      echo "$GEN_OUTPUT"
+      PATCH_GENERATED=true
+    done
+
     ok "Patch generated: $PATCH_FILE"
   else
     err "claude-generate-patch.sh not found or not executable"

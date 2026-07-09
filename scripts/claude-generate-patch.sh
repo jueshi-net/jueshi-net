@@ -238,7 +238,7 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
       ;;
     75)
       err "Rate limited"
-      echo "CLAUDE_CODE_RATE_LIMITED_PAUSED"
+      echo "RATE_LIMITED"
       exit 75
       ;;
     76)
@@ -258,6 +258,12 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
       exit 126
       ;;
     *)
+      # Check for rate limit patterns in stderr/stdout even if exit code is not 75
+      if grep -qiE '(429|rate.limit|rate_limit|provider.rate|too.many.request|throttl)' "$STDERR_LOG" "$STDOUT_LOG" 2>/dev/null; then
+        err "Rate limit detected in output (exit code: $EXIT_CODE)"
+        echo "RATE_LIMITED"
+        exit 75
+      fi
       err "Unexpected exit code: $EXIT_CODE"
       if [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; then
         warn "Retrying in 5s..."
@@ -268,6 +274,13 @@ while [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; do
       exit 126
       ;;
   esac
+
+  # Also check for rate limit patterns in successful exit (Claude may output error but exit 0)
+  if [ "$EXIT_CODE" -eq 0 ] && grep -qiE '(429|rate.limit|rate_limit|provider.rate|too.many.request|throttl)' "$STDERR_LOG" "$STDOUT_LOG" 2>/dev/null; then
+    err "Rate limit detected in output despite exit code 0"
+    echo "RATE_LIMITED"
+    exit 75
+  fi
 
   # ─── 8. Extract proposals and generate patch (V3: full-file proposal mode) ───
   if grep -q '^<<<FILE:' "$STDOUT_LOG"; then

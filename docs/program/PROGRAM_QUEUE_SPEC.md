@@ -454,8 +454,22 @@ Task 失败
 ├── Build 失败 → 自动回滚 → 标记为 failed → 停止执行
 ├── Deploy 失败 → 自动回滚 → 标记为 failed → 停止执行
 ├── Runtime Error → 自动回滚 → 标记为 failed → 停止执行
+├── Rate Limit (429) → 暂停 22-30 分钟 → 自动重试当前 Task（最多 3 次）
+├── Cooldown (exit 76) → 等待 60 秒 → 自动重试（最多 5 次）
 └── 验证失败 → 手动检查 → 决定是否继续
 ```
+
+### Rate Limit 自动恢复
+
+当 Claude Code 遇到 429 rate limit 时：
+
+1. **第一次触发**: 暂停 22 分钟，写入 `.hermes/pipeline/rate-limit.lock`
+2. **1 小时内第二次触发**: 暂停 30 分钟
+3. **超过 3 次**: 输出 `PROGRAM_RATE_LIMIT_MAX_RETRY_PAUSED` 并停止
+
+恢复后自动重试当前 Task，不会跳到下一个任务。
+
+详见 `docs/NIGHT_PIPELINE.md` 第 12 章。
 
 ---
 
