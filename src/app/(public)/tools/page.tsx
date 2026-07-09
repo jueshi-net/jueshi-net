@@ -64,21 +64,13 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
     : tools;
 
   const breadcrumbs = [
-    { label: '首页', href: '/' },
-    { label: '工具中心' },
+    { title: '首页', href: '/' },
+    { title: '工具中心' },
   ];
 
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 pb-12">
-        {/* Sticky Filter Bar */}
-        <ToolFilterBar
-          currentQuery={query}
-          currentCategory={category}
-          currentSort={sort}
-          presentCategories={presentCategories}
-        />
-
         {/* Main Content */}
         <PageContainer paddingTop paddingBottom>
           {/* Breadcrumb */}
@@ -88,6 +80,14 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           <PageHero
             title={query ? `搜索结果: "${query}"` : '工具中心'}
             subtitle={query ? `共找到 ${tools.length} 个匹配项` : `${tools.length} 个工具可用 · 外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱`}
+          />
+
+          {/* Sticky Filter Bar - 必须在 Hero 之后 */}
+          <ToolFilterBar
+            currentQuery={query}
+            currentCategory={category}
+            currentSort={sort}
+            presentCategories={presentCategories}
           />
 
           {/* Template Studio CTA Banner */}
