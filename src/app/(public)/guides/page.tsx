@@ -98,11 +98,48 @@ export default async function GuidesPage({
         </div>
 
         {/* Hero */}
-        <PageHero
-          title="海外实用指南"
-          subtitle="面向出海商家、海外华人、留学生的工具教程、避坑指南与实操经验。"
-          variant="gradient"
-        />
+        <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
+          <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+              <div className="flex-1">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    <BookOpen className="w-3.5 h-3.5" /> 实用指南
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    出海商家
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    海外生活
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    留学工具
+                  </span>
+                </div>
+                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
+                  海外实用指南
+                </h1>
+                <p className="text-teal-100 mt-3 max-w-lg text-sm md:text-base">
+                  面向出海商家、海外华人、留学生的工具教程、避坑指南与实操经验。
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 lg:flex lg:gap-6">
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">{articles.length}</div>
+                  <div className="text-xs text-teal-200 mt-1">已发布</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">{allCategoryCounts.filter(c => c.category).length}</div>
+                  <div className="text-xs text-teal-200 mt-1">分类</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">{articles.length > 0 ? formatDate(articles[0].updatedAt).slice(0, 7) : '—'}</div>
+                  <div className="text-xs text-teal-200 mt-1">最近更新</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Category Filter */}
         <div className="max-w-6xl mx-auto px-4 -mt-5 relative z-10">

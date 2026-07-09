@@ -53,13 +53,30 @@ export default async function TopicsPage() {
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
         {/* Hero */}
-        <PageHero
-          title="专题推荐"
-          subtitle="围绕真实使用场景的精选内容，不写空泛的理论，只给你最实用的指南。"
-          variant="gradient"
-        />
+        <div className="bg-gradient-to-br from-indigo-600 via-blue-700 to-teal-700 text-white py-12 md:py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <nav className="flex items-center gap-1.5 text-sm text-blue-200 mb-6 min-h-[44px]">
+              <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
+                <Home className="w-3.5 h-3.5" /> 首页
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-white font-medium">专题推荐</span>
+            </nav>
 
-        <div className="max-w-6xl mx-auto px-4 pb-16">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-blue-100 border border-white/10 mb-6">
+                <Sparkles className="w-4 h-4" />
+                <span>精选专题内容，帮你快速适应海外生活</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-3">专题推荐</h1>
+              <p className="text-lg text-blue-100/90 max-w-2xl leading-relaxed">
+                围绕真实使用场景的精选内容，不写空泛的理论，只给你最实用的指南。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16 relative z-10">
           {/* Topic cards */}
           {topics.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

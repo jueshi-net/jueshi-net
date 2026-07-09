@@ -96,13 +96,30 @@ export default async function ChecklistsPage() {
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
         {/* Hero */}
-        <PageHero
-          title="实用清单"
-          subtitle="从出国行李打包到国际集运发货，从海外租房到看房避坑，每一步都有可勾选的行动清单。"
-          variant="gradient"
-        />
+        <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-green-700 text-white py-12 md:py-16">
+          <div className="max-w-6xl mx-auto px-4">
+            <nav className="flex items-center gap-1.5 text-sm text-teal-100 mb-6 min-h-[44px]">
+              <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
+                <Home className="w-3.5 h-3.5" /> 首页
+              </Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-white font-medium">清单</span>
+            </nav>
 
-        <div className="max-w-6xl mx-auto px-4 pb-16">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-teal-100 border border-white/10 mb-6">
+                <ListChecks className="w-4 h-4" />
+                <span>实用的出海行动核对清单，帮你少走弯路</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-3">实用清单</h1>
+              <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
+                从出国行李打包到国际集运发货，从海外租房到看房避坑，每一步都有可勾选的行动清单。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16 relative z-10">
           {/* Checklist cards - 使用 Design System */}
           <ContentSection>
             {checklists.length > 0 ? (
