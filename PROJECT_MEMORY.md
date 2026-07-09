@@ -23,6 +23,30 @@
 
 遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
 
+**环境分离模式**：
+- 当前采用开发/预览服务器与生产服务器分离模式
+
+**Staging / 开发预览环境**：
+- SSH: `deploy@192.129.155.149`
+- PM2: `xixiong-staging`
+- 域名: `i.jueshi.net`
+- 仅允许 staging build / staging deploy / staging DB
+
+**Production / 生产环境**：
+- 必须单独确认生产服务器 SSH、PM2、目录、域名后才能操作
+- 未经用户在当前对话明确授权，禁止连接 production
+- 禁止生产 DB migration / db push / 数据修改
+
+**SSH 连接故障诊断**：
+遇到 SSH banner/kex/timeout 时：
+1. 第一优先级检查是否连错用户、连错服务器、连错环境
+2. 不得默认判定服务器故障
+
+**永久禁止**：
+- 不得用 root/admin/chq 等用户替代 deploy
+- 不得混用 staging 与 production
+- 不得触碰 9833416@qq.com
+
 ### Program Manager V3 状态
 
 **当前状态**: ✅ CHECKPOINT_ENGINE_READY + Night 8 完成

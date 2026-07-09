@@ -6,24 +6,47 @@
 
 ---
 
-## 0. SSH 部署永久规则
+## 0. 服务器环境永久规则
 
-**xixiong-saas staging/production SSH 连接必须使用 `deploy@192.129.155.149`。**
+### 0.1 环境分离模式
 
-遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
+当前采用开发/预览服务器与生产服务器分离模式。
 
-**禁止使用的用户名**：
-- ❌ root
-- ❌ admin
-- ❌ chq
-- ❌ 其他任何用户名
+### 0.2 Staging / 开发预览环境
 
-**唯一允许的用户名**：
-- ✅ deploy
+| 项目 | 值 |
+|------|-----|
+| SSH | `deploy@192.129.155.149` |
+| PM2 | `xixiong-staging` |
+| 域名 | `i.jueshi.net` |
+| 目录 | `/home/deploy/xixiong-saas-staging` |
+| 权限 | 仅允许 staging build / staging deploy / staging DB |
 
-**服务器地址**：
-- Staging: `192.129.155.149`
-- Production: `192.129.155.149` (同一服务器，不同 PM2 应用)
+### 0.3 Production / 生产环境
+
+| 项目 | 值 |
+|------|-----|
+| SSH | 必须单独确认后才能操作 |
+| PM2 | 必须单独确认后才能操作 |
+| 域名 | `jueshi.net` |
+| 目录 | 必须单独确认后才能操作 |
+
+**生产环境操作前提**：
+- 必须单独确认生产服务器 SSH、PM2、目录、域名后才能操作
+- 未经用户在当前对话明确授权，禁止连接 production
+- 禁止生产 DB migration / db push / 数据修改
+
+### 0.4 SSH 连接故障诊断
+
+遇到 SSH banner/kex/timeout 时：
+1. **第一优先级**检查是否连错用户、连错服务器、连错环境
+2. 不得默认判定服务器故障
+
+### 0.5 永久禁止
+
+- ❌ 不得用 root/admin/chq 等用户替代 deploy
+- ❌ 不得混用 staging 与 production
+- ❌ 不得触碰 9833416@qq.com
 
 ---
 
