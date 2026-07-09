@@ -24,6 +24,8 @@ import { parseYouTubeUrl, getYouTubeEmbedUrl, getYouTubeThumbnail } from "@/lib/
 import { getTopicBySlug as getCmsTopicBySlug } from "@/lib/cms-utils";
 import SmartRelatedLinks from "@/components/smart-related-links";
 import TaskChainCta from "@/components/content/task-chain-cta";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import { PageHero, BreadcrumbBar, ContentSection, PageCTA, SectionHeader } from "@/components/design-system";
 
 // Reuse rating/category constants from static data (these are UI-only constants, not data)
 import {
@@ -150,94 +152,96 @@ function VideoObjectJsonLd({
 
 function CmsTopicPage({ cmsTopic }: { cmsTopic: import("@/lib/cms-utils").ParsedTopic }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-700 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <BreadcrumbBar
+            items={[
+              { title: "首页", href: "/" },
+              { title: "专题", href: "/topics" },
+              { title: cmsTopic.frontmatter.title, current: true }
+            ]}
+          />
         </div>
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
-          <nav className="flex items-center gap-1.5 text-sm text-purple-200 mb-6 min-h-[44px]">
-            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" /> 首页
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/topics" className="hover:text-white transition-colors">专题</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-medium truncate">{cmsTopic.frontmatter.title}</span>
-          </nav>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-            {cmsTopic.frontmatter.title}
-          </h1>
-          {cmsTopic.frontmatter.subtitle && (
-            <p className="text-lg text-purple-100/90 max-w-2xl">{cmsTopic.frontmatter.subtitle}</p>
-          )}
-        </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl border p-6 md:p-8">
-              <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-a:text-teal-600 prose-strong:text-gray-900">
-                {cmsTopic.content.split('\n').map((line, i) => {
-                  if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold text-gray-900 mt-8 mb-4 pb-2 border-b">{line.replace('## ', '')}</h2>;
-                  if (line.startsWith('### ')) return <h3 key={i} className="text-lg font-semibold text-gray-800 mt-6 mb-3">{line.replace('### ', '')}</h3>;
-                  if (line.startsWith('- **[')) {
-                    const match = line.match(/- \*\*\[(.+?)\]\((.+?)\)\*\*\s*—?\s*(.*)/);
-                    if (match) return (
-                      <div key={i} className="flex items-start gap-2 py-2">
-                        <span className="text-teal-500 mt-0.5">→</span>
-                        <Link href={match[2]} className="text-sm font-medium text-teal-600 hover:underline">{match[1]}</Link>
-                        {match[3] && <span className="text-xs text-gray-500">{match[3]}</span>}
-                      </div>
-                    );
-                  }
-                  if (line.trim() === '') return <br key={i} />;
-                  if (line.startsWith('- ')) return <p key={i} className="text-sm text-gray-700 pl-4 before:content-['•'] before:mr-2 before:text-gray-400">{line.replace('- ', '')}</p>;
-                  return <p key={i} className="text-sm text-gray-700 leading-relaxed mb-2">{line}</p>;
-                })}
-              </div>
-            </div>
+        {/* Hero */}
+        <div className="bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-700 text-white relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <SmartRelatedLinks
-              tags={cmsTopic.frontmatter.tags}
-              tool={cmsTopic.frontmatter.slug}
-              type="article"
-              layout="sidebar"
-            />
-            {cmsTopic.frontmatter.related_tools && cmsTopic.frontmatter.related_tools.length > 0 && (
-              <div className="bg-white border rounded-xl p-5">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-teal-600" /> 相关工具
-                </h3>
-                <div className="space-y-2">
-                  {cmsTopic.frontmatter.related_tools.map((tool: string, i: number) => (
-                    <Link key={i} href={`/tools/${tool}`} className="block px-3 py-2 text-sm text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
-                      → {tool}
-                    </Link>
-                  ))}
-                </div>
-              </div>
+          <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
+              {cmsTopic.frontmatter.title}
+            </h1>
+            {cmsTopic.frontmatter.subtitle && (
+              <p className="text-lg text-purple-100/90 max-w-2xl">{cmsTopic.frontmatter.subtitle}</p>
             )}
           </div>
         </div>
 
-        {/* Bottom related */}
-        <div className="mt-10">
-          <SmartRelatedLinks
-            tags={cmsTopic.frontmatter.tags}
-            tool={cmsTopic.frontmatter.slug}
-            type="article"
-            layout="bottom"
-          />
+        <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main content */}
+            <div className="lg:col-span-2">
+              <ContentSection>
+                <div className="prose prose-sm max-w-none prose-headings:text-gray-900 prose-a:text-teal-600 prose-strong:text-gray-900">
+                  {cmsTopic.content.split('\n').map((line, i) => {
+                    if (line.startsWith('## ')) return <h2 key={i} className="text-xl font-bold text-gray-900 mt-8 mb-4 pb-2 border-b">{line.replace('## ', '')}</h2>;
+                    if (line.startsWith('### ')) return <h3 key={i} className="text-lg font-semibold text-gray-800 mt-6 mb-3">{line.replace('### ', '')}</h3>;
+                    if (line.startsWith('- **[')) {
+                      const match = line.match(/- \*\*\[(.+?)\]\((.+?)\)\*\*\s*—?\s*(.*)/);
+                      if (match) return (
+                        <div key={i} className="flex items-start gap-2 py-2">
+                          <span className="text-teal-500 mt-0.5">→</span>
+                          <Link href={match[2]} className="text-sm font-medium text-teal-600 hover:underline">{match[1]}</Link>
+                          {match[3] && <span className="text-xs text-gray-500">{match[3]}</span>}
+                        </div>
+                      );
+                    }
+                    if (line.trim() === '') return <br key={i} />;
+                    if (line.startsWith('- ')) return <p key={i} className="text-sm text-gray-700 pl-4 before:content-['•'] before:mr-2 before:text-gray-400">{line.replace('- ', '')}</p>;
+                    return <p key={i} className="text-sm text-gray-700 leading-relaxed mb-2">{line}</p>;
+                  })}
+                </div>
+              </ContentSection>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              <SmartRelatedLinks
+                tags={cmsTopic.frontmatter.tags}
+                tool={cmsTopic.frontmatter.slug}
+                type="article"
+                layout="sidebar"
+              />
+              {cmsTopic.frontmatter.related_tools && cmsTopic.frontmatter.related_tools.length > 0 && (
+                <ContentSection>
+                  <SectionHeader title="相关工具" />
+                  <div className="space-y-2">
+                    {cmsTopic.frontmatter.related_tools.map((tool: string, i: number) => (
+                      <Link key={i} href={`/tools/${tool}`} className="block px-3 py-2 text-sm text-gray-600 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
+                        → {tool}
+                      </Link>
+                    ))}
+                  </div>
+                </ContentSection>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom related */}
+          <div className="mt-10">
+            <SmartRelatedLinks
+              tags={cmsTopic.frontmatter.tags}
+              tool={cmsTopic.frontmatter.slug}
+              type="article"
+              layout="bottom"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }
 
@@ -387,119 +391,118 @@ export default async function TopicSlugPage({
   const introSections = sections.filter((s) => s.type === "intro");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Preview Mode Banner */}
-      {(previewMode || isDraft) && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6 mx-4 mt-4">
-          <p className="text-yellow-800 font-medium">
-            🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
-          </p>
-          <p className="text-yellow-600 text-sm mt-1">
-            状态: {topic.status} | slug: {topic.slug}
-          </p>
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <BreadcrumbBar
+            items={[
+              { title: '首页', href: '/' },
+              { title: '专题', href: '/topics' },
+              { title: topic.title, current: true }
+            ]}
+          />
         </div>
-      )}
 
-      {/* VideoObject JSON-LD */}
-      {youtubeVideoId && (
-        <VideoObjectJsonLd
-          videoId={youtubeVideoId}
-          title={youtubeTitle}
-          description={youtubeDescription}
-          youtubeUrl={topic.youtubeUrl}
-        />
-      )}
+        {/* Preview Mode Banner */}
+        {(previewMode || isDraft) && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6 mx-4 mt-4">
+            <p className="text-yellow-800 font-medium">
+              🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+            </p>
+            <p className="text-yellow-600 text-sm mt-1">
+              状态: {topic.status} | slug: {topic.slug}
+            </p>
+          </div>
+        )}
 
-      {/* ===== HERO ===== */}
-      <div className="bg-gradient-to-br from-indigo-600 via-blue-700 to-teal-700 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-teal-300/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-sm text-blue-200 mb-6 min-h-[44px]">
-            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" /> 首页
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/topics" className="hover:text-white transition-colors">
-              专题
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-medium truncate">{topic.title}</span>
-          </nav>
+        {/* VideoObject JSON-LD */}
+        {youtubeVideoId && (
+          <VideoObjectJsonLd
+            videoId={youtubeVideoId}
+            title={youtubeTitle}
+            description={youtubeDescription}
+            youtubeUrl={topic.youtubeUrl}
+          />
+        )}
 
-          {/* Title */}
-          <div className="max-w-3xl">
-            {/* Hero badges */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {heroBadges.length > 0 ? (
-                heroBadges.map((badge, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10"
-                  >
-                    {badge.label}
-                  </span>
-                ))
-              ) : (
-                <>
-                  {items.length > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                      📱 {items.length} 个 APP
+        {/* ===== HERO ===== */}
+        <div className="bg-gradient-to-br from-indigo-600 via-blue-700 to-teal-700 text-white relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-teal-300/10 rounded-full blur-3xl" />
+          </div>
+          <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
+            {/* Title */}
+            <div className="max-w-3xl">
+              {/* Hero badges */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {heroBadges.length > 0 ? (
+                  heroBadges.map((badge, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10"
+                    >
+                      {badge.label}
                     </span>
-                  )}
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                    🏆 S/A/B/C/D 评级
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                    ⚠️ 避坑提醒
-                  </span>
-                </>
+                  ))
+                ) : (
+                  <>
+                    {items.length > 0 && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                        📱 {items.length} 个 APP
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                      🏆 S/A/B/C/D 评级
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                      ⚠️ 避坑提醒
+                    </span>
+                  </>
+                )}
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
+                {topic.title}
+                {topic.subtitle && (
+                  <>
+                    <br />
+                    <span className="text-2xl md:text-3xl text-blue-200">{topic.subtitle}</span>
+                  </>
+                )}
+              </h1>
+              {topic.summary && (
+                <p className="text-lg text-blue-100/90 max-w-2xl leading-relaxed">
+                  {topic.summary}
+                </p>
               )}
             </div>
-
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              {topic.title}
-              {topic.subtitle && (
-                <>
-                  <br />
-                  <span className="text-2xl md:text-3xl text-blue-200">{topic.subtitle}</span>
-                </>
-              )}
-            </h1>
-            {topic.summary && (
-              <p className="text-lg text-blue-100/90 max-w-2xl leading-relaxed">
-                {topic.summary}
-              </p>
-            )}
           </div>
         </div>
-      </div>
 
       <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
         {/* ===== 文章式开篇 ===== */}
-        {introSections.length > 0 ? (
-          introSections.map((section) => (
-            <div key={section.id} className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
-              {section.title && (
-                <h2 className="text-lg font-bold text-gray-900 mb-3">{section.title}</h2>
-              )}
-              {section.content && (
-                <div className="prose prose-sm max-w-none">
-                  {section.content.split("\n").map((p, i) => (
-                    <p key={i} className="text-base text-gray-700 leading-relaxed mb-4 last:mb-0">
-                      {p}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          /* Default intro fallback */
-          <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
+        <ContentSection>
+          {introSections.length > 0 ? (
+            introSections.map((section) => (
+              <div key={section.id} className="prose prose-sm max-w-none">
+                {section.title && (
+                  <SectionHeader title={section.title} />
+                )}
+                {section.content && (
+                  <div>
+                    {section.content.split("\n").map((p, i) => (
+                      <p key={i} className="text-base text-gray-700 leading-relaxed mb-4 last:mb-0">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            /* Default intro fallback */
             <div className="prose prose-sm max-w-none">
               <p className="text-base text-gray-700 leading-relaxed mb-4">
                 刚出海最尴尬的不是不会英语，而是不知道该用哪些软件。
@@ -512,15 +515,13 @@ export default async function TopicSlugPage({
                 不用在一堆应用商店里逐个试，照着这份清单装就行。
               </p>
             </div>
-          </div>
-        )}
+          )}
+        </ContentSection>
 
         {/* ===== YouTube Video ===== */}
         {youtubeVideoId && youtubeEmbedUrl && (
-          <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              ▶️ {youtubeTitle}
-            </h2>
+          <ContentSection>
+            <SectionHeader title={`▶️ ${youtubeTitle}`} />
             <div className="relative w-full overflow-hidden rounded-lg" style={{ paddingBottom: "56.25%" }}>
               <iframe
                 src={youtubeEmbedUrl}
@@ -535,21 +536,16 @@ export default async function TopicSlugPage({
             {youtubeDescription && (
               <p className="text-sm text-gray-500 mt-3">{youtubeDescription}</p>
             )}
-          </div>
+          </ContentSection>
         )}
 
         {/* ===== 先装清单 ===== */}
         {quickStartItems.length > 0 && (
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-200 p-5 md:p-6 mb-8">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-5 h-5 text-emerald-600" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">如果你刚出海，先装这 {quickStartItems.length} 个</h2>
-                <p className="text-sm text-gray-500">不用纠结顺序，到了当地就装上下面的就行：</p>
-              </div>
-            </div>
+          <ContentSection>
+            <SectionHeader 
+              title={`如果你刚出海，先装这 ${quickStartItems.length} 个`} 
+              description="不用纠结顺序，到了当地就装上下面的就行："
+            />
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {quickStartItems.map((app) => (
                 <div key={app.id} className="bg-white rounded-xl border border-emerald-100 p-3 text-center hover:shadow-md transition-shadow">
@@ -569,15 +565,12 @@ export default async function TopicSlugPage({
                 </div>
               ))}
             </div>
-          </div>
+          </ContentSection>
         )}
 
         {/* ===== 怎么读这份榜单 ===== */}
-        <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Star className="w-5 h-5 text-amber-500" />
-            怎么读这份榜单
-          </h2>
+        <ContentSection>
+          <SectionHeader title="怎么读这份榜单" />
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
             {RATING_ORDER.map((rating) => {
               const info = ratingInfo[rating];
@@ -599,18 +592,12 @@ export default async function TopicSlugPage({
               评级基于海外生活实用性和不可替代程度，主观判断，仅供参考。
             </p>
           </div>
-        </div>
+        </ContentSection>
 
         {/* ===== 按用途分类 ===== */}
         {appsByRating.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border p-5 md:p-6 mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Target className="w-5 h-5 text-blue-500" />
-              按用途分类
-            </h2>
-            <p className="text-sm text-gray-500 mb-4">
-              不确定自己需要什么？根据用途快速定位：
-            </p>
+          <ContentSection>
+            <SectionHeader title="按用途分类" description="不确定自己需要什么？根据用途快速定位：" />
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => {
                 const count = items.filter((a) => a.category === cat.id).length;
@@ -628,26 +615,19 @@ export default async function TopicSlugPage({
                 );
               })}
             </div>
-          </div>
+          </ContentSection>
         )}
 
         {/* ===== APP 卡片网格 by Rating ===== */}
         {appsByRating.map(({ rating, info, apps: ratingApps }) => (
-          <section key={rating} id={`rating-${rating}`} className="mb-10">
-            <div className={`flex flex-col sm:flex-row sm:items-center gap-2 mb-5 p-4 rounded-xl ${info.bg}`}>
-              <div className="flex items-center gap-3">
-                <span className={`text-2xl font-extrabold ${info.color}`}>{info.label} 级</span>
-                <span className="text-gray-600 text-sm">{info.desc}</span>
-              </div>
-              <p className="text-sm text-gray-500 sm:ml-auto">{info.advice}（{ratingApps.length} 个）</p>
-            </div>
-
+          <ContentSection key={rating}>
+            <SectionHeader title={`${info.label} 级 APP`} description={`${info.desc}（${ratingApps.length} 个）`} />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {ratingApps.map((app) => (
                 <AppCard key={app.id} app={app} />
               ))}
             </div>
-          </section>
+          </ContentSection>
         ))}
 
         {/* ===== 避坑提醒区 ===== */}
@@ -655,62 +635,37 @@ export default async function TopicSlugPage({
           const noticeSections = sections.filter((s) => s.type === "notice");
           if (noticeSections.length > 0) {
             return noticeSections.map((section) => (
-              <section key={section.id} className="mb-10">
-                <div className="bg-red-50 border border-red-200 rounded-xl p-5 md:p-6">
-                  {section.title && (
-                    <div className="flex items-start gap-3 mb-4">
-                      <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h2 className="text-lg font-bold text-red-800">{section.title}</h2>
-                        {section.content && (
-                          <p className="text-sm text-red-600 mt-1">{section.content}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {section.content && !section.title && (
-                    <div className="flex items-start gap-3 mb-4">
-                      <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-red-700">{section.content}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </section>
+              <ContentSection key={section.id}>
+                <SectionHeader title={section.title || "避坑提醒"} />
+                {section.content && (
+                  <p className="text-sm text-red-700">{section.content}</p>
+                )}
+              </ContentSection>
             ));
           }
 
           // Default fallback warnings
           return (
-            <section className="mb-10">
-              <div className="bg-red-50 border border-red-200 rounded-xl p-5 md:p-6">
-                <div className="flex items-start gap-3 mb-4">
-                  <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h2 className="text-lg font-bold text-red-800">⚠️ 海外上网必知的 5 个避坑提醒</h2>
-                    <p className="text-sm text-red-600 mt-1">不管你是留学、工作还是移民，请务必记住：</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {[
-                    { title: "永远不要相信「先转账后发货」", desc: "无论是 Telegram、Facebook Marketplace 还是任何平台，正规交易都有买家保护。先转账给陌生人的，99% 是诈骗。" },
-                    { title: "重要账号务必开启两步验证（2FA）", desc: "Gmail、WhatsApp、Facebook、Instagram 都支持。开启后即使密码泄露，黑客也无法登录。推荐使用 Authenticator App 而非短信验证。" },
-                    { title: "不要在公开场合暴露个人敏感信息", desc: "家庭住址、银行信息、护照号码等不要在任何社交平台公开。海外身份盗窃问题比国内更严重，信息一旦泄露很难补救。" },
-                    { title: "App 只从官方渠道下载", desc: "Google Play、App Store、官网下载。不要从第三方网站下载 APK，不要相信「破解版」「免费版」，这些往往带有木马。" },
-                    { title: "警惕冒充熟人的消息", desc: "WhatsApp、Telegram 上冒充朋友/家人的骗局非常普遍。收到「我换了号码」「帮我转账」类消息，先电话确认。" },
-                  ].map((tip, i) => (
-                    <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-3">
-                      <CheckCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h3 className="font-semibold text-gray-900 text-sm">{tip.title}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
-                      </div>
+            <ContentSection>
+              <SectionHeader title="⚠️ 海外上网必知的 5 个避坑提醒" description="不管你是留学、工作还是移民，请务必记住：" />
+              <div className="space-y-3">
+                {[
+                  { title: "永远不要相信「先转账后发货」", desc: "无论是 Telegram、Facebook Marketplace 还是任何平台，正规交易都有买家保护。先转账给陌生人的，99% 是诈骗。" },
+                  { title: "重要账号务必开启两步验证（2FA）", desc: "Gmail、WhatsApp、Facebook、Instagram 都支持。开启后即使密码泄露，黑客也无法登录。推荐使用 Authenticator App 而非短信验证。" },
+                  { title: "不要在公开场合暴露个人敏感信息", desc: "家庭住址、银行信息、护照号码等不要在任何社交平台公开。海外身份盗窃问题比国内更严重，信息一旦泄露很难补救。" },
+                  { title: "App 只从官方渠道下载", desc: "Google Play、App Store、官网下载。不要从第三方网站下载 APK，不要相信「破解版」「免费版」，这些往往带有木马。" },
+                  { title: "警惕冒充熟人的消息", desc: "WhatsApp、Telegram 上冒充朋友/家人的骗局非常普遍。收到「我换了号码」「帮我转账」类消息，先电话确认。" },
+                ].map((tip, i) => (
+                  <div key={i} className="flex items-start gap-3 bg-white rounded-lg p-3">
+                    <CheckCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm">{tip.title}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{tip.desc}</p>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            </section>
+            </ContentSection>
           );
         })()}
 
@@ -864,6 +819,7 @@ export default async function TopicSlugPage({
         )}
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }
 

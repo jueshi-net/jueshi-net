@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { FileText, CalendarDays, Eye, Clock, ChevronRight, BookOpen, TrendingUp, Sparkles } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
-import { SectionHeader, ContentSection } from '@/components/design-system';
+import { SectionHeader, ContentSection, PageHero, BreadcrumbBar, PageCTA } from '@/components/design-system';
 
 export const metadata: Metadata = {
   title: '海外实用指南 - 跨境寄送、海外生活、出海经营',
@@ -87,6 +87,16 @@ export default async function GuidesPage({
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <BreadcrumbBar
+            items={[
+              { title: '首页', href: '/' },
+              { title: '实用指南', current: true }
+            ]}
+          />
+        </div>
+
         {/* Hero */}
         <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
           <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
@@ -157,7 +167,6 @@ export default async function GuidesPage({
           <SectionHeader
             title="推荐阅读"
             description="精选热门指南，快速上手"
-            icon={<Sparkles className="w-5 h-5 text-amber-500" />}
           />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link href="/guides" className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group">
@@ -227,9 +236,16 @@ export default async function GuidesPage({
 
           {articles.length > 0 && (
             <div className="mt-8 text-center">
-              <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
-                <BookOpen className="w-4 h-4" /> 查看资源库 →
-              </Link>
+              <PageCTA
+                title="需要更多资源？"
+                description="查看我们的资源库，获取更多出海工具和指南"
+                actions={
+                  <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
+                    <BookOpen className="w-4 h-4" /> 查看资源库 →
+                  </Link>
+                }
+                lightBackground
+              />
             </div>
           )}
         </ContentSection>

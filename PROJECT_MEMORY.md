@@ -11,14 +11,15 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Program Manager V3 — CHECKPOINT_ENGINE_READY |
+| **当前阶段** | Phase 5 — Architecture Convergence Batch 1 完成 |
 | **管理模式** | Program → Epic → Batch → Task → Checkpoint → Resume |
 | **Pipeline 版本** | V3.2 Full-file Proposal Mode + Rate Limit Resume + Checkpoint Engine |
-| **Design System** | V1 Foundation（14 组件，0.9% 应用） |
+| **Design System** | V1 Foundation（14 组件，详情页迁移完成） |
+| **重复组件** | 7 组 → 5 组（Phase 5 Batch 1 完成） |
 
 ### Program Manager V3 状态
 
-**当前状态**: ✅ CHECKPOINT_ENGINE_READY
+**当前状态**: ✅ CHECKPOINT_ENGINE_READY + Night 8 完成
 
 - ✅ 四层模型建立 (Program → Epic → Batch → Task)
 - ✅ Program Queue 规范建立
@@ -48,6 +49,7 @@
 
 ### 最近完成
 
+- ✅ Phase 5 Batch 1: WorkspaceSidebar 收敛（删除 2 个死代码组件，减少 377 行）
 - ✅ Night 8: V4 Shell 统一 - Blog 和 Cities 页面（/guides/[slug], /cities/[city]）
 - ✅ Night 6: 组件整合（ActionCard, StatusBadge, EmptyState）
 - ✅ Night 5: V4 Shell 统一 + Design System 应用
