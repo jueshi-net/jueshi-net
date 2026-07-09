@@ -11,12 +11,25 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Phase 4 进行中 → Night 5 完成 |
-| **阶段目标** | V4 Shell 统一 + Design System 应用 |
-| **Phase 1** | ✅ V4 Shell 统一（11/221 页面，5.0%） |
-| **Phase 2** | ✅ Night Pipeline V3 建立 |
-| **Phase 3** | ✅ Design System V1 建立（14 组件，0.9% 应用） |
-| **Phase 4** | ✅ V4 Shell 扩展 + Design System 应用（Night 5 完成） |
+| **当前阶段** | Program Manager V2 启动 |
+| **管理模式** | Program → Epic → Batch → Task |
+| **Pipeline 版本** | V3 Full-file Proposal Mode |
+| **Design System** | V1 Foundation（14 组件，0.9% 应用） |
+
+### Program 概览
+
+| Program | 状态 | 进度 | 关键指标 |
+|---------|------|------|----------|
+| **Design System Migration** | 🟡 进行中 | 27.5% | 重复组件 7→4，DS 覆盖率 0.9% |
+| **V4 Shell Unification** | 🟡 进行中 | 40% | V4 覆盖率 5.9% |
+| **Workspace Enhancement** | 🔴 未开始 | 0% | - |
+| **Performance Optimization** | 🔴 未开始 | 0% | - |
+
+### 最近完成
+
+- ✅ Night 6: 组件整合（ActionCard, StatusBadge, EmptyState）
+- ✅ Night 5: V4 Shell 统一 + Design System 应用
+- ✅ Night 4: V4 Shell 统一（Core Pages）
 
 ---
 
@@ -303,57 +316,65 @@ feature/* → staging branch → i.jueshi.net → 用户验收 → audit → mai
 
 ## 18. 下一步推荐任务
 
-### Night 3 推荐任务
+### 当前 Program 队列
 
-| 优先级 | 任务 | 预计耗时 | 风险 |
-|--------|------|----------|------|
-| P0 | `/topics` 页面 V4 Shell 统一 | 30-45min | 🟢 低 |
-| P0 | `/search` 页面 V4 Shell 统一 | 30-45min | 🟢 低 |
-| P1 | `/about` Design System 试点 | 1-2h | 🟢 低 |
-| P1 | `/contact` Design System 试点 | 1-2h | 🟢 低 |
+**Program: Design System Migration (进度 27.5%)**
+
+| Epic | 状态 | 进度 | 下一 Batch |
+|------|------|------|-----------|
+| DS-01 Foundation | ✅ 完成 | 100% | - |
+| DS-02 Public Pages | 🟡 进行中 | 30% | DS-02-B3: Topics & Search |
+| DS-03 Workspace Pages | 🔴 未开始 | 0% | DS-03-B1: Workspace 试点 |
+| DS-04 Admin Pages | 🔴 未开始 | 0% | DS-04-B1: Admin 试点 |
+| DS-05 Component Consolidation | 🟡 进行中 | 60% | DS-05-B4: WorkspaceSidebar |
+
+**Program: V4 Shell Unification (进度 40%)**
+
+| Epic | 状态 | 进度 | 下一 Batch |
+|------|------|------|-----------|
+| V4-01 Core Pages | ✅ 完成 | 100% | - |
+| V4-02 Content Pages | 🟡 进行中 | 60% | V4-02-B5: Starter & Pricing |
+| V4-03 Community Pages | 🔴 未开始 | 0% | V4-03-B1: Community 审计 |
+| V4-04 Destination Pages | 🔴 未开始 | 0% | V4-04-B1: Destinations 审计 |
+
+### 优先级排序
+
+**P0（本周必须完成）**:
+1. DS-02-B3: Topics & Search Design System 应用
+2. DS-05-B4: WorkspaceSidebar 组件整合
+3. DS-05-B5: ToolGrid 组件整合
+
+**P1（下周完成）**:
+1. DS-02-B4: Resources Design System 应用
+2. DS-02-B5: Tools Design System 应用
+3. V4-03-B1: Community Pages 审计
+
+**P2（后续迭代）**:
+1. DS-03: Workspace Pages Design System 应用
+2. DS-04: Admin Pages Design System 应用
+3. V4-04: Destination Pages V4 Shell 统一
 
 ### 入口命令
 
 ```bash
-# 准备任务队列
-cat > .hermes/pipeline/queue.json << 'EOF'
-[{
-  "id": "night3-topics-search-v4-shell",
-  "title": "Apply V4 Shell to topics and search pages",
-  "mode": "full-file-proposal",
-  "allowed_files": [
-    "src/app/(public)/topics/page.tsx",
-    "src/app/(public)/search/page.tsx",
-    "src/app/(public)/public-layout-client.tsx"
-  ],
-  "prompt": "输出完整的新文件内容，不要输出 patch。目标：1. 修改 src/app/(public)/topics/page.tsx，导入 JueshiV4PublicShell，并用 <JueshiV4PublicShell> 包裹原页面内容。2. 修改 src/app/(public)/search/page.tsx，同样包裹。3. 修改 public-layout-client.tsx，添加 isTopics 和 isSearch 跳过条件。"
-}]
-EOF
+# 执行 Program Queue
+bash scripts/program-runner.sh
 
-# 执行 Night Pipeline
-bash scripts/night-run.sh
+# 或手动执行特定 Batch
+bash scripts/night-run.sh --batch DS-02-B3
 ```
 
 ---
 
-## 附录：项目统计（修正后）
+## 19. Program Manager V2 文档索引
 
-| 指标 | 原始值 | 修正值 | 说明 |
-|------|--------|--------|------|
-| 总页面数 | 221 | 221 | 正确 |
-| Production 页面 | 221 | 205 | 排除 UI Lab(7) + preview(9) |
-| UI Lab 页面 | 7 | 7 | 正确 |
-| Preview/Draft 页面 | 0 | 9 | resources-v2(7) + community-preview(2) |
-| 总组件数 | 213 | 213 | 正确 |
-| Active 组件 | 213 | 168 | 排除 UI Lab(45) |
-| UI Lab 组件 | 45 | 45 | 正确 |
-| Design System 覆盖率 | 0% | 0% | 确认正确（0 文件引用） |
-| V4 Shell 覆盖率 | 3.6% | 3.2% | 7/221（排除 ui-lab 页面） |
-| 重复组件 | 7 组 | 7 组 | 确认正确 |
-| Dead Code | ~47 | ~47 | 确认正确 |
+| 文档 | 路径 | 说明 |
+|------|------|------|
+| Program Model | `docs/program/PROGRAM_MODEL.md` | 四层模型定义 |
+| Program Progress | `docs/program/PROGRAM_PROGRESS.md` | 进度追踪 |
+| Program Queue Spec | `docs/program/PROGRAM_QUEUE_SPEC.md` | Queue 规范 |
+| Automation Boundary | `docs/program/AUTOMATION_BOUNDARY.md` | 自动化边界 |
 
----
-
-**文档状态**: PROJECT_MEMORY_ESTABLISHED  
-**生成时间**: 2026-07-09 00:15 CST  
-**下次更新**: 每次 Night Pipeline 完成后
+**文档状态**: PROGRAM_MANAGER_V2_READY  
+**生成时间**: 2026-07-09  
+**下次更新**: Program 状态变更时
