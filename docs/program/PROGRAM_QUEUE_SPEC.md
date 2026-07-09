@@ -390,6 +390,44 @@ batch:
 
 ## Queue 执行规则
 
+### 执行命令
+
+```bash
+# 查看帮助
+bash scripts/night-run.sh --help
+
+# 查看状态
+bash scripts/night-run.sh --status
+
+# 查看队列
+bash scripts/night-run.sh --list
+
+# 模拟运行（不实际执行）
+bash scripts/night-run.sh --dry-run
+
+# 运行下一个任务
+bash scripts/night-run.sh
+
+# Program Manager V2 命令
+bash scripts/night-run.sh --batch DS-02-B3 --dry-run
+bash scripts/night-run.sh --task ds-05-b4-1 --dry-run
+bash scripts/night-run.sh --batch DS-02-B3
+bash scripts/night-run.sh --task ds-05-b4-1
+```
+
+### 可用 Batch 列表
+
+- `DS-02-B3` — Topics & Search Design System
+- `DS-05-B4` — WorkspaceSidebar 整合
+- `DS-05-B5` — ToolGrid 整合
+
+### 可用 Task 列表
+
+- `ds-02-b3-topics` — Apply Design System to /topics
+- `ds-02-b3-search` — Apply Design System to /search
+- `ds-05-b4-1` — Consolidate WorkspaceSidebar
+- `ds-05-b5-1` — Create unified ToolGrid
+
 ### 执行顺序
 
 1. **优先级排序**: P0 > P1 > P2 > P3

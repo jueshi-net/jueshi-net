@@ -11,10 +11,22 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Program Manager V2 启动 |
+| **当前阶段** | Program Manager V2 — SCRIPT_IMPLEMENTED |
 | **管理模式** | Program → Epic → Batch → Task |
-| **Pipeline 版本** | V3 Full-file Proposal Mode |
+| **Pipeline 版本** | V3 Full-file Proposal Mode + Program Manager V2 Commands |
 | **Design System** | V1 Foundation（14 组件，0.9% 应用） |
+
+### Program Manager V2 状态
+
+**当前状态**: ✅ SCRIPT_IMPLEMENTED
+
+- ✅ 四层模型建立 (Program → Epic → Batch → Task)
+- ✅ Program Queue 规范建立
+- ✅ `--batch <batch-id>` 命令已实现
+- ✅ `--task <task-id>` 命令已实现
+- ✅ Batch/Task Registry 内置映射
+- ✅ `--dry-run` 组合支持
+- ✅ `--help` 已更新
 
 ### Program 概览
 

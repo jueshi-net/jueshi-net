@@ -327,6 +327,17 @@ actions:
 - [x] 升级 ROADMAP.md
 - [x] 建立 Program Queue 规范
 
+### Script Implementation 成功标准（本轮已实现）
+
+✅ **本轮已实现**:
+- [x] `--batch <batch-id>` 命令支持
+- [x] `--task <task-id>` 命令支持
+- [x] Batch/Task Registry 内置映射
+- [x] `--dry-run` 与 `--batch`/`--task` 组合支持
+- [x] `--help` 更新显示新命令
+- [x] 语法检查通过 (`bash -n`)
+- [x] Dry run 测试通过
+
 ### 下一步成功标准
 
 - [ ] 成功执行 DS-02-B3

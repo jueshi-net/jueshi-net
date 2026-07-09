@@ -7,6 +7,8 @@
 #   ./scripts/night-run.sh --enqueue <desc>    # add task to queue
 #   ./scripts/night-run.sh --list              # list queue
 #   ./scripts/night-run.sh --dry-run           # simulate without applying
+#   ./scripts/night-run.sh --batch <id>        # run specific batch
+#   ./scripts/night-run.sh --task <id>         # run specific task
 #
 # Flow:
 #   1. Health check
@@ -19,7 +21,62 @@
 #
 # Idempotent: safe to re-run. Will skip already-completed tasks.
 
-set -euo pipefail
+set -eo pipefail
+
+# ─── Program Manager V2: Batch/Task Registry ───
+# Uses simple lookup functions instead of associative arrays for portability
+
+get_batch_info() {
+  local BATCH_ID="$1"
+  case "$BATCH_ID" in
+    DS-02-B3)
+      echo "Topics & Search Design System|src/app/(public)/topics/page.tsx,src/app/(public)/search/page.tsx,src/app/(public)/public-layout-client.tsx,docs/**|30-45min|low"
+      ;;
+    DS-05-B4)
+      echo "WorkspaceSidebar 整合|src/components/workspace/WorkspaceSidebar.tsx,src/components/saas/WorkspaceSidebar.tsx,src/app/(workspace)/**/page.tsx|30min|medium"
+      ;;
+    DS-05-B5)
+      echo "ToolGrid 整合|src/components/design-system/ToolGrid.tsx,src/components/home/tool-grid.tsx,src/components/tools/tool-grid.tsx,src/app/(public)/page.tsx,src/app/(public)/tools/page.tsx|1h|medium"
+      ;;
+    *)
+      echo ""
+      ;;
+  esac
+}
+
+get_task_info() {
+  local TASK_ID="$1"
+  case "$TASK_ID" in
+    ds-02-b3-topics)
+      echo "Apply Design System to /topics|src/app/(public)/topics/page.tsx|15min|low"
+      ;;
+    ds-02-b3-search)
+      echo "Apply Design System to /search|src/app/(public)/search/page.tsx|15min|low"
+      ;;
+    ds-05-b4-1)
+      echo "Consolidate WorkspaceSidebar|src/components/workspace/WorkspaceSidebar.tsx,src/components/saas/WorkspaceSidebar.tsx|20min|medium"
+      ;;
+    ds-05-b5-1)
+      echo "Create unified ToolGrid|src/components/design-system/ToolGrid.tsx|30min|medium"
+      ;;
+    *)
+      echo ""
+      ;;
+  esac
+}
+
+list_batches() {
+  echo "  DS-02-B3 — Topics & Search Design System"
+  echo "  DS-05-B4 — WorkspaceSidebar 整合"
+  echo "  DS-05-B5 — ToolGrid 整合"
+}
+
+list_tasks() {
+  echo "  ds-02-b3-topics — Apply Design System to /topics"
+  echo "  ds-02-b3-search — Apply Design System to /search"
+  echo "  ds-05-b4-1 — Consolidate WorkspaceSidebar"
+  echo "  ds-05-b5-1 — Create unified ToolGrid"
+}
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -365,33 +422,228 @@ PYEOF
   echo "═══════════════════════════════════════════════"
 }
 
-# ─── Main dispatch ───
-case "${1:-}" in
-  --status)
-    cmd_status
-    ;;
-  --enqueue)
-    shift
-    cmd_enqueue "$@"
-    ;;
-  --list)
-    cmd_list
-    ;;
-  --dry-run)
-    cmd_dry_run
-    ;;
-  --help|-h)
-    echo "Usage: $0 [OPTIONS]"
+# ─── Program Manager V2: Batch/Task commands ───
+
+cmd_batch() {
+  local BATCH_ID="${1:-}"
+  if [ -z "$BATCH_ID" ]; then
+    err "Usage: $0 --batch <batch-id>"
+    exit 1
+  fi
+
+  local REGISTRY_ENTRY
+  REGISTRY_ENTRY="$(get_batch_info "$BATCH_ID")"
+  if [ -z "$REGISTRY_ENTRY" ]; then
+    err "Batch not found: $BATCH_ID"
+    echo "PROGRAM_BATCH_NOT_FOUND"
     echo ""
-    echo "Options:"
-    echo "  (no args)         Run next task from queue"
-    echo "  --status          Show pipeline status"
-    echo "  --enqueue <desc>  Add task to queue"
-    echo "  --list            List queue and completed"
-    echo "  --dry-run         Simulate without applying"
-    echo "  --help            Show this help"
-    ;;
-  *)
+    echo "Available batches:"
+    list_batches
+    exit 1
+  fi
+
+  # Parse registry entry: name|allowed_files|duration|risk
+  local BATCH_NAME="${REGISTRY_ENTRY%%|*}"
+  local REMAINDER="${REGISTRY_ENTRY#*|}"
+  local BATCH_FILES="${REMAINDER%%|*}"
+  REMAINDER="${REMAINDER#*|}"
+  local BATCH_DURATION="${REMAINDER%%|*}"
+  local BATCH_RISK="${REMAINDER#*|}"
+
+  echo "═══════════════════════════════════════════════"
+  echo "  Program Manager V2 — Batch: $BATCH_ID"
+  echo "═══════════════════════════════════════════════"
+  echo ""
+  echo "  Name:     $BATCH_NAME"
+  echo "  Files:    $BATCH_FILES"
+  echo "  Duration: $BATCH_DURATION"
+  echo "  Risk:     $BATCH_RISK"
+  echo ""
+
+  if [ "${DRY_RUN:-false}" = "true" ]; then
+    info "DRY RUN: Would execute batch $BATCH_ID"
+    info "DRY RUN: Name: $BATCH_NAME"
+    info "DRY RUN: Allowed files: $BATCH_FILES"
+    info "DRY RUN: Estimated duration: $BATCH_DURATION"
+    info "DRY RUN: Risk level: $BATCH_RISK"
+    info "DRY RUN: Would generate proposal via Claude Code"
+    info "DRY RUN: Would apply patch"
+    info "DRY RUN: Would build and deploy to staging"
+    info "DRY RUN: Would verify with curl"
+    echo ""
+    echo "PROGRAM_BATCH_DRY_RUN_OK: $BATCH_ID"
+    exit 0
+  fi
+
+  # Real execution: convert batch to queue task and run
+  info "Converting batch $BATCH_ID to queue task..."
+  local TASK_JSON="{\"id\":\"$BATCH_ID\",\"title\":\"$BATCH_NAME\",\"allowed_files\":["
+  local FIRST=true
+  IFS=',' read -ra FILE_ARRAY <<< "$BATCH_FILES"
+  for f in "${FILE_ARRAY[@]}"; do
+    if [ "$FIRST" = true ]; then
+      TASK_JSON+="\"$f\""
+      FIRST=false
+    else
+      TASK_JSON+=",\"$f\""
+    fi
+  done
+  TASK_JSON+="],\"prompt\":\"Execute batch $BATCH_ID: $BATCH_NAME\"}"
+
+  # Write to queue temporarily
+  echo "[$TASK_JSON]" > "$QUEUE_FILE"
+  info "Batch $BATCH_ID loaded into queue"
+  cmd_run_inner
+}
+
+cmd_task() {
+  local TASK_ID="${1:-}"
+  if [ -z "$TASK_ID" ]; then
+    err "Usage: $0 --task <task-id>"
+    exit 1
+  fi
+
+  local REGISTRY_ENTRY
+  REGISTRY_ENTRY="$(get_task_info "$TASK_ID")"
+  if [ -z "$REGISTRY_ENTRY" ]; then
+    err "Task not found: $TASK_ID"
+    echo "PROGRAM_TASK_NOT_FOUND"
+    echo ""
+    echo "Available tasks:"
+    list_tasks
+    exit 1
+  fi
+
+  # Parse registry entry: name|allowed_files|duration|risk
+  local TASK_NAME="${REGISTRY_ENTRY%%|*}"
+  local REMAINDER="${REGISTRY_ENTRY#*|}"
+  local TASK_FILES="${REMAINDER%%|*}"
+  REMAINDER="${REMAINDER#*|}"
+  local TASK_DURATION="${REMAINDER%%|*}"
+  local TASK_RISK="${REMAINDER#*|}"
+
+  echo "═══════════════════════════════════════════════"
+  echo "  Program Manager V2 — Task: $TASK_ID"
+  echo "═══════════════════════════════════════════════"
+  echo ""
+  echo "  Name:     $TASK_NAME"
+  echo "  Files:    $TASK_FILES"
+  echo "  Duration: $TASK_DURATION"
+  echo "  Risk:     $TASK_RISK"
+  echo ""
+
+  if [ "${DRY_RUN:-false}" = "true" ]; then
+    info "DRY RUN: Would execute task $TASK_ID"
+    info "DRY RUN: Name: $TASK_NAME"
+    info "DRY RUN: Allowed files: $TASK_FILES"
+    info "DRY RUN: Estimated duration: $TASK_DURATION"
+    info "DRY RUN: Risk level: $TASK_RISK"
+    info "DRY RUN: Would generate proposal via Claude Code"
+    info "DRY RUN: Would apply patch"
+    info "DRY RUN: Would build and deploy to staging"
+    info "DRY RUN: Would verify with curl"
+    echo ""
+    echo "PROGRAM_TASK_DRY_RUN_OK: $TASK_ID"
+    exit 0
+  fi
+
+  # Real execution: convert task to queue task and run
+  info "Converting task $TASK_ID to queue task..."
+  local TASK_JSON="{\"id\":\"$TASK_ID\",\"title\":\"$TASK_NAME\",\"allowed_files\":["
+  local FIRST=true
+  IFS=',' read -ra FILE_ARRAY <<< "$TASK_FILES"
+  for f in "${FILE_ARRAY[@]}"; do
+    if [ "$FIRST" = true ]; then
+      TASK_JSON+="\"$f\""
+      FIRST=false
+    else
+      TASK_JSON+=",\"$f\""
+    fi
+  done
+  TASK_JSON+="],\"prompt\":\"Execute task $TASK_ID: $TASK_NAME\"}"
+
+  echo "[$TASK_JSON]" > "$QUEUE_FILE"
+  info "Task $TASK_ID loaded into queue"
+  cmd_run_inner
+}
+
+# ─── Main dispatch ───
+# Parse flags that may combine with --dry-run
+DRY_RUN=false
+BATCH_ID=""
+TASK_ID=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    --batch)
+      BATCH_ID="${2:-}"
+      shift 2 || { err "Missing batch ID"; exit 1; }
+      ;;
+    --task)
+      TASK_ID="${2:-}"
+      shift 2 || { err "Missing task ID"; exit 1; }
+      ;;
+    --status)
+      cmd_status
+      exit 0
+      ;;
+    --enqueue)
+      shift
+      cmd_enqueue "$@"
+      exit 0
+      ;;
+    --list)
+      cmd_list
+      exit 0
+      ;;
+    --help|-h)
+      echo "Usage: $0 [OPTIONS]"
+      echo ""
+      echo "Options:"
+      echo "  (no args)              Run next task from queue"
+      echo "  --status               Show pipeline status"
+      echo "  --enqueue <desc>       Add task to queue"
+      echo "  --list                 List queue and completed"
+      echo "  --dry-run              Simulate without applying"
+      echo "  --batch <batch-id>     Run specific Program Manager V2 batch"
+      echo "  --task <task-id>       Run specific Program Manager V2 task"
+      echo "  --help                 Show this help"
+      echo ""
+      echo "Program Manager V2 Examples:"
+      echo "  $0 --batch DS-02-B3 --dry-run"
+      echo "  $0 --task ds-05-b4-1 --dry-run"
+      echo "  $0 --batch DS-02-B3"
+      echo "  $0 --task ds-05-b4-1"
+      echo ""
+      echo "Available Batches:"
+      list_batches
+      echo ""
+      echo "Available Tasks:"
+      list_tasks
+      exit 0
+      ;;
+    *)
+      err "Unknown option: $1"
+      echo "Use --help for usage information"
+      exit 1
+      ;;
+  esac
+done
+
+# If --batch or --task was specified, run those
+if [ -n "$BATCH_ID" ]; then
+  cmd_batch "$BATCH_ID"
+elif [ -n "$TASK_ID" ]; then
+  cmd_task "$TASK_ID"
+else
+  # Default: run next from queue (with DRY_RUN if --dry-run was passed)
+  if [ "$DRY_RUN" = "true" ]; then
+    cmd_dry_run
+  else
     cmd_run_inner
-    ;;
-esac
+  fi
+fi

@@ -749,7 +749,91 @@ Result: ✅ 成功
 
 ---
 
-**文档版本**: v3.0  
+## 11. Program Manager V2 命令入口
+
+> 新增时间: 2026-07-09  
+> 版本: v2.0 (Script Implementation)
+
+### 11.1 概述
+
+Program Manager V2 为 `night-run.sh` 增加了 `--batch` 和 `--task` 命令，支持直接执行指定的 Batch 或 Task，而不再依赖队列顺序。
+
+### 11.2 新增命令
+
+```bash
+# 执行指定 Batch
+bash scripts/night-run.sh --batch <batch-id>
+
+# 执行指定 Task
+bash scripts/night-run.sh --task <task-id>
+
+# Dry run 模式（模拟执行，不实际修改）
+bash scripts/night-run.sh --batch <batch-id> --dry-run
+bash scripts/night-run.sh --task <task-id> --dry-run
+```
+
+### 11.3 内置 Batch/Task Registry
+
+脚本内置了以下 Batch 和 Task 的映射：
+
+**可用 Batch：**
+
+| Batch ID | 名称 | 风险等级 | 预计耗时 |
+|----------|------|----------|----------|
+| DS-02-B3 | Topics & Search Design System | 🟢 低 | 30-45min |
+| DS-05-B4 | WorkspaceSidebar 整合 | 🟡 中 | 30min |
+| DS-05-B5 | ToolGrid 整合 | 🟡 中 | 1h |
+
+**可用 Task：**
+
+| Task ID | 名称 | 风险等级 | 预计耗时 |
+|---------|------|----------|----------|
+| ds-02-b3-topics | Apply Design System to /topics | 🟢 低 | 15min |
+| ds-02-b3-search | Apply Design System to /search | 🟢 低 | 15min |
+| ds-05-b4-1 | Consolidate WorkspaceSidebar | 🟡 中 | 20min |
+| ds-05-b5-1 | Create unified ToolGrid | 🟡 中 | 30min |
+
+### 11.4 使用示例
+
+```bash
+# 1. 查看帮助
+bash scripts/night-run.sh --help
+
+# 2. Dry run 测试 Batch
+bash scripts/night-run.sh --batch DS-02-B3 --dry-run
+
+# 3. Dry run 测试 Task
+bash scripts/night-run.sh --task ds-05-b4-1 --dry-run
+
+# 4. 实际执行 Batch（会调用 Claude Code 生成 proposal）
+bash scripts/night-run.sh --batch DS-02-B3
+
+# 5. 实际执行 Task
+bash scripts/night-run.sh --task ds-05-b4-1
+```
+
+### 11.5 错误处理
+
+- **Batch 不存在**: 输出 `PROGRAM_BATCH_NOT_FOUND`，并列出所有可用 Batch
+- **Task 不存在**: 输出 `PROGRAM_TASK_NOT_FOUND`，并列出所有可用 Task
+
+### 11.6 与原有命令的兼容性
+
+所有原有命令仍然有效：
+
+```bash
+# 原有命令（不受影响）
+bash scripts/night-run.sh                     # 运行队列中的下一个任务
+bash scripts/night-run.sh --status            # 查看状态
+bash scripts/night-run.sh --enqueue <desc>    # 添加任务到队列
+bash scripts/night-run.sh --list              # 列出队列
+bash scripts/night-run.sh --dry-run           # 模拟运行队列中的下一个任务
+bash scripts/night-run.sh --help              # 显示帮助
+```
+
+---
+
+**文档版本**: v3.1  
 **创建时间**: 2026-07-08  
-**更新时间**: 2026-07-08  
+**更新时间**: 2026-07-09  
 **关联脚本**: `scripts/night-run.sh`, `scripts/claude-generate-patch.sh`, `scripts/ai-patch-runner.sh`, `scripts/hermes-health-check.sh`
