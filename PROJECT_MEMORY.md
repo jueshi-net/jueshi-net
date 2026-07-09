@@ -11,11 +11,17 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Phase 5 — Architecture Convergence Batch 1 完成 |
+| **当前阶段** | Public Experience Upgrade Batch 1 完成 |
 | **管理模式** | Program → Epic → Batch → Task → Checkpoint → Resume |
 | **Pipeline 版本** | V3.2 Full-file Proposal Mode + Rate Limit Resume + Checkpoint Engine |
-| **Design System** | V1 Foundation（14 组件，详情页迁移完成） |
+| **Design System** | V1 Foundation（14 组件，公共页面迁移进行中） |
 | **重复组件** | 7 组 → 5 组（Phase 5 Batch 1 完成） |
+
+### SSH 部署永久规则
+
+**xixiong-saas staging/production SSH 连接必须使用 `deploy@192.129.155.149`。**
+
+遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
 
 ### Program Manager V3 状态
 

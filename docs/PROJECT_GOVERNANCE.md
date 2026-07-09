@@ -6,6 +6,34 @@
 
 ---
 
+## 0. SSH 部署永久规则
+
+**xixiong-saas staging/production SSH 连接必须使用 `deploy@192.129.155.149`。**
+
+遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
+
+**禁止使用的用户名**：
+- ❌ root
+- ❌ admin
+- ❌ chq
+- ❌ 其他任何用户名
+
+**唯一允许的用户名**：
+- ✅ deploy
+
+**服务器地址**：
+- Staging: `192.129.155.149`
+- Production: `192.129.155.149` (同一服务器，不同 PM2 应用)
+
+**诊断步骤**（遇到连接问题时）：
+1. 检查用户名是否为 `deploy`
+2. 检查服务器地址是否为 `192.129.155.149`
+3. 检查 SSH 服务连接数/MaxStartups 问题
+4. 查看 auth 日志
+5. 检查当前已有 SSH 连接数
+
+---
+
 ## 1. Inventory 使用规则
 
 ### 1.1 Inventory 文档清单

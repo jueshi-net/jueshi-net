@@ -3,7 +3,28 @@
 > 夜间自动化 patch-based 长链路基础设施  
 > 版本: v3.0 (Full-file Proposal Mode)  
 > 创建时间: 2026-07-08  
-> 更新时间: 2026-07-08
+> 更新时间: 2026-07-09
+
+---
+
+## 0. SSH 部署永久规则
+
+**xixiong-saas staging/production SSH 连接必须使用 `deploy@192.129.155.149`。**
+
+遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
+
+**禁止使用的用户名**：
+- ❌ root
+- ❌ admin
+- ❌ chq
+- ❌ 其他任何用户名
+
+**唯一允许的用户名**：
+- ✅ deploy
+
+**服务器地址**：
+- Staging: `192.129.155.149`
+- Production: `192.129.155.149` (同一服务器，不同 PM2 应用)
 
 ---
 

@@ -6,6 +6,27 @@
 
 ---
 
+## 0. SSH 部署永久规则
+
+**xixiong-saas staging/production SSH 连接必须使用 `deploy@192.129.155.149`。**
+
+遇到 banner/kex 超时，先核对用户名，不得尝试 root/admin/chq。
+
+**禁止使用的用户名**：
+- ❌ root
+- ❌ admin
+- ❌ chq
+- ❌ 其他任何用户名
+
+**唯一允许的用户名**：
+- ✅ deploy
+
+**服务器地址**：
+- Staging: `192.129.155.149`
+- Production: `192.129.155.149` (同一服务器，不同 PM2 应用)
+
+---
+
 ## 1. 平台定位
 
 **绝世百宝箱 (jueshi.net)** — 海外华人的实用工具箱
