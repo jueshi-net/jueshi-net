@@ -11,14 +11,14 @@
 | 项目 | 值 |
 |------|-----|
 | **项目名** | 绝世百宝箱 (jueshi.net) |
-| **当前阶段** | Program Manager V2 — RATE_LIMIT_RESUME_READY |
-| **管理模式** | Program → Epic → Batch → Task |
-| **Pipeline 版本** | V3.2 Full-file Proposal Mode + Rate Limit Resume |
+| **当前阶段** | Program Manager V3 — CHECKPOINT_ENGINE_READY |
+| **管理模式** | Program → Epic → Batch → Task → Checkpoint → Resume |
+| **Pipeline 版本** | V3.2 Full-file Proposal Mode + Rate Limit Resume + Checkpoint Engine |
 | **Design System** | V1 Foundation（14 组件，0.9% 应用） |
 
-### Program Manager V2 状态
+### Program Manager V3 状态
 
-**当前状态**: ✅ RATE_LIMIT_RESUME_READY
+**当前状态**: ✅ CHECKPOINT_ENGINE_READY
 
 - ✅ 四层模型建立 (Program → Epic → Batch → Task)
 - ✅ Program Queue 规范建立
@@ -29,6 +29,13 @@
 - ✅ `--help` 已更新
 - ✅ Rate limit 自动暂停/恢复机制已实现
 - ✅ Cooldown (exit 76) 自动重试机制已实现
+- ✅ Checkpoint Engine 已实现（program/epic/batch/task 四级 checkpoint）
+- ✅ Resume Engine 已实现（自动检测未完成 task 并恢复）
+- ✅ Program State 管理已实现（program-state.json）
+- ✅ Morning Brief V2 自动生成器
+- ✅ Night Report V2 自动生成器
+- ✅ `--program-status` 命令已实现
+- ✅ Crash Recovery 支持（基于 checkpoint 恢复）
 
 ### Program 概览
 

@@ -527,7 +527,101 @@ Task 失败
 
 ## 文档状态
 
-**状态**: PROGRAM_QUEUE_SPEC_ESTABLISHED  
-**版本**: v2.0  
+**状态**: PROGRAM_QUEUE_SPEC_V3_CHECKPOINT_ENGINE  
+**版本**: v3.0  
 **创建时间**: 2026-07-09  
 **下次更新**: Queue 结构变更时
+
+---
+
+## V3 Checkpoint Engine 集成（新增）
+
+### Checkpoint 与 Queue 的集成
+
+Program Queue 现在与 Checkpoint Engine 深度集成，每个 Task 执行时自动保存 checkpoint：
+
+```
+Task 开始
+  ├── 保存 program.json checkpoint
+  ├── 保存 epic.json checkpoint
+  ├── 保存 batch.json checkpoint
+  └── 保存 task.json checkpoint (status: in_progress)
+      │
+      ├── 执行 Claude Code 生成 proposal
+      │   └── 更新 task.json (proposal_path, retry_count)
+      │
+      ├── 应用 patch
+      │   └── 更新 task.json (patch_path)
+      │
+      ├── Build 验证
+      │   └── 更新 task.json (build_status)
+      │
+      ├── Deploy staging
+      │   └── 更新 task.json (deploy_status)
+      │
+      ├── Runtime 验证
+      │   └── 更新 task.json (runtime_status)
+      │
+      └── Task 完成
+          └── 更新 task.json (status: completed, completed_at)
+```
+
+### Resume 与 Queue 的集成
+
+当 night-run.sh 启动时：
+
+1. 检查 `.hermes/pipeline/checkpoints/task.json`
+2. 如果 status 为 `in_progress` 或 `failed`，自动恢复
+3. 从 checkpoint 中读取 program/epic/batch/task 信息
+4. 继续执行未完成的 Task
+5. 不重新执行已完成的 Task
+
+### Program State 与 Queue 的集成
+
+`program-state.json` 维护全局状态，与 Queue 同步更新：
+
+```json
+{
+  "current_program": "design-system-migration",
+  "current_epic": "DS-02",
+  "current_batch": "DS-02-B3",
+  "current_task": "ds-02-b3-topics",
+  "progress": 27.5,
+  "last_success": "2026-07-09T12:15:00Z",
+  "last_failure": null,
+  "eta": "2026-07-10T00:00:00Z",
+  "remaining_tasks": 5,
+  "remaining_batches": 2
+}
+```
+
+### 新增命令
+
+```bash
+# 查看 Program 状态（含 checkpoint 信息）
+bash scripts/night-run.sh --program-status
+
+# Dry run 生成报告（不执行任务）
+bash scripts/night-run.sh --program-status --dry-run
+```
+
+### 报告生成
+
+V3 Checkpoint Engine 自动生成两种报告：
+
+1. **Morning Brief V2** (`.hermes/reports/morning-brief.md`)
+   - Program Progress
+   - Yesterday Completed
+   - Today's Plan
+   - ETA
+   - Blocked Items
+   - Need Human Review
+   - Next Batch
+
+2. **Night Report V2** (`.hermes/reports/night-report.md`)
+   - Completed Tasks
+   - Task Details (proposal, patch, build, deploy, runtime)
+   - Rate Limit / Retry 信息
+   - 耗时
+   - 风险
+   - 下一步

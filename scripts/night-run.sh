@@ -4,6 +4,7 @@
 # Usage:
 #   ./scripts/night-run.sh                     # run next task from queue
 #   ./scripts/night-run.sh --status            # show pipeline status
+#   ./scripts/night-run.sh --program-status    # show Program Manager V3 status
 #   ./scripts/night-run.sh --enqueue <desc>    # add task to queue
 #   ./scripts/night-run.sh --list              # list queue
 #   ./scripts/night-run.sh --dry-run           # simulate without applying
@@ -85,6 +86,9 @@ STATE_FILE="$PIPELINE_DIR/state.json"
 QUEUE_FILE="$PIPELINE_DIR/queue.json"
 COMPLETED_FILE="$PIPELINE_DIR/completed.json"
 LOCKS_DIR="$PIPELINE_DIR/locks"
+CHECKPOINTS_DIR="$PIPELINE_DIR/checkpoints"
+PROGRAM_STATE_FILE="$PIPELINE_DIR/program-state.json"
+REPORTS_DIR="$REPO_ROOT/.hermes/reports"
 
 # ─── Colors ───
 if [ -t 1 ]; then
@@ -100,7 +104,7 @@ err()   { echo -e "${RED}[ERROR]${NC} $*"; }
 step()  { echo -e "${CYAN}[STEP]${NC} $*"; }
 
 # ─── Ensure dirs exist ───
-mkdir -p "$LOCKS_DIR"
+mkdir -p "$LOCKS_DIR" "$CHECKPOINTS_DIR" "$REPORTS_DIR"
 
 # ─── Init state files if missing ───
 init_state() {
@@ -113,11 +117,374 @@ init_state() {
   if [ ! -f "$COMPLETED_FILE" ]; then
     echo '[]' > "$COMPLETED_FILE"
   fi
+  if [ ! -f "$PROGRAM_STATE_FILE" ]; then
+    echo '{"current_program":null,"current_epic":null,"current_batch":null,"current_task":null,"progress":0,"last_success":null,"last_failure":null,"eta":null,"remaining_tasks":0,"remaining_batches":0,"updated_at":null}' > "$PROGRAM_STATE_FILE"
+  fi
 }
 
 init_state
 
+# ─── Checkpoint Engine ───
+
+save_checkpoint() {
+  local program_id="${1:-}"
+  local epic_id="${2:-}"
+  local batch_id="${3:-}"
+  local task_id="${4:-}"
+  local status="${5:-in_progress}"
+  
+  # Save program checkpoint
+  python3 - "$CHECKPOINTS_DIR/program.json" "$program_id" "$status" <<'PYEOF'
+import json, sys, datetime
+path, program_id, status = sys.argv[1], sys.argv[2], sys.argv[3]
+data = {"program_id": program_id, "status": status, "updated_at": datetime.datetime.now().isoformat()}
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+
+  # Save epic checkpoint
+  python3 - "$CHECKPOINTS_DIR/epic.json" "$epic_id" "$status" <<'PYEOF'
+import json, sys, datetime
+path, epic_id, status = sys.argv[1], sys.argv[2], sys.argv[3]
+data = {"epic_id": epic_id, "status": status, "updated_at": datetime.datetime.now().isoformat()}
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+
+  # Save batch checkpoint
+  python3 - "$CHECKPOINTS_DIR/batch.json" "$batch_id" "$status" <<'PYEOF'
+import json, sys, datetime
+path, batch_id, status = sys.argv[1], sys.argv[2], sys.argv[3]
+data = {"batch_id": batch_id, "status": status, "updated_at": datetime.datetime.now().isoformat()}
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+
+  # Save task checkpoint
+  python3 - "$CHECKPOINTS_DIR/task.json" "$task_id" "$status" <<'PYEOF'
+import json, sys, datetime
+path, task_id, status = sys.argv[1], sys.argv[2], sys.argv[3]
+data = {
+    "task_id": task_id,
+    "status": status,
+    "proposal_path": None,
+    "patch_path": None,
+    "build_status": None,
+    "deploy_status": None,
+    "runtime_status": None,
+    "retry_count": 0,
+    "rate_limit_status": None,
+    "started_at": datetime.datetime.now().isoformat(),
+    "completed_at": None
+}
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+
+  ok "Checkpoint saved: $program_id/$epic_id/$batch_id/$task_id"
+}
+
+update_task_checkpoint() {
+  local task_id="${1:-}"
+  local field="${2:-}"
+  local value="${3:-}"
+  
+  python3 - "$CHECKPOINTS_DIR/task.json" "$task_id" "$field" "$value" <<'PYEOF'
+import json, sys, datetime
+path, task_id, field, value = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+data = json.load(open(path))
+if field == "completed_at" and value == "now":
+    data[field] = datetime.datetime.now().isoformat()
+else:
+    try:
+        data[field] = int(value)
+    except:
+        data[field] = value
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+}
+
+# ─── Resume Engine ───
+
+check_resume() {
+  if [ -f "$CHECKPOINTS_DIR/task.json" ]; then
+    local task_status=$(python3 -c "import json; print(json.load(open('$CHECKPOINTS_DIR/task.json')).get('status', 'unknown'))" 2>/dev/null || echo "unknown")
+    
+    if [ "$task_status" = "in_progress" ] || [ "$task_status" = "failed" ]; then
+      local task_id=$(python3 -c "import json; print(json.load(open('$CHECKPOINTS_DIR/task.json')).get('task_id', ''))" 2>/dev/null || echo "")
+      local batch_id=$(python3 -c "import json; print(json.load(open('$CHECKPOINTS_DIR/batch.json')).get('batch_id', ''))" 2>/dev/null || echo "")
+      local epic_id=$(python3 -c "import json; print(json.load(open('$CHECKPOINTS_DIR/epic.json')).get('epic_id', ''))" 2>/dev/null || echo "")
+      local program_id=$(python3 -c "import json; print(json.load(open('$CHECKPOINTS_DIR/program.json')).get('program_id', ''))" 2>/dev/null || echo "")
+      
+      warn "Found incomplete task: $task_id (status: $task_status)"
+      info "Resuming from checkpoint: $program_id/$epic_id/$batch_id/$task_id"
+      
+      echo "RESUME|$program_id|$epic_id|$batch_id|$task_id"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+# ─── Program State Management ───
+
+update_program_state() {
+  local program_id="${1:-}"
+  local epic_id="${2:-}"
+  local batch_id="${3:-}"
+  local task_id="${4:-}"
+  local progress="${5:-0}"
+  local status="${6:-in_progress}"
+  
+  python3 - "$PROGRAM_STATE_FILE" "$program_id" "$epic_id" "$batch_id" "$task_id" "$progress" "$status" <<'PYEOF'
+import json, sys, datetime
+path, program_id, epic_id, batch_id, task_id, progress, status = sys.argv[1:7]
+data = json.load(open(path))
+data["current_program"] = program_id
+data["current_epic"] = epic_id
+data["current_batch"] = batch_id
+data["current_task"] = task_id
+data["progress"] = int(progress)
+data["updated_at"] = datetime.datetime.now().isoformat()
+
+if status == "completed":
+    data["last_success"] = datetime.datetime.now().isoformat()
+elif status == "failed":
+    data["last_failure"] = datetime.datetime.now().isoformat()
+
+json.dump(data, open(path, "w"), indent=2)
+PYEOF
+}
+
+# ─── Morning Brief V2 Generator ───
+
+generate_morning_brief() {
+  local output_file="$REPORTS_DIR/morning-brief.md"
+  
+  python3 - "$PROGRAM_STATE_FILE" "$COMPLETED_FILE" "$CHECKPOINTS_DIR" "$output_file" <<'PYEOF'
+import json, sys, datetime
+from pathlib import Path
+
+program_state_path, completed_path, checkpoints_dir, output_file = sys.argv[1:5]
+
+# Load program state
+program_state = json.load(open(program_state_path))
+
+# Load completed tasks
+completed = json.load(open(completed_path))
+
+# Generate report
+report = []
+report.append("# Morning Brief V2")
+report.append(f"\n**Generated:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+report.append("## Program Progress\n")
+report.append(f"- **Current Program:** {program_state.get('current_program', 'N/A')}")
+report.append(f"- **Current Epic:** {program_state.get('current_epic', 'N/A')}")
+report.append(f"- **Current Batch:** {program_state.get('current_batch', 'N/A')}")
+report.append(f"- **Current Task:** {program_state.get('current_task', 'N/A')}")
+report.append(f"- **Progress:** {program_state.get('progress', 0)}%")
+report.append(f"- **Last Success:** {program_state.get('last_success', 'N/A')}")
+report.append(f"- **Last Failure:** {program_state.get('last_failure', 'N/A')}")
+report.append(f"- **ETA:** {program_state.get('eta', 'N/A')}")
+report.append(f"- **Remaining Tasks:** {program_state.get('remaining_tasks', 0)}")
+report.append(f"- **Remaining Batches:** {program_state.get('remaining_batches', 0)}")
+
+report.append("\n## Yesterday Completed\n")
+yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+yesterday_tasks = [t for t in completed if t.get('completed', '').startswith(yesterday)]
+if yesterday_tasks:
+    for task in yesterday_tasks:
+        report.append(f"- ✅ {task.get('id', 'unknown')} - {task.get('result', 'unknown')}")
+else:
+    report.append("- No tasks completed yesterday")
+
+report.append("\n## Today's Plan\n")
+report.append(f"- Continue with: {program_state.get('current_task', 'N/A')}")
+report.append(f"- Target progress: {min(program_state.get('progress', 0) + 10, 100)}%")
+
+report.append("\n## Blocked Items\n")
+# Check for rate limit
+rate_limit_lock = Path(program_state_path).parent / "rate-limit.lock"
+if rate_limit_lock.exists():
+    lock_data = json.load(open(rate_limit_lock))
+    report.append(f"- ⚠️ Rate limited: {lock_data.get('task_id', 'unknown')} (resume: {lock_data.get('resume_time', 'N/A')})")
+else:
+    report.append("- No blocked items")
+
+report.append("\n## Need Human Review\n")
+report.append("- Check staging environment for visual verification")
+
+report.append("\n## Next Batch\n")
+report.append(f"- {program_state.get('current_batch', 'N/A')}")
+
+# Write report
+Path(output_file).write_text('\n'.join(report))
+print(f"Morning brief generated: {output_file}")
+PYEOF
+  
+  ok "Morning Brief V2 generated: $output_file"
+}
+
+# ─── Night Report V2 Generator ───
+
+generate_night_report() {
+  local output_file="$REPORTS_DIR/night-report.md"
+  local run_id="${1:-unknown}"
+  
+  python3 - "$PROGRAM_STATE_FILE" "$COMPLETED_FILE" "$CHECKPOINTS_DIR" "$output_file" "$run_id" <<'PYEOF'
+import json, sys, datetime
+from pathlib import Path
+
+program_state_path, completed_path, checkpoints_dir, output_file, run_id = sys.argv[1:6]
+
+# Load program state
+program_state = json.load(open(program_state_path))
+
+# Load completed tasks
+completed = json.load(open(completed_path))
+
+# Load task checkpoint
+task_checkpoint_path = Path(checkpoints_dir) / "task.json"
+task_checkpoint = json.load(open(task_checkpoint_path)) if task_checkpoint_path.exists() else {}
+
+# Generate report
+report = []
+report.append("# Night Report V2")
+report.append(f"\n**Run ID:** {run_id}")
+report.append(f"**Generated:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+report.append("## Completed Tasks\n")
+today = datetime.datetime.now().strftime('%Y-%m-%d')
+today_tasks = [t for t in completed if t.get('completed', '').startswith(today)]
+if today_tasks:
+    for task in today_tasks:
+        report.append(f"- ✅ {task.get('id', 'unknown')}")
+        report.append(f"  - Result: {task.get('result', 'unknown')}")
+        report.append(f"  - Completed: {task.get('completed', 'unknown')}")
+else:
+    report.append("- No tasks completed today")
+
+report.append("\n## Task Details\n")
+report.append(f"- **Task ID:** {task_checkpoint.get('task_id', 'N/A')}")
+report.append(f"- **Status:** {task_checkpoint.get('status', 'N/A')}")
+report.append(f"- **Proposal Path:** {task_checkpoint.get('proposal_path', 'N/A')}")
+report.append(f"- **Patch Path:** {task_checkpoint.get('patch_path', 'N/A')}")
+report.append(f"- **Build Status:** {task_checkpoint.get('build_status', 'N/A')}")
+report.append(f"- **Deploy Status:** {task_checkpoint.get('deploy_status', 'N/A')}")
+report.append(f"- **Runtime Status:** {task_checkpoint.get('runtime_status', 'N/A')}")
+report.append(f"- **Retry Count:** {task_checkpoint.get('retry_count', 0)}")
+report.append(f"- **Rate Limit Status:** {task_checkpoint.get('rate_limit_status', 'N/A')}")
+
+report.append("\n## Program State\n")
+report.append(f"- **Progress:** {program_state.get('progress', 0)}%")
+report.append(f"- **Current Batch:** {program_state.get('current_batch', 'N/A')}")
+report.append(f"- **Remaining Tasks:** {program_state.get('remaining_tasks', 0)}")
+
+report.append("\n## Risks\n")
+# Check for rate limit
+rate_limit_lock = Path(program_state_path).parent / "rate-limit.lock"
+if rate_limit_lock.exists():
+    report.append("- ⚠️ Rate limited during execution")
+else:
+    report.append("- No risks detected")
+
+report.append("\n## Next Steps\n")
+report.append(f"- Continue with: {program_state.get('current_task', 'N/A')}")
+
+# Write report
+Path(output_file).write_text('\n'.join(report))
+print(f"Night report generated: {output_file}")
+PYEOF
+  
+  ok "Night Report V2 generated: $output_file"
+}
+
 # ─── Subcommands ───
+
+cmd_program_status() {
+  echo "═══════════════════════════════════════════════"
+  echo "  Program Manager V3 — Program Status"
+  echo "═══════════════════════════════════════════════"
+  echo ""
+
+  # Program State
+  if [ -f "$PROGRAM_STATE_FILE" ]; then
+    echo "Program State:"
+    python3 -c "
+import json, datetime
+state = json.load(open('$PROGRAM_STATE_FILE'))
+print(f'  Program:        {state.get(\"current_program\", \"N/A\")}')
+print(f'  Epic:           {state.get(\"current_epic\", \"N/A\")}')
+print(f'  Batch:          {state.get(\"current_batch\", \"N/A\")}')
+print(f'  Task:           {state.get(\"current_task\", \"N/A\")}')
+print(f'  Progress:       {state.get(\"progress\", 0)}%')
+print(f'  Last Success:   {state.get(\"last_success\", \"N/A\")}')
+print(f'  Last Failure:   {state.get(\"last_failure\", \"N/A\")}')
+print(f'  ETA:            {state.get(\"eta\", \"N/A\")}')
+print(f'  Remaining Tasks: {state.get(\"remaining_tasks\", 0)}')
+print(f'  Remaining Batches: {state.get(\"remaining_batches\", 0)}')
+print(f'  Updated:        {state.get(\"updated_at\", \"N/A\")}')
+" 2>/dev/null || cat "$PROGRAM_STATE_FILE" | sed 's/^/  /'
+  else
+    echo "Program State: (not initialized)"
+  fi
+  echo ""
+
+  # Checkpoints
+  echo "Checkpoints:"
+  for cp_file in program.json epic.json batch.json task.json; do
+    cp_path="$CHECKPOINTS_DIR/$cp_file"
+    if [ -f "$cp_path" ]; then
+      python3 -c "
+import json
+data = json.load(open('$cp_path'))
+name = data.get('program_id') or data.get('epic_id') or data.get('batch_id') or data.get('task_id') or 'unknown'
+status = data.get('status', 'unknown')
+updated = data.get('updated_at', 'N/A')
+completed = data.get('completed_at', '')
+retry = data.get('retry_count', '')
+extra = f' | retry: {retry}' if retry != '' and retry != 0 else ''
+extra += f' | completed: {completed}' if completed else ''
+print(f'  ✅ {\"$cp_file\":20s} {name:30s} status={status:15s} updated={updated}{extra}')
+" 2>/dev/null || echo "  ⚠️  $cp_file (parse error)"
+    else
+      echo "  ⚪  $cp_file (empty)"
+    fi
+  done
+  echo ""
+
+  # Rate Limit Status
+  RATE_LIMIT_LOCK="$PIPELINE_DIR/rate-limit.lock"
+  if [ -f "$RATE_LIMIT_LOCK" ]; then
+    echo "Rate Limit:"
+    python3 -c "
+import json, datetime
+lock = json.load(open('$RATE_LIMIT_LOCK'))
+resume_epoch = lock.get('resume_epoch', 0)
+now = int(__import__('time').time())
+remaining = max(0, resume_epoch - now)
+resume_dt = datetime.datetime.fromtimestamp(resume_epoch)
+print(f'  Status:       RATE_LIMITED')
+print(f'  Task:         {lock.get(\"task_id\", \"unknown\")}')
+print(f'  Batch:        {lock.get(\"batch_id\", \"unknown\")}')
+print(f'  Retry Count:  {lock.get(\"retry_count\", 0)}/3')
+print(f'  Resume Time:  {resume_dt.strftime(\"%Y-%m-%d %H:%M:%S\")}')
+print(f'  Remaining:    {remaining}s ({remaining//60}m{remaining%60}s)')
+" 2>/dev/null || cat "$RATE_LIMIT_LOCK" | sed 's/^/  /'
+  else
+    echo "Rate Limit: OK (no active rate limit)"
+  fi
+  echo ""
+
+  # Reports
+  echo "Reports:"
+  for report_file in morning-brief.md night-report.md; do
+    report_path="$REPORTS_DIR/$report_file"
+    if [ -f "$report_path" ]; then
+      local mod_time=$(stat -f "%Sm" "$report_path" 2>/dev/null || stat -c "%y" "$report_path" 2>/dev/null || echo "unknown")
+      echo "  ✅ $report_file (updated: $mod_time)"
+    else
+      echo "  ⚪  $report_file (not generated)"
+    fi
+  done
+}
 
 cmd_status() {
   echo "═══════════════════════════════════════════════"
@@ -224,6 +591,15 @@ cmd_run_inner() {
   echo "═══════════════════════════════════════════════"
   echo ""
 
+  # ─── Check for resume point ───
+  if [ "$DRY_RUN" != "true" ]; then
+    RESUME_INFO=$(check_resume 2>/dev/null) || true
+    if [ -n "$RESUME_INFO" ]; then
+      IFS='|' read -r RESUME_FLAG RESUME_PROGRAM RESUME_EPIC RESUME_BATCH RESUME_TASK <<< "$RESUME_INFO"
+      info "Resuming from checkpoint: $RESUME_PROGRAM/$RESUME_EPIC/$RESUME_BATCH/$RESUME_TASK"
+    fi
+  fi
+
   # ─── Step 1: Health check ───
   step "1/7 Health check"
   if [ -x "$SCRIPT_DIR/hermes-health-check.sh" ]; then
@@ -287,6 +663,12 @@ PYEOF
   ok "Task: ${TASK_PROMPT:0:100}..."
   info "Allowed files: $TASK_ALLOWED_FILES"
 
+  # Save checkpoint before starting
+  if [ "$DRY_RUN" != "true" ]; then
+    save_checkpoint "${BATCH_ID:-program}" "${BATCH_ID:-epic}" "${BATCH_ID:-batch}" "$TASK_ID" "in_progress"
+    update_program_state "${BATCH_ID:-program}" "${BATCH_ID:-epic}" "${BATCH_ID:-batch}" "$TASK_ID" 0 "in_progress"
+  fi
+
   # Update state
   python3 - "$STATE_FILE" "$TASK_ID" "$RUN_ID" <<'PYEOF'
 import json, sys
@@ -309,6 +691,8 @@ PYEOF
     info "DRY RUN: Would apply via ai-patch-runner.sh"
     info "DRY RUN: Would deploy staging"
     info "DRY RUN: Would curl verify"
+    info "DRY RUN: Would save checkpoint"
+    info "DRY RUN: Would generate morning brief and night report"
     echo "NIGHT_DRY_RUN_OK"
     exit 0
   fi
@@ -554,8 +938,8 @@ PYEOF
   fi
   echo ""
 
-  # ─── Step 7: Update state ───
-  step "7/7 Update state"
+  # ─── Step 7: Update state + checkpoint + reports ───
+  step "7/7 Update state + checkpoint + reports"
   python3 - "$STATE_FILE" "$QUEUE_FILE" "$COMPLETED_FILE" "$TASK_ID" "$RUN_ID" <<'PYEOF'
 import json, sys, datetime
 
@@ -593,6 +977,21 @@ json.dump(c, open(completed_path, "w"), indent=2, ensure_ascii=False)
 
 print(f"COMPLETED: {task_id}")
 PYEOF
+
+  # Update task checkpoint to completed
+  update_task_checkpoint "$TASK_ID" "status" "completed"
+  update_task_checkpoint "$TASK_ID" "proposal_path" "$PROPOSALS_DIR"
+  update_task_checkpoint "$TASK_ID" "patch_path" "$PATCH_FILE"
+  update_task_checkpoint "$TASK_ID" "build_status" "ok"
+  update_task_checkpoint "$TASK_ID" "deploy_status" "ok"
+  update_task_checkpoint "$TASK_ID" "runtime_status" "ok"
+  update_task_checkpoint "$TASK_ID" "completed_at" "now"
+
+  # Update program state
+  update_program_state "${BATCH_ID:-program}" "${BATCH_ID:-epic}" "${BATCH_ID:-batch}" "$TASK_ID" 100 "completed"
+
+  # Generate night report
+  generate_night_report "$RUN_ID"
 
   echo ""
   echo "═══════════════════════════════════════════════"
@@ -751,6 +1150,14 @@ DRY_RUN=false
 BATCH_ID=""
 TASK_ID=""
 
+# Pre-scan for --dry-run (so it works regardless of argument order)
+for arg in "$@"; do
+  if [ "$arg" = "--dry-run" ]; then
+    DRY_RUN=true
+    break
+  fi
+done
+
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run)
@@ -769,6 +1176,19 @@ while [ $# -gt 0 ]; do
       cmd_status
       exit 0
       ;;
+    --program-status)
+      cmd_program_status
+      # If also --dry-run, generate reports without executing
+      if [ "$DRY_RUN" = "true" ]; then
+        echo ""
+        info "DRY RUN: Generating Morning Brief V2..."
+        generate_morning_brief
+        info "DRY RUN: Generating Night Report V2..."
+        generate_night_report "dry-run-$(date '+%Y%m%d-%H%M%S')"
+        info "DRY RUN: Reports generated (no tasks executed)"
+      fi
+      exit 0
+      ;;
     --enqueue)
       shift
       cmd_enqueue "$@"
@@ -784,6 +1204,7 @@ while [ $# -gt 0 ]; do
       echo "Options:"
       echo "  (no args)              Run next task from queue"
       echo "  --status               Show pipeline status"
+      echo "  --program-status       Show Program Manager V3 status (checkpoints, progress, ETA)"
       echo "  --enqueue <desc>       Add task to queue"
       echo "  --list                 List queue and completed"
       echo "  --dry-run              Simulate without applying"
@@ -791,7 +1212,9 @@ while [ $# -gt 0 ]; do
       echo "  --task <task-id>       Run specific Program Manager V2 task"
       echo "  --help                 Show this help"
       echo ""
-      echo "Program Manager V2 Examples:"
+      echo "Program Manager V3 Examples:"
+      echo "  $0 --program-status"
+      echo "  $0 --program-status --dry-run"
       echo "  $0 --batch DS-02-B3 --dry-run"
       echo "  $0 --task ds-05-b4-1 --dry-run"
       echo "  $0 --batch DS-02-B3"

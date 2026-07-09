@@ -1,0 +1,13 @@
+{
+  "current_program": null,
+  "current_epic": null,
+  "current_batch": null,
+  "current_task": null,
+  "progress": 0,
+  "last_success": null,
+  "last_failure": null,
+  "eta": null,
+  "remaining_tasks": 0,
+  "remaining_batches": 0,
+  "updated_at": null
+}

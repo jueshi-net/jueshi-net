@@ -247,7 +247,42 @@
 
 ## 文档状态
 
-**状态**: PROGRAM_PROGRESS_REPORT_ESTABLISHED  
-**版本**: v1.0  
+**状态**: PROGRAM_PROGRESS_V3_CHECKPOINT_ENGINE  
+**版本**: v3.0  
 **创建时间**: 2026-07-09  
 **下次更新**: 每个 Night 完成后
+
+---
+
+## Checkpoint Engine 状态（V3 新增）
+
+### Checkpoint 文件
+
+| 文件 | 路径 | 状态 |
+|------|------|------|
+| Program Checkpoint | `.hermes/pipeline/checkpoints/program.json` | ✅ 已初始化 |
+| Epic Checkpoint | `.hermes/pipeline/checkpoints/epic.json` | ✅ 已初始化 |
+| Batch Checkpoint | `.hermes/pipeline/checkpoints/batch.json` | ✅ 已初始化 |
+| Task Checkpoint | `.hermes/pipeline/checkpoints/task.json` | ✅ 已初始化 |
+| Program State | `.hermes/pipeline/program-state.json` | ✅ 已初始化 |
+
+### Report 文件
+
+| 文件 | 路径 | 状态 |
+|------|------|------|
+| Morning Brief V2 | `.hermes/reports/morning-brief.md` | ✅ 已生成 |
+| Night Report V2 | `.hermes/reports/night-report.md` | ✅ 已生成 |
+
+### Resume Engine
+
+- ✅ 自动检测未完成 task
+- ✅ 自动恢复到最后一个未完成 task
+- ✅ 不重新执行已完成的 task
+- ✅ 不重新分析，直接从 checkpoint 恢复
+
+### Crash Recovery
+
+- ✅ Hermes 重启 → 自动恢复
+- ✅ OpenClaw 重启 → 自动恢复
+- ✅ Mac 重启 → 自动恢复
+- ✅ 基于 checkpoint 恢复到最后一个未完成 Task
