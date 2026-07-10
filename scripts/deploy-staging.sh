@@ -8,6 +8,15 @@ STAGING_SERVER="deploy@192.129.155.149"
 STAGING_DIR="/home/deploy/xixiong-saas-staging"
 PM2_APP="xixiong-staging"
 
+# P2 Deploy Guard: Check staging environment first
+echo "=== [0/5] Pre-deploy staging environment check ==="
+if ! bash scripts/check-staging.sh; then
+    echo "❌ Staging environment check failed. Aborting deployment."
+    exit 1
+fi
+echo "✅ Staging environment verified"
+echo ""
+
 # Environment guard
 ENV_MARKER=$(ssh "$STAGING_SERVER" "cat /etc/jueshi-environment 2>/dev/null || echo 'MISSING'")
 if ! echo "$ENV_MARKER" | grep -q "environment=staging"; then
