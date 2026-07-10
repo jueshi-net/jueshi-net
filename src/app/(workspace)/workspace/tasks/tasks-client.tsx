@@ -7,7 +7,7 @@ import {
   Sparkles, MessageSquare, CalendarCheck, Globe, Loader2,
   Trophy, Flame, Star, TrendingUp, Zap, Award, Clock,
 } from "lucide-react";
-import { MetricCard } from "@/components/saas/MetricCard";
+import { MetricCard } from "@/components/design-system";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { ActionCard } from "@/components/design-system/ActionCard";
 import { StatusBadge } from "@/components/design-system/StatusBadge";

@@ -21,7 +21,7 @@ import CheckinButton from "@/components/user/CheckinButton";
 import TodayTasks from "@/components/user/TodayTasks";
 import RecentTools from "@/components/user/RecentTools";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { MetricCard } from "@/components/saas/MetricCard";
+import { MetricCard } from "@/components/design-system";
 import { ActionCard } from "@/components/design-system/ActionCard";
 import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
 
