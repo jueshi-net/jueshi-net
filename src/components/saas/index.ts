@@ -7,8 +7,9 @@
  * - WorkspaceSidebar: 工作区左侧导航（支持分组、折叠、徽标）
  * - WorkspaceTopbar: 工作区顶部工具栏（支持搜索、通知、用户信息）
  * - SectionCard: 区块卡片
+ * - MetricCard: 指标卡片
  *
- * 注意：ActionCard、StatusBadge、EmptyState、MetricCard 已迁移到 design-system
+ * 注意：ActionCard、StatusBadge、EmptyState 已迁移到 design-system
  */
 
 export { CompactTable } from './CompactTable';
@@ -19,7 +20,4 @@ export { WorkspaceTopbar } from './WorkspaceTopbar';
 
 // Re-export existing saas components for unified imports
 export { SectionCard } from './SectionCard';
-
-// MetricCard has been migrated to design-system
-// Import from '@/components/design-system' instead
-export { MetricCard } from '@/components/design-system';
+export { MetricCard } from './MetricCard';
