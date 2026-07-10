@@ -6,14 +6,9 @@ import React, { FC } from 'react';
 
 interface StatusBadgeProps {
   /**
-   * 状态文本（children 或 label）
+   * 状态文本
    */
-  children?: string;
-  
-  /**
-   * 状态文本（向后兼容）
-   */
-  label?: string;
+  children: string;
   
   /**
    * 状态类型
@@ -34,24 +29,15 @@ interface StatusBadgeProps {
    * 是否包含图标
    */
   withIcon?: boolean;
-  
-  /**
-   * 是否显示点指示器
-   */
-  dot?: boolean;
 }
 
 export const StatusBadge: FC<StatusBadgeProps> = ({
   children,
-  label,
   status,
   className = '',
   circular = false,
-  withIcon = false,
-  dot = false
+  withIcon = false
 }) => {
-  const displayText = children || label || '';
-  
   const statusClasses = {
     success: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300',
     warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-300',
@@ -94,9 +80,8 @@ export const StatusBadge: FC<StatusBadgeProps> = ({
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
       statusClasses[status]
     } ${circular ? '!rounded-full' : ''} ${className}`}>
-      {dot && <span className="w-2 h-2 rounded-full bg-current mr-1.5"></span>}
       {withIcon && iconMap[status]}
-      {displayText}
+      {children}
     </span>
   );
 };

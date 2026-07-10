@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
-import { MetricCard } from '@/components/design-system';
+import { MetricCard } from '@/components/saas/MetricCard';
 import { StatusBadge } from '@/components/design-system/StatusBadge';
 import { CompactTable } from '@/components/saas/CompactTable';
 import { EmptyState } from '@/components/design-system/EmptyState';

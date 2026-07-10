@@ -8,12 +8,7 @@ interface StatsCardProps {
   /**
    * 卡片标题
    */
-  title?: string;
-  
-  /**
-   * 卡片标签（兼容 MetricCard 接口）
-   */
-  label?: string;
+  title: string;
   
   /**
    * 显示的数据值
@@ -41,21 +36,17 @@ interface StatsCardProps {
 
 export const StatsCard: FC<StatsCardProps> = ({
   title,
-  label,
   value,
   trend,
   className = '',
   icon
 }) => {
-  // 支持 title 或 label（向后兼容）
-  const displayTitle = title || label || '';
-  
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm ${className}`}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-            {displayTitle}
+            {title}
           </p>
           <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
             {value}
@@ -81,8 +72,5 @@ export const StatsCard: FC<StatsCardProps> = ({
     </div>
   );
 };
-
-// 向后兼容导出
-export const MetricCard = StatsCard;
 
 export default StatsCard;

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { BookOpen, Trash2, Edit, Plus, Save, X, Loader2, ExternalLink, Upload, Download, FileJson, AlertCircle, Activity, Tag, Globe, Sparkles, Search } from 'lucide-react';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
-import { MetricCard } from '@/components/design-system';
+import { MetricCard } from '@/components/saas/MetricCard';
 import { StatusBadge } from '@/components/design-system/StatusBadge';
 import { EmptyState } from '@/components/design-system/EmptyState';
 

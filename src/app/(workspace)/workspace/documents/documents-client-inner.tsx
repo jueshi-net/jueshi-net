@@ -10,7 +10,7 @@ import {
   documentTools, getToolHref, getToolIcon, getToolColor,
   categoryLabels, onlineToolCount,
 } from '@/lib/document-tools-config';
-import { MetricCard } from '@/components/design-system';
+import { MetricCard } from '@/components/saas/MetricCard';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { StatusBadge } from '@/components/design-system/StatusBadge';

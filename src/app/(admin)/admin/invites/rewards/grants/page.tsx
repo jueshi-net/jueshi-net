@@ -5,7 +5,7 @@ import { Gift, CheckCircle, XCircle, AlertCircle, Clock, RefreshCw } from 'lucid
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { StatusBadge } from '@/components/design-system/StatusBadge';
-import { MetricCard } from '@/components/design-system';
+import { MetricCard } from '@/components/saas/MetricCard';
 import { EmptyState } from '@/components/design-system/EmptyState';
 
 interface RewardGrant {

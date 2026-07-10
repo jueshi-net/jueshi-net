@@ -39,16 +39,6 @@ interface EmptyStateProps {
    * 是否显示辅助操作在主操作下方
    */
   verticalActions?: boolean;
-  
-  /**
-   * 样式变体（向后兼容）
-   */
-  variant?: 'default' | 'compact';
-  
-  /**
-   * 是否紧凑模式（向后兼容）
-   */
-  compact?: boolean;
 }
 
 export const EmptyState: FC<EmptyStateProps> = ({
@@ -58,24 +48,17 @@ export const EmptyState: FC<EmptyStateProps> = ({
   secondaryAction,
   icon,
   className = '',
-  verticalActions = false,
-  variant = 'default',
-  compact = false
+  verticalActions = false
 }) => {
-  const isCompact = compact || variant === 'compact';
-  const paddingClass = isCompact ? 'py-6 px-4' : 'py-12 px-4';
-  const iconSizeClass = isCompact ? 'h-16 w-16' : 'h-24 w-24';
-  const titleSizeClass = isCompact ? 'text-base' : 'text-lg';
-  
   return (
-    <div className={`text-center ${paddingClass} ${className}`}>
+    <div className={`text-center py-12 px-4 ${className}`}>
       {icon && (
-        <div className={`mx-auto ${iconSizeClass} flex items-center justify-center text-gray-400 dark:text-gray-500 mb-4`}>
+        <div className="mx-auto h-24 w-24 flex items-center justify-center text-gray-400 dark:text-gray-500 mb-4">
           {icon}
         </div>
       )}
       
-      <h3 className={`${titleSizeClass} font-medium text-gray-900 dark:text-white mb-2`}>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
         {title}
       </h3>
       
