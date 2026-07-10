@@ -112,10 +112,10 @@ bash scripts/night-run.sh --dry-run
 - 扫描 docs/ 目录中的违禁短语
 - 失败时输出 `NIGHT_REPORT_QUALITY_FAILED` 并退出
 
-**违禁短语**:
-- "请用户检查 SSH"
-- "请用户登录服务器"
-- "请用户执行 systemctl"
+**违禁短语类型**:
+- 要求用户检查 SSH 连接的短语
+- 要求用户登录服务器的短语
+- 要求用户执行 systemctl 的短语
 
 ---
 
