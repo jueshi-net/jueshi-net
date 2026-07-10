@@ -22,7 +22,7 @@ echo "✅ SSH connection OK"
 
 # 2. Working Directory Check
 echo "[2/4] Checking working directory..."
-ACTUAL_DIR=$(ssh "$STAGING_SERVER" 'pwd' 2>/dev/null)
+ACTUAL_DIR=$(ssh "$STAGING_SERVER" "cd '$STAGING_DIR' && pwd" 2>/dev/null)
 if [ "$ACTUAL_DIR" != "$STAGING_DIR" ]; then
     echo "❌ Working directory mismatch"
     echo "   Expected: $STAGING_DIR"
