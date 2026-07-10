@@ -1,8 +1,8 @@
 {
-  "status": "COMPLETED",
+  "status": "IDLE",
   "current_task": null,
-  "last_run": "2026-07-08T13:03:26.574220",
-  "last_result": "PATCH_APPLIED_BUILD_OK",
+  "last_run": "2026-07-10T11:34:46.573192",
+  "last_result": "QUEUE_EMPTY",
   "version": "1.0",
   "created": "2026-07-08T07:25:00+08:00",
   "run_id": "night-20260708-130326"
