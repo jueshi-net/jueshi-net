@@ -621,6 +621,34 @@ PYEOF
   else
     warn "hermes-health-check.sh not found, skipping"
   fi
+
+  # ─── Step 1b: Bootstrap + Memory Lock ───
+  step "1b/7 Bootstrap + Memory Lock"
+  if [ -x "$SCRIPT_DIR/project-bootstrap.sh" ]; then
+    BOOTSTRAP_OUTPUT=$(bash "$SCRIPT_DIR/project-bootstrap.sh" 2>&1)
+    if ! echo "$BOOTSTRAP_OUTPUT" | grep -q "Bootstrap: OK"; then
+      err "Bootstrap FAILED"
+      echo "$BOOTSTRAP_OUTPUT"
+      echo "NIGHT_BLOCKED_BY_BOOTSTRAP"
+      exit 1
+    fi
+    ok "Bootstrap OK"
+  else
+    warn "project-bootstrap.sh not found, skipping"
+  fi
+
+  if [ -x "$SCRIPT_DIR/memory-lock.sh" ]; then
+    MEMORY_OUTPUT=$(bash "$SCRIPT_DIR/memory-lock.sh" 2>&1)
+    if ! echo "$MEMORY_OUTPUT" | grep -q "Memory Lock: OK"; then
+      err "Memory Lock FAILED"
+      echo "$MEMORY_OUTPUT"
+      echo "PROJECT_MEMORY_NOT_LOADED"
+      exit 1
+    fi
+    ok "Memory Lock OK"
+  else
+    warn "memory-lock.sh not found, skipping"
+  fi
   echo ""
 
   # ─── Step 2: Dequeue next task ───
@@ -992,6 +1020,21 @@ PYEOF
 
   # Generate night report
   generate_night_report "$RUN_ID"
+
+  # ─── Step 7b: Report Quality Check ───
+  step "7b/7 Report Quality Check"
+  if [ -x "$SCRIPT_DIR/report-quality-check.sh" ]; then
+    QUALITY_OUTPUT=$(bash "$SCRIPT_DIR/report-quality-check.sh" 2>&1)
+    if ! echo "$QUALITY_OUTPUT" | grep -q "Report Quality: PASS"; then
+      err "Report Quality Check FAILED"
+      echo "$QUALITY_OUTPUT"
+      echo "NIGHT_REPORT_QUALITY_FAILED"
+      exit 1
+    fi
+    ok "Report Quality: PASS"
+  else
+    warn "report-quality-check.sh not found, skipping"
+  fi
 
   echo ""
   echo "═══════════════════════════════════════════════"
