@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Heart, ExternalLink, Star, Package, Truck, MapPin, FileText, Calculator, Globe, Bookmark, Layers, Search, Zap, Clock, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { MetricCard } from "@/components/design-system";
+import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { ActionCard } from "@/components/design-system/ActionCard";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";

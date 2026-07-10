@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Building2, Plus, Edit3, Crown, ExternalLink, Mail, Phone, MapPin, Check, BarChart3, AlertCircle, AlertTriangle, CheckCircle2, XCircle, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { MetricCard } from "@/components/design-system";
+import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 import { StatusBadge } from "@/components/design-system/StatusBadge";

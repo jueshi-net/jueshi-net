@@ -3,7 +3,7 @@
 import { Crown, Shield, Zap, Star, ArrowRight, Infinity, HeadphonesIcon, Sparkles, Check, X as XIcon, TrendingUp, Award, Megaphone, Calendar, Upload, Send, Gift } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { MetricCard } from "@/components/design-system";
+import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { ActionCard } from "@/components/design-system/ActionCard";
 import { StatusBadge } from "@/components/design-system/StatusBadge";

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Bell, CheckCircle, Clock, Loader2, ExternalLink, Mail, TrendingUp, AlertTriangle, Gift, Filter, Calendar, Zap, MessageCircle } from "lucide-react";
-import { MetricCard } from "@/components/design-system";
+import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { StatusBadge } from "@/components/design-system/StatusBadge";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
