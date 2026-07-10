@@ -31,6 +31,7 @@ ALLOWLIST=(
   "src/app/(public)/**"
   "src/components/layout/**"
   "src/components/ui-lab/**"
+  "src/components/tools/**"
   "docs/**"
 )
 
