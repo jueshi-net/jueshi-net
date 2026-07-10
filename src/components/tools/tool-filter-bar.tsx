@@ -55,7 +55,7 @@ export default function ToolFilterBar({ currentQuery, currentCategory, currentSo
   const categories = [{ key: "all", label: "全部" }, ...filteredCategories];
 
   return (
-    <div className="bg-white border-b sticky top-[57px] z-30 shadow-sm">
+    <div className="bg-white border-b z-30 shadow-sm md:sticky md:top-[80px] md:z-30">
       <div className="max-w-6xl mx-auto px-4 py-3 space-y-3">
         {/* Search and Sort Row */}
         <div className="flex flex-col sm:flex-row gap-3">
