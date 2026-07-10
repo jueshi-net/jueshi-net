@@ -1,0 +1,248 @@
+{
+  "extractedAt": "2026-07-10T07:17:51.813Z",
+  "url": "https://i.jueshi.net/tools",
+  "viewport": "390x844",
+  "statistics": {
+    "totalCards": 29,
+    "uniqueHrefs": 0,
+    "emptyHrefs": 29,
+    "duplicateHrefs": 29,
+    "visibleCards": 29,
+    "clickableCards": 29
+  },
+  "duplicates": [],
+  "tools": [
+    {
+      "name": "邮编查询",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "HS 编码查询",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "汇率换算",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Commercial Invoice",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Quote Sheet",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "运费计算器",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "集装箱计算器",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Shipping Label",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Inbound Receipt",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Handover Note",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Debit Note",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "Video Script SOP",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "形式发票 / Proforma Invoice",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "外贸销售合同 / Sales Contract",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "装箱单 / Packing List",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "订舱委托书 / Booking Instruction",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "提单补料 / Shipping Instruction",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "送货单 / Delivery Note",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "拖车派车单 / Trucking Dispatch Order",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "唛头通用模板 / Shipping Mark",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "装柜明细单 / Container Loading List",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "报关委托书 / Customs Declaration Authorization",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "国际快递申报单 / International Express Declaration",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "原产地证 CO 模板 / Certificate of Origin Template",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "熏蒸证明模板 / Fumigation Certificate Template",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "集运合箱打包清单 / Consolidation Packing List",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "退货装箱清单 / Return Packing List",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "运费对账单 / Freight Statement",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    },
+    {
+      "name": "信用证简易资料单 / Letter of Credit Info Sheet",
+      "href": null,
+      "elementType": "BUTTON_ONLY",
+      "isVisible": true,
+      "isEnabled": true,
+      "isClickable": true
+    }
+  ]
+}
