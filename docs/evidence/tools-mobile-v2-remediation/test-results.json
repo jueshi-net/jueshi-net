@@ -1,0 +1,57 @@
+{
+  "menuOpen": true,
+  "menuClose": true,
+  "menuNavigation": false,
+  "stickyFilterNoHeaderOverlap": true,
+  "noHorizontalOverflow": true,
+  "toolCards": {
+    "total": 11,
+    "unique": 11,
+    "empty": 0,
+    "duplicate": 0,
+    "hrefs": [
+      "/tools/template-studio/canvas/new",
+      "/tools/documents",
+      "/tools/template-studio",
+      "/tools/postal-code",
+      "/tools/hs-code",
+      "/tools/exchange-rate",
+      "/tools/address-formatter",
+      "/tools/shipping-calculator",
+      "/tools/invoice",
+      "/tools/quote"
+    ]
+  },
+  "toolClicks": {
+    "邮编查询": {
+      "href": "/tools/postal-code",
+      "navigated": true,
+      "hasError": false,
+      "finalUrl": "https://i.jueshi.net/tools/postal-code"
+    },
+    "HS 编码": {
+      "href": "/tools/hs-code",
+      "navigated": true,
+      "hasError": false,
+      "finalUrl": "https://i.jueshi.net/tools/hs-code"
+    },
+    "汇率换算": {
+      "href": "/tools/exchange-rate",
+      "navigated": true,
+      "hasError": false,
+      "finalUrl": "https://i.jueshi.net/tools/exchange-rate"
+    },
+    "地址格式化": {
+      "href": "/tools/address-formatter",
+      "navigated": true,
+      "hasError": false,
+      "finalUrl": "https://i.jueshi.net/tools/address-formatter"
+    },
+    "运费计算": {
+      "href": "/tools/shipping-calculator",
+      "navigated": true,
+      "hasError": false,
+      "finalUrl": "https://i.jueshi.net/tools/shipping-calculator"
+    }
+  }
+}
