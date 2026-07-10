@@ -691,6 +691,11 @@ PYEOF
   ok "Task: ${TASK_PROMPT:0:100}..."
   info "Allowed files: $TASK_ALLOWED_FILES"
 
+  # Checkpoint: TASK_STARTED
+  if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+    bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "TASK_STARTED" "Task dequeued and started"
+  fi
+
   # Save checkpoint before starting
   if [ "$DRY_RUN" != "true" ]; then
     save_checkpoint "${BATCH_ID:-program}" "${BATCH_ID:-epic}" "${BATCH_ID:-batch}" "$TASK_ID" "in_progress"
@@ -757,6 +762,11 @@ PYEOF
   fi
 
   if [ -x "$SCRIPT_DIR/claude-generate-patch.sh" ]; then
+    # Checkpoint: CLAUDE_PROPOSAL_STARTED
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "CLAUDE_PROPOSAL_STARTED" "Claude Code proposal generation started"
+    fi
+
     # Rate-limit retry loop
     RL_RETRY_COUNT=0
     COOLDOWN_RETRY_COUNT=0
@@ -897,6 +907,16 @@ PYEOF
       PATCH_GENERATED=true
     done
 
+    # Checkpoint: CLAUDE_PROPOSAL_COMPLETED
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "CLAUDE_PROPOSAL_COMPLETED" "Claude Code proposal generation completed"
+    fi
+
+    # Checkpoint: PATCH_GENERATED
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "PATCH_GENERATED" "Patch file generated: $PATCH_FILE"
+    fi
+
     ok "Patch generated: $PATCH_FILE"
   else
     err "claude-generate-patch.sh not found or not executable"
@@ -906,6 +926,12 @@ PYEOF
 
   # ─── Step 4: Apply patch ───
   step "4/7 Apply patch"
+  
+  # Checkpoint: PATCH_APPLIED
+  if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+    bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "PATCH_APPLIED" "Patch application started"
+  fi
+  
   if [ -x "$SCRIPT_DIR/ai-patch-runner.sh" ]; then
     bash "$SCRIPT_DIR/ai-patch-runner.sh" "$PATCH_FILE"
     APPLY_RC=$?
@@ -929,14 +955,47 @@ PYEOF
 
   # ─── Step 5: Deploy staging ───
   step "5/7 Deploy staging"
+  
+  # Checkpoint: BUILD_STARTED (build happens inside deploy-staging.sh)
+  if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+    bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "BUILD_STARTED" "Build started (inside deploy-staging.sh)"
+  fi
+  
+  # Checkpoint: DEPLOY_STARTED
+  if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+    bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "DEPLOY_STARTED" "Deploy to staging started"
+  fi
+  
   if [ -x "$REPO_ROOT/scripts/deploy-staging.sh" ]; then
     bash "$REPO_ROOT/scripts/deploy-staging.sh"
     DEPLOY_RC=$?
     if [ $DEPLOY_RC -ne 0 ]; then
       err "Deploy failed (exit=$DEPLOY_RC)"
+      
+      # Checkpoint: BUILD_FAILED
+      if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+        bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "BUILD_FAILED" "Build failed during deploy"
+      fi
+      
+      # Checkpoint: DEPLOY_FAILED
+      if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+        bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "DEPLOY_FAILED" "Deploy failed with exit code $DEPLOY_RC"
+      fi
+      
       echo "NIGHT_DEPLOY_FAILED"
       exit $DEPLOY_RC
     fi
+    
+    # Checkpoint: BUILD_PASSED (build succeeded inside deploy)
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "BUILD_PASSED" "Build completed successfully"
+    fi
+    
+    # Checkpoint: DEPLOY_PASSED
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "DEPLOY_PASSED" "Deploy to staging completed"
+    fi
+    
     ok "Deploy successful"
   else
     warn "deploy-staging.sh not found, skipping deploy"
@@ -963,6 +1022,11 @@ PYEOF
   done
   if [ "$CURL_ALL_OK" = false ]; then
     warn "Some curl checks failed"
+  else
+    # Checkpoint: RUNTIME_VERIFIED
+    if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+      bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "RUNTIME_VERIFIED" "All runtime curl checks passed"
+    fi
   fi
   echo ""
 
@@ -1034,6 +1098,11 @@ PYEOF
     ok "Report Quality: PASS"
   else
     warn "report-quality-check.sh not found, skipping"
+  fi
+
+  # Checkpoint: TASK_COMPLETED
+  if [ -x "$SCRIPT_DIR/create-checkpoint.sh" ]; then
+    bash "$SCRIPT_DIR/create-checkpoint.sh" "$TASK_ID" "TASK_COMPLETED" "Task completed successfully"
   fi
 
   echo ""
