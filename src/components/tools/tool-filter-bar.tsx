@@ -50,10 +50,11 @@ export default function ToolFilterBar({ currentQuery, currentCategory, presentCa
     <div className="max-w-6xl mx-auto px-4 -mt-5 relative z-10">
       <div className="bg-white rounded-xl border shadow-sm p-4">
         {/* Search Box */}
-        <div className="relative mb-3">
+        <div className="relative mb-3" data-testid="tool-search-container">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
             type="text"
+            data-testid="tool-search-input"
             defaultValue={currentQuery || ""}
             placeholder="搜索工具名称或描述..."
             onChange={handleSearch}
