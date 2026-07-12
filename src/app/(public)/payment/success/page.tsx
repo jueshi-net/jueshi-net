@@ -4,13 +4,14 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Check, ArrowRight, Package, Star } from 'lucide-react';
 import Link from 'next/link';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4">
+    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         {/* Success Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
@@ -74,7 +75,7 @@ function PaymentSuccessContent() {
               <Package className="w-5 h-5" />
               前往工作台
             </Link>
-            
+
             <Link
               href="/tools"
               className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -96,12 +97,14 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccess() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    }>
-      <PaymentSuccessContent />
-    </Suspense>
+    <JueshiV4PublicShell>
+      <Suspense fallback={
+        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      }>
+        <PaymentSuccessContent />
+      </Suspense>
+    </JueshiV4PublicShell>
   );
 }
