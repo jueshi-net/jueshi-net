@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpCircle, ChevronDown, Search, Book, MessageSquare, Mail } from 'lucide-react';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const metadata: Metadata = {
   title: '帮助中心 - 绝世百宝箱',
@@ -50,6 +51,7 @@ const faqs = [
 
 export default function HelpPage() {
   return (
+    <JueshiV4PublicShell>
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-teal-600 to-cyan-700 text-white">
@@ -132,5 +134,6 @@ export default function HelpPage() {
         </div>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }

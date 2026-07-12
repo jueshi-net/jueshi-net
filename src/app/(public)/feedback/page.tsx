@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import FeedbackClient from "./feedback-client";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 
 export const metadata: Metadata = {
   title: buildTitle("反馈与联系"),
@@ -14,5 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default function FeedbackPage() {
-  return <FeedbackClient />;
+  return (
+    <JueshiV4PublicShell>
+      <FeedbackClient />
+    </JueshiV4PublicShell>
+  );
 }
