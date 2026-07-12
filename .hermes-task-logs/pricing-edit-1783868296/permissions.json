@@ -1,0 +1,54 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Edit"
+    ],
+    "deny": [
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Agent",
+      "mcp__*",
+      "Git",
+      "SSH",
+      "PM2",
+      "Prisma",
+      "Write",
+      "MultiEdit"
+    ]
+  },
+  "editRestrictions": {
+    "allowPaths": [
+      "src/app/(public)/pricing/page.tsx",
+      "src/app/(public)/pricing/pricing-client.tsx"
+    ],
+    "denyPaths": [
+      "src/app/**/about/**",
+      "src/app/**/contact/**",
+      "src/app/**/blog/**",
+      "src/app/**/guides/**",
+      "src/app/**/tools/**",
+      "src/app/**/resources/**",
+      "src/app/**/topics/**",
+      "src/app/**/search/**",
+      "src/app/**/feedback/**",
+      "src/app/**/help/**",
+      "src/components/design-system/**",
+      "src/components/saas/**",
+      "src/components/workspace/**",
+      "src/components/layout/Header*",
+      "src/components/layout/Footer*",
+      "src/app/globals.css",
+      "tailwind.config.*",
+      "package.json",
+      "package-lock.json",
+      "bun.lockb",
+      ".env*",
+      ".git/**",
+      ".claude/**"
+    ]
+  }
+}
