@@ -40,13 +40,13 @@ export default function FeedbackPage() {
 
   if (success) {
     return (
-      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+      <div className="max-w-2xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">感谢反馈！</h2>
         <p className="text-gray-500 mb-6">我们会认真处理每一条反馈</p>
         <button
           onClick={() => setSuccess(false)}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           继续提交
         </button>
@@ -58,22 +58,38 @@ export default function FeedbackPage() {
   const Icon = selectedType?.icon || Lightbulb;
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-          <MessageSquare className="w-6 h-6 text-blue-600" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">意见反馈</h1>
-          <p className="text-sm text-gray-500">您的建议是我们进步的动力</p>
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="flex items-center space-x-2 text-sm">
+            <li>
+              <a href="/" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                首页
+              </a>
+            </li>
+            <li className="text-gray-400">/</li>
+            <li className="text-gray-500 dark:text-gray-400">意见反馈</li>
+          </ol>
+        </nav>
+
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">意见反馈</h1>
+            <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl">
+              您的建议是我们进步的动力，欢迎提出宝贵意见帮助我们改进产品
+            </p>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 sm:p-8 space-y-8">
         {/* Type Selection */}
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">反馈类型</label>
-          <div className="grid grid-cols-3 gap-3">
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">反馈类型</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {typeOptions.map(opt => {
               const OptIcon = opt.icon;
               return (
@@ -81,14 +97,16 @@ export default function FeedbackPage() {
                   key={opt.value}
                   type="button"
                   onClick={() => setType(opt.value)}
-                  className={`p-3 rounded-lg border-2 transition-all text-center ${
+                  className={`p-4 rounded-lg border-2 transition-all text-left ${
                     type === opt.value
                       ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                       : "border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600"
                   }`}
                 >
-                  <OptIcon className={`w-6 h-6 mx-auto mb-1 ${opt.color}`} />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{opt.label}</span>
+                  <div className="flex items-center gap-3">
+                    <OptIcon className={`w-6 h-6 flex-shrink-0 ${opt.color}`} />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{opt.label}</span>
+                  </div>
                 </button>
               );
             })}
@@ -97,31 +115,34 @@ export default function FeedbackPage() {
 
         {/* Content */}
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-            <span className="flex items-center gap-1">
-              <Icon className="w-4 h-4" />
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+            <span className="flex items-center gap-2">
+              <Icon className="w-4 h-4 flex-shrink-0" />
               详细内容
             </span>
           </label>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
-            rows={5}
-            placeholder="请详细描述您的反馈..."
-            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-y"
+            rows={6}
+            placeholder="请详细描述您的反馈...（如遇到的问题、期望的功能或改进建议）"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-y focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           />
+          {content.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1 text-right">{content.length}/500</p>
+          )}
         </div>
 
         {/* URL (optional) */}
         <div>
-          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">相关页面 (可选)</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">相关页面 (可选)</label>
           <input
             type="text"
             value={url}
             onChange={e => setUrl(e.target.value)}
-            placeholder="https://..."
-            className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            placeholder="如有相关页面链接，请粘贴在此处（便于我们快速定位问题）"
+            className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -129,9 +150,9 @@ export default function FeedbackPage() {
         <button
           type="submit"
           disabled={submitting || !content.trim()}
-          className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-5 h-5" />
           {submitting ? "提交中..." : "提交反馈"}
         </button>
       </form>
