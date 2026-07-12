@@ -314,7 +314,7 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
     <div className="min-h-screen bg-gray-50">
         {/* Compact Hero */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-          <div className="max-w-[1480px] mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto px-4 py-8">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
@@ -337,7 +337,7 @@ export default function ResourceDirectoryClient({ resources, featuredResources }
         </div>
 
         {/* Main Content: Three Column Layout */}
-        <div className="max-w-[1480px] mx-auto px-4 py-6">
+        <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex gap-6">
             {/* Left Sidebar: Category Navigation */}
             <div className="hidden lg:block w-56 shrink-0">

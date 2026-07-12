@@ -72,7 +72,7 @@ function HSCodeSearch() {
 
   return (
     <div>
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -86,7 +86,7 @@ function HSCodeSearch() {
         <button
           onClick={() => searchHS(hsQuery)}
           disabled={hsLoading}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 min-h-[44px]"
         >
           {hsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Hash className="w-4 h-4" />}
           查询
@@ -94,11 +94,11 @@ function HSCodeSearch() {
       </div>
 
       {hsResults.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <p className="text-sm text-gray-500 mb-2">找到 {hsTotal} 条结果</p>
           {hsResults.map((item) => (
-            <div key={item.id} className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50">
-              <div className="flex items-center justify-between">
+            <div key={item.id} className="p-6 border border-gray-100 rounded-xl hover:bg-gray-50">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
                   <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">{item.code}</span>
                   <span className="text-sm text-gray-500">{item.category}</span>
@@ -114,19 +114,19 @@ function HSCodeSearch() {
             </div>
           ))}
           {hsTotal > 10 && (
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               <button
                 disabled={hsPage === 1}
                 onClick={() => searchHS(hsQuery, hsPage - 1)}
-                className="px-4 py-2 border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+                className="px-4 py-3 border rounded-xl disabled:opacity-30 hover:bg-gray-50 min-w-[80px] min-h-[44px]"
               >
                 上一页
               </button>
-              <span className="px-4 py-2 text-gray-500">第 {hsPage} 页</span>
+              <span className="px-4 py-3 text-gray-500 min-h-[44px] flex items-center">第 {hsPage} 页</span>
               <button
                 disabled={hsPage * 10 >= hsTotal}
                 onClick={() => searchHS(hsQuery, hsPage + 1)}
-                className="px-4 py-2 border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+                className="px-4 py-3 border rounded-xl disabled:opacity-30 hover:bg-gray-50 min-w-[80px] min-h-[44px]"
               >
                 下一页
               </button>
@@ -198,11 +198,11 @@ export default function SearchPage() {
 
   return (
     <JueshiV4PublicShell>
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 text-center mb-8">搜索中心</h1>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">搜索中心</h1>
 
         {/* Tabs */}
-        <div className="flex justify-center gap-2 mb-8">
+        <div className="flex justify-center gap-2 mb-6 sm:mb-8">
           {[
             { key: "search" as const, label: "综合搜索", icon: Search },
             { key: "tracking" as const, label: "快递追踪", icon: Truck },
@@ -211,7 +211,7 @@ export default function SearchPage() {
             <button
               key={t.key}
               onClick={() => { setTab(t.key); setTrackingResult(null); setTrackingError(""); }}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors min-h-[44px] ${
                 tab === t.key ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
               }`}
             >
@@ -221,25 +221,25 @@ export default function SearchPage() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
           {tab === "search" && (
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")}
                 placeholder="输入关键词搜索..."
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
               />
-              <button onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Google</button>
-              <button onClick={() => window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200">百度</button>
+              <button onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 min-h-[44px]">Google</button>
+              <button onClick={() => window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 min-h-[44px]">百度</button>
             </div>
           )}
 
           {tab === "tracking" && (
             <div>
               {/* Input */}
-              <div className="flex gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <div className="flex-1 relative">
                   <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -247,13 +247,13 @@ export default function SearchPage() {
                     onChange={(e) => setTrackingNumber(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="输入快递单号，如：1234567890"
-                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
                 </div>
                 <button
                   onClick={handleTracking}
                   disabled={trackingLoading}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 min-h-[44px]"
                 >
                   {trackingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
                   查询
