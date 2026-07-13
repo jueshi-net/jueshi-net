@@ -117,7 +117,7 @@ export default function NotificationsClient() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full">
       {/* Page Header */}
       <WorkspacePageHeader
         title="通知中心"

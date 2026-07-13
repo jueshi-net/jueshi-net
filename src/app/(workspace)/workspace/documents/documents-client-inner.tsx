@@ -297,7 +297,7 @@ export default function DocumentsClientInner() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="w-full">
       <WorkspacePageHeader
         title="我的单据"
         subtitle="管理所有单据草稿，快速编辑和创建"
