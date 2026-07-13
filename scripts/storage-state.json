@@ -2,8 +2,8 @@
   "cookies": [
     {
       "name": "__Host-authjs.csrf-token",
-      "value": "cb945fe4c5bda6c206336c7be2877da2edc2e7e04aa96a2932098b58bc40fbc1%7Cde3d25d3099083ec6e788f7aa29ab18a40e58e89857825a671aa003f7af18aef",
-      "domain": "jueshi.net",
+      "value": "fe5e1d933fc5ddb6d87276eb0031c607af1dc0e7a92a99fd4db969201c362cd6%7Cdb1ae12bca531ca93d161681bde75dcfdf487dfbe02fb5f06438405b7425144a",
+      "domain": "i.jueshi.net",
       "path": "/",
       "expires": -1,
       "httpOnly": true,
@@ -12,8 +12,8 @@
     },
     {
       "name": "__Secure-authjs.callback-url",
-      "value": "https%3A%2F%2Fjueshi.net%2Flogin",
-      "domain": "jueshi.net",
+      "value": "https%3A%2F%2Fjueshi.net",
+      "domain": "i.jueshi.net",
       "path": "/",
       "expires": -1,
       "httpOnly": true,
@@ -22,10 +22,10 @@
     },
     {
       "name": "__Secure-authjs.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..2xSwNDOgnm3-46jcbqcddw.8wbfkzAnWfXDvfVdAp1CZwbtoSKeknCilRzJD0uX-XU4Te-iQS7TzE01-qT59omvV31Iz9LRHTyljS1zaB9wpEki_6pZJ684kDtKKEu5Z8O1G-Tf1a7H19Jykt6I4L93JedB7jaIJ0i1a1ZJeRrs4JWOmymWfdSCUyVROuAOhaPm18rTgjKaVFcJrr4Mz3g_UVBdRXFwGBFMIRi2GF8NP3N2KhDlYqYQWFvAN4IiAcnXPXjUF9zb49EXjri6h3xGcI2b6Kn8JA49AwOx9Z8bvpO0xYD6BFa7mZO5kzDMfeY16oVvswC7nH0OF9JBwWv9.L9yiJClKuHO5wCgmR3ZPTFHD2RVXIwdsYUS3s2FwsNU",
-      "domain": "jueshi.net",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..nmuxvu1MopQk7EV4W0w2zw.i3SSonx2ELpon1K3k0ss1E-cOOxvjXEaMGgU5Sb8iMk9G_bDVUCqhuJ70HtMCllVWGmkWmFvJrvZtt7LFyLW6wqVBsI4sNYXG00m_wWozrGD1PUSlAczD1D38XwuIMpx9yIoXDuexlHl46JVMlabg3mOITdfxm1dls6MXhDT5NEP7emhseasI72O56ibl1sQkAEvGAMXk9fG3Rv97sUqiI4-RogA2ybHRojkA53xF3o7IvL9HctwbYQuzZNMfhbpLyGNHlWUhycYSvbv9Md9p-dbV8_68sPsnmqlGF08cNjZyB9FMp-klMbE-F9UOZlj.lECKGnAjsu6YkF1e0j63VQvRj3NKjQBzOCtZa-Ny4CY",
+      "domain": "i.jueshi.net",
       "path": "/",
-      "expires": 1783778110.246587,
+      "expires": 1786531411.238397,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -33,11 +33,23 @@
   ],
   "origins": [
     {
-      "origin": "https://jueshi.net",
+      "origin": "https://i.jueshi.net",
       "localStorage": [
+        {
+          "name": "__bxb_stime",
+          "value": "1783939410773"
+        },
         {
           "name": "theme",
           "value": "light"
+        },
+        {
+          "name": "__bxb_sid",
+          "value": "3d596627-2c38-4246-8bc4-c1a4da7d270d"
+        },
+        {
+          "name": "__bxb_aid",
+          "value": "e2693abc-90f9-4f63-86f4-15bd57c82c00"
         }
       ]
     }
