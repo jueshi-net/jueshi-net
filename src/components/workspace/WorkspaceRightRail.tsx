@@ -17,8 +17,8 @@ export default function WorkspaceRightRail({
   userId,
 }: WorkspaceRightRailProps) {
   return (
-    <aside className="w-[300px] border-l border-[#E8ECF3] bg-[#F6F8FC]">
-      <div className="sticky top-14 h-[calc(100vh-3.5rem-4rem)] overflow-y-auto py-5 px-4 pb-8 space-y-4">
+    <aside className="w-full lg:w-[300px] lg:border-l border-[#E8ECF3] bg-[#F6F8FC]">
+      <div className="lg:sticky lg:top-14 lg:h-[calc(100vh-3.5rem-4rem)] overflow-y-auto py-5 px-4 pb-8 space-y-4">
         {/* Notifications */}
         <section className="bg-[#F6F8FC] rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">

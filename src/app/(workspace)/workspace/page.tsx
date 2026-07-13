@@ -128,9 +128,9 @@ export default async function WorkspacePage() {
   const todayChecked = user?.lastCheckinDate === new Date().toISOString().split("T")[0];
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_300px] gap-6 pb-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 pb-8">
       {/* Main Content Area - Column 1 */}
-      <div className="space-y-5 pb-4">
+      <div className="min-w-0 space-y-5 pb-4">
         {/* Welcome Section */}
         <section className="bg-gradient-to-br from-[#6C5DD3] via-[#5b4fc4] to-[#3F8CFF] rounded-2xl p-5 md:p-6 text-white shadow-lg">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
