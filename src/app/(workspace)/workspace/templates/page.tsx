@@ -60,16 +60,23 @@ export default function WorkspaceTemplatesPage() {
 
   const fetchWorkspaceStats = useCallback(async () => {
     try {
-      const res = await fetch("/api/workspace/stats");
-      if (res.ok) {
-        const data = await res.json();
-        setWorkspaceStats({
-          unreadNotifs: data.unreadNotifs || 0,
-          badgeCount: data.badgeCount || 0,
-          recentMemos: data.recentMemos || [],
-          userId: data.userId || ""
-        });
-      }
+      // Use Promise.allSettled to fetch stats individually
+      const [notifsRes, badgesRes, memosRes] = await Promise.allSettled([
+        fetch('/api/workspace/notifications?limit=1').then(r => r.ok ? r.json() : { unread: 0 }),
+        fetch('/api/workspace/badges/count').then(r => r.ok ? r.json() : { count: 0 }),
+        fetch('/api/workspace/memos?limit=3').then(r => r.ok ? r.json() : { memos: [] })
+      ]);
+
+      const unreadNotifs = notifsRes.status === 'fulfilled' ? (notifsRes.value.unread || 0) : 0;
+      const badgeCount = badgesRes.status === 'fulfilled' ? (badgesRes.value.count || 0) : 0;
+      const recentMemos = memosRes.status === 'fulfilled' ? (memosRes.value.memos || []) : [];
+
+      setWorkspaceStats({
+        unreadNotifs,
+        badgeCount,
+        recentMemos,
+        userId: "" // Will be set from session if needed
+      });
     } catch (err) {
       console.error("Failed to fetch workspace stats:", err);
     }

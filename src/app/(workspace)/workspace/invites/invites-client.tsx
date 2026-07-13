@@ -27,6 +27,13 @@ interface InviteCode {
 }
 
 export function InvitesClient() {
+  const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
+  const [invitedCount, setInvitedCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetchInviteCodes();
