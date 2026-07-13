@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { AdSlot } from '@/components/ad-slot';
-import { JueshiV4PublicShell } from '@/components/layout/JueshiV4PublicShell';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import {
   Globe,
   CreditCard,
