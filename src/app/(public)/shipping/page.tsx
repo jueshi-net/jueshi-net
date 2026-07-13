@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Package, Truck, MapPin, Calculator, FileText, AlertCircle, Globe, ArrowRight } from "lucide-react";
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const metadata: Metadata = {
   title: '跨境寄送 - 绝世百宝箱',
@@ -60,6 +61,7 @@ const shippingGuides = [
 
 export default function ShippingPage() {
   return (
+    <JueshiV4PublicShell>
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
@@ -129,5 +131,6 @@ export default function ShippingPage() {
         </div>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }

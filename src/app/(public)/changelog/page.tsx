@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, Tag } from "lucide-react";
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const metadata: Metadata = {
   title: "更新日志 | 绝世百宝箱",
@@ -86,6 +87,7 @@ const changelogs = [
 
 export default function ChangelogPage() {
   return (
+    <JueshiV4PublicShell>
     <div className="max-w-4xl mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">更新日志</h1>
 
@@ -124,5 +126,6 @@ export default function ChangelogPage() {
         </Link>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }

@@ -28,9 +28,11 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isAiTools = pathname === '/ai-tools';
   const isAnalytics = pathname === '/analytics';
   const isBusiness = pathname === '/business';
+  const isChangelog = pathname === '/changelog';
+  const isShipping = pathname === '/shipping';
 
-  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness) {
+  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页使用各自的 shell，跳过公共 Header/Footer
+  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
     return <>{children}</>;
   }
 
