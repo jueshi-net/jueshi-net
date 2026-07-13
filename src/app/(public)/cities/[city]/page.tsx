@@ -13,6 +13,8 @@ import {
   Building2,
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import { BreadcrumbBar, TagGroup, ContentSection, SectionHeader, PageCTA } from "@/components/design-system";
 
 // Force SSR — DB not available during build time
 export const dynamic = "force-dynamic";
@@ -108,25 +110,26 @@ export default async function CityPage({ params }: Props) {
   const heroSubtitle = hero.subtitle || hero.summary || "";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-1.5 text-sm text-gray-500 flex-wrap" aria-label="面包屑导航">
-          <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-            <Home className="w-4 h-4" />
-            <span>首页</span>
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
-          <span className="text-gray-900 font-medium truncate max-w-[200px]">{cityName}</span>
-        </nav>
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
+          {/* Breadcrumb */}
+          <BreadcrumbBar
+            items={[
+              { title: "首页", href: "/" },
+              { title: cityName, current: true }
+            ]}
+            className="mb-6"
+          />
 
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-10 shadow-lg">
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             <Building2 className="w-5 h-5 text-indigo-200" />
-            <span className="px-2.5 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-              城市指南
-            </span>
+            <TagGroup
+              tags={[{ text: "城市指南", type: "info", rounded: true }]}
+              className="[&_span]:bg-white/15 [&_span]:border [&_span]:border-white/10 [&_span]:text-white"
+            />
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight mb-3">
             {cityName}
@@ -149,11 +152,8 @@ export default async function CityPage({ params }: Props) {
 
         {/* Related Tools */}
         {relatedTools.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Wrench className="w-5 h-5 text-gray-600" />
-              相关工具
-            </h2>
+          <ContentSection>
+            <SectionHeader title="相关工具" icon={<Wrench className="w-5 h-5 text-gray-600" />} />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {relatedTools.map((tool) => (
                 <Link
@@ -172,16 +172,13 @@ export default async function CityPage({ params }: Props) {
                 </Link>
               ))}
             </div>
-          </section>
+          </ContentSection>
         )}
 
         {/* Related Guides */}
         {guides.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-gray-600" />
-              相关指南
-            </h2>
+          <ContentSection>
+            <SectionHeader title="相关指南" icon={<BookOpen className="w-5 h-5 text-gray-600" />} />
             <div className="space-y-3">
               {guides.map((guide) => (
                 <Link
@@ -194,16 +191,13 @@ export default async function CityPage({ params }: Props) {
                 </Link>
               ))}
             </div>
-          </section>
+          </ContentSection>
         )}
 
         {/* FAQ */}
         {faqItems.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-gray-600" />
-              常见问题
-            </h2>
+          <ContentSection>
+            <SectionHeader title="常见问题" icon={<HelpCircle className="w-5 h-5 text-gray-600" />} />
             <div className="space-y-3">
               {faqItems.map((faq: any, i: number) => (
                 <details key={i} className="group bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -217,16 +211,13 @@ export default async function CityPage({ params }: Props) {
                 </details>
               ))}
             </div>
-          </section>
+          </ContentSection>
         )}
 
         {/* Official Links */}
         {officialLinks.length > 0 && (
-          <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ExternalLink className="w-5 h-5 text-gray-600" />
-              官方链接
-            </h2>
+          <ContentSection>
+            <SectionHeader title="官方链接" icon={<ExternalLink className="w-5 h-5 text-gray-600" />} />
             <div className="space-y-2">
               {officialLinks.map((link: any, i: number) => (
                 <a
@@ -241,33 +232,30 @@ export default async function CityPage({ params }: Props) {
                 </a>
               ))}
             </div>
-          </section>
+          </ContentSection>
         )}
 
         {/* CTA */}
         {ctaConfig.title && (
-          <section className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white rounded-2xl p-6 sm:p-8 text-center">
-            <h2 className="text-xl font-bold mb-2">{ctaConfig.title}</h2>
-            {ctaConfig.description && <p className="text-indigo-100 mb-4">{ctaConfig.description}</p>}
-            {ctaConfig.href && (
-              <Link
-                href={ctaConfig.href}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-700 rounded-full font-semibold hover:bg-indigo-50 transition-colors"
-              >
-                {ctaConfig.buttonText || "开始"}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            )}
-          </section>
+          <PageCTA
+            title={ctaConfig.title}
+            description={ctaConfig.description || ""}
+            primaryAction={{
+              label: ctaConfig.buttonText || "开始",
+              href: ctaConfig.href || "#"
+            }}
+            variant="dark"
+          />
         )}
 
         {/* Disclaimer */}
-        <section className="text-xs text-gray-400 border-t pt-4">
+        <div className="text-xs text-gray-400 border-t pt-4">
           <p>
             ※ 本页面内容仅供参考，不构成专业建议。具体操作请以相关机构最新要求为准。
           </p>
-        </section>
+        </div>
       </div>
     </div>
+    </JueshiV4PublicShell>
   );
 }

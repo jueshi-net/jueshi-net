@@ -1,0 +1,227 @@
+Create a static HTML/CSS/JS high-fidelity visual prototype for the jueshi.net /tools directory page.
+
+OUTPUT DIRECTORY: /Users/chq/xixiong-saas/docs/ui-prototypes/tools-v4/
+
+Create:
+- index.html
+- styles.css
+- prototype.js
+- assets/ (for any images/icons)
+
+==================================================
+DESIGN POSITIONING
+==================================================
+
+Professional, compact, trustworthy cross-border tool directory.
+
+Reference:
+- Modern SaaS console information density
+- Public service directory clear hierarchy
+- 绝世百宝箱 existing brand style
+- No admin-panel thick borders
+- No cheap gradients and large blank areas
+- NO EMOJI
+- Not a visually separate design from the rest of the site
+
+==================================================
+PAGE STRUCTURE (exact order)
+==================================================
+
+Header (existing style)
+→ Compact Page Intro
+→ Search + Category Navigation
+→ Quick Tools (常用工具)
+→ Category Tool Directory (按分类展示)
+→ Compact CTA
+→ Footer
+
+NO large Hero section.
+
+==================================================
+COLOR PALETTE (brand-aligned)
+==================================================
+
+Primary: #6C5DD3 (brand purple)
+Background: #F7F9FC
+Card BG: #FFFFFF
+Text Primary: #11142D
+Text Secondary: #808191
+Border: #E8ECF3
+Active: #6C5DD3
+Inactive: #F3F5FA
+Link: #6C5DD3
+Success: #10B981
+
+==================================================
+MOBILE SPECS (390×844)
+==================================================
+
+Page padding: 16px left/right.
+Background: #F7F9FC.
+
+1. Header
+- Height ~64-68px
+- Logo left, notification bell + menu right
+- Existing style, no redesign
+
+2. Compact Page Intro
+- Breadcrumb: 12-13px, color #808191
+- Title "工具中心": 28-30px, #11142D, font-weight 600
+- Subtitle: 14px, #808191, "29 个实用工具"
+- Total height: ~100-120px
+- No hero background
+- No blank space > 32px
+
+3. Search
+- Single search box, height 46px
+- Search icon on LEFT
+- Border-radius 14px
+- Light gray border #E8ECF3
+- No thick dark border
+- Placeholder: "搜索工具..."
+
+4. Category Navigation (single row)
+- Items: 全部, 外贸单据, 物流工具, 编码查询, 汇率金融, 经营工具, AI 内容
+- Height: 34-36px
+- Horizontal scroll, no-wrap, hidden scrollbar
+- Active: bg #6C5DD3, text white
+- Inactive: bg #F3F5FA, text #808191
+- No large pill buttons
+
+5. Quick Tools (常用工具)
+- Title: "常用工具" 20-22px, right side "查看全部" link
+- 6 tools in 2 columns x 3 rows
+- Cards: height 84-92px, border-radius 14-16px, 1px border #E8ECF3, very light shadow
+- Lucide-style linear icons (SVG), 24px, NO emoji
+- Icon container: 40x40px, bg #F3F5FA, border-radius 10px
+- Tool title: single line, 15px, #11142D
+- Tool description: max 1 line, 13px, #808191
+- Entire card clickable
+- Cards must be visibly distinct from regular tool cards
+
+Tools:
+- 邮编查询 - 全球邮编查询，支持美国 ZIP、英国 postcode 等
+- HS 编码查询 - 海关编码查询，支持中国、美国、欧盟等
+- 汇率换算 - 实时汇率查询与换算，支持主流货币
+- 地址格式化 - 全球地址格式标准化，支持多国家
+- 运费计算器 - 国际快递与海运运费估算
+- 物流追踪 - 全球主流物流商包裹追踪
+
+6. Category Tool Directory (按分类)
+- Section title: "全部工具" 20-22px
+- Category collapsible sections:
+  外贸单据 · 12
+  物流工具 · 8
+  编码查询 · 3
+  汇率金融 · 2
+  经营工具 · 2
+  AI 内容 · 2
+- Default: "外贸单据" expanded, others collapsed
+- Expanded items: single column compact list
+- Each item: ~64-70px height
+- Left: Lucide icon (18-20px)
+- Middle: Chinese title 14-15px + one-line desc 12-13px
+- Right: chevron arrow
+
+Tools by category (use these EXACT Chinese names):
+外贸单据: 商业发票, 形式发票, 装箱单, 外贸销售合同, 报价单, 信用证信息表, 订舱委托书, 装运指示, 原产地证模板, 报关委托书, 熏蒸证书模板, 送货单
+物流工具: 物流追踪, 国际快递面单, 集装箱装载清单, 唛头, 集运装箱单, 运费清单, 交接单, 入库收货单
+编码查询: HS 编码查询, 邮编查询, 国际快递申报单
+汇率金融: 汇率换算, 借记通知单
+经营工具: 地址格式化, 运费计算器
+AI 内容: 视频脚本 SOP, 产品描述生成
+
+7. CTA
+- Background: #F3F5FA
+- Title: "需要更多资源？" 18px
+- Desc: "探索教程、指南与实用资源，快速完成跨境任务。" 14px
+- Button: "浏览资源库" with arrow
+- Max height ~160px
+- No strong gradients
+
+8. Footer
+- Simplified but shows real proportions
+- Copyright, links
+
+==================================================
+DESKTOP SPECS (1440×900)
+==================================================
+
+Container: ~1180-1240px centered.
+
+- Breadcrumb, title, subtitle compact
+- Intro to search: max 32px gap
+- Search: width ~420-520px, aligned left
+- Category nav: inline with search or adjacent
+- Quick Tools: 3 columns x 2 rows, cards 92-104px
+- All Tools: two-column tool list under each category
+- First viewport must show: title, search+categories, most/all quick tools
+- No large blank areas
+
+==================================================
+ICON SYSTEM
+==================================================
+
+Use inline SVG Lucide-style icons. Each tool needs a matching icon:
+
+Icon mapping (tool slug → icon):
+- 商业发票 → FileText
+- 形式发票 → FileSpreadsheet
+- 装箱单 → Package
+- 外贸销售合同 → FileCheck
+- 报价单 → Calculator
+- 信用证信息表 → CreditCard
+- 订舱委托书 → Send
+- 装运指示 → Truck
+- 原产地证模板 → Globe
+- 报关委托书 → Shield
+- 熏蒸证书模板 → Award
+- 送货单 → Receipt
+- 物流追踪 → MapPin
+- 国际快递面单 → Truck
+- 集装箱装载清单 → Container
+- 唛头 → Tag
+- 集运装箱单 → Archive
+- 运费清单 → DollarSign
+- 交接单 → Clipboard
+- 入库收货单 → Package
+- HS 编码查询 → Hash
+- 邮编查询 → MapPin
+- 国际快递申报单 → FileText
+- 汇率换算 → DollarSign
+- 借记通知单 → Calculator
+- 地址格式化 → MapPin
+- 运费计算器 → Calculator
+- 视频脚本 SOP → Video
+- 产品描述生成 → Type
+
+Icons: 24px for quick tools, 20px for directory items.
+Container: 40x40px for quick tools, 36x36px for directory.
+Background: #F3F5FA, border-radius 10px.
+Color: #6C5DD3 (primary) or #808191 (secondary).
+
+NO emoji. NO colorful system icons.
+
+==================================================
+INTERACTIVITY (prototype.js)
+==================================================
+
+- Search filtering: typing filters tools in real-time
+- Category switching: clicking a category chip filters tools
+- Category collapse/expand: clicking category title toggles
+- Mobile menu: hamburger opens overlay, close button closes
+- "查看全部" scrolls to full directory
+- Quick tool cards show hover/click feedback
+
+==================================================
+NO Cookie Banner in screenshots.
+
+==================================================
+AFTER creating files:
+1. Start a local static server on port 8765
+2. Take screenshots using Playwright:
+   - mobile-first-viewport-v4.png (390x844)
+   - mobile-category-open-v4.png (390x844, with a category expanded)
+   - mobile-full-page-v4.png (390x844, full page scroll)
+   - desktop-tools-v4.png (1440x900)
+3. Save screenshots to /Users/chq/xixiong-saas/docs/ui-prototypes/tools-v4/screenshots/

@@ -2,7 +2,14 @@
 import { prisma } from "@/lib/prisma";
 import LevelsClient from "./levels-client";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLevelsPage() {
-  const levels = await prisma.userLevel.findMany({ orderBy: { sortOrder: "asc" } });
+  let levels = [];
+  try {
+    levels = await prisma.userLevel.findMany({ orderBy: { sortOrder: "asc" } });
+  } catch (error) {
+    console.error('Failed to fetch user levels:', error);
+  }
   return <LevelsClient initialLevels={levels} />;
 }

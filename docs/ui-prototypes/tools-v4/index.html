@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具中心 - 绝世百宝箱</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">绝世百宝箱</div>
+            <div class="header-actions">
+                <button class="notification-btn" aria-label="通知">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button class="menu-btn" aria-label="菜单">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Compact Page Intro -->
+            <section class="page-intro">
+                <nav class="breadcrumb">
+                    <span>首页</span>
+                    <span class="separator">/</span>
+                    <span>工具中心</span>
+                </nav>
+                <h1 class="page-title">工具中心</h1>
+                <p class="page-subtitle">29 个实用工具</p>
+            </section>
+
+            <!-- Search + Category Navigation -->
+            <section class="search-section">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <input type="text" placeholder="搜索工具..." aria-label="搜索工具">
+                </div>
+
+                <div class="category-nav">
+                    <button class="category-btn active" data-category="all">全部</button>
+                    <button class="category-btn" data-category="foreign-trade">外贸单据</button>
+                    <button class="category-btn" data-category="logistics">物流工具</button>
+                    <button class="category-btn" data-category="coding">编码查询</button>
+                    <button class="category-btn" data-category="finance">汇率金融</button>
+                    <button class="category-btn" data-category="business">经营工具</button>
+                    <button class="category-btn" data-category="ai">AI 内容</button>
+                </div>
+            </section>
+
+            <!-- Quick Tools -->
+            <section class="quick-tools-section">
+                <div class="section-header">
+                    <h2 class="section-title">常用工具</h2>
+                    <a href="#full-directory" class="view-all-link">查看全部</a>
+                </div>
+
+                <div class="quick-tools-grid">
+                    <div class="tool-card quick-tool" data-category="coding" data-search="邮编 邮政编码">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 8C18 6.4087 18 5.10457 17.2722 4.15482C16.5443 3.20508 15.2347 2.72754 13.7 2.72754C12.1653 2.72754 10.8557 3.20508 10.1278 4.15482C9.4 5.10457 9.4 6.4087 9.4 8C9.4 9.5913 9.4 10.8954 10.1278 11.8452C10.8557 12.7949 12.1653 13.2725 13.7 13.2725C15.2347 13.2725 16.5443 12.7949 17.2722 11.8452C18 10.8954 18 9.5913 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.3787 21C19.2744 21 20 20.2744 20 19.3787C20 18.483 19.2744 17.7574 18.3787 17.7574C17.483 17.7574 16.7574 18.483 16.7574 19.3787C16.7574 20.2744 17.483 21 18.3787 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">邮编查询</h3>
+                            <p class="tool-desc">全球邮编查询，支持美国 ZIP、英国 postcode 等</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-card quick-tool" data-category="coding" data-search="HS 编码 海关">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 7C4 5.89543 4 5.34315 4.34315 5.05279C4.64214 4.79904 5.06642 4.70368 5.65685 4.65685C6.31303 4.60457 7.10457 4.72754 8.6 4.72754C10.0954 4.72754 10.887 4.60457 11.5431 4.65685C12.1336 4.70368 12.5579 4.79904 12.8569 5.05279C13.2 5.34315 13.2 5.89543 13.2 7C13.2 8.10457 13.2 8.65685 12.8569 8.94721C12.5579 9.201 12.1336 9.29632 11.5431 9.34315C10.887 9.39543 10.0954 9.27246 8.6 9.27246C7.10457 9.27246 6.31303 9.39543 5.65685 9.34315C5.06642 9.29632 4.64214 9.201 4.34315 8.94721C4 8.65685 4 8.10457 4 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 12C4 10.8954 4 10.3431 4.34315 10.0528C4.64214 9.79904 5.06642 9.70368 5.65685 9.65685C6.31303 9.60457 7.10457 9.72754 8.6 9.72754C10.0954 9.72754 10.887 9.60457 11.5431 9.65685C12.1336 9.70368 12.5579 9.79904 12.8569 10.0528C13.2 10.3431 13.2 10.8954 13.2 12C13.2 13.1046 13.2 13.6569 12.8569 13.9472C12.5579 14.201 12.1336 14.2963 11.5431 14.3431C10.887 14.3954 10.0954 14.2725 8.6 14.2725C7.10457 14.2725 6.31303 14.3954 5.65685 14.3431C5.06642 14.2963 4.64214 14.201 4.34315 13.9472C4 13.6569 4 13.1046 4 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4 17C4 15.8954 4 15.3431 4.34315 15.0528C4.64214 14.799 5.06642 14.7037 5.65685 14.6569C6.31303 14.6046 7.10457 14.7275 8.6 14.7275C10.0954 14.7275 10.887 14.6046 11.5431 14.6569C12.1336 14.7037 12.5579 14.799 12.8569 15.0528C13.2 15.3431 13.2 15.8954 13.2 17C13.2 18.1046 13.2 18.6569 12.8569 18.9472C12.5579 19.201 12.1336 19.2963 11.5431 19.3431C10.887 19.3954 10.0954 19.2725 8.6 19.2725C7.10457 19.2725 6.31303 19.3954 5.65685 19.3431C5.06642 19.2963 4.64214 19.201 4.34315 18.9472C4 18.6569 4 18.1046 4 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">HS 编码查询</h3>
+                            <p class="tool-desc">海关编码查询，支持中国、美国、欧盟等</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-card quick-tool" data-category="finance" data-search="汇率 货币">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2V22M5 5C3.89543 5 3.34315 5 3.05279 5.34315C2.79904 5.64214 2.70368 6.06642 2.65685 6.65685C2.60457 7.31303 2.72754 8.10457 2.72754 9.6C2.72754 11.0954 2.60457 11.887 2.65685 12.5431C2.70368 13.1336 2.79904 13.5579 3.05279 13.8569C3.34315 14.2 3.89543 14.2 5 14.2C6.10457 14.2 6.65685 14.2 6.94721 14.5431C7.201 14.8421 7.29632 15.2664 7.34315 15.8569C7.39543 16.513 7.27246 17.3046 7.27246 18.8C7.27246 20.2954 7.39543 21.087 7.34315 21.7431C7.29632 22.3336 7.201 22.7579 6.94721 23.0528C6.65685 23.4 6.10457 23.4 5 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19 5C20.1046 5 20.6569 5 20.9472 5.34315C21.201 5.64214 21.2963 6.06642 21.3431 6.65685C21.3954 7.31303 21.2725 8.10457 21.2725 9.6C21.2725 11.0954 21.3954 11.887 21.3431 12.5431C21.2963 13.1336 21.201 13.5579 20.9472 13.8569C20.6569 14.2 20.1046 14.2 19 14.2C17.8954 14.2 17.3431 14.2 17.0528 14.5431C16.799 14.8421 16.7037 15.2664 16.6569 15.8569C16.6046 16.513 16.7275 17.3046 16.7275 18.8C16.7275 20.2954 16.6046 21.087 16.6569 21.7431C16.7037 22.3336 16.799 22.7579 17.0528 23.0528C17.3431 23.4 17.8954 23.4 19 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">汇率换算</h3>
+                            <p class="tool-desc">实时汇率查询与换算，支持主流货币</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-card quick-tool" data-category="business" data-search="地址 格式化 标准化">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 8C18 6.4087 18 5.10457 17.2722 4.15482C16.5443 3.20508 15.2347 2.72754 13.7 2.72754C12.1653 2.72754 10.8557 3.20508 10.1278 4.15482C9.4 5.10457 9.4 6.4087 9.4 8C9.4 9.5913 9.4 10.8954 10.1278 11.8452C10.8557 12.7949 12.1653 13.2725 13.7 13.2725C15.2347 13.2725 16.5443 12.7949 17.2722 11.8452C18 10.8954 18 9.5913 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.3787 21C19.2744 21 20 20.2744 20 19.3787C20 18.483 19.2744 17.7574 18.3787 17.7574C17.483 17.7574 16.7574 18.483 16.7574 19.3787C16.7574 20.2744 17.483 21 18.3787 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">地址格式化</h3>
+                            <p class="tool-desc">全球地址格式标准化，支持多国家</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-card quick-tool" data-category="logistics" data-search="运费 计算器 快递 海运">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 17V7M12 17V13M16 17V11M3 17H19M3 7H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">运费计算器</h3>
+                            <p class="tool-desc">国际快递与海运运费估算</p>
+                        </div>
+                    </div>
+
+                    <div class="tool-card quick-tool" data-category="logistics" data-search="物流 追踪 包裹">
+                        <div class="icon-container">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.5 17.5L22 22M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 8V12L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="tool-info">
+                            <h3 class="tool-title">物流追踪</h3>
+                            <p class="tool-desc">全球主流物流商包裹追踪</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Category Tool Directory -->
+            <section class="directory-section" id="full-directory">
+                <h2 class="section-title">全部工具</h2>
+
+                <div class="category-group">
+                    <!-- Foreign Trade Documents -->
+                    <div class="category-section expanded" data-category="foreign-trade">
+                        <div class="category-header">
+                            <h3 class="category-title">外贸单据 · 12</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="foreign-trade" data-search="商业发票">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M16 13H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M16 17H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M10 9H9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">商业发票</h4>
+                                    <p class="tool-desc">用于报关和结算的正式商业凭证</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="形式发票">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 20V10M12 10V4M12 10H22M12 10H2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 20H6C5.46957 20 4.96086 19.7893 4.58579 19.4142C4.21071 19.0391 4 18.5304 4 18V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H18C18.5304 4 19.0391 4.21071 19.4142 4.58579C19.7893 4.96086 20 5.46957 20 6V18C20 18.5304 19.7893 19.0391 19.4142 19.4142C19.0391 19.7893 18.5304 20 18 20H12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">形式发票</h4>
+                                    <p class="tool-desc">非正式商业文件，用于报价或样品确认</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="装箱单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 7L12 3L4 7M20 7L12 11M20 7V17L12 21L4 17V7M12 11V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">装箱单</h4>
+                                    <p class="tool-desc">详细记录货物包装情况的单据</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="外贸销售合同">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12L11 14L15 10M5 19C3.89543 19 3.34315 19 3.05279 18.7071C2.79904 18.445 2.70368 18.0627 2.65685 17.6569C2.60457 17.2055 2.72754 16.7347 2.72754 15.8C2.72754 14.8653 2.60457 14.3945 2.65685 13.9431C2.70368 13.5373 2.79904 13.155 3.05279 12.8929C3.34315 12.6 3.89543 12.6 5 12.6C6.10457 12.6 6.65685 12.6 6.94721 12.8929C7.201 13.155 7.29632 13.5373 7.34315 13.9431C7.39543 14.3945 7.27246 14.8653 7.27246 15.8C7.27246 16.7347 7.39543 17.2055 7.34315 17.6569C7.29632 18.0627 7.201 18.445 6.94721 18.7071C6.65685 19 6.10457 19 5 19Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M17 12C18.1046 12 18.6569 12 18.9472 11.7071C19.201 11.445 19.2963 11.0627 19.3431 10.6569C19.3954 10.2055 19.2725 9.73467 19.2725 8.8C19.2725 7.86534 19.3954 7.39452 19.3431 6.94315C19.2963 6.53731 19.201 6.15503 18.9472 5.89289C18.6569 5.6 18.1046 5.6 17 5.6C15.8954 5.6 15.3431 5.6 15.0528 5.89289C14.799 6.15503 14.7037 6.53731 14.6569 6.94315C14.6046 7.39452 14.7275 7.86534 14.7275 8.8C14.7275 9.73467 14.6046 10.2055 14.6569 10.6569C14.7037 11.0627 14.799 11.445 15.0528 11.7071C15.3431 12 15.8954 12 17 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">外贸销售合同</h4>
+                                    <p class="tool-desc">国际贸易买卖双方签署的正式合同</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="报价单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 18V12M15 18V12M15 12V6H9V12M15 12H21M9 12H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">报价单</h4>
+                                    <p class="tool-desc">商品价格及交易条件的初步方案</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="信用证信息表">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 10H14V15C14 16.0609 13.5786 17.0783 12.8284 17.8284C12.0783 18.5786 11.0609 19 10 19C8.93913 19 7.92172 18.5786 7.17157 17.8284C6.42143 17.0783 6 16.0609 6 15V5C6 3.93913 6.42143 2.92172 7.17157 2.17157C7.92172 1.42143 8.93913 1 10 1H21V10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M15 15V18M10 15V18M5 15V18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M3 23H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">信用证信息表</h4>
+                                    <p class="tool-desc">银行信用证详细信息整理表单</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="订舱委托书">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 7L17 12L12 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">订舱委托书</h4>
+                                    <p class="tool-desc">货运代理委托订舱的正式文件</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="装运指示">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 12H16M16 12L13 9M16 12L13 15M3 6C3 5.46957 3.21071 4.96086 3.58579 4.58579C3.96086 4.21071 4.46957 4 5 4H19C19.5304 4 20.0391 4.21071 20.4142 4.58579C20.7893 4.96086 21 5.46957 21 6V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M15 16H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">装运指示</h4>
+                                    <p class="tool-desc">明确货物运输要求的指导性文件</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="原产地证">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">原产地证模板</h4>
+                                    <p class="tool-desc">证明货物原产国的标准格式证书</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="报关委托书">
+                                <div class="icon-container small">
+                                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M8 12H16M12 8V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">报关委托书</h4>
+                                    <p class="tool-desc">委托代理办理海关手续的授权文件</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="熏蒸证书">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12L11 14L15 10M5 19C3.89543 19 3.34315 19 3.05279 18.7071C2.79904 18.445 2.70368 18.0627 2.65685 17.6569C2.60457 17.2055 2.72754 16.7347 2.72754 15.8C2.72754 14.8653 2.60457 14.3945 2.65685 13.9431C2.70368 13.5373 2.79904 13.155 3.05279 12.8929C3.34315 12.6 3.89543 12.6 5 12.6C6.10457 12.6 6.65685 12.6 6.94721 12.8929C7.201 13.155 7.29632 13.5373 7.34315 13.9431C7.39543 14.3945 7.27246 14.8653 7.27246 15.8C7.27246 16.7347 7.39543 17.2055 7.34315 17.6569C7.29632 18.0627 7.201 18.445 6.94721 18.7071C6.65685 19 6.10457 19 5 19Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M17 12C18.1046 12 18.6569 12 18.9472 11.7071C19.201 11.445 19.2963 11.0627 19.3431 10.6569C19.3954 10.2055 19.2725 9.73467 19.2725 8.8C19.2725 7.86534 19.3954 7.39452 19.3431 6.94315C19.2963 6.53731 19.201 6.15503 18.9472 5.89289C18.6569 5.6 18.1046 5.6 17 5.6C15.8954 5.6 15.3431 5.6 15.0528 5.89289C14.799 6.15503 14.7037 6.53731 14.6569 6.94315C14.6046 7.39452 14.7275 7.86534 14.7275 8.8C14.7275 9.73467 14.6046 10.2055 14.6569 10.6569C14.7037 11.0627 14.799 11.445 15.0528 11.7071C15.3431 12 15.8954 12 17 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">熏蒸证书模板</h4>
+                                    <p class="tool-desc">木材及木质包装检疫处理证明</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="foreign-trade" data-search="送货单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15 11H21M18 8V14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 20H6C5.46957 20 4.96086 19.7893 4.58579 19.4142C4.21071 19.0391 4 18.5304 4 18V6C4 5.46957 4.21071 4.96086 4.58579 4.58579C4.96086 4.21071 5.46957 4 6 4H14L18 8V10.5M18 15V12H22V15C22 16.8856 21.25 18.3333 20 19.3333C18.75 20.3333 17.25 20.8333 15.5 21C14 19.5 13 18 12.5 16.5C12 15 12 13.5 12 12C12 10.5 12 9 12.5 7.5C13 6 14 4.5 15.5 3C17.25 2.83333 18.75 3.33333 20 4.33333C21.25 5.33333 22 6.78105 22 8.5V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">送货单</h4>
+                                    <p class="tool-desc">货物配送交接凭证，用于签收确认</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logistics Tools -->
+                    <div class="category-section" data-category="logistics">
+                        <div class="category-header">
+                            <h3 class="category-title">物流工具 · 8</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="logistics" data-search="物流追踪">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17.5 17.5L22 22M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 8V12L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">物流追踪</h4>
+                                    <p class="tool-desc">全球主流物流商包裹追踪</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="国际快递面单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12H15M12 9V15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">国际快递面单</h4>
+                                    <p class="tool-desc">标准快递单据格式生成工具</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="集装箱装载清单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 16L12 12L8 8M16 8L12 12L16 16M12 12V21M12 12V3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">集装箱装载清单</h4>
+                                    <p class="tool-desc">详细记录集装箱货物分布情况</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="唛头">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9.86996 5.85999C9.43996 5.52999 8.83996 5.79999 8.83996 6.28999V17.72C8.83996 18.21 9.43996 18.48 9.86996 18.15L15.57 13.85C15.92 13.59 15.92 13.11 15.57 12.85L9.86996 5.85999Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">唛头</h4>
+                                    <p class="tool-desc">货物运输标识符生成器</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="集运装箱单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 7L12 3L4 7M20 7L12 11M20 7V17L12 21L4 17V7M12 11V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">集运装箱单</h4>
+                                    <p class="tool-desc">集运服务专用装箱单据生成</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="运费清单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2V22M5 5C3.89543 5 3.34315 5 3.05279 5.34315C2.79904 5.64214 2.70368 6.06642 2.65685 6.65685C2.60457 7.31303 2.72754 8.10457 2.72754 9.6C2.72754 11.0954 2.60457 11.887 2.65685 12.5431C2.70368 13.1336 2.79904 13.5579 3.05279 13.8569C3.34315 14.2 3.89543 14.2 5 14.2C6.10457 14.2 6.65685 14.2 6.94721 14.5431C7.201 14.8421 7.29632 15.2664 7.34315 15.8569C7.39543 16.513 7.27246 17.3046 7.27246 18.8C7.27246 20.2954 7.39543 21.087 7.34315 21.7431C7.29632 22.3336 7.201 22.7579 6.94721 23.0528C6.65685 23.4 6.10457 23.4 5 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M19 5C20.1046 5 20.6569 5 20.9472 5.34315C21.201 5.64214 21.2963 6.06642 21.3431 6.65685C21.3954 7.31303 21.2725 8.10457 21.2725 9.6C21.2725 11.0954 21.3954 11.887 21.3431 12.5431C21.2963 13.1336 21.201 13.5579 20.9472 13.8569C20.6569 14.2 20.1046 14.2 19 14.2C17.8954 14.2 17.3431 14.2 17.0528 14.5431C16.799 14.8421 16.7037 15.2664 16.6569 15.8569C16.6046 16.513 16.7275 17.3046 16.7275 18.8C16.7275 20.2954 16.6046 21.087 16.6569 21.7431C16.7037 22.3336 16.799 22.7579 17.0528 23.0528C17.3431 23.4 17.8954 23.4 19 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">运费清单</h4>
+                                    <p class="tool-desc">物流费用明细统计与分析</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="交接单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M15 12H15.01M12 8H12.01M9 12H9.01M8 21H16C17.1046 21 17.6569 21 18.0528 20.782C18.4121 20.5853 18.7071 20.2902 18.9134 20.005C19.2122 19.5902 19.385 18.9542 19.4 18L19.9 9C19.9358 7.58579 19.9537 6.87868 19.6956 6.33895C19.4678 5.8623 19.0877 5.48223 18.611 5.25442C18.0713 5 17.3642 4.98211 16 4.98211H8C6.63579 4.98211 5.92868 5.00001 5.38895 5.25807C4.9123 5.48586 4.53223 5.86593 4.30442 6.34258C4 6.88231 4.01789 7.58942 4.01789 9L4.51789 18C4.53284 18.9542 4.70561 19.5902 5.00442 20.005C5.21068 20.2902 5.50565 20.5853 5.86499 20.782C6.34315 21 6.65685 21 8 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">交接单</h4>
+                                    <p class="tool-desc">货物转运过程中的交接凭证</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="logistics" data-search="入库收货单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 7L12 3L4 7M20 7L12 11M20 7V17L12 21L4 17V7M12 11V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">入库收货单</h4>
+                                    <p class="tool-desc">仓库收货确认与入库登记单据</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coding Tools -->
+                    <div class="category-section" data-category="coding">
+                        <div class="category-header">
+                            <h3 class="category-title">编码查询 · 3</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="coding" data-search="HS 编码">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 7C4 5.89543 4 5.34315 4.34315 5.05279C4.64214 4.79904 5.06642 4.70368 5.65685 4.65685C6.31303 4.60457 7.10457 4.72754 8.6 4.72754C10.0954 4.72754 10.887 4.60457 11.5431 4.65685C12.1336 4.70368 12.5579 4.79904 12.8569 5.05279C13.2 5.34315 13.2 5.89543 13.2 7C13.2 8.10457 13.2 8.65685 12.8569 8.94721C12.5579 9.201 12.1336 9.29632 11.5431 9.34315C10.887 9.39543 10.0954 9.27246 8.6 9.27246C7.10457 9.27246 6.31303 9.39543 5.65685 9.34315C5.06642 9.29632 4.64214 9.201 4.34315 8.94721C4 8.65685 4 8.10457 4 7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4 12C4 10.8954 4 10.3431 4.34315 10.0528C4.64214 9.79904 5.06642 9.70368 5.65685 9.65685C6.31303 9.60457 7.10457 9.72754 8.6 9.72754C10.0954 9.72754 10.887 9.60457 11.5431 9.65685C12.1336 9.70368 12.5579 9.79904 12.8569 10.0528C13.2 10.3431 13.2 10.8954 13.2 12C13.2 13.1046 13.2 13.6569 12.8569 13.9472C12.5579 14.201 12.1336 14.2963 11.5431 14.3431C10.887 14.3954 10.0954 14.2725 8.6 14.2725C7.10457 14.2725 6.31303 14.3954 5.65685 14.3431C5.06642 14.2963 4.64214 14.201 4.34315 13.9472C4 13.6569 4 13.1046 4 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M4 17C4 15.8954 4 15.3431 4.34315 15.0528C4.64214 14.799 5.06642 14.7037 5.65685 14.6569C6.31303 14.6046 7.10457 14.7275 8.6 14.7275C10.0954 14.7275 10.887 14.6046 11.5431 14.6569C12.1336 14.7037 12.5579 14.799 12.8569 15.0528C13.2 15.3431 13.2 15.8954 13.2 17C13.2 18.1046 13.2 18.6569 12.8569 18.9472C12.5579 19.201 12.1336 19.2963 11.5431 19.3431C10.887 19.3954 10.0954 19.2725 8.6 19.2725C7.10457 19.2725 6.31303 19.3954 5.65685 19.3431C5.06642 19.2963 4.64214 19.201 4.34315 18.9472C4 18.6569 4 18.1046 4 17Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">HS 编码查询</h4>
+                                    <p class="tool-desc">海关编码查询，支持中国、美国、欧盟等</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="coding" data-search="邮编">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 8C18 6.4087 18 5.10457 17.2722 4.15482C16.5443 3.20508 15.2347 2.72754 13.7 2.72754C12.1653 2.72754 10.8557 3.20508 10.1278 4.15482C9.4 5.10457 9.4 6.4087 9.4 8C9.4 9.5913 9.4 10.8954 10.1278 11.8452C10.8557 12.7949 12.1653 13.2725 13.7 13.2725C15.2347 13.2725 16.5443 12.7949 17.2722 11.8452C18 10.8954 18 9.5913 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18.3787 21C19.2744 21 20 20.2744 20 19.3787C20 18.483 19.2744 17.7574 18.3787 17.7574C17.483 17.7574 16.7574 18.483 16.7574 19.3787C16.7574 20.2744 17.483 21 18.3787 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">邮编查询</h4>
+                                    <p class="tool-desc">全球邮编查询，支持美国 ZIP、英国 postcode 等</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="coding" data-search="国际快递申报单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M16 13H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M16 17H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M10 9H9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">国际快递申报单</h4>
+                                    <p class="tool-desc">国际快件出口申报表格填写助手</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Finance Tools -->
+                    <div class="category-section" data-category="finance">
+                        <div class="category-header">
+                            <h3 class="category-title">汇率金融 · 2</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="finance" data-search="汇率">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2V22M5 5C3.89543 5 3.34315 5 3.05279 5.34315C2.79904 5.64214 2.70368 6.06642 2.65685 6.65685C2.60457 7.31303 2.72754 8.10457 2.72754 9.6C2.72754 11.0954 2.60457 11.887 2.65685 12.5431C2.70368 13.1336 2.79904 13.5579 3.05279 13.8569C3.34315 14.2 3.89543 14.2 5 14.2C6.10457 14.2 6.65685 14.2 6.94721 14.5431C7.201 14.8421 7.29632 15.2664 7.34315 15.8569C7.39543 16.513 7.27246 17.3046 7.27246 18.8C7.27246 20.2954 7.39543 21.087 7.34315 21.7431C7.29632 22.3336 7.201 22.7579 6.94721 23.0528C6.65685 23.4 6.10457 23.4 5 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M19 5C20.1046 5 20.6569 5 20.9472 5.34315C21.201 5.64214 21.2963 6.06642 21.3431 6.65685C21.3954 7.31303 21.2725 8.10457 21.2725 9.6C21.2725 11.0954 21.3954 11.887 21.3431 12.5431C21.2963 13.1336 21.201 13.5579 20.9472 13.8569C20.6569 14.2 20.1046 14.2 19 14.2C17.8954 14.2 17.3431 14.2 17.0528 14.5431C16.799 14.8421 16.7037 15.2664 16.6569 15.8569C16.6046 16.513 16.7275 17.3046 16.7275 18.8C16.7275 20.2954 16.6046 21.087 16.6569 21.7431C16.7037 22.3336 16.799 22.7579 17.0528 23.0528C17.3431 23.4 17.8954 23.4 19 23.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">汇率换算</h4>
+                                    <p class="tool-desc">实时汇率查询与换算，支持主流货币</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="finance" data-search="借记通知单">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 18V12M15 18V12M15 12V6H9V12M15 12H21M9 12H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">借记通知单</h4>
+                                    <p class="tool-desc">银行扣款或费用通知单据模板</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Tools -->
+                    <div class="category-section" data-category="business">
+                        <div class="category-header">
+                            <h3 class="category-title">经营工具 · 2</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="business" data-search="地址格式化">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 8C18 6.4087 18 5.10457 17.2722 4.15482C16.5443 3.20508 15.2347 2.72754 13.7 2.72754C12.1653 2.72754 10.8557 3.20508 10.1278 4.15482C9.4 5.10457 9.4 6.4087 9.4 8C9.4 9.5913 9.4 10.8954 10.1278 11.8452C10.8557 12.7949 12.1653 13.2725 13.7 13.2725C15.2347 13.2725 16.5443 12.7949 17.2722 11.8452C18 10.8954 18 9.5913 18 8Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M6 21C7.65685 21 9 19.6569 9 18C9 16.3431 7.65685 15 6 15C4.34315 15 3 16.3431 3 18C3 19.6569 4.34315 21 6 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M18.3787 21C19.2744 21 20 20.2744 20 19.3787C20 18.483 19.2744 17.7574 18.3787 17.7574C17.483 17.7574 16.7574 18.483 16.7574 19.3787C16.7574 20.2744 17.483 21 18.3787 21Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">地址格式化</h4>
+                                    <p class="tool-desc">全球地址格式标准化，支持多国家</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="business" data-search="运费计算">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 17V7M12 17V13M16 17V11M3 17H19M3 7H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">运费计算器</h4>
+                                    <p class="tool-desc">国际快递与海运运费估算</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Content -->
+                    <div class="category-section" data-category="ai">
+                        <div class="category-header">
+                            <h3 class="category-title">AI 内容 · 2</h3>
+                            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div class="category-content">
+                            <div class="tool-item" data-category="ai" data-search="视频脚本">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 7L5 7M21 7C21 5.89543 21 5.34315 20.7071 5.05279C20.445 4.79904 20.0627 4.70368 19.6569 4.65685C19.2055 4.60457 18.7347 4.72754 17.8 4.72754H6.2C5.26534 4.72754 4.79452 4.60457 4.34315 4.65685C3.93731 4.70368 3.55503 4.79904 3.29289 5.05279C3 5.34315 3 5.89543 3 7V17C3 18.1046 3 18.6569 3.29289 18.9472C3.55503 19.201 3.93731 19.2963 4.34315 19.3431C4.79452 19.3954 5.26534 19.2725 6.2 19.2725H17.8C18.7347 19.2725 19.2055 19.3954 19.6569 19.3431C20.0627 19.2963 20.445 19.201 20.7071 18.9472C21 18.6569 21 18.1046 21 17V7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M15 12L10 9V15L15 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">视频脚本 SOP</h4>
+                                    <p class="tool-desc">跨境电商推广视频脚本模板</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+
+                            <div class="tool-item" data-category="ai" data-search="产品描述">
+                                <div class="icon-container small">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4 14.899C4 15.922 4.42435 16.8903 5.17157 17.5676C5.9188 18.2449 6.91556 18.599 8 18.599C9.08444 18.599 10.0812 18.2449 10.8284 17.5676C11.5756 16.8903 12 15.922 12 14.899V7.101C12 6.078 11.5756 5.1097 10.8284 4.4324C10.0812 3.7551 9.08444 3.401 8 3.401C6.91556 3.401 5.9188 3.7551 5.17157 4.4324C4.42435 5.1097 4 6.078 4 7.101V14.899Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M20 14.899C20 15.922 19.5756 16.8903 18.8284 17.5676C18.0812 18.2449 17.0844 18.599 16 18.599C14.9156 18.599 13.9188 18.2449 13.1716 17.5676C12.4244 16.8903 12 15.922 12 14.899V7.101C12 6.078 12.4244 5.1097 13.1716 4.4324C13.9188 3.7551 14.9156 3.401 16 3.401C17.0844 3.401 18.0812 3.7551 18.8284 4.4324C19.5756 5.1097 20 6.078 20 7.101V14.899Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="tool-details">
+                                    <h4 class="tool-title">产品描述生成</h4>
+                                    <p class="tool-desc">AI 自动生成多语言产品描述</p>
+                                </div>
+                                <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="cta-content">
+                    <h2 class="cta-title">需要更多资源？</h2>
+                    <p class="cta-description">探索教程、指南与实用资源，快速完成跨境任务。</p>
+                    <button class="cta-button">
+                        浏览资源库
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-logo">绝世百宝箱</h3>
+                    <p class="footer-tagline">专业的跨境工具集</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>工具中心</h4>
+                        <ul>
+                            <li><a href="#">外贸单据</a></li>
+                            <li><a href="#">物流工具</a></li>
+                            <li><a href="#">编码查询</a></li>
+                            <li><a href="#">汇率金融</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>关于我们</h4>
+                        <ul>
+                            <li><a href="#">服务条款</a></li>
+                            <li><a href="#">隐私政策</a></li>
+                            <li><a href="#">联系我们</a></li>
+                            <li><a href="#">帮助中心</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 绝世百宝箱. 版权所有.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="prototype.js"></script>
+</body>
+</html>

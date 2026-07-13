@@ -131,21 +131,21 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl font-bold mb-3">💎 定价方案</h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8">
+      {/* Page Title and Controls */}
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">💎 定价方案</h1>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
             选择适合您的方案，从个人免费到企业定制，灵活应对不同需求
           </p>
 
           {/* Toggle */}
-          <div className="mt-8 inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full p-1">
+          <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
             <button
               onClick={() => setIsYearly(false)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                !isYearly ? 'bg-white text-blue-600' : 'text-white/80'
+                !isYearly ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
               }`}
             >
               月付
@@ -153,23 +153,23 @@ export default function PricingPage() {
             <button
               onClick={() => setIsYearly(true)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                isYearly ? 'bg-white text-blue-600' : 'text-white/80'
+                isYearly ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'
               }`}
             >
-              年付 <span className="text-green-300 ml-1">省 17%</span>
+              年付 <span className="text-green-600 ml-1">省 17%</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Plans */}
-      <div className="max-w-5xl mx-auto px-4 -mt-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-6">
           {plans.map((plan, i) => {
             const Icon = plan.icon;
             const isPopular = plan.popular;
-            const displayPrice = isYearly && plan.yearlyPrice 
-              ? Math.round(plan.yearlyPrice / 12) 
+            const displayPrice = isYearly && plan.yearlyPrice
+              ? Math.round(plan.yearlyPrice / 12)
               : plan.price;
 
             return (

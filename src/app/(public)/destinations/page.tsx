@@ -5,6 +5,7 @@ import { ALL_COUNTRIES, type AllCountryConfig } from "@/lib/all-countries";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import type { Metadata } from "next";
 import DestinationsIndexClient from "./destinations-index-client";
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const dynamic = "force-dynamic";
 
@@ -115,106 +116,108 @@ export default async function DestinationsIndexPage() {
   const featured = mergedCountries.filter(c => c.completenessTier === 1);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ===== HERO (keep original style) ===== */}
-      <div className="bg-gradient-to-br from-indigo-700 via-purple-700 to-blue-800 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-32 right-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-12 pb-14 md:pt-16 md:pb-20">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-              <Globe className="w-3.5 h-3.5" /> 全球覆盖 {mergedCountries.length} 国
-            </span>
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* ===== HERO (keep original style) ===== */}
+        <div className="bg-gradient-to-br from-indigo-700 via-purple-700 to-blue-800 text-white relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-32 right-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl" />
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-            🌍 全球目的地工具导航
-          </h1>
+          <div className="relative z-10 max-w-6xl mx-auto px-4 pt-12 pb-14 md:pt-16 md:pb-20">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                <Globe className="w-3.5 h-3.5" /> 全球覆盖 {mergedCountries.length} 国
+              </span>
+            </div>
 
-          <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed">
-            按地区查找出海常用工具 — 邮编查询、地址格式化、运费计算、商业发票、HS 编码，一站式解决。
-          </p>
+            <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
+              🌍 全球目的地工具导航
+            </h1>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-              ✅ {mergedCountries.filter(c => c.completenessTier === 1).length} 个完整页
-            </span>
-            <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-              📊 {mergedCountries.filter(c => c.completenessTier === 2).length} 个增强页
-            </span>
-            <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-              🌐 {mergedCountries.filter(c => c.completenessTier === 3).length} 个基础页
-            </span>
+            <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed">
+              按地区查找出海常用工具 — 邮编查询、地址格式化、运费计算、商业发票、HS 编码，一站式解决。
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
+                ✅ {mergedCountries.filter(c => c.completenessTier === 1).length} 个完整页
+              </span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
+                📊 {mergedCountries.filter(c => c.completenessTier === 2).length} 个增强页
+              </span>
+              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
+                🌐 {mergedCountries.filter(c => c.completenessTier === 3).length} 个基础页
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ===== SEARCHABLE COUNTRY INDEX (new, from /countries) ===== */}
-      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-10">
-        <DestinationsIndexClient countries={mergedCountries} featured={featured} />
-      </div>
+        {/* ===== SEARCHABLE COUNTRY INDEX (new, from /countries) ===== */}
+        <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-10">
+          <DestinationsIndexClient countries={mergedCountries} featured={featured} />
+        </div>
 
-      {/* ===== COMMON SCENARIOS (keep original) ===== */}
-      <div className="max-w-6xl mx-auto px-4 pb-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">常见出海场景</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { title: "发货到海外", desc: "运费计算、集装箱装柜、物流追踪", tools: [
-              { label: "运费计算", href: "/tools/shipping-calculator" },
-              { label: "集装箱计算", href: "/tools/container" },
-              { label: "物流追踪", href: "/tracking" },
-            ]},
-            { title: "清关报关", desc: "商业发票、装箱单、HS编码", tools: [
-              { label: "商业发票", href: "/tools/documents/commercial-invoice" },
-              { label: "装箱单", href: "/tools/documents/packing-list" },
-              { label: "HS编码", href: "/tools/hs-code" },
-            ]},
-            { title: "地址填写", desc: "邮编查询、地址格式化、唛头模板", tools: [
-              { label: "邮编查询", href: "/tools/postal-code" },
-              { label: "地址格式化", href: "/tools/address-formatter" },
-              { label: "唛头模板", href: "/tools/documents/shipping-mark" },
-            ]},
-            { title: "收款结汇", desc: "汇率换算、报价单、形式发票", tools: [
-              { label: "汇率换算", href: "/tools/exchange-rate" },
-              { label: "报价单", href: "/tools/documents/quotation" },
-              { label: "形式发票", href: "/tools/documents/proforma-invoice" },
-            ]},
-          ].map(scenario => (
-            <div key={scenario.title} className="bg-white rounded-xl border border-gray-100 p-5">
-              <h3 className="font-bold text-gray-900 mb-1">{scenario.title}</h3>
-              <p className="text-xs text-gray-500 mb-3">{scenario.desc}</p>
-              <div className="space-y-1.5">
-                {scenario.tools.map(tool => (
-                  <Link
-                    key={tool.href}
-                    href={tool.href}
-                    className="flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 hover:underline min-h-[32px]"
-                  >
-                    <ArrowRight className="w-3 h-3" />
-                    {tool.label}
-                  </Link>
-                ))}
+        {/* ===== COMMON SCENARIOS (keep original) ===== */}
+        <div className="max-w-6xl mx-auto px-4 pb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">常见出海场景</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { title: "发货到海外", desc: "运费计算、集装箱装柜、物流追踪", tools: [
+                { label: "运费计算", href: "/tools/shipping-calculator" },
+                { label: "集装箱计算", href: "/tools/container" },
+                { label: "物流追踪", href: "/tracking" },
+              ]},
+              { title: "清关报关", desc: "商业发票、装箱单、HS编码", tools: [
+                { label: "商业发票", href: "/tools/documents/commercial-invoice" },
+                { label: "装箱单", href: "/tools/documents/packing-list" },
+                { label: "HS编码", href: "/tools/hs-code" },
+              ]},
+              { title: "地址填写", desc: "邮编查询、地址格式化、唛头模板", tools: [
+                { label: "邮编查询", href: "/tools/postal-code" },
+                { label: "地址格式化", href: "/tools/address-formatter" },
+                { label: "唛头模板", href: "/tools/documents/shipping-mark" },
+              ]},
+              { title: "收款结汇", desc: "汇率换算、报价单、形式发票", tools: [
+                { label: "汇率换算", href: "/tools/exchange-rate" },
+                { label: "报价单", href: "/tools/documents/quotation" },
+                { label: "形式发票", href: "/tools/documents/proforma-invoice" },
+              ]},
+            ].map(scenario => (
+              <div key={scenario.title} className="bg-white rounded-xl border border-gray-100 p-5">
+                <h3 className="font-bold text-gray-900 mb-1">{scenario.title}</h3>
+                <p className="text-xs text-gray-500 mb-3">{scenario.desc}</p>
+                <div className="space-y-1.5">
+                  {scenario.tools.map(tool => (
+                    <Link
+                      key={tool.href}
+                      href={tool.href}
+                      className="flex items-center gap-1.5 text-sm text-teal-600 hover:text-teal-700 hover:underline min-h-[32px]"
+                    >
+                      <ArrowRight className="w-3 h-3" />
+                      {tool.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== ALL TOOLS CTA (keep original) ===== */}
+        <div className="max-w-6xl mx-auto px-4 pb-16">
+          <Link href="/tools" className="block bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-bold mb-1">🔧 浏览全部工具</h3>
+                <p className="text-teal-100 text-sm">邮编、HS编码、汇率、运费、单据模板，一个站搞定</p>
+              </div>
+              <ArrowRight className="w-6 h-6 flex-shrink-0" />
             </div>
-          ))}
+          </Link>
         </div>
       </div>
-
-      {/* ===== ALL TOOLS CTA (keep original) ===== */}
-      <div className="max-w-6xl mx-auto px-4 pb-16">
-        <Link href="/tools" className="block bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-bold mb-1">🔧 浏览全部工具</h3>
-              <p className="text-teal-100 text-sm">邮编、HS编码、汇率、运费、单据模板，一个站搞定</p>
-            </div>
-            <ArrowRight className="w-6 h-6 flex-shrink-0" />
-          </div>
-        </Link>
-      </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }

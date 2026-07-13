@@ -1,0 +1,6 @@
+src/app/(public)/resources/page.tsx:3:import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+src/app/(public)/resources/page.tsx:75:    <JueshiV4PublicShell>
+src/app/(public)/resources/page.tsx:80:    </JueshiV4PublicShell>
+src/app/(public)/resources/site/[id]/page.tsx:10:import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+src/app/(public)/resources/site/[id]/page.tsx:488:    </JueshiV4PublicShell>
+src/app/(public)/resources/site/[id]/page.tsx:75:    <JueshiV4PublicShell>

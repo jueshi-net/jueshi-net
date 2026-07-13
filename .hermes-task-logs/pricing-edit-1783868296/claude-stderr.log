@@ -1,0 +1,5 @@
+Permission deny rule "Git" matches no known tool — check for typos.
+Permission deny rule "SSH" matches no known tool — check for typos.
+Permission deny rule "PM2" matches no known tool — check for typos.
+Permission deny rule "Prisma" matches no known tool — check for typos.
+Permission deny rule "MultiEdit" matches no known tool — check for typos.

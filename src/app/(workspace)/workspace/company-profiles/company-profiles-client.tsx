@@ -6,8 +6,8 @@ import Link from "next/link";
 import { MetricCard } from "@/components/saas/MetricCard";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
-import { StatusBadge } from "@/components/saas/StatusBadge";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
+import { EmptyState } from "@/components/design-system/EmptyState";
 
 function getCompleteness(profile: any): { score: number; missing: string[]; filled: string[] } {
   const fields = [
@@ -290,7 +290,7 @@ export default function CompanyProfilesClient({ profiles, isMember }: { profiles
 
         {/* Profile Cards */}
         {profiles.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="还没有公司资料"
             description="创建公司资料后，填写单据时可以自动填充公司信息"

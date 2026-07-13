@@ -1,0 +1,15 @@
+{
+  "task_id": null,
+  "task_name": null,
+  "batch_id": null,
+  "status": "not_started",
+  "proposal_path": null,
+  "patch_path": null,
+  "build_status": null,
+  "deploy_status": null,
+  "runtime_status": null,
+  "retry_count": 0,
+  "rate_limit_status": null,
+  "started_at": null,
+  "completed_at": null
+}

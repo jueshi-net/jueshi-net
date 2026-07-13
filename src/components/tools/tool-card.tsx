@@ -2,20 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Star, Eye, Heart, FileCheck, Sparkles, ArrowRight, FileText, Package, Tag, Receipt, Truck, Shield, Send, Calculator, CreditCard, Clipboard, Hash, DollarSign, Container, MapPin, QrCode, Video, Image as ImageIcon, Type, Languages, Palette, Music, Camera, Globe, Phone, Mail, Clock, Calendar, TrendingUp, BarChart3, PieChart, Activity, Zap, Target, Award, BookOpen, GraduationCap, Briefcase, ShoppingBag, Store, Landmark, Scale, Wrench, Settings, Filter, Search, Download, Upload, Share2, Link2, Copy, Scissors, Archive, FolderOpen, FileIcon, Files, FileSpreadsheet, FileBarChart, FilePieChart, FileLineChart } from "lucide-react";
+import { ArrowRight, FileCheck, Sparkles, Eye } from "lucide-react";
 import { trackEvent } from "@/lib/tracking";
 import { ToolCenterItem } from "@/lib/tool-center";
-
-// Icon mapping: Lucide icon name → component
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  FileText, Package, Tag, Receipt, Truck, Shield, Send, Calculator, CreditCard, Clipboard,
-  Hash, DollarSign, Container, MapPin, QrCode, Video, ImageIcon, Type, Languages,
-  Palette, Music, Camera, Globe, Phone, Mail, Clock, Calendar, TrendingUp, BarChart3,
-  PieChart, Activity, Zap, Target, Award, BookOpen, GraduationCap, Briefcase,
-  ShoppingBag, Store, Landmark, Scale, Wrench, Settings, Filter, Search, Download,
-  Upload, Share2, Link2, Copy, Scissors, Archive, FolderOpen, FileIcon, Files,
-  FileSpreadsheet, FileBarChart, FilePieChart, FileLineChart, Sparkles, FileCheck,
-};
 
 interface ToolCardProps {
   tool: ToolCenterItem;
@@ -25,108 +14,86 @@ export default function ToolCard({ tool }: ToolCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    // Fire tracking
     trackEvent("Tool_Click", {
       toolSlug: tool.slug,
       toolName: tool.name,
       source: "tool_center",
     });
-    
-    // Navigate
     if (tool.route) {
       router.push(tool.route);
     }
   };
 
-  const { metrics, favorites, review } = tool;
-  const score = tool.score;
-
-  // Determine tags
   const isNew = tool.isNew;
-  const isHot = score > 50;
+  const isHot = tool.score > 50;
 
-  // Render icon: handle both emoji strings and Lucide icon names
+  // Lucide icon component from tool.icon string
   const renderIcon = () => {
-    if (!tool.icon) {
-      // Fallback based on category
-      if (tool.category === 'documents') return <FileCheck className="w-5 h-5" />;
-      if (tool.category === 'ai_content') return <Sparkles className="w-5 h-5" />;
-      return <span className="text-lg font-bold">{tool.name.charAt(0)}</span>;
+    const iconStr = tool.icon;
+    if (!iconStr) {
+      return <FileCheck className="w-5 h-5 text-gray-500" />;
     }
-
-    // Check if it's an emoji (single character or contains emoji patterns)
-    const isEmoji = tool.icon.length <= 4 && /[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u.test(tool.icon);
-    
-    if (isEmoji) {
-      return <span className="text-xl">{tool.icon}</span>;
-    }
-
-    // Try to map Lucide icon name
-    const IconComponent = iconMap[tool.icon];
-    if (IconComponent) {
-      return <IconComponent className="w-5 h-5" />;
-    }
-
-    // Fallback: show first letter
-    return <span className="text-lg font-bold">{tool.name.charAt(0)}</span>;
+    // Dynamically import the named icon
+    return <LucideIcon name={iconStr} className="w-5 h-5 text-gray-600" />;
   };
 
   return (
-    <div className="group flex flex-col p-4 bg-white border border-gray-200 rounded-xl hover:shadow-md hover:border-blue-300 transition-all duration-200 h-full">
-      {/* Header */}
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
+    <Link
+      href={tool.route || "/tools"}
+      onClick={handleClick}
+      className="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-md transition-all group"
+    >
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0">
           {renderIcon()}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
-            {tool.name}
-          </h3>
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2 min-h-[2.5em]">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-1">
+              {tool.name}
+            </h3>
+            {isNew && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                <Sparkles className="w-3 h-3" />
+                已上线
+              </span>
+            )}
+            {isHot && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                热门
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 line-clamp-2">
             {tool.description || "暂无描述"}
           </p>
         </div>
+        <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-teal-600 flex-shrink-0 mt-1 transition-colors" />
       </div>
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-1 mb-3">
-        {isNew && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-medium">已上线</span>}
-        {isHot && <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 text-[10px] rounded font-medium">热门</span>}
-      </div>
-
-      {/* Metrics */}
-      <div className="flex items-center gap-3 mt-auto pt-3 border-t border-gray-100 text-[11px] text-gray-500">
-        <span className="flex items-center gap-1" title={`Views: ${metrics.views}, Clicks: ${metrics.clicks}`}>
-          <Eye className="w-3 h-3" />
-          {metrics.views + metrics.clicks > 0 ? (metrics.views + metrics.clicks).toLocaleString() : "-"}
-        </span>
-        <span className="flex items-center gap-1" title="Saves">
-          <FileCheck className="w-3 h-3" />
-          {metrics.saves > 0 ? metrics.saves : "-"}
-        </span>
-        <span className="flex items-center gap-1" title="Favorites">
-          <Heart className="w-3 h-3" />
-          {favorites > 0 ? favorites : "-"}
-        </span>
-        <div className="ml-auto flex items-center gap-1">
-          {review.count > 0 ? (
-            <span className="flex items-center gap-0.5 text-orange-500 font-medium">
-              <Star className="w-3 h-3 fill-current" />
-              {review.avg.toFixed(1)}
-            </span>
-          ) : (
-            <span className="text-gray-300">暂无评分</span>
-          )}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <button
-        onClick={handleClick}
-        className="mt-3 w-full flex items-center justify-center gap-2 py-2 bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors"
-      >
-        立即使用 <ArrowRight className="w-3 h-3" />
-      </button>
-    </div>
+    </Link>
   );
+}
+
+/**
+ * Dynamic Lucide icon loader — renders a Lucide component by name string.
+ * Falls back to FileCheck if the icon is not found or is an emoji.
+ */
+function LucideIcon({ name, className }: { name: string; className?: string }) {
+  // Guard against emoji or invalid icon names
+  if (!name || name.length > 30 || /[^\w-]/.test(name)) {
+    return <FileCheck className={className || "w-5 h-5 text-gray-500"} />;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { default: lucideIcons } = require("lucide-react");
+    const IconComponent = lucideIcons[name];
+    if (IconComponent && typeof IconComponent === "function") {
+      return <IconComponent className={className || "w-5 h-5 text-gray-500"} />;
+    }
+  } catch {
+    // ignore
+  }
+
+  return <FileCheck className={className || "w-5 h-5 text-gray-500"} />;
 }

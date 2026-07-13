@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { Package, Plus, Search, Edit2, Trash2, Copy, X, Save, Download, Upload } from 'lucide-react';
-import { WorkspacePageHeader, CompactTable, SaasEmptyState, StatusBadge, SectionCard } from '@/components/saas';
+import { WorkspacePageHeader, CompactTable, SectionCard } from '@/components/saas';
+import { StatusBadge } from '@/components/design-system';
+import { EmptyState } from '@/components/design-system';
 import { track } from '@/lib/analytics';
 
 interface ProductItem {
@@ -712,7 +714,7 @@ export default function ProductsPage() {
         {loading ? (
           <div className="text-center py-12 text-gray-500">加载中...</div>
         ) : products.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant={search ? 'no-results' : 'no-data'}
             title={search ? '没有找到匹配的商品' : '还没有添加商品'}
             description={search ? '尝试使用不同的关键词搜索' : '添加商品信息后，可在报价单、发票、装箱单中一键引用'}

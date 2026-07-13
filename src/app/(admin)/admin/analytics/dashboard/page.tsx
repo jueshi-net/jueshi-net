@@ -9,9 +9,9 @@ import {
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { MetricCard } from '@/components/saas/MetricCard';
-import { StatusBadge } from '@/components/saas/StatusBadge';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
 import { CompactTable } from '@/components/saas/CompactTable';
-import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
+import { EmptyState } from '@/components/design-system/EmptyState';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -177,7 +177,7 @@ export default function AnalyticsDashboard() {
 
   if (!overviewData) {
     return (
-      <SaasEmptyState
+      <EmptyState
         variant="error"
         title="加载失败"
         description={error || '无法加载 Analytics 数据'}
@@ -226,7 +226,7 @@ export default function AnalyticsDashboard() {
       {activeTab === 'pages' && (
         <SectionCard title="页面 PV 排行（近 7 天）" action={<Eye className="w-5 h-5 text-blue-500" />}>
           {overviewData.topPages.length === 0 ? (
-            <SaasEmptyState variant="no-data" title="暂无数据" description="页面访问数据将在用户使用后显示" compact />
+            <EmptyState variant="no-data" title="暂无数据" description="页面访问数据将在用户使用后显示" compact />
           ) : (
             <CompactTable
               columns={[
@@ -245,7 +245,7 @@ export default function AnalyticsDashboard() {
       {activeTab === 'referrers' && (
         <SectionCard title="来源域名排行（近 7 天）" action={<Link2 className="w-5 h-5 text-blue-500" />}>
           {overviewData.topReferrers.length === 0 ? (
-            <SaasEmptyState variant="no-data" title="暂无数据" description="来源数据将在有外部流量后显示" compact />
+            <EmptyState variant="no-data" title="暂无数据" description="来源数据将在有外部流量后显示" compact />
           ) : (
             <CompactTable
               columns={[
@@ -264,7 +264,7 @@ export default function AnalyticsDashboard() {
       {activeTab === 'tools' && (
         <SectionCard title="工具使用排行（近 7 天）" action={<MousePointer className="w-5 h-5 text-blue-500" />}>
           {overviewData.topTools.length === 0 ? (
-            <SaasEmptyState variant="no-data" title="暂无数据" description="工具使用数据将在用户使用后显示" compact />
+            <EmptyState variant="no-data" title="暂无数据" description="工具使用数据将在用户使用后显示" compact />
           ) : (
             <CompactTable
               columns={[
@@ -283,7 +283,7 @@ export default function AnalyticsDashboard() {
       {activeTab === 'devices' && (
         <SectionCard title="设备分布（近 7 天）" action={<Users className="w-5 h-5 text-blue-500" />}>
           {overviewData.deviceDistribution.length === 0 ? (
-            <SaasEmptyState variant="no-data" title="暂无数据" description="设备数据将在用户访问后显示" compact />
+            <EmptyState variant="no-data" title="暂无数据" description="设备数据将在用户访问后显示" compact />
           ) : (
             <CompactTable
               columns={[
@@ -387,7 +387,7 @@ function FunnelsTab({
 
   if (!data) {
     return (
-      <SaasEmptyState
+      <EmptyState
         variant="error"
         title="加载失败"
         description="无法加载增长漏斗数据"
@@ -659,7 +659,7 @@ function ResourcesSection({ data }: { data: ResourcesData }) {
       )}
 
       {data.topClicks.length === 0 && data.featuredGroups.length === 0 && (
-        <SaasEmptyState
+        <EmptyState
           variant="no-data"
           title="暂无推荐资源数据"
           description="推荐资源数据将在用户点击后显示"

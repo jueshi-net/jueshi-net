@@ -9,6 +9,8 @@ import { TrackedArticleToolLink } from "@/components/tracked-article-tool-link";
 import { AdSlot } from "@/components/ad-slot";
 import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { ArticleLayoutClient } from "./article-layout-client";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import { BreadcrumbBar, TagGroup, ContentSection, SectionHeader, PageCTA } from "@/components/design-system";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
   "tracking": { name: "运单号整理工具", route: "/tracking", icon: "📦", desc: "批量整理运单号，自动识别承运商" },
@@ -167,45 +169,45 @@ export default async function ArticlePage({ params, searchParams }: Props) {
       const isDraft = guide.status === "draft";
 
       return (
-        <ArticleLayoutClient toc={toc}>
-          <div className="min-h-screen bg-gray-50">
-            <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-              {/* Preview Mode Banner */}
-              {(previewMode || isDraft) && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6">
-                  <p className="text-yellow-800 font-medium">
-                    🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
-                  </p>
-                  <p className="text-yellow-600 text-sm mt-1">
-                    状态: {guide.status} | slug: {guide.slug}
-                  </p>
-                </div>
-              )}
-
-              <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6" aria-label="面包屑导航">
-                <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-                  <Home className="w-4 h-4" /><span>首页</span>
-                </Link>
-                <span className="text-gray-300">/</span>
-                <Link href="/guides" className="hover:text-gray-900 transition-colors">实用指南</Link>
-                <span className="text-gray-300">/</span>
-                <span className="text-gray-900 font-medium truncate">{guide.title}</span>
-              </nav>
-
-              <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <header className="px-6 pt-8 pb-6 sm:px-10 sm:pt-10 sm:pb-8">
-                  <div className="mb-4">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-teal-50 text-teal-700 border border-teal-100">
-                      <BookOpen className="w-3.5 h-3.5" />{guide.category}
-                    </span>
+        <JueshiV4PublicShell>
+          <ArticleLayoutClient toc={toc}>
+            <div className="min-h-screen bg-gray-50">
+              <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+                {/* Preview Mode Banner */}
+                {(previewMode || isDraft) && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6">
+                    <p className="text-yellow-800 font-medium">
+                      🔒 预览模式 — 此内容尚未发布，不会被搜索引擎索引
+                    </p>
+                    <p className="text-yellow-600 text-sm mt-1">
+                      状态: {guide.status} | slug: {guide.slug}
+                    </p>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">{guide.title}</h1>
-                  {guide.summary && <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-6">{guide.summary}</p>}
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                    {guide.author && <span>{guide.author}</span>}
-                    <span className="flex items-center gap-1"><CalendarDays className="w-4 h-4" />{publishDate.toLocaleDateString("zh-CN")}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-4 h-4" />约 {readingTime} 分钟</span>
-                  </div>
+                )}
+
+                <BreadcrumbBar
+                  items={[
+                    { title: "首页", href: "/" },
+                    { title: "实用指南", href: "/guides" },
+                    { title: guide.title, current: true }
+                  ]}
+                  className="mb-6"
+                />
+
+                <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <header className="px-6 pt-8 pb-6 sm:px-10 sm:pt-10 sm:pb-8">
+                    <div className="mb-4">
+                      <TagGroup
+                        tags={[{ text: guide.category || "指南", type: "info", rounded: true }]}
+                      />
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">{guide.title}</h1>
+                    {guide.summary && <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-6">{guide.summary}</p>}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      {guide.author && <span>{guide.author}</span>}
+                      <span className="flex items-center gap-1"><CalendarDays className="w-4 h-4" />{publishDate.toLocaleDateString("zh-CN")}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-4 h-4" />约 {readingTime} 分钟</span>
+                    </div>
                 </header>
 
                 <div className="px-6 sm:px-10 pb-8">
@@ -361,6 +363,7 @@ export default async function ArticlePage({ params, searchParams }: Props) {
             </div>
           </div>
         </ArticleLayoutClient>
+        </JueshiV4PublicShell>
       );
     }
   } catch { /* Guide table may not exist during build — fall through to Article */ }
@@ -412,28 +415,25 @@ export default async function ArticlePage({ params, searchParams }: Props) {
   };
 
   return (
-    <ArticleLayoutClient toc={toc}>
-      <div className="min-h-screen bg-gray-50">
-        {/* JSON-LD */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+    <JueshiV4PublicShell>
+      <ArticleLayoutClient toc={toc}>
+        <div className="min-h-screen bg-gray-50">
+          {/* JSON-LD */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
 
-        <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6" aria-label="面包屑导航">
-            <Link href="/" className="flex items-center gap-1 hover:text-gray-900 transition-colors">
-              <Home className="w-4 h-4" />
-              <span>首页</span>
-            </Link>
-            <span className="text-gray-300">/</span>
-            <Link href="/guides" className="hover:text-gray-900 transition-colors">
-              实用指南
-            </Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-900 font-medium truncate">{article.title}</span>
-          </nav>
+          <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+            {/* Breadcrumb */}
+            <BreadcrumbBar
+              items={[
+                { title: "首页", href: "/" },
+                { title: "实用指南", href: "/guides" },
+                { title: article.title, current: true }
+              ]}
+              className="mb-6"
+            />
 
           {/* Article Card */}
           <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -446,10 +446,9 @@ export default async function ArticlePage({ params, searchParams }: Props) {
               )}
 
               <div className="mb-4">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-teal-50 text-teal-700 border border-teal-100">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  {categoryLabel}
-                </span>
+                <TagGroup
+                  tags={[{ text: categoryLabel, type: "info", rounded: true }]}
+                />
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-4">
@@ -529,11 +528,8 @@ export default async function ArticlePage({ params, searchParams }: Props) {
 
             {/* Related Tools */}
             {getRelatedTools(article.relatedTools).length > 0 && (
-              <section className="px-6 sm:px-10 mt-4 pt-8 border-t border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Wrench className="w-5 h-5 text-teal-600" />
-                  🔧 相关工具
-                </h2>
+              <ContentSection className="px-6 sm:px-10 mt-4 pt-8 border-t border-gray-100">
+                <SectionHeader title="相关工具" icon={<Wrench className="w-5 h-5 text-teal-600" />} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {getRelatedTools(article.relatedTools).map((tool) => (
                     <TrackedArticleToolLink key={tool.route} href={tool.route} toolName={tool.name}>
@@ -550,16 +546,13 @@ export default async function ArticlePage({ params, searchParams }: Props) {
                     </TrackedArticleToolLink>
                   ))}
                 </div>
-              </section>
+              </ContentSection>
             )}
 
             {/* Related Articles */}
             {relatedArticles.length > 0 && (
-              <section className="px-6 sm:px-10 mt-4 pt-8 border-t border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-teal-600" />
-                  📖 相关文章
-                </h2>
+              <ContentSection className="px-6 sm:px-10 mt-4 pt-8 border-t border-gray-100">
+                <SectionHeader title="相关文章" icon={<BookOpen className="w-5 h-5 text-teal-600" />} />
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {relatedArticles.map((ra) => (
                     <Link key={ra.slug} href={`/guides/${ra.slug}`} className="group block p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-md hover:border-teal-200 transition-all">
@@ -573,7 +566,7 @@ export default async function ArticlePage({ params, searchParams }: Props) {
                     </Link>
                   ))}
                 </div>
-              </section>
+              </ContentSection>
             )}
 
             {/* Disclaimer */}
@@ -604,6 +597,7 @@ export default async function ArticlePage({ params, searchParams }: Props) {
         </div>
       </div>
     </ArticleLayoutClient>
+  </JueshiV4PublicShell>
   );
 }
 

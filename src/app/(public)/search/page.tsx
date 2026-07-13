@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Truck, Hash, Loader2, Package, MapPin, Calendar, ArrowRight, AlertCircle } from "lucide-react";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 
 interface TrackingEvent {
   time: string;
@@ -71,7 +72,7 @@ function HSCodeSearch() {
 
   return (
     <div>
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -85,7 +86,7 @@ function HSCodeSearch() {
         <button
           onClick={() => searchHS(hsQuery)}
           disabled={hsLoading}
-          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 min-h-[44px]"
         >
           {hsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Hash className="w-4 h-4" />}
           查询
@@ -93,11 +94,11 @@ function HSCodeSearch() {
       </div>
 
       {hsResults.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <p className="text-sm text-gray-500 mb-2">找到 {hsTotal} 条结果</p>
           {hsResults.map((item) => (
-            <div key={item.id} className="p-4 border border-gray-100 rounded-lg hover:bg-gray-50">
-              <div className="flex items-center justify-between">
+            <div key={item.id} className="p-6 border border-gray-100 rounded-xl hover:bg-gray-50">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
                   <span className="font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">{item.code}</span>
                   <span className="text-sm text-gray-500">{item.category}</span>
@@ -113,19 +114,19 @@ function HSCodeSearch() {
             </div>
           ))}
           {hsTotal > 10 && (
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               <button
                 disabled={hsPage === 1}
                 onClick={() => searchHS(hsQuery, hsPage - 1)}
-                className="px-4 py-2 border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+                className="px-4 py-3 border rounded-xl disabled:opacity-30 hover:bg-gray-50 min-w-[80px] min-h-[44px]"
               >
                 上一页
               </button>
-              <span className="px-4 py-2 text-gray-500">第 {hsPage} 页</span>
+              <span className="px-4 py-3 text-gray-500 min-h-[44px] flex items-center">第 {hsPage} 页</span>
               <button
                 disabled={hsPage * 10 >= hsTotal}
                 onClick={() => searchHS(hsQuery, hsPage + 1)}
-                className="px-4 py-2 border rounded-lg disabled:opacity-30 hover:bg-gray-50"
+                className="px-4 py-3 border rounded-xl disabled:opacity-30 hover:bg-gray-50 min-w-[80px] min-h-[44px]"
               >
                 下一页
               </button>
@@ -196,148 +197,150 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 text-center mb-8">搜索中心</h1>
+    <JueshiV4PublicShell>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">搜索中心</h1>
 
-      {/* Tabs */}
-      <div className="flex justify-center gap-2 mb-8">
-        {[
-          { key: "search" as const, label: "综合搜索", icon: Search },
-          { key: "tracking" as const, label: "快递追踪", icon: Truck },
-          { key: "hs" as const, label: "HS编码", icon: Hash },
-        ].map((t) => (
-          <button
-            key={t.key}
-            onClick={() => { setTab(t.key); setTrackingResult(null); setTrackingError(""); }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-              tab === t.key ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
-            }`}
-          >
-            <t.icon className="w-4 h-4" />
-            {t.label}
-          </button>
-        ))}
-      </div>
+        {/* Tabs */}
+        <div className="flex justify-center gap-2 mb-6 sm:mb-8">
+          {[
+            { key: "search" as const, label: "综合搜索", icon: Search },
+            { key: "tracking" as const, label: "快递追踪", icon: Truck },
+            { key: "hs" as const, label: "HS编码", icon: Hash },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => { setTab(t.key); setTrackingResult(null); setTrackingError(""); }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-colors min-h-[44px] ${
+                tab === t.key ? "bg-blue-600 text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-blue-300"
+              }`}
+            >
+              <t.icon className="w-4 h-4" />
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-        {tab === "search" && (
-          <div className="flex gap-3">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")}
-              placeholder="输入关键词搜索..."
-              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Google</button>
-            <button onClick={() => window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200">百度</button>
-          </div>
-        )}
-
-        {tab === "tracking" && (
-          <div>
-            {/* Input */}
-            <div className="flex gap-3 mb-6">
-              <div className="flex-1 relative">
-                <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  value={trackingNumber}
-                  onChange={(e) => setTrackingNumber(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="输入快递单号，如：1234567890"
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                onClick={handleTracking}
-                disabled={trackingLoading}
-                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-              >
-                {trackingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
-                查询
-              </button>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          {tab === "search" && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")}
+                placeholder="输入关键词搜索..."
+                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
+              />
+              <button onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 min-h-[44px]">Google</button>
+              <button onClick={() => window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, "_blank")} className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 min-h-[44px]">百度</button>
             </div>
+          )}
 
-            {/* Error */}
-            {trackingError && (
-              <div className="flex items-center gap-2 text-red-600 bg-red-50 rounded-lg p-3 mb-4">
-                <AlertCircle className="w-5 h-5" />
-                <span className="text-sm">{trackingError}</span>
-              </div>
-            )}
-
-            {/* Result */}
-            {trackingResult && (
-              <div className="border border-gray-100 rounded-xl overflow-hidden">
-                {/* Header */}
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                  <div className="flex items-center justify-between flex-wrap gap-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{trackingResult.carrier}</h3>
-                      <p className="text-sm text-gray-500">单号：{trackingResult.trackingNumber}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`px-3 py-1 rounded-full text-sm border ${statusColors[trackingResult.status] || "bg-gray-100 text-gray-600"}`}>
-                        {statusLabels[trackingResult.status] || trackingResult.status}
-                      </span>
-                      {trackingResult.mock && (
-                        <span className="px-2 py-0.5 bg-yellow-50 text-yellow-600 rounded text-xs border border-yellow-200">
-                          演示数据
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
-                    <MapPin className="w-4 h-4" />
-                    <span>{trackingResult.origin}</span>
-                    <ArrowRight className="w-3 h-3" />
-                    <span>{trackingResult.destination}</span>
-                  </div>
+          {tab === "tracking" && (
+            <div>
+              {/* Input */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <div className="flex-1 relative">
+                  <Package className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    value={trackingNumber}
+                    onChange={(e) => setTrackingNumber(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="输入快递单号，如：1234567890"
+                    className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
+                  />
                 </div>
+                <button
+                  onClick={handleTracking}
+                  disabled={trackingLoading}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2 min-h-[44px]"
+                >
+                  {trackingLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                  查询
+                </button>
+              </div>
 
-                {/* Timeline */}
-                <div className="px-6 py-4">
-                  <div className="space-y-0">
-                    {trackingResult.events.map((event, i) => (
-                      <div key={i} className="flex gap-4">
-                        <div className="flex flex-col items-center">
-                          <div className={`w-3 h-3 rounded-full ${i === 0 ? "bg-blue-600 ring-4 ring-blue-100" : "bg-gray-300"}`} />
-                          {i < trackingResult.events.length - 1 && <div className="w-0.5 h-full bg-gray-200 mt-1" />}
-                        </div>
-                        <div className={`pb-6 ${i === trackingResult.events.length - 1 ? "pb-0" : ""}`}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-sm font-medium ${i === 0 ? "text-blue-600" : "text-gray-900"}`}>
-                              {event.status}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {new Date(event.time).toLocaleString("zh-CN")}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600">{event.description}</p>
-                          <p className="text-xs text-gray-400 mt-0.5">{event.location}</p>
-                        </div>
+              {/* Error */}
+              {trackingError && (
+                <div className="flex items-center gap-2 text-red-600 bg-red-50 rounded-lg p-3 mb-4">
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-sm">{trackingError}</span>
+                </div>
+              )}
+
+              {/* Result */}
+              {trackingResult && (
+                <div className="border border-gray-100 rounded-xl overflow-hidden">
+                  {/* Header */}
+                  <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between flex-wrap gap-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{trackingResult.carrier}</h3>
+                        <p className="text-sm text-gray-500">单号：{trackingResult.trackingNumber}</p>
                       </div>
-                    ))}
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-sm border ${statusColors[trackingResult.status] || "bg-gray-100 text-gray-600"}`}>
+                          {statusLabels[trackingResult.status] || trackingResult.status}
+                        </span>
+                        {trackingResult.mock && (
+                          <span className="px-2 py-0.5 bg-yellow-50 text-yellow-600 rounded text-xs border border-yellow-200">
+                            演示数据
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
+                      <MapPin className="w-4 h-4" />
+                      <span>{trackingResult.origin}</span>
+                      <ArrowRight className="w-3 h-3" />
+                      <span>{trackingResult.destination}</span>
+                    </div>
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="px-6 py-4">
+                    <div className="space-y-0">
+                      {trackingResult.events.map((event, i) => (
+                        <div key={i} className="flex gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className={`w-3 h-3 rounded-full ${i === 0 ? "bg-blue-600 ring-4 ring-blue-100" : "bg-gray-300"}`} />
+                            {i < trackingResult.events.length - 1 && <div className="w-0.5 h-full bg-gray-200 mt-1" />}
+                          </div>
+                          <div className={`pb-6 ${i === trackingResult.events.length - 1 ? "pb-0" : ""}`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-sm font-medium ${i === 0 ? "text-blue-600" : "text-gray-900"}`}>
+                                {event.status}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {new Date(event.time).toLocaleString("zh-CN")}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">{event.description}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{event.location}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Empty State */}
-            {!trackingResult && !trackingLoading && !trackingError && (
-              <div className="text-center text-gray-400 py-12">
-                <Truck className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>输入快递单号查询物流轨迹</p>
-                <p className="text-sm mt-2">支持 DHL, UPS, FedEx, 顺丰等主流快递公司</p>
-              </div>
-            )}
-          </div>
-        )}
+              {/* Empty State */}
+              {!trackingResult && !trackingLoading && !trackingError && (
+                <div className="text-center text-gray-400 py-12">
+                  <Truck className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p>输入快递单号查询物流轨迹</p>
+                  <p className="text-sm mt-2">支持 DHL, UPS, FedEx, 顺丰等主流快递公司</p>
+                </div>
+              )}
+            </div>
+          )}
 
-        {tab === "hs" && (
-          <HSCodeSearch />
-        )}
+          {tab === "hs" && (
+            <HSCodeSearch />
+          )}
+        </div>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }

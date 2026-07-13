@@ -1,0 +1,10 @@
+{
+  "batch_id": null,
+  "batch_name": null,
+  "epic_id": null,
+  "status": "not_started",
+  "progress": 0,
+  "started_at": null,
+  "completed_at": null,
+  "tasks": []
+}

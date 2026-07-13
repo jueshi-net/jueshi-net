@@ -11,7 +11,7 @@ import {
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
 import { MetricCard } from '@/components/saas/MetricCard';
-import { StatusBadge } from '@/components/saas/StatusBadge';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
 
 interface TaskChainDraft {
   id: string;

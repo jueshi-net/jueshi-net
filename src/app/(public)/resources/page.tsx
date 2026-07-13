@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ResourceDirectoryClient from "./resource-directory-client";
+import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -71,9 +72,11 @@ export default async function ResourceDirectoryPage() {
   }
 
   return (
-    <ResourceDirectoryClient
-      resources={resources}
-      featuredResources={featuredResources}
-    />
+    <JueshiV4PublicShell>
+      <ResourceDirectoryClient
+        resources={resources}
+        featuredResources={featuredResources}
+      />
+    </JueshiV4PublicShell>
   );
 }

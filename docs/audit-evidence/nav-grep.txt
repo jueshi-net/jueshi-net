@@ -1,0 +1,1023 @@
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:26:  category: "daily" | "growth" | "community" | "content";
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:41:  community: { label: "社区任务", color: "bg-teal-50 text-teal-700 border-teal-200", icon: MessageSquare, variant: "success" },
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:60:  const [activeTab, setActiveTab] = useState<"all" | "daily" | "growth" | "community" | "content">("all");
+src/app/(workspace)/workspace/tasks/tasks-client.tsx:127:    { label: "社区", key: "community" as const, count: tasks.filter(t => t.category === "community").length },
+src/app/(workspace)/workspace/task-chains/shipping/new/shipping-new-client.tsx:93:              { step: 5, label: '目的地址', icon: MapPin },
+src/app/(workspace)/workspace/task-chains/shipping/new/shipping-new-client.tsx:143:                目的国家/地区（可选）
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:41:  { index: 4, title: '目的地址', description: '填写目的国地址信息', icon: MapPin, toolLink: '/tools/postal-code', toolLabel: '邮编查询工具' },
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:1167:  // Country list (common destinations)
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:1273:        <p className="text-xs mt-1">选择国家后自动显示地址格式，输入邮编可自动匹配城市。</p>
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:1278:        <FormField label="国家/地区" required>
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:1284:            <option value="">请选择国家</option>
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:2358:- 目的国家：${destinationCountry}
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:2396:目的国家：${destinationCountry}
+src/app/(workspace)/workspace/task-chains/shipping/[id]/shipping-workbench.tsx:2491:        <p className="text-xs mt-1">基于前面步骤填写的商品、包装、目的地信息，已生成物流询价模板和客户报价说明。可直接复制使用。</p>
+src/app/(workspace)/workspace/task-chains/task-chains-client.tsx:31:  '目的地址', '商业发票', '装箱单', '汇率成本',
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:23:  { title: "邮编查询", desc: "全球 200+ 国家邮编查询", route: "/tools/postal-code", icon: <MapPin className="w-5 h-5" /> },
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:26:  { title: "资源中心", desc: "跨境工具与资源导航", route: "/resources", icon: <Globe className="w-5 h-5" /> },
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:82:            <Link href="/resources" className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+src/app/(workspace)/workspace/favorites/favorites-client.tsx:179:                  secondaryAction={{ label: '浏览资源中心', href: '/resources' }}
+src/app/(workspace)/dashboard/tasks/tasks-client.tsx:20:  category: "daily" | "growth" | "community" | "content";
+src/app/(workspace)/dashboard/tasks/tasks-client.tsx:35:  community: { label: "社区任务", color: "bg-teal-50 text-teal-700 border-teal-200", icon: MessageSquare },
+src/app/(workspace)/dashboard/points/points-client.tsx:471:          <Link href="/resources" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]">
+src/app/(workspace)/workbench/workbench-client.tsx:19:  { id: '2', title: '邮编查询', desc: '全球 200+ 国家邮编查询', route: '/tools/postal-code', icon: <MapPin className="w-5 h-5" />, tag: 'recommended', isInternal: true },
+src/app/(workspace)/workbench/workbench-client.tsx:445:          <Link href="/resources" className={`inline-flex items-center gap-1 text-[11px] ${theme.iconText} hover:text-gray-900 mt-0.5 transition-colors font-medium`}>浏览网址导航 <ChevronRight className="w-3 h-3" /></Link>
+src/app/robots.ts:11:          "/guides/",
+src/app/robots.ts:14:          "/resources/",
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:33:  guides: { title: string; description: string; type: string }[];
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:52:  'postal-code': { key: 'postal-code', titleZh: '全球邮编查询', titleEn: 'Postal Code Lookup', description: '查询 200+ 国家和地区的邮政编码与邮编格式', category: 'query', href: '/tools/postal-code', emoji: '📮' },
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:152:    router.push(`/destinations/${slug}`);
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:191:                placeholder="搜索其他国家，如「日本」「美国」「英国」..."
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:199:            <p className="mt-2 text-xs text-indigo-200/50 pl-1">输入国家/地区名称，快速跳转专属工具箱</p>
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:245:      {dest.guides && dest.guides.length > 0 && (
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:251:          <p className="text-sm text-gray-500 mb-6">{dest.guides.length} 篇实操指南与政策解读，助你合规出海</p>
+src/app/(public)destinations/[slug]/destination-hero-client.tsx:254:            {dest.guides.map((guide, i) => (
+src/app/(public)tools/postal-code/postal-code-client.tsx:4:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)tools/postal-code/postal-code-client.tsx:453:                {SUPPORTED_COUNTRIES.length}+ 国家
+src/app/(public)tools/postal-code/postal-code-client.tsx:467:              输入邮编，快速识别城市、省份/州、国家信息。适合集运、清关、地址核对使用。
+src/app/(public)tools/postal-code/postal-code-client.tsx:484:          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">选择国家 / 地区</h2>
+src/app/(public)tools/postal-code/postal-code-client.tsx:490:                placeholder="搜索国家（如 Japan、德国、JP）…"
+src/app/(public)tools/postal-code/postal-code-client.tsx:564:              <span className="text-xs text-gray-400 ml-auto">{SUPPORTED_COUNTRIES.length} 个国家可选</span>
+src/app/(public)tools/postal-code/postal-code-client.tsx:797:                              <div><span className="text-gray-400 text-xs">国家</span><div className="text-gray-700">🌍 {r.country}</div></div>
+src/app/(public)tools/postal-code/postal-code-client.tsx:1047:                <li>• 数据库收录全球 50+ 国家邮编数据（GeoNames 全量数据）</li>
+src/app/(public)resources/resource-directory-client.tsx:130:export default function ResourceDirectoryClient({ resources }: { resources: Resource[] }) {
+src/app/(public)resources/resource-directory-client.tsx:137:    for (const r of resources) {
+src/app/(public)resources/resource-directory-client.tsx:148:  }, [resources]);
+src/app/(public)resources/resource-directory-client.tsx:152:    let items = resources;
+src/app/(public)resources/resource-directory-client.tsx:167:  }, [resources, activeCategory, search]);
+src/app/(public)resources/resource-directory-client.tsx:185:            精选 {resources.length} 个优质海外工具、平台与服务，助您畅行全球。
+src/app/(public)resources/resource-directory-client.tsx:217:                  <span className="text-xs text-gray-400">{resources.length - adResources.length}</span>
+src/app/sitemap.ts:26:      url: `${BASE_URL}/guides`,
+src/app/sitemap.ts:32:      url: `${BASE_URL}/resources`,
+src/app/sitemap.ts:44:      url: `${BASE_URL}/community`,
+src/app/sitemap.ts:50:      url: `${BASE_URL}/destinations`,
+src/app/sitemap.ts:57:      url: `${BASE_URL}/destinations/canada`,
+src/app/sitemap.ts:63:      url: `${BASE_URL}/destinations/usa`,
+src/app/sitemap.ts:69:      url: `${BASE_URL}/destinations/uk`,
+src/app/sitemap.ts:75:      url: `${BASE_URL}/destinations/australia`,
+src/app/sitemap.ts:81:      url: `${BASE_URL}/destinations/japan`,
+src/app/sitemap.ts:87:      url: `${BASE_URL}/destinations/singapore`,
+src/app/sitemap.ts:93:      url: `${BASE_URL}/destinations/malaysia`,
+src/app/sitemap.ts:129:  let communityPages: MetadataRoute.Sitemap = [];
+src/app/sitemap.ts:142:      url: `${BASE_URL}/guides/${a.slug}`,
+src/app/sitemap.ts:185:      url: `${BASE_URL}/checklists/${slug}`,
+src/app/sitemap.ts:191:    // Published Topics (for community pages)
+src/app/sitemap.ts:198:    communityPages = topics.map((t) => ({
+src/app/sitemap.ts:199:      url: `${BASE_URL}/community/${t.slug}`,
+src/app/sitemap.ts:236:  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages, ...forumCategoryPages, ...forumPostPages];
+src/app/(public)/tools/customs-generator/page.tsx:488:                <li>• 不同国家进口政策可能不同</li>
+src/app/(public)/tools/customs-generator/page.tsx:502:            answer: "HS 编码错误可能导致清关延误或罚款。建议在提交前通过海关官网或专业报关行核实 HS 编码。不同国家对同一商品的 HS 编码可能略有差异（前6位国际通用，后几位各国自定）。",
+src/app/(public)/tools/postal-code/postal-code-client.tsx:6:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)/tools/postal-code/postal-code-client.tsx:866:                {SUPPORTED_COUNTRIES.length}+ 国家地址/邮编资料
+src/app/(public)/tools/postal-code/postal-code-client.tsx:923:        {/* ===== 1. 选择国家 / 地区 (核心区块 1) ===== */}
+src/app/(public)/tools/postal-code/postal-code-client.tsx:926:            <h2 className="text-lg font-bold text-gray-900 mb-1">1. 选择国家 / 地区</h2>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:927:            <p className="text-sm text-gray-500">选择国家后，下方查询区将自动切换到对应国家的邮编数据库</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:930:            {/* 当前查询国家指示器 */}
+src/app/(public)/tools/postal-code/postal-code-client.tsx:934:              <span className="text-xs text-teal-500 ml-auto">{SUPPORTED_COUNTRIES.length}+ 国家资料</span>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:936:            {/* 搜索国家 */}
+src/app/(public)/tools/postal-code/postal-code-client.tsx:945:                  placeholder="搜索国家（如 Japan、德国、JP）…"
+src/app/(public)/tools/postal-code/postal-code-client.tsx:982:              {/* 热门国家快捷选择 */}
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1080:                  <p className="mt-1.5 text-amber-600">⚠️ 当前国家暂未接入可查询邮编数据库，请使用地址格式参考或官方入口确认。</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1102:                    <p className="text-sm font-semibold text-slate-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1109:                    <p className="text-xs text-slate-500 mt-1">当前国家已有邮编数据库，但输入的关键词未匹配到任何记录。</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1118:                    <p className="text-sm font-semibold text-slate-900 mb-1">当前国家暂未接入可查询邮编数据库</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1183:                      <div><span className="text-gray-400 text-xs">国家</span><div className="text-gray-700">🌍 {r.country}</div></div>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1250:                    <div><span className="text-gray-400 text-xs">国家</span><div className="font-semibold text-gray-900">{r.country}</div></div>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1281:                <li>• 切换其他国家</li>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1314:                <span className="text-xs text-gray-400 self-center">选择国家：</span>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1425:                    <p className="text-sm text-amber-700">该国家的详细寄件地址格式暂未收录，请参考官方邮政网站获取完整信息。</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1441:                  <p className="text-sm text-gray-400">选择上方国家查看寄件地址格式</p>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1458:                输入邮编，查询所属国家、城市、省份、区域和时区信息。
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1499:                          <div><span className="text-gray-400 text-xs">国家</span><div className="font-semibold text-gray-900">{r.country}</div></div>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1881:                <li>• 数据库已收录 8 个重点国家邮编数据（CA/US/GB/AU/NZ/JP/SG/MY），其他国家提供地址格式和官方查询入口</li>
+src/app/(public)/tools/postal-code/postal-code-client.tsx:1961:                          <div><span className="text-gray-400">国家：</span>{SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.flag} {SUPPORTED_COUNTRIES.find(c => c.code === city.countryCode)?.name}</div>
+src/app/(public)/tools/postal-code/layout.tsx:5:  title: '邮编查询 - 全球50+国家邮编数据库 - 绝世百宝箱',
+src/app/(public)/tools/postal-code/layout.tsx:6:  description: '支持加拿大、美国、英国、日本、德国等50+国家邮编查询。格式校验、城市匹配、DB实时搜索。集运、清关、地址核对必备工具。',
+src/app/(public)/tools/postal-code/layout.tsx:9:    title: '邮编查询 - 全球50+国家邮编数据库',
+src/app/(public)/tools/postal-code/layout.tsx:10:    description: '支持加拿大、美国、英国、日本、德国等50+国家邮编查询。格式校验、城市匹配、DB实时搜索。',
+src/app/(public)/tools/postal-code/layout.tsx:19:    description: '支持50+国家邮编查询、格式校验、城市匹配和DB实时搜索。集运、清关、地址核对必备工具。',
+src/app/(public)/tools/postal-code/page.tsx:5:import { RelatedDiscussions } from '@/components/community/related-discussions';
+src/app/(public)/tools/shipping-calculator/page.tsx:10:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)/tools/shipping-calculator/page.tsx:16:import { RelatedDiscussionsClient } from '@/components/community/related-discussions-client';
+src/app/(public)/tools/shipping-calculator/page.tsx:515:              <strong>已从集装箱计算器带入尺寸、重量和数量。</strong>尺寸单位：cm，重量单位：kg。请确认运输方式、目的地和计费规则。
+src/app/(public)/tools/shipping-calculator/page.tsx:529:                  已检测到来自地址格式化助手的目的地信息
+src/app/(public)/tools/shipping-calculator/page.tsx:532:                  是否将目的地信息带入运费计算参考？
+src/app/(public)/tools/shipping-calculator/page.tsx:537:                      <div className="text-gray-500 text-xs">国家</div>
+src/app/(public)/tools/shipping-calculator/page.tsx:589:              <strong>已带入目的地信息。</strong>请继续确认运输方式、重量、体积和计费规则。
+src/app/(public)/tools/shipping-calculator/page.tsx:1096:                <strong>影响实际价格的因素：</strong>服务商定价策略、渠道类型、目的地和派送区域、
+src/app/(public)/tools/shipping-calculator/page.tsx:1157:            answer: "不能。本站只提供体积重和计费重的计算参考，不涉及具体运费报价。实际运费因承运商、渠道、目的地、燃油附加费等因素而异，请以承运商或集运商的实际报价为准。",
+src/app/(public)/tools/hs-code/page.tsx:7:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)/tools/hs-code/page.tsx:15:import { RelatedDiscussionsClient } from '@/components/community/related-discussions-client';
+src/app/(public)/tools/hs-code/page.tsx:759:                        <strong>⚠️ 风险提示：</strong>此编码为系统根据关键词匹配的结果，仅供辅助参考。不同国家/地区可能采用不同位数和扩展编码。正式申报前请与报关行或目的国海关确认。
+src/app/(public)/tools/hs-code/page.tsx:943:          { question: "为什么同一个商品可能有不同编码？", answer: "HS 编码前 6 位是全球统一的，但各国可以扩展至 8-10 位。同一商品在不同国家可能有不同的后几位编码。此外，商品如果有多重用途或材质，可能归入不同类别。" },
+src/app/(public)/tools/sensitive-goods/page.tsx:5:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)/tools/sensitive-goods/page.tsx:34:    note: "需密封防漏，部分国家对液体品类有严格限制",
+src/app/(public)/tools/sensitive-goods/page.tsx:67:    confirm: ["是否为处方药（部分国家严禁邮寄）", "是否需要医生处方或证明", "药品成分是否在目的国允许清单内", "数量是否超过个人自用范围"],
+src/app/(public)/tools/sensitive-goods/page.tsx:83:    confirm: ["是否需要熏蒸处理证明", "是否为原木材料（部分国家禁止）", "是否需要植物检疫证书", "目的国对木制品的特殊要求"],
+src/app/(public)/tools/sensitive-goods/page.tsx:90:    note: "部分国家严格禁止邮寄刀具，务必提前确认",
+src/app/(public)/tools/sensitive-goods/page.tsx:114:    note: "多数国家严格限制或禁止邮寄电子烟和烟油",
+src/app/(public)/tools/sensitive-goods/page.tsx:115:    confirm: ["目的国是否合法允许电子烟", "烟油是否含尼古丁（部分国家禁止）", "电池部分是否符合航空运输标准", "是否有合法进口许可证"],
+src/app/(public)/tools/sensitive-goods/page.tsx:170:                不同国家、服务商和渠道规则不同，本表仅为常见情况的参考汇总，不代表任何物流服务商的接货规则。
+src/app/(public)/tools/sensitive-goods/page.tsx:261:                <li><strong>仿牌/高仿商品</strong>：邮寄可能涉及商标侵权，部分国家海关会直接扣押并处罚。如有授权请提供证明文件</li>
+src/app/(public)/tools/sensitive-goods/page.tsx:263:                <li><strong>刀具/利器</strong>：航空运输严格限制，部分国家完全禁止邮寄。请遵守目的国刀具管制法规</li>
+src/app/(public)/tools/sensitive-goods/page.tsx:264:                <li><strong>电子烟/烟油</strong>：多数国家对尼古丁烟油有严格管制，请先确认目的国法律。不符合法规的请勿寄送</li>
+src/app/(public)/tools/documents/[type]/page.tsx:1428:                  <p>本模板为通用单据参考格式，仅用于资料整理、内部流转或业务沟通。不同国家、海关、银行、船公司、报关行或物流服务商可能有不同要求，正式用途请以相关机构要求为准。</p>
+src/app/(public)/tools/documents/page.tsx:304:                不同国家、海关、银行、船公司、报关行或物流服务商可能有不同要求，
+src/app/(public)/tools/address-formatter/page.tsx:6:import { RelatedGuidesSection } from '@/components/related-guides-section';
+src/app/(public)/tools/address-formatter/page.tsx:284:      `国家：${form.country}`,
+src/app/(public)/tools/address-formatter/page.tsx:429:                    <span className="text-xs text-gray-500 block">国家</span>
+src/app/(public)/tools/address-formatter/page.tsx:493:                  将国家、城市、邮编等目的地信息带入运费计算器，便于继续估算运输成本。
+src/app/(public)/tools/address-formatter/page.tsx:514:                <label className={labelStyles.field}>国家</label>
+src/app/(public)/tools/address-formatter/page.tsx:764:          { question: "为什么要格式化国际地址？", answer: "不同国家有不同的地址格式规范。格式错误的地址可能导致包裹延误、退回或无法投递。使用正确的格式可以提高投递成功率。" },
+src/app/(public)/privacy/page.tsx:36:                <li><strong>功能 Cookie：</strong>记住您的偏好设置（如国家选择）</li>
+src/app/(public)/public-layout-client.tsx:11:  const isResources = pathname === '/resources';
+src/app/(public)/public-layout-client.tsx:12:  const isResourcesSite = pathname.startsWith('/resources/site/');
+src/app/(public)/community-preview-v2/page.tsx:144:  // ---- Parallel queries (same data as /community) ----
+src/app/(public)/community-preview-v2/page.tsx:226:    ? "/community/new"
+src/app/(public)/community-preview-v2/page.tsx:227:    : "/login?callbackUrl=/community/new";
+src/app/(public)/community-preview-v2/page.tsx:259:                      href={`/community/c/${cat.key}`}
+src/app/(public)/community-preview-v2/page.tsx:338:                      ? "/community-preview-v2"
+src/app/(public)/community-preview-v2/page.tsx:339:                      : `/community-preview-v2?filter=${tab.key}`
+src/app/(public)/community-preview-v2/page.tsx:396:                    href="/community-preview-v2"
+src/app/(public)/community-preview-v2/page.tsx:419:                    href={`/community/t/${post.slug}`}
+src/app/(public)/community-preview-v2/page.tsx:591:                    href="/community-preview-v2?filter=latest"
+src/app/(public)/destinations/destinations-index-client.tsx:63:            🌟 重点国家
+src/app/(public)/destinations/destinations-index-client.tsx:69:                href={`/destinations/${c.slug}`}
+src/app/(public)/destinations/destinations-index-client.tsx:88:              placeholder="搜索国家/地区..."
+src/app/(public)/destinations/destinations-index-client.tsx:119:          共 {filtered.length} 个国家/地区
+src/app/(public)/destinations/destinations-index-client.tsx:138:                    href={`/destinations/${c.slug}`}
+src/app/(public)/destinations/destinations-index-client.tsx:165:            <p>未找到匹配的国家/地区</p>
+src/app/(public)/destinations/page.tsx:3:import { getAllDestinationsActive } from "@/lib/destinations-db";
+src/app/(public)/destinations/page.tsx:7:import DestinationsIndexClient from "./destinations-index-client";
+src/app/(public)/destinations/page.tsx:12:  title: buildTitle("全球目的地工具导航"),
+src/app/(public)/destinations/page.tsx:14:  alternates: { canonical: buildCanonical("/destinations") },
+src/app/(public)/destinations/page.tsx:17:    title: buildTitle("全球目的地工具导航"),
+src/app/(public)/destinations/page.tsx:19:    url: buildCanonical("/destinations"),
+src/app/(public)/destinations/page.tsx:43:  // Fetch DB destinations
+src/app/(public)/destinations/page.tsx:54:  // Merge: all-countries config + DB destinations
+src/app/(public)/destinations/page.tsx:70:  // Also add DB destinations not in all-countries config (if any)
+src/app/(public)/destinations/page.tsx:134:            🌍 全球目的地工具导航
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:33:  guides: { title: string; description: string; type: string }[];
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:52:  'postal-code': { key: 'postal-code', titleZh: '全球邮编查询', titleEn: 'Postal Code Lookup', description: '查询 200+ 国家和地区的邮政编码与邮编格式', category: 'query', href: '/tools/postal-code', emoji: '📮' },
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:152:    router.push(`/destinations/${slug}`);
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:191:                placeholder="搜索其他国家，如「日本」「美国」「英国」..."
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:199:            <p className="mt-2 text-xs text-indigo-200/50 pl-1">输入国家/地区名称，快速跳转专属工具箱</p>
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:245:      {dest.guides && dest.guides.length > 0 && (
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:251:          <p className="text-sm text-gray-500 mb-6">{dest.guides.length} 篇实操指南与政策解读，助你合规出海</p>
+src/app/(public)/destinations/[slug]/destination-hero-client.tsx:254:            {dest.guides.map((guide, i) => (
+src/app/(public)/destinations/[slug]/page.tsx:3:import { getDestinationPageConfig, getVisibleModules, getOfficialLinks, getFaqs, getAdSlots } from "@/lib/destinations/get-destination-page-config";
+src/app/(public)/destinations/[slug]/page.tsx:17:    const { REGION_GROUPS } = require("@/lib/destinations-db");
+src/app/(public)/destinations/[slug]/page.tsx:26:  if (!config) return { title: "国家页面未找到" };
+src/app/(public)/destinations/[slug]/page.tsx:28:  const canonical = `${SITE_URL}/destinations/${slug}`;
+src/app/(public)/destinations/[slug]/page.tsx:98:  { icon: "📖", label: "看生活/办事指南", desc: "入境、税务、生活", href: "#guides" },
+src/app/(public)/destinations/[slug]/page.tsx:101:  { icon: "📋", label: "看清单", desc: "发货与地址检查", href: "#checklists" },
+src/app/(public)/destinations/[slug]/page.tsx:102:  { icon: "💬", label: "去社区提问", desc: "经验交流与反馈", href: "#community" },
+src/app/(public)/destinations/[slug]/page.tsx:131:  const dbGuides = config.guides;
+src/app/(public)/destinations/[slug]/page.tsx:135:  const MAIN_MODULES = ["guides", "topics", "checklists", "tools", "officialLinks", "taskChain", "community", "faq"];
+src/app/(public)/destinations/[slug]/page.tsx:140:  const afterGuidesAd = adSlots.find(s => s.placement === "after_guides");
+src/app/(public)/destinations/[slug]/page.tsx:162:      case "guides":
+src/app/(public)/destinations/[slug]/page.tsx:164:          <SectionCard key="guides" id="guides" icon={<BookOpen className="w-5 h-5 text-teal-600" />} title={`${countryName}实用指南`}>
+src/app/(public)/destinations/[slug]/page.tsx:168:                <Link href={`/guides/${countryCode.toLowerCase()}-${dbGuides[0].title.toLowerCase().replace(/\s+/g, "-")}`}
+src/app/(public)/destinations/[slug]/page.tsx:179:                {/* Remaining guides as compact cards */}
+src/app/(public)/destinations/[slug]/page.tsx:183:                      <Link key={i} href={`/guides/${countryCode.toLowerCase()}-${guide.title.toLowerCase().replace(/\s+/g, "-")}`}
+src/app/(public)/destinations/[slug]/page.tsx:224:      case "checklists":
+src/app/(public)/destinations/[slug]/page.tsx:226:          <SectionCard key="checklists" id="checklists" icon={<ClipboardList className="w-5 h-5 text-teal-600" />} title={`${countryName}清单`}>
+src/app/(public)/destinations/[slug]/page.tsx:235:                  <Link key={i} href="/checklists"
+src/app/(public)/destinations/[slug]/page.tsx:345:      case "community":
+src/app/(public)/destinations/[slug]/page.tsx:347:          <SectionCard key="community" id="community" icon={<MessageCircle className="w-5 h-5 text-teal-600" />} title={`${countryName}社区讨论`}>
+src/app/(public)/destinations/[slug]/page.tsx:353:                { label: "官方资源补充", tag: "resources" },
+src/app/(public)/destinations/[slug]/page.tsx:399:              <Link href="/destinations" className="hover:text-white">目的地</Link>
+src/app/(public)/destinations/[slug]/page.tsx:482:        <Link href="/destinations" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-teal-600 mb-4">
+src/app/(public)/destinations/[slug]/page.tsx:483:          <ArrowLeft className="w-4 h-4" /> 返回全球目的地
+src/app/(public)/destinations/[slug]/page.tsx:517:                {/* After-guides ad */}
+src/app/(public)/destinations/[slug]/page.tsx:518:                {key === "guides" && visibleModules.includes("adSlots") && afterGuidesAd && (
+src/app/(public)/destinations/[slug]/page.tsx:606:              {/* Official resources */}
+src/app/(public)/checklists/page.tsx:12:  alternates: { canonical: "https://jueshi.net/checklists" },
+src/app/(public)/checklists/page.tsx:16:    url: "https://jueshi.net/checklists",
+src/app/(public)/checklists/page.tsx:23:    // Get checklists from both landingPage and checklist tables
+src/app/(public)/checklists/page.tsx:60:    // Add landingPage checklists
+src/app/(public)/checklists/page.tsx:68:    // Add checklist model checklists (override if duplicate)
+src/app/(public)/checklists/page.tsx:91:  const checklists = await getChecklists();
+src/app/(public)/checklists/page.tsx:121:        {checklists.length > 0 ? (
+src/app/(public)/checklists/page.tsx:123:            {checklists.map((cl) => {
+src/app/(public)/checklists/page.tsx:134:                  href={`/checklists/${cl.slug}`}
+src/app/(public)/checklists/[slug]/page.tsx:116:      alternates: c.canonicalUrl ? { canonical: c.canonicalUrl } : { canonical: `https://jueshi.net/checklists/${c.slug}` },
+src/app/(public)/checklists/[slug]/page.tsx:129:    alternates: { canonical: `https://jueshi.net/checklists/${page.slug}` },
+src/app/(public)/checklists/[slug]/page.tsx:207:                      🌍 适用国家/地区：
+src/app/(public)/checklists/[slug]/page.tsx:502:              <a key={art.slug} href={`/guides/${art.slug}`} className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+src/app/(public)/checklists/[slug]/page.tsx:552:      {/* Next Steps — only link to published checklists */}
+src/app/(public)/checklists/[slug]/page.tsx:561:                ? stepUrl.replace('/checklists/', '')
+src/app/(public)/checklists/[slug]/page.tsx.orig:64:      alternates: c.canonicalUrl ? { canonical: c.canonicalUrl } : { canonical: `https://jueshi.net/checklists/${c.slug}` },
+src/app/(public)/checklists/[slug]/page.tsx.orig:77:    alternates: { canonical: `https://jueshi.net/checklists/${page.slug}` },
+src/app/(public)/checklists/[slug]/page.tsx.orig:372:              <a key={art.slug} href={`/guides/${art.slug}`} className="block p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+src/app/(public)/checklists/[slug]/page.tsx.orig:422:      {/* Next Steps — only link to published checklists */}
+src/app/(public)/checklists/[slug]/page.tsx.orig:431:                ? stepUrl.replace('/checklists/', '')
+src/app/(public)/resources/resource-directory-client.tsx:6:import { getCategoryInfo } from '@/lib/resources/category-config';
+src/app/(public)/resources/resource-directory-client.tsx:102:        <Link href={`/resources/site/${resource.id}`} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-50 text-gray-700 hover:bg-purple-50 hover:text-purple-600 border border-gray-200 hover:border-purple-200 transition-colors" title="查看网站介绍">
+src/app/(public)/resources/resource-directory-client.tsx:172:function RightSidebar({ resources }: { resources: Resource[] }) {
+src/app/(public)/resources/resource-directory-client.tsx:173:  const topResources = resources.filter(r => !r.isAd).sort((a, b) => b.qualityScore - a.qualityScore).slice(0, 10);
+src/app/(public)/resources/resource-directory-client.tsx:174:  const latestResources = resources.filter(r => !r.isAd).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 8);
+src/app/(public)/resources/resource-directory-client.tsx:189:              <Link key={resource.id} href={`/resources/site/${resource.id}`} className="flex items-center gap-3 group">
+src/app/(public)/resources/resource-directory-client.tsx:224:              <Link key={resource.id} href={`/resources/site/${resource.id}`} className="flex items-center gap-3 group">
+src/app/(public)/resources/resource-directory-client.tsx:249:export default function ResourceDirectoryClient({ resources, featuredResources }: { resources: Resource[]; featuredResources: Resource[] }) {
+src/app/(public)/resources/resource-directory-client.tsx:258:    for (const r of resources) {
+src/app/(public)/resources/resource-directory-client.tsx:265:  }, [resources]);
+src/app/(public)/resources/resource-directory-client.tsx:270:    for (const r of resources) {
+src/app/(public)/resources/resource-directory-client.tsx:275:  }, [resources]);
+src/app/(public)/resources/resource-directory-client.tsx:279:    let items = resources.filter(r => !r.isAd);
+src/app/(public)/resources/resource-directory-client.tsx:288:  }, [resources, activeCategory, search]);
+src/app/(public)/resources/resource-directory-client.tsx:290:  // Hot resources (only one horizontal section)
+src/app/(public)/resources/resource-directory-client.tsx:292:    return resources.filter(r => !r.isAd).sort((a, b) => b.qualityScore - a.qualityScore).slice(0, 12);
+src/app/(public)/resources/resource-directory-client.tsx:293:  }, [resources]);
+src/app/(public)/resources/resource-directory-client.tsx:324:                <p className="text-sm text-white/80">精选 {resources.length} 个优质海外工具与服务</p>
+src/app/(public)/resources/resource-directory-client.tsx:382:                        <Link key={r.id} href={`/resources/site/${r.id}`} className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
+src/app/(public)/resources/resource-directory-client.tsx:446:              <RightSidebar resources={resources} />
+src/app/(public)/resources/site/[id]/page.tsx:83:            <Link href="/resources" className="hover:text-teal-600 transition-colors">资源库</Link>
+src/app/(public)/resources/site/[id]/page.tsx:85:            <Link href={`/resources/${resource.category}`} className="hover:text-teal-600 transition-colors">{catConfig.name}</Link>
+src/app/(public)/resources/site/[id]/page.tsx:226:                  <Link href={`/resources/${resource.category}`} className="text-teal-600 hover:underline">
+src/app/(public)/resources/site/[id]/page.tsx:309:                  <Link href={`/resources/${resource.category}`} className="text-xs text-teal-600 hover:underline">
+src/app/(public)/resources/site/[id]/page.tsx:320:                        href={`/resources/site/${r.id}`}
+src/app/(public)/resources/site/[id]/page.tsx:434:                      href={`/resources/site/${r.id}`}
+src/app/(public)/resources/site/[id]/page.tsx:450:                  href="/resources"
+src/app/(public)/resources/site/[id]/page.tsx:469:                  href={`/resources/${resource.category}`}
+src/app/(public)/resources/site/[id]/page.tsx:476:                  href="/resources"
+src/app/(public)/resources/page.tsx:10:  alternates: { canonical: "https://jueshi.net/resources" },
+src/app/(public)/resources/page.tsx:14: * Featured resources use the isFeatured field with optional time-based scheduling.
+src/app/(public)/resources/page.tsx:22: * Fallback: if no featured resources exist, show top qualityScore resources.
+src/app/(public)/resources/page.tsx:28:  const resources = await prisma.resource.findMany({
+src/app/(public)/resources/page.tsx:77:        resources={resources}
+src/app/(public)/resources/[slug]/page.tsx:163:  const resources = await prisma.resource.findMany({
+src/app/(public)/resources/[slug]/page.tsx:184:              href="/resources"
+src/app/(public)/resources/[slug]/page.tsx:208:              {resources.length} 个资源
+src/app/(public)/resources/[slug]/page.tsx:211:              href="/resources"
+src/app/(public)/resources/[slug]/page.tsx:222:        {resources.length === 0 ? (
+src/app/(public)/resources/[slug]/page.tsx:229:              href="/resources"
+src/app/(public)/resources/[slug]/page.tsx:237:            {resources.map((resource) => {
+src/app/(public)/resources/[slug]/page.tsx:241:                : `/resources/${slug}/${resource.id}`;
+src/app/(public)/resources/[slug]/page.tsx:337:                  href={`/resources/${rc.slug}`}
+src/app/(public)/workspace/community/my-community-client.tsx:210:              actionHref="/community/new"
+src/app/(public)/workspace/community/my-community-client.tsx:229:                          href={`/community/t/${p.slug}`}
+src/app/(public)/workspace/community/my-community-client.tsx:272:              actionHref="/community"
+src/app/(public)/workspace/community/my-community-client.tsx:280:                      href={`/community/t/${c.post.slug}`}
+src/app/(public)/workspace/community/my-community-client.tsx:318:              actionHref="/community"
+src/app/(public)/workspace/community/my-community-client.tsx:328:                          href={`/community/t/${b.post.slug}`}
+src/app/(public)/workspace/community/my-community-client.tsx:405:                      href={`/community/t/${
+src/app/(public)/workspace/community/page.tsx:4:import { MyCommunityClient } from "./my-community-client";
+src/app/(public)/workspace/community/page.tsx:12:  if (!session?.user) redirect("/login?callbackUrl=/workspace/community");
+src/app/(public)/community-preview-v3/preview-client.tsx:360:                        href={`/community/c/${cat.key}`}
+src/app/(public)/community-preview-v3/preview-client.tsx:528:                      href={`/community/t/${post.slug}`}
+src/app/(public)/community-preview-v3/page.tsx:21:/** Canonical V3 community taxonomy (6 categories). */
+src/app/(public)/community-preview-v3/page.tsx:53:    ? "/community/new"
+src/app/(public)/community-preview-v3/page.tsx:54:    : "/login?callbackUrl=/community/new";
+src/app/(public)/lp/[slug]/page.tsx:170:  // Fetch related checklists (from ctaConfig.relatedChecklists)
+src/app/(public)/lp/[slug]/page.tsx:171:  const checklists = relatedChecklistSlugs.length > 0
+src/app/(public)/lp/[slug]/page.tsx:312:                      href={`/guides/${a.slug}`}
+src/app/(public)/lp/[slug]/page.tsx:329:            return checklists.length > 0 ? (
+src/app/(public)/lp/[slug]/page.tsx:336:                  {checklists.map((c) => (
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:14:  official: ["国家外汇管理局", "中国人民银行"],
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:18:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:22:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:56:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:74:        <div data-testid="resources-v2-scenario-page" className="space-y-6">
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:126:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:131:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:133:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:140:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/payment/page.tsx:178:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/life/page.tsx:14:  official: ["教育部留学服务中心", "国家移民管理局"],
+src/app/(public)/resources-v2/scenarios/life/page.tsx:18:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/life/page.tsx:22:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/life/page.tsx:56:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/life/page.tsx:74:        <div data-testid="resources-v2-scenario-page" className="space-y-6">
+src/app/(public)/resources-v2/scenarios/life/page.tsx:126:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/life/page.tsx:131:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/life/page.tsx:133:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/life/page.tsx:140:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/life/page.tsx:178:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:18:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:22:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:41:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:60:          data-testid="resources-v2-scenario-page"
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:90:          {/* Official resources */}
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:110:          {/* Related resources from DB */}
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:117:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:122:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:124:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:131:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/shipping/page.tsx:169:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/official/page.tsx:15:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/official/page.tsx:19:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/official/page.tsx:35:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/official/page.tsx:53:        <div data-testid="resources-v2-scenario-page" className="space-y-6">
+src/app/(public)/resources-v2/scenarios/official/page.tsx:105:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/official/page.tsx:110:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/official/page.tsx:112:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/official/page.tsx:119:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/official/page.tsx:151:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/company/page.tsx:14:  official: ["商务部", "国家市场监督管理总局", "美国 SEC"],
+src/app/(public)/resources-v2/scenarios/company/page.tsx:18:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/company/page.tsx:22:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/company/page.tsx:54:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/company/page.tsx:72:        <div data-testid="resources-v2-scenario-page" className="space-y-6">
+src/app/(public)/resources-v2/scenarios/company/page.tsx:124:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/company/page.tsx:129:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/company/page.tsx:131:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/company/page.tsx:138:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/company/page.tsx:176:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:16:  official: ["国家税务总局", "海关总署"],
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:20:  let resources: any[] = [];
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:24:    resources = await prisma.resource.findMany({
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:43:          href="/resources-v2"
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:61:        <div data-testid="resources-v2-scenario-page" className="space-y-6">
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:113:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:118:            ) : resources.length > 0 ? (
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:120:                {resources.map((r) => (
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:127:                    data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/scenarios/invoice/page.tsx:165:                data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/resources-v2-client.tsx:48:  resources,
+src/app/(public)/resources-v2/resources-v2-client.tsx:55:  resources: ResourceItem[];
+src/app/(public)/resources-v2/resources-v2-client.tsx:75:    const cats = new Set(resources.map((r) => r.category).filter(Boolean));
+src/app/(public)/resources-v2/resources-v2-client.tsx:77:  }, [resources]);
+src/app/(public)/resources-v2/resources-v2-client.tsx:84:    resources.forEach((r) => {
+src/app/(public)/resources-v2/resources-v2-client.tsx:88:  }, [resources]);
+src/app/(public)/resources-v2/resources-v2-client.tsx:90:  // Filter resources by search, category, and country (tag)
+src/app/(public)/resources-v2/resources-v2-client.tsx:92:    let result = resources;
+src/app/(public)/resources-v2/resources-v2-client.tsx:114:  }, [searchQuery, selectedCategory, selectedCountry, resources]);
+src/app/(public)/resources-v2/resources-v2-client.tsx:118:    const total = resources.length;
+src/app/(public)/resources-v2/resources-v2-client.tsx:119:    const official = resources.filter(
+src/app/(public)/resources-v2/resources-v2-client.tsx:124:  }, [resources, countryOptions]);
+src/app/(public)/resources-v2/resources-v2-client.tsx:140:        data-testid="resources-v2-page"
+src/app/(public)/resources-v2/resources-v2-client.tsx:164:      data-testid="resources-v2-page"
+src/app/(public)/resources-v2/resources-v2-client.tsx:182:            data-testid="resources-v2-search"
+src/app/(public)/resources-v2/resources-v2-client.tsx:189:        data-testid="resources-v2-stats"
+src/app/(public)/resources-v2/resources-v2-client.tsx:221:              href={`/resources-v2/scenarios/${s.slug}`}
+src/app/(public)/resources-v2/resources-v2-client.tsx:223:              data-testid="resources-v2-scenario-card"
+src/app/(public)/resources-v2/resources-v2-client.tsx:238:          热门国家
+src/app/(public)/resources-v2/resources-v2-client.tsx:244:              href={`/destinations/${c.code === "CA" ? "canada" : c.code === "US" ? "usa" : c.code === "AU" ? "australia" : c.code === "GB" ? "uk" : c.code === "JP" ? "japan" : "germany"}`}
+src/app/(public)/resources-v2/resources-v2-client.tsx:269:                data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/resources-v2-client.tsx:298:              data-testid="resources-v2-category-filter"
+src/app/(public)/resources-v2/resources-v2-client.tsx:331:            data-testid="resources-v2-country-filter"
+src/app/(public)/resources-v2/resources-v2-client.tsx:401:                data-testid="resources-v2-resource-card"
+src/app/(public)/resources-v2/resources-v2-client.tsx:445:            data-testid="resources-v2-empty-state"
+src/app/(public)/resources-v2/resources-v2-client.tsx:450:              {resources.length === 0
+src/app/(public)/resources-v2/resources-v2-client.tsx:455:              {resources.length === 0
+src/app/(public)/resources-v2/page.tsx:2:import ResourcesV2Client from "./resources-v2-client";
+src/app/(public)/resources-v2/page.tsx:37:  let resources: any[] = [];
+src/app/(public)/resources-v2/page.tsx:42:    [resources, officialResources] = await Promise.all([
+src/app/(public)/resources-v2/page.tsx:66:        resources={resources.map((r) => ({
+src/app/(public)/u/[id]/page.tsx:5:import { UserTrustCard, type TrustCardData } from "@/components/community/user-trust-card";
+src/app/(public)/u/[id]/page.tsx:20:    select: { name: true, communityProfile: { select: { displayName: true } } },
+src/app/(public)/u/[id]/page.tsx:22:  const name = user?.communityProfile?.displayName || user?.name || "用户";
+src/app/(public)/blog/page.tsx:1:import { permanentRedirect } from "next/navigation"; export default function BlogRedirect() { permanentRedirect("/guides"); }
+src/app/(public)/blog/[slug]/page.tsx:5:  permanentRedirect(`/guides/${slug}`);
+src/app/(public)/cities/[city]/page.tsx:49:  const guides =
+src/app/(public)/cities/[city]/page.tsx:65:  return { page, guides };
+src/app/(public)/cities/[city]/page.tsx:100:  const { page, guides } = data;
+src/app/(public)/cities/[city]/page.tsx:179:        {guides.length > 0 && (
+src/app/(public)/cities/[city]/page.tsx:186:              {guides.map((guide) => (
+src/app/(public)/cities/[city]/page.tsx:189:                  href={`/guides/${guide.slug}`}
+src/app/(public)/starter/student/page.tsx:52:    description: "全球邮编极速搜索，支持国家/城市级联，覆盖 200+ 国家地区",
+src/app/(public)/starter/student/page.tsx:78:const destinations: DestLink[] = [
+src/app/(public)/starter/student/page.tsx:79:  { name: "英国", emoji: "🇬🇧", href: "/destinations/uk", desc: "海关清关 + VAT 税务指南" },
+src/app/(public)/starter/student/page.tsx:80:  { name: "美国", emoji: "🇺🇸", href: "/destinations/usa", desc: "CBP 清关 + 海外仓推荐" },
+src/app/(public)/starter/student/page.tsx:81:  { name: "澳大利亚", emoji: "🇦🇺", href: "/destinations/australia", desc: "GST 注册 + 物流时效" },
+src/app/(public)/starter/student/page.tsx:82:  { name: "加拿大", emoji: "🇨🇦", href: "/destinations/canada", desc: "CBSA 流程 + 留学行李" },
+src/app/(public)/starter/student/page.tsx:83:  { name: "新加坡", emoji: "🇸🇬", href: "/destinations/singapore", desc: "GST 税率 + 双清包税" },
+src/app/(public)/starter/student/page.tsx:84:  { name: "新西兰", emoji: "🇳🇿", href: "/destinations/new-zealand", desc: "MPI 检疫 + 物流专线" },
+src/app/(public)/starter/student/page.tsx:85:  { name: "日本", emoji: "🇯🇵", href: "/destinations/japan", desc: "通关手续 + 消费税" },
+src/app/(public)/starter/student/page.tsx:86:  { name: "韩国", emoji: "🇰🇷", href: "/destinations/south-korea", desc: "KCS 清关 + 关税指南" },
+src/app/(public)/starter/student/page.tsx:161:          热门留学目的地
+src/app/(public)/starter/student/page.tsx:164:          {destinations.map((d) => (
+src/app/(public)/starter/page.tsx:4:import { starterResources, starterCategories } from "@/lib/data/starter-resources";
+src/app/(public)/starter/page.tsx:44:    resources: starterResources.filter((r) => r.category === cat.id),
+src/app/(public)/starter/page.tsx:104:              <span className="ml-1 text-xs text-gray-400">({cat.resources.length})</span>
+src/app/(public)/starter/page.tsx:121:              {cat.resources.map((r) => (
+src/app/(public)/guides/commercial-invoice/page.tsx:16:    answer: '国际交易中建议使用英文。部分国家接受双语（如中英文对照），但纯中文发票在大多数国家无法用于清关。发票金额可以用数字+大写两种方式标注以防篡改。',
+src/app/(public)/guides/commercial-invoice/page.tsx:121:                <li>• 公司盖章（部分国家要求）</li>
+src/app/(public)/guides/shipping-from-china-to-canada/page.tsx:205:                <p className="text-sm text-gray-600">加拿大地广人稀，北部和偏远地区可能收取偏远附加费，发货前确认目的地是否在偏远区域。</p>
+src/app/(public)/guides/msds-un38-3-basics/page.tsx:8:  alternates: { canonical: buildCanonical("/guides/msds-un38-3-basics") },
+src/app/(public)/guides/msds-un38-3-basics/page.tsx:55:          <li>出口到欧美等发达国家</li>
+src/app/(public)/guides/msds-un38-3-basics/page.tsx:80:          <li>所有国家和地区都要求</li>
+src/app/(public)/guides/msds-un38-3-basics/page.tsx:163:        <p className="text-sm text-gray-600">本指南仅供参考，不构成法律或认证建议。具体认证要求请以目的地国家法规和承运商政策为准。建议咨询专业认证机构。</p>
+src/app/(public)/guides/export-documents-checklist/page.tsx:20:    answer: '原产地证（Certificate of Origin）证明货物的生产国/地区，主要用途：1) 享受自贸协定优惠税率（如 RCEP、中国-东盟 FTA）；2) 满足进口国强制要求（如部分中东国家）；3) 应对反倾销调查。没有原产地证可能无法享受关税减免。',
+src/app/(public)/guides/export-documents-checklist/page.tsx:27:    question: '不同国家对单据的要求一样吗？',
+src/app/(public)/guides/export-documents-checklist/page.tsx:28:    answer: '不一样。例如：中东国家通常要求发票和原产地证经过领事认证；欧盟需要 CE 声明；美国需要 ISF 申报；澳洲需要熏蒸证明（木质包装）。发货前务必确认目的地国家的具体单据要求。',
+src/app/(public)/guides/export-documents-checklist/page.tsx:132:              <li>• <strong>目的国/地区</strong> — 最终目的地</li>
+src/app/(public)/guides/export-documents-checklist/page.tsx:165:                  <td className="py-3 pr-4">所有国家（非优惠）</td>
+src/app/(public)/guides/export-documents-checklist/page.tsx:185:                  <td className="py-3 pr-4">对应自贸协定国家</td>
+src/app/(public)/guides/export-documents-checklist/page.tsx:190:                  <td className="py-3 pr-4">对应国家</td>
+src/app/(public)/guides/export-documents-checklist/page.tsx:260:                <p className="text-sm font-medium text-gray-900">忽略目的地国家的特殊单据要求</p>
+src/app/(public)/guides/export-documents-checklist/page.tsx:261:                <p className="text-sm text-gray-600">如中东国家需要领事认证、澳洲需要熏蒸证明、欧盟需要 CE 声明。未提前准备会导致货物到港后无法清关。</p>
+src/app/(public)/guides/export-documents-checklist/page.tsx:278:            本指南提供的单据要求为通用参考。不同国家、不同商品、不同贸易方式的具体单据要求可能有所不同。建议根据具体出口情况咨询专业报关行或贸易顾问，确保单据合规。
+src/app/(public)/guides/address-format/page.tsx:9:  description: '详解美国、加拿大、英国、日本、澳大利亚等国家的标准地址格式，包含地址结构说明、示例地址、常见错误和注意事项，帮助您正确填写国际快递收件地址。',
+src/app/(public)/guides/address-format/page.tsx:16:    answer: '大多数国际快递（DHL、FedEx、UPS）要求用英文或目的地国家语言填写。寄往日本的地址可以用日文汉字，但建议同时标注英文/罗马字以便中转环节识别。',
+src/app/(public)/guides/address-format/page.tsx:28:    answer: '强烈建议填写收件人电话号码。国际快递在派送时通常需要电话联系，缺少电话可能导致派送失败。部分国家（如日本）的快递员一定会先打电话确认。',
+src/app/(public)/guides/address-format/page.tsx:51:            详解美国、加拿大、英国、日本、澳大利亚等国家的标准地址格式，避免因地址错误导致包裹延误或退件。
+src/app/(public)/guides/address-format/page.tsx:72:            国际地址通常遵循「从小到大」或「从大到小」两种排列方式。英语国家一般从小到大（门牌→街道→城市→州/省→邮编→国家），而日本、中国等东亚国家传统上从大到小。国际快递建议使用英文从小到大格式。
+src/app/(public)/guides/address-format/page.tsx:83:              <li className="flex gap-2"><span className="font-bold text-blue-600 shrink-0">6.</span><span><strong>邮编</strong>（Postal/ZIP Code）— 格式因国家而异</span></li>
+src/app/(public)/guides/address-format/page.tsx:84:              <li className="flex gap-2"><span className="font-bold text-blue-600 shrink-0">7.</span><span><strong>国家</strong>（Country）— 使用英文全称</span></li>
+src/app/(public)/guides/address-format/page.tsx:215:                <p className="text-sm font-medium text-gray-900">使用中文写非中文目的地</p>
+src/app/(public)/guides/address-format/page.tsx:222:                <p className="text-sm font-medium text-gray-900">国家名拼写不完整</p>
+src/app/(public)/guides/address-format/page.tsx:223:                <p className="text-sm text-gray-600">写 "USA" 不如写 "UNITED STATES" 清晰，避免与南美国家混淆</p>
+src/app/(public)/guides/address-format/page.tsx:239:              <span>查询目的地邮编，确认格式符合该国标准（使用邮编校验工具）</span>
+src/app/(public)/guides/address-format/page.tsx:243:              <span>使用目的地国家的州/省标准缩写</span>
+src/app/(public)/guides/packing-list/page.tsx:32:    answer: '国际物流建议使用英文。部分国家接受双语版本。纯中文装箱单在目的港可能无法被仓库或海关识别，导致操作延误。',
+src/app/(public)/guides/packing-list/page.tsx:131:                <li>• 目的地（Place of Destination）</li>
+src/app/(public)/guides/international-shipping-documents/page.tsx:28:    answer: '大多数国家接受英文单据。部分国家（如俄罗斯、巴西）可能要求当地语言或双语版本。建议统一使用英文，必要时附上翻译件。',
+src/app/(public)/guides/international-shipping-documents/page.tsx:32:    answer: '越来越多国家和快递公司接受电子单据（e-AWB、电子发票），但部分目的地仍需纸质随货。建议同时准备电子版和打印版。',
+src/app/(public)/guides/international-shipping-documents/page.tsx:72:            国际发货通常需要以下三类核心单据。不同运输方式（快递、空运、海运）和目的地国家的要求可能略有差异，但这三份文件是最基本的。
+src/app/(public)/guides/international-shipping-documents/page.tsx:196:                <p className="text-sm text-gray-600">大多数国家要求提供 6 位以上的 HS 编码，缺少会导致清关延误</p>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:16:    answer: '最重要的是确认：1) 目的地国家的进口政策和禁运物品；2) 商品是否需要特殊认证或许可；3) 准备齐全的清关文件（发票、装箱单、报关单）；4) 选择合适的物流渠道并确认费用。建议制作一份标准化清单，每次发货前逐项核对。',
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:28:    answer: '国际快递标签通常需要：收发件人完整地址和联系方式、运单号/追踪号、件数标识（如 1/3, 2/3）、重量、目的地国家、以及必要的警示标签（如易碎、向上、锂电池标签等）。FBA 货物还需要 FNSKU 和 FBA 箱标。',
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:76:                <li className="flex gap-2"><span className="text-emerald-600">☐</span> 确认目的地国家的进口政策和禁运清单</li>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:192:                <li className="flex gap-2"><span className="text-emerald-600">☐</span> 发件人信息（可简化为公司名+国家）</li>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:196:                <li className="flex gap-2"><span className="text-emerald-600">☐</span> 目的地国家（大写英文）</li>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:244:                <p className="text-sm font-medium text-gray-900">忽略目的地国家的特殊要求</p>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:245:                <p className="text-sm text-gray-600">不同国家有不同的进口限制和认证要求。如澳洲需要熏蒸证明（木质包装），美国需要 FDA 注册（食品接触品）。</p>
+src/app/(public)/guides/cross-border-shipping-checklist/page.tsx:262:            本检查清单为通用参考，不同国家、不同物流渠道、不同商品类型可能有额外要求。建议根据具体发货情况调整清单内容，并在首次发往新国家时咨询专业报关行。
+src/app/(public)/guides/shipping-from-china-to-germany/page.tsx:8:  alternates: { canonical: buildCanonical("/guides/shipping-from-china-to-germany") },
+src/app/(public)/guides/shipping-from-china-to-usa/page.tsx:207:              <span><strong>放行</strong> — 清关完成后提货或转运至最终目的地</span>
+src/app/(public)/guides/shipping-quote-template/page.tsx:8:  alternates: { canonical: buildCanonical("/guides/shipping-quote-template") },
+src/app/(public)/guides/shipping-quote-template/page.tsx:144:          <li>✅ 起运地和目的地</li>
+src/app/(public)/guides/hs-code-basics/page.tsx:19:    question: '为什么不同国家的 HS 编码后几位不一样？',
+src/app/(public)/guides/hs-code-basics/page.tsx:32:    answer: '大多数国家要求国际快递和贸易件提供 HS 编码。缺少编码可能导致清关延误、退件或罚款。部分国家对低价值个人物品有豁免，但建议始终提供。',
+src/app/(public)/guides/hs-code-basics/page.tsx:72:            HS 编码（Harmonized System Code）是国际通用的商品分类编码系统，由世界海关组织（WCO）维护。全球 200 多个国家和地区使用这套系统对贸易商品进行分类，用于关税征收、贸易统计和监管。
+src/app/(public)/guides/hs-code-basics/page.tsx:140:              <span>确认前 6 位编码，如需出口到特定国家，查询该国的扩展编码</span>
+src/app/(public)/guides/hs-code-basics/page.tsx:188:                <p className="text-sm text-gray-600">同一商品在不同国家可能有不同的后几位扩展码，使用前请确认目的地国家的具体要求</p>
+src/app/(public)/guides/battery-shipping-notice/page.tsx:8:  alternates: { canonical: buildCanonical("/guides/battery-shipping-notice") },
+src/app/(public)/guides/page.tsx:10:  alternates: { canonical: "https://jueshi.net/guides" },
+src/app/(public)/guides/page.tsx:138:                href={c.key === 'all' ? '/guides' : `/guides?category=${encodeURIComponent(c.key)}`}
+src/app/(public)/guides/page.tsx:159:          <Link href="/guides" className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group">
+src/app/(public)/guides/page.tsx:164:          <Link href="/guides" className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group">
+src/app/(public)/guides/page.tsx:169:          <Link href="/guides" className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group">
+src/app/(public)/guides/page.tsx:188:            <Link href="/guides" className="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 min-h-[48px]">
+src/app/(public)/guides/page.tsx:197:                href={`/guides/${a.slug}`}
+src/app/(public)/guides/page.tsx:228:            <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
+src/app/(public)/guides/[slug]/page.tsx:99:        alternates: guide.canonicalUrl ? { canonical: guide.canonicalUrl } : { canonical: `https://jueshi.net/guides/${slug}` },
+src/app/(public)/guides/[slug]/page.tsx:190:                <Link href="/guides" className="hover:text-gray-900 transition-colors">实用指南</Link>
+src/app/(public)/guides/[slug]/page.tsx:257:                            🌍 适用国家/地区：
+src/app/(public)/guides/[slug]/page.tsx:411:    mainEntityOfPage: `https://jueshi.net/guides/${slug}`,
+src/app/(public)/guides/[slug]/page.tsx:431:            <Link href="/guides" className="hover:text-gray-900 transition-colors">
+src/app/(public)/guides/[slug]/page.tsx:525:                pagePath={`/guides/${slug}`}
+src/app/(public)/guides/[slug]/page.tsx:565:                    <Link key={ra.slug} href={`/guides/${ra.slug}`} className="group block p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:shadow-md hover:border-teal-200 transition-all">
+src/app/(public)/guides/[slug]/page.tsx:595:            <Link href="/guides" className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+src/app/(public)/guides/[slug]/page.tsx:599:            <Link href="/resources" className="min-h-[44px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-700 transition-all shadow-sm">
+src/app/(public)/page.tsx.backup.v3:7:import CommunitySection from "@/components/home/community-section";
+src/app/(public)/bbs/[slug]/page.tsx:483:                    <Link href={`/admin/community/posts`} className="block text-sm text-amber-700 hover:text-amber-900">
+src/app/(public)/countries/page.tsx:4:  redirect("/destinations");
+src/app/(public)/countries/[country]/page.tsx:3:// Slug aliases: countries config uses different slugs than destinations DB
+src/app/(public)/countries/[country]/page.tsx:20:  redirect(`/destinations/${destSlug}`);
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:28:} from "@/components/community/user-trust-card";
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:191:    `/community/t/${post.slug}`
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:407:      const res = await fetch(`/api/admin/community/posts/${post.id}`, {
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:520:            href={`/community/c/${post.category.key}`}
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:601:                  href={`/guides/${post.relatedGuide.slug}`}
+src/app/(public)/community/t/[slug]/topic-detail-client.tsx:609:                  href={`/checklists/${post.relatedChecklist.slug}`}
+src/app/(public)/community/new/new-post-client.tsx:151:        router.push(`/community/t/${data.post.slug}`);
+src/app/(public)/topics/page.tsx:117:            <Link href="/guides" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]">
+src/app/(public)/topics/[slug]/page.tsx:779:                  <Link href="/resources" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]">
+src/app/(public)/topics/[slug]/page.tsx:782:                  <Link href="/guides" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white text-gray-700 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors min-h-[44px]">
+src/app/api/ads/dispatch/route.ts:9: * 2. 如果广告设置了 targetCountries，必须包含当前国家（空数组=通投）
+src/app/api/postal-codes/advanced/route.ts:268:        note: '该国家的详细地址格式暂未收录，请参考官方邮政网站',
+src/app/api/postal-codes/route.ts:54:        message: '当前国家暂未接入可查询邮编数据库，请使用地址格式或官方入口确认。',
+src/app/api/checklists/route.ts:19:    const checklists = await prisma.landingPage.findMany({
+src/app/api/checklists/route.ts:31:    const data = checklists.map((c) => {
+src/app/api/checklists/route.ts:50:    return NextResponse.json({ error: "Failed to fetch checklists" }, { status: 500 });
+src/app/api/resources/route.ts:34:    // Non-admin only sees active resources
+src/app/api/resources/route.ts:60:    const [resources, total] = await Promise.all([
+src/app/api/resources/route.ts:70:    return NextResponse.json({ resources, total, page, limit });
+src/app/api/resources/featured/route.ts:5: * GET /api/resources/featured
+src/app/api/resources/featured/route.ts:41:    console.error('GET /api/resources/featured error:', error);
+src/app/api/admin/destinations/route.ts:15:// GET: List all destinations OR get single by slug/id
+src/app/api/admin/destinations/route.ts:30:        guides: { orderBy: { sortOrder: "asc" } },
+src/app/api/admin/destinations/route.ts:43:        guides: { orderBy: { sortOrder: "asc" } },
+src/app/api/admin/destinations/route.ts:51:  const destinations = await prisma.destination.findMany({
+src/app/api/admin/destinations/route.ts:53:      _count: { select: { tools: true, guides: true, services: true } },
+src/app/api/admin/destinations/route.ts:58:  return NextResponse.json({ success: true, data: destinations });
+src/app/api/admin/destinations/route.ts:67:  const { slug, name, nameEn, currency, region, emoji, heroTitle, heroSubtitle, seoTitle, seoDescription, keywords, keyCities, userCount, docCount, isActive, tools, guides, services } = body;
+src/app/api/admin/destinations/route.ts:102:      if (guides?.length) {
+src/app/api/admin/destinations/route.ts:104:          data: (guides as any[]).map((g, i) => ({ destinationId: d.id, title: g.title, description: g.description, type: g.type, sortOrder: i })),
+src/app/api/admin/destinations/route.ts:117:          guides: { orderBy: { sortOrder: "asc" } },
+src/app/api/admin/destinations/route.ts:163:      if (data.guides !== undefined) {
+src/app/api/admin/destinations/route.ts:165:        if (data.guides.length) {
+src/app/api/admin/destinations/route.ts:167:            data: (data.guides as any[]).map((g, i) => ({ destinationId: id, title: g.title, description: g.description, type: g.type, sortOrder: i })),
+src/app/api/admin/destinations/route.ts:184:          guides: { orderBy: { sortOrder: "asc" } },
+src/app/api/admin/destinations/generate/route.ts:31:  const prompt = `你是一位资深跨境出海专家与 SEO 大师。请为目标国家生成完整的 pSEO 聚合页数据。
+src/app/api/admin/destinations/generate/route.ts:33:目标国家：${countryName}${countryEn ? ` (${countryEn})` : ""}
+src/app/api/admin/destinations/generate/route.ts:38:  "slug": "国家英文名小写连字符 (如 united-kingdom)",
+src/app/api/admin/destinations/generate/route.ts:39:  "name": "国家中文名",
+src/app/api/admin/destinations/generate/route.ts:40:  "nameEn": "国家英文名",
+src/app/api/admin/destinations/generate/route.ts:52:  "guides": [
+src/app/api/admin/destinations/generate/route.ts:83:2. guides 要覆盖不同 type，包含实用的实操细节和具体数字
+src/app/api/admin/checklists/route.ts:43:// GET /api/admin/checklists — list checklists with optional status filter
+src/app/api/admin/checklists/route.ts:63:    const checklists = await prisma.checklist.findMany({
+src/app/api/admin/checklists/route.ts:75:    return NextResponse.json(checklists);
+src/app/api/admin/checklists/route.ts:77:    console.error("Admin checklists list error:", e);
+src/app/api/admin/checklists/route.ts:82:// POST /api/admin/checklists — create checklist
+src/app/api/admin/checklists/[id]/route.ts:35:// GET /api/admin/checklists/[id] — single checklist
+src/app/api/admin/checklists/[id]/route.ts:57:// PUT /api/admin/checklists/[id] — update checklist
+src/app/api/admin/checklists/[id]/route.ts:120:// DELETE /api/admin/checklists/[id] — delete checklist
+src/app/api/admin/resources/quality-check/route.ts:6: * GET /api/admin/resources/quality-check
+src/app/api/admin/resources/quality-check/route.ts:88:        resources: items,
+src/app/api/admin/resources/quality-check/route.ts:125:    console.error('GET /api/admin/resources/quality-check error:', error);
+src/app/api/admin/resources/featured/route.ts:6: * GET /api/admin/resources/featured
+src/app/api/admin/resources/featured/route.ts:32:    console.error('GET /api/admin/resources/featured error:', error);
+src/app/api/admin/resources/featured/route.ts:38: * POST /api/admin/resources/featured
+src/app/api/admin/resources/featured/route.ts:77:    console.error('POST /api/admin/resources/featured error:', error);
+src/app/api/admin/resources/import/route.ts:2: * POST /api/admin/resources/import
+src/app/api/admin/resources/import/route.ts:4: * Batch import resources from crawler JSON output.
+src/app/api/admin/resources/import/route.ts:9: *   "resources": [
+src/app/api/admin/resources/import/route.ts:44:    resources: Array<{
+src/app/api/admin/resources/import/route.ts:65:  const { resources, createTopic = false, topicName } = body;
+src/app/api/admin/resources/import/route.ts:67:  if (!Array.isArray(resources) || resources.length === 0) {
+src/app/api/admin/resources/import/route.ts:69:      { error: 'resources 必须是包含至少一条数据的数组' },
+src/app/api/admin/resources/import/route.ts:81:  // ─── Step 1: Bulk upsert resources ───────────────────────────────────
+src/app/api/admin/resources/import/route.ts:85:  const allUrls = resources.map(r => r.url.trim());
+src/app/api/admin/resources/import/route.ts:96:  for (let idx = 0; idx < resources.length; idx++) {
+src/app/api/admin/resources/import/route.ts:97:    const res = resources[idx];
+src/app/api/admin/resources/import/route.ts:195:          const matchedResource = resources.find(
+src/app/api/admin/content/stats/route.ts:63:      guides: {
+src/app/api/admin/content/stats/route.ts:69:      checklists: {
+src/app/api/admin/cms/import/route.ts:8:// Body: { items: [{ title, slug, content, category: "topics"|"destinations", tags?: [], excerpt?: "" }] }
+src/app/api/admin/cms/import/route.ts:19:  destinations: "countries",
+src/app/api/admin/guides/route.ts:37:// GET /api/admin/guides — list guides with optional status/category filters
+src/app/api/admin/guides/route.ts:59:    const guides = await prisma.guide.findMany({
+src/app/api/admin/guides/route.ts:71:    return NextResponse.json(guides);
+src/app/api/admin/guides/route.ts:73:    console.error("Admin guides list error:", e);
+src/app/api/admin/guides/route.ts:78:// POST /api/admin/guides — create guide
+src/app/api/admin/guides/[id]/route.ts:37:// GET /api/admin/guides/[id] — single guide
+src/app/api/admin/guides/[id]/route.ts:59:// PUT /api/admin/guides/[id] — update guide
+src/app/api/admin/guides/[id]/route.ts:126:// DELETE /api/admin/guides/[id] — delete guide
+src/app/api/admin/community/honor/route.ts:6:// POST /api/admin/community/honor — admin manually adjust user honor
+src/app/api/admin/community/honor/route.ts:59:// GET /api/admin/community/honor — list honor logs
+src/app/api/admin/community/moderation-log/route.ts:7:// GET /api/admin/community/moderation-log
+src/app/api/admin/community/reputation/route.ts:5:// GET /api/admin/community/reputation — list users with honor scores
+src/app/api/admin/community/reputation/route.ts:37:        communityStat: true,
+src/app/api/admin/community/badges/grant/route.ts:5:// POST /api/admin/community/badges/grant — admin grant badge to user
+src/app/api/admin/community/badges/grant/route.ts:56:// DELETE /api/admin/community/badges/grant — admin remove badge
+src/app/api/admin/overview/route.ts:71:      resources: { total: resTotal, active: resActive, inactive: resInactive, categories: resCategories },
+src/app/api/admin/analytics/growth-funnels/route.ts:200:    const resources = {
+src/app/api/admin/analytics/growth-funnels/route.ts:277:      resources: resources.featuredTotal < MIN_SAMPLE_SIZE,
+src/app/api/admin/analytics/growth-funnels/route.ts:295:        resources,
+src/app/api/internal/contentops/drafts/route.ts:33:  if (!data.resources || data.resources.length < 8) {
+src/app/api/internal/contentops/drafts/route.ts:34:    errors.push('resources must have at least 8 items');
+src/app/api/internal/contentops/drafts/route.ts:38:  if (data.resources) {
+src/app/api/internal/contentops/drafts/route.ts:39:    const hasRating = data.resources.some((r: any) => 
+src/app/api/internal/contentops/drafts/route.ts:42:    if (!hasRating) errors.push('resources must have S/A/B/C rating');
+src/app/api/forum/posts/route.ts:246:    // v18.6.1: Update community stats + grant first_post badge (fire-and-forget)
+src/app/api/forum/posts/[slug]/comments/route.ts:178:    // v18.6.1: Update community stats + grant first_reply badge (fire-and-forget)
+src/app/api/workbench/recent-tools/route.ts:86:    'resources': '资源中心',
+src/app/api/workbench/recent-tools/route.ts:100:    'resources': '/resources',
+src/app/api/workbench/recent-tools/route.ts:115:    'resources': 'bookmark',
+src/app/api/community/user/[id]/route.ts:5:// GET /api/community/user/[id] — public community profile
+src/app/(admin)/admin/ads/page.tsx:479:                  定向国家 <span className="text-gray-400 font-normal">（不选=通投全球）</span>
+src/app/(admin)/admin/ads/page.tsx:488:                        <span className="text-gray-400">通投所有国家</span>
+src/app/(admin)/admin/destinations/page.tsx:27:  _count: { tools: number; guides: number; services: number };
+src/app/(admin)/admin/destinations/page.tsx:41:      const res = await fetch("/api/admin/destinations");
+src/app/(admin)/admin/destinations/page.tsx:54:      await fetch("/api/admin/destinations", {
+src/app/(admin)/admin/destinations/page.tsx:83:              <Globe className="w-5 h-5" /> 国家/地区管理 (pSEO CMS)
+src/app/(admin)/admin/destinations/page.tsx:86:              管理全球出海市场大盘 — 增删改查国家专题、百科指南与服务商
+src/app/(admin)/admin/destinations/page.tsx:90:            onClick={() => router.push("/admin/destinations/new/edit")}
+src/app/(admin)/admin/destinations/page.tsx:93:            <Plus className="w-4 h-4" /> 新增国家
+src/app/(admin)/admin/destinations/page.tsx:129:          placeholder="搜索国家名称、slug 或区域..."
+src/app/(admin)/admin/destinations/page.tsx:141:                <th className="text-left px-4 py-3 font-medium text-gray-500">国家</th>
+src/app/(admin)/admin/destinations/page.tsx:172:                  <td className="px-4 py-3"><span className="px-2 py-0.5 bg-teal-50 text-teal-600 rounded text-xs">{d._count.guides}</span></td>
+src/app/(admin)/admin/destinations/page.tsx:176:                      <a href={`/destinations/${d.slug}`} target="_blank" rel="noopener" className="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors">预览</a>
+src/app/(admin)/admin/destinations/page.tsx:177:                      <button onClick={() => router.push(`/admin/destinations/${d.slug}/edit`)} className="px-2 py-1 text-xs text-indigo-600 hover:bg-indigo-50 rounded transition-colors flex items-center gap-1"><Edit2 className="w-3.5 h-3.5" /> 编辑</button>
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:21:  tools: string[]; guides: Guide[]; services: Service[];
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:74:  const [activeTab, setActiveTab] = useState<"basic" | "guides" | "services" | "tools" | "modules" | "ads">("basic");
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:81:    tools: [], guides: [], services: [],
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:85:      { key: "guides", label: "实用指南", visible: true, sortOrder: 2, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:87:      { key: "checklists", label: "关联清单", visible: true, sortOrder: 4, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:91:      { key: "community", label: "社区讨论", visible: true, sortOrder: 8, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:98:      { id: "after_guides_ad", name: "指南后广告位", placement: "after_guides", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 1 },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:115:      const res = await fetch(`/api/admin/destinations?slug=${slug}`);
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:120:        setMessage({ type: "error", text: `未找到国家 "${slug}"` });
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:128:        { key: "guides", label: "实用指南", visible: true, sortOrder: 2, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:130:        { key: "checklists", label: "关联清单", visible: true, sortOrder: 4, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:134:        { key: "community", label: "社区讨论", visible: true, sortOrder: 8, title: "" },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:159:        guides: (d.guides || []).map((g: any) => ({ title: g.title, description: g.description, type: g.type })),
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:164:          { id: "after_guides_ad", name: "指南后广告位", placement: "after_guides", enabled: false, label: "广告", title: "", description: "", linkUrl: "", sponsorName: "", sortOrder: 1 },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:178:      setMessage({ type: "error", text: "请先输入国家名称" });
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:185:      const res = await fetch("/api/admin/destinations/generate", {
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:210:        guides: (g.guides || []).map((gi: any) => ({ title: gi.title, description: gi.description, type: gi.type })),
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:240:        guides: form.guides.map(g => ({ title: g.title, description: g.description, type: g.type })),
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:250:      const res = await fetch("/api/admin/destinations", {
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:268:  const addGuide = () => setForm(f => ({ ...f, guides: [...f.guides, { title: "", description: "", type: "guide" }] }));
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:270:    setForm(f => ({ ...f, guides: f.guides.map((g, j) => j === i ? { ...g, [field]: value } : g) }));
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:271:  const removeGuide = (i: number) => setForm(f => ({ ...f, guides: f.guides.filter((_, j) => j !== i) }));
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:294:          <button onClick={() => router.push("/admin/destinations")} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:300:              {isEditMode ? (form.name ? `✏️ 编辑国家: ${form.emoji || ''} ${form.name}` : "✏️ 编辑国家") : "✨ 新增国家"}
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:306:          <button onClick={() => router.push("/admin/destinations")} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">取消</button>
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:322:              placeholder="输入国家名称，如「英国」「日本」「澳大利亚」..."
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:348:          { key: "guides" as const, label: `百科指南 (${form.guides.length})`, icon: BookOpen },
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:458:        {activeTab === "guides" && (
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:461:              <p className="text-sm text-gray-500">{form.guides.length} 条指南</p>
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:466:            {form.guides.map((g, i) => (
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:484:            {form.guides.length === 0 && <p className="text-center text-gray-400 py-8">暂无指南，点击上方按钮添加</p>}
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:537:            <p className="text-sm text-gray-500 mb-4">勾选需要在此国家页面展示的工具（{form.tools.length} 个已选）</p>
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:563:            <p className="text-sm text-gray-500 mb-2">配置国家详情页各模块的显示/隐藏、排序和标题。保存后前台立即生效。</p>
+src/app/(admin)/admin/destinations/[slug]/edit/page.tsx:638:        <button onClick={() => router.push("/admin/destinations")} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-50">← 返回列表</button>
+src/app/(admin)/admin/resources/import/page.tsx:30:      const items = Array.isArray(parsed) ? parsed : parsed.resources;
+src/app/(admin)/admin/resources/import/page.tsx:53:    let resources: any[];
+src/app/(admin)/admin/resources/import/page.tsx:56:      resources = Array.isArray(parsed) ? parsed : parsed.resources;
+src/app/(admin)/admin/resources/import/page.tsx:57:      if (!Array.isArray(resources) || resources.length === 0) {
+src/app/(admin)/admin/resources/import/page.tsx:68:    const body: any = { resources };
+src/app/(admin)/admin/resources/import/page.tsx:75:      const res = await fetch('/api/admin/resources/import', {
+src/app/(admin)/admin/resources/import/page.tsx:370:              href="/admin/resources"
+src/app/(admin)/admin/resources/page.tsx:55:  const [resources, setResources] = useState<ResourceItem[]>([]);
+src/app/(admin)/admin/resources/page.tsx:112:      const res = await fetch(`/api/resources?${params}`);
+src/app/(admin)/admin/resources/page.tsx:114:      setResources(data.resources || []);
+src/app/(admin)/admin/resources/page.tsx:150:      const url = editingId ? `/api/resources?id=${editingId}` : '/api/resources';
+src/app/(admin)/admin/resources/page.tsx:171:    try { const res = await fetch(`/api/resources?id=${id}`, { method: 'DELETE' }); const data = await res.json(); if (data.success) fetchResources(); }
+src/app/(admin)/admin/resources/page.tsx:178:    if (action === 'delete') { for (const id of selected) await fetch(`/api/resources?id=${id}`, { method: 'DELETE' }); }
+src/app/(admin)/admin/resources/page.tsx:185:      const res = await fetch('/api/resources?limit=1000'); const data = await res.json();
+src/app/(admin)/admin/resources/page.tsx:186:      const blob = new Blob([JSON.stringify(data.resources, null, 2)], { type: 'application/json' });
+src/app/(admin)/admin/resources/page.tsx:187:      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'resources-export.json'; a.click();
+src/app/(admin)/admin/resources/page.tsx:198:      for (const item of arr) { const res = await fetch('/api/resources', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...item, tags: item.tags || [] }) }); const data = await res.json(); if (data.success) count++; }
+src/app/(admin)/admin/resources/page.tsx:210:    for (let i = 0; i < resources.length; i++) {
+src/app/(admin)/admin/resources/page.tsx:212:      const r = resources[i];
+src/app/(admin)/admin/resources/page.tsx:214:        const res = await fetch(`/api/resources/${r.id}/check-link`, {
+src/app/(admin)/admin/resources/page.tsx:226:          await fetch(`/api/resources?id=${r.id}`, {
+src/app/(admin)/admin/resources/page.tsx:244:  }, [resources]);
+src/app/(admin)/admin/resources/page.tsx:253:      const res = await fetch('/api/admin/resources/quality-check');
+src/app/(admin)/admin/resources/page.tsx:301:  const activeCount = resources.filter(r => r.isActive).length;
+src/app/(admin)/admin/resources/page.tsx:302:  const inactiveCount = resources.filter(r => !r.isActive).length;
+src/app/(admin)/admin/resources/page.tsx:303:  const adCount = resources.filter(r => r.isAd).length;
+src/app/(admin)/admin/resources/page.tsx:304:  const categoryCount = new Set(resources.map(r => r.category)).size;
+src/app/(admin)/admin/resources/page.tsx:312:        subtitle="管理前台 /resources 页面展示的导航网址。每个网址条目包含名称、URL、分类、标签等信息。"
+src/app/(admin)/admin/resources/page.tsx:329:              disabled={resources.length === 0}
+src/app/(admin)/admin/resources/page.tsx:426:      ) : resources.length === 0 ? (
+src/app/(admin)/admin/resources/page.tsx:440:                  <th className="px-4 py-3 text-left w-10"><input type="checkbox" onChange={e => setSelected(e.target.checked ? resources.map(r => r.id) : [])} checked={selected.length === resources.length && resources.length > 0} /></th>
+src/app/(admin)/admin/resources/page.tsx:453:                {resources.map(r => {
+src/app/(admin)/admin/resources/page.tsx:804:                          {dup.resources.map((r: any) => r.name).join(', ')}
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:20:export default function ChecklistsListClient({ checklists: initialChecklists }: { checklists: Checklist[] }) {
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:21:  const [checklists, setChecklists] = useState<Checklist[]>(initialChecklists);
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:34:      const res = await fetch(`/api/admin/checklists?${params.toString()}`, { cache: "no-store" });
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:54:      const res = await fetch(`/api/admin/checklists/${id}`, { method: "DELETE" });
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:57:      setChecklists(checklists.filter((c) => c.id !== id));
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:76:          href="/admin/content/checklists/new"
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:137:            {checklists.length === 0 ? (
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:144:              checklists.map((c) => {
+src/app/(admin)/admin/content/checklists/checklists-list-client.tsx:174:                          href={`/admin/content/checklists/${c.id}/edit`}
+src/app/(admin)/admin/content/checklists/new/page.tsx:96:      const res = await fetch("/api/admin/checklists", {
+src/app/(admin)/admin/content/checklists/new/page.tsx:104:      router.push("/admin/content/checklists");
+src/app/(admin)/admin/content/checklists/new/page.tsx:116:        <Link href="/admin/content/checklists" className="p-2 hover:bg-gray-100 rounded-lg" title="返回">
+src/app/(admin)/admin/content/checklists/new/page.tsx:258:          <Link href="/admin/content/checklists"
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:186:      const res = await fetch(`/api/admin/checklists/${checklist.id}`, {
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:194:      router.push("/admin/content/checklists");
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:206:        <Link href="/admin/content/checklists" className="p-2 hover:bg-gray-100 rounded-lg" title="返回">
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:551:              href={`/checklists/${form.slug}?preview=true`}
+src/app/(admin)/admin/content/checklists/[id]/edit/checklist-edit-client.tsx:561:          <Link href="/admin/content/checklists"
+src/app/(admin)/admin/content/checklists/page.tsx:1:// Server Component: loads checklists from DB directly
+src/app/(admin)/admin/content/checklists/page.tsx:3:import ChecklistsListClient from "./checklists-list-client";
+src/app/(admin)/admin/content/checklists/page.tsx:13:  const checklists = await prisma.checklist.findMany({
+src/app/(admin)/admin/content/checklists/page.tsx:23:  const serialized = JSON.parse(JSON.stringify(checklists));
+src/app/(admin)/admin/content/checklists/page.tsx:24:  return <ChecklistsListClient checklists={serialized} />;
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:18:export default function GuidesListClient({ guides: initialGuides }: { guides: Guide[] }) {
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:19:  const [guides, setGuides] = useState<Guide[]>(initialGuides);
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:32:      const res = await fetch(`/api/admin/guides?${params.toString()}`, { cache: "no-store" });
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:52:      const res = await fetch(`/api/admin/guides/${id}`, { method: "DELETE" });
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:55:      setGuides(guides.filter((g) => g.id !== id));
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:72:          href="/admin/content/guides/new"
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:133:            {guides.length === 0 ? (
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:140:              guides.map((g) => {
+src/app/(admin)/admin/content/guides/guides-list-client.tsx:170:                          href={`/admin/content/guides/${g.id}/edit`}
+src/app/(admin)/admin/content/guides/new/page.tsx:74:      const res = await fetch("/api/admin/guides", {
+src/app/(admin)/admin/content/guides/new/page.tsx:82:      router.push("/admin/content/guides");
+src/app/(admin)/admin/content/guides/new/page.tsx:94:        <Link href="/admin/content/guides" className="p-2 hover:bg-gray-100 rounded-lg" title="返回">
+src/app/(admin)/admin/content/guides/new/page.tsx:211:          <Link href="/admin/content/guides"
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:153:      const res = await fetch(`/api/admin/guides/${guide.id}`, {
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:161:      router.push("/admin/content/guides");
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:173:        <Link href="/admin/content/guides" className="p-2 hover:bg-gray-100 rounded-lg" title="返回">
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:493:              href={`/guides/${form.slug}?preview=true`}
+src/app/(admin)/admin/content/guides/[id]/edit/guide-edit-client.tsx:503:          <Link href="/admin/content/guides"
+src/app/(admin)/admin/content/guides/page.tsx:1:// Server Component: loads guides from DB directly
+src/app/(admin)/admin/content/guides/page.tsx:3:import GuidesListClient from "./guides-list-client";
+src/app/(admin)/admin/content/guides/page.tsx:13:  const guides = await prisma.guide.findMany({
+src/app/(admin)/admin/content/guides/page.tsx:23:  const serialized = JSON.parse(JSON.stringify(guides));
+src/app/(admin)/admin/content/guides/page.tsx:24:  return <GuidesListClient guides={serialized} />;
+src/app/(admin)/admin/content/page.tsx:41:      href: "/admin/content/guides",
+src/app/(admin)/admin/content/page.tsx:52:      href: "/admin/content/checklists",
+src/app/(admin)/admin/content/topics/[id]/edit/topic-edit-client.tsx:439:            <label className={labelCls}>目标国家 (逗号分隔)</label>
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:78:  // Structured editing state for checklists
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:250:    // Internal linking warnings for checklists
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:554:              <span className="font-medium">公开页面:</span> <a href="/lp/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/lp/[slug]</a> | <span className="font-medium">清单:</span> <a href="/checklists/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/checklists/[slug]</a>
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:706:                <a href={editing.pageType === 'checklist' ? `/checklists/${editing.slug}` : `/lp/${editing.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 border border-blue-200 transition-colors">
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:846:                            <a href={p.pageType === 'checklist' ? `/checklists/${p.slug}` : `/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline flex items-center gap-1 font-mono text-xs">
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:847:                              {p.pageType === 'checklist' ? `/checklists/` : `/lp/`}{p.slug} <ExternalLink className="w-3 h-3" />
+src/app/(admin)/admin/landing-pages/landing-pages-client.tsx:860:                              <a href={p.pageType === 'checklist' ? `/checklists/${p.slug}` : `/lp/${p.slug}`} target="_blank" rel="noopener noreferrer" className="p-1.5 text-teal-500 hover:text-teal-700 rounded-lg hover:bg-teal-50 transition-colors" title="打开公开页"><Eye className="w-3.5 h-3.5" /></a>
+src/app/(admin)/admin/cms/page.tsx:179:            <p className="text-sm text-orange-100 mt-1">管理 /guides 前台展示的文章内容。共 {articles.length} 篇。</p>
+src/app/(admin)/admin/cms/page.tsx:203:              即本页管理的文章。长文教程、工具推荐、操作指南。展示在 /guides 列表和详情页。适合深度内容、SEO 长尾词。
+src/app/(admin)/admin/cms/page.tsx:436:                    <Link href={`/guides/${a.slug}`} target="_blank" className="text-teal-600 hover:text-teal-700 mr-3 inline-flex items-center gap-1 min-h-[44px]"><LinkIcon className="w-3 h-3" /> 预览</Link>
+src/app/(admin)/admin/levels/levels-client.tsx:47:        <Link href="/admin/community/badges" className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 transition-colors">
+src/app/(admin)/admin/levels/levels-client.tsx:52:      <p className="text-sm text-gray-500">勋章管理已迁移至 <Link href="/admin/community/badges" className="text-blue-600 hover:underline">社区管理 → 勋章管理</Link></p>
+src/app/(admin)/admin/levels/page.tsx:1:// Server Component — levels management only. Badges moved to /admin/community/badges.
+src/app/(admin)/admin/community/comments/comments-client.tsx:18:    const res = await fetch(`/api/admin/community/comments/${id}`, {
+src/app/(admin)/admin/community/comments/comments-client.tsx:40:          <Link href="/admin/community/comments" className={`px-3 py-1.5 rounded-lg text-sm ${!currentStatus ? "bg-teal-600 text-white" : "bg-gray-100"}`}>全部</Link>
+src/app/(admin)/admin/community/comments/comments-client.tsx:42:            <Link key={s} href={`/admin/community/comments?status=${s}`} className={`px-3 py-1.5 rounded-lg text-sm ${currentStatus === s ? "bg-teal-600 text-white" : "bg-gray-100"}`}>{s}</Link>
+src/app/(admin)/admin/community/comments/comments-client.tsx:55:              <Link href={`/community/t/${c.post.slug}`} className="text-xs text-teal-600 hover:underline">回复: {c.post.title}</Link>
+src/app/(admin)/admin/community/posts/posts-client.tsx:94:    return qs ? `/admin/community/posts?${qs}` : "/admin/community/posts";
+src/app/(admin)/admin/community/posts/posts-client.tsx:107:    const res = await fetch(`/api/admin/community/posts/${id}`, {
+src/app/(admin)/admin/community/posts/posts-client.tsx:216:                      href={`/community/t/${p.slug}`}
+src/app/(admin)/admin/community/posts/posts-client.tsx:333:                href={`/community/t/${p.slug}`}
+src/app/(admin)/admin/community/reputation/reputation-client.tsx:72:      const res = await fetch("/api/admin/community/honor", {
+src/app/(admin)/admin/community/reputation/reputation-client.tsx:87:        const logRes = await fetch("/api/admin/community/honor?pageSize=30");
+src/app/(admin)/admin/community/flagged/reports-client.tsx:19:    const res = await fetch(`/api/admin/community/flagged/${id}`, {
+src/app/(admin)/admin/community/flagged/reports-client.tsx:56:                <Link href={`/community/t/${r.post.slug}`} className="font-medium text-gray-900 hover:underline">{r.post.title}</Link>
+src/app/(admin)/admin/community/layout.tsx:5:  { href: "/admin/community/reputation", label: "荣誉管理", icon: Shield },
+src/app/(admin)/admin/community/layout.tsx:6:  { href: "/admin/community/badges", label: "勋章管理", icon: Award },
+src/app/(admin)/admin/community/users/[id]/detail-client.tsx:46:      const res = await fetch("/api/admin/community/badges/grant", {
+src/app/(admin)/admin/community/users/[id]/detail-client.tsx:70:      const res = await fetch("/api/admin/community/badges/grant", {
+src/app/(admin)/admin/community/users/[id]/page.tsx:37:    prisma.communityStat.findUnique({ where: { userId: id } }),
+src/app/(admin)/admin/community/dashboard-client.tsx:49:      href: "/admin/community/posts",
+src/app/(admin)/admin/community/dashboard-client.tsx:56:      href: "/admin/community/comments",
+src/app/(admin)/admin/community/dashboard-client.tsx:63:      href: "/admin/community/posts?status=pending",
+src/app/(admin)/admin/community/dashboard-client.tsx:70:      href: "/admin/community/comments?status=pending",
+src/app/(admin)/admin/community/dashboard-client.tsx:77:      href: "/admin/community/flagged",
+src/app/(admin)/admin/community/dashboard-client.tsx:84:      href: "/admin/community/posts?status=hidden",
+src/app/(admin)/admin/community/dashboard-client.tsx:91:      href: "/admin/community/posts",
+src/app/(admin)/admin/community/dashboard-client.tsx:98:      href: "/admin/community/comments",
+src/app/(admin)/admin/community/dashboard-client.tsx:105:      href: "/admin/community/reputation",
+src/app/(admin)/admin/community/dashboard-client.tsx:114:      href: "/admin/community/posts",
+src/app/(admin)/admin/community/dashboard-client.tsx:119:      href: "/admin/community/comments",
+src/app/(admin)/admin/community/dashboard-client.tsx:124:      href: "/admin/community/flagged",
+src/app/(admin)/admin/community/dashboard-client.tsx:129:      href: "/admin/community/reputation",
+src/app/(admin)/admin/community/badges/badges-client.tsx:33:const CATEGORIES = ["achievement", "milestone", "special", "community"];
+src/app/(admin)/admin/analytics/dashboard/page.tsx:105:    resources: ResourcesData;
+src/app/(admin)/admin/analytics/dashboard/page.tsx:113:    resources: boolean;
+src/app/(admin)/admin/analytics/dashboard/page.tsx:403:    { id: 'resources', label: '资源推荐', icon: Star },
+src/app/(admin)/admin/analytics/dashboard/page.tsx:472:      {subTab === 'resources' && <ResourcesSection data={data.funnels.resources} />}
+src/app/(admin)/layout.tsx:35:      { href: "/admin/community", label: "社区概览", icon: LayoutDashboard },
+src/app/(admin)/layout.tsx:36:      { href: "/admin/community/posts", label: "帖子管理", icon: MessageSquare },
+src/app/(admin)/layout.tsx:37:      { href: "/admin/community/comments", label: "评论管理", icon: MessageCircle },
+src/app/(admin)/layout.tsx:38:      { href: "/admin/community/flagged", label: "举报处理", icon: Flag },
+src/app/(admin)/layout.tsx:39:      { href: "/admin/community/reputation", label: "荣誉管理", icon: ThumbsUp },
+src/app/(admin)/layout.tsx:40:      { href: "/admin/community/badges", label: "勋章管理", icon: Award },
+src/app/(admin)/layout.tsx:41:      { href: "/admin/community/users", label: "用户社区资料", icon: Users },
+src/app/(admin)/layout.tsx:49:      { href: "/admin/resources", label: "🌍 网址导航大厅", icon: Globe },
+src/app/(admin)/layout.tsx:51:      { href: "/admin/destinations", label: "国家/地区 (pSEO)", icon: Globe },
+src/app/(admin)/layout.tsx:52:      { href: "/admin/resources/import", label: "资源导入", icon: Upload },
+src/components/home/mega-footer.tsx:37:      { label: "指南", href: "/guides" },
+src/components/home/mega-footer.tsx:41:      { label: "网址导航", href: "/resources" },
+src/components/home/featured-slider.tsx:40:    desc: "热门国家长居/工作签证指南",
+src/components/home/main-content-grid.tsx:86:  { label: "邮编查询", desc: "支持 200+ 国家", route: "/tools/postal-code", icon: "MapPin" },
+src/components/home/main-content-grid.tsx:90:  { label: "网址导航", desc: "出海工具集合", route: "/resources", icon: "Library" },
+src/components/home/main-content-grid.tsx:97:  { name: "Shopify 开店指南", url: "/resources/shopify", description: "从零搭建独立站全流程", category: "ecommerce", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:98:  { name: "Stripe 收款教程", url: "/resources/stripe", description: "跨境支付合规与费率", category: "tax", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:99:  { name: "跨境 ERP 选型对比", url: "/resources/erp", description: "主流 ERP 功能与价格分析", category: "business", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:100:  { name: "TikTok Shop 运营", url: "/resources/tiktok", description: "短视频电商从 0 到 1", category: "ecommerce", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:101:  { name: "各国清关政策汇总", url: "/resources/customs", description: "重点国家清关流程详解", category: "logistics", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:102:  { name: "美国销售税合规", url: "/resources/tax", description: "各州税率与申报指南", category: "tax", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:103:  { name: "Amazon 全球开店", url: "/resources/amazon", description: "各站点入驻条件与费用", category: "ecommerce", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:104:  { name: "国际快递渠道对比", url: "/resources/logistics", description: "DHL/FedEx/UPS 价格分析", category: "logistics", tags: [] as string[] },
+src/components/home/main-content-grid.tsx:379:          href="/resources"
+src/components/home/popular-tools-new.tsx:16:  { name: "邮编查询", desc: "支持 200+ 国家邮编校验", href: "/tools/postal-code", icon: "MapPin", usage: 12400, favs: 890, rating: "4.9", updated: "3天前" },
+src/components/home/featured-topics.tsx:9:  { href: "/topics/digital-nomad", title: "数字游民签证合集", desc: "热门国家长居/工作签证" },
+src/components/home/promo-section.tsx:55:                <div className="text-xs text-white font-bold">200+ 国家覆盖</div>
+src/components/home/hero-super-search.tsx:10:  { id: 'postal', label: '查邮编', icon: MapPin, placeholder: '输入国家/城市或邮编...', btn: '查询' },
+src/components/home/hero-super-search.tsx:13:  { id: 'community', label: '问社区', icon: MessageSquare, placeholder: '如：东南亚TikTok怎么开店？', btn: '发帖' },
+src/components/home/hero-super-search.tsx:121:    if (activeTab === 'community') {
+src/components/home/resource-nav.tsx:34:        <a href="/resources" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center gap-0.5">
+src/components/home/topics-section-new.tsx:11:  { href: "/topics/digital-nomad", title: "数字游民签证合集", desc: "热门国家长居/工作签证指南", image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=800&auto=format&fit=crop", tag: "签证" },
+src/components/home/starter-resources.tsx:3:import { starterResources, starterCategories, getResourcesByCategory } from '@/lib/data/starter-resources';
+src/components/home/starter-resources.tsx:11:  const resources = getResourcesByCategory(activeCategory);
+src/components/home/starter-resources.tsx:54:          {resources.map((resource) => (
+src/components/home/starter-resources.tsx:108:            href="/resources"
+src/components/home/tool-grid.tsx:17:  { name: '邮编查询', desc: '全球国家邮编地址', icon: MapPin, href: '/tools/postal-code', heat: '956', iconBg: 'from-violet-50 to-purple-50', iconColor: 'text-violet-600', audiences: ['all', 'student', 'nomad'] },
+src/components/home/quick-tools.tsx:31:  { href: "/resources", label: "网址导航", icon: Globe, color: "text-[#4f46e5]" },
+src/components/home/quick-tools.tsx:34:  { href: "/destinations", label: "海外仓", icon: Warehouse, color: "text-[#57534e]" },
+src/components/home/quick-tools.tsx:36:  { href: "/resources", label: "货运保险", icon: Shield, color: "text-[#dc2626]" },
+src/components/home/quick-tools.tsx:37:  { href: "/resources", label: "报关行", icon: Phone, color: "text-[#c026d3]" },
+src/components/home/market-overview.tsx:12:  { id: 'na', name: '北美', countries: [{ name: '加拿大', slug: 'canada' }, { name: '美国', slug: 'usa' }, { name: '墨西哥', slug: 'mexico' }], href: '/destinations', topics: 8, hot: true },
+src/components/home/market-overview.tsx:13:  { id: 'eu', name: '欧洲', countries: [{ name: '英国', slug: 'uk' }, { name: '德国', slug: 'germany' }, { name: '法国', slug: 'france' }], href: '/destinations', topics: 6 },
+src/components/home/market-overview.tsx:14:  { id: 'sea', name: '东南亚', countries: [{ name: '马来西亚', slug: 'malaysia' }, { name: '泰国', slug: 'thailand' }, { name: '菲律宾', slug: 'philippines' }], href: '/destinations', topics: 12, hot: true },
+src/components/home/market-overview.tsx:15:  { id: 'ea', name: '日韩', countries: [{ name: '日本', slug: 'japan' }, { name: '韩国', slug: 'south-korea' }], href: '/destinations', topics: 5 },
+src/components/home/market-overview.tsx:16:  { id: 'latam', name: '拉美', countries: [{ name: '巴西', slug: 'brazil' }, { name: '智利', slug: 'chile' }, { name: '阿根廷', slug: 'argentina' }], href: '/destinations', topics: 4 },
+src/components/home/market-overview.tsx:17:  { id: 'me', name: '中东', countries: [{ name: '阿联酋', slug: 'uae' }, { name: '沙特', slug: 'saudi-arabia' }], href: '/destinations', topics: 3, isNew: true },
+src/components/home/market-overview.tsx:18:  { id: 'oc', name: '澳洲', countries: [{ name: '澳大利亚', slug: 'australia' }, { name: '新西兰', slug: 'new-zealand' }], href: '/destinations', topics: 4 },
+src/components/home/market-overview.tsx:28:            🌍 全球目的地全景向导
+src/components/home/market-overview.tsx:30:          <p className="mt-0.5 text-sm text-gray-500">按国家或地区，探索专属于您的政策指南、实用工具与服务</p>
+src/components/home/market-overview.tsx:32:        <a href="/destinations" className="text-sm font-medium text-teal-600 hover:text-teal-700 flex items-center gap-0.5">
+src/components/home/market-overview.tsx:33:          全部目的地 <ChevronRight className="w-4 h-4" />
+src/components/home/market-overview.tsx:62:                      href={`/destinations/${slug}`}
+src/components/home/popular-tools.tsx:21:  { name: "邮编查询", desc: "支持200+国家邮编校验", href: "/tools/postal-code", icon: "MapPin" },
+src/components/home/popular-tools.tsx:39:  { name: "目的国指南", desc: "各国清关与派送", href: "/destinations", icon: "Globe" },
+src/components/home/popular-tools.tsx:40:  { name: "资源导航", desc: "出海必备资源合集", href: "/resources", icon: "LinkIcon" },
+src/components/ui-lab/jueshi-v4/JueshiV4Sidebar.tsx:81:      { id: 'guides', label: '指南文章', icon: BookOpen },
+src/components/ui-lab/jueshi-v4/JueshiV4Sidebar.tsx:109:      { id: 'community', label: '社区', icon: Users },
+src/components/ui-lab/jueshi-v4/JueshiV4Topbar.tsx:36:              placeholder="搜索工具、指南、资源、国家、城市..."
+src/components/ui-lab/jueshi-v4/JueshiV4Hero.tsx:70:                  href="/guides"
+src/components/ui-lab/jueshi-v4/JueshiV4ContentSection.tsx:15:const guides = [
+src/components/ui-lab/jueshi-v4/JueshiV4ContentSection.tsx:78:          <Link href="/guides" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4/JueshiV4ContentSection.tsx:84:          {guides.map((guide) => (
+src/components/ui-lab/jueshi-v4/JueshiV4ContentSection.tsx:87:              href={`/guides/${guide.id}`}
+src/components/ui-lab/jueshi-v4/JueshiV4ProfileRail.tsx:37:    checklists: 3,
+src/components/ui-lab/jueshi-v4/JueshiV4ProfileRail.tsx:204:            <div className="text-lg font-bold text-[#6C5DD3]">{user.stats.checklists}</div>
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header.tsx:38:  const coreNavItems = navItems.filter(item => item.priority === 'core');
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header.tsx:62:                {coreNavItems.map((item) => (
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:20:  { label: '清单任务', href: '/checklists' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:21:  { label: '指南文章', href: '/guides' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:24:  { label: '留学指南', href: '/guides/study-abroad' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:25:  { label: '集运清单', href: '/checklists/shipping' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:29:  { label: '官方机构', href: '/resources/official' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:30:  { label: '支付收款', href: '/resources/payment' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:31:  { label: '跨境电商', href: '/resources/ecommerce' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:32:  { label: '物流查询', href: '/resources/logistics' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:33:  { label: '海外生活', href: '/resources/overseas' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:34:  { label: '留学教育', href: '/resources/education' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:43:  { label: '社区', href: '/community' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Footer.tsx:107:              <Link href="/community" className="text-sm text-white/60 hover:text-white transition-colors">
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:128:  communityEnterButton: ButtonConfig;
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:129:  communityViewMoreButton: ButtonConfig;
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:160:    { key: 'nav_checklist', label: '清单', href: '/checklists', enabled: true, external: false, sortOrder: 30, trackingKey: 'header_nav_checklist', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:161:    { key: 'nav_guides', label: '指南', href: '/guides', enabled: true, external: false, sortOrder: 40, trackingKey: 'header_nav_guides', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:162:    { key: 'nav_resources', label: '资源', href: '/resources', enabled: true, external: false, sortOrder: 50, trackingKey: 'header_nav_resources', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:163:    { key: 'nav_country', label: '国家', href: '/destinations', enabled: true, external: false, sortOrder: 55, trackingKey: 'header_nav_country', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:165:    { key: 'nav_community', label: '社区', href: '/community', enabled: true, external: false, sortOrder: 70, trackingKey: 'header_nav_community', priority: 'extended' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:167:  headerSearchPlaceholder: '搜索工具、指南、资源、国家、城市...',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:175:  heroSecondaryCta: { key: 'hero_secondary_cta', label: '查看清单指南', href: '/checklists', enabled: true, variant: 'secondary', external: false, sortOrder: 20, trackingKey: 'home_hero_secondary_checklists' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:197:  communityEnterButton: { key: 'community_enter', label: '进入社区', href: '/community', enabled: true, variant: 'primary', external: false, sortOrder: 10, trackingKey: 'community_enter' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:198:  communityViewMoreButton: { key: 'community_view_more', label: '查看更多', href: '/community', enabled: true, variant: 'link', external: false, sortOrder: 20, trackingKey: 'community_view_more' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:209:    { key: 'mobile_tab_checklist', label: '清单', href: '/checklists', icon: 'CheckSquare', enabled: true, isCenterAction: false, sortOrder: 40, trackingKey: 'mobile_tab_checklist' },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:276:      groupKey: 'home_community_ad_group',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:279:      position: 'community',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:288:        { slotKey: 'home_community_text', placement: 'AD_HOME_COMMUNITY_TEXT', enabled: true, fallbackMode: 'hide', sortOrder: 10 },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts:289:        { slotKey: 'home_community_image', placement: 'AD_HOME_COMMUNITY_IMAGE', enabled: true, fallbackMode: 'hide', sortOrder: 20 },
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:261:    groupKey: 'home_community_ad_group',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:264:    position: 'community',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:274:        slotKey: 'home_community_text',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:275:        groupKey: 'home_community_ad_group',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:282:          creativeKey: `community_text_${String(i + 1).padStart(2, '0')}`,
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:283:          slotKey: 'home_community_text',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:288:          href: `/ads/community-${i + 1}`,
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:300:        slotKey: 'home_community_image',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:301:        groupKey: 'home_community_ad_group',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:308:          creativeKey: `community_image_${String(i + 1).padStart(2, '0')}`,
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:309:          slotKey: 'home_community_image',
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:313:          imageUrl: `/images/ads/community-${i + 1}.jpg`,
+src/components/ui-lab/jueshi-v4-home-candidate-v4/adInventory.ts:314:          href: `/ads/community-image-${i + 1}`,
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:7:const communityStats = {
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:82:        <Link href="/community" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:105:              <span className="text-sm font-bold text-[#11142D]">{communityStats.todayDiscussions}</span>
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:112:              <span className="text-sm font-bold text-[#11142D]">{communityStats.activeUsers.toLocaleString()}</span>
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:119:              <span className="text-sm font-bold text-[#11142D]">{communityStats.newPosts}</span>
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:139:            href="/community"
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:150:            <Link href="/community" className="text-[11px] text-[#6C5DD3] hover:underline">
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4CommunitySection.tsx:162:                  href="/community"
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4AdSlot.tsx:33:  home_community_sidebar: {
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Hero.tsx:15:  { icon: CheckSquare, label: '清单任务', color: 'from-pink-400 to-rose-400', href: '/checklists', testId: 'home-hero-tool-checklist' },
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Hero.tsx:35:  { label: '准备出国留学', icon: '🎓', href: '/checklists/student-first-abroad', testId: 'home-hero-task-study-abroad' },
+src/components/ui-lab/jueshi-v4-home-candidate-v3/JueshiV4HomeCandidateV3Hero.tsx:152:                  href="/checklists"
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Workspace.tsx:26:    checklists: 3,
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Workspace.tsx:143:                  <span className="text-sm font-bold text-[#11142D]">{user.stats.checklists}</span>
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Workspace.tsx:201:            {/* Right: Badges + Checkin + Pending checklists */}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Workspace.tsx:234:              {/* Pending checklists */}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2TaskChains.tsx:73:    steps: ['选择国家', '查找机构', '访问官网', '办理业务'],
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2BottomTab.tsx:17:  { id: 'checklist', label: '清单', icon: CheckSquare, href: '/checklists' },
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ResourceNav.tsx:7:const resources = [
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ResourceNav.tsx:66:        <Link href="/resources" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ResourceNav.tsx:72:        {resources.map((resource) => {
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2ResourceNav.tsx:77:              href={`/resources/${resource.id}`}
+src/components/ui-lab/jueshi-v4-home-candidate-v2/JueshiV4HomeCandidateV2Hero.tsx:95:                  href="/checklists"
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4ResourceNav.tsx:7:const resources = [
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4ResourceNav.tsx:63:        <Link href="/resources" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4ResourceNav.tsx:69:        {resources.map((resource) => {
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4ResourceNav.tsx:74:              href={`/resources/${resource.id}`}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4WorkspaceCard.tsx:26:    checklists: 3,
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4WorkspaceCard.tsx:146:                  {user.stats.checklists}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:7:const checklists = [
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:26:    title: '初到新国家必做事项',
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:34:const guides = [
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:92:          <Link href="/checklists" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:98:          {checklists.map((item) => (
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:101:              href={`/checklists/${item.id}`}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:148:          <Link href="/guides" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:154:          {guides.map((item) => (
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4RecommendedContent.tsx:157:              href={`/guides/${item.id}`}
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TaskChains.tsx:58:    steps: ['选择国家', '查找机构', '访问官网', '办理业务'],
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHero.tsx:60:                  href="/checklists"
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:15:  { id: 'checklist', label: '清单', href: '/checklists' },
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:16:  { id: 'guides', label: '指南', href: '/guides' },
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:18:  { id: 'resources', label: '资源', href: '/resources' },
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:19:  { id: 'community', label: '社区', href: '/community' },
+src/components/ui-lab/jueshi-v4-topnav/JueshiV4TopNavHeader.tsx:67:                  placeholder="搜索工具、指南、资源、国家、城市..."
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHero.tsx:75:                  href="/checklists"
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:16:  { id: 'checklist', label: '清单', href: '/checklists', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:17:  { id: 'guides', label: '指南', href: '/guides', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:19:  { id: 'resources', label: '资源', href: '/resources', priority: 'core' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:20:  { id: 'community', label: '社区', href: '/community', priority: 'extended' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateHeader.tsx:92:                  placeholder="搜索工具、指南、资源、国家、城市..."
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateBottomTab.tsx:15:  { id: 'checklist', label: '清单', icon: CheckSquare, href: '/checklists' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:19:  { label: '清单任务', href: '/checklists' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:20:  { label: '指南文章', href: '/guides' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:23:  { label: '留学指南', href: '/guides/study-abroad' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:24:  { label: '集运清单', href: '/checklists/shipping' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:28:  { label: '官方机构', href: '/resources/official' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:29:  { label: '支付收款', href: '/resources/payment' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:30:  { label: '跨境电商', href: '/resources/ecommerce' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:31:  { label: '物流查询', href: '/resources/logistics' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:32:  { label: '海外生活', href: '/resources/overseas' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:33:  { label: '留学教育', href: '/resources/education' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:42:  { label: '社区', href: '/community' },
+src/components/ui-lab/jueshi-v4-home-candidate/JueshiV4HomeCandidateFooter.tsx:94:              <Link href="/community" className="text-sm text-white/60 hover:text-white transition-colors">
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:16:  { id: 'checklist', label: '清单', href: '/checklists' },
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:17:  { id: 'guides', label: '指南', href: '/guides' },
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:19:  { id: 'resources', label: '资源', href: '/resources' },
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:20:  { id: 'community', label: '社区', href: '/community' },
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHeader.tsx:72:                  placeholder="搜索工具、指南、资源、国家、城市..."
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedHero.tsx:76:                  href="/checklists"
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedWorkspaceCard.tsx:27:    checklists: 3,
+src/components/ui-lab/jueshi-v4-topnav-polished/JueshiV4TopNavPolishedWorkspaceCard.tsx:154:                  {user.stats.checklists}
+src/components/community-analytics.tsx:11:    if (pathname === "/community") {
+src/components/community-analytics.tsx:16:          eventType: "community_list_view",
+src/components/community-analytics.tsx:17:          toolName: "community",
+src/components/community-analytics.tsx:19:          path: "/community",
+src/components/community-analytics.tsx:27:    if (pathname.startsWith("/community/") && pathname !== "/community") {
+src/components/community-analytics.tsx:28:      const slug = pathname.split("/community/")[1];
+src/components/community-analytics.tsx:33:          eventType: "community_article_view",
+src/components/community-analytics.tsx:34:          toolName: "community",
+src/components/community-analytics.tsx:53:      eventType: "community_cta_click",
+src/components/community-analytics.tsx:54:      toolName: "community",
+src/components/community-analytics.tsx:56:      path: `/community/${slug}`,
+src/components/community-analytics.tsx:69:      eventType: "community_tool_continue",
+src/components/community-analytics.tsx:70:      toolName: "community",
+src/components/community-analytics.tsx:72:      path: `/community/${slug}`,
+src/components/tools/task-chain-next-step.tsx:152:    if (context.destinationCountry) summaryItems.push({ label: '目的地', value: context.destinationCountry });
+src/components/tools/task-chain-next-step.tsx:325:    { label: '检查集运清单', href: '/checklists/first-shipping-checklist', icon: <span className="text-sm">✅</span> },
+src/components/tools/task-chain-next-step.tsx:330:    { label: '检查集运清单', href: '/checklists/first-shipping-checklist', icon: <span className="text-sm">✅</span> },
+src/components/tools/task-chain-next-step.tsx:335:    { label: '检查集运清单', href: '/checklists/first-shipping-checklist', icon: <span className="text-sm">✅</span> },
+src/components/layout/footer-new.tsx:21:      { label: "资源导航", href: "/resources" },
+src/components/layout/footer-new.tsx:22:      { label: "目的地", href: "/destinations" },
+src/components/layout/footer-new.tsx:23:      { label: "指南", href: "/guides" },
+src/components/layout/JueshiV4PublicShell.tsx:14: * 用于所有需要 V4 Header/Footer 的公共页面（如 /resources）
+src/components/layout/footer.tsx:13:  { href: "/resources", label: "资源导航" },
+src/components/layout/footer.tsx:15:  { href: "/destinations", label: "目的地" },
+src/components/layout/footer.tsx:17:  { href: "/guides", label: "指南" },
+src/components/layout/footer.tsx:53:                { href: "/destinations", label: "目的地" },
+src/components/layout/header.tsx:27:  { href: "/guides", label: "百科指南", icon: BookOpen },
+src/components/layout/header.tsx:28:  { href: "/resources", label: "网址导航", icon: BookOpen },
+src/components/layout/header.tsx:29:  { href: "/checklists", label: "清单", icon: ListChecks },
+src/components/related-guides-section.tsx:15:  const [guides, setGuides] = useState<Guide[]>([]);
+src/components/related-guides-section.tsx:19:    fetch(`/api/guides?slugs=${slugs.join(',')}`)
+src/components/related-guides-section.tsx:28:  if (loading || guides.length === 0) return null;
+src/components/related-guides-section.tsx:37:        {guides.map((guide) => (
+src/components/related-guides-section.tsx:40:            href={`/guides/${guide.slug}`}
+src/components/workspace/WorkspaceSidebar.tsx:94:      { id: 'community', label: '社区', icon: Users, href: '/community' },
+src/components/command-palette.tsx:90:  { id: "nav-guides", title: "实用指南", href: "/guides", icon: <BookOpen className="w-4 h-4" />, keywords: ["guides", "指南", "攻略"] },
+src/components/command-palette.tsx:91:  { id: "nav-resources", title: "资源导航", href: "/resources", icon: <Library className="w-4 h-4" />, keywords: ["resources", "资源", "导航"] },
+src/components/related-tools-widget.tsx:36:    { name: '资源库', href: '/resources', emoji: '📚', desc: '海外生活和学习资源' },
+src/components/breadcrumb.tsx:11:  resources: '资源库',
+src/components/breadcrumb.tsx:12:  guides: '指南教程',
+src/components/related-checklist-section.tsx:18:  checklists?: RelatedChecklistCard[];
+src/components/related-checklist-section.tsx:19:  /** If provided, fetches published checklists that reference this tool */
+src/components/related-checklist-section.tsx:21:  /** All published checklists will be shown (filtered by relevance if possible) */
+src/components/related-checklist-section.tsx:26:export function RelatedChecklistSection({ checklists, toolSlug, showAll, sourcePath }: Props) {
+src/components/related-checklist-section.tsx:41:        const res = await fetch(`/api/checklists?${params}`, { signal: abort.signal });
+src/components/related-checklist-section.tsx:54:  // Use static checklists if provided (backwards compat), otherwise use fetched
+src/components/related-checklist-section.tsx:55:  const display = checklists && checklists.length > 0 ? checklists : fetched;
+src/components/related-checklist-section.tsx:81:            href={`/checklists/${cl.slug}`}
+src/components/countries/countries-index-client.tsx:73:            🌟 重点国家
+src/components/countries/countries-index-client.tsx:98:              placeholder="搜索国家/地区..."
+src/components/countries/countries-index-client.tsx:130:          共 {filtered.length} 个国家/地区
+src/components/countries/countries-index-client.tsx:176:            <p>未找到匹配的国家/地区</p>
+src/components/community/related-discussions.tsx:32:          href={`/community/new?tool=${encodeURIComponent(tool)}`}
+src/components/community/related-discussions.tsx:46:          href={`/community/new?tool=${encodeURIComponent(tool)}`}
+src/components/community/related-discussions.tsx:56:            href={`/community/t/${post.slug}`}
+src/components/community/related-discussions-client.tsx:47:            href={`/community/new?tool=${encodeURIComponent(tool)}`}
+src/components/community/related-discussions-client.tsx:58:              href={`/community/new?tool=${encodeURIComponent(tool)}`}
+src/components/community/related-discussions-client.tsx:69:                href={`/community/t/${post.slug}`}
+src/components/document-tools/tool-content-section.tsx:124:          <div className="border-t p-4" data-testid="tool-content-related-resources">
+src/components/home-live/HomeLivePage.tsx:17:  { icon: CheckSquare, label: '清单任务', color: 'from-pink-400 to-rose-400', href: '/checklists', testId: 'home-live-tool-checklists' },
+src/components/home-live/HomeLivePage.tsx:24:  { label: '准备出国留学', icon: '🎓', href: '/checklists/student-first-abroad', testId: 'home-live-task-study-abroad' },
+src/components/home-live/HomeLivePage.tsx:53:  { id: 'official', title: '我要找官方资源', description: '各国政府、海关、移民局官网汇总', time: '10分钟', audience: '所有用户', steps: ['选择国家', '查找机构', '访问官网', '办理业务'], related: ['资源导航', '翻译工具', '清单任务'] },
+src/components/home-live/HomeLivePage.tsx:69:const communityStats = {
+src/components/home-live/HomeLivePage.tsx:93:const checklists = [
+src/components/home-live/HomeLivePage.tsx:96:  { id: 'new-country', title: '初到新国家必做事项', description: '银行、手机、租房、注册，一步步来', progress: 25, tags: ['生活', '新手'], updated: '2024-01-10' },
+src/components/home-live/HomeLivePage.tsx:100:const guides = [
+src/components/home-live/HomeLivePage.tsx:114:const resources = [
+src/components/home-live/HomeLivePage.tsx:152:              <Link href="/checklists" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">清单</Link>
+src/components/home-live/HomeLivePage.tsx:153:              <Link href="/guides" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">指南</Link>
+src/components/home-live/HomeLivePage.tsx:154:              <Link href="/resources" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">资源</Link>
+src/components/home-live/HomeLivePage.tsx:224:                <Link href="/checklists" className="px-5 py-2.5 bg-white text-[#6C5DD3] border border-[#6C5DD3]/20 rounded-xl text-sm font-medium hover:bg-[#6C5DD3]/5 transition-all">
+src/components/home-live/HomeLivePage.tsx:485:        <Link href="/community" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/home-live/HomeLivePage.tsx:503:              <span className="text-sm font-bold text-[#11142D]">{communityStats.todayDiscussions}</span>
+src/components/home-live/HomeLivePage.tsx:510:              <span className="text-sm font-bold text-[#11142D]">{communityStats.activeUsers.toLocaleString()}</span>
+src/components/home-live/HomeLivePage.tsx:517:              <span className="text-sm font-bold text-[#11142D]">{communityStats.newPosts}</span>
+src/components/home-live/HomeLivePage.tsx:528:          <Link href="/community" className="block w-full text-center py-2.5 bg-[#6C5DD3] text-white rounded-lg text-xs font-medium hover:bg-[#5A4FBF] transition-colors">
+src/components/home-live/HomeLivePage.tsx:535:            <Link href="/community" className="text-[11px] text-[#6C5DD3] hover:underline">查看更多</Link>
+src/components/home-live/HomeLivePage.tsx:542:                <Link key={post.id} href="/community" className="group block p-3 bg-[#F8F9FC] rounded-lg hover:bg-[#F3F5FA] transition-colors">
+src/components/home-live/HomeLivePage.tsx:576:          <Link href="/checklists" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/home-live/HomeLivePage.tsx:581:          {checklists.map((item) => (
+src/components/home-live/HomeLivePage.tsx:582:            <Link key={item.id} href={`/checklists/${item.id}`} className="group bg-white rounded-xl p-4 md:p-5 border border-[#E8ECF3] hover:shadow-[0_18px_45px_rgba(17,20,45,0.10)] hover:border-[#6C5DD3]/20 transition-all">
+src/components/home-live/HomeLivePage.tsx:614:          <Link href="/guides" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/home-live/HomeLivePage.tsx:619:          {guides.map((item) => (
+src/components/home-live/HomeLivePage.tsx:620:            <Link key={item.id} href={`/guides/${item.id}`} className="group bg-white rounded-xl p-4 md:p-5 border border-[#E8ECF3] hover:shadow-[0_18px_45px_rgba(17,20,45,0.10)] hover:border-[#6C5DD3]/20 transition-all">
+src/components/home-live/HomeLivePage.tsx:679:        <Link href="/resources" className="inline-flex items-center gap-1 text-xs text-[#6C5DD3] hover:underline font-medium">
+src/components/home-live/HomeLivePage.tsx:684:        {resources.map((resource) => {
+src/components/home-live/HomeLivePage.tsx:687:            <Link key={resource.id} href={`/resources/${resource.id}`} className="group bg-white rounded-xl p-5 border border-[#E8ECF3] hover:shadow-[0_18px_45px_rgba(17,20,45,0.10)] hover:border-[#6C5DD3]/20 transition-all">
+src/components/home-live/HomeLivePage.tsx:754:              <li><Link href="/checklists" className="text-xs text-[#808191] hover:text-[#6C5DD3]">清单任务</Link></li>
+src/components/home-live/HomeLivePage.tsx:755:              <li><Link href="/guides" className="text-xs text-[#808191] hover:text-[#6C5DD3]">指南文章</Link></li>
+src/components/home-live/HomeLivePage.tsx:762:              <li><Link href="/resources" className="text-xs text-[#808191] hover:text-[#6C5DD3]">资源导航</Link></li>
+src/components/home-live/HomeLivePage.tsx:763:              <li><Link href="/community" className="text-xs text-[#808191] hover:text-[#6C5DD3]">社区论坛</Link></li>
+src/components/home-live/HomeLivePage.tsx:796:        <Link href="/checklists" className="flex flex-col items-center gap-1 px-3 py-2 text-[#808191]">

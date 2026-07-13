@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { buildCanonical, buildTitle } from '@/lib/seo';
 import PricingClient from './pricing-client';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const metadata: Metadata = {
   title: buildTitle('价格方案与会员权益'),
@@ -14,5 +15,9 @@ export const metadata: Metadata = {
 };
 
 export default function PricingPage() {
-  return <PricingClient />;
+  return (
+    <JueshiV4PublicShell>
+      <PricingClient />
+    </JueshiV4PublicShell>
+  );
 }

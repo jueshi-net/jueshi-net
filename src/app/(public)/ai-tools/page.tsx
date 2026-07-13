@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { buildCanonical, buildTitle } from "@/lib/seo";
 import { FileText, Languages, FileSearch, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export const metadata: Metadata = {
   title: buildTitle("AI 工具集"),
@@ -49,7 +50,7 @@ const colorMap: Record<string, { bg: string; icon: string; badge: string }> = {
 
 export default function AiToolsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <JueshiV4PublicShell>
       {/* Hero */}
       <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
@@ -114,6 +115,6 @@ export default function AiToolsPage() {
           <p className="text-xs text-gray-400 mt-1">AI 图片处理、智能客服话术、多语言 SEO 优化等</p>
         </div>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }

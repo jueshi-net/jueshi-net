@@ -1,0 +1,454 @@
+# Code Bridge Rate Limit Policy
+
+**Version:** 1.0  
+**Last Updated:** 2026-07-07  
+**Mode:** DEV (staging only)
+
+---
+
+## 1. Core Principle
+
+**claude-safe is the ONLY allowed entry point for Claude Code calls.**
+
+- ❌ Direct `claude` command execution is FORBIDDEN for business tasks
+- ✅ All Claude Code calls MUST go through `claude-safe` wrapper
+- ✅ Rate limiting and 429 detection are MANDATORY
+
+---
+
+## 2. Claude-Safe Configuration
+
+### Location
+```
+/Users/chq/bin/claude-safe
+```
+
+### Critical Requirements
+1. **settings.json 必须使用 env 结构** - 不支持旧的 apiKey/baseUrl 格式
+2. **claude-safe 必须调用真实 Claude 二进制绝对路径** - `/Users/chq/.hermes/node/bin/claude`
+3. **shim 只能用于拦截 Code Bridge 的 claude 命令** - 不能全局替换
+4. **防止递归** - shim → claude-safe → 真实 claude，不能 shim → claude-safe → shim
+
+### Exit Codes
+| Code | Meaning | Action |
+|------|---------|--------|
+| 0 | Success | Continue |
+| 75 | Rate Limited (429/Provider Rate Limit) | STOP, report `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN` or `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN` |
+| 76 | Cooldown Active or Concurrent Call Blocked | STOP, report `CLAUDE_CODE_COOLDOWN_ACTIVE` or `CLAUDE_CODE_CONCURRENT_CALL_BLOCKED` |
+| 1 | General Failure | STOP, report `CODE_BRIDGE_CALL_FAILED_NO_FALLBACK` |
+
+### Throttling Parameters
+- **Minimum interval between calls:** 30 seconds (default)
+- **First rate limit pause:** 1320 seconds (22 minutes)
+- **Repeat rate limit pause (within 1 hour):** 1800 seconds (30 minutes)
+- **Rate limit exit code:** 75 (not 429, to avoid shell exit code issues)
+- **Cooldown/concurrent exit code:** 76
+
+### State Files
+```
+~/.claude-code-bridge/
+├── claude-safe.log              # Call log
+├── last-call.ts                 # Last call timestamp
+├── last-output.txt              # Last call output
+├── rate-limit.lock              # 429 lock file (contains unlock timestamp)
+├── rate-limit-history.ts        # Last rate limit timestamp (for repeat detection)
+└── claude-safe-running.lock     # Running lock (prevents concurrent calls)
+```
+
+---
+
+## 3. Hermes Code Bridge Integration
+
+### Current Status
+- **Shim created:** `~/bin/claude-bridge-shim/claude` → calls `claude-safe`
+- **PATH priority:** Shim directory should be first in PATH for Code Bridge calls
+- **Skill file:** `~/.hermes/plugins/hermes-code-bridge/skills/hermes-code-bridge/SKILL.md`
+  - Currently references `claude` command directly
+  - Needs update to use `claude-safe` or ensure PATH includes shim
+
+### Required PATH Configuration
+```bash
+export PATH="/Users/chq/bin/claude-bridge-shim:/Users/chq/bin:$PATH"
+```
+
+This ensures:
+1. `claude` command resolves to shim
+2. Shim calls `claude-safe`
+3. `claude-safe` calls real `claude` with rate limiting
+
+---
+
+## 4. Rate Limit Detection
+
+### Detection Keywords
+`claude-safe` monitors output for:
+- `429`
+- `rate limit`
+- `rate-limiting`
+- `too many requests`
+- `quota`
+- `throttle`
+- `The model provider is rate-limiting requests`
+- `Please wait a moment and try again`
+
+### Detection Logic
+```bash
+if grep -Ei "429|rate limit|rate-limiting|too many requests|quota|throttle|The model provider is rate-limiting requests|Please wait a moment and try again" "$STATE_DIR/last-output.txt"; then
+  # Check if this is a repeat rate limit (within 1 hour)
+  if [ -f "$RATE_LIMIT_HISTORY_FILE" ]; then
+    last_rate_limit="$(cat "$RATE_LIMIT_HISTORY_FILE")"
+    time_since_last=$(( $(date +%s) - last_rate_limit ))
+    one_hour=3600
+    
+    if [ "$time_since_last" -lt "$one_hour" ]; then
+      # Repeat rate limit - pause 30 minutes
+      pause_duration=1800
+      rate_limit_type="repeat"
+      echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN" >> "$LOG_FILE"
+    else
+      # First rate limit - pause 22 minutes
+      pause_duration=1320
+      rate_limit_type="first"
+      echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN" >> "$LOG_FILE"
+    fi
+  else
+    # First rate limit - pause 22 minutes
+    pause_duration=1320
+    rate_limit_type="first"
+    echo "CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN" >> "$LOG_FILE"
+  fi
+  
+  # Record this rate limit timestamp
+  date +%s > "$RATE_LIMIT_HISTORY_FILE"
+  
+  # Create lock file
+  pause_until=$(( $(date +%s) + pause_duration ))
+  echo "$pause_until" > "$LOCK_FILE"
+  
+  # Log detection
+  echo "CLAUDE_CODE_RATE_LIMIT_DETECTED pause_seconds=$pause_duration type=$rate_limit_type" >> "$LOG_FILE"
+  
+  # Exit with code 75
+  exit 75
+fi
+```
+
+### Tiered Rate Limit Strategy
+1. **First rate limit detected:**
+   - Pause for 22 minutes (1320 seconds)
+   - Output: `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN`
+   - Exit code: 75
+
+2. **Second rate limit within 1 hour:**
+   - Pause for 30 minutes (1800 seconds)
+   - Output: `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN`
+   - Exit code: 75
+
+3. **Third+ rate limit within 1 hour:**
+   - Continue with 30-minute pauses
+   - No further escalation
+
+---
+
+## 5. Failure Handling Rules
+
+### Rule 1: No Fallback to Direct Code Writing
+**When Claude Code fails (exit code != 0 and != 75 and != 76):**
+- ❌ Hermes MUST NOT fallback to writing code directly
+- ✅ Hermes MUST report: `CODE_BRIDGE_CALL_FAILED_NO_FALLBACK`
+- ✅ Hermes MUST stop and wait for user instruction
+
+### Rule 2: Rate Limit Handling (Exit Code 75)
+**When Claude Code is rate limited (exit code = 75):**
+- ❌ Hermes MUST NOT retry immediately
+- ✅ Hermes MUST check output for:
+  - `CLAUDE_CODE_RATE_LIMITED_PAUSED_22_MIN` → First rate limit, pause 22 minutes
+  - `CLAUDE_CODE_RATE_LIMITED_PAUSED_30_MIN` → Repeat rate limit, pause 30 minutes
+- ✅ Hermes MUST report the appropriate status
+- ✅ Hermes MUST stop and wait for user instruction
+
+### Rule 3: Cooldown/Concurrent Handling (Exit Code 76)
+**When claude-safe blocks due to cooldown or concurrent call (exit code = 76):**
+- ❌ Hermes MUST NOT retry immediately
+- ✅ Hermes MUST check output for:
+  - `CLAUDE_CODE_COOLDOWN_ACTIVE wait_left_seconds=X` → Normal cooldown, wait X seconds
+  - `CLAUDE_CODE_CONCURRENT_CALL_BLOCKED` → Another call is running
+- ✅ Hermes MUST report the appropriate status
+- ✅ Hermes MUST stop and wait for user instruction
+
+### Rule 4: Success Handling
+**When Claude Code succeeds (exit code = 0):**
+- ✅ Hermes MAY continue with the task
+- ✅ Hermes MUST verify the changes
+- ✅ Hermes MUST wait for user confirmation before next Claude Code call
+
+### Rule 5: Smart Cooldown Behavior
+**claude-safe implements intelligent cooldown:**
+- If remaining cooldown ≤ 10 seconds: sleep and proceed
+- If remaining cooldown > 10 seconds: exit 76 immediately (no long sleep)
+- This prevents Hermes from being blocked by long unnecessary sleeps
+
+---
+
+## 6. Development Workflow Rules
+
+### Rule 1: One Call Per Round
+- Each development round allows **maximum 1 Claude Code call**
+- After the call, MUST wait for user confirmation
+- No automatic retry or follow-up calls
+
+### Rule 2: No Visual Claims Without Screenshots
+- ❌ Cannot claim "视觉通过" (visual pass) without screenshots
+- ✅ Must provide screenshot evidence or explicitly state "截图失败" (screenshot failed)
+
+### Rule 3: No Completion Claims Without New Commit
+- ❌ Cannot claim "完成" (complete) without new commit
+- ✅ Must generate new commit with proper message
+- ✅ Must verify commit is not a duplicate
+
+### Rule 4: Non-Claude-Code Operations
+The following operations do NOT require Claude Code calls and can be executed directly:
+- ✅ Shell verification commands (git status, git diff, etc.)
+- ✅ Build commands (npm run build, etc.)
+- ✅ HTTP requests (curl, wget, etc.)
+- ✅ Process management (PM2 restart, PM2 status, etc.)
+- ✅ File system operations (ls, cat, grep, etc.)
+- ✅ Database queries (read-only)
+- ✅ Log inspection
+
+**Only use Claude Code for:**
+- Code generation and modification
+- Complex debugging and analysis
+- Architecture design and planning
+- Code review and optimization
+
+---
+
+## 7. Smoke Test Requirements
+
+### Pre-Flight Check
+Before any Claude Code call:
+1. Verify `claude-safe` exists and is executable
+2. Verify PATH includes shim directory
+3. Verify Claude Code is authenticated (`claude --version` should work)
+4. Check `rate-limit.lock` - if exists and not expired, STOP
+
+### Smoke Test Procedure
+1. Call `claude-safe` with simple prompt: "只回答：CLAUDE_SAFE_BRIDGE_OK"
+2. Check exit code:
+   - 0: Success, check output contains `CLAUDE_SAFE_BRIDGE_OK`
+   - 75: Rate limited, STOP
+   - Other: Failure, STOP
+3. **Verify `claude-safe.log` has new entry** - 必须确认日志有新增记录
+4. Verify `last-output.txt` contains expected output
+5. Verify no business files were modified
+
+### Smoke Test Validation
+```bash
+# 1. 执行 smoke test
+cd /tmp && PATH="/Users/chq/bin/claude-bridge-shim:$PATH" claude -p "只回答 CLAUDE_SAFE_BRIDGE_OK"
+
+# 2. 检查日志新增记录
+tail -1 ~/.claude-code-bridge/claude-safe.log
+# 必须看到新的 CLAUDE_SAFE_EXIT status=0 记录
+
+# 3. 检查输出
+cat ~/.claude-code-bridge/last-output.txt
+# 必须包含 CLAUDE_SAFE_BRIDGE_OK
+
+# 4. 检查无业务改动
+cd /Users/chq/xixiong-saas && git status --short
+# 必须为空
+```
+
+### Smoke Test Gate
+**未通过 smoke test 前禁止真实开发。**
+
+必须满足以下条件才能开始真实开发：
+- ✅ claude-safe.log 有新增记录
+- ✅ last-output.txt 包含 CLAUDE_SAFE_BRIDGE_OK
+- ✅ git status --short 为空
+- ✅ 退出码为 0
+
+如果任一条件不满足，必须停止并报告：
+- `CODE_BRIDGE_STILL_CALLS_RAW_CLAUDE` - 如果 Code Bridge 绕过 claude-safe
+- `CLAUDE_CODE_AUTH_STILL_NOT_READY` - 如果认证失败
+- `CLAUDE_SAFE_RECURSION_FOUND` - 如果出现递归
+
+---
+
+## 8. Troubleshooting
+
+### Issue: Claude Code Not Authenticated
+**Symptom:** `claude --version` returns error or requires login  
+**Solution:**
+
+**百炼模式（推荐）：**
+```bash
+# 1. 设置 ~/.claude.json 跳过 onboarding
+cat > ~/.claude.json <<EOF
+{
+  "hasCompletedOnboarding": true
+}
+EOF
+
+# 2. 设置 ~/.claude/settings.json 使用 env 结构
+cat > ~/.claude/settings.json <<EOF
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "YOUR_API_KEY",
+    "ANTHROPIC_BASE_URL": "https://coding.dashscope.aliyuncs.com/apps/anthropic",
+    "ANTHROPIC_MODEL": "qwen3-coder-plus"
+  }
+}
+EOF
+
+# 3. 验证
+claude --version
+```
+
+**Anthropic 官方模式（不推荐）：**
+```bash
+claude login
+# Follow authentication flow
+```
+
+**注意：** 百炼模式下不要执行 `claude login`，会覆盖配置。
+
+### Issue: Rate Limit Lock Stuck
+**Symptom:** All calls return exit code 75  
+**Solution:**
+```bash
+# Check lock file
+cat ~/.claude-code-bridge/rate-limit.lock
+
+# If timestamp is in the past, remove lock
+rm ~/.claude-code-bridge/rate-limit.lock
+```
+
+### Issue: Shim Not Being Used
+**Symptom:** Calls bypass rate limiting  
+**Solution:**
+```bash
+# Verify PATH
+echo $PATH | tr ':' '\n' | grep claude-bridge-shim
+
+# Verify shim
+which claude
+# Should return: /Users/chq/bin/claude-bridge-shim/claude
+
+# If not, update PATH
+export PATH="/Users/chq/bin/claude-bridge-shim:$PATH"
+```
+
+---
+
+## 9. Rollback Plan
+
+### Disable claude-safe
+```bash
+# Remove shim from PATH
+export PATH=$(echo $PATH | sed 's|/Users/chq/bin/claude-bridge-shim:||g')
+
+# Verify direct claude works
+which claude
+# Should return: /Users/chq/.hermes/node/bin/claude
+```
+
+### Remove Rate Limiting
+```bash
+# Remove lock file
+rm ~/.claude-code-bridge/rate-limit.lock
+
+# Reset last call timestamp
+rm ~/.claude-code-bridge/last-call.ts
+```
+
+---
+
+## 10. Compliance Checklist
+
+Before each Claude Code call, verify:
+- [ ] Using `claude-safe` (not direct `claude`)
+- [ ] PATH includes shim directory
+- [ ] No rate limit lock active
+- [ ] Minimum 5 minutes since last call
+- [ ] User confirmation received for this round
+- [ ] No fallback to direct code writing on failure
+
+After each Claude Code call, verify:
+- [ ] Exit code is 0 (success) or 75 (rate limited)
+- [ ] Output logged to `claude-safe.log`
+- [ ] No business files modified unexpectedly
+- [ ] User informed of result
+- [ ] Waiting for user confirmation before next call
+
+---
+
+## 11. Protection Scope and Limitations
+
+### What claude-safe Protects
+
+✅ **claude-safe ONLY protects:**
+- Claude Code CLI calls through `claude` command
+- Calls routed through Code Bridge shim
+- Direct calls to `~/bin/claude-safe`
+
+### What claude-safe Does NOT Protect
+
+❌ **claude-safe does NOT protect:**
+- Hermes internal judge loop model calls
+- Hermes own LLM provider calls (alibaba/openrouter/etc)
+- Hermes self-improvement mechanism model calls
+- Any model calls that don't go through `claude` CLI
+
+### Critical: Hermes Judge Loop Rate Limit Handling
+
+**When Hermes judge loop receives RateLimitError:**
+
+1. ❌ MUST NOT continue `Continuing toward goal (N/20)`
+2. ❌ MUST NOT continue judge retry
+3. ❌ MUST NOT enter next goal round
+4. ❌ MUST NOT execute self-improvement
+5. ❌ MUST NOT patch SKILL.md automatically
+6. ❌ MUST NOT call Claude Code
+7. ❌ MUST NOT fallback to writing code directly
+8. ✅ MUST stop current goal immediately
+9. ✅ MUST report rate limit status
+10. ✅ MUST wait for user confirmation
+
+**Pause Duration:**
+- First rate limit: 22 minutes (1320 seconds)
+- Repeat rate limit (within 1 hour): 30 minutes (1800 seconds)
+
+### Self-Improvement Freeze During Rate Limit
+
+**During rate limit pause, self-improvement is FORBIDDEN:**
+
+- ❌ No automatic SKILL.md patching
+- ❌ No automatic skill file modification
+- ❌ No automatic skill creation
+- ❌ No automatic documentation updates
+- ❌ No automatic config changes
+
+**Only allowed during rate limit:**
+- ✅ Read-only audit (check files, logs, status)
+- ✅ Report status to user
+- ✅ Wait for user instruction
+- ✅ Execute read-only shell commands (ls, cat, grep)
+- ✅ Check process status (ps aux)
+- ✅ Check lock file status
+
+**See also:** `~/.hermes/policies/rate-limit-failsafe-policy.md` for detailed failsafe rules.
+
+---
+
+## 12. Contact & Support
+
+**Policy Owner:** Hermes Agent System  
+**Last Review:** 2026-07-07  
+**Next Review:** After first production use
+
+---
+
+**END OF POLICY**

@@ -4,7 +4,9 @@ import { getToolsData, CATEGORY_MAP } from '@/lib/tool-center';
 import ToolFilterBar from '@/components/tools/tool-filter-bar';
 import ToolGrid from '@/components/tools/tool-grid';
 import Link from 'next/link';
-import { FileText, ArrowRight, Wrench } from 'lucide-react';
+import { FileText, ArrowRight, BookOpen } from 'lucide-react';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PageContainer, PageHero, BreadcrumbBar, ContentSection, SectionHeader, PageCTA } from '@/components/design-system';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
   const params = await searchParams;
@@ -28,15 +30,14 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   };
 }
 
-// 高频工具 slug 列表，用于置顶显示
+// Six quick tools — must be accurate
 const PINNED_TOOL_SLUGS = [
   'postal-code',
   'hs-code',
   'exchange-rate',
-  'commercial-invoice',
-  'quote-sheet',
+  'address-formatter',
   'shipping-calculator',
-  'container',
+  'tracking',
 ];
 
 export default async function ToolsPage({ searchParams }: { searchParams: Promise<{ q?: string; cat?: string; sort?: string }> }) {
@@ -47,11 +48,11 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
   const tools = await getToolsData(query, category, sort);
 
-  // Compute which categories actually have tools (for hiding empty tabs)
+  // Compute which categories actually have tools
   const presentCats = new Set(tools.map(t => t.category));
   const presentCategories = Array.from(presentCats);
 
-  // 如果没有搜索词且没有分类过滤，将高频工具置顶
+  // Quick tools: pinned + rest
   const displayTools = (!query && !category) 
     ? [
         ...PINNED_TOOL_SLUGS
@@ -61,131 +62,155 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
       ]
     : tools;
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-12">
-      {/* Sticky Filter Bar */}
-      <ToolFilterBar
-        currentQuery={query}
-        currentCategory={category}
-        currentSort={sort}
-        presentCategories={presentCategories}
-      />
+  const breadcrumbs = [
+    { title: '首页', href: '/' },
+    { title: '工具中心' },
+  ];
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 pt-6">
-        {/* Template Studio CTA Banner */}
-        {!query && !category && (
-          <div className="mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-8 shadow-lg" data-testid="tools-template-cta-banner">
-            <div className="max-w-3xl">
-              <h2 className="text-3xl font-bold text-white mb-3">免费自定义你的单据模板</h2>
-              <p className="text-lg text-white/90 mb-6">自由拖拽设计报价单、发票、装箱单、商品标签，支持批量打印与导出 PNG。免费注册，限时免费使用。</p>
-              <div className="flex gap-4 flex-wrap">
-                <Link
-                  href="/tools/template-studio/canvas/new"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 text-base font-semibold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
-                  data-testid="tools-template-cta-create"
-                >
-                  <Wrench className="w-5 h-5" />
-                  立即创建模板
-                </Link>
-                <Link
-                  href="/workspace/templates"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white text-base font-semibold rounded-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
-                  data-testid="tools-template-cta-my-templates"
-                >
-                  <FileText className="w-5 h-5" />
-                  查看我的模板
-                </Link>
+  return (
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumb */}
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <BreadcrumbBar items={breadcrumbs} />
+        </div>
+
+        {/* Hero — uses standard PageHero */}
+        <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
+          <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+              <div className="flex-1">
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    实用工具
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    外贸单据
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
+                    跨境物流
+                  </span>
+                </div>
+                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
+                  {query ? `搜索: "${query}"` : '工具中心'}
+                </h1>
+                <p className="text-teal-100 mt-3 max-w-lg text-sm md:text-base">
+                  {query
+                    ? `共找到 ${tools.length} 个匹配项`
+                    : `${tools.length} 个工具可用 · 外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱`}
+                </p>
+              </div>
+              <div className="grid grid-cols-3 gap-3 lg:flex lg:gap-6">
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">{tools.length}</div>
+                  <div className="text-xs text-teal-200 mt-1">工具总数</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">{Object.keys(CATEGORY_MAP).length}</div>
+                  <div className="text-xs text-teal-200 mt-1">分类</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-extrabold">免费</div>
+                  <div className="text-xs text-teal-200 mt-1">开放使用</div>
+                </div>
               </div>
             </div>
           </div>
-        )}
-
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {query ? `搜索结果: "${query}"` : '工具中心'}
-          </h1>
-          <p className="text-gray-500 text-sm">
-            {tools.length} 个工具可用 {query ? `(共找到 ${tools.length} 个匹配项)` : ''}
-          </p>
-          {/* Documents hub CTA — only on default view */}
-          {!query && !category && (
-            <div className="mt-3 flex items-center gap-2 flex-wrap">
-              <Link
-                href="/tools/documents"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-100 transition-colors border border-purple-200"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                外贸单据模板中心
-                <ArrowRight className="w-3 h-3" />
-              </Link>
-              <Link
-                href="/tools/template-studio"
-                data-testid="tools-template-studio-card"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors border border-blue-200"
-              >
-                <Wrench className="w-3.5 h-3.5" />
-                模板设计器
-                <ArrowRight className="w-3 h-3" />
-              </Link>
-              <Link
-                href="/workspace/templates"
-                data-testid="tools-my-templates-card"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 text-xs font-medium rounded-lg hover:bg-green-100 transition-colors border border-green-200"
-              >
-                <FileText className="w-3.5 h-3.5" />
-                我的模板
-                <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-          )}
         </div>
 
-        <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
-          {tools.length === 0 && query ? (
-            <EmptySearchState query={query} />
-          ) : tools.length === 0 && category && category !== 'all' ? (
-            <EmptyCategoryState category={category} />
-          ) : (
-            <ToolGrid tools={displayTools} query={query} />
-          )}
+        {/* Filter Bar — matches /guides style */}
+        <Suspense fallback={null}>
+          <ToolFilterBar
+            currentQuery={query}
+            currentCategory={category}
+            presentCategories={presentCategories}
+          />
         </Suspense>
+
+        {/* Quick Tools */}
+        {!query && !category && (
+          <ContentSection className="max-w-6xl mx-auto px-4">
+            <SectionHeader
+              title="常用工具"
+              description="高频使用工具，快速入口"
+            />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {displayTools.slice(0, 6).map(tool => (
+                <Link
+                  key={tool.slug}
+                  href={tool.route || '/tools'}
+                  className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group block"
+                >
+                  <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-1 mb-2">
+                    {tool.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-2">{tool.description || '暂无描述'}</p>
+                  <div className="flex items-center gap-1 mt-3 text-sm text-teal-600">
+                    立即使用 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </ContentSection>
+        )}
+
+        {/* All Tools */}
+        <ContentSection className="max-w-6xl mx-auto px-4 pb-16">
+          <SectionHeader title={query ? '搜索结果' : (category && category !== 'all' ? (CATEGORY_MAP[category] || category) : '全部工具')} />
+
+          <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
+            {tools.length === 0 && query ? (
+              <EmptySearchState query={query} />
+            ) : tools.length === 0 && category && category !== 'all' ? (
+              <EmptyCategoryState category={category} />
+            ) : (
+              <ToolGrid tools={displayTools} query={query} />
+            )}
+          </Suspense>
+
+          {/* CTA — uses standard PageCTA */}
+          {!query && !category && (
+            <div className="mt-8">
+              <PageCTA
+                title="需要更多资源？"
+                description="查看我们的资源库，获取更多出海工具和指南"
+                actions={
+                  <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
+                    <BookOpen className="w-4 h-4" /> 查看资源库 →
+                  </Link>
+                }
+                lightBackground
+              />
+            </div>
+          )}
+        </ContentSection>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }
 
 function EmptySearchState({ query }: { query: string }) {
   return (
     <div className="text-center py-16">
-      <div className="text-6xl mb-4">🔍</div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <FileText className="w-14 h-14 mx-auto mb-4 text-gray-300" />
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">
         没有找到与 &quot;{query}&quot; 相关的工具
       </h2>
-      <p className="text-gray-500 mb-6">你可以试试以下热门工具：</p>
+      <p className="text-gray-500 mb-6">你可以试试其他关键词：</p>
       <div className="flex flex-wrap justify-center gap-3">
-        <Link href="/tools/postal-code" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools/postal-code" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           邮编查询
         </Link>
-        <Link href="/tools/hs-code" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools/hs-code" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           HS 编码
         </Link>
-        <Link href="/tools/exchange-rate" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools/exchange-rate" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           汇率换算
         </Link>
-        <Link href="/tools/documents/quotation" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-          报价单
-        </Link>
-        <Link href="/tools/shipping-calculator" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools/shipping-calculator" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           运费计算
         </Link>
-        <Link href="/tools/container" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-          集装箱计算
-        </Link>
       </div>
-      <p className="mt-6 text-sm text-gray-400">
-        也可以试试 <Link href="/tools/documents" className="text-purple-600 hover:underline">外贸单据模板中心</Link>
-      </p>
     </div>
   );
 }
@@ -194,23 +219,20 @@ function EmptyCategoryState({ category }: { category: string }) {
   const catName = CATEGORY_MAP[category] || category;
   return (
     <div className="text-center py-16">
-      <div className="text-6xl mb-4">🚧</div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <FileText className="w-14 h-14 mx-auto mb-4 text-gray-300" />
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">
         「{catName}」分类暂无工具
       </h2>
-      <p className="text-gray-500 mb-6">该分类正在建设中，敬请期待。你也可以浏览其他分类：</p>
+      <p className="text-gray-500 mb-6">该分类正在建设中，你也可以浏览其他分类：</p>
       <div className="flex flex-wrap justify-center gap-3">
-        <Link href="/tools" className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+        <Link href="/tools" className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-200 transition-all">
           全部工具
         </Link>
-        <Link href="/tools?cat=documents" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools?cat=documents" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           外贸单据
         </Link>
-        <Link href="/tools?cat=logistics" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
+        <Link href="/tools?cat=logistics" className="px-5 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 transition-all">
           物流工具
-        </Link>
-        <Link href="/tools?cat=general" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors">
-          编码查询
         </Link>
       </div>
     </div>

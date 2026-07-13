@@ -5,8 +5,8 @@ import { Check, X, Eye, Filter, Clock, CheckCircle, XCircle, Loader2, Shield } f
 import { track } from "@/lib/analytics";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 import { SectionCard } from "@/components/saas/SectionCard";
-import { StatusBadge } from "@/components/saas/StatusBadge";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
+import { EmptyState } from "@/components/design-system/EmptyState";
 
 interface Application {
   id: string;
@@ -156,7 +156,7 @@ export default function AdEntitlementsClient() {
             加载中...
           </div>
         ) : applications.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="暂无申请"
             description={`当前没有${statusFilter === "ALL" ? "" : STATUS_LABELS[statusFilter] + "的"}广告权益申请`}

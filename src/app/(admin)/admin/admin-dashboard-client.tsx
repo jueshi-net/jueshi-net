@@ -10,9 +10,9 @@ import type { AdminStatsData } from "@/lib/admin-stats";
 import { WorkspacePageHeader } from "@/components/saas/WorkspacePageHeader";
 import { SectionCard } from "@/components/saas/SectionCard";
 import { MetricCard } from "@/components/saas/MetricCard";
-import { StatusBadge } from "@/components/saas/StatusBadge";
+import { StatusBadge } from "@/components/design-system/StatusBadge";
 import { CompactTable } from "@/components/saas/CompactTable";
-import { SaasEmptyState } from "@/components/saas/SaasEmptyState";
+import { EmptyState } from "@/components/design-system/EmptyState";
 
 const LEVEL_NAMES: Record<string, string> = {
   lv1: "Lv.1 新手", lv2: "Lv.2 进阶", lv3: "Lv.3 精英",
@@ -64,7 +64,7 @@ export default function AdminDashboardClient({ stats }: { stats: AdminStatsData 
           </div>
         </SectionCard>
       ) : (
-        <SaasEmptyState
+        <EmptyState
           variant="error"
           title="运营数据加载失败"
           description="模块卡片仍可用，数据加载异常不影响基础功能"

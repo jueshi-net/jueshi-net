@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Check, X, Pin, PinOff, StickyNote, Search } from "lucide-react";
-import { WorkspacePageHeader, SaasEmptyState, SectionCard, StatusBadge } from "@/components/saas";
+import { WorkspacePageHeader, SectionCard } from "@/components/saas";
+import { EmptyState, StatusBadge } from "@/components/design-system";
 
 interface Memo {
   id: string;
@@ -171,14 +172,14 @@ export default function MemosClient() {
         {/* 备忘列表 */}
         {sorted.length === 0 ? (
           searchQuery ? (
-            <SaasEmptyState
+            <EmptyState
               variant="no-results"
               title="没有找到匹配的备忘"
               description="尝试使用不同的关键词搜索"
               primaryAction={{ label: "清除搜索", onClick: () => setSearchQuery("") }}
             />
           ) : (
-            <SaasEmptyState
+            <EmptyState
               variant="no-data"
               title="还没有备忘录"
               description="记录客户资料、物流备注、常用链接、灵感想法。置顶重要备忘，方便快速查找。"

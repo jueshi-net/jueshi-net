@@ -5,8 +5,8 @@ import { Gift, Plus, Edit2, Trash2, ToggleLeft, ToggleRight } from 'lucide-react
 import Link from 'next/link';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
-import { StatusBadge } from '@/components/saas/StatusBadge';
-import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
+import { EmptyState } from '@/components/design-system/EmptyState';
 
 interface RewardRule {
   id: string;
@@ -359,7 +359,7 @@ export default function AdminRewardRulesPage() {
         {loading ? (
           <div className="text-center text-gray-400 py-12">加载中...</div>
         ) : rules.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="还没有奖励规则"
             description="创建奖励规则，配置邀请奖励"

@@ -8,6 +8,15 @@ STAGING_SERVER="deploy@192.129.155.149"
 STAGING_DIR="/home/deploy/xixiong-saas-staging"
 PM2_APP="xixiong-staging"
 
+# P2 Deploy Guard: Check staging environment first
+echo "=== [0/5] Pre-deploy staging environment check ==="
+if ! bash scripts/check-staging.sh; then
+    echo "❌ Staging environment check failed. Aborting deployment."
+    exit 1
+fi
+echo "✅ Staging environment verified"
+echo ""
+
 # Environment guard
 ENV_MARKER=$(ssh "$STAGING_SERVER" "cat /etc/jueshi-environment 2>/dev/null || echo 'MISSING'")
 if ! echo "$ENV_MARKER" | grep -q "environment=staging"; then
@@ -53,10 +62,24 @@ ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +
 echo "=== [5/5] Restart PM2 ==="
 ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +a && PORT=3001 pm2 restart $PM2_APP --update-env && pm2 save"
 
+echo "=== [6/6] Write deployment manifest ==="
+LOCAL_COMMIT=$(git rev-parse HEAD)
+DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+BUILD_ID=$(ssh "$STAGING_SERVER" "cat $STAGING_DIR/.next/BUILD_ID" 2>/dev/null || echo 'unknown')
+
+ssh "$STAGING_SERVER" "echo '$LOCAL_COMMIT' > $STAGING_DIR/.deployed-commit"
+ssh "$STAGING_SERVER" "echo '$DEPLOY_TIME' > $STAGING_DIR/.deployed-at"
+ssh "$STAGING_SERVER" "echo '$BUILD_ID' > $STAGING_DIR/.deployed-build-id"
+
 echo ""
 echo "=== DEPLOY SUMMARY ==="
 echo "  Server: $STAGING_SERVER (staging)"
 echo "  PM2 app: $PM2_APP"
 echo "  PM2 restarts: $(ssh "$STAGING_SERVER" "pm2 jlist 2>/dev/null | python3 -c 'import sys,json;d=json.load(sys.stdin);[print(p[\"restart_time\"]) for p in d if p[\"name\"]==\"$PM2_APP\"]'" 2>/dev/null || echo 'unknown')"
-echo "  Build: $(ssh "$STAGING_SERVER" "cat $STAGING_DIR/.next/BUILD_ID" 2>/dev/null || echo 'unknown')"
+echo "  Deployed commit: $LOCAL_COMMIT"
+echo "  Deployed at: $DEPLOY_TIME"
+echo "  Build ID: $BUILD_ID"
 echo "  Health: $(ssh "$STAGING_SERVER" "curl -sI http://127.0.0.1:3001/ | head -1" 2>/dev/null || echo 'unknown')"
+echo ""
+echo "STAGING_GIT_HEAD_NOT_AUTHORITATIVE"
+echo "Use .deployed-commit for version verification"

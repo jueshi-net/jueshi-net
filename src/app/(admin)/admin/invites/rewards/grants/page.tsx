@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import { Gift, CheckCircle, XCircle, AlertCircle, Clock, RefreshCw } from 'lucide-react';
 import { WorkspacePageHeader } from '@/components/saas/WorkspacePageHeader';
 import { SectionCard } from '@/components/saas/SectionCard';
-import { StatusBadge } from '@/components/saas/StatusBadge';
+import { StatusBadge } from '@/components/design-system/StatusBadge';
 import { MetricCard } from '@/components/saas/MetricCard';
-import { SaasEmptyState } from '@/components/saas/SaasEmptyState';
+import { EmptyState } from '@/components/design-system/EmptyState';
 
 interface RewardGrant {
   id: string;
@@ -176,7 +176,7 @@ export default function AdminRewardGrantsPage() {
         {loading ? (
           <div className="text-center text-gray-400 py-12">加载中...</div>
         ) : grants.length === 0 ? (
-          <SaasEmptyState
+          <EmptyState
             variant="no-data"
             title="还没有奖励发放记录"
             description="当用户成功邀请好友注册后，奖励发放记录会显示在这里"
