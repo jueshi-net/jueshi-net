@@ -3,11 +3,14 @@
 import Link from 'next/link';
 import { Bell, Award, FileText, TrendingUp, Gift, ArrowRight } from 'lucide-react';
 
+type RightRailSection = 'notifications' | 'growth' | 'memos';
+
 interface WorkspaceRightRailProps {
   unreadNotifs: number;
   badgeCount: number;
   recentMemos: any[];
   userId: string;
+  hiddenSections?: RightRailSection[];
 }
 
 export default function WorkspaceRightRail({
@@ -15,59 +18,66 @@ export default function WorkspaceRightRail({
   badgeCount,
   recentMemos,
   userId,
+  hiddenSections = [],
 }: WorkspaceRightRailProps) {
+  const hidden = new Set(hiddenSections);
+
   return (
     <aside className="w-full lg:w-[300px] lg:border-l border-[#E8ECF3] bg-[#F6F8FC]">
       <div className="lg:sticky lg:top-14 lg:h-[calc(100vh-3.5rem-4rem)] overflow-y-auto py-5 px-4 pb-8 space-y-4">
         {/* Notifications */}
-        <section className="bg-[#F6F8FC] rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[13px] font-semibold text-[#11142D]">通知提醒</h3>
-            {unreadNotifs > 0 && (
-              <span className="px-2 py-0.5 bg-red-500 text-white text-[11px] rounded-full font-medium">
-                {unreadNotifs}
-              </span>
-            )}
-          </div>
-          <Link
-            href="/workspace/notifications"
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <div className="w-9 h-9 rounded-lg bg-[#6C5DD3]/10 flex items-center justify-center flex-shrink-0">
-              <Bell className="w-4 h-4 text-[#6C5DD3]" />
+        {!hidden.has('notifications') && (
+          <section className="bg-[#F6F8FC] rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[13px] font-semibold text-[#11142D]">通知提醒</h3>
+              {unreadNotifs > 0 && (
+                <span className="px-2 py-0.5 bg-red-500 text-white text-[11px] rounded-full font-medium">
+                  {unreadNotifs}
+                </span>
+              )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-[#11142D]">
-                {unreadNotifs > 0 ? `${unreadNotifs} 条未读通知` : '暂无新通知'}
-              </p>
-              <p className="text-[11px] text-[#808191]">点击查看详情</p>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-[#808191] flex-shrink-0" />
-          </Link>
-        </section>
-
-        {/* Badges */}
-        <section className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[13px] font-semibold text-[#11142D]">成长路径</h3>
-            <Link href="/workspace/member" className="text-[11px] text-[#6C5DD3] hover:text-[#5b4fc4] font-medium">
-              查看全部
+            <Link
+              href="/workspace/notifications"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-9 h-9 rounded-lg bg-[#6C5DD3]/10 flex items-center justify-center flex-shrink-0">
+                <Bell className="w-4 h-4 text-[#6C5DD3]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium text-[#11142D]">
+                  {unreadNotifs > 0 ? `${unreadNotifs} 条未读通知` : '暂无新通知'}
+                </p>
+                <p className="text-[11px] text-[#808191]">点击查看详情</p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-[#808191] flex-shrink-0" />
             </Link>
-          </div>
-          <Link
-            href="/workspace/member"
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
-              <Award className="w-5 h-5 text-amber-600" />
+          </section>
+        )}
+
+        {/* Badges / Growth */}
+        {!hidden.has('growth') && (
+          <section className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[13px] font-semibold text-[#11142D]">成长路径</h3>
+              <Link href="/workspace/member" className="text-[11px] text-[#6C5DD3] hover:text-[#5b4fc4] font-medium">
+                查看全部
+              </Link>
             </div>
-            <div className="flex-1">
-              <p className="text-xl font-bold text-[#11142D]">{badgeCount}</p>
-              <p className="text-[11px] text-[#808191]">已获勋章</p>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-          </Link>
-        </section>
+            <Link
+              href="/workspace/member"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <Award className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xl font-bold text-[#11142D]">{badgeCount}</p>
+                <p className="text-[11px] text-[#808191]">已获勋章</p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            </Link>
+          </section>
+        )}
 
         {/* Quick Stats */}
         <section className="bg-[#F6F8FC] rounded-xl p-4">
@@ -107,7 +117,7 @@ export default function WorkspaceRightRail({
         </section>
 
         {/* Recent Memos */}
-        {recentMemos.length > 0 && (
+        {!hidden.has('memos') && recentMemos.length > 0 && (
           <section className="bg-[#F6F8FC] rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-[13px] font-semibold text-[#11142D]">最近备忘录</h3>
