@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(src/app/(workspace)/workspace/products/page.tsx)",
+      "Write(src/app/(workspace)/workspace/products/page.tsx)",
+      "Write(src/app/(workspace)/workspace/products/products-client.tsx)",
+      "Read(src/components/workspace/WorkspacePageFrame.tsx)",
+      "Read(src/components/workspace/WorkspaceRightRail.tsx)"
+    ],
+    "deny": [
+      "Bash",
+      "Edit(src/components/workspace/*)",
+      "Edit(src/app/api/*)",
+      "Edit(prisma/*)",
+      "Edit(src/lib/*)",
+      "Edit(middleware.ts)",
+      "Edit(package.json)"
+    ]
+  }
+}

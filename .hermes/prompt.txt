@@ -1,0 +1,89 @@
+CURRENT_TASK=WORKSPACE_PRODUCTS_DEDICATED_MIGRATION
+
+任务：将 /workspace/products 页面迁移到 WorkspacePageFrame
+
+目标：
+1. 将当前的单文件客户端组件拆分为 server component + client component
+2. 使用 WorkspacePageFrame 包装页面
+3. 添加 WorkspaceRightRail 右侧栏
+4. 保留所有 CRUD 业务逻辑
+
+允许修改的文件：
+- src/app/(workspace)/workspace/products/page.tsx（修改为 server component）
+- src/app/(workspace)/workspace/products/products-client.tsx（新建客户端组件）
+
+禁止修改：
+- src/components/workspace/*（共享组件）
+- src/app/api/*（API 路由）
+- prisma/*（数据库）
+- src/lib/*（工具库）
+- middleware.ts
+- package.json
+
+实现步骤：
+
+1. 读取当前 page.tsx（737行，'use client' 组件）
+
+2. 创建 products-client.tsx：
+   - 添加 'use client' 指令
+   - 复制所有 useState、useEffect
+   - 复制所有 handler 函数（fetchProducts, handleSave, handleEdit, handleDelete, handleDuplicate, handleNew, handleDownloadTemplate, handleImportFile, handleImport）
+   - 复制所有 JSX（统计指标、搜索过滤、导入模态框、表单模态框、产品列表）
+   - 保留所有 API 调用和业务逻辑
+
+3. 修改 page.tsx：
+   - 移除 'use client' 指令
+   - 移除所有 useState、useEffect、handler 函数
+   - 移除所有 JSX
+   - 添加 server component 数据获取：
+     ```typescript
+     import { auth } from "@/lib/auth";
+     import { redirect } from "next/navigation";
+     import { prisma } from "@/lib/prisma";
+     import WorkspacePageFrame from "@/components/workspace/WorkspacePageFrame";
+     import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
+     import ProductsClient from "./products-client";
+     
+     export default async function ProductsPage() {
+       const session = await auth();
+       if (!session?.user?.id) redirect("/login?callbackUrl=/workspace/products");
+       
+       const userId = session.user.id;
+       
+       const [unreadNotifs, badgeCount, recentMemos] = await Promise.all([
+         prisma.notification.count({ where: { userId, readAt: null } }).catch(() => 0),
+         prisma.userBadgeAward.count({ where: { userId } }).catch(() => 0),
+         prisma.memo.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }).catch(() => []),
+       ]);
+       
+       return (
+         <WorkspacePageFrame
+           rightRail={
+             <WorkspaceRightRail
+               unreadNotifs={unreadNotifs}
+               badgeCount={badgeCount}
+               recentMemos={recentMemos}
+               userId={userId}
+             />
+           }
+         >
+           <ProductsClient />
+         </WorkspacePageFrame>
+       );
+     }
+     ```
+
+4. 验证：
+   - page.tsx 不包含 'use client'
+   - page.tsx 不包含 useState、useEffect
+   - products-client.tsx 包含 'use client'
+   - products-client.tsx 保留所有业务逻辑
+   - 使用 WorkspacePageFrame 包装
+   - 使用 WorkspaceRightRail 作为 rightRail prop
+
+成功标记：
+WORKSPACE_PRODUCTS_MIGRATION_COMPLETE
+ACTUAL_CHANGED_FILES=page.tsx,products-client.tsx
+PRESERVED_CRUD_FLOWS=create,edit,delete,duplicate,import,export
+COMPLETED_UI_IMPROVEMENTS=WorkspacePageFrame,WorkspaceRightRail
+DUPLICATED_SEMANTIC_BLOCKS=0
