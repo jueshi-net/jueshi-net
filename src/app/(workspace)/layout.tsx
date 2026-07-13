@@ -4,9 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { UserNavSidebar } from "@/components/user/UserSidebar";
 import { WorkspaceProviders } from "@/components/user/WorkspaceProviders";
 import TopBar from "./topbar";
-import MobileHeader from "@/components/mobile/MobileHeader";
-import MobileBottomNav from "@/components/mobile/MobileBottomNav";
-import { cn } from "@/lib/utils";
+import JueshiV4Header from "@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4Header";
+import JueshiV4BottomTab from "@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4BottomTab";
 
 const levelLabels: Record<string, string> = {
   lv1: "Lv.1 新手",
@@ -59,18 +58,22 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   return (
     <WorkspaceProviders>
       <div className="flex min-h-screen bg-[#F6F8FC]">
-        <UserNavSidebar userAsset={userAsset} className="hidden lg:flex" />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="hidden lg:block">
-            <TopBar />
-          </div>
-          <div className="lg:hidden">
-            <MobileHeader />
-          </div>
-          <main className="flex-1 overflow-y-auto pt-14 pb-20 lg:pt-0 lg:pb-0">{children}</main>
-          <div className="lg:hidden">
-            <MobileBottomNav />
-          </div>
+        {/* Desktop sidebar */}
+        <div className="hidden lg:block">
+          <UserNavSidebar userAsset={userAsset} />
+        </div>
+
+        {/* Mobile layout with V4 navigation */}
+        <div className="lg:hidden flex flex-col min-h-screen">
+          <JueshiV4Header onMenuClick={() => {}} menuOpen={false} />
+          <main className="flex-1 pt-16 pb-20 overflow-y-auto">{children}</main>
+          <JueshiV4BottomTab activeTab="mobile_tab_profile" onTabChange={() => {}} />
+        </div>
+
+        {/* Desktop main content */}
+        <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:overflow-hidden">
+          <TopBar />
+          <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
     </WorkspaceProviders>
