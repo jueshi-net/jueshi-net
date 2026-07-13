@@ -44,8 +44,8 @@ export default async function DocumentsPage() {
   const docCount = docCountRes.status === "fulfilled" ? docCountRes.value : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6">
-      <main>
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 pb-8">
+      <main className="min-w-0">
         <DocumentsClientInner />
       </main>
 

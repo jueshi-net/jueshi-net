@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(src/app/(workspace)/workspace/documents/documents-client-inner.tsx)",
+      "Edit(src/app/(workspace)/workspace/documents/documents-client-inner.tsx)"
+    ],
+    "deny": [
+      "Edit(src/app/(public)/**)",
+      "Edit(src/app/(workspace)/workspace/notifications/**)",
+      "Edit(src/components/**)",
+      "Edit(src/app/globals.css)",
+      "Edit(tailwind.config.*)",
+      "Edit(package.json)",
+      "Edit(package-lock.json)"
+    ]
+  }
+}

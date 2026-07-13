@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Edit"
+    ],
+    "deny": [
+      "Bash",
+      "Git",
+      "WebFetch",
+      "WebSearch",
+      "Agent",
+      "MCP",
+      "bypassPermissions"
+    ]
+  },
+  "fileRestrictions": {
+    "allowWrite": [
+      "src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts",
+      "src/components/layout/JueshiV4PublicShell.tsx",
+      "src/app/(workspace)/layout.tsx"
+    ],
+    "denyWrite": [
+      "src/**/*",
+      "!src/components/ui-lab/jueshi-v4-home-candidate-v4/homepageConfig.ts",
+      "!src/components/layout/JueshiV4PublicShell.tsx",
+      "!src/app/(workspace)/layout.tsx"
+    ]
+  }
+}

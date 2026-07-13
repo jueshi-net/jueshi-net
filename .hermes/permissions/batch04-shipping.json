@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(src/app/(public)/shipping/page.tsx)",
+      "Edit(src/app/(public)/shipping/page.tsx)"
+    ],
+    "deny": [
+      "Edit(src/app/(public)/changelog/**)",
+      "Edit(src/app/(workspace)/**)",
+      "Edit(src/components/**)",
+      "Edit(src/app/globals.css)",
+      "Edit(tailwind.config.*)",
+      "Edit(package.json)",
+      "Edit(package-lock.json)"
+    ]
+  }
+}
