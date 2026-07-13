@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(src/app/(workspace)/workspace/page.tsx)",
+      "Edit(src/components/workspace/WorkspaceRightRail.tsx)"
+    ],
+    "deny": [
+      "Edit(src/app/(public)/public-layout-client.tsx)",
+      "Edit(src/components/layout/JueshiV4PublicShell.tsx)",
+      "Edit(src/components/layout/header.tsx)",
+      "Edit(src/components/layout/footer-new.tsx)",
+      "Edit(src/components/design-system/**)",
+      "Edit(src/app/globals.css)",
+      "Edit(tailwind.config.*)",
+      "Edit(package.json)",
+      "Edit(package-lock.json)",
+      "Edit(src/lib/auth.ts)",
+      "Edit(src/lib/prisma.ts)",
+      "Edit(middleware.ts)",
+      "Edit(src/components/user/UserSidebar.tsx)"
+    ]
+  }
+}

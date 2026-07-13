@@ -1,10 +1,8 @@
 'use client';
 
-import { ArrowLeft, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu, X, ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +19,7 @@ export default function MobileHeader({
 }: MobileHeaderProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +29,23 @@ export default function MobileHeader({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // 关闭菜单当路由变化时
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // 锁定 body 滚动当菜单打开时
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
 
   return (
     <header
@@ -43,82 +59,20 @@ export default function MobileHeader({
       <div className="flex items-center justify-between h-full px-4">
         <div className="flex items-center space-x-2">
           {showBackButton ? (
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={onBackClick}
-              className="h-10 w-10"
+              className="h-10 w-10 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
-            </Button>
+            </button>
           ) : (
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10"
-                >
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-0">
-                <div className="flex flex-col h-full pt-12">
-                  <nav className="flex-1 px-2 py-4">
-                    <Link
-                      href="/"
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
-                        pathname === '/'
-                          ? 'bg-teal-100 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      首页
-                    </Link>
-                    <Link
-                      href="/tools"
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
-                        pathname.startsWith('/tools')
-                          ? 'bg-teal-100 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      工具
-                    </Link>
-                    <Link
-                      href="/workspace"
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
-                        pathname.startsWith('/workspace')
-                          ? 'bg-teal-100 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      工作台
-                    </Link>
-                    <Link
-                      href="/bbs"
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
-                        pathname.startsWith('/bbs')
-                          ? 'bg-teal-100 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      社区
-                    </Link>
-                    <Link
-                      href="/workspace/member"
-                      className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
-                        pathname.startsWith('/workspace/member')
-                          ? 'bg-teal-100 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      我的
-                    </Link>
-                  </nav>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="h-10 w-10 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
+              aria-label="打开菜单"
+            >
+              {menuOpen ? <Menu className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           )}
         </div>
 
@@ -132,6 +86,73 @@ export default function MobileHeader({
           {children}
         </div>
       </div>
+
+      {/* 移动端菜单 */}
+      {menuOpen && (
+        <>
+          {/* 背景遮罩 */}
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setMenuOpen(false)}
+          />
+          
+          {/* 菜单面板 */}
+          <div className="fixed top-14 left-0 right-0 bg-white border-b border-gray-200 z-50 lg:hidden shadow-lg">
+            <nav className="flex flex-col px-2 py-4">
+              <Link
+                href="/"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                  pathname === '/'
+                    ? 'bg-teal-100 text-teal-600'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                首页
+              </Link>
+              <Link
+                href="/tools"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
+                  pathname.startsWith('/tools')
+                    ? 'bg-teal-100 text-teal-600'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                工具
+              </Link>
+              <Link
+                href="/workspace"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
+                  pathname.startsWith('/workspace')
+                    ? 'bg-teal-100 text-teal-600'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                工作台
+              </Link>
+              <Link
+                href="/bbs"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
+                  pathname.startsWith('/bbs')
+                    ? 'bg-teal-100 text-teal-600'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                社区
+              </Link>
+              <Link
+                href="/workspace/member"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium mt-1 ${
+                  pathname.startsWith('/workspace/member')
+                    ? 'bg-teal-100 text-teal-600'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                我的
+              </Link>
+            </nav>
+          </div>
+        </>
+      )}
     </header>
   );
 }

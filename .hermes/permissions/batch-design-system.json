@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(src/app/(public)/design-system/page.tsx)"
+    ],
+    "deny": [
+      "Edit(src/app/(public)/public-layout-client.tsx)",
+      "Edit(src/components/layout/JueshiV4PublicShell.tsx)",
+      "Edit(src/components/layout/header.tsx)",
+      "Edit(src/components/layout/footer-new.tsx)",
+      "Edit(src/components/design-system/**)",
+      "Edit(src/app/globals.css)",
+      "Edit(tailwind.config.*)",
+      "Edit(package.json)",
+      "Edit(package-lock.json)"
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(src/components/mobile/MobileBottomNav.tsx)",
+      "Edit(src/components/mobile/MobileHeader.tsx)",
+      "Edit(src/app/(public)/public-layout-client.tsx)",
+      "Edit(src/app/(workspace)/layout.tsx)",
+      "Edit(src/app/(workspace)/workspace/page.tsx)"
+    ],
+    "deny": [
+      "Edit(src/lib/**)",
+      "Edit(src/api/**)",
+      "Edit(prisma/**)",
+      "Edit(package.json)",
+      "Edit(package-lock.json)",
+      "Edit(next.config.js)",
+      "Edit(tailwind.config.js)"
+    ]
+  }
+}

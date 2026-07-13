@@ -1,0 +1,8 @@
+PAGE_1=/payment/success
+PAGE_1_FILE=/Users/chq/xixiong-saas/src/app/(public)/payment/success/page.tsx
+PAGE_1_LINES=107
+
+PAGE_2=/ai-tools
+PAGE_2_FILE=/Users/chq/xixiong-saas/src/app/(public)/ai-tools/page.tsx
+PAGE_2_LINES=119
+
