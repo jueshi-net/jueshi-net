@@ -82,10 +82,15 @@ for (const page of TARGET_PAGES) {
           !e.includes('net::ERR') &&
           !e.includes('Mixed Content')
         );
-        // Log remaining errors for debugging but don't fail on them
-        if (fatalErrors.length > 0) {
-          console.log(`[${page} ${vp.name}] console errors:`, fatalErrors);
+        
+        // React error #31 must fail the test
+        const react31Errors = fatalErrors.filter(e => e.includes('Minified React error #31'));
+        if (react31Errors.length > 0) {
+          console.error(`[REACT_31_DETECTED] ${page} ${vp.name}:`, react31Errors);
         }
+        expect(react31Errors.length).toBe(0);
+        
+        expect(fatalErrors.length).toBe(0);
 
         await context.close();
       });
