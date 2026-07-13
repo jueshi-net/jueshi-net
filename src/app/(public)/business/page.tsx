@@ -2,11 +2,10 @@
 
 import Link from 'next/link';
 import { AdSlot } from '@/components/ad-slot';
-import { Breadcrumb } from '@/components/breadcrumb';
+import { JueshiV4PublicShell } from '@/components/jueshi-v4-public-shell';
 import {
   Globe,
   CreditCard,
-  Truck,
   Mail,
   Server,
   Users,
@@ -125,9 +124,11 @@ function ToolLinkItem({ link }: { link: ToolLink }) {
 
   if (isPlaceholder) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed">
+      <span className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed min-w-[120px] justify-center">
         {link.name}
-        <span className="text-xs">(即将上线)</span>
+        <span className="text-xs bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded ml-1.5">
+          即将上线
+        </span>
       </span>
     );
   }
@@ -138,10 +139,10 @@ function ToolLinkItem({ link }: { link: ToolLink }) {
         href={link.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+        className="group inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors min-w-[120px] justify-center"
       >
         {link.name}
-        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
       </a>
     );
   }
@@ -149,47 +150,32 @@ function ToolLinkItem({ link }: { link: ToolLink }) {
   return (
     <Link
       href={link.href}
-      className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+      className="group inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors min-w-[120px] justify-center"
     >
       {link.name}
-      <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity" />
     </Link>
   );
 }
 
 export default function BusinessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-14 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">我要出海做生意</h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto">
-            建站、收款、物流、获客、工具导航 — 一站式出海工具指南
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
-
+    <JueshiV4PublicShell>
+      <div className="max-w-6xl mx-auto px-4 pb-16 pt-8">
         {/* Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {categories.map((cat) => {
             const Icon = cat.icon;
             return (
               <div
                 key={cat.title}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300 ease-in-out"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-lg ${cat.bgColor} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${cat.iconColor}`} />
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-12 h-12 rounded-lg ${cat.bgColor} flex items-center justify-center`}>
+                    <Icon className={`w-6 h-6 ${cat.iconColor}`} />
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{cat.title}</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{cat.title}</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {cat.links.map((link) => (
@@ -202,20 +188,20 @@ export default function BusinessPage() {
         </div>
 
         {/* Related Tools */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="text-xl">🔗</span> 相关工具
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
             {relatedTools.map((tool) => {
               const Icon = tool.icon;
               return (
                 <Link
                   key={tool.href}
                   href={tool.href}
-                  className="group flex flex-col items-center text-center p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all"
+                  className="group flex flex-col items-center text-center p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all min-h-[80px]"
                 >
-                  <div className={`w-10 h-10 rounded-lg ${tool.bg} flex items-center justify-center mb-2`}>
+                  <div className={`w-12 h-12 rounded-lg ${tool.bg} flex items-center justify-center mb-2`}>
                     <Icon className={`w-5 h-5 ${tool.color}`} />
                   </div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
@@ -231,8 +217,8 @@ export default function BusinessPage() {
         <AdSlot placement="tool-bottom" variant="card" className="mb-8" />
 
         {/* Disclaimer */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 flex items-start gap-4">
+          <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-800 dark:text-amber-300">
             <strong>免责声明：</strong>本站收录的工具和网站仅供信息参考，不构成任何推荐或担保。
             所有外部链接均指向第三方网站，本站不对其内容、安全性或可用性负责。
@@ -240,6 +226,6 @@ export default function BusinessPage() {
           </div>
         </div>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }
