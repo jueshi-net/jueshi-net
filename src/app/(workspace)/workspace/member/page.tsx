@@ -2,18 +2,22 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import MemberClient from "./member-client";
+import WorkspacePageFrame from "@/components/workspace/WorkspacePageFrame";
+import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
 
 export default async function MemberPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login?callbackUrl=/workspace/member");
 
-  const [user, permissions] = await Promise.allSettled([
+  const userId = session.user.id;
+
+  const results = await Promise.allSettled([
     prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { role: true, memberUntil: true, growthValue: true, levelKey: true, points: true },
     }),
     prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { role: true, memberUntil: true },
     }).then(async (u) => {
       const isMember = Boolean(u?.memberUntil && new Date(u.memberUntil) > new Date());
@@ -42,10 +46,31 @@ export default async function MemberPage() {
         points: 0,
       };
     }),
+    prisma.notification.count({ where: { userId, readAt: null } }),
+    prisma.userBadgeAward.count({ where: { userId } }),
+    prisma.memo.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }),
   ]);
+
+  const [user, permissions, unreadNotifsRes, badgeCountRes, memosRes] = results;
 
   const userData = user.status === "fulfilled" ? user.value : null;
   const perms = permissions.status === "fulfilled" ? permissions.value : null;
+  const unreadNotifs = unreadNotifsRes.status === "fulfilled" ? unreadNotifsRes.value : 0;
+  const badgeCount = badgeCountRes.status === "fulfilled" ? badgeCountRes.value : 0;
+  const recentMemos = memosRes.status === "fulfilled" ? memosRes.value : [];
 
-  return <MemberClient userData={userData} permissions={perms} />;
+  return (
+    <WorkspacePageFrame
+      rightRail={
+        <WorkspaceRightRail
+          unreadNotifs={unreadNotifs}
+          badgeCount={badgeCount}
+          recentMemos={recentMemos}
+          userId={userId}
+        />
+      }
+    >
+      <MemberClient userData={userData} permissions={perms} />
+    </WorkspacePageFrame>
+  );
 }

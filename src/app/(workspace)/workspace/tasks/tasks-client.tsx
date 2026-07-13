@@ -129,7 +129,7 @@ export default function TasksClient() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="w-full">
       {/* Page Header */}
       <WorkspacePageHeader
         title="任务中心"

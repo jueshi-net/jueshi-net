@@ -65,7 +65,7 @@ export default function FavoritesClient({ favorites }: { favorites: any[] }) {
   }).length;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="px-6 py-6 space-y-6">
       <WorkspacePageHeader
         title="工具收藏中心"
         subtitle="收藏常用工具、专题和资源，方便下次快速打开"
@@ -86,7 +86,7 @@ export default function FavoritesClient({ favorites }: { favorites: any[] }) {
         }
       />
 
-      <div className="px-6 py-6 space-y-6">
+      <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <MetricCard

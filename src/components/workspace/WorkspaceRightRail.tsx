@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Award, FileText, TrendingUp, Gift } from 'lucide-react';
+import { Bell, Award, FileText, TrendingUp, Gift, ArrowRight } from 'lucide-react';
 
 interface WorkspaceRightRailProps {
   unreadNotifs: number;

@@ -266,7 +266,7 @@ export default function MemberClient({ userData, permissions }: { userData: any;
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div>
       {/* Page Header */}
       <WorkspacePageHeader
         title="会员中心"
