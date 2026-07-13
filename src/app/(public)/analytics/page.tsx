@@ -10,7 +10,7 @@ import {
   TrendingUp, Users, MousePointer, BarChart3,
   Download, Calendar, ArrowUp, ArrowDown, Globe, Clock
 } from 'lucide-react';
-import JueshiV4PublicShell from '@/components/shells/JueshiV4PublicShell';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
