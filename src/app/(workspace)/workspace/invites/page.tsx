@@ -7,6 +7,22 @@ import { StatusBadge } from '@/components/design-system';
 import { EmptyState } from '@/components/design-system';
 import { track } from '@/lib/analytics';
 
+import type { Metadata } from "next";
+import { buildCanonical, buildTitle } from "@/lib/seo";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
+import WorkspacePageFrame from "@/components/workspace/WorkspacePageFrame";
+
+export const metadata: Metadata = {
+  title: buildTitle("邀请增长中心"),
+  description: "邀请好友注册，获得会员奖励",
+  robots: { index: false, follow: false },
+  alternates: { canonical: buildCanonical("/workspace/invites") },
+};
+
+// 定义接口
 interface InviteCode {
   id: string;
   code: string;
@@ -26,7 +42,8 @@ interface InviteCode {
   }>;
 }
 
-export default function InvitesPage() {
+// 客户端组件
+export function InvitesClient() {
   const [inviteCodes, setInviteCodes] = useState<InviteCode[]>([]);
   const [invitedCount, setInvitedCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -61,13 +78,13 @@ export default function InvitesPage() {
     try {
       const res = await fetch('/api/workspace/invites', { method: 'POST' });
       const data = await res.json();
-      
+
       if (data.success && data.inviteCode) {
         // Refresh the list to ensure consistency
         await fetchInviteCodes();
-        
+
         setSuccess('邀请码生成成功！');
-        
+
         track({
           eventType: 'invite_code_generate',
           toolName: 'invite-system',
@@ -96,7 +113,7 @@ export default function InvitesPage() {
       await navigator.clipboard.writeText(text);
       setCopiedCode(codeId);
       setTimeout(() => setCopiedCode(null), 2000);
-      
+
       track({
         eventType: isLink ? 'invite_link_copy' : 'invite_code_copy',
         toolName: 'invite-system',
@@ -131,9 +148,9 @@ export default function InvitesPage() {
       header: '状态',
       align: 'center' as const,
       render: (row: any) => (
-        <StatusBadge 
-          label={row.status === 'COMPLETED' ? '已完成' : row.status} 
-          variant={row.status === 'COMPLETED' ? 'success' : 'neutral'} 
+        <StatusBadge
+          label={row.status === 'COMPLETED' ? '已完成' : row.status}
+          variant={row.status === 'COMPLETED' ? 'success' : 'neutral'}
           size="sm"
           dot
         />
@@ -153,20 +170,12 @@ export default function InvitesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <WorkspacePageHeader
-          title="邀请增长中心"
-          subtitle="邀请好友注册，获得会员奖励"
-          icon={<Gift className="w-5 h-5" />}
-          breadcrumbs={[{ label: "工作台", href: "/workspace" }, { label: "邀请" }]}
-        />
-        <div className="p-8 text-center text-gray-400">加载中...</div>
-      </div>
+      <div className="p-8 text-center text-gray-400">加载中...</div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="space-y-6">
       <WorkspacePageHeader
         title="邀请增长中心"
         subtitle="邀请好友注册，获得会员奖励"
@@ -183,147 +192,179 @@ export default function InvitesPage() {
         }
       />
 
-      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700">
-            {success}
-          </div>
-        )}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-green-700">
+          {success}
+        </div>
+      )}
 
-        {/* 我的邀请码（个人奖励码） */}
-        <SectionCard title="🎁 我的邀请码" subtitle="邀请好友注册，获得会员奖励">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <MetricCard
-              label="已邀请人数"
-              value={invitedCount}
-              icon={<Users className="w-5 h-5" />}
-            />
-            <MetricCard
-              label="我的邀请码"
-              value={`${inviteCodes.length}/3`}
-              icon={<Gift className="w-5 h-5" />}
-            />
-            <MetricCard
-              label="当前奖励"
-              value="3 天会员/人"
-              icon={<Award className="w-5 h-5" />}
-            />
-          </div>
-        </SectionCard>
-
-        {/* 奖励说明 */}
-        <SectionCard title="邀请奖励说明">
-          <div className="space-y-2 text-sm text-gray-700">
-            <p>• 每成功邀请一位好友注册，您将获得 <span className="font-bold text-teal-600">3 天会员</span> 奖励</p>
-            <p>• 好友注册后将获得 <span className="font-bold text-teal-600">50 积分</span> 新手奖励</p>
-            <p>• 奖励由平台规则决定，可能随活动调整</p>
-            <p className="text-xs text-gray-500 mt-2">
-              广告权益以内测规则为准，具体请咨询管理员
-            </p>
-          </div>
-        </SectionCard>
-
-        {/* 邀请码列表 */}
-        {inviteCodes.length === 0 ? (
-          <EmptyState
-            variant="no-data"
-            title="还没有邀请码"
-            description="生成您的专属邀请码，邀请好友注册获得奖励"
-            icon={<Gift className="w-12 h-12" />}
-            primaryAction={{ label: '生成第一个邀请码', onClick: generateInviteCode }}
+      {/* 我的邀请码（个人奖励码） */}
+      <SectionCard title="🎁 我的邀请码" subtitle="邀请好友注册，获得会员奖励">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <MetricCard
+            label="已邀请人数"
+            value={invitedCount}
+            icon={<Users className="w-5 h-5" />}
           />
-        ) : (
-          <div className="space-y-4">
-            {inviteCodes.map(code => (
-              <SectionCard key={code.id}>
-                <div className="space-y-4">
-                  {/* Code header */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg font-mono font-bold text-gray-900">{code.code}</span>
-                        <StatusBadge 
-                          label={code.status === 'ACTIVE' ? '启用' : code.status === 'PAUSED' ? '暂停' : '过期'} 
-                          variant={code.status === 'ACTIVE' ? 'success' : code.status === 'PAUSED' ? 'warning' : 'neutral'} 
-                          size="sm"
-                          dot
-                          pulse={code.status === 'ACTIVE'}
-                        />
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {code.usedCount}/{code.maxUses} 次使用
-                        </span>
-                        {code.expiresAt && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(code.expiresAt).toLocaleDateString('zh-CN')} 过期
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        onClick={() => copyToClipboard(code.code, code.id)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors border border-gray-200"
-                      >
-                        {copiedCode === code.id ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-green-600" />
-                            已复制
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            复制邀请码
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(getInviteLink(code.code), `${code.id}-link`, true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors border border-teal-200"
-                      >
-                        {copiedCode === `${code.id}-link` ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-green-600" />
-                            已复制
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            复制邀请链接
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
+          <MetricCard
+            label="我的邀请码"
+            value={`${inviteCodes.length}/3`}
+            icon={<Gift className="w-5 h-5" />}
+          />
+          <MetricCard
+            label="当前奖励"
+            value="3 天会员/人"
+            icon={<Award className="w-5 h-5" />}
+          />
+        </div>
+      </SectionCard>
 
-                  {/* Redemption records */}
-                  {code.redemptions.length > 0 && (
-                    <div className="border-t border-gray-100 pt-4">
-                      <h4 className="text-xs font-medium text-gray-700 mb-3">邀请记录</h4>
-                      <CompactTable
-                        columns={redemptionColumns}
-                        data={code.redemptions}
-                        rowKey={(row) => row.id}
-                        density="compact"
-                        striped
+      {/* 奖励说明 */}
+      <SectionCard title="邀请奖励说明">
+        <div className="space-y-2 text-sm text-gray-700">
+          <p>• 每成功邀请一位好友注册，您将获得 <span className="font-bold text-teal-600">3 天会员</span> 奖励</p>
+          <p>• 好友注册后将获得 <span className="font-bold text-teal-600">50 积分</span> 新手奖励</p>
+          <p>• 奖励由平台规则决定，可能随活动调整</p>
+          <p className="text-xs text-gray-500 mt-2">
+            广告权益以内测规则为准，具体请咨询管理员
+          </p>
+        </div>
+      </SectionCard>
+
+      {/* 邀请码列表 */}
+      {inviteCodes.length === 0 ? (
+        <EmptyState
+          variant="no-data"
+          title="还没有邀请码"
+          description="生成您的专属邀请码，邀请好友注册获得奖励"
+          icon={<Gift className="w-12 h-12" />}
+          primaryAction={{ label: '生成第一个邀请码', onClick: generateInviteCode }}
+        />
+      ) : (
+        <div className="space-y-4">
+          {inviteCodes.map(code => (
+            <SectionCard key={code.id}>
+              <div className="space-y-4">
+                {/* Code header */}
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg font-mono font-bold text-gray-900">{code.code}</span>
+                      <StatusBadge
+                        label={code.status === 'ACTIVE' ? '启用' : code.status === 'PAUSED' ? '暂停' : '过期'}
+                        variant={code.status === 'ACTIVE' ? 'success' : code.status === 'PAUSED' ? 'warning' : 'neutral'}
+                        size="sm"
+                        dot
+                        pulse={code.status === 'ACTIVE'}
                       />
                     </div>
-                  )}
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3 h-3" />
+                        {code.usedCount}/{code.maxUses} 次使用
+                      </span>
+                      {code.expiresAt && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(code.expiresAt).toLocaleDateString('zh-CN')} 过期
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => copyToClipboard(code.code, code.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors border border-gray-200"
+                    >
+                      {copiedCode === code.id ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-green-600" />
+                          已复制
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          复制邀请码
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => copyToClipboard(getInviteLink(code.code), `${code.id}-link`, true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium hover:bg-teal-100 transition-colors border border-teal-200"
+                    >
+                      {copiedCode === `${code.id}-link` ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-green-600" />
+                          已复制
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          复制邀请链接
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </SectionCard>
-            ))}
-          </div>
-        )}
-      </div>
+
+                {/* Redemption records */}
+                {code.redemptions.length > 0 && (
+                  <div className="border-t border-gray-100 pt-4">
+                    <h4 className="text-xs font-medium text-gray-700 mb-3">邀请记录</h4>
+                    <CompactTable
+                      columns={redemptionColumns}
+                      data={code.redemptions}
+                      rowKey={(row) => row.id}
+                      density="compact"
+                      striped
+                    />
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+          ))}
+        </div>
+      )}
     </div>
+  );
+}
+
+export default async function InvitesPage() {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login?callbackUrl=/workspace/invites");
+
+  const userId = session.user.id;
+
+  const results = await Promise.allSettled([
+    prisma.notification.count({ where: { userId, readAt: null } }),
+    prisma.userBadgeAward.count({ where: { userId } }),
+    prisma.memo.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }),
+  ]);
+
+  const [unreadNotifsRes, badgeCountRes, memosRes] = results;
+
+  const unreadNotifs = unreadNotifsRes.status === "fulfilled" ? unreadNotifsRes.value : 0;
+  const badgeCount = badgeCountRes.status === "fulfilled" ? badgeCountRes.value : 0;
+  const recentMemos = memosRes.status === "fulfilled" ? memosRes.value : [];
+
+  return (
+    <WorkspacePageFrame
+      rightRail={
+        <WorkspaceRightRail
+          unreadNotifs={unreadNotifs}
+          badgeCount={badgeCount}
+          recentMemos={recentMemos}
+          userId={userId}
+        />
+      }
+    >
+      <InvitesClient />
+    </WorkspacePageFrame>
   );
 }
