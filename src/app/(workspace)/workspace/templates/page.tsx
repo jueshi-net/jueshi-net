@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import WorkspacePageFrame from '@/components/workspace/WorkspacePageFrame';
+import WorkspaceRightRail from '@/components/workspace/WorkspaceRightRail';
 
 interface TemplateConfig {
   id: string;
@@ -19,10 +21,27 @@ interface TemplateListResponse {
   data: TemplateConfig[];
 }
 
+interface WorkspaceStats {
+  unreadNotifs: number;
+  badgeCount: number;
+  recentMemos: Array<{
+    id: string;
+    title: string;
+    updatedAt: string;
+  }>;
+  userId: string;
+}
+
 export default function WorkspaceTemplatesPage() {
   const [templates, setTemplates] = useState<TemplateConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteConfirmId, setDeleteConfirmId] = useState("");
+  const [workspaceStats, setWorkspaceStats] = useState<WorkspaceStats>({
+    unreadNotifs: 0,
+    badgeCount: 0,
+    recentMemos: [],
+    userId: ""
+  });
 
   const fetchTemplates = useCallback(async () => {
     try {
@@ -37,18 +56,42 @@ export default function WorkspaceTemplatesPage() {
     } catch (err) {
       console.error("Failed to fetch templates:", err);
     }
-    setLoading(false);
+  }, []);
+
+  const fetchWorkspaceStats = useCallback(async () => {
+    try {
+      const res = await fetch("/api/workspace/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setWorkspaceStats({
+          unreadNotifs: data.unreadNotifs || 0,
+          badgeCount: data.badgeCount || 0,
+          recentMemos: data.recentMemos || [],
+          userId: data.userId || ""
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch workspace stats:", err);
+    }
   }, []);
 
   useEffect(() => {
-    fetchTemplates();
-  }, [fetchTemplates]);
+    const fetchData = async () => {
+      await Promise.all([
+        fetchTemplates(),
+        fetchWorkspaceStats()
+      ]);
+      setLoading(false); // 设置加载完成状态
+    };
+
+    fetchData();
+  }, [fetchTemplates, fetchWorkspaceStats]);
 
   const handleDelete = async (id: string) => {
     try {
       await fetch(`/api/template-studio/templates/${id}`, { method: "DELETE" });
       setDeleteConfirmId("");
-      fetchTemplates();
+      fetchTemplates(); // 重新获取模板列表
     } catch {
       // ignore
     }
@@ -56,14 +99,23 @@ export default function WorkspaceTemplatesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-gray-400">
-        加载中...
-      </div>
+      <WorkspacePageFrame rightRail={null}>
+        <div className="flex items-center justify-center py-20 text-gray-400">
+          加载中...
+        </div>
+      </WorkspacePageFrame>
     );
   }
 
   return (
-    <div data-testid="workspace-templates-page">
+    <WorkspacePageFrame rightRail={
+      <WorkspaceRightRail
+        unreadNotifs={workspaceStats.unreadNotifs}
+        badgeCount={workspaceStats.badgeCount}
+        recentMemos={workspaceStats.recentMemos}
+        userId={workspaceStats.userId}
+      />
+    } data-testid="workspace-templates-page">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold">我的模板</h1>
@@ -115,7 +167,7 @@ export default function WorkspaceTemplatesPage() {
               const displayType = t.toolKey || "自定义模板";
               const displayTime = (t.updatedAt || t.createdAt) ? new Date(t.updatedAt || t.createdAt).toLocaleDateString("zh-CN") : "时间未知";
               const hasId = !!t.id;
-              
+
               return (
               <div
                 key={t.id || Math.random()}
@@ -180,6 +232,6 @@ export default function WorkspaceTemplatesPage() {
           </div>
         )}
       </div>
-    </div>
+    </WorkspacePageFrame>
   );
 }
