@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
+import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
-import { 
-  TrendingUp, Users, MousePointer, BarChart3, 
+import {
+  TrendingUp, Users, MousePointer, BarChart3,
   Download, Calendar, ArrowUp, ArrowDown, Globe, Clock
 } from 'lucide-react';
+import JueshiV4PublicShell from '@/components/shells/JueshiV4PublicShell';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
@@ -63,12 +64,14 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">加载数据分析...</p>
+      <JueshiV4PublicShell>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-4 text-gray-600">加载数据分析...</p>
+          </div>
         </div>
-      </div>
+      </JueshiV4PublicShell>
     );
   }
 
@@ -80,11 +83,11 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+    <JueshiV4PublicShell>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {/* Time Range Selector and Export Button at the top of content area */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">数据分析中心</h1>
               <p className="text-sm text-gray-500 mt-1">实时监控与深度洞察</p>
@@ -111,185 +114,183 @@ export default function AnalyticsPage() {
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statCards.map((stat, i) => (
-            <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-gray-500">{stat.label}</span>
-                <stat.icon className="w-5 h-5 text-blue-500" />
+          {/* Stat Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {statCards.map((stat, i) => (
+              <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-gray-500">{stat.label}</span>
+                  <stat.icon className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <div className="flex items-center gap-1 mt-2">
+                  {stat.positive ? (
+                    <ArrowUp className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <ArrowDown className="w-4 h-4 text-red-500" />
+                  )}
+                  <span className={`text-sm ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
+                    {stat.change}
+                  </span>
+                  <span className="text-xs text-gray-400 ml-1">vs 上期</span>
+                </div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-              <div className="flex items-center gap-1 mt-2">
-                {stat.positive ? (
-                  <ArrowUp className="w-4 h-4 text-green-500" />
-                ) : (
-                  <ArrowDown className="w-4 h-4 text-red-500" />
-                )}
-                <span className={`text-sm ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
-                  {stat.change}
-                </span>
-                <span className="text-xs text-gray-400 ml-1">vs 上期</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Click Trend */}
-          <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">点击趋势</h3>
-              <Calendar className="w-5 h-5 text-gray-400" />
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={stats.clickTrend}>
-                <defs>
-                  <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <Tooltip />
-                <Area 
-                  type="monotone" 
-                  dataKey="clicks" 
-                  stroke="#3B82F6" 
-                  strokeWidth={2}
-                  fill="url(#colorClicks)" 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            ))}
           </div>
 
-          {/* Category Distribution */}
+          {/* Main Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Click Trend */}
+            <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">点击趋势</h3>
+                <Calendar className="w-5 h-5 text-gray-400" />
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={stats.clickTrend}>
+                  <defs>
+                    <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="clicks"
+                    stroke="#3B82F6"
+                    strokeWidth={2}
+                    fill="url(#colorClicks)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Category Distribution */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">分类分布</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={stats.categoryDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {stats.categoryDistribution.map((entry: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Secondary Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Top Links */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">热门链接 TOP 10</h3>
+              <div className="space-y-3">
+                {stats.topLinks.map((link: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        i < 3 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {i + 1}
+                      </span>
+                      <span className="text-sm text-gray-700 truncate max-w-[200px]">{link.name}</span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{link.clicks.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Device Distribution */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">设备分布</h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={stats.deviceDistribution}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <Tooltip />
+                  <Bar dataKey="value" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Advanced Analytics Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Hourly Traffic */}
+            <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900">24小时流量分布</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={stats.hourlyTraffic}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="hour" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="#9CA3AF" />
+                  <Tooltip />
+                  <Bar dataKey="visits" fill="#10B981" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Conversion Funnel */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">转化漏斗</h3>
+              <div className="space-y-4">
+                {stats.conversionFunnel.map((step: any, i: number) => (
+                  <div key={i}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm text-gray-600">{step.name}</span>
+                      <span className="text-sm font-medium text-gray-900">{step.value.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2.5">
+                      <div
+                        className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all"
+                        style={{ width: `${step.percentage}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Comparison */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">分类分布</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">周对比分析</h3>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.categoryDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {stats.categoryDistribution.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
+              <LineChart data={stats.weeklyComparison}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                 <Tooltip />
                 <Legend />
-              </PieChart>
+                <Line type="monotone" dataKey="thisWeek" stroke="#3B82F6" strokeWidth={2} name="本周" dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="lastWeek" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="5 5" name="上周" dot={{ r: 3 }} />
+              </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
-
-        {/* Secondary Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Links */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">热门链接 TOP 10</h3>
-            <div className="space-y-3">
-              {stats.topLinks.map((link: any, i: number) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      i < 3 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {i + 1}
-                    </span>
-                    <span className="text-sm text-gray-700 truncate max-w-[200px]">{link.name}</span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-900">{link.clicks.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Device Distribution */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">设备分布</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats.deviceDistribution}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <Tooltip />
-                <Bar dataKey="value" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Advanced Analytics Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Hourly Traffic */}
-          <div className="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-5 h-5 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900">24小时流量分布</h3>
-            </div>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={stats.hourlyTraffic}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="hour" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
-                <YAxis tick={{ fontSize: 11 }} stroke="#9CA3AF" />
-                <Tooltip />
-                <Bar dataKey="visits" fill="#10B981" radius={[3, 3, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Conversion Funnel */}
-          <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">转化漏斗</h3>
-            <div className="space-y-4">
-              {stats.conversionFunnel.map((step: any, i: number) => (
-                <div key={i}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-gray-600">{step.name}</span>
-                    <span className="text-sm font-medium text-gray-900">{step.value.toLocaleString()}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2.5">
-                    <div 
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2.5 rounded-full transition-all"
-                      style={{ width: `${step.percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Weekly Comparison */}
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">周对比分析</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={stats.weeklyComparison}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-              <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="thisWeek" stroke="#3B82F6" strokeWidth={2} name="本周" dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="lastWeek" stroke="#9CA3AF" strokeWidth={2} strokeDasharray="5 5" name="上周" dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
       </div>
-    </div>
+    </JueshiV4PublicShell>
   );
 }
 
