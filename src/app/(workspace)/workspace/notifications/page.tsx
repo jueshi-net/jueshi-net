@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
 import NotificationsClient from "./notifications-client";
 import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
+import WorkspacePageFrame from "@/components/workspace/WorkspacePageFrame";
 
 export const metadata: Metadata = {
   title: "通知中心 — 绝世百宝箱",
@@ -39,17 +40,17 @@ export default async function NotificationsPage() {
   const recentMemos = memosRes.status === "fulfilled" ? memosRes.value : [];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 pb-8">
-      <main className="min-w-0">
-        <NotificationsClient />
-      </main>
-
-      <WorkspaceRightRail
-        unreadNotifs={unreadNotifs}
-        badgeCount={badgeCount}
-        recentMemos={recentMemos}
-        userId={userId}
-      />
-    </div>
+    <WorkspacePageFrame
+      rightRail={
+        <WorkspaceRightRail
+          unreadNotifs={unreadNotifs}
+          badgeCount={badgeCount}
+          recentMemos={recentMemos}
+          userId={userId}
+        />
+      }
+    >
+      <NotificationsClient />
+    </WorkspacePageFrame>
   );
 }

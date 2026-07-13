@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DocumentsClientInner from "./documents-client-inner";
 import WorkspaceRightRail from "@/components/workspace/WorkspaceRightRail";
+import WorkspacePageFrame from "@/components/workspace/WorkspacePageFrame";
 
 const levelLabels: Record<string, string> = {
   lv1: "Lv.1 新手",
@@ -44,17 +45,17 @@ export default async function DocumentsPage() {
   const docCount = docCountRes.status === "fulfilled" ? docCountRes.value : 0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-6 pb-8">
-      <main className="min-w-0">
-        <DocumentsClientInner />
-      </main>
-
-      <WorkspaceRightRail
-        unreadNotifs={unreadNotifs}
-        badgeCount={badgeCount}
-        recentMemos={recentMemos}
-        userId={userId}
-      />
-    </div>
+    <WorkspacePageFrame
+      rightRail={
+        <WorkspaceRightRail
+          unreadNotifs={unreadNotifs}
+          badgeCount={badgeCount}
+          recentMemos={recentMemos}
+          userId={userId}
+        />
+      }
+    >
+      <DocumentsClientInner />
+    </WorkspacePageFrame>
   );
 }
