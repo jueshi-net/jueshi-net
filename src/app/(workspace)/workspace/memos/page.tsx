@@ -37,6 +37,7 @@ export default async function MemosPage() {
           badgeCount={badgeCount}
           recentMemos={recentMemos}
           userId={userId}
+          hiddenSections={['memos']}
         />
       }
     >

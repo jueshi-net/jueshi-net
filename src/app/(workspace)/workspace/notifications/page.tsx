@@ -47,6 +47,7 @@ export default async function NotificationsPage() {
           badgeCount={badgeCount}
           recentMemos={recentMemos}
           userId={userId}
+          hiddenSections={['notifications']}
         />
       }
     >
