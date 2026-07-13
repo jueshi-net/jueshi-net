@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { UserNavSidebar } from "@/components/user/UserSidebar";
 import { WorkspaceProviders } from "@/components/user/WorkspaceProviders";
 import TopBar from "./topbar";
+import MobileHeader from "@/components/mobile/MobileHeader";
+import MobileBottomNav from "@/components/mobile/MobileBottomNav";
+import { cn } from "@/lib/utils";
 
 const levelLabels: Record<string, string> = {
   lv1: "Lv.1 新手",
@@ -56,10 +59,18 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
   return (
     <WorkspaceProviders>
       <div className="flex min-h-screen bg-[#F6F8FC]">
-        <UserNavSidebar userAsset={userAsset} />
+        <UserNavSidebar userAsset={userAsset} className="hidden lg:flex" />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopBar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <div className="hidden lg:block">
+            <TopBar />
+          </div>
+          <div className="lg:hidden">
+            <MobileHeader />
+          </div>
+          <main className="flex-1 overflow-y-auto pt-14 pb-20 lg:pt-0 lg:pb-0">{children}</main>
+          <div className="lg:hidden">
+            <MobileBottomNav />
+          </div>
         </div>
       </div>
     </WorkspaceProviders>

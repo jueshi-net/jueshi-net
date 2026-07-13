@@ -3,6 +3,9 @@
 import { usePathname } from 'next/navigation';
 import Header from '@/components/layout/header';
 import FooterNew from '@/components/layout/footer-new';
+import MobileHeader from '@/components/mobile/MobileHeader';
+import MobileBottomNav from '@/components/mobile/MobileBottomNav';
+import { cn } from '@/lib/utils';
 
 export function PublicLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -33,8 +36,16 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
 
   return (
     <>
-      <Header />
-      <main className="flex-1">{children}</main>
+      <div className="hidden lg:block">
+        <Header />
+      </div>
+      <div className="lg:hidden">
+        <MobileHeader />
+      </div>
+      <main className="flex-1 pb-20 lg:pb-0">{children}</main>
+      <div className="lg:hidden">
+        <MobileBottomNav />
+      </div>
       <FooterNew />
     </>
   );
