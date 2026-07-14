@@ -6,17 +6,18 @@ import { buildCanonical, buildTitle } from "@/lib/seo";
 import type { Metadata } from "next";
 import DestinationsIndexClient from "./destinations-index-client";
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: buildTitle("全球目的地工具导航"),
-  description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，邮编查询、地址格式化、运费计算、商业发票、HS编码，一站式出海解决方案。",
+  description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲,邮编查询、地址格式化、运费计算、商业发票、HS编码,一站式出海解决方案。",
   alternates: { canonical: buildCanonical("/destinations") },
   robots: "index,follow",
   openGraph: {
     title: buildTitle("全球目的地工具导航"),
-    description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲，一站式出海解决方案。",
+    description: "按地区浏览出海工具 — 北美、欧洲、东南亚、日韩、拉美、中东、澳洲,一站式出海解决方案。",
     url: buildCanonical("/destinations"),
   },
 };
@@ -117,50 +118,18 @@ export default async function DestinationsIndexPage() {
 
   return (
     <JueshiV4PublicShell>
-      <div className="min-h-screen bg-gray-50">
-        {/* ===== HERO (keep original style) ===== */}
-        <div className="bg-gradient-to-br from-indigo-700 via-purple-700 to-blue-800 text-white relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -top-32 right-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl" />
-            <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl" />
-          </div>
-
-          <div className="relative z-10 max-w-6xl mx-auto px-4 pt-12 pb-14 md:pt-16 md:pb-20">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                <Globe className="w-3.5 h-3.5" /> 全球覆盖 {mergedCountries.length} 国
-              </span>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-4 leading-tight">
-              🌍 全球目的地工具导航
-            </h1>
-
-            <p className="text-lg md:text-xl text-indigo-100/90 max-w-2xl leading-relaxed">
-              按地区查找出海常用工具 — 邮编查询、地址格式化、运费计算、商业发票、HS 编码，一站式解决。
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-                ✅ {mergedCountries.filter(c => c.completenessTier === 1).length} 个完整页
-              </span>
-              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-                📊 {mergedCountries.filter(c => c.completenessTier === 2).length} 个增强页
-              </span>
-              <span className="px-3 py-1 bg-white/20 rounded-full text-xs">
-                🌐 {mergedCountries.filter(c => c.completenessTier === 3).length} 个基础页
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* ===== SEARCHABLE COUNTRY INDEX (new, from /countries) ===== */}
-        <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 mb-10">
+      <PublicCategoryPageFrame
+        title="🌍 全球目的地工具导航"
+        description="按地区查找出海常用工具 — 邮编查询、地址格式化、运费计算、商业发票、HS 编码,一站式解决。"
+        icon={<Globe className="w-6 h-6" />}
+      >
+        {/* ===== SEARCHABLE COUNTRY INDEX ===== */}
+        <div className="-mt-6 relative z-10 mb-10">
           <DestinationsIndexClient countries={mergedCountries} featured={featured} />
         </div>
 
-        {/* ===== COMMON SCENARIOS (keep original) ===== */}
-        <div className="max-w-6xl mx-auto px-4 pb-8">
+        {/* ===== COMMON SCENARIOS ===== */}
+        <div className="pb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">常见出海场景</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
@@ -205,19 +174,19 @@ export default async function DestinationsIndexPage() {
           </div>
         </div>
 
-        {/* ===== ALL TOOLS CTA (keep original) ===== */}
-        <div className="max-w-6xl mx-auto px-4 pb-16">
+        {/* ===== ALL TOOLS CTA ===== */}
+        <div className="pb-16">
           <Link href="/tools" className="block bg-gradient-to-r from-teal-600 to-cyan-600 rounded-xl p-6 text-white hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold mb-1">🔧 浏览全部工具</h3>
-                <p className="text-teal-100 text-sm">邮编、HS编码、汇率、运费、单据模板，一个站搞定</p>
+                <p className="text-teal-100 text-sm">邮编、HS编码、汇率、运费、单据模板,一个站搞定</p>
               </div>
               <ArrowRight className="w-6 h-6 flex-shrink-0" />
             </div>
           </Link>
         </div>
-      </div>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

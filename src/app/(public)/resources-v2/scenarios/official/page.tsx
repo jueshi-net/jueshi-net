@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
 
 export const dynamic = "force-dynamic";
 
@@ -29,27 +31,12 @@ export default async function ScenarioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <Link
-          href="/resources-v2"
-          className="mb-4 inline-block text-sm text-gray-500 hover:text-gray-700"
-        >
-          ← 返回资源导航
-        </Link>
-
-        <div className="mb-6 rounded-xl border bg-white p-6">
-          <div className="mb-3 flex items-center gap-3">
-            <span className="text-3xl">{SCENARIO.icon}</span>
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">
-                {SCENARIO.title}
-              </h1>
-              <p className="text-sm text-gray-500">{SCENARIO.desc}</p>
-            </div>
-          </div>
-        </div>
-
+    <JueshiV4PublicShell>
+      <PublicCategoryPageFrame
+        title={SCENARIO.title}
+        description={SCENARIO.desc}
+        icon={<span className="text-2xl">{SCENARIO.icon}</span>}
+      >
         <div data-testid="resources-v2-scenario-page" className="space-y-6">
           <div>
             <h2 className="mb-3 text-sm font-semibold text-gray-700">
@@ -105,7 +92,7 @@ export default async function ScenarioPage() {
                 data-testid="resources-v2-empty-state"
                 className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600"
               >
-                ⚠️ 资源数据加载失败，请稍后重试。
+                ⚠️ 资源数据加载失败,请稍后重试。
               </div>
             ) : resources.length > 0 ? (
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -153,13 +140,13 @@ export default async function ScenarioPage() {
               >
                 <div className="mb-2 text-3xl">🏛️</div>
                 <p className="text-sm text-gray-400">
-                  暂无官方资源，资源库持续更新中。
+                  暂无官方资源,资源库持续更新中。
                 </p>
               </div>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </PublicCategoryPageFrame>
+    </JueshiV4PublicShell>
   );
 }

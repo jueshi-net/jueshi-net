@@ -3,18 +3,19 @@ import Link from "next/link";
 import { ListChecks, Home, ChevronRight, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
 import { SectionHeader, ContentSection } from '@/components/design-system';
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "清单 - 绝世百宝箱",
-  description: "实用的出海行动清单：留学生行李准备、集运发货核对、多伦多租房看房避坑。",
+  description: "实用的出海行动清单:留学生行李准备、集运发货核对、多伦多租房看房避坑。",
   keywords: "清单,出国清单,留学清单,集运清单,租房清单,行李清单,发货清单,checklist,出海清单,海外生活清单",
   alternates: { canonical: "https://jueshi.net/checklists" },
   openGraph: {
     title: "清单 - 绝世百宝箱",
-    description: "实用的出海行动清单：留学生行李准备、集运发货核对、多伦多租房看房避坑。",
+    description: "实用的出海行动清单:留学生行李准备、集运发货核对、多伦多租房看房避坑。",
     url: "https://jueshi.net/checklists",
     type: "website",
   },
@@ -94,32 +95,12 @@ export default async function ChecklistsPage() {
 
   return (
     <JueshiV4PublicShell>
-      <div className="min-h-screen bg-gray-50">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-teal-600 via-emerald-600 to-green-700 text-white py-12 md:py-16">
-          <div className="max-w-6xl mx-auto px-4">
-            <nav className="flex items-center gap-1.5 text-sm text-teal-100 mb-6 min-h-[44px]">
-              <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
-                <Home className="w-3.5 h-3.5" /> 首页
-              </Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-white font-medium">清单</span>
-            </nav>
-
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-sm text-teal-100 border border-white/10 mb-6">
-                <ListChecks className="w-4 h-4" />
-                <span>实用的出海行动核对清单，帮你少走弯路</span>
-              </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-3">实用清单</h1>
-              <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
-                从出国行李打包到国际集运发货，从海外租房到看房避坑，每一步都有可勾选的行动清单。
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-6xl mx-auto px-4 -mt-6 pb-16 relative z-10">
+      <PublicCategoryPageFrame
+        title="实用清单"
+        description="从出国行李打包到国际集运发货,从海外租房到看房避坑,每一步都有可勾选的行动清单。"
+        icon={<ListChecks className="w-6 h-6" />}
+      >
+        <div className="-mt-6 pb-16 relative z-10">
           {/* Checklist cards - 使用 Design System */}
           <ContentSection>
             {checklists.length > 0 ? (
@@ -183,7 +164,7 @@ export default async function ChecklistsPage() {
               <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
                 <div className="text-4xl mb-4">📝</div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">暂无清单</h2>
-                <p className="text-sm text-gray-500 mb-6">我们正在准备更多实用清单，敬请期待。</p>
+                <p className="text-sm text-gray-500 mb-6">我们正在准备更多实用清单,敬请期待。</p>
                 <div className="flex flex-wrap justify-center gap-3">
                   <Link href="/tools" className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors min-h-[44px]">
                     🛠️ 工具中心
@@ -196,7 +177,7 @@ export default async function ChecklistsPage() {
             )}
           </ContentSection>
         </div>
-      </div>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

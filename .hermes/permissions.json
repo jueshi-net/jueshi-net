@@ -1,20 +1,16 @@
 {
-  "permissions": {
-    "allow": [
-      "Read(src/app/(workspace)/workspace/products/page.tsx)",
-      "Write(src/app/(workspace)/workspace/products/page.tsx)",
-      "Write(src/app/(workspace)/workspace/products/products-client.tsx)",
-      "Read(src/components/workspace/WorkspacePageFrame.tsx)",
-      "Read(src/components/workspace/WorkspaceRightRail.tsx)"
-    ],
-    "deny": [
-      "Bash",
-      "Edit(src/components/workspace/*)",
-      "Edit(src/app/api/*)",
-      "Edit(prisma/*)",
-      "Edit(src/lib/*)",
-      "Edit(middleware.ts)",
-      "Edit(package.json)"
-    ]
-  }
+  "allow": [
+    "Read(src/app/(public)/**/*.tsx)",
+    "Edit(src/app/(public)/**/*.tsx)",
+    "Read(src/components/templates/PublicCategoryPageFrame.tsx)",
+    "Read(src/components/layout/JueshiV4PublicShell.tsx)"
+  ],
+  "deny": [
+    "Edit(src/components/**)",
+    "Edit(src/app/api/**)",
+    "Edit(src/app/(workspace)/**)",
+    "Edit(src/app/(admin)/**)",
+    "Edit(prisma/**)",
+    "Edit(package.json)"
+  ]
 }
