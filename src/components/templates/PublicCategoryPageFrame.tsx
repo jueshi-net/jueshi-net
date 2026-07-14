@@ -7,6 +7,10 @@ interface PublicCategoryPageFrameProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  breadcrumbItems?: { label: string; href?: string }[];
+  showBreadcrumb?: boolean;
+  className?: string;
+  containerClassName?: string;
 }
 
 /**
@@ -18,9 +22,11 @@ interface PublicCategoryPageFrameProps {
  * - /topics 话题分类
  * - /blog 博客列表
  * - /resources 资源分类
+ * - /starter 场景包
+ * - /pricing 价格方案
  * 
  * 结构：
- * - 面包屑导航（自动生成）
+ * - 面包屑导航（自动生成或自定义）
  * - 分类标题区（标题 + 描述 + 图标 + 操作按钮）
  * - 主内容区（卡片/列表）
  */
@@ -30,14 +36,24 @@ export default function PublicCategoryPageFrame({
   icon,
   children,
   actions,
+  breadcrumbItems,
+  showBreadcrumb = true,
+  className = '',
+  containerClassName = 'max-w-7xl',
 }: PublicCategoryPageFrameProps) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 面包屑（自动生成） */}
-        <div className="mb-6">
-          <Breadcrumb />
-        </div>
+    <div className={`min-h-screen bg-gray-50 ${className}`}>
+      <div className={`${containerClassName} mx-auto px-4 sm:px-6 lg:px-8 py-8`}>
+        {/* 面包屑（自动生成或自定义） */}
+        {showBreadcrumb && (
+          <div className="mb-6">
+            {breadcrumbItems ? (
+              <Breadcrumb items={breadcrumbItems} />
+            ) : (
+              <Breadcrumb />
+            )}
+          </div>
+        )}
 
         {/* 分类标题区 */}
         <div className="mb-8">
