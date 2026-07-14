@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Breadcrumb } from '@/components/breadcrumb';
 import { FAQSection } from '@/components/faq-section';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import { MapPin, Globe, AlertCircle, CheckCircle, ArrowRight, Wrench, Zap } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -35,23 +36,13 @@ const faqItems = [
 
 export default function AddressFormatGuidePage() {
   return (
-    <>
-      <Breadcrumb />
-      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 sm:p-10 text-white mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Globe className="w-5 h-5 text-blue-200" />
-            <span className="text-sm font-medium text-blue-200">跨境寄送指南</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4">
-            国际地址格式指南：如何正确填写海外收件地址
-          </h1>
-          <p className="text-blue-100 text-base sm:text-lg leading-relaxed">
-            详解美国、加拿大、英国、日本、澳大利亚等国家的标准地址格式，避免因地址错误导致包裹延误或退件。
-          </p>
-        </div>
-
+    <JueshiV4PublicShell>
+      <PublicLandingPageFrame
+        title="国际地址格式指南：如何正确填写海外收件地址"
+        description="详解美国、加拿大、英国、日本、澳大利亚等国家的标准地址格式，避免因地址错误导致包裹延误或退件。"
+        icon={<Globe className="w-6 h-6" />}
+        variant="form"
+      >
         {/* Target Audience */}
         <div className="bg-teal-50 border border-teal-100 rounded-xl p-5 mb-8">
           <h2 className="text-sm font-bold text-teal-800 mb-2 flex items-center gap-2">
@@ -322,7 +313,7 @@ export default function AddressFormatGuidePage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-      </div>
-    </>
+      </PublicLandingPageFrame>
+    </JueshiV4PublicShell>
   );
 }
