@@ -1,5 +1,7 @@
 // Server Component: loads all forum data directly from DB
 import { prisma } from "@/lib/prisma";
+import { MessageSquare } from "lucide-react";
+import AdminPageFrame from "@/components/templates/AdminPageFrame";
 import ForumAdminClient from "./forum-admin-client";
 
 export const dynamic = "force-dynamic";
@@ -93,5 +95,14 @@ async function loadForumData() {
 export default async function AdminForumPage() {
   const data = await loadForumData();
 
-  return <ForumAdminClient data={data} />;
+  return (
+    <AdminPageFrame
+      title="论坛管理"
+      description="管理帖子、评论、分类和社区规范"
+      icon={<MessageSquare className="w-5 h-5" />}
+      variant="table"
+    >
+      <ForumAdminClient data={data} />
+    </AdminPageFrame>
+  );
 }

@@ -198,14 +198,6 @@ export default function ForumAdminClient({ data }: { data: ForumData | null }) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-violet-600 to-purple-600 rounded-xl p-5 text-white">
-        <h1 className="text-xl font-extrabold flex items-center gap-2">
-          <MessageSquare className="w-5 h-5" /> 论坛管理
-        </h1>
-        <p className="text-sm text-violet-100 mt-1">管理帖子、评论、分类和社区规范</p>
-      </div>
-
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2">
         {[

@@ -42,8 +42,7 @@ export default function LevelsClient({ initialLevels }: { initialLevels: UserLev
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">会员等级管理</h1>
+      <div className="flex items-center justify-end">
         <Link href="/admin/community/badges" className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 transition-colors">
           <Award className="w-4 h-4" /> 勋章管理 →
         </Link>

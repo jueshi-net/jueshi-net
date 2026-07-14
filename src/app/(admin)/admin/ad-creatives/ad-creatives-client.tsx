@@ -151,12 +151,8 @@ export default function AdCreativesClient() {
   const getCampaignTitle = (id: string) => campaigns.find(c => c.id === id)?.title || id;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">广告素材管理</h1>
-          <p className="text-sm text-gray-500 mt-1">管理各广告活动的素材（图片/HTML/文案/原生）</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <button onClick={() => { resetForm(); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建素材
         </button>

@@ -78,12 +78,8 @@ export default function AdPlacementsClient() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">广告位管理</h1>
-          <p className="text-sm text-gray-500 mt-1">管理各页面可投放广告的位置</p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <button onClick={() => { setEditing(null); setForm({ key: "", name: "", pageType: "home", zone: "hero_below", device: "all", description: "", isActive: true, sortOrder: 0 }); setShowForm(!showForm); }} className="inline-flex items-center gap-2 px-3 py-2 bg-teal-600 text-white rounded-lg text-sm hover:bg-teal-700">
           <Plus className="w-4 h-4" /> 新建广告位
         </button>

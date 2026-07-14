@@ -66,12 +66,8 @@ export default function ChecklistsListClient({ checklists: initialChecklists }: 
   const stepCount = (c: Checklist) => (Array.isArray(c.steps) ? c.steps.length : 0);
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <ListChecks className="w-6 h-6 text-teal-600" />
-          <h1 className="text-xl font-bold text-gray-900">清单管理</h1>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <Link
           href="/admin/content/checklists/new"
           className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 min-h-[44px]"

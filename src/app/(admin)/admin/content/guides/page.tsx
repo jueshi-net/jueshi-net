@@ -1,5 +1,7 @@
 // Server Component: loads guides from DB directly
 import { prisma } from "@/lib/prisma";
+import { BookOpen } from "lucide-react";
+import AdminPageFrame from "@/components/templates/AdminPageFrame";
 import GuidesListClient from "./guides-list-client";
 
 export const dynamic = "force-dynamic";
@@ -21,5 +23,14 @@ export default async function AdminGuidesPage() {
 
   // Serialize dates for client component
   const serialized = JSON.parse(JSON.stringify(guides));
-  return <GuidesListClient guides={serialized} />;
+  return (
+    <AdminPageFrame
+      title="指南管理"
+      description="管理内容指南和分类"
+      icon={<BookOpen className="w-5 h-5" />}
+      variant="table"
+    >
+      <GuidesListClient guides={serialized} />
+    </AdminPageFrame>
+  );
 }

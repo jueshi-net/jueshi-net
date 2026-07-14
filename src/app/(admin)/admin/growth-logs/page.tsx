@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+import { TrendingUp } from "lucide-react";
+import AdminPageFrame from "@/components/templates/AdminPageFrame";
 import GrowthLogsClient from "./growth-logs-client";
 import { prisma } from "@/lib/prisma";
 
@@ -56,12 +58,19 @@ export default async function AdminGrowthLogsPage({
   ]);
 
   return (
-    <GrowthLogsClient
-      initialLogs={logs.map(l => ({ ...l, createdAt: l.createdAt.toISOString() }))}
-      initialPagination={{ page, pageSize, total, totalPages: Math.ceil(total / pageSize) }}
-      initialType={typeFilter}
-      initialEmail={emailFilter}
-      allTypes={allTypes}
-    />
+    <AdminPageFrame
+      title="成长日志"
+      description="查看所有用户的成长值变动记录，含签到、审核、后台调整"
+      icon={<TrendingUp className="w-5 h-5" />}
+      variant="table"
+    >
+      <GrowthLogsClient
+        initialLogs={logs.map(l => ({ ...l, createdAt: l.createdAt.toISOString() }))}
+        initialPagination={{ page, pageSize, total, totalPages: Math.ceil(total / pageSize) }}
+        initialType={typeFilter}
+        initialEmail={emailFilter}
+        allTypes={allTypes}
+      />
+    </AdminPageFrame>
   );
 }

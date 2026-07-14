@@ -112,20 +112,9 @@ export default function AdEntitlementsClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <WorkspacePageHeader
-        title="广告权益审核"
-        subtitle="审核用户提交的广告权益申请"
-        icon={<Shield className="w-5 h-5" />}
-        breadcrumbs={[
-          { label: '管理后台', href: '/admin' },
-          { label: '广告权益审核' },
-        ]}
-      />
-
-      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
-        {/* 状态筛选 */}
-        <div className="flex gap-2 flex-wrap">
+    <div className="space-y-6">
+      {/* 状态筛选 */}
+      <div className="flex gap-2 flex-wrap">
           {STATUS_OPTIONS.map((opt) => (
             <button
               key={opt.value}

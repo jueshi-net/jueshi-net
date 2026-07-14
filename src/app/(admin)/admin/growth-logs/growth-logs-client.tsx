@@ -85,23 +85,6 @@ export default function GrowthLogsClient({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-5 text-white">
-        <div className="flex items-center gap-2 text-sm text-emerald-100 mb-2">
-          <Link href="/admin" className="hover:text-white transition-colors">
-            管理后台
-          </Link>
-          <span>/</span>
-          <span className="text-white font-medium">成长日志</span>
-        </div>
-        <h1 className="text-xl font-extrabold flex items-center gap-2">
-          <TrendingUp className="w-5 h-5" /> 成长值流水审计
-        </h1>
-        <p className="text-sm text-emerald-100 mt-1">
-          查看所有用户的成长值变动记录，含签到、审核、后台调整
-        </p>
-      </div>
-
       {/* Filters */}
       <div className="bg-white rounded-xl border p-4">
         <div className="flex flex-col sm:flex-row gap-3">

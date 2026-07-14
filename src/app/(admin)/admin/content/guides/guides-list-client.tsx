@@ -62,12 +62,8 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <BookOpen className="w-6 h-6 text-blue-600" />
-          <h1 className="text-xl font-bold text-gray-900">指南管理</h1>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-end">
         <Link
           href="/admin/content/guides/new"
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-h-[44px]"

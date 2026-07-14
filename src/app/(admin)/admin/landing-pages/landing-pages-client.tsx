@@ -529,56 +529,40 @@ export default function LandingPagesClient() {
   const labelCls = "block text-xs font-medium text-gray-500 mb-1";
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <WorkspacePageHeader
-        title="落地页管理"
-        subtitle="配置落地页 SEO、关联内容与广告位"
-        icon={<Layout className="w-5 h-5" />}
-        breadcrumbs={[
-          { label: '管理后台', href: '/admin' },
-          { label: '落地页管理' },
-        ]}
-        actions={
-          <button onClick={() => { setEditing(null); setForm({ slug: "", title: "", seoTitle: "", seoDescription: "", pageType: "landing", status: "draft", primaryTool: "", relatedTools: "", relatedTopics: "", relatedArticles: "", heroSectionJson: "", blockVisibility: "{}", blockOrder: "[]" }); setShowForm(!showForm); setEditMode("structured"); }} className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors shadow-sm">
-            <Plus className="w-4 h-4" /> 新建落地页
-          </button>
-        }
-      />
-
-      <div className="max-w-6xl mx-auto px-6 py-6 space-y-6">
-        {/* Info Banner */}
-        <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800">
-          <div className="flex items-start gap-2">
-            <span className="text-base">💡</span>
-            <div>
-              <span className="font-medium">公开页面:</span> <a href="/lp/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/lp/[slug]</a> | <span className="font-medium">清单:</span> <a href="/checklists/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/checklists/[slug]</a>
-              <div className="text-xs text-teal-600 mt-1">清单提示：可使用 Hermes ContentOps 生成 checklist draft JSON，人工审核后再发布为 published。</div>
-            </div>
+    <div className="space-y-6">
+      {/* Info Banner */}
+      <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 text-sm text-teal-800">
+        <div className="flex items-start gap-2">
+          <span className="text-base">💡</span>
+          <div>
+            <span className="font-medium">公开页面:</span> <a href="/lp/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/lp/[slug]</a> | <span className="font-medium">清单:</span> <a href="/checklists/[slug]" className="text-teal-700 hover:underline font-mono text-xs">/checklists/[slug]</a>
+            <div className="text-xs text-teal-600 mt-1">清单提示：可使用 Hermes ContentOps 生成 checklist draft JSON，人工审核后再发布为 published。</div>
           </div>
         </div>
+      </div>
 
-        {/* Filters */}
-        <SectionCard>
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex items-center gap-2">
-              <Search className="w-4 h-4 text-gray-400" />
-              <input type="text" placeholder="搜索 slug/标题..." value={filters.search} onChange={e => setFilters(f => ({ ...f, search: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 w-48 transition-colors" />
-            </div>
-            <select value={filters.pageType} onChange={e => setFilters(f => ({ ...f, pageType: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-colors">
-              <option value="">全部类型</option>
-              {PAGE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-colors">
-              <option value="">全部状态</option>
-              {STATUSES.map(s => <option key={s} value={s}>{statusLabels[s]}</option>)}
-            </select>
-            <button onClick={() => setFilters({ pageType: "", status: "", search: "" })} className="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">重置</button>
+      {/* Filters */}
+      <SectionCard>
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input type="text" placeholder="搜索 slug/标题..." value={filters.search} onChange={e => setFilters(f => ({ ...f, search: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 w-48 transition-colors" />
           </div>
-        </SectionCard>
+          <select value={filters.pageType} onChange={e => setFilters(f => ({ ...f, pageType: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-colors">
+            <option value="">全部类型</option>
+            {PAGE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))} className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-colors">
+            <option value="">全部状态</option>
+            {STATUSES.map(s => <option key={s} value={s}>{statusLabels[s]}</option>)}
+          </select>
+          <button onClick={() => setFilters({ pageType: "", status: "", search: "" })} className="px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">重置</button>
+        </div>
+      </SectionCard>
 
-        {/* Form */}
-        {showForm && (
-          <SectionCard title={editing ? "编辑落地页" : "新建落地页"} className="border-teal-200 border-2">
+      {/* Form */}
+      {showForm && (
+        <SectionCard title={editing ? "编辑落地页" : "新建落地页"} className="border-teal-200 border-2">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Slug (唯一) *</label>
@@ -874,7 +858,6 @@ export default function LandingPagesClient() {
             </div>
           </SectionCard>
         )}
-      </div>
     </div>
   );
 }

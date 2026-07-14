@@ -1,63 +1,62 @@
-# Worker B: PUBLIC_LANDING content/tool 页面迁移任务
+# Worker D: ADMIN 页面迁移任务
 
 ## 任务目标
-将以下 PUBLIC_LANDING 页面（content/tool 变体）迁移到 PublicLandingPageFrame 模板。
+将以下 ADMIN 页面迁移到 AdminPageFrame 模板。
 
-## 目标页面列表（前 10 个）
-- /
-- /
-- /tools/video-script-sop
-- /tools/postal-code
-- /tools/handover-note
-- /tools/document-runtime-demo
-- /tools/sensitive-goods
-- /tools/documents
-- /tools/documents/quotation
-- /tools/documents/settings/role-switcher
+## 目标页面列表
+- /(admin)/admin/ad-placements
+- /(admin)/admin/content
+- /(admin)/admin/content/checklists
+- /(admin)/admin/content/guides
+- /(admin)/admin/landing-pages
+- /(admin)/admin/growth-logs
+- /(admin)/admin/ad-entitlements
+- /(admin)/admin/ad-creatives
+- /(admin)/admin/forum
+- /(admin)/admin/levels
 
-... 还有 25 个页面
+... 还有 1 个页面
 
 ## 迁移步骤
 
 ### 1. 检查页面当前结构
 读取每个页面文件，确认：
-- 是否已使用 JueshiV4PublicShell
 - 当前布局结构
-- 页面类型（content/tool）
+- 页面类型（table/form/detail）
 
-### 2. 应用 PublicLandingPageFrame
+### 2. 应用 AdminPageFrame
 对每个页面：
 
 ```tsx
-import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
-import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import AdminPageFrame from '@/components/templates/AdminPageFrame';
 
 export default function Page() {
   return (
-    <JueshiV4PublicShell>
-      <PublicLandingPageFrame
-        title="页面标题"
-        description="页面描述"
-        icon={<IconComponent />}
-        variant="content" // 或 "tool"
-      >
-        {/* 页面主内容 */}
-      </PublicLandingPageFrame>
-    </JueshiV4PublicShell>
+    <AdminPageFrame
+      title="页面标题"
+      description="页面描述"
+      icon={<IconComponent />}
+      variant="table" // 或 "form" 或 "detail"
+      actions={
+        <Button>操作按钮</Button>
+      }
+    >
+      {/* 页面主内容 */}
+    </AdminPageFrame>
   );
 }
 ```
 
 ### 3. 选择正确的 variant
-- `content`: 指南、文章、介绍类页面
-- `tool`: 工具展示、工具说明类页面
-- `form`: 工具主界面（不在本 Worker 范围）
+- `table`: 列表页、数据表格页
+- `form`: 表单页、编辑页
+- `detail`: 详情页、查看页
 
 ### 4. 移除重复布局
 - 删除页面内的 min-h-screen
-- 删除页面内的 max-w-4xl 或 max-w-7xl 容器
-- 删除页面内的 px-4/py-8 等间距
-- 删除自定义面包屑（PublicLandingPageFrame 已包含）
+- 删除页面内的 max-w-7xl 容器
+- 删除页面内的 px-4/py-6 等间距
+- 删除自定义标题区（AdminPageFrame 已包含）
 
 ### 5. 保留业务内容
 - 保留所有数据获取逻辑
@@ -75,4 +74,4 @@ export default function Page() {
 - 不要修改数据获取
 - 不要修改 API 调用
 - 只调整布局结构
-- 本 Worker 只处理 content/tool 变体，不处理 form 变体
+- Admin 页面不需要 JueshiV4PublicShell 包装

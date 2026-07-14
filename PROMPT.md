@@ -1,23 +1,22 @@
-# PUBLIC_LANDING content/tool 页面批量迁移任务
+# ADMIN 页面批量迁移任务
 
 ## 任务概述
-将 10 个 PUBLIC_LANDING 页面（content/tool 变体）迁移到 PublicLandingPageFrame 模板。
+将 10 个 ADMIN 页面迁移到 AdminPageFrame 模板。
 
 ## 目标页面（第一批）
-  - /
-  - /
-  - /tools/video-script-sop
-  - /tools/postal-code
-  - /tools/handover-note
-  - /tools/document-runtime-demo
-  - /tools/sensitive-goods
-  - /tools/documents
-  - /tools/documents/quotation
-  - /tools/documents/settings/role-switcher
+  - /(admin)/admin/ad-placements
+  - /(admin)/admin/content
+  - /(admin)/admin/content/checklists
+  - /(admin)/admin/content/guides
+  - /(admin)/admin/landing-pages
+  - /(admin)/admin/growth-logs
+  - /(admin)/admin/ad-entitlements
+  - /(admin)/admin/ad-creatives
+  - /(admin)/admin/forum
+  - /(admin)/admin/levels
 
 ## 模板组件位置
-- PublicLandingPageFrame: src/components/templates/PublicLandingPageFrame.tsx
-- JueshiV4PublicShell: src/components/layout/JueshiV4PublicShell.tsx
+- AdminPageFrame: src/components/templates/AdminPageFrame.tsx
 
 ## 迁移模式
 
@@ -25,41 +24,41 @@
 
 ### 1. 读取当前页面
 ```bash
-cat src/app/(public)/[route]/page.tsx
+cat src/app/(admin)/[route]/page.tsx
 ```
 
 ### 2. 应用模板包装
 ```tsx
-import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
-import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import AdminPageFrame from '@/components/templates/AdminPageFrame';
 
 export default function Page() {
   return (
-    <JueshiV4PublicShell>
-      <PublicLandingPageFrame
-        title="页面标题"
-        description="页面描述"
-        icon={<IconComponent />}
-        variant="content" // 或 "tool"
-      >
-        {/* 原有内容 */}
-      </PublicLandingPageFrame>
-    </JueshiV4PublicShell>
+    <AdminPageFrame
+      title="页面标题"
+      description="页面描述"
+      icon={<IconComponent />}
+      variant="table" // 或 "form" 或 "detail"
+      actions={
+        <Button>操作按钮</Button>
+      }
+    >
+      {/* 页面主内容 */}
+    </AdminPageFrame>
   );
 }
 ```
 
 ### 3. 选择正确的 variant
-- `content`: 指南、文章、介绍类页面
-- `tool`: 工具展示、工具说明类页面
+- `table`: 列表页、数据表格页
+- `form`: 表单页、编辑页
+- `detail`: 详情页、查看页
 
 ### 4. 清理重复布局
 删除以下内容：
 - `min-h-screen` 类名
-- `max-w-4xl` 或 `max-w-7xl` 容器
-- `px-4 sm:px-6 lg:px-8` 间距
-- `py-8` 间距
-- 自定义面包屑组件
+- `max-w-7xl` 容器
+- `px-4 py-6` 间距
+- 自定义标题区
 
 ### 5. 保留业务逻辑
 保留：
@@ -74,20 +73,19 @@ export default function Page() {
 - 布局正确
 
 ## 执行顺序
-1. /
-2. /
-3. /tools/video-script-sop
-4. /tools/postal-code
-5. /tools/handover-note
-6. /tools/document-runtime-demo
-7. /tools/sensitive-goods
-8. /tools/documents
-9. /tools/documents/quotation
-10. /tools/documents/settings/role-switcher
+1. /(admin)/admin/ad-placements
+2. /(admin)/admin/content
+3. /(admin)/admin/content/checklists
+4. /(admin)/admin/content/guides
+5. /(admin)/admin/landing-pages
+6. /(admin)/admin/growth-logs
+7. /(admin)/admin/ad-entitlements
+8. /(admin)/admin/ad-creatives
+9. /(admin)/admin/forum
+10. /(admin)/admin/levels
 
 ## 成功标准
-- 所有页面使用 PublicLandingPageFrame
-- 所有页面使用 JueshiV4PublicShell
+- 所有页面使用 AdminPageFrame
 - 无重复布局代码
 - 业务逻辑完整保留
 - TypeScript 编译通过

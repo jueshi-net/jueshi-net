@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { BookOpen, ListChecks, LayoutTemplate, FolderOpen, ArrowRight, CheckCircle, FileEdit } from "lucide-react";
+import AdminPageFrame from "@/components/templates/AdminPageFrame";
 
 export const dynamic = "force-dynamic";
 
@@ -84,12 +85,12 @@ export default async function ContentCenterPage() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <BookOpen className="w-6 h-6 text-gray-700" />
-        <h1 className="text-xl font-bold text-gray-900">内容中心</h1>
-      </div>
-
+    <AdminPageFrame
+      title="内容中心"
+      description="管理指南、清单、落地页、专题等内容资源"
+      icon={<BookOpen className="w-5 h-5" />}
+      variant="detail"
+    >
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-lg shadow-sm p-5">
@@ -154,6 +155,6 @@ export default async function ContentCenterPage() {
           </Link>
         ))}
       </div>
-    </div>
+    </AdminPageFrame>
   );
 }
