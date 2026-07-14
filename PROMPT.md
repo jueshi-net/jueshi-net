@@ -1,20 +1,22 @@
-# PUBLIC_CATEGORY 页面批量迁移任务
+# PUBLIC_LANDING content/tool 页面批量迁移任务
 
 ## 任务概述
-将 8 个 PUBLIC_CATEGORY 页面迁移到 PublicCategoryPageFrame 模板。
+将 10 个 PUBLIC_LANDING 页面（content/tool 变体）迁移到 PublicLandingPageFrame 模板。
 
-## 目标页面
-  - /destinations
-  - /checklists
-  - /resources-v2/scenarios/payment
-  - /resources-v2/scenarios/life
-  - /resources-v2/scenarios/shipping
-  - /resources-v2/scenarios/official
-  - /resources-v2/scenarios/company
-  - /resources-v2/scenarios/invoice
+## 目标页面（第一批）
+  - /
+  - /
+  - /tools/video-script-sop
+  - /tools/postal-code
+  - /tools/handover-note
+  - /tools/document-runtime-demo
+  - /tools/sensitive-goods
+  - /tools/documents
+  - /tools/documents/quotation
+  - /tools/documents/settings/role-switcher
 
 ## 模板组件位置
-- PublicCategoryPageFrame: src/components/templates/PublicCategoryPageFrame.tsx
+- PublicLandingPageFrame: src/components/templates/PublicLandingPageFrame.tsx
 - JueshiV4PublicShell: src/components/layout/JueshiV4PublicShell.tsx
 
 ## 迁移模式
@@ -28,57 +30,63 @@ cat src/app/(public)/[route]/page.tsx
 
 ### 2. 应用模板包装
 ```tsx
-import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 
 export default function Page() {
   return (
     <JueshiV4PublicShell>
-      <PublicCategoryPageFrame
+      <PublicLandingPageFrame
         title="页面标题"
         description="页面描述"
         icon={<IconComponent />}
+        variant="content" // 或 "tool"
       >
         {/* 原有内容 */}
-      </PublicCategoryPageFrame>
+      </PublicLandingPageFrame>
     </JueshiV4PublicShell>
   );
 }
 ```
 
-### 3. 清理重复布局
+### 3. 选择正确的 variant
+- `content`: 指南、文章、介绍类页面
+- `tool`: 工具展示、工具说明类页面
+
+### 4. 清理重复布局
 删除以下内容：
 - `min-h-screen` 类名
-- `max-w-7xl mx-auto` 容器
+- `max-w-4xl` 或 `max-w-7xl` 容器
 - `px-4 sm:px-6 lg:px-8` 间距
 - `py-8` 间距
 - 自定义面包屑组件
 
-### 4. 保留业务逻辑
+### 5. 保留业务逻辑
 保留：
-- 数据获取（getServerSideProps, fetch 等）
+- 数据获取
 - 业务组件
 - 状态管理
 - 事件处理
 
-### 5. 验证
+### 6. 验证
 - TypeScript 编译通过
 - 页面可正常访问
 - 布局正确
 
 ## 执行顺序
-按以下顺序处理页面：
-1. /destinations
-2. /checklists
-3. /resources-v2/scenarios/payment
-4. /resources-v2/scenarios/life
-5. /resources-v2/scenarios/shipping
-6. /resources-v2/scenarios/official
-7. /resources-v2/scenarios/company
-8. /resources-v2/scenarios/invoice
+1. /
+2. /
+3. /tools/video-script-sop
+4. /tools/postal-code
+5. /tools/handover-note
+6. /tools/document-runtime-demo
+7. /tools/sensitive-goods
+8. /tools/documents
+9. /tools/documents/quotation
+10. /tools/documents/settings/role-switcher
 
 ## 成功标准
-- 所有页面使用 PublicCategoryPageFrame
+- 所有页面使用 PublicLandingPageFrame
 - 所有页面使用 JueshiV4PublicShell
 - 无重复布局代码
 - 业务逻辑完整保留

@@ -5,9 +5,10 @@ import { AlertTriangle, Info, CheckCircle, Shield, ClipboardList, MessageSquare 
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
-import { Breadcrumb } from '@/components/breadcrumb';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { trackEvent } from '@/lib/analytics';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
 
 interface SensitiveItem {
   name: string;
@@ -146,20 +147,14 @@ export default function SensitiveGoodsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold mb-4">敏感货参考查询</h1>
-          <p className="text-lg text-orange-100">了解常见物品的邮寄分类参考，非任何服务商的接货规则</p>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
+    <JueshiV4PublicShell>
+      <PublicLandingPageFrame
+        title="敏感货参考查询"
+        description="了解常见物品的邮寄分类参考，非任何服务商的接货规则"
+        icon={<AlertTriangle className="w-6 h-6" />}
+        variant="tool"
+      >
+        <div className="max-w-6xl mx-auto px-4 pb-16">
         {/* Disclaimer */}
         <div className={cardStyles.base + " mb-6"}>
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">

@@ -8,11 +8,12 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { ArrowLeftRight, RotateCcw, DollarSign, AlertTriangle, RefreshCw, Info, TrendingUp, Copy, Check, Clock, Truck, Bell, BellRing, Calculator, Globe, Bookmark, Trash2, Eye } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { FAQSection } from '@/components/faq-section';
-import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import Link from 'next/link';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
 
 interface RateResponse {
   source: string;
@@ -572,33 +573,21 @@ ${'─'.repeat(30)}
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
-
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <DollarSign className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-gray-900">海外换汇与多币种报价助手</h1>
-          <p className="text-gray-500 mt-2 text-sm">
-            Exchange Rate &amp; Multi-currency Quote Helper
-          </p>
-          <p className="text-gray-400 mt-1 text-xs">
-            查询常用货币汇率，估算换汇金额、跨境成本和外贸报价。适用于海外生活、跨境收款、外贸报价和电商成本核算。
-          </p>
-        </div>
-
-        {/* Disclaimer - top */}
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
-          <p className="text-xs text-amber-800">
-            <strong>免责声明：</strong>汇率数据仅供参考，实际换汇、收款和结算请以银行、支付平台或服务商最终成交价为准。
-          </p>
-        </div>
+    <JueshiV4PublicShell>
+      <PublicLandingPageFrame
+        title="海外换汇与多币种报价助手"
+        description="查询常用货币汇率，估算换汇金额、跨境成本和外贸报价。适用于海外生活、跨境收款、外贸报价和电商成本核算。"
+        icon={<DollarSign className="w-6 h-6" />}
+        variant="tool"
+      >
+        <div className="bg-gray-50 py-8 px-4">
+          <div className="max-w-7xl mx-auto">
+            {/* Disclaimer - top */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-6">
+              <p className="text-xs text-amber-800">
+                <strong>免责声明：</strong>汇率数据仅供参考，实际换汇、收款和结算请以银行、支付平台或服务商最终成交价为准。
+              </p>
+            </div>
 
         {/* Tab Navigation */}
         <div className="flex gap-1 mb-6 bg-white rounded-xl p-1 border border-gray-200 overflow-x-auto">
@@ -1583,7 +1572,8 @@ ${'─'.repeat(30)}
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-exchange-rate-bottom" className="mt-8 mb-8" />
-      </div>
-    </div>
+        </div>
+      </PublicLandingPageFrame>
+    </JueshiV4PublicShell>
   );
 }

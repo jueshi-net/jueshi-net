@@ -3,6 +3,9 @@ import { buildCanonical, buildTitle } from '@/lib/seo';
 import PostalCodeClient from './postal-code-client';
 import ToolReviewServer from '@/components/tools/tool-review-server';
 import { RelatedDiscussions } from '@/components/community/related-discussions';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
+import { MapPin } from 'lucide-react';
 
 const description = '快速查询和整理海外地址、邮编信息，适合寄件、集运、表单填写和地址核对。';
 
@@ -20,14 +23,21 @@ export const metadata: Metadata = {
 
 export default function PostalCodePage() {
   return (
-    <>
-      <PostalCodeClient />
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <ToolReviewServer toolKey="postal-code" />
-      </div>
-      <div className="max-w-5xl mx-auto px-4 pb-8">
-        <RelatedDiscussions tool="postal-code" />
-      </div>
-    </>
+    <JueshiV4PublicShell>
+      <PublicLandingPageFrame
+        title="邮编查询"
+        description={description}
+        icon={<MapPin className="w-6 h-6" />}
+        variant="tool"
+      >
+        <PostalCodeClient />
+        <div className="mt-8">
+          <ToolReviewServer toolKey="postal-code" />
+        </div>
+        <div className="mt-8">
+          <RelatedDiscussions tool="postal-code" />
+        </div>
+      </PublicLandingPageFrame>
+    </JueshiV4PublicShell>
   );
 }
