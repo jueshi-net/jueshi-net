@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { parseAddress, formatEnglishAddress, formatChineseAddress, formatLineByLineAddress, type ParsedAddress } from '@/lib/address-parser';
 import { saveAddressToShipping } from '@/lib/address-shipping-transfer';
+import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
 
 interface AddressForm {
   country: string;
@@ -323,19 +324,12 @@ export default function AddressFormatterPage() {
   const config = countryConfig[form.country];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-16">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">地址格式生成器</h1>
-          <p className="text-lg text-indigo-100">输入地址信息，生成适合快递/集运填写的规范英文地址格式</p>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 -mt-8 pb-16">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
+    <PublicLandingPageFrame
+      title="地址格式生成器"
+      description="输入地址信息，生成适合快递/集运填写的规范英文地址格式"
+      icon={<MapPin className="w-6 h-6" />}
+      variant="tool"
+    >
 
         {/* Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6 flex items-start gap-3">
@@ -781,7 +775,6 @@ export default function AddressFormatterPage() {
             steps={TASK_CHAIN_STEPS['address-formatter']}
           />
         </div>
-      </div>
-    </div>
+    </PublicLandingPageFrame>
   );
 }

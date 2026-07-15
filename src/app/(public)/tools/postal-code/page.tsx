@@ -3,7 +3,6 @@ import { buildCanonical, buildTitle } from '@/lib/seo';
 import PostalCodeClient from './postal-code-client';
 import ToolReviewServer from '@/components/tools/tool-review-server';
 import { RelatedDiscussions } from '@/components/community/related-discussions';
-import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
 import { MapPin } from 'lucide-react';
 
@@ -23,21 +22,19 @@ export const metadata: Metadata = {
 
 export default function PostalCodePage() {
   return (
-    <JueshiV4PublicShell>
-      <PublicLandingPageFrame
-        title="邮编查询"
-        description={description}
-        icon={<MapPin className="w-6 h-6" />}
-        variant="tool"
-      >
-        <PostalCodeClient />
-        <div className="mt-8">
-          <ToolReviewServer toolKey="postal-code" />
-        </div>
-        <div className="mt-8">
-          <RelatedDiscussions tool="postal-code" />
-        </div>
-      </PublicLandingPageFrame>
-    </JueshiV4PublicShell>
+    <PublicLandingPageFrame
+      title="邮编查询"
+      description={description}
+      icon={<MapPin className="w-6 h-6" />}
+      variant="tool"
+    >
+      <PostalCodeClient />
+      <div className="mt-8">
+        <ToolReviewServer toolKey="postal-code" />
+      </div>
+      <div className="mt-8">
+        <RelatedDiscussions tool="postal-code" />
+      </div>
+    </PublicLandingPageFrame>
   );
 }
