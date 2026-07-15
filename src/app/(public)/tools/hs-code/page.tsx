@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Search, Package, ExternalLink, ChevronDown, ChevronUp, Loader2, Copy, Check, Clock, Truck, AlertTriangle, Bookmark, BookmarkCheck, Shield, FileText, Calculator, Link2 } from 'lucide-react';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
-import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { TaskChainSelectDialog } from '@/components/tools/task-chain-select-dialog';
@@ -490,19 +490,11 @@ export default function HSCodePage() {
   const sensitiveQuery = isSensitiveQuery(activeQuery);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="bg-gradient-to-r from-teal-500 to-blue-600 text-white py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold mb-3">HS Code 商品归类辅助查询助手</h1>
-          <p className="text-sm md:text-base text-teal-100 mb-2">HS Code Classification Assistant</p>
-          <p className="text-sm text-teal-100/80 max-w-2xl mx-auto">
-            输入商品中文名、英文名或 HS 编码，查询可能的商品归类结果，辅助填写商业发票、报价单和集运申报资料。
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 -mt-6 pb-16">
-        <div className="mb-4"><Breadcrumb /></div>
+    <PublicLandingPageFrame
+      title="HS Code 商品归类查询"
+      subtitle="输入商品中文名、英文名或 HS 编码，查询可能的商品归类结果"
+    >
+      <div className="pb-16">
         
         {/* Primary Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
@@ -1045,6 +1037,6 @@ export default function HSCodePage() {
         onCreateNew={handleCreateNewTaskChain}
         sourceTool="hs-code"
       />
-    </div>
+    </PublicLandingPageFrame>
   );
 }

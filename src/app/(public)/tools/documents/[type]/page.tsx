@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 import {
   ArrowLeft, Save, Printer, Download, FileText, Image, Crown,
   Plus, Trash2, ChevronDown, Building2, AlertTriangle, Eye,
@@ -844,7 +845,11 @@ export default function DocumentEditorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PublicLandingPageFrame
+      title={docType?.titleZh || "单据工具"}
+      subtitle={docType?.titleEn || ""}
+    >
+    <div>
       {/* Task Chain Prefill Banner */}
       {showTaskChainBanner && taskChainData && (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-200 px-4 py-3">
@@ -937,16 +942,9 @@ export default function DocumentEditorPage() {
       <div className="bg-white border-b sticky top-0 z-40 no-print">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/tools/documents" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1">
-              <ArrowLeft className="w-4 h-4" /> 返回
-            </Link>
             <Link href="/tools/documents/drafts" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1" title="我的草稿">
               <Clock className="w-4 h-4" />
             </Link>
-            <div>
-              <h1 className="font-bold text-gray-900">{docType.titleZh}</h1>
-              <p className="text-xs text-gray-400">{docType.titleEn}</p>
-            </div>
           </div>
           <div className="hidden lg:flex items-center gap-2">
             <TaskChainGeneratorButton
@@ -1723,5 +1721,6 @@ export default function DocumentEditorPage() {
         </div>
       </div>
     </div>
+    </PublicLandingPageFrame>
   );
 }
