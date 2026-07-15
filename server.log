@@ -1,0 +1,26 @@
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.13.231:3000
+- Environments: .env.local
+✓ Ready in 137ms
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+○ Compiling / ...
+ GET / 200 in 4.3s (next.js: 4.1s, application-code: 141ms)
+ GET /tools/shipping-calculator 200 in 236ms (next.js: 184ms, application-code: 51ms)
+ GET /tools/container 200 in 187ms (next.js: 147ms, application-code: 40ms)
+Failed to load notes from localStorage
+ GET /tools/memo 200 in 170ms (next.js: 138ms, application-code: 32ms)
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/Users/chq/xixiong-saas/.next/dev/server/chunks/ssr/node_modules_@auth_core_0~jrzue._.js:513:16)
+    at Auth (/Users/chq/xixiong-saas/.next/dev/server/chunks/ssr/node_modules_@auth_core_0~jrzue._.js:5344:202)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at listOnTimeout (node:internal/timers:547:9)
+    at process.processTimers (node:internal/timers:521:7)
+[31m[auth][error][0m MissingSecret: Please define a `secret`. Read more at https://errors.authjs.dev#missingsecret
+    at assertConfig (/Users/chq/xixiong-saas/.next/dev/server/chunks/ssr/node_modules_@auth_core_0~jrzue._.js:513:16)
+    at Auth (/Users/chq/xixiong-saas/.next/dev/server/chunks/ssr/node_modules_@auth_core_0~jrzue._.js:5344:202)
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17)
+ GET /tools/documents 200 in 449ms (next.js: 239ms, application-code: 209ms)

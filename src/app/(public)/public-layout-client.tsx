@@ -31,8 +31,9 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isChangelog = pathname === '/changelog';
   const isShipping = pathname === '/shipping';
 
-  // 首页、UI Lab、资源页、工具页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources || isResourcesSite || isTools || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
+  // 首页、UI Lab、资源页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页使用各自的 shell，跳过公共 Header/Footer
+  // 工具页（/tools）现在使用公共 Shell，以便统一移动端体验
+  if (isUILab || isV4Home || isResources || isResourcesSite || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
     return <>{children}</>;
   }
 
