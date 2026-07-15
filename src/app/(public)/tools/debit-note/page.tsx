@@ -8,12 +8,19 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import DebitNoteClient from "./debit-note-client";
+import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
 
 export default function DebitNotePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
-      <DebitNotePageInner />
-    </Suspense>
+    <PublicLandingPageFrame
+      title="借记单"
+      subtitle="快速生成专业借记单据，支持PDF导出"
+      variant="tool"
+    >
+      <Suspense fallback={<div className="flex items-center justify-center py-12"><div className="text-gray-500">加载中...</div></div>}>
+        <DebitNotePageInner />
+      </Suspense>
+    </PublicLandingPageFrame>
   );
 }
 

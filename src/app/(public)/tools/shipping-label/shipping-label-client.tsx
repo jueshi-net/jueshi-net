@@ -133,39 +133,26 @@ export default function ShippingLabelClient({ draftId }: { draftId: string | nul
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 overflow-x-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <Link href="/tools/document-tools" className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 min-h-[44px] shrink-0">
-              <ArrowLeft className="w-4 h-4" /> 返回
-            </Link>
-            <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2 min-w-0">
-              <Tag className="w-5 h-5 text-purple-600 shrink-0" />
-              <span className="truncate">唛头标签打印</span>
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
-            {currentDocId && (
-              <ToolHistoryPanel documentId={currentDocId} toolKey="shipping_label" onRestore={handleRestore} />
-            )}
-            <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
-              {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
-            </button>
-            <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 min-h-[44px]">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存
-            </button>
-            <button onClick={handleReset} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">🗑️ 清空</button>
-            <button onClick={handlePrint} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 min-h-[44px]">
-              <Printer className="w-4 h-4" /> 打印
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="overflow-x-hidden">
+      {/* Action buttons */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        {currentDocId && (
+          <ToolHistoryPanel documentId={currentDocId} toolKey="shipping_label" onRestore={handleRestore} />
+        )}
+        <button onClick={() => setShowPreview(!showPreview)} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">
+          {showPreview ? <><Code className="w-4 h-4" /> 编辑</> : <><Eye className="w-4 h-4" /> 预览</>}
+        </button>
+        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 min-h-[44px]">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 保存
+        </button>
+        <button onClick={handleReset} className="inline-flex items-center gap-1 px-3 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 min-h-[44px]">🗑️ 清空</button>
+        <button onClick={handlePrint} className="inline-flex items-center gap-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700 min-h-[44px]">
+          <Printer className="w-4 h-4" /> 打印
+        </button>
+      </div>
 
       {loadingDraft && (
-        <div className="max-w-7xl mx-auto px-4 mt-3">
+        <div className="mb-3">
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-700 flex items-center gap-2">
             <Loader2 className="w-4 h-4 animate-spin" /> 正在加载草稿...
           </div>
