@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
 import { buttonVariants, cardStyles } from "@/lib/ui-styles";
 
 export default function InvoiceRedirectPage() {
@@ -14,11 +15,14 @@ export default function InvoiceRedirectPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className={cardStyles.base + " max-w-md text-center"}>
-        <h2 className={cardStyles.header + " text-base"}>单据工具已升级</h2>
+    <PublicLandingPageFrame
+      title="单据工具已升级"
+      subtitle="发票生成功能已整合到新的「外贸单据生成器」中"
+      variant="tool"
+    >
+      <div className={cardStyles.base + " max-w-md text-center mx-auto"}>
         <p className="text-gray-500 mb-6">
-          发票生成功能已整合到新的「外贸单据生成器」中，正在跳转...
+          正在跳转到新的外贸单据生成器...
         </p>
         <Link
           href="/tools/documents/commercial-invoice"
@@ -28,6 +32,6 @@ export default function InvoiceRedirectPage() {
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
-    </div>
+    </PublicLandingPageFrame>
   );
 }

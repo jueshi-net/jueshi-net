@@ -4,7 +4,7 @@ import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { FAQSection } from "@/components/faq-section";
-import { Breadcrumb } from "@/components/breadcrumb";
+import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 export default function QRCodePage() {
@@ -32,22 +32,13 @@ export default function QRCodePage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      {/* Breadcrumb */}
-      <div className="mb-4">
-        <Breadcrumb />
-      </div>
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-          <QrCode className="w-6 h-6 text-purple-600" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">二维码生成器</h1>
-          <p className="text-sm text-gray-500">为链接、文本生成二维码</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <PublicLandingPageFrame
+      title="二维码生成器"
+      subtitle="为链接、文本生成二维码"
+      variant="tool"
+    >
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Form */}
         <div className={`${cardStyles.base} space-y-4`}>
           <div>
@@ -135,6 +126,7 @@ export default function QRCodePage() {
             </div>
           )}
         </div>
+        </div>
 
         {/* Tool-specific ads */}
         <AdSlot placement="tool-bottom" className="mb-8" />
@@ -154,6 +146,6 @@ export default function QRCodePage() {
           { question: "生成的二维码可以商用吗？", answer: "QR Code 是公开标准，可以自由使用。但请确保链接内容合法合规。" },
         ]} />
       </div>
-    </div>
+    </PublicLandingPageFrame>
   );
 }
