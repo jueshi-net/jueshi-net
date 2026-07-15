@@ -864,11 +864,9 @@ export default function TemplateStudioClient({ mode, templateId }: TemplateStudi
       {/* Print CSS — dynamic based on paper size */}
       <style dangerouslySetInnerHTML={{ __html: getPrintCSS(config.style.paperSize || "A4") }} />
 
-      {/* Header */}
+      {/* Action toolbar */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <a href="/tools/template-studio" className="text-blue-600 text-sm">← 返回列表</a>
-          <h1 className="text-xl font-bold" data-testid="editor-title">{config.name}</h1>
           <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
             PARTIAL_STORAGE
           </span>
