@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Wand2, Loader2, Copy, Check, Video, Sparkles, AlertCircle } from "lucide-react";
+import { Wand2, Loader2, Copy, Check, Sparkles, AlertCircle } from "lucide-react";
 import { useFreemiumGate } from "@/hooks/use-freemium-gate";
 import PaywallModal from "@/components/ui/paywall-modal";
 
@@ -128,30 +127,8 @@ export default function VideoScriptSopClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-teal-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-teal-900/10">
-      {/* Header */}
-      <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-3 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/tools" className="inline-flex items-center gap-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 min-h-[44px]">
-              <ArrowLeft className="w-4 h-4" /> 返回
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
-                <Video className="w-4 h-4 text-white" />
-              </div>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">短视频 SOP 生成器</h1>
-            </div>
-          </div>
-          {freemium.mounted && freemium.remaining > 0 && !document.cookie.includes("next-auth.session-token") && !document.cookie.includes("__Secure-next-auth.session-token") && !document.cookie.includes("authjs.session-token") && !document.cookie.includes("__Secure-authjs.session-token") && (
-            <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full">
-              剩余免费 {freemium.remaining} 次
-            </span>
-          )}
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+    <div className="overflow-x-hidden">
+      <main className="space-y-6">
         {/* Error */}
         {error && (
           <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 text-sm text-red-700 dark:text-red-300">

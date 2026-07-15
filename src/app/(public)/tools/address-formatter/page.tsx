@@ -6,7 +6,6 @@ import { MapPin, Copy, CheckCircle, AlertCircle, Info, Check, ExternalLink, Clip
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
-import { Breadcrumb } from '@/components/breadcrumb';
 import { RelatedChecklistSection } from '@/components/related-checklist-section';
 import { TaskChainNextStep, TASK_CHAIN_STEPS } from '@/components/tools/task-chain-next-step';
 import { trackEvent } from '@/lib/analytics';
@@ -15,7 +14,7 @@ import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { parseAddress, formatEnglishAddress, formatChineseAddress, formatLineByLineAddress, type ParsedAddress } from '@/lib/address-parser';
 import { saveAddressToShipping } from '@/lib/address-shipping-transfer';
-import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
 interface AddressForm {
   country: string;
@@ -326,8 +325,7 @@ export default function AddressFormatterPage() {
   return (
     <PublicLandingPageFrame
       title="地址格式生成器"
-      description="输入地址信息，生成适合快递/集运填写的规范英文地址格式"
-      icon={<MapPin className="w-6 h-6" />}
+      subtitle="输入地址信息，生成适合快递/集运填写的规范英文地址格式"
       variant="tool"
     >
 

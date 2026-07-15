@@ -3,10 +3,9 @@ import { buildCanonical, buildTitle } from '@/lib/seo';
 import PostalCodeClient from './postal-code-client';
 import ToolReviewServer from '@/components/tools/tool-review-server';
 import { RelatedDiscussions } from '@/components/community/related-discussions';
-import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
-import { MapPin } from 'lucide-react';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
-const description = '快速查询和整理海外地址、邮编信息，适合寄件、集运、表单填写和地址核对。';
+const description = '快速查询和整理海外地址、邮编信息，支持 51+ 国家，适合寄件、集运、表单填写和地址核对。';
 
 export const metadata: Metadata = {
   title: buildTitle('邮编查询'),
@@ -24,8 +23,7 @@ export default function PostalCodePage() {
   return (
     <PublicLandingPageFrame
       title="邮编查询"
-      description={description}
-      icon={<MapPin className="w-6 h-6" />}
+      subtitle="快速查询和整理海外地址、邮编信息，支持 51+ 国家"
       variant="tool"
     >
       <PostalCodeClient />

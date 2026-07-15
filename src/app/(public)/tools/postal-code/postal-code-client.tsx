@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, ChevronRight, Home, Truck, Shield, Calculator, Globe, FileText, Sparkles, Link2 } from 'lucide-react';
+import { MapPin, CheckCircle, AlertCircle, ExternalLink, Info, Copy, Check, Search, Database, Loader2, Home, Truck, Shield, Calculator, Globe, FileText, Sparkles, Link2 } from 'lucide-react';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { AdSlot } from '@/components/ads/AdSlot';
 import { CountryInfoSection } from '@/components/country-info-section';
@@ -837,66 +837,7 @@ export default function PostalCodePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ===== HERO ===== */}
-      <div className="bg-gradient-to-br from-teal-600 via-teal-700 to-blue-800 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-teal-300/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 md:py-14">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-sm text-teal-100 mb-6 min-h-[44px]">
-            <Link href="/" className="hover:text-white transition-colors inline-flex items-center gap-1">
-              <Home className="w-3.5 h-3.5" /> 首页
-            </Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link href="/tools" className="hover:text-white transition-colors">工具</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-white font-medium">邮编查询</span>
-          </nav>
-
-          <div className="max-w-3xl">
-            {/* Badges */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                <Database className="w-3.5 h-3.5" /> 邮编查询
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                {SUPPORTED_COUNTRIES.length}+ 国家地址/邮编资料
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                地址核对
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                集运工具
-              </span>
-            </div>
-
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              海外地址与邮编助手
-            </h1>
-            <p className="text-lg text-teal-100/90 max-w-2xl leading-relaxed">
-              支持输入城市、邮编、州省、地址关键词，查询精确邮编、邮编范围、地址格式和官方查询入口。适用于跨境电商、国际物流、留学、海外生活等场景。
-            </p>
-            {/* Coverage status badge */}
-            {(() => {
-              const coverage = getCoverageStatus(selectedCountryCode);
-              const icon = getCoverageIcon(coverage.status);
-              const label = getCoverageLabel(coverage.status);
-              return (
-                <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
-                  <span>{icon}</span>
-                  <span className="text-teal-100">{country.name}：{label}</span>
-                  {coverage.recordCount && <span className="text-teal-200/70 text-xs">({coverage.recordCount.toLocaleString()} 条记录)</span>}
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-4 -mt-6 relative z-10 pb-16">
+    <div className="overflow-x-hidden">
         {/* ===== DISCLAIMER ===== */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -2226,7 +2167,6 @@ export default function PostalCodePage() {
         <div className="text-center py-4 text-xs text-gray-400 border-t border-gray-200 mt-8">
           部分邮编地理数据参考公开数据源整理，实际投递以当地邮政官方为准。
         </div>
-      </div>
 
       {/* Task Chain Select Dialog */}
       <TaskChainSelectDialog
