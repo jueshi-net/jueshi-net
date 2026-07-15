@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpCircle, ChevronDown, Search, Book, MessageSquare, Mail } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
 
 export const metadata: Metadata = {
   title: '帮助中心 - 绝世百宝箱',
@@ -53,10 +53,9 @@ const faqs = [
 export default function HelpPage() {
   return (
     <JueshiV4PublicShell>
-    <PublicLandingPageFrame
+    <PublicCategoryPageFrame
       title="❓ 帮助中心"
-      subtitle="查找问题的答案，了解平台功能和使用方法"
-      variant="content"
+      description="查找问题的答案，了解平台功能和使用方法"
     >
       {/* 快捷入口 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
@@ -121,7 +120,7 @@ export default function HelpPage() {
           </a>
         </div>
       </div>
-    </PublicLandingPageFrame>
+    </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

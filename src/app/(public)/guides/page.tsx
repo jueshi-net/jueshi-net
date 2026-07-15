@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { FileText, CalendarDays, Eye, Clock, ChevronRight, BookOpen, TrendingUp, Sparkles } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import PublicCategoryPageFrame from '@/components/templates/PublicCategoryPageFrame';
 import { SectionHeader, ContentSection, PageCTA } from '@/components/design-system';
 
 export const metadata: Metadata = {
@@ -87,10 +87,9 @@ export default async function GuidesPage({
 
   return (
     <JueshiV4PublicShell>
-      <PublicLandingPageFrame
+      <PublicCategoryPageFrame
         title="海外实用指南"
-        subtitle="面向出海商家、海外华人、留学生的工具教程、避坑指南与实操经验"
-        variant="content"
+        description="面向出海商家、海外华人、留学生的工具教程、避坑指南与实操经验"
       >
         {/* Category Filter */}
         <div className="mb-6">
@@ -200,7 +199,7 @@ export default async function GuidesPage({
             </div>
           )}
         </ContentSection>
-      </PublicLandingPageFrame>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }
