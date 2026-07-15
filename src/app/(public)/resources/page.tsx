@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import ResourceDirectoryClient from "./resource-directory-client";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import { Globe, ExternalLink, Star, Tag, Users } from 'lucide-react';
+import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -73,10 +75,16 @@ export default async function ResourceDirectoryPage() {
 
   return (
     <JueshiV4PublicShell>
-      <ResourceDirectoryClient
-        resources={resources}
-        featuredResources={featuredResources}
-      />
+      <PublicCategoryPageFrame
+        title="🌐 资源中心"
+        description="精选优质出海资源，涵盖建站工具、收款服务、营销推广等各方面"
+        icon={<Globe className="w-6 h-6" />}
+      >
+        <ResourceDirectoryClient
+          resources={resources}
+          featuredResources={featuredResources}
+        />
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

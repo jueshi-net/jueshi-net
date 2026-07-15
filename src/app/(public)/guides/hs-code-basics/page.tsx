@@ -1,288 +1,152 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
-import { Hash, Search, AlertCircle, CheckCircle, ArrowRight, Wrench, Zap, BookOpen } from 'lucide-react';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
-export const metadata: Metadata = {
-  title: 'HS 编码入门：如何查询商品海关编码 | 绝世百宝箱',
-  description: 'HS 编码是什么？如何查询商品的海关编码？本文详解 HS 编码的结构、查询方法、常见商品编码示例和注意事项，帮助外贸新手快速掌握海关编码查询技巧。',
-  keywords: 'HS编码,海关编码,HS Code,商品编码查询,国际贸易编码',
-};
+// Server component version - no client-side hooks
+export default function HSCodeBasicsGuide() {
+  // Static data for related guides - in real implementation this would come from API
+  const relatedGuidesSlugs = [
+    'shipping-guide',
+    'commercial-invoice-basics',
+    'customs-declaration'
+  ];
 
-const faqItems = [
-  {
-    question: 'HS 编码和海关编码是同一个东西吗？',
-    answer: '是的，HS 编码（Harmonized System Code）就是海关编码，也叫税则号列、商品编码。国际通用前 6 位，各国在此基础上扩展到 8-10 位用于本国税率和统计。',
-  },
-  {
-    question: '为什么不同国家的 HS 编码后几位不一样？',
-    answer: 'HS 编码前 6 位是国际统一的（由 WCO 维护），第 7 位起由各国自行扩展。例如同一商品在中国可能是 8471.30.1000，在美国可能是 8471.30.0100。前 6 位一定相同。',
-  },
-  {
-    question: '找不到完全匹配的编码怎么办？',
-    answer: '选择最接近的类别。如果商品跨多个类别，按主要功能或材质归类。不确定的情况下可以咨询报关行或海关预归类服务。错误归类可能导致罚款或税率差异。',
-  },
-  {
-    question: 'HS 编码多久更新一次？',
-    answer: '国际 HS 编码每 5 年修订一次（最新版为 2022 版）。各国本国税号可能更频繁调整。建议发货前确认最新编码。',
-  },
-  {
-    question: '没有 HS 编码可以发货吗？',
-    answer: '大多数国家要求国际快递和贸易件提供 HS 编码。缺少编码可能导致清关延误、退件或罚款。部分国家对低价值个人物品有豁免，但建议始终提供。',
-  },
-];
+  // FAQ data
+  const faqs = [
+    {
+      question: "什么是HS编码？",
+      answer: "HS编码（Harmonized System Code）是国际通用的商品分类编码体系，由世界海关组织（WCO）维护。前6位全球统一，各国可在此基础上扩展到8-10位。用于海关报关、关税计算、贸易统计等。"
+    },
+    {
+      question: "为什么同一个商品可能有不同编码？",
+      answer: "HS编码前6位是全球统一的，但各国可以扩展至8-10位。同一商品在不同国家可能有不同的后几位编码。此外，商品如果有多重用途或材质，可能归入不同类别。"
+    },
+    {
+      question: "如何确定商品的正确HS编码？",
+      answer: "确定HS编码需要综合考虑：商品材质、用途、加工工艺、包装方式等。本工具提供关键词匹配结果供参考，但最终归类应以海关或专业报关行的判断为准。如有疑问，可申请海关预归类。"
+    },
+    {
+      question: "HS编码和关税有什么关系？",
+      answer: "HS编码决定了商品适用的关税税率。不同编码对应不同的最惠国税率、暂定税率、协定税率等。正确归类可以避免多缴税或被处罚。"
+    }
+  ];
 
-export default function HSCodeBasicsPage() {
   return (
-    <>
-      <Breadcrumb />
-      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-2xl p-6 sm:p-10 text-white mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Hash className="w-5 h-5 text-violet-200" />
-            <span className="text-sm font-medium text-violet-200">出海经营指南</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4">
-            HS 编码入门：如何查询商品海关编码
-          </h1>
-          <p className="text-violet-100 text-base sm:text-lg leading-relaxed">
-            了解 HS 编码的结构和查询方法，快速找到商品对应的海关编码，避免清关延误。
+    <PublicLandingPageFrame 
+      title="HS编码基础知识" 
+      subtitle="全面了解HS编码的定义、作用及查询方法"
+      breadcrumbs={<Breadcrumb />}
+      variant="content"
+    >
+      <div className="prose max-w-none">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">什么是HS编码？</h2>
+          <p className="text-gray-700 leading-relaxed">
+            HS编码（Harmonized System Code），全称为《商品名称及编码协调制度》，是由世界海关组织（World Customs Organization, WCO）制定的一套国际贸易商品分类标准。该制度于1988年正式生效，目前已被全球超过200个国家和地区采用。
+          </p>
+          <p className="text-gray-700 leading-relaxed mt-3">
+            HS编码的目的是为了统一国际贸易中的商品分类，便于海关统计、征税、贸易管制等。HS编码分为21类、97章，每章下设品目和子目，形成了一个层次分明的商品分类体系。
           </p>
         </div>
 
-        {/* Target Audience */}
-        <div className="bg-teal-50 border border-teal-100 rounded-xl p-5 mb-8">
-          <h2 className="text-sm font-bold text-teal-800 mb-2 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4" /> 适用人群
-          </h2>
-          <p className="text-sm text-teal-700">
-            跨境电商卖家、外贸新手、报关员、国际物流操作人员、需要填写海关申报信息的个人寄件者。
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">HS编码的结构</h2>
+          <p className="text-gray-700 leading-relaxed">
+            标准的HS编码由6位数字组成：
+          </p>
+          <ul className="list-disc pl-6 mt-3 space-y-2 text-gray-700">
+            <li><span className="font-semibold">第1-2位</span>：章（Chapter）- 按商品的基本材料或功能进行分类</li>
+            <li><span className="font-semibold">第3-4位</span>：品目（Heading）- 在章的基础上进一步细分</li>
+            <li><span className="font-semibold">第5-6位</span>：子目（Subheading）- 在品目的基础上再细分</li>
+          </ul>
+          <p className="text-gray-700 leading-relaxed mt-3">
+            各国可在6位HS编码基础上增加本国子目，形成8位、10位或更多位的编码。例如，中国的HS编码通常是8位或10位。
           </p>
         </div>
 
-        {/* What is HS Code */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-violet-600" />
-            什么是 HS 编码？
-          </h2>
-          <p className="text-gray-700 leading-relaxed mb-4">
-            HS 编码（Harmonized System Code）是国际通用的商品分类编码系统，由世界海关组织（WCO）维护。全球 200 多个国家和地区使用这套系统对贸易商品进行分类，用于关税征收、贸易统计和监管。
-          </p>
-          <div className="bg-violet-50 rounded-lg p-4 text-sm text-violet-800">
-            <p className="font-medium mb-1">核心要点：</p>
-            <ul className="space-y-1">
-              <li>• 前 6 位国际统一，后几位由各国自行扩展</li>
-              <li>• 每 5 年修订一次（当前版本：HS 2022）</li>
-              <li>• 涵盖约 5,000 个商品组别，超过 20 万条明细</li>
-              <li>• 是国际贸易中不可缺少的标识符</li>
-            </ul>
-          </div>
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">HS编码的作用</h2>
+          <ul className="list-disc pl-6 mt-3 space-y-2 text-gray-700">
+            <li><span className="font-semibold">关税征收：</span> 不同HS编码对应不同的关税税率</li>
+            <li><span className="font-semibold">贸易统计：</span> 用于统计各类商品的进出口数量和金额</li>
+            <li><span className="font-semibold">贸易管制：</span> 实施反倾销、反补贴等贸易措施的基础</li>
+            <li><span className="font-semibold">原产地规则：</span> 确定商品原产地的重要依据</li>
+            <li><span className="font-semibold">许可证管理：</span> 某些商品需要特定许可证才能进出口</li>
+          </ul>
         </div>
 
-        {/* HS Code Structure */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">📐 HS 编码结构</h2>
-          <p className="text-gray-700 text-sm mb-4">
-            以 <code className="bg-gray-100 px-1.5 py-0.5 rounded text-violet-700">8471.30.1000</code>（笔记本电脑）为例：
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">HS编码查询技巧</h2>
+          <p className="text-gray-700 leading-relaxed">
+            查询HS编码时，建议遵循以下步骤：
           </p>
-          <div className="overflow-x-auto">
-            <div className="min-w-[500px]">
-              <div className="flex border-b border-gray-200">
-                <div className="flex-1 bg-violet-100 p-3 text-center font-bold text-violet-800 rounded-tl-lg">84</div>
-                <div className="flex-1 bg-violet-200 p-3 text-center font-bold text-violet-800">71</div>
-                <div className="flex-1 bg-violet-300 p-3 text-center font-bold text-violet-900">.</div>
-                <div className="flex-1 bg-purple-100 p-3 text-center font-bold text-purple-800">30</div>
-                <div className="flex-1 bg-purple-200 p-3 text-center font-bold text-purple-900">.</div>
-                <div className="flex-1 bg-fuchsia-100 p-3 text-center font-bold text-fuchsia-800 rounded-tr-lg">1000</div>
-              </div>
-              <div className="flex text-xs text-center">
-                <div className="flex-1 p-2 text-gray-600">章（Chapter）<br/>84 = 机械设备</div>
-                <div className="flex-1 p-2 text-gray-600">品目（Heading）<br/>71 = 数据处理设备</div>
-                <div className="flex-1 p-2"></div>
-                <div className="flex-1 p-2 text-gray-600">子目（Subheading）<br/>30 = 便携式</div>
-                <div className="flex-1 p-2"></div>
-                <div className="flex-1 p-2 text-gray-600">本国税号<br/>1000 = 具体细分</div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 bg-gray-50 rounded-lg p-4 text-sm text-gray-700">
-            <p className="font-medium mb-2">层级说明：</p>
-            <ul className="space-y-1">
-              <li>• <strong>第 1-2 位</strong>（章 Chapter）：大类，如 84 = 核反应堆、锅炉、机械</li>
-              <li>• <strong>第 3-4 位</strong>（品目 Heading）：中类，如 8471 = 数据处理设备</li>
-              <li>• <strong>第 5-6 位</strong>（子目 Subheading）：国际统一的最小分类</li>
-              <li>• <strong>第 7-10 位</strong>：各国自行扩展，用于税率和统计</li>
-            </ul>
-          </div>
-        </div>
-
-        {/* How to Query */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">🔍 查询 HS 编码的步骤</h2>
-          <ol className="space-y-3 text-sm text-gray-700">
-            <li className="flex gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-700 font-bold text-xs shrink-0">1</span>
-              <span>明确商品的名称、材质、用途、功能</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-700 font-bold text-xs shrink-0">2</span>
-              <span>使用我们的 HS 编码查询工具，输入商品关键词（中英文均可）</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-700 font-bold text-xs shrink-0">3</span>
-              <span>在搜索结果中找到最匹配的商品描述</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-700 font-bold text-xs shrink-0">4</span>
-              <span>确认前 6 位编码，如需出口到特定国家，查询该国的扩展编码</span>
-            </li>
-            <li className="flex gap-3">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-100 text-violet-700 font-bold text-xs shrink-0">5</span>
-              <span>将编码填入发票和报关单中</span>
-            </li>
+          <ol className="list-decimal pl-6 mt-3 space-y-2 text-gray-700">
+            <li><span className="font-semibold">了解商品属性：</span> 包括材质、用途、规格、加工工艺等</li>
+            <li><span className="font-semibold">使用关键词：</span> 中文名称、英文名称、行业术语等</li>
+            <li><span className="font-semibold">查看详细描述：</span> 对比商品描述与HS编码条目的具体描述</li>
+            <li><span className="font-semibold">注意特殊规定：</span> 某些商品有特殊的归类规则</li>
+            <li><span className="font-semibold">验证准确性：</span> 通过多个渠道交叉验证结果</li>
           </ol>
         </div>
 
-        {/* Common HS Codes */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">📋 常见商品 HS 编码示例</h2>
-          <p className="text-sm text-gray-600 mb-4">以下为前 6 位国际通用编码，仅供参考：</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 pr-4 font-semibold text-gray-700">HS 编码</th>
-                  <th className="text-left py-2 pr-4 font-semibold text-gray-700">商品描述</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600">
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">8471.30</td><td className="py-2">便携式笔记本电脑</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">8517.12</td><td className="py-2">智能手机</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">6109.10</td><td className="py-2">棉质 T 恤</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">9503.00</td><td className="py-2">玩具（三轮车、拼图等）</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">4202.21</td><td className="py-2">皮革面手提包</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">8528.72</td><td className="py-2">彩色电视接收机</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">6110.30</td><td className="py-2">化纤制针织套头衫</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">9603.21</td><td className="py-2">牙刷</td></tr>
-                <tr className="border-b border-gray-50"><td className="py-2 pr-4 font-mono text-violet-700">3923.21</td><td className="py-2">塑料制包装袋</td></tr>
-                <tr><td className="py-2 pr-4 font-mono text-violet-700">7323.93</td><td className="py-2">不锈钢制餐桌厨房用具</td></tr>
-              </tbody>
-            </table>
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">HS编码查询注意事项</h2>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-amber-800">
+              <span className="font-semibold">重要提醒：</span>HS编码查询结果仅供参考，不构成海关、税务或法律意见。正式报关前请以目的国海关、报关行或专业归类意见为准。同一商品可能因材质、用途、规格不同而归入不同编码。
+            </p>
           </div>
+          <ul className="list-disc pl-6 mt-3 space-y-2 text-gray-700">
+            <li>HS编码具有时效性，定期更新，需关注最新版本</li>
+            <li>不同国家对相同商品可能有不同归类解释</li>
+            <li>复合材料或多功能商品归类较为复杂</li>
+            <li>敏感商品（如电池、液体、食品、药品）可能有特殊监管要求</li>
+          </ul>
         </div>
 
-        {/* Common Mistakes */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            注意事项
-          </h2>
-          <div className="space-y-4">
-            <div className="flex gap-3">
-              <span className="text-amber-500 font-bold shrink-0">⚠</span>
-              <div>
-                <p className="text-sm font-medium text-gray-900">编码不是万能的</p>
-                <p className="text-sm text-gray-600">同一商品在不同国家可能有不同的后几位扩展码，使用前请确认目的地国家的具体要求</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-amber-500 font-bold shrink-0">⚠</span>
-              <div>
-                <p className="text-sm font-medium text-gray-900">归类规则复杂</p>
-                <p className="text-sm text-gray-600">多功能商品、组合商品、半成品等的归类需要专业知识，不确定时请咨询报关行</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-amber-500 font-bold shrink-0">⚠</span>
-              <div>
-                <p className="text-sm font-medium text-gray-900">编码会更新</p>
-                <p className="text-sm text-gray-600">HS 编码每 5 年修订，各国税率也经常调整。请使用最新数据查询</p>
-              </div>
-            </div>
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">实用资源</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a 
+              href="https://www.wcoomd.org/en/topics/nomenclature/hs-nomenclature/hs-nomenclature-2022-edition.aspx" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+            >
+              <h3 className="font-semibold text-blue-700">WCO国际协调制度</h3>
+              <p className="text-sm text-blue-600 mt-1">世界海关组织官方HS编码资料</p>
+            </a>
+            <a 
+              href="https://www.customs.gov.cn" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block p-4 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-colors"
+            >
+              <h3 className="font-semibold text-green-700">中国海关总署</h3>
+              <p className="text-sm text-green-600 mt-1">中国海关HS编码查询</p>
+            </a>
+            <a 
+              href="/tools/hs-code" 
+              className="block p-4 bg-teal-50 hover:bg-teal-100 rounded-lg border border-teal-200 transition-colors"
+            >
+              <h3 className="font-semibold text-teal-700">HS编码查询工具</h3>
+              <p className="text-sm text-teal-600 mt-1">在线HS编码辅助查询</p>
+            </a>
+            <a 
+              href="/tools/documents/commercial-invoice" 
+              className="block p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors"
+            >
+              <h3 className="font-semibold text-purple-700">商业发票工具</h3>
+              <p className="text-sm text-purple-600 mt-1">制作含HS编码的商业发票</p>
+            </a>
           </div>
-        </div>
-
-        {/* Disclaimer */}
-        <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 mb-8">
-          <p className="text-sm text-amber-800">
-            <span className="font-medium">免责声明：</span>
-            本指南提供的 HS 编码信息仅供参考。实际归类应以海关裁定或专业报关行的意见为准。错误归类可能导致罚款、补税或货物扣押。
-          </p>
-        </div>
-
-        {/* Related Tools */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Wrench className="w-5 h-5 text-teal-600" />
-            相关工具
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <Link href="/tools/hs-code" className="flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:border-teal-200 hover:shadow-sm transition-all group">
-              <span className="text-2xl">🔍</span>
-              <div>
-                <p className="font-medium text-gray-900 group-hover:text-teal-700">HS 编码查询工具</p>
-                <p className="text-xs text-gray-500">输入关键词快速查找编码</p>
-              </div>
-            </Link>
-            <Link href="/tools/commercial-invoice" className="flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:border-teal-200 hover:shadow-sm transition-all group">
-              <span className="text-2xl">📄</span>
-              <div>
-                <p className="font-medium text-gray-900 group-hover:text-teal-700">商业发票生成器</p>
-                <p className="text-xs text-gray-500">在发票中填入 HS 编码</p>
-              </div>
-            </Link>
-            <Link href="/tools/customs-generator" className="flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:border-teal-200 hover:shadow-sm transition-all group">
-              <span className="text-2xl">📦</span>
-              <div>
-                <p className="font-medium text-gray-900 group-hover:text-teal-700">报关单生成</p>
-                <p className="text-xs text-gray-500">生成含 HS 编码的报关单</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Related Task Chains */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 sm:p-8 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-500" />
-            相关任务链
-          </h2>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <Link href="/workspace/task-chains/shipping/new" className="flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:border-amber-200 hover:shadow-sm transition-all group">
-              <span className="text-2xl">🚀</span>
-              <div>
-                <p className="font-medium text-gray-900 group-hover:text-amber-700">新建发货任务</p>
-                <p className="text-xs text-gray-500">包含 HS 编码查询步骤</p>
-              </div>
-            </Link>
-            <Link href="/workspace/task-chains" className="flex items-center gap-3 p-4 rounded-lg border border-gray-100 bg-gray-50 hover:bg-white hover:border-amber-200 hover:shadow-sm transition-all group">
-              <span className="text-2xl">📋</span>
-              <div>
-                <p className="font-medium text-gray-900 group-hover:text-amber-700">任务链列表</p>
-                <p className="text-xs text-gray-500">查看所有可用的工作流</p>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* FAQ */}
-        <FAQSection items={faqItems} />
-
-        {/* CTA */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/tools/hs-code"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition-all shadow-lg shadow-teal-600/20 min-h-[48px]"
-          >
-            <Search className="w-5 h-5" />
-            使用 HS 编码查询工具
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </div>
-    </>
+
+      <FAQSection title="HS编码常见问题" items={faqs} />
+      
+      <RelatedGuidesSection slugs={relatedGuidesSlugs} />
+    </PublicLandingPageFrame>
   );
 }

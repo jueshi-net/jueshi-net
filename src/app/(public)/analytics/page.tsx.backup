@@ -11,7 +11,6 @@ import {
   Download, Calendar, ArrowUp, ArrowDown, Globe, Clock
 } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
-import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
@@ -85,12 +84,8 @@ export default function AnalyticsPage() {
 
   return (
     <JueshiV4PublicShell>
-      <PublicCategoryPageFrame
-        title="📊 数据分析中心"
-        description="实时监控与深度洞察"
-        icon={<TrendingUp className="w-6 h-6" />}
-      >
-        <div className="space-y-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           {/* Time Range Selector and Export Button at the top of content area */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
             <div>
@@ -294,7 +289,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
         </div>
-      </PublicCategoryPageFrame>
+      </div>
     </JueshiV4PublicShell>
   );
 }

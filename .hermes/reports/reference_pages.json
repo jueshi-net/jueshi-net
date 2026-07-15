@@ -1,0 +1,6 @@
+{
+  "REFERENCE_CATEGORY_ROUTE": "/destinations",
+  "REFERENCE_CONTENT_LANDING_ROUTE": "/guides/hs-code-basics",
+  "REFERENCE_TOOL_OR_FORM_ROUTE": "/tools/hs-code",
+  "REFERENCE_ADMIN_LIST_ROUTE": "/admin/users"
+}

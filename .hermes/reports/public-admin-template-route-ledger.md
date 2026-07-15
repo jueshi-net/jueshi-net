@@ -1,0 +1,2977 @@
+# Public and Admin Template Route Ledger
+
+## Summary Statistics
+- TOTAL_PUBLIC_ROUTES: 127
+- TOTAL_PUBLIC_CATEGORY: 59
+- TOTAL_PUBLIC_LANDING_CONTENT: 2
+- TOTAL_PUBLIC_LANDING_TOOL: 11
+- TOTAL_PUBLIC_LANDING_FORM: 0
+- TOTAL_ADMIN_ROUTES: 58
+- TOTAL_ADMIN_TABLE: 8
+- TOTAL_ADMIN_FORM: 11
+- TOTAL_ADMIN_DETAIL: 0
+- TOTAL_SPECIAL_EXCEPTION: 55
+
+## Public Routes Analysis
+
+### Public Route #1
+- ROUTE: `/page.tsx`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #2
+- ROUTE: `/ui-lab/jueshi-v4`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #3
+- ROUTE: `/ui-lab/jueshi-v4-home-candidate-v4`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #4
+- ROUTE: `/ui-lab/jueshi-v4-home-candidate-v3`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #5
+- ROUTE: `/ui-lab/jueshi-v4-home-candidate-v2`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #6
+- ROUTE: `/ui-lab/jueshi-v4-topnav`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #7
+- ROUTE: `/ui-lab/jueshi-v4-home-candidate`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #8
+- ROUTE: `/ui-lab/jueshi-v4-topnav-polished`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #9
+- ROUTE: `/tools`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #10
+- ROUTE: `/tools/commercial-invoice`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #11
+- ROUTE: `/tools/video-script-sop`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #12
+- ROUTE: `/tools/calculator`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #13
+- ROUTE: `/tools/customs-generator`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #14
+- ROUTE: `/tools/quote`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #15
+- ROUTE: `/tools/postal-code`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #16
+- ROUTE: `/tools/template-studio`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #17
+- ROUTE: `/tools/template-studio/canvas/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #18
+- ROUTE: `/tools/template-studio/canvas/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #19
+- ROUTE: `/tools/template-studio/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #20
+- ROUTE: `/tools/template-studio/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #21
+- ROUTE: `/tools/handover-note`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #22
+- ROUTE: `/tools/shipping-calculator`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #23
+- ROUTE: `/tools/shipping-mark`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #24
+- ROUTE: `/tools/qrcode`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #25
+- ROUTE: `/tools/shipping-estimator`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #26
+- ROUTE: `/tools/container`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #27
+- ROUTE: `/tools/zip`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #28
+- ROUTE: `/tools/receipt`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #29
+- ROUTE: `/tools/hs-code`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #30
+- ROUTE: `/tools/memo`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #31
+- ROUTE: `/tools/inbound`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #32
+- ROUTE: `/tools/documents`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #33
+- ROUTE: `/tools/documents/quotation`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #34
+- ROUTE: `/tools/documents/settings/role-switcher`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #35
+- ROUTE: `/tools/documents/[type]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #36
+- ROUTE: `/tools/documents/drafts`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #37
+- ROUTE: `/tools/documents/shipping-label`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #38
+- ROUTE: `/tools/shipping-label`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #39
+- ROUTE: `/tools/document-tools`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #40
+- ROUTE: `/tools/quote-sheet`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #41
+- ROUTE: `/tools/debit-note`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #42
+- ROUTE: `/tools/address-formatter`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #43
+- ROUTE: `/tools/invoice`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #44
+- ROUTE: `/tools/inbound-receipt`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #45
+- ROUTE: `/privacy`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #46
+- ROUTE: `/changelog`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #47
+- ROUTE: `/community-preview-v2`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #48
+- ROUTE: `/destinations`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #49
+- ROUTE: `/destinations/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #50
+- ROUTE: `/payment/success`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #51
+- ROUTE: `/checklists`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #52
+- ROUTE: `/checklists/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #53
+- ROUTE: `/favorites`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #54
+- ROUTE: `/resources`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #55
+- ROUTE: `/resources/site/[id]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #56
+- ROUTE: `/resources/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #57
+- ROUTE: `/workspace/community`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #58
+- ROUTE: `/community-preview-v3`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #59
+- ROUTE: `/lp/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #60
+- ROUTE: `/terms`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #61
+- ROUTE: `/business`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #62
+- ROUTE: `/ai-learning`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #63
+- ROUTE: `/resources-v2`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #64
+- ROUTE: `/resources-v2/scenarios/payment`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #65
+- ROUTE: `/resources-v2/scenarios/life`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #66
+- ROUTE: `/resources-v2/scenarios/shipping`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #67
+- ROUTE: `/resources-v2/scenarios/official`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #68
+- ROUTE: `/resources-v2/scenarios/company`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #69
+- ROUTE: `/resources-v2/scenarios/invoice`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #70
+- ROUTE: `/u/[id]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #71
+- ROUTE: `/shipping`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #72
+- ROUTE: `/feedback`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #73
+- ROUTE: `/blog`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #74
+- ROUTE: `/blog/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #75
+- ROUTE: `/search`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #76
+- ROUTE: `/rankings`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #77
+- ROUTE: `/scenario/[role]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #78
+- ROUTE: `/ai-tools`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #79
+- ROUTE: `/ai-tools/product-copy`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #80
+- ROUTE: `/ai-tools/translate-polish`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #81
+- ROUTE: `/ai-tools/document-summary`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #82
+- ROUTE: `/profile`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #83
+- ROUTE: `/cities/[city]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #84
+- ROUTE: `/starter`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #85
+- ROUTE: `/starter/student`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #86
+- ROUTE: `/starter/apps`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #87
+- ROUTE: `/starter/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #88
+- ROUTE: `/guides`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #89
+- ROUTE: `/guides/commercial-invoice`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #90
+- ROUTE: `/guides/shipping-from-china-to-canada`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #91
+- ROUTE: `/guides/msds-un38-3-basics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #92
+- ROUTE: `/guides/export-documents-checklist`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #93
+- ROUTE: `/guides/address-format`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #94
+- ROUTE: `/guides/packing-list`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #95
+- ROUTE: `/guides/international-shipping-documents`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #96
+- ROUTE: `/guides/cross-border-shipping-checklist`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #97
+- ROUTE: `/guides/shipping-from-china-to-germany`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #98
+- ROUTE: `/guides/cbm-calculation`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #99
+- ROUTE: `/guides/shipping-from-china-to-usa`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #100
+- ROUTE: `/guides/shipping-quote-template`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #101
+- ROUTE: `/guides/hs-code-basics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #102
+- ROUTE: `/guides/battery-shipping-notice`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #103
+- ROUTE: `/guides/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #104
+- ROUTE: `/packages/[id]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #105
+- ROUTE: `/tracking`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #106
+- ROUTE: `/nav`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #107
+- ROUTE: `/export`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #108
+- ROUTE: `/bbs`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #109
+- ROUTE: `/bbs/category/[key]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #110
+- ROUTE: `/bbs/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #111
+- ROUTE: `/bbs/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #112
+- ROUTE: `/bbs/[slug]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #113
+- ROUTE: `/countries`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #114
+- ROUTE: `/countries/[country]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #115
+- ROUTE: `/community`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #116
+- ROUTE: `/community/t/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #117
+- ROUTE: `/community/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #118
+- ROUTE: `/community/c/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #119
+- ROUTE: `/community/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #120
+- ROUTE: `/api-docs`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #121
+- ROUTE: `/design-system`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #122
+- ROUTE: `/pricing`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #123
+- ROUTE: `/logistics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #124
+- ROUTE: `/help`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #125
+- ROUTE: `/topics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #126
+- ROUTE: `/topics/[slug]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Public Route #127
+- ROUTE: `/analytics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+## Admin Routes Analysis
+
+### Admin Route #1
+- ROUTE: `/admin`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #2
+- ROUTE: `/admin/beta`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #3
+- ROUTE: `/admin/ad-placements`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #4
+- ROUTE: `/admin/ads`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #5
+- ROUTE: `/admin/settings`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #6
+- ROUTE: `/admin/short-links`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #7
+- ROUTE: `/admin/link-health`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #8
+- ROUTE: `/admin/destinations`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #9
+- ROUTE: `/admin/destinations/[slug]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #10
+- ROUTE: `/admin/health`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #11
+- ROUTE: `/admin/resources`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `True`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #12
+- ROUTE: `/admin/resources/import`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #13
+- ROUTE: `/admin/rewards/redemptions`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #14
+- ROUTE: `/admin/rewards/items`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #15
+- ROUTE: `/admin/content`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #16
+- ROUTE: `/admin/content/checklists`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #17
+- ROUTE: `/admin/content/checklists/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #18
+- ROUTE: `/admin/content/checklists/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #19
+- ROUTE: `/admin/content/guides`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #20
+- ROUTE: `/admin/content/guides/new`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #21
+- ROUTE: `/admin/content/guides/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #22
+- ROUTE: `/admin/content/topics/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #23
+- ROUTE: `/admin/landing-pages`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #24
+- ROUTE: `/admin/growth-logs`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #25
+- ROUTE: `/admin/ad-entitlements`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #26
+- ROUTE: `/admin/ad-creatives`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #27
+- ROUTE: `/admin/feedback`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #28
+- ROUTE: `/admin/tags`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `SPECIAL_EXCEPTION`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `SPECIAL_EXCEPTION`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #29
+- ROUTE: `/admin/tool-reviews`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #30
+- ROUTE: `/admin/forum`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #31
+- ROUTE: `/admin/audit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #32
+- ROUTE: `/admin/cms`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #33
+- ROUTE: `/admin/import-bookmarks`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #34
+- ROUTE: `/admin/links`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #35
+- ROUTE: `/admin/users`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #36
+- ROUTE: `/admin/newsletter`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #37
+- ROUTE: `/admin/levels`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #38
+- ROUTE: `/admin/community`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #39
+- ROUTE: `/admin/community/comments`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #40
+- ROUTE: `/admin/community/posts`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #41
+- ROUTE: `/admin/community/reputation`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #42
+- ROUTE: `/admin/community/flagged`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #43
+- ROUTE: `/admin/community/users`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_TABLE`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #44
+- ROUTE: `/admin/community/users/[id]`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #45
+- ROUTE: `/admin/community/badges`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #46
+- ROUTE: `/admin/backup`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_CONTENT`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #47
+- ROUTE: `/admin/webhooks`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_LANDING_TOOL`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicLandingPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #48
+- ROUTE: `/admin/invites`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #49
+- ROUTE: `/admin/invites/rewards`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #50
+- ROUTE: `/admin/invites/rewards/grants`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #51
+- ROUTE: `/admin/import`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #52
+- ROUTE: `/admin/categories`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `True`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `True`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #53
+- ROUTE: `/admin/notifications`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `True`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `LOW`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #54
+- ROUTE: `/admin/topics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #55
+- ROUTE: `/admin/topics/[id]/edit`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `False`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #56
+- ROUTE: `/admin/analytics`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #57
+- ROUTE: `/admin/analytics/task-chains`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `ADMIN_FORM`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `AdminPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `True`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `HIGH`
+- MIGRATION_STATUS: `PENDING`
+
+### Admin Route #58
+- ROUTE: `/admin/analytics/dashboard`
+- PAGE_FILE: `page.tsx`
+- TEMPLATE_FAMILY: `PUBLIC_CATEGORY`
+- CURRENT_TEMPLATE: `unknown`
+- TARGET_TEMPLATE: `PublicCategoryPageFrame`
+- IS_REDIRECT: `False`
+- IS_PLACEHOLDER: `False`
+- HAS_FORM: `False`
+- HAS_CLIENT_STATE: `True`
+- HAS_API_WRITE: `False`
+- HAS_DELETE_ACTION: `False`
+- HAS_PAYMENT_ACTION: `False`
+- RISK: `MEDIUM`
+- MIGRATION_STATUS: `PENDING`

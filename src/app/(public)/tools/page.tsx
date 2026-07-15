@@ -4,15 +4,16 @@ import { getToolsData, CATEGORY_MAP } from '@/lib/tool-center';
 import ToolFilterBar from '@/components/tools/tool-filter-bar';
 import ToolGrid from '@/components/tools/tool-grid';
 import Link from 'next/link';
-import { FileText, ArrowRight, BookOpen } from 'lucide-react';
+import { FileText, ArrowRight, BookOpen, Wrench } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 import { PageContainer, PageHero, BreadcrumbBar, ContentSection, SectionHeader, PageCTA } from '@/components/design-system';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
   const params = await searchParams;
   const q = params.q;
   
-  const title = q ? `搜索 "${q}" - 工具中心` : '工具中心 - 绝世百宝箱';
+  const title = q ? `搜索 \"${q}\" - 工具中心` : '工具中心 - 绝世百宝箱';
   const description = q 
     ? `查找与 ${q} 相关的出海工具。`
     : '外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱。';
@@ -69,122 +70,80 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
 
   return (
     <JueshiV4PublicShell>
-      <div className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="max-w-6xl mx-auto px-4 pt-6">
-          <BreadcrumbBar items={breadcrumbs} />
-        </div>
-
-        {/* Hero — uses standard PageHero */}
-        <div className="bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 text-white">
-          <div className="max-w-6xl mx-auto px-4 py-10 md:py-16">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
-              <div className="flex-1">
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                    实用工具
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                    外贸单据
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-medium border border-white/10">
-                    跨境物流
-                  </span>
-                </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold leading-tight">
-                  {query ? `搜索: "${query}"` : '工具中心'}
-                </h1>
-                <p className="text-teal-100 mt-3 max-w-lg text-sm md:text-base">
-                  {query
-                    ? `共找到 ${tools.length} 个匹配项`
-                    : `${tools.length} 个工具可用 · 外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱`}
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-3 lg:flex lg:gap-6">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-extrabold">{tools.length}</div>
-                  <div className="text-xs text-teal-200 mt-1">工具总数</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-extrabold">{Object.keys(CATEGORY_MAP).length}</div>
-                  <div className="text-xs text-teal-200 mt-1">分类</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-extrabold">免费</div>
-                  <div className="text-xs text-teal-200 mt-1">开放使用</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filter Bar — matches /guides style */}
-        <Suspense fallback={null}>
-          <ToolFilterBar
-            currentQuery={query}
-            currentCategory={category}
-            presentCategories={presentCategories}
-          />
-        </Suspense>
-
-        {/* Quick Tools */}
-        {!query && !category && (
-          <ContentSection className="max-w-6xl mx-auto px-4">
-            <SectionHeader
-              title="常用工具"
-              description="高频使用工具，快速入口"
+      <PublicCategoryPageFrame
+        title="🔧 工具中心"
+        description="外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱"
+        icon={<Wrench className="w-6 h-6" />}
+      >
+        <div className="space-y-8">
+          {/* Filter Bar — matches /guides style */}
+          <Suspense fallback={null}>
+            <ToolFilterBar
+              currentQuery={query}
+              currentCategory={category}
+              presentCategories={presentCategories}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {displayTools.slice(0, 6).map(tool => (
-                <Link
-                  key={tool.slug}
-                  href={tool.route || '/tools'}
-                  className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group block"
-                >
-                  <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-1 mb-2">
-                    {tool.name}
-                  </h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">{tool.description || '暂无描述'}</p>
-                  <div className="flex items-center gap-1 mt-3 text-sm text-teal-600">
-                    立即使用 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </ContentSection>
-        )}
-
-        {/* All Tools */}
-        <ContentSection className="max-w-6xl mx-auto px-4 pb-16">
-          <SectionHeader title={query ? '搜索结果' : (category && category !== 'all' ? (CATEGORY_MAP[category] || category) : '全部工具')} />
-
-          <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
-            {tools.length === 0 && query ? (
-              <EmptySearchState query={query} />
-            ) : tools.length === 0 && category && category !== 'all' ? (
-              <EmptyCategoryState category={category} />
-            ) : (
-              <ToolGrid tools={displayTools} query={query} />
-            )}
           </Suspense>
 
-          {/* CTA — uses standard PageCTA */}
+          {/* Quick Tools */}
           {!query && !category && (
-            <div className="mt-8">
-              <PageCTA
-                title="需要更多资源？"
-                description="查看我们的资源库，获取更多出海工具和指南"
-                actions={
-                  <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
-                    <BookOpen className="w-4 h-4" /> 查看资源库 →
-                  </Link>
-                }
-                lightBackground
+            <ContentSection>
+              <SectionHeader
+                title="常用工具"
+                description="高频使用工具，快速入口"
               />
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {displayTools.slice(0, 6).map(tool => (
+                  <Link
+                    key={tool.slug}
+                    href={tool.route || '/tools'}
+                    className="bg-white border rounded-xl p-5 hover:shadow-md transition-all group block"
+                  >
+                    <h3 className="font-semibold text-gray-900 group-hover:text-teal-700 line-clamp-1 mb-2">
+                      {tool.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 line-clamp-2">{tool.description || '暂无描述'}</p>
+                    <div className="flex items-center gap-1 mt-3 text-sm text-teal-600">
+                      立即使用 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </ContentSection>
           )}
-        </ContentSection>
-      </div>
+
+          {/* All Tools */}
+          <ContentSection>
+            <SectionHeader title={query ? '搜索结果' : (category && category !== 'all' ? (CATEGORY_MAP[category] || category) : '全部工具')} />
+
+            <Suspense fallback={<div className="text-center py-10">加载中...</div>}>
+              {tools.length === 0 && query ? (
+                <EmptySearchState query={query} />
+              ) : tools.length === 0 && category && category !== 'all' ? (
+                <EmptyCategoryState category={category} />
+              ) : (
+                <ToolGrid tools={displayTools} query={query} />
+              )}
+            </Suspense>
+
+            {/* CTA — uses standard PageCTA */}
+            {!query && !category && (
+              <div className="mt-8">
+                <PageCTA
+                  title="需要更多资源？"
+                  description="查看我们的资源库，获取更多出海工具和指南"
+                  actions={
+                    <Link href="/resources" className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors min-h-[48px]">
+                      <BookOpen className="w-4 h-4" /> 查看资源库 →
+                    </Link>
+                  }
+                  lightBackground
+                />
+              </div>
+            )}
+          </ContentSection>
+        </div>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

@@ -1,0 +1,34 @@
+{
+  "read": [
+    "**/*.tsx",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.js",
+    "**/*.json",
+    "**/*.md",
+    "**/*.txt",
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "write": [
+    "src/app/(public)/tools/shipping-calculator/page.tsx",
+    "src/app/(public)/tools/container/page.tsx",
+    "src/app/(public)/tools/memo/page.tsx",
+    "src/app/(public)/tools/documents/page.tsx"
+  ],
+  "command": {
+    "allowed": [
+      "ls",
+      "find",
+      "grep",
+      "cat",
+      "head",
+      "tail",
+      "wc",
+      "sort",
+      "uniq",
+      "sed",
+      "awk"
+    ]
+  }
+}

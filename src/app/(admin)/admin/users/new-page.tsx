@@ -476,8 +476,6 @@ export default function AdminUsersPage() {
       icon={<Users className="w-5 h-5" />}
       toolbar={toolbar}
       variant="table"
-      showSidebar={false}  // 不显示侧边栏
-      showHeader={true}    // 显示头部
     >
       {loading ? (
         <div className="text-center text-gray-500 flex items-center justify-center gap-2 min-h-[200px]">

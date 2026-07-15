@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { AdSlot } from '@/components/ad-slot';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 import {
   Globe,
   CreditCard,
@@ -161,71 +162,77 @@ function ToolLinkItem({ link }: { link: ToolLink }) {
 export default function BusinessPage() {
   return (
     <JueshiV4PublicShell>
-      <div className="max-w-6xl mx-auto px-4 pb-16 pt-8">
-        {/* Category Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <div
-                key={cat.title}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300 ease-in-out"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`w-12 h-12 rounded-lg ${cat.bgColor} flex items-center justify-center`}>
-                    <Icon className={`w-6 h-6 ${cat.iconColor}`} />
-                  </div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{cat.title}</h2>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {cat.links.map((link) => (
-                    <ToolLinkItem key={link.name + link.href} link={link} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Related Tools */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <span className="text-xl">🔗</span> 相关工具
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {relatedTools.map((tool) => {
-              const Icon = tool.icon;
+      <PublicCategoryPageFrame
+        title="商务工具"
+        description="为出海企业提供全方位的工具支持，包括建站、收款、服务器等。"
+        icon={<Globe className="w-6 h-6" />}
+      >
+        <div className="pb-16 pt-8">
+          {/* Category Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
               return (
-                <Link
-                  key={tool.href}
-                  href={tool.href}
-                  className="group flex flex-col items-center text-center p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all min-h-[80px]"
+                <div
+                  key={cat.title}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-all duration-300 ease-in-out"
                 >
-                  <div className={`w-12 h-12 rounded-lg ${tool.bg} flex items-center justify-center mb-2`}>
-                    <Icon className={`w-5 h-5 ${tool.color}`} />
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`w-12 h-12 rounded-lg ${cat.bgColor} flex items-center justify-center`}>
+                      <Icon className={`w-6 h-6 ${cat.iconColor}`} />
+                    </div>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{cat.title}</h2>
                   </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {tool.name}
-                  </span>
-                </Link>
+                  <div className="flex flex-wrap gap-2">
+                    {cat.links.map((link) => (
+                      <ToolLinkItem key={link.name + link.href} link={link} />
+                    ))}
+                  </div>
+                </div>
               );
             })}
           </div>
-        </div>
 
-        {/* Ad Slot */}
-        <AdSlot placement="tool-bottom" variant="card" className="mb-8" />
+          {/* Related Tools */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 mb-8">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <span className="text-xl">🔗</span> 相关工具
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {relatedTools.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <Link
+                    key={tool.href}
+                    href={tool.href}
+                    className="group flex flex-col items-center text-center p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all min-h-[80px]"
+                  >
+                    <div className={`w-12 h-12 rounded-lg ${tool.bg} flex items-center justify-center mb-2`}>
+                      <Icon className={`w-5 h-5 ${tool.color}`} />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {tool.name}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
 
-        {/* Disclaimer */}
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 flex items-start gap-4">
-          <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-300">
-            <strong>免责声明：</strong>本站收录的工具和网站仅供信息参考，不构成任何推荐或担保。
-            所有外部链接均指向第三方网站，本站不对其内容、安全性或可用性负责。
-            请用户自行判断和选择适合的工具。部分工具标注「即将上线」，敬请期待。
+          {/* Ad Slot */}
+          <AdSlot placement="tool-bottom" variant="card" className="mb-8" />
+
+          {/* Disclaimer */}
+          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-5 flex items-start gap-4">
+            <AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-500 shrink-0 mt-0.5" />
+            <div className="text-sm text-amber-800 dark:text-amber-300">
+              <strong>免责声明：</strong>本站收录的工具和网站仅供信息参考，不构成任何推荐或担保。
+              所有外部链接均指向第三方网站，本站不对其内容、安全性或可用性负责。
+              请用户自行判断和选择适合的工具。部分工具标注「即将上线」，敬请期待。
+            </div>
           </div>
         </div>
-      </div>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }

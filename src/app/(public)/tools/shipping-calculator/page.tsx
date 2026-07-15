@@ -24,6 +24,7 @@ import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { loadContainerToShipping, markContainerToShippingConsumed, clearContainerToShipping, ContainerToShippingData } from '@/lib/container-shipping-transfer';
 import { loadAddressFromShipping, markAddressFromShippingConsumed, clearAddressFromShipping, AddressToShippingData } from '@/lib/address-shipping-transfer';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
 // ==================== Types ====================
 interface CalcRow {
@@ -409,37 +410,16 @@ export default function ShippingCalculatorPage() {
   const dimUnit = useMeters ? '米 (m)' : '厘米 (cm)';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-sky-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto mt-8">
-          <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-xl">
-                <Calculator className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">物流体积 / CBM / 运费计算器</h1>
-                <p className="text-sm text-gray-500">体积重 · 计费重 · CBM · 费用构成参考</p>
-              </div>
-            </div>
-            <button onClick={clearAll}
-              className={buttonVariants.secondary}>
-              <RotateCcw className="w-4 h-4" />重置
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-6">
+    <PublicLandingPageFrame 
+      title="物流体积 / CBM / 运费计算器"
+      subtitle="体积重 · 计费重 · CBM · 费用构成参考"
+      variant="tool"
+    >
+      <div className="max-w-7xl mx-auto">
         {/* ===== Dual-column workbench layout (desktop) ===== */}
         <div className="lg:grid lg:grid-cols-[1fr_420px] lg:gap-6 items-start">
         {/* ===== LEFT COLUMN: Inputs ===== */}
         <div className="space-y-6 min-w-0">
-        {/* Breadcrumb */}
-        <div className="mb-4">
-          <Breadcrumb />
-        </div>
         {/* Disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -1094,7 +1074,8 @@ export default function ShippingCalculatorPage() {
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
               <p className="text-xs text-amber-700">
                 <strong>影响实际价格的因素：</strong>服务商定价策略、渠道类型、目的地和派送区域、
-                偏远地区附加费、燃油附加费波动、货物属性（敏感/带电/品牌）、旺季附加费、操作费/取件费等。
+                偏远地区附加费、燃油附加费波动、货物属性（敏感/带电/品牌）、
+                化学品、喷雾等特殊品类附加费、旺季附加费、操作费/取件费等。
               </p>
             </div>
           </div>
@@ -1295,6 +1276,6 @@ export default function ShippingCalculatorPage() {
       <AdSlot placement="tool-bottom" className="mt-4 mb-8 max-w-4xl mx-auto" />
 
       <RelatedDiscussionsClient tool="shipping-calculator" />
-    </div>
+    </PublicLandingPageFrame>
   );
 }

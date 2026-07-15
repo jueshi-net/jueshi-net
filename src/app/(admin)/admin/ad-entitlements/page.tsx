@@ -1,7 +1,5 @@
 import { Metadata } from "next";
 import { Shield } from "lucide-react";
-import AdminPageFrame from "@/components/templates/AdminPageFrame";
-import AdEntitlementsClient from "./ad-entitlements-client";
 
 export const metadata: Metadata = {
   title: "广告权益审核 — 管理后台",
@@ -10,13 +8,9 @@ export const metadata: Metadata = {
 
 export default function AdminAdEntitlementsPage() {
   return (
-    <AdminPageFrame
-      title="广告权益审核"
-      description="审核用户提交的广告权益申请"
-      icon={<Shield className="w-5 h-5" />}
-      variant="table"
-    >
-      <AdEntitlementsClient />
-    </AdminPageFrame>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">广告权益审核</h1>
+      <p>广告权益审核页面 - 待实现</p>
+    </div>
   );
 }
