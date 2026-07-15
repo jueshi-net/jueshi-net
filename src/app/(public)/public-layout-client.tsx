@@ -5,6 +5,7 @@ import Header from '@/components/layout/header';
 import FooterNew from '@/components/layout/footer-new';
 import MobileHeader from '@/components/mobile/MobileHeader';
 import MobileBottomNav from '@/components/mobile/MobileBottomNav';
+import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import { cn } from '@/lib/utils';
 
 export function PublicLayoutClient({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,7 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isResources = pathname === '/resources';
   const isResourcesSite = pathname.startsWith('/resources/site/');
   const isTools = pathname === '/tools';
+  const isToolsSubpage = pathname.startsWith('/tools/');
   const isDestinations = pathname === '/destinations';
   const isGuides = pathname === '/guides';
   const isChecklists = pathname === '/checklists';
@@ -32,9 +34,13 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isShipping = pathname === '/shipping';
 
   // 首页、UI Lab、资源页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页使用各自的 shell，跳过公共 Header/Footer
-  // 工具页（/tools）现在使用公共 Shell，以便统一移动端体验
   if (isUILab || isV4Home || isResources || isResourcesSite || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
     return <>{children}</>;
+  }
+
+  // 工具子页面（/tools/*）使用 JueshiV4PublicShell，统一品牌 Header 和底栏
+  if (isToolsSubpage) {
+    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
   }
 
   return (
