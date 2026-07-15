@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, Tag } from "lucide-react";
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
 export const metadata: Metadata = {
   title: "更新日志 | 绝世百宝箱",
@@ -88,9 +89,11 @@ const changelogs = [
 export default function ChangelogPage() {
   return (
     <JueshiV4PublicShell>
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">更新日志</h1>
-
+    <PublicLandingPageFrame
+      title="更新日志"
+      subtitle="绝世百宝箱的版本更新历史记录"
+      variant="content"
+    >
       <div className="space-y-8">
         {changelogs.map(log => (
           <div key={log.version} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6">
@@ -125,7 +128,7 @@ export default function ChangelogPage() {
           ← 返回首页
         </Link>
       </div>
-    </div>
+    </PublicLandingPageFrame>
     </JueshiV4PublicShell>
   );
 }

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpCircle, ChevronDown, Search, Book, MessageSquare, Mail } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
 export const metadata: Metadata = {
   title: '帮助中心 - 绝世百宝箱',
@@ -52,88 +53,75 @@ const faqs = [
 export default function HelpPage() {
   return (
     <JueshiV4PublicShell>
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-teal-600 to-cyan-700 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">❓ 帮助中心</h1>
-          <p className="text-teal-100 text-lg mb-6">查找问题的答案，了解平台功能和使用方法</p>
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors min-h-[44px]"
-          >
-            <Search className="w-5 h-5" />
-            搜索全站内容
-          </Link>
-        </div>
+    <PublicLandingPageFrame
+      title="❓ 帮助中心"
+      subtitle="查找问题的答案，了解平台功能和使用方法"
+      variant="content"
+    >
+      {/* 快捷入口 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+        <Link href="/api-docs" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
+          <Book className="w-8 h-8 text-blue-500 mb-3" />
+          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">API 文档</h3>
+          <p className="text-sm text-gray-500 mt-1 mt-auto">完整的 REST API 接口文档</p>
+        </Link>
+        <Link href="/feedback" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
+          <MessageSquare className="w-8 h-8 text-green-500 mb-3" />
+          <h3 className="font-semibold text-gray-900 group-hover:text-green-600">意见反馈</h3>
+          <p className="text-sm text-gray-500 mt-1 mt-auto">提交建议或报告问题</p>
+        </Link>
+        <a href="mailto:contact@jueshi.net" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
+          <Mail className="w-8 h-8 text-purple-500 mb-3" />
+          <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">联系我们</h3>
+          <p className="text-sm text-gray-500 mt-1 mt-auto">contact@jueshi.net</p>
+        </a>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 快捷入口 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-          <Link href="/api-docs" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
-            <Book className="w-8 h-8 text-blue-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">API 文档</h3>
-            <p className="text-sm text-gray-500 mt-1 mt-auto">完整的 REST API 接口文档</p>
+      {/* FAQ */}
+      <div className="space-y-8">
+        {faqs.map((section, i) => (
+          <div key={i}>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{section.category}</h2>
+            <div className="space-y-3">
+              {section.items.map((faq, j) => (
+                <details key={j} className="bg-white rounded-lg border border-gray-200 group">
+                  <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 rounded-lg min-h-[44px]">
+                    <span className="font-medium text-gray-900">{faq.q}</span>
+                    <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <div className="px-4 pb-4 pt-2 text-gray-600 text-sm leading-relaxed">
+                    {faq.a}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 底部引导 */}
+      <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 text-center border border-blue-100">
+        <HelpCircle className="w-12 h-12 text-blue-500 mx-auto mb-3" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">没找到答案？</h3>
+        <p className="text-gray-600 mb-4">我们随时为您提供帮助</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/feedback"
+            className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-h-[44px] justify-center"
+          >
+            <MessageSquare className="w-4 h-4" />
+            提交反馈
           </Link>
-          <Link href="/feedback" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
-            <MessageSquare className="w-8 h-8 text-green-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 group-hover:text-green-600">意见反馈</h3>
-            <p className="text-sm text-gray-500 mt-1 mt-auto">提交建议或报告问题</p>
-          </Link>
-          <a href="mailto:contact@jueshi.net" className="bg-white rounded-xl border p-5 hover:shadow-md transition-all group min-h-[120px] flex flex-col">
-            <Mail className="w-8 h-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">联系我们</h3>
-            <p className="text-sm text-gray-500 mt-1 mt-auto">contact@jueshi.net</p>
+          <a
+            href="mailto:contact@jueshi.net"
+            className="inline-flex items-center gap-2 px-5 py-3 border border-gray-300 rounded-lg hover:bg-white min-h-[44px] justify-center"
+          >
+            <Mail className="w-4 h-4" />
+            邮件联系
           </a>
         </div>
-
-        {/* FAQ */}
-        <div className="space-y-8">
-          {faqs.map((section, i) => (
-            <div key={i}>
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{section.category}</h2>
-              <div className="space-y-3">
-                {section.items.map((faq, j) => (
-                  <details key={j} className="bg-white rounded-lg border border-gray-200 group">
-                    <summary className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 rounded-lg min-h-[44px]">
-                      <span className="font-medium text-gray-900">{faq.q}</span>
-                      <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
-                    </summary>
-                    <div className="px-4 pb-4 pt-2 text-gray-600 text-sm leading-relaxed">
-                      {faq.a}
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 底部引导 */}
-        <div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 text-center border border-blue-100">
-          <HelpCircle className="w-12 h-12 text-blue-500 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">没找到答案？</h3>
-          <p className="text-gray-600 mb-4">我们随时为您提供帮助</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/feedback"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-h-[44px] justify-center"
-            >
-              <MessageSquare className="w-4 h-4" />
-              提交反馈
-            </Link>
-            <a
-              href="mailto:contact@jueshi.net"
-              className="inline-flex items-center gap-2 px-5 py-3 border border-gray-300 rounded-lg hover:bg-white min-h-[44px] justify-center"
-            >
-              <Mail className="w-4 h-4" />
-              邮件联系
-            </a>
-          </div>
-        </div>
       </div>
-    </div>
+    </PublicLandingPageFrame>
     </JueshiV4PublicShell>
   );
 }

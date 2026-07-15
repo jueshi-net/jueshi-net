@@ -131,17 +131,10 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      {/* Page Title and Controls */}
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">💎 定价方案</h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
-            选择适合您的方案，从个人免费到企业定制，灵活应对不同需求
-          </p>
-
-          {/* Toggle */}
-          <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
+    <div className="py-4">
+      {/* Toggle */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-3 bg-gray-100 rounded-full p-1">
             <button
               onClick={() => setIsYearly(false)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
@@ -159,7 +152,6 @@ export default function PricingPage() {
               年付 <span className="text-green-600 ml-1">省 17%</span>
             </button>
           </div>
-        </div>
       </div>
 
       {/* Plans */}
