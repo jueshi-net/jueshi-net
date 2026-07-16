@@ -333,7 +333,7 @@ export default function DocumentsClientInner() {
             label="近7天更新"
             value={recentCount}
             icon={<Clock className="w-5 h-5" />}
-            trend={{ value: `${Math.round((recentCount / Math.max(drafts.length, 1)) * 100)}%`, positive: recentCount > 0 }}
+            trend={recentCount > 0 ? { value: `${Math.round((recentCount / Math.max(drafts.length, 1)) * 100)}%`, positive: true } : { value: '暂无变化', positive: true }}
           />
           <MetricCard
             label="关联公司"
@@ -363,11 +363,11 @@ export default function DocumentsClientInner() {
         >
           {drafts.length > 0 ? (
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-gray-400 mr-1">按类型：</span>
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                <span className="text-xs text-gray-400 mr-1 shrink-0">按类型：</span>
                 <button
                   onClick={() => setFilterToolKey('')}
-                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all ${!filterToolKey ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+                  className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all whitespace-nowrap shrink-0 ${!filterToolKey ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
                 >
                   全部
                 </button>
@@ -376,7 +376,7 @@ export default function DocumentsClientInner() {
                   if (count === 0) return null;
                   return (
                     <button key={key} onClick={() => setFilterToolKey(key)}
-                      className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all ${filterToolKey === key ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      className={`px-2.5 py-1 text-xs rounded-lg font-medium transition-all whitespace-nowrap shrink-0 ${filterToolKey === key ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                       {label} ({count})
                     </button>
                   );

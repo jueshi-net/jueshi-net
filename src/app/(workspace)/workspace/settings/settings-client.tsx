@@ -20,7 +20,7 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   const theme = getTheme(themeColor);
   const [formName, setFormName] = useState('');
   const [localWbTitle, setLocalWbTitle] = useState('');
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const [saving, setSaving] = useState(false);
 
   // Password change state
@@ -55,19 +55,29 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   const selectTheme = useCallback((key: string) => {
     setThemeColor(key);
     const color = THEME_COLORS.find(c => c.key === key);
-    setToast(`🎨 主题色已更新为「${color?.label}」`);
+    setToast({ message: `🎨 主题色已更新为「${color?.label}」`, type: 'success' });
   }, [setThemeColor]);
 
   const saveProfile = useCallback(() => {
     setSaving(true);
-    try { localStorage.setItem('wb:user_name', formName); } catch {}
-    setTimeout(() => { setSaving(false); setToast('✅ 个人信息已保存'); }, 300);
+    try { 
+      localStorage.setItem('wb:user_name', formName);
+      setTimeout(() => { setSaving(false); setToast({ message: '✅ 个人信息已保存', type: 'success' }); }, 300);
+    } catch {
+      setSaving(false);
+      setToast({ message: '❌ 保存失败，请重试', type: 'error' });
+    }
   }, [formName]);
 
   const saveWorkspace = useCallback(() => {
     setSaving(true);
-    setWorkspaceTitle(localWbTitle);
-    setTimeout(() => { setSaving(false); setToast('✅ 工作台设置已保存'); }, 300);
+    try {
+      setWorkspaceTitle(localWbTitle);
+      setTimeout(() => { setSaving(false); setToast({ message: '✅ 工作台设置已保存', type: 'success' }); }, 300);
+    } catch {
+      setSaving(false);
+      setToast({ message: '❌ 保存失败，请重试', type: 'error' });
+    }
   }, [localWbTitle, setWorkspaceTitle]);
 
   const handleChangePassword = useCallback(async () => {
@@ -116,7 +126,9 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
   return (
     <div className="min-h-screen bg-gray-50">
       {toast && (
-        <div className="fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg bg-white/90 border border-gray-100">{toast}</div>
+        <div className={`fixed top-5 right-5 z-50 px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg bg-white/90 border ${
+          toast.type === 'success' ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'
+        }`}>{toast.message}</div>
       )}
 
       <WorkspacePageHeader
@@ -137,13 +149,15 @@ export default function SettingsClient({ userName, userEmail }: { userName: stri
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">邮箱</label>
               <input type="email" value={userEmail} disabled className="w-full px-3 py-2 border border-gray-100 rounded-xl text-sm bg-gray-50 text-gray-400" />
+              <p className="text-[10px] text-gray-400 mt-1">登录邮箱暂不支持直接修改</p>
             </div>
             <div>
               <label className="text-[11px] font-medium text-gray-500 mb-1 block">二级域名</label>
-              <div className="flex items-center gap-2">
-                <input type="text" placeholder="专属域名（即将上线）" disabled className="w-44 px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-400" />
-                <span className="text-xs text-gray-400">.jueshi.net</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <input type="text" placeholder="专属域名" disabled className="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-400" />
+                <span className="text-xs text-gray-400 whitespace-nowrap">.jueshi.net</span>
               </div>
+              <p className="text-[10px] text-gray-400 mt-1">即将上线，敬请期待</p>
             </div>
             <button onClick={saveProfile} disabled={saving} className={btnCls}>
               {saving ? '保存中...' : '保存修改'}

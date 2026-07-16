@@ -172,61 +172,61 @@ export default function TasksClient() {
       />
 
       <div className="px-4 py-6 space-y-6">
-        {/* Hero: Level + Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Level Card */}
-          <div className="md:col-span-2 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-600 rounded-xl p-5 text-white shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-8 translate-x-8" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-6 -translate-x-6" />
+        {/* Hero: Level + Stats - Mobile Optimized */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Level Card - Compact on mobile */}
+          <div className="md:col-span-1 bg-gradient-to-br from-teal-500 via-cyan-500 to-blue-600 rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full -translate-y-6 translate-x-6" />
             <div className="relative">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl">
                   {levelInfo?.level?.iconText || "⭐"}
                 </div>
-                <div className="flex-1">
-                  <div className="font-bold text-lg">{levelInfo?.level?.name || "Lv.1 新手"}</div>
-                  <div className="text-sm text-white/80">成长值 {levelInfo?.growthValue || 0}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-sm truncate">{levelInfo?.level?.name || "Lv.1 新手"}</div>
+                  <div className="text-xs text-white/80">成长值 {levelInfo?.growthValue || 0}</div>
                 </div>
-                {levelInfo?.nextLevel && (
-                  <div className="text-right text-xs text-white/70">
-                    <div>→ {levelInfo.nextLevel.iconText} {levelInfo.nextLevel.name}</div>
-                    <div className="font-medium text-white">还需 {levelInfo.nextLevel.minGrowth - (levelInfo?.growthValue || 0)}</div>
-                  </div>
-                )}
               </div>
               {levelInfo?.nextLevel && (
-                <div className="w-full h-2.5 bg-white/20 rounded-full overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-white/90 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(
-                        ((levelInfo.growthValue - (levelInfo.level?.minGrowth || 0)) /
-                        (levelInfo.nextLevel.minGrowth - (levelInfo.level?.minGrowth || 0))) * 100, 100
-                      )}%`,
-                    }}
-                  />
-                </div>
+                <>
+                  <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden mb-1.5">
+                    <div
+                      className="h-full bg-white/90 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(
+                          ((levelInfo.growthValue - (levelInfo.level?.minGrowth || 0)) /
+                          (levelInfo.nextLevel.minGrowth - (levelInfo.level?.minGrowth || 0))) * 100, 100
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                  <div className="text-[10px] text-white/70 truncate">
+                    → {levelInfo.nextLevel.iconText} {levelInfo.nextLevel.name}
+                  </div>
+                </>
               )}
-              <div className="flex items-center justify-between text-sm text-white/80">
-                <span>今日完成 <span className="font-bold text-white">{completedCount}</span> / {totalCount} 个任务</span>
-                {totalReward > 0 && <span className="text-white/70">还可获得 +{totalReward} 成长值</span>}
-              </div>
             </div>
           </div>
 
-          {/* Stat Cards */}
-          <MetricCard
-            label="已完成任务"
-            value={`${completedCount}/${totalCount}`}
-            icon={<CheckCircle className="w-5 h-5" />}
-            trend={completedCount > 0 ? { value: `${progressPercent}% 完成率`, positive: true } : undefined}
-          />
-          <MetricCard
-            label="待获成长值"
-            value={`+${totalReward}`}
-            icon={<Flame className="w-5 h-5" />}
-            trend={totalReward > 0 ? { value: `${tasks.filter(t => !t.completed).length} 个任务待完成`, positive: false } : undefined}
-          />
+          {/* Stat Cards - 2x2 grid on mobile */}
+          <div className="md:col-span-2 grid grid-cols-2 gap-3">
+            <MetricCard
+              label="已完成"
+              value={`${completedCount}/${totalCount}`}
+              icon={<CheckCircle className="w-4 h-4" />}
+              trend={completedCount > 0 ? { value: `${progressPercent}%`, positive: true } : undefined}
+            />
+            <MetricCard
+              label="待获成长值"
+              value={`+${totalReward}`}
+              icon={<Flame className="w-4 h-4" />}
+              trend={totalReward > 0 ? { value: `${tasks.filter(t => !t.completed).length} 个任务`, positive: false } : undefined}
+            />
+            <div className="col-span-2 flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-gray-100">
+              <span className="text-xs text-gray-500">今日进度</span>
+              <span className="text-sm font-bold text-gray-900">{completedCount} / {totalCount} 个任务</span>
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}
