@@ -93,6 +93,33 @@ If environment marker does not match → `exit 1`.
 
 ---
 
+## Staging Login & E2E Testing
+
+### Credential Management
+
+- **Staging test account**: `e2e-doc-user@jueshi.net`
+- **Storage state location**: `tools/jueshi-audit/artifacts/storage-state/user-session.json`
+- **Documentation**: `docs/STAGING_E2E_ACCOUNT.md`
+
+### Rules
+
+- ✅ Staging login acceptance MUST NOT require user to repeatedly provide credentials
+- ✅ Prefer reading existing Hermes/E2E secrets from storage state files
+- ✅ Use Playwright storage state for automated browser testing
+- ✅ SSH MUST use `deploy` user, NEVER use `root`
+- ❌ NEVER ask user for test account passwords when storage state exists
+- ❌ NEVER touch or modify `9833416@qq.com` account
+- ❌ NEVER commit actual passwords, tokens, or session secrets
+
+### Session Refresh
+
+When storage state expires:
+1. Re-authenticate via Playwright login flow
+2. Update `tools/jueshi-audit/artifacts/storage-state/user-session.json`
+3. Document rotation without exposing secrets
+
+---
+
 ## Related Documents
 
 - `docs/HERMES_ALWAYS_READ.md` — **MUST READ FIRST** (authoritative, strictest rules)
@@ -102,5 +129,6 @@ If environment marker does not match → `exit 1`.
 - `docs/BRANCHING_POLICY.md` — branch strategy
 - `docs/HERMES_TASK_TEMPLATES.md` — task templates
 - `docs/CONTENT_PUBLISHING_WORKFLOW.md` — content publish flow
+- `docs/STAGING_E2E_ACCOUNT.md` — staging test account and credential management
 
 **If AGENTS.md conflicts with docs/HERMES_ALWAYS_READ.md, the stricter rule in HERMES_ALWAYS_READ.md wins.**
