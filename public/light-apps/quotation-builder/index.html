@@ -19,45 +19,63 @@
             font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #f3f4f6;
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             color: #374151;
+            overflow-x: hidden;
         }
         /* 控制台样式 */
         .control-panel {
             max-width: 900px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 16px auto;
             background: white;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 4px;
             color: white;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: opacity 0.2s;
+            white-space: nowrap;
         }
         .btn:hover { opacity: 0.9; }
-        .btn-print { background-color: var(--blue); margin-right: 10px; }
+        .btn-print { background-color: var(--blue); margin-right: 8px; }
         .btn-image { background-color: var(--orange); }
-        .hint-text { font-size: 13px; color: var(--gray-text); }
+        .hint-text { font-size: 12px; color: var(--gray-text); }
 
-        /* 报价单主体内容区 */
-        .quotation-card {
+        /* 报价单主体内容区 - 文档滚动容器 */
+        .document-scroll {
             max-width: 900px;
             margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .quotation-card {
+            width: 800px;
+            min-width: 800px;
             background: white;
-            padding: 50px;
+            padding: 40px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             border-top: 10px solid var(--blue);
             box-sizing: border-box;
             position: relative;
+        }
+
+        /* 桌面端居中 */
+        @media (min-width: 860px) {
+            .quotation-card {
+                margin: 0 auto;
+            }
         }
 
         /* 头部 */
@@ -113,11 +131,81 @@
         /* 元素可编辑时的提示 */
         [contenteditable="true"]:hover { background-color: #fef08a; outline: 1px dashed var(--orange); cursor: text; }
 
+        /* =========================================
+           📱 移动端响应式
+           ========================================= */
+        @media (max-width: 767px) {
+            body {
+                padding: 12px;
+            }
+
+            .control-panel {
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-panel > div:first-child {
+                display: flex;
+                gap: 8px;
+            }
+
+            .control-panel .btn {
+                flex: 1;
+                text-align: center;
+                padding: 10px 12px;
+            }
+
+            .btn-print { margin-right: 0; }
+
+            .hint-text {
+                text-align: center;
+                font-size: 11px;
+            }
+
+            .document-scroll {
+                margin: 0 -4px;
+                padding: 0 4px;
+                /* 滚动提示 */
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.03) 0%, 
+                    transparent 8%, 
+                    transparent 92%, 
+                    rgba(0,0,0,0.03) 100%
+                );
+            }
+
+            .quotation-card {
+                width: 700px;
+                min-width: 700px;
+                padding: 24px;
+            }
+        }
+
+        /* =========================================
+           📱 平板端
+           ========================================= */
+        @media (min-width: 768px) and (max-width: 859px) {
+            .quotation-card {
+                width: 720px;
+                min-width: 720px;
+                padding: 32px;
+            }
+        }
+
         /* 打印模式：隐藏控制台、操作按钮，清除阴影背景 */
         @media print {
             body { background: white; padding: 0; }
             .control-panel, .no-print { display: none !important; }
-            .quotation-card { box-shadow: none; padding: 20px 0; width: 100%; max-width: 100%; border-top: 8px solid var(--blue) !important; }
+            .document-scroll { overflow: visible; }
+            .quotation-card { 
+                box-shadow: none; 
+                padding: 20px 0; 
+                width: 100%; 
+                max-width: 100%; 
+                min-width: auto;
+                border-top: 8px solid var(--blue) !important; 
+            }
             th { background-color: var(--blue) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .logo-box, .bottom-banner { background-color: var(--blue) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .customer-box { border-left: 5px solid var(--orange) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -135,135 +223,135 @@
         <div class="hint-text">💡 提示：点击文字可修改，点击 ➕ 可增加费用项</div>
     </div>
 
-    <!-- 报价单主体内容区 -->
-    <div class="quotation-card" id="quotation-card">
-        
-        <!-- 头部公司信息 -->
-        <div class="header">
-            <div>
-                <div class="logo-area">
-                    <div class="logo-box">LOGISTICS</div>
-                    <div class="logo-divider"></div>
-                    <div class="company-name" contenteditable="true">集运巴巴 / 您的物流公司</div>
+    <!-- 报价单主体内容区 - 带横向滚动 -->
+    <div class="document-scroll">
+        <div class="quotation-card" id="quotation-card">
+            
+            <!-- 头部公司信息 -->
+            <div class="header">
+                <div>
+                    <div class="logo-area">
+                        <div class="logo-box">LOGISTICS</div>
+                        <div class="logo-divider"></div>
+                        <div class="company-name" contenteditable="true">集运巴巴 / 您的物流公司</div>
+                    </div>
+                    <div class="company-info" contenteditable="true">公司地址：广东省深圳市宝安区国际货运中心<br>联系电话：+86-755-XXXX-XXXX<br>企业邮箱：contact@yourcompany.com</div>
                 </div>
-                <div class="company-info" contenteditable="true">公司地址：广东省深圳市宝安区国际货运中心<br>联系电话：+86-755-XXXX-XXXX<br>企业邮箱：contact@yourcompany.com</div>
-            </div>
-            <div class="title-area">
-                <h1 class="main-title">QUOTATION</h1>
-                <div class="company-info">
-                    报价单号：<span contenteditable="true">QT-260428-01</span><br>
-                    生成日期：<span contenteditable="true" id="current-date"></span>
+                <div class="title-area">
+                    <h1 class="main-title">QUOTATION</h1>
+                    <div class="company-info">
+                        报价单号：<span contenteditable="true">QT-260428-01</span><br>
+                        生成日期：<span contenteditable="true" id="current-date"></span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 客户及航线信息 -->
-        <div class="info-grid">
-            <div class="customer-box">
-                <div class="label-sm">致客户 (TO):</div>
-                <div class="customer-name" contenteditable="true">请输入客户公司名称</div>
-                <div class="company-info" contenteditable="true">联系人：John Doe / 目的地：温哥华</div>
+            <!-- 客户及航线信息 -->
+            <div class="info-grid">
+                <div class="customer-box">
+                    <div class="label-sm">致客户 (TO):</div>
+                    <div class="customer-name" contenteditable="true">请输入客户公司名称</div>
+                    <div class="company-info" contenteditable="true">联系人：John Doe / 目的地：温哥华</div>
+                </div>
+                <div class="logistics-details">
+                    <div class="detail-item">
+                        <div class="label-sm">起运港 (POL)</div>
+                        <p contenteditable="true">中国 深圳 (Shenzhen)</p>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label-sm">目的港 (POD)</div>
+                        <p contenteditable="true">加拿大 温哥华 (Vancouver)</p>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label-sm">运输方式</div>
+                        <p contenteditable="true">海运散货 (LCL) - DDP</p>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label-sm">报价有效期</div>
+                        <p class="highlight" contenteditable="true">15天 (15 Days Valid)</p>
+                    </div>
+                </div>
             </div>
-            <div class="logistics-details">
-                <div class="detail-item">
-                    <div class="label-sm">起运港 (POL)</div>
-                    <p contenteditable="true">中国 深圳 (Shenzhen)</p>
-                </div>
-                <div class="detail-item">
-                    <div class="label-sm">目的港 (POD)</div>
-                    <p contenteditable="true">加拿大 温哥华 (Vancouver)</p>
-                </div>
-                <div class="detail-item">
-                    <div class="label-sm">运输方式</div>
-                    <p contenteditable="true">海运散货 (LCL) - DDP</p>
-                </div>
-                <div class="detail-item">
-                    <div class="label-sm">报价有效期</div>
-                    <p class="highlight" contenteditable="true">15天 (15 Days Valid)</p>
-                </div>
-            </div>
-        </div>
 
-        <!-- 费用明细表格 -->
-        <div class="table-container">
-            <table id="fee-table">
-                <thead>
-                    <tr>
-                        <th>费用明细 (Description)</th>
-                        <th>单位 (Unit)</th>
-                        <th>数量 (Qty)</th>
-                        <th>单价 (Price)</th>
-                        <th class="text-right">小计 (Subtotal)</th>
-                        <!-- 注意：这列在打印和截图时会被忽略 -->
-                        <th class="no-print text-center" data-html2canvas-ignore="true" style="width: 50px;">操作</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body">
-                    <tr>
-                        <td contenteditable="true">海运费 (Ocean Freight)</td>
-                        <td contenteditable="true">CBM</td>
-                        <td contenteditable="true">5</td>
-                        <td contenteditable="true">¥850.00</td>
-                        <td class="text-right" contenteditable="true">¥4,250.00</td>
-                        <td class="no-print text-center" data-html2canvas-ignore="true">
-                            <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td contenteditable="true">报关及文件费 (Customs & Doc)</td>
-                        <td contenteditable="true">票 (SET)</td>
-                        <td contenteditable="true">1</td>
-                        <td contenteditable="true">¥550.00</td>
-                        <td class="text-right" contenteditable="true">¥550.00</td>
-                        <td class="no-print text-center" data-html2canvas-ignore="true">
-                            <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <!-- 添加行按钮：同样在打印和截图时忽略 -->
-            <button class="no-print add-row-btn" data-html2canvas-ignore="true" onclick="addRow()">
-                ➕ 添加费用项
-            </button>
-        </div>
+            <!-- 费用明细表格 -->
+            <div class="table-container">
+                <table id="fee-table">
+                    <thead>
+                        <tr>
+                            <th>费用明细 (Description)</th>
+                            <th>单位 (Unit)</th>
+                            <th>数量 (Qty)</th>
+                            <th>单价 (Price)</th>
+                            <th class="text-right">小计 (Subtotal)</th>
+                            <th class="no-print text-center" data-html2canvas-ignore="true" style="width: 50px;">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr>
+                            <td contenteditable="true">海运费 (Ocean Freight)</td>
+                            <td contenteditable="true">CBM</td>
+                            <td contenteditable="true">5</td>
+                            <td contenteditable="true">¥850.00</td>
+                            <td class="text-right" contenteditable="true">¥4,250.00</td>
+                            <td class="no-print text-center" data-html2canvas-ignore="true">
+                                <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">报关及文件费 (Customs & Doc)</td>
+                            <td contenteditable="true">票 (SET)</td>
+                            <td contenteditable="true">1</td>
+                            <td contenteditable="true">¥550.00</td>
+                            <td class="text-right" contenteditable="true">¥550.00</td>
+                            <td class="no-print text-center" data-html2canvas-ignore="true">
+                                <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="no-print add-row-btn" data-html2canvas-ignore="true" onclick="addRow()">
+                    ➕ 添加费用项
+                </button>
+            </div>
 
-        <!-- 金额汇总 -->
-        <div class="summary-area">
-            <div class="summary-box">
-                <div class="summary-line">
-                    <span>合计金额:</span>
-                    <span contenteditable="true">¥4,800.00</span>
-                </div>
-                <div class="summary-line">
-                    <span>折扣优惠:</span>
-                    <span contenteditable="true">-¥0.00</span>
-                </div>
-                <div class="summary-total">
-                    <span>总计 Total:</span>
-                    <span contenteditable="true">¥4,800.00</span>
+            <!-- 金额汇总 -->
+            <div class="summary-area">
+                <div class="summary-box">
+                    <div class="summary-line">
+                        <span>合计金额:</span>
+                        <span contenteditable="true">¥4,800.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span>折扣优惠:</span>
+                        <span contenteditable="true">-¥0.00</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>总计 Total:</span>
+                        <span contenteditable="true">¥4,800.00</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 条款及签字 -->
-        <div class="footer-grid">
-            <div class="terms">
-                <h4>⚠️ 业务条款 (Terms & Conditions)</h4>
-                <div contenteditable="true">
-                    1. 付款方式：预付全款，款到发货 (T/T in advance)。<br>
-                    2. 以上报价为普通货物价格，不包含仿牌、纯电池、液体等敏感货附加费。<br>
-                    3. 目的地若产生海关查验，产生的查验费实报实销。<br>
-                    4. 请确保货物包装坚固，易碎品请自行打木架，如遇破损物流方不予赔偿。
+            <!-- 条款及签字 -->
+            <div class="footer-grid">
+                <div class="terms">
+                    <h4>⚠️ 业务条款 (Terms & Conditions)</h4>
+                    <div contenteditable="true">
+                        1. 付款方式：预付全款，款到发货 (T/T in advance)。<br>
+                        2. 以上报价为普通货物价格，不包含仿牌、纯电池、液体等敏感货附加费。<br>
+                        3. 目的地若产生海关查验，产生的查验费实报实销。<br>
+                        4. 请确保货物包装坚固，易碎品请自行打木架，如遇破损物流方不予赔偿。
+                    </div>
+                </div>
+                <div class="sign-area">
+                    <div class="sign-line">客户确认签字 (Client)</div>
+                    <div class="sign-line">集运巴巴盖章 (Stamp)</div>
                 </div>
             </div>
-            <div class="sign-area">
-                <div class="sign-line">客户确认签字 (Client)</div>
-                <div class="sign-line">集运巴巴盖章 (Stamp)</div>
-            </div>
-        </div>
 
-        <div class="bottom-banner">
-            销售代表：<span contenteditable="true">陈先生</span> | 业务专线：<span contenteditable="true">138-0000-0000</span> | 您的国际物流专属管家
+            <div class="bottom-banner">
+                销售代表：<span contenteditable="true">陈先生</span> | 业务专线：<span contenteditable="true">138-0000-0000</span> | 您的国际物流专属管家
+            </div>
         </div>
     </div>
 
@@ -292,7 +380,6 @@
         // 删除当前行
         function deleteRow(btn) {
             const row = btn.closest('tr');
-            // 如果只剩最后一行了，给个提示
             if(document.getElementById('table-body').children.length > 1) {
                 row.remove();
             } else {
@@ -300,7 +387,7 @@
             }
         }
 
-        // 下载图片逻辑
+        // 下载图片逻辑 - 截取完整报价单
         function downloadImage() {
             const card = document.getElementById('quotation-card');
             const btn = document.querySelector('.btn-image');
@@ -309,10 +396,14 @@
             btn.disabled = true;
 
             html2canvas(card, {
-                scale: 2, // 2倍高清图
+                scale: 2,
                 useCORS: true, 
                 backgroundColor: "#ffffff", 
-                logging: false
+                logging: false,
+                width: card.scrollWidth,
+                height: card.scrollHeight,
+                windowWidth: card.scrollWidth,
+                windowHeight: card.scrollHeight
             }).then(canvas => {
                 const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 const link = document.createElement('a');

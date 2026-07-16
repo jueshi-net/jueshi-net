@@ -10,7 +10,7 @@
         /* 基础重置 */
         body { margin: 0; padding: 0; background: #eef2f6; font-family: 'Microsoft YaHei', sans-serif; }
         
-        /* 屏幕显示布局 */
+        /* 屏幕显示布局 - 桌面端横向 */
         .screen-layout { display: flex; height: 100vh; overflow: hidden; }
 
         /* 预览区 */
@@ -30,11 +30,11 @@
         /* 标签卡片 (通用) */
         .label-card {
             background: white;
-            box-sizing: border-box; /* 关键：边框含在尺寸内 */
+            box-sizing: border-box;
             position: relative;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 内容多了切掉，不准撑开 */
+            overflow: hidden;
         }
 
         /* 屏幕预览时的样式 */
@@ -44,7 +44,42 @@
         }
 
         /* =========================================
-           🖨️ 打印核心 (V4 改进)
+           📱 移动端响应式 (< 768px)
+           ========================================= */
+        @media (max-width: 767px) {
+            .screen-layout {
+                flex-direction: column;
+                height: auto;
+                min-height: 100dvh;
+                overflow: visible;
+            }
+
+            /* 左侧控制面板 - 移动端全宽 */
+            .no-print.w-full.md\:w-80 {
+                width: 100% !important;
+                border-right: none !important;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            /* 预览区 - 移动端允许滚动 */
+            .preview-wrapper {
+                padding: 20px;
+                min-height: 400px;
+                overflow: auto;
+            }
+        }
+
+        /* =========================================
+           📱 平板端 (768px - 1023px)
+           ========================================= */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .preview-wrapper {
+                padding: 24px;
+            }
+        }
+
+        /* =========================================
+           🖨️ 打印核心
            ========================================= */
         @media print {
             /* 1. 隐藏杂项 */
@@ -150,10 +185,9 @@
                 <div v-for="i in data.totalCount" :key="i" class="label-card"
                      :style="{
                         width: settings.width + 'mm',
-                        /* 关键公式：内容高度 = 纸张高度 - 安全留白 */
                         height: (settings.height - settings.safeMargin) + 'mm',
                         padding: styles.padding + 'mm',
-                        marginBottom: settings.safeMargin + 'mm' /* 预览时补齐视觉高度，打印时忽略 */
+                        marginBottom: settings.safeMargin + 'mm'
                      }">
                     
                     <div class="flex flex-col h-full w-full justify-between">
@@ -190,7 +224,7 @@
                 const settings = reactive({ 
                     width: 100, 
                     height: 150,
-                    safeMargin: 2 // 默认留白 2mm，防止跑页
+                    safeMargin: 2
                 })
                 const styles = reactive({
                     companySize: 80,

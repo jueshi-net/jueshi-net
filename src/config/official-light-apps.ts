@@ -5,6 +5,13 @@
  * 状态只允许：published | hidden
  */
 
+export interface LightAppViewport {
+  desktopHeight: number;
+  tabletHeight: number;
+  mobileHeight: number;
+  mobileMode: 'responsive' | 'canvas-scroll';
+}
+
 export interface OfficialLightApp {
   slug: string;
   name: string;
@@ -17,6 +24,7 @@ export interface OfficialLightApp {
   featured: boolean;
   status: 'published' | 'hidden';
   privacyNote: string;
+  viewport: LightAppViewport;
 }
 
 export const OFFICIAL_LIGHT_APPS: OfficialLightApp[] = [
@@ -31,7 +39,13 @@ export const OFFICIAL_LIGHT_APPS: OfficialLightApp[] = [
     capabilities: ['edit', 'print'],
     featured: true,
     status: 'published',
-    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。'
+    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。',
+    viewport: {
+      desktopHeight: 820,
+      tabletHeight: 820,
+      mobileHeight: 720,
+      mobileMode: 'responsive'
+    }
   },
   {
     slug: 'quotation-builder',
@@ -44,7 +58,13 @@ export const OFFICIAL_LIGHT_APPS: OfficialLightApp[] = [
     capabilities: ['edit', 'dynamic-rows', 'print', 'download-image'],
     featured: true,
     status: 'published',
-    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。'
+    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。',
+    viewport: {
+      desktopHeight: 980,
+      tabletHeight: 900,
+      mobileHeight: 760,
+      mobileMode: 'canvas-scroll'
+    }
   },
   {
     slug: 'delivery-note',
@@ -57,7 +77,13 @@ export const OFFICIAL_LIGHT_APPS: OfficialLightApp[] = [
     capabilities: ['edit', 'upload-logo', 'dynamic-rows', 'print', 'download-image'],
     featured: true,
     status: 'published',
-    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。'
+    privacyNote: '本工具在当前浏览器中运行，填写的数据不会自动保存到绝世百宝箱账户。请及时打印或下载结果。',
+    viewport: {
+      desktopHeight: 980,
+      tabletHeight: 900,
+      mobileHeight: 760,
+      mobileMode: 'canvas-scroll'
+    }
   }
 ];
 

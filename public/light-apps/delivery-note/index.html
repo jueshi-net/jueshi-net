@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>物流出货单-最终版</title>
+    <title>出货交接单 - 绝世百宝箱</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -16,73 +16,142 @@
         body {
             background-color: var(--bg);
             font-family: "Microsoft YaHei", sans-serif;
-            margin: 0; padding: 30px;
-            display: flex; flex-direction: column; align-items: center;
+            margin: 0; 
+            padding: 16px;
             color: var(--text);
+            overflow-x: hidden;
         }
 
         /* 功能按钮栏 */
         .toolbar {
-            position: sticky; top: 10px; z-index: 999;
-            display: flex; gap: 15px; margin-bottom: 20px;
-            background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 30px;
+            position: sticky; 
+            top: 8px; 
+            z-index: 999;
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.95); 
+            padding: 8px 16px; 
+            border-radius: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .btn {
-            border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; font-size: 13px;
+            border: none; 
+            padding: 8px 14px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: white; 
+            transition: 0.2s; 
+            font-size: 13px;
+            white-space: nowrap;
         }
         .btn-img { background: var(--orange); }
         .btn-print { background: var(--blue); }
         .btn-add { background: #27ae60; }
         .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-        /* A4 纸张容器 - 固定宽度确保稳定 */
+        /* 文档滚动容器 */
+        .document-scroll {
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* A4 纸张容器 */
         #deliveryNote {
-            background: white; width: 800px; min-height: 1100px;
-            padding: 40px; box-sizing: border-box;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 4px;
+            background: white; 
+            width: 800px; 
+            min-width: 800px;
+            min-height: 1100px;
+            padding: 40px; 
+            box-sizing: border-box;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+            border-radius: 4px;
         }
 
         /* 头部 */
         .header {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            border-bottom: 3px solid var(--blue); padding-bottom: 15px; margin-bottom: 30px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-end;
+            border-bottom: 3px solid var(--blue); 
+            padding-bottom: 15px; 
+            margin-bottom: 30px;
         }
-        /* --- 修改点：去掉了 border 属性 --- */
         .logo-box {
-            width: 150px; height: 70px; 
-            /* border: 2px dashed var(--blue);  <-- 删除了这行 */
-            display: flex; align-items: center; justify-content: flex-start; cursor: pointer; background: transparent;
+            width: 150px; 
+            height: 70px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start; 
+            cursor: pointer; 
+            background: transparent;
         }
         .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        /* 让提示文字稍微淡一点 */
-        .logo-text { font-size: 14px; color: #999; font-weight: bold; background: #f5f5f5; padding: 10px 20px; border-radius: 4px;}
+        .logo-text { 
+            font-size: 14px; 
+            color: #999; 
+            font-weight: bold; 
+            background: #f5f5f5; 
+            padding: 10px 20px; 
+            border-radius: 4px;
+        }
         
         .title-box { text-align: right; }
         h1 { margin: 0; color: var(--blue); font-size: 28px; }
         .comp-input { 
-            border: none; font-size: 16px; text-align: right; color: var(--orange); 
-            font-weight: bold; width: 300px; outline: none; background: transparent;
+            border: none; 
+            font-size: 16px; 
+            text-align: right; 
+            color: var(--orange); 
+            font-weight: bold; 
+            width: 300px; 
+            outline: none; 
+            background: transparent;
         }
 
         /* 信息条 */
         .meta-bar {
-            display: flex; gap: 20px; background: var(--blue); color: white;
-            padding: 10px 20px; border-radius: 4px; margin-bottom: 30px;
+            display: flex; 
+            gap: 20px; 
+            background: var(--blue); 
+            color: white;
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
         .meta-item { display: flex; align-items: center; }
         .meta-label { font-weight: bold; margin-right: 8px; font-size: 13px; opacity: 0.9; }
         .meta-input {
-            border: none; background: transparent; color: white; font-weight: bold; 
-            border-bottom: 1px solid rgba(255,255,255,0.3); outline: none; width: 140px;
+            border: none; 
+            background: transparent; 
+            color: white; 
+            font-weight: bold; 
+            border-bottom: 1px solid rgba(255,255,255,0.3); 
+            outline: none; 
+            width: 140px;
         }
 
         /* 收发货地址 */
         .address-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            margin-bottom: 30px;
         }
         .addr-box {
-            padding: 15px; background: #fcfcfc; border: 1px solid #eee; border-left-width: 5px;
+            padding: 15px; 
+            background: #fcfcfc; 
+            border: 1px solid #eee; 
+            border-left-width: 5px;
         }
         .sender { border-left-color: var(--blue); }
         .receiver { border-left-color: var(--orange); }
@@ -90,10 +159,15 @@
         .sender .addr-title { color: var(--blue); }
         .receiver .addr-title { color: var(--orange); }
         
-        /* 统一输入框样式，增加高度防止截断 */
+        /* 统一输入框样式 */
         .info-input {
-            width: 100%; border: none; border-bottom: 1px solid #eee; 
-            padding: 8px 0; font-size: 14px; outline: none; background: transparent;
+            width: 100%; 
+            border: none; 
+            border-bottom: 1px solid #eee; 
+            padding: 8px 0; 
+            font-size: 14px; 
+            outline: none; 
+            background: transparent;
             line-height: 1.5;
         }
         .info-input:focus { border-bottom-color: var(--blue); }
@@ -101,22 +175,35 @@
         /* 表格 */
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { 
-            text-align: left; background: #f2f7fb; color: var(--blue); 
-            padding: 10px; font-size: 13px; border-bottom: 2px solid #ddd;
+            text-align: left; 
+            background: #f2f7fb; 
+            color: var(--blue); 
+            padding: 10px; 
+            font-size: 13px; 
+            border-bottom: 2px solid #ddd;
         }
         td { padding: 5px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
         
         /* 表格输入框 */
         .tbl-input {
-            width: 100%; border: none; outline: none; padding: 8px 0; 
-            font-size: 14px; background: transparent; line-height: 1.5;
+            width: 100%; 
+            border: none; 
+            outline: none; 
+            padding: 8px 0; 
+            font-size: 14px; 
+            background: transparent; 
+            line-height: 1.5;
         }
 
         /* 合计 */
         .total-area { display: flex; justify-content: flex-end; margin-top: 20px; }
         .total-box {
-            background: var(--orange); color: white; padding: 10px 25px;
-            border-radius: 4px; font-weight: bold; font-size: 16px;
+            background: var(--orange); 
+            color: white; 
+            padding: 10px 25px;
+            border-radius: 4px; 
+            font-weight: bold; 
+            font-size: 16px;
         }
         #totalQty { font-size: 22px; margin-left: 10px; }
 
@@ -128,10 +215,106 @@
         .no-print { cursor: pointer; color: #e74c3c; border: none; background: none; font-weight: bold;}
         #hiddenFileInput { display: none; }
 
+        /* =========================================
+           📱 移动端响应式
+           ========================================= */
+        @media (max-width: 767px) {
+            body {
+                padding: 12px;
+            }
+
+            .toolbar {
+                padding: 8px 12px;
+                gap: 8px;
+                border-radius: 12px;
+                max-width: 100%;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .document-scroll {
+                margin: 0 -4px;
+                padding: 0 4px;
+                /* 滚动提示 */
+                background: linear-gradient(to right, 
+                    rgba(0,0,0,0.03) 0%, 
+                    transparent 8%, 
+                    transparent 92%, 
+                    rgba(0,0,0,0.03) 100%
+                );
+            }
+
+            #deliveryNote {
+                width: 700px;
+                min-width: 700px;
+                padding: 24px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .title-box {
+                text-align: left;
+                width: 100%;
+            }
+
+            .comp-input {
+                width: 100%;
+                text-align: left;
+            }
+
+            .meta-bar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px 16px;
+            }
+
+            .meta-item {
+                width: 100%;
+            }
+
+            .meta-input {
+                flex: 1;
+                width: auto;
+            }
+
+            .address-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .signatures {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        /* =========================================
+           📱 平板端
+           ========================================= */
+        @media (min-width: 768px) and (max-width: 859px) {
+            #deliveryNote {
+                width: 720px;
+                min-width: 720px;
+                padding: 32px;
+            }
+        }
+
         @media print {
             .toolbar, .no-print { display: none !important; }
             body { padding: 0; background: white; }
-            #deliveryNote { box-shadow: none; width: 100%; }
+            .document-scroll { overflow: visible; }
+            #deliveryNote { 
+                box-shadow: none; 
+                width: 100%; 
+                min-width: auto;
+            }
         }
     </style>
 </head>
@@ -145,81 +328,83 @@
         <button class="btn btn-add" onclick="addRow()">➕ 加一行</button>
     </div>
 
-    <div id="deliveryNote">
-        <div class="header">
-            <div class="logo-box" onclick="document.getElementById('hiddenFileInput').click()">
-                <img id="logoImg" src="" style="display: none;">
-                <span class="logo-text" id="logoPlaceholder">点击上传LOGO</span>
+    <div class="document-scroll">
+        <div id="deliveryNote">
+            <div class="header">
+                <div class="logo-box" onclick="document.getElementById('hiddenFileInput').click()">
+                    <img id="logoImg" src="" style="display: none;">
+                    <span class="logo-text" id="logoPlaceholder">点击上传LOGO</span>
+                </div>
+                <div class="title-box">
+                    <h1>出货交接单</h1>
+                    <input type="text" class="comp-input" value="您的物流公司名称">
+                </div>
             </div>
-            <div class="title-box">
-                <h1>出货交接单</h1>
-                <input type="text" class="comp-input" value="您的物流公司名称">
-            </div>
-        </div>
 
-        <div class="meta-bar">
-            <div class="meta-item">
-                <span class="meta-label">单号 NO:</span>
-                <input type="text" id="orderNo" class="meta-input">
+            <div class="meta-bar">
+                <div class="meta-item">
+                    <span class="meta-label">单号 NO:</span>
+                    <input type="text" id="orderNo" class="meta-input">
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">日期 DATE:</span>
+                    <input type="date" id="dateInput" class="meta-input" style="color:white">
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">渠道 VIA:</span>
+                    <input type="text" class="meta-input" placeholder="例如: 顺丰速运">
+                </div>
             </div>
-            <div class="meta-item">
-                <span class="meta-label">日期 DATE:</span>
-                <input type="date" id="dateInput" class="meta-input" style="color:white">
-            </div>
-            <div class="meta-item">
-                <span class="meta-label">渠道 VIA:</span>
-                <input type="text" class="meta-input" placeholder="例如: 顺丰速运">
-            </div>
-        </div>
 
-        <div class="address-grid">
-            <div class="addr-box sender">
-                <span class="addr-title">发货方 (SENDER)</span>
-                <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
-                <input type="text" class="info-input" placeholder="联系人及电话">
-                <input type="text" class="info-input" placeholder="详细地址">
+            <div class="address-grid">
+                <div class="addr-box sender">
+                    <span class="addr-title">发货方 (SENDER)</span>
+                    <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
+                    <input type="text" class="info-input" placeholder="联系人及电话">
+                    <input type="text" class="info-input" placeholder="详细地址">
+                </div>
+                <div class="addr-box receiver">
+                    <span class="addr-title">收货方 (RECEIVER)</span>
+                    <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
+                    <input type="text" class="info-input" placeholder="联系人及电话">
+                    <input type="text" class="info-input" placeholder="详细地址">
+                </div>
             </div>
-            <div class="addr-box receiver">
-                <span class="addr-title">收货方 (RECEIVER)</span>
-                <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
-                <input type="text" class="info-input" placeholder="联系人及电话">
-                <input type="text" class="info-input" placeholder="详细地址">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th width="50">序号</th>
+                        <th width="150">追踪号</th>
+                        <th>品名描述</th>
+                        <th width="80">件数</th>
+                        <th width="120">备注</th>
+                        <th width="50" class="no-print">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="tbl-input" placeholder="Tracking No."></td>
+                        <td><input type="text" class="tbl-input" placeholder="Description"></td>
+                        <td><input type="number" class="tbl-input qty" value="1" oninput="calcTotal()"></td>
+                        <td><input type="text" class="tbl-input"></td>
+                        <td class="no-print"><button class="no-print" onclick="delRow(this)">×</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="total-area">
+                <div class="total-box">
+                    合计件数 (Total Qty): <span id="totalQty">1</span>
+                </div>
             </div>
-        </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th width="50">序号</th>
-                    <th width="150">追踪号</th>
-                    <th>品名描述</th>
-                    <th width="80">件数</th>
-                    <th width="120">备注</th>
-                    <th width="50" class="no-print">操作</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr>
-                    <td>1</td>
-                    <td><input type="text" class="tbl-input" placeholder="Tracking No."></td>
-                    <td><input type="text" class="tbl-input" placeholder="Description"></td>
-                    <td><input type="number" class="tbl-input qty" value="1" oninput="calcTotal()"></td>
-                    <td><input type="text" class="tbl-input"></td>
-                    <td class="no-print"><button class="no-print" onclick="delRow(this)">×</button></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="total-area">
-            <div class="total-box">
-                合计件数 (Total Qty): <span id="totalQty">1</span>
+            <div class="signatures">
+                <div class="sig-line">发货人签字 (Sender)</div>
+                <div class="sig-line">承运人签字 (Carrier)</div>
+                <div class="sig-line">收货人签字 (Receiver)</div>
             </div>
-        </div>
-
-        <div class="signatures">
-            <div class="sig-line">发货人签字 (Sender)</div>
-            <div class="sig-line">承运人签字 (Carrier)</div>
-            <div class="sig-line">收货人签字 (Receiver)</div>
         </div>
     </div>
 
@@ -269,7 +454,7 @@
             document.getElementById('totalQty').innerText = total;
         }
 
-        // 保存图片（包含文字截断修复）
+        // 保存图片 - 截取完整单据
         async function saveAsImage() {
             const btn = document.querySelector('.btn-img');
             btn.innerText = "正在处理...";
@@ -280,6 +465,10 @@
                     scale: 2,
                     useCORS: true,
                     backgroundColor: '#ffffff',
+                    width: target.scrollWidth,
+                    height: target.scrollHeight,
+                    windowWidth: target.scrollWidth,
+                    windowHeight: target.scrollHeight,
                     onclone: (clonedDoc) => {
                         clonedDoc.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
                         clonedDoc.querySelectorAll('input').forEach(input => {

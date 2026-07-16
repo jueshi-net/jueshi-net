@@ -4,6 +4,7 @@ import { getLightAppBySlug, getPublishedLightApps } from '@/config/official-ligh
 import OfficialLightAppFrame from '@/components/light-apps/OfficialLightAppFrame';
 import OfficialLightAppCard from '@/components/light-apps/OfficialLightAppCard';
 import Link from 'next/link';
+import '@/styles/official-light-apps.css';
 
 interface Props {
   params: Promise<{
