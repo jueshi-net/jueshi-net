@@ -66,6 +66,9 @@ export async function generateStaticParams() {
   }));
 }
 
+// 未知 slug 直接返回 404，不动态渲染
+export const dynamicParams = false;
+
 // 生成元数据
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
