@@ -72,12 +72,10 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
   ];
 
   return (
-    <JueshiV4PublicShell>
-      <PublicCategoryPageFrame
-        title="🔧 工具中心"
-        description="外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱"
-        icon={<Wrench className="w-6 h-6" />}
-      >
+    <PublicCategoryPageFrame
+      title=" 工具中心"
+      subtitle="外贸单据、跨境物流、邮编汇率、HS 编码，一站式实用工具箱"
+    >
         <div className="space-y-8">
           {/* Filter Bar — matches /guides style */}
           <Suspense fallback={null}>
@@ -167,7 +165,6 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
           </ContentSection>
         </div>
       </PublicCategoryPageFrame>
-    </JueshiV4PublicShell>
   );
 }
 

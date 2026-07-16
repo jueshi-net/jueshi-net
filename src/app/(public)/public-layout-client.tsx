@@ -45,6 +45,11 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
     return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
   }
 
+  // 工具中心（/tools）也使用 JueshiV4PublicShell，避免双 Header
+  if (isTools) {
+    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
+  }
+
   return (
     <>
       <div className="hidden lg:block">
