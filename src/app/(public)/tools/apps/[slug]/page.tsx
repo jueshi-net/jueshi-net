@@ -6,17 +6,18 @@ import OfficialLightAppCard from '@/components/light-apps/OfficialLightAppCard';
 import Link from 'next/link';
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 /**
  * 官方轻应用详情页面
  * 路由：/tools/apps/[slug]
  */
-export default function LightAppPage({ params }: Props) {
-  const app = getLightAppBySlug(params.slug);
+export default async function LightAppPage({ params }: Props) {
+  const { slug } = await params;
+  const app = getLightAppBySlug(slug);
 
   // 如果应用不存在或未发布，返回 404
   if (!app || app.status !== 'published') {
@@ -24,7 +25,7 @@ export default function LightAppPage({ params }: Props) {
   }
 
   // 获取其他推荐应用
-  const otherApps = getPublishedLightApps().filter(a => a.slug !== params.slug).slice(0, 2);
+  const otherApps = getPublishedLightApps().filter(a => a.slug !== slug).slice(0, 2);
 
   return (
     <div className="light-app-page">
@@ -66,7 +67,8 @@ export async function generateStaticParams() {
 
 // 生成元数据
 export async function generateMetadata({ params }: Props) {
-  const app = getLightAppBySlug(params.slug);
+  const { slug } = await params;
+  const app = getLightAppBySlug(slug);
   if (!app) {
     return {
       title: '应用未找到 - 绝世百宝箱',

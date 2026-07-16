@@ -1,0 +1,57 @@
+{
+  "cookies": [
+    {
+      "name": "__Host-authjs.csrf-token",
+      "value": "a5baf6737413550b4974e8f0dc641c489c0fd3611a670791542c30d9dc92fed9%7Ce97dcc826bf60a282a82dfe390b3561a0cf5e91db1613b6d23acbb6709282e27",
+      "domain": "i.jueshi.net",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-authjs.callback-url",
+      "value": "https%3A%2F%2Fi.jueshi.net%2Flogin",
+      "domain": "i.jueshi.net",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "__Secure-authjs.session-token",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..V6W1GgG4VLPGppFCvsEq4Q.7WSF3C9_4n7GiO3zci5Odz6cli2uW1Ekcfnwk5Qk6ExasXvO9lGcMMgEcSNS0-mmHYHm0Eym5pdxFZNx87oeDMezRUQmYq1ZY-svZ9ckZJ2Et7EkRBBO1_5iyr9M3d5ysQRFPN4NG6sa-GtXJXo_WAvk1jK74zL0Z0eqz-jRn9lEsKgcRfh4rKEC05MxvO4_AY44KGuR7AJBsTOyjCh2G0XMyBZlfNtrQNt4TEGk9Xj2g4AjSZNCLnkiT2Wi3KT2GFGuS3Foiw5-wQ4FMeU2ypDsNP3IcvNjhGP6yMlfjGc.UD-Y0xxtnDGz7NLtbSWCoKmpMHt8ht3bCkWeQqxoprg",
+      "domain": "i.jueshi.net",
+      "path": "/",
+      "expires": 1786772614.455574,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://i.jueshi.net",
+      "localStorage": [
+        {
+          "name": "__bxb_stime",
+          "value": "1784180613998"
+        },
+        {
+          "name": "theme",
+          "value": "light"
+        },
+        {
+          "name": "__bxb_sid",
+          "value": "bd24d8e4-edc4-4a67-8ff9-05db34242b17"
+        },
+        {
+          "name": "__bxb_aid",
+          "value": "5446bdb2-8918-4663-8de1-9b1b19e3c7b3"
+        }
+      ]
+    }
+  ]
+}
