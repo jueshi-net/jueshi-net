@@ -5,7 +5,7 @@ import { AlertCircle, RotateCcw, ArrowLeft } from "lucide-react";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 
 export default function Error({
-  error: _error,
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
@@ -21,9 +21,15 @@ export default function Error({
           <h1 className="text-xl font-bold text-gray-900 mb-2">
             帖子加载出错
           </h1>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-2">
             无法加载该帖子内容，请重试或返回论坛。
           </p>
+          {error.digest && (
+            <p className="text-xs text-gray-400 mb-6">
+              错误代码: {error.digest}
+            </p>
+          )}
+          {!error.digest && <div className="mb-6" />}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={reset}
