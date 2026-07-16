@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Search, Sparkles, FileText, Tag, Clock, MessageCircle, Eye, TrendingUp, Award, BookOpen, Wrench } from "lucide-react";
+import { Plus, Search, FileText, Tag, Clock, MessageCircle, TrendingUp, Award, BookOpen, Wrench, Lightbulb, Package, Ship, Mail, Medal } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical } from "@/lib/seo";
@@ -8,6 +8,7 @@ import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
 import { formatDateTime } from "@/lib/utils";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 
 export const dynamic = "force-dynamic";
 
@@ -174,12 +175,19 @@ export default async function BBSPage({
   const isLoggedIn = !!session?.user;
 
   const totalPages = Math.ceil(total / pageSize);
-  const medals = ["🥇", "🥈", "🥉"];
+  const medals = ["1", "2", "3"];
 
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-[1400px] mx-auto px-4 py-6">
+          {/* Breadcrumb */}
+          <div className="mb-4">
+            <BreadcrumbBar items={[
+              { title: "首页", href: "/" },
+              { title: "社区", current: true },
+            ]} />
+          </div>
           {/* Compact page header */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -260,7 +268,7 @@ export default async function BBSPage({
                     href="/bbs/new"
                     className="block bg-gradient-to-br from-brand/5 to-accent/5 rounded-xl border border-accent/20 p-4 text-center hover:border-brand/30 transition-colors"
                   >
-                    <span className="text-sm font-medium text-brand">💡 Beta 反馈</span>
+                    <span className="text-sm font-medium text-brand flex items-center justify-center gap-1.5"><Lightbulb className="w-4 h-4" /> Beta 反馈</span>
                     <p className="text-xs text-slate-600 mt-1">反馈布局与功能建议</p>
               </Link>
             </div>
@@ -354,7 +362,9 @@ export default async function BBSPage({
               </div>
             ) : (
               <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                <div className="text-4xl mb-4">📭</div>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <Mail className="w-8 h-8 text-gray-400" />
+                </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">
                   {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
                 </h2>
@@ -417,11 +427,11 @@ export default async function BBSPage({
               {/* New post button */}
               {isLoggedIn ? (
                 <Link href="/bbs/new" className="block w-full bg-brand text-white rounded-xl py-3 text-center font-bold text-sm hover:bg-brand-dark transition-colors">
-                  ✍️ 发布新帖
+                  <span className="flex items-center justify-center gap-1.5"><Plus className="w-4 h-4" /> 发布新帖</span>
                 </Link>
               ) : (
                 <Link href="/login?callbackUrl=/bbs/new" className="block w-full bg-brand text-white rounded-xl py-3 text-center font-bold text-sm hover:bg-brand-dark transition-colors">
-                  ✍️ 登录后发帖
+                  <span className="flex items-center justify-center gap-1.5"><Plus className="w-4 h-4" /> 登录后发帖</span>
                 </Link>
               )}
 
@@ -467,7 +477,7 @@ export default async function BBSPage({
                   <div className="space-y-2">
                     {topUsers.map((user, i) => (
                       <div key={user.id} className="flex items-center gap-2">
-                        <span className="text-sm">{medals[i] || `${i + 1}`}</span>
+                        <span className="text-sm flex items-center justify-center w-5 h-5 rounded-full bg-brand/10 text-brand text-xs font-bold">{i < 3 ? medals[i] : `${i + 1}`}</span>
                         <div className="w-7 h-7 rounded-full bg-brand/10 text-brand flex items-center justify-center text-xs font-bold">
                           {user.name?.charAt(0).toUpperCase() || "U"}
                         </div>
@@ -486,9 +496,9 @@ export default async function BBSPage({
                   相关工具入口
                 </h3>
                 <div className="space-y-1.5">
-                  <Link href="/tools/hs-code" className="block text-sm text-gray-600 hover:text-brand transition-colors">📦 HS 编码查询</Link>
-                  <Link href="/tools/shipping-calculator" className="block text-sm text-gray-600 hover:text-brand transition-colors">🚢 运费计算器</Link>
-                  <Link href="/tools/postal-code" className="block text-sm text-gray-600 hover:text-brand transition-colors">📮 邮编查询</Link>
+                  <Link href="/tools/hs-code" className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand transition-colors"><Package className="w-4 h-4" /> HS 编码查询</Link>
+                  <Link href="/tools/shipping-calculator" className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand transition-colors"><Ship className="w-4 h-4" /> 运费计算器</Link>
+                  <Link href="/tools/postal-code" className="flex items-center gap-2 text-sm text-gray-600 hover:text-brand transition-colors"><Mail className="w-4 h-4" /> 邮编查询</Link>
                 </div>
               </div>
             </div>

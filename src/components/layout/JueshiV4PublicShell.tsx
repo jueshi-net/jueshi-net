@@ -31,6 +31,8 @@ export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellPro
       setActiveTab('mobile_tab_checklist');
     } else if (pathname.startsWith('/workspace')) {
       setActiveTab('mobile_tab_profile');
+    } else if (pathname.startsWith('/bbs') || pathname.startsWith('/community')) {
+      setActiveTab('mobile_tab_community');
     } else {
       setActiveTab('mobile_tab_home'); // 默认
     }

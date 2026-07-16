@@ -9,6 +9,7 @@ import { formatDateTime } from "@/lib/utils";
 import { PostContent } from "@/components/bbs/post-content";
 import { CategoryBadge } from "@/components/bbs/category-badge";
 import CommentSection from "@/components/bbs/comment-section";
+import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 
 export const dynamic = "force-dynamic";
 
@@ -140,19 +141,12 @@ export default async function PostDetailPage({
       {/* Breadcrumb bar */}
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-[1200px] mx-auto px-4 py-2.5">
-          <nav className="flex items-center gap-1 text-sm text-slate-500 flex-wrap">
-            <Link href="/" className="hover:text-brand inline-flex items-center gap-0.5">
-              <Home className="w-3.5 h-3.5" /> 首页
-            </Link>
-            <ChevronRight className="w-3 h-3 text-gray-300" />
-            <Link href="/bbs" className="hover:text-brand">社区论坛</Link>
-            <ChevronRight className="w-3 h-3 text-gray-300" />
-            <Link href={`/bbs/category/${post.category.key}`} className="hover:text-brand">
-              {post.category.name}
-            </Link>
-            <ChevronRight className="w-3 h-3 text-gray-300" />
-            <span className="text-slate-500 truncate max-w-[200px]">{post.title}</span>
-          </nav>
+          <BreadcrumbBar items={[
+            { title: "首页", href: "/" },
+            { title: "社区论坛", href: "/bbs" },
+            { title: post.category.name, href: `/bbs/category/${post.category.key}` },
+            { title: post.title.length > 30 ? post.title.slice(0, 30) + "..." : post.title, current: true },
+          ]} />
         </div>
       </div>
 
