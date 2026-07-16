@@ -214,9 +214,9 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
   // 默认素材
   defaultAssets: {
     defaultAvatar: '/images/brand/default-avatar-crab.jpg',
-    mobileTabCenterImage: '/images/brand/jueshi-mobile-tab-center.png',
-    brandLogo: '/images/brand/jueshi-logo-crab.jpg',
-    brandCrabMark: '/images/brand/jueshi-crab-mark.png',
+    mobileTabCenterImage: '/brand/v2/app-mark.svg',
+    brandLogo: '/brand/v2/logo-horizontal-color.svg',
+    brandCrabMark: '/brand/v2/robot-symbol-color.svg',
   },
 };
 

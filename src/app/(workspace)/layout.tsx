@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { UserNavSidebar } from "@/components/user/UserSidebar";
 import { WorkspaceProviders } from "@/components/user/WorkspaceProviders";
+import WorkspaceMobileNav from "@/components/workspace/WorkspaceMobileNav";
 import TopBar from "./topbar";
 
 const levelLabels: Record<string, string> = {
@@ -59,8 +60,9 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
         <UserNavSidebar userAsset={userAsset} />
         <div className="flex-1 flex flex-col overflow-hidden">
           <TopBar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          <main className="flex-1 overflow-y-auto md:pb-0 pb-16">{children}</main>
         </div>
+        <WorkspaceMobileNav />
       </div>
     </WorkspaceProviders>
   );

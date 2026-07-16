@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="300" viewBox="0 0 360 300" role="img" aria-label="绝世百宝箱机器人图形 color">
+<title>绝世百宝箱机器人图形 color</title>
+<g id="robot-symbol">
+  <rect x="0" y="126" width="28" height="86" rx="12" fill="#0A1D6B"/>
+  <rect x="332" y="126" width="28" height="86" rx="12" fill="#0A1D6B"/>
+  <rect x="32" y="54" width="296" height="220" rx="74" fill="#0A1D6B"/>
+  <rect x="74" y="104" width="212" height="112" rx="43" fill="#FFFFFF"/>
+  <rect x="174" y="22" width="12" height="48" rx="6" fill="#0A1D6B"/>
+  <circle cx="180" cy="20" r="20" fill="#FFB800"/>
+  <path d="M137 138 L109 160 L137 182" fill="none" stroke="#00D4FF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M223 138 L251 160 L223 182" fill="none" stroke="#00D4FF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

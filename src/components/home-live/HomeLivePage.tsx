@@ -144,7 +144,7 @@ function HomeLiveHeader() {
         <div className="flex items-center justify-between h-[76px]">
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center flex-shrink-0">
-              <Image src="/logo.svg" alt="绝世百宝箱" width={160} height={44} className="h-[44px] w-auto object-contain" priority />
+              <Image src="/brand/v2/logo-horizontal-color.svg" alt="绝世百宝箱" width={160} height={44} className="h-[44px] w-auto object-contain" priority />
             </Link>
             <nav className="hidden lg:flex items-center gap-1">
               <Link href="/" className="px-3 py-2 rounded-lg text-sm font-medium text-[#6C5DD3] bg-[#6C5DD3]/8">首页</Link>

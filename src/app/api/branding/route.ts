@@ -5,10 +5,10 @@ import * as path from 'path';
 const SETTINGS_FILE = path.join(process.cwd(), 'data', 'system-settings.json');
 
 const DEFAULT_BRANDING = {
-  logoUrl: '/brand/jueshi-logo-header.png',
+  logoUrl: '/brand/v2/logo-horizontal-color.svg',
   logoAlt: '绝世百宝箱 jueshi.net',
-  logoWidth: 97,
-  logoHeight: 40,
+  logoWidth: 160,
+  logoHeight: 44,
 };
 
 // GET /api/branding - 公开 API，供 Header 读取品牌配置

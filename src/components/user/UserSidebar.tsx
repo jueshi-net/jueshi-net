@@ -82,11 +82,9 @@ export function UserNavSidebar({ className, userAsset }: { className?: string; u
         <div className="h-14 flex items-center px-5 border-b border-gray-100/80">
           <Link href="/" className="flex items-center gap-2.5">
             <img 
-              src="/images/brand/jueshi-logo-crab.jpg" 
+              src="/brand/v2/logo-horizontal-color.svg"
               alt="绝世百宝箱" 
-              className="h-10 w-auto object-contain"
-              width={97}
-              height={40}
+              className="h-9 w-auto object-contain"
             />
           </Link>
         </div>

@@ -115,9 +115,9 @@ export default function WorkspaceSidebar({
       <div className="h-14 flex items-center px-5 border-b border-[#E8ECF3]">
         <Link href="/" className="flex items-center gap-2.5">
           <img 
-            src="/brand/jueshi-logo.png" 
+            src="/brand/v2/logo-horizontal-color.svg"
             alt="绝世百宝箱" 
-            className="h-8 w-auto"
+            className="h-8 w-auto object-contain"
           />
           <span className="font-semibold text-[#11142D] text-base">绝世百宝箱</span>
         </Link>

@@ -1,23 +1,35 @@
 {
-  "name": "海外百宝箱 - 海外华人的常用工具与资源平台",
-  "short_name": "海外百宝箱",
+  "name": "绝世百宝箱 - 海外华人的常用工具与资源平台",
+  "short_name": "绝世百宝箱",
   "description": "查包裹、算运费、做单据、查邮编、找资源，一个站搞定。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F4F8FB",
-  "theme_color": "#0F3D5E",
+  "theme_color": "#0A1D6B",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "/brand/v2/favicon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/v2/favicon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/v2/favicon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "/brand/v2/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],

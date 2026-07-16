@@ -15,8 +15,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0F3D5E" },
-    { media: "(prefers-color-scheme: dark)", color: "#0A2E47" },
+    { media: "(prefers-color-scheme: light)", color: "#0A1D6B" },
+    { media: "(prefers-color-scheme: dark)", color: "#0A1D6B" },
   ],
 };
 
@@ -27,11 +27,11 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/v2/favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/v2/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/brand/v2/favicon-32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "/brand/v2/favicon-512.png",
   },
   openGraph: {
     type: "website",

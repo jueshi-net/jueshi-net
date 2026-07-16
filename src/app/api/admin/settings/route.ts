@@ -20,10 +20,10 @@ async function readSettings() {
       emailEnabled: !!(process.env.RESEND_API_KEY || process.env.SMTP_HOST),
       emailProvider: process.env.RESEND_API_KEY ? 'resend' : process.env.SMTP_HOST ? 'smtp' : null,
       branding: {
-        logoUrl: '/brand/jueshi-logo-header.png',
+        logoUrl: '/brand/v2/logo-horizontal-color.svg',
         logoAlt: '绝世百宝箱 jueshi.net',
-        logoWidth: 97,
-        logoHeight: 40,
+        logoWidth: 160,
+        logoHeight: 44,
       },
     };
   }
