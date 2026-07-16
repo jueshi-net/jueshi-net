@@ -74,21 +74,6 @@ export default async function ResourceDetailPage({ params }: Props) {
   return (
     <JueshiV4PublicShell>
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm text-gray-500">
-            <Link href="/" className="hover:text-teal-600 transition-colors">首页</Link>
-            <span className="text-gray-300">/</span>
-            <Link href="/resources" className="hover:text-teal-600 transition-colors">资源库</Link>
-            <span className="text-gray-300">/</span>
-            <Link href={`/resources/${resource.category}`} className="hover:text-teal-600 transition-colors">{catConfig.name}</Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-gray-900 font-medium truncate">{resource.name}</span>
-          </nav>
-        </div>
-      </div>
-
       {/* Main Layout: Two columns */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex flex-col lg:flex-row gap-6">

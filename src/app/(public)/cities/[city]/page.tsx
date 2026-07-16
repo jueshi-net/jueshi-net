@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { SITE_URL } from "@/lib/seo";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
-import { BreadcrumbBar, TagGroup, ContentSection, SectionHeader, PageCTA } from "@/components/design-system";
+import { TagGroup, ContentSection, PageCTA, SectionHeader } from "@/components/design-system";
 
 // Force SSR — DB not available during build time
 export const dynamic = "force-dynamic";
@@ -113,15 +113,6 @@ export default async function CityPage({ params }: Props) {
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
-          {/* Breadcrumb */}
-          <BreadcrumbBar
-            items={[
-              { title: "首页", href: "/" },
-              { title: cityName, current: true }
-            ]}
-            className="mb-6"
-          />
-
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-10 shadow-lg">
           <div className="flex items-center gap-2 mb-3 flex-wrap">

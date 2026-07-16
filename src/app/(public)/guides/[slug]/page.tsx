@@ -10,7 +10,7 @@ import { AdSlot } from "@/components/ad-slot";
 import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { ArticleLayoutClient } from "./article-layout-client";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
-import { BreadcrumbBar, TagGroup, ContentSection, SectionHeader, PageCTA } from "@/components/design-system";
+import { TagGroup, ContentSection, SectionHeader, PageCTA } from "@/components/design-system";
 
 const TOOL_MAP: Record<string, { name: string; route: string; icon: string; desc: string }> = {
   "tracking": { name: "运单号整理工具", route: "/tracking", icon: "📦", desc: "批量整理运单号，自动识别承运商" },
@@ -184,15 +184,6 @@ export default async function ArticlePage({ params, searchParams }: Props) {
                     </p>
                   </div>
                 )}
-
-                <BreadcrumbBar
-                  items={[
-                    { title: "首页", href: "/" },
-                    { title: "实用指南", href: "/guides" },
-                    { title: guide.title, current: true }
-                  ]}
-                  className="mb-6"
-                />
 
                 <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                   <header className="px-6 pt-8 pb-6 sm:px-10 sm:pt-10 sm:pb-8">
@@ -425,16 +416,6 @@ export default async function ArticlePage({ params, searchParams }: Props) {
           />
 
           <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-            {/* Breadcrumb */}
-            <BreadcrumbBar
-              items={[
-                { title: "首页", href: "/" },
-                { title: "实用指南", href: "/guides" },
-                { title: article.title, current: true }
-              ]}
-              className="mb-6"
-            />
-
           {/* Article Card */}
           <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Hero Section */}

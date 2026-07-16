@@ -25,7 +25,7 @@ import { getTopicBySlug as getCmsTopicBySlug } from "@/lib/cms-utils";
 import SmartRelatedLinks from "@/components/smart-related-links";
 import TaskChainCta from "@/components/content/task-chain-cta";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
-import { PageHero, BreadcrumbBar, ContentSection, PageCTA, SectionHeader } from "@/components/design-system";
+import { ContentSection, SectionHeader } from "@/components/design-system";
 
 // Reuse rating/category constants from static data (these are UI-only constants, not data)
 import {
@@ -154,17 +154,6 @@ function CmsTopicPage({ cmsTopic }: { cmsTopic: import("@/lib/cms-utils").Parsed
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="max-w-6xl mx-auto px-4 pt-6">
-          <BreadcrumbBar
-            items={[
-              { title: "首页", href: "/" },
-              { title: "专题", href: "/topics" },
-              { title: cmsTopic.frontmatter.title, current: true }
-            ]}
-          />
-        </div>
-
         {/* Hero */}
         <div className="bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-700 text-white relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0">
@@ -393,17 +382,6 @@ export default async function TopicSlugPage({
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="max-w-6xl mx-auto px-4 pt-6">
-          <BreadcrumbBar
-            items={[
-              { title: '首页', href: '/' },
-              { title: '专题', href: '/topics' },
-              { title: topic.title, current: true }
-            ]}
-          />
-        </div>
-
         {/* Preview Mode Banner */}
         {(previewMode || isDraft) && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center mb-6 mx-4 mt-4">

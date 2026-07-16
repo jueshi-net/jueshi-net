@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/workspace', label: '概览', icon: Home },
   { href: '/workspace/documents', label: '文档', icon: FileText },
-  { href: '/tools/documents', label: '新建', icon: PlusCircle, isCenter: true },
+  { href: '/workspace/documents', label: '新建', icon: PlusCircle, isCenter: true },
   { href: '/workspace/tasks', label: '任务', icon: Target },
   { href: '/workspace/settings', label: '我的', icon: User },
 ];

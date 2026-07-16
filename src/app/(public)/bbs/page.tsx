@@ -8,7 +8,6 @@ import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
 import { formatDateTime } from "@/lib/utils";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
-import { PageContainer, PageHero, BreadcrumbBar, ContentSection } from "@/components/design-system";
 
 export const dynamic = "force-dynamic";
 
@@ -177,45 +176,36 @@ export default async function BBSPage({
   const totalPages = Math.ceil(total / pageSize);
   const medals = ["🥇", "🥈", "🥉"];
 
-  const breadcrumbs = [
-    { title: '首页', href: '/' },
-    { title: '社区论坛' },
-  ];
-
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
-        <PageContainer paddingTop paddingBottom>
-          {/* Breadcrumb */}
-          <BreadcrumbBar items={breadcrumbs} />
-
-          {/* Hero Section */}
-          <PageHero
-            title="社区论坛"
-            subtitle={`交流出海工具、海外生活、物流经验 · ${stats.postCount} 帖 · ${stats.categoryCount} 分类`}
-            actions={
-              isLoggedIn ? (
-                <Link
-                  href="/bbs/new"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  发布帖子
-                </Link>
-              ) : (
-                <Link
-                  href="/login?callbackUrl=/bbs/new"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  登录后发帖
-                </Link>
-              )
-            }
-          />
-
-          {/* Three-column layout */}
-          <div className="max-w-[1400px] mx-auto px-4 py-6">
+        <div className="max-w-[1400px] mx-auto px-4 py-6">
+          {/* Compact page header */}
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">社区论坛</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                交流出海工具、海外生活、物流经验 · {stats.postCount} 帖 · {stats.categoryCount} 分类
+              </p>
+            </div>
+            {isLoggedIn ? (
+              <Link
+                href="/bbs/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                发布帖子
+              </Link>
+            ) : (
+              <Link
+                href="/login?callbackUrl=/bbs/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-brand text-white rounded-lg text-sm font-bold hover:bg-brand-dark transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                登录后发帖
+              </Link>
+            )}
+          </div>
             <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] xl:grid-cols-[220px_1fr_300px] gap-6">
               {/* Left sidebar — Community navigation */}
               <aside className="hidden lg:block">
@@ -505,7 +495,6 @@ export default async function BBSPage({
           </aside>
         </div>
       </div>
-      </PageContainer>
       </div>
     </JueshiV4PublicShell>
   );
