@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Search, Package, ExternalLink, ChevronDown, ChevronUp, Loader2, Copy, Check, Clock, Truck, AlertTriangle, Bookmark, BookmarkCheck, Shield, FileText, Calculator, Link2 } from 'lucide-react';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolLandingPageShell from '@/components/tools/ToolLandingPageShell';
 import { RelatedGuidesSection } from '@/components/related-guides-section';
 import { FAQSection } from '@/components/faq-section';
 import { AdSlot } from '@/components/ad-slot';
@@ -490,9 +490,15 @@ export default function HSCodePage() {
   const sensitiveQuery = isSensitiveQuery(activeQuery);
 
   return (
-    <PublicLandingPageFrame
+    <ToolLandingPageShell
       title="HS Code 商品归类查询"
       subtitle="输入商品中文名、英文名或 HS 编码，查询可能的商品归类结果"
+      privacyNotice={
+        <span>
+          <strong>HS Code 查询结果仅供参考，不构成海关、税务或法律意见。</strong>
+          正式报关前请以目的国海关、报关行或专业归类意见为准。
+        </span>
+      }
     >
       <div className="pb-16">
         
@@ -1037,6 +1043,6 @@ export default function HSCodePage() {
         onCreateNew={handleCreateNewTaskChain}
         sourceTool="hs-code"
       />
-    </PublicLandingPageFrame>
+    </ToolLandingPageShell>
   );
 }
