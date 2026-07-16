@@ -22,7 +22,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 |------|--------|--------|--------|-----|-----|------|
 | Production | 104.250.109.99 | jueshi.net | main | xixiong-saas | production DB | /home/deploy/xixiong-saas |
 | Staging | 192.129.155.149 | i.jueshi.net | staging | xixiong-staging | xixiong_staging | /home/deploy/xixiong-saas-staging |
-| Hot Standby | 192.129.155.149 | — | — | xixiong-saas | production snapshot | /home/deploy/xixiong-saas (do not touch) |
+
+**Note**: 192.129.155.149 是开发、测试、部署和验收服务器，允许正常修改和部署 staging。
 
 ---
 
