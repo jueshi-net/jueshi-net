@@ -103,10 +103,10 @@ export function WorkspacePageHeader({
 
       {/* Tabs */}
       {tabs && tabs.length > 0 && (
-        <div className="px-6 flex items-center gap-1 border-t border-gray-100">
+        <div className="px-6 flex items-center gap-1 border-t border-gray-100 overflow-x-auto scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
           {tabs.map((tab, idx) => {
             const tabClasses = cn(
-              'px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
+              'px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0',
               tab.active
                 ? 'border-teal-600 text-teal-700'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

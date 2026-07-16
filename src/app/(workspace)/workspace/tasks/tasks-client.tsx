@@ -64,11 +64,16 @@ export default function TasksClient() {
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.success) {
-          const apiTasks = (d.tasks || []).map((t: any) => ({
-            ...t,
-            actionType: t.actionType || "workspace_visit",
-            targetUrl: t.targetUrl || "/workspace",
-          }));
+          const apiTasks = (d.tasks || []).map((t: any) => {
+            const rg = Number(t.rewardGrowth);
+            return {
+              ...t,
+              rewardGrowth: Number.isFinite(rg) ? rg : 0,
+              actionType: t.actionType || "workspace_visit",
+              targetUrl: t.targetUrl || "/workspace",
+              count: Number.isFinite(Number(t.count)) ? Number(t.count) : 0,
+            };
+          });
           if (apiTasks.length > 0) {
             setTasks(apiTasks);
             if (d.levelInfo) setLevelInfo(d.levelInfo);
@@ -109,7 +114,10 @@ export default function TasksClient() {
 
   const completedCount = tasks.filter(t => t.completed).length;
   const totalCount = tasks.length;
-  const totalReward = tasks.filter(t => !t.completed).reduce((sum, t) => sum + t.rewardGrowth, 0);
+  const totalReward = tasks.filter(t => !t.completed).reduce((sum, t) => {
+    const val = Number(t.rewardGrowth);
+    return sum + (Number.isFinite(val) ? val : 0);
+  }, 0);
   const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   const filteredTasks = activeTab === "all" ? tasks : tasks.filter(t => t.category === activeTab);
@@ -322,7 +330,7 @@ export default function TasksClient() {
                         <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400">
                           <span className="inline-flex items-center gap-0.5 text-amber-500 font-medium">
                             <Zap className="w-3 h-3" />
-                            +{task.rewardGrowth} 成长值
+                            +{Number.isFinite(Number(task.rewardGrowth)) ? task.rewardGrowth : 0} 成长值
                           </span>
                           {task.count > 0 && (
                             <span className="inline-flex items-center gap-0.5">

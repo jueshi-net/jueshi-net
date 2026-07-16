@@ -46,7 +46,7 @@ export const ContentSection: FC<ContentSectionProps> = ({
   headingLevel = 'h2'
 }) => {
   return (
-    <section className={`py-8 sm:py-12 ${className}`}>
+    <section className={`py-4 sm:py-6 ${className}`}>
       {(title || description || actions) && (
         <SectionHeader
           title={title || ''}
