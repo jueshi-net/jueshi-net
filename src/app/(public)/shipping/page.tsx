@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Package, Truck, MapPin, Calculator, FileText, AlertCircle, Globe, ArrowRight } from "lucide-react";
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
 
 export const metadata: Metadata = {
   title: '跨境寄送 - 绝世百宝箱',
@@ -62,21 +63,11 @@ const shippingGuides = [
 export default function ShippingPage() {
   return (
     <JueshiV4PublicShell>
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Hero */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center gap-3 mb-4">
-            <Truck className="w-10 h-10" />
-            <h1 className="text-3xl font-bold">跨境寄送</h1>
-          </div>
-          <p className="text-blue-100 text-lg">
-            包裹追踪、运费估算、地址格式、敏感货参考 — 跨境寄送全流程工具一站搞定
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <PublicLandingPageFrame
+      title="跨境寄送"
+      subtitle="包裹追踪、运费估算、地址格式、敏感货参考 — 跨境寄送全流程工具一站搞定"
+      variant="content"
+    >
         {/* Disclaimer */}
         <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-8 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
@@ -129,8 +120,7 @@ export default function ShippingPage() {
             </div>
           ))}
         </div>
-      </div>
-    </div>
+    </PublicLandingPageFrame>
     </JueshiV4PublicShell>
   );
 }

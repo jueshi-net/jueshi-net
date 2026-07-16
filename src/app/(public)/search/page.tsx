@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Search, Truck, Hash, Loader2, Package, MapPin, Calendar, ArrowRight, AlertCircle } from "lucide-react";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
+import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
 
 interface TrackingEvent {
   time: string;
@@ -198,9 +199,11 @@ export default function SearchPage() {
 
   return (
     <JueshiV4PublicShell>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">搜索中心</h1>
-
+      <PublicLandingPageFrame
+        title="搜索中心"
+        subtitle="综合搜索、快递追踪、HS编码查询"
+        variant="tool"
+      >
         {/* Tabs */}
         <div className="flex justify-center gap-2 mb-6 sm:mb-8">
           {[
@@ -340,7 +343,7 @@ export default function SearchPage() {
             <HSCodeSearch />
           )}
         </div>
-      </div>
+      </PublicLandingPageFrame>
     </JueshiV4PublicShell>
   );
 }

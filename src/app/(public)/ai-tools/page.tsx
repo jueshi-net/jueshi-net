@@ -3,6 +3,7 @@ import { buildCanonical, buildTitle } from "@/lib/seo";
 import { FileText, Languages, FileSearch, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
+import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 
 export const metadata: Metadata = {
   title: buildTitle("AI 工具集"),
@@ -51,27 +52,10 @@ const colorMap: Record<string, { bg: string; icon: string; badge: string }> = {
 export default function AiToolsPage() {
   return (
     <JueshiV4PublicShell>
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-20 right-1/4 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-purple-300/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-4 py-12 md:py-16">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 text-sm mb-6">
-            <Sparkles className="w-4 h-4" /> AI 驱动 · 效率翻倍
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
-            AI 出海工具集
-          </h1>
-          <p className="text-lg text-purple-100/90 max-w-2xl leading-relaxed">
-            专为跨境电商、集运用户、海外华人打造的 AI 效率工具。文案生成、翻译润色、文档摘要，一站式解决内容出海难题。
-          </p>
-        </div>
-      </div>
-
-      {/* Tools Grid */}
-      <div className="max-w-5xl mx-auto px-4 -mt-6 relative z-10 pb-16">
+      <PublicCategoryPageFrame
+        title="AI 出海工具集"
+        subtitle="专为跨境电商、集运用户、海外华人打造的 AI 效率工具"
+      >
         <div className="grid md:grid-cols-3 gap-6">
           {AI_TOOLS.map((tool) => {
             const Icon = tool.icon;
@@ -114,7 +98,7 @@ export default function AiToolsPage() {
           <p className="text-sm font-medium text-gray-500">更多 AI 工具正在路上…</p>
           <p className="text-xs text-gray-400 mt-1">AI 图片处理、智能客服话术、多语言 SEO 优化等</p>
         </div>
-      </div>
+      </PublicCategoryPageFrame>
     </JueshiV4PublicShell>
   );
 }
