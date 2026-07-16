@@ -33,45 +33,41 @@ import { ForumEmptyState } from "@/components/community/forum-empty-state";
 export const dynamic = "force-dynamic";
 
 async function getPost(slug: string, userId: string | null) {
-  try {
-    const post = await prisma.forumPost.findUnique({
-      where: { slug },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            levelKey: true,
-            growthValue: true,
-            honorScore: true,
-            createdAt: true,
-            role: true,
-            membershipTier: true,
-            _count: {
-              select: {
-                forumPosts: { where: { status: "published" } },
-                forumComments: { where: { status: "published" } },
-              },
+  const post = await prisma.forumPost.findUnique({
+    where: { slug },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          levelKey: true,
+          growthValue: true,
+          honorScore: true,
+          createdAt: true,
+          role: true,
+          membershipTier: true,
+          _count: {
+            select: {
+              forumPosts: { where: { status: "published" } },
+              forumComments: { where: { status: "published" } },
             },
           },
         },
-        category: true,
-        _count: { select: { comments: { where: { status: "published" } } } },
-        likes: userId ? { where: { userId }, select: { id: true } } : false,
-        bookmarks: userId
-          ? { where: { userId }, select: { id: true } }
-          : false,
       },
-    });
+      category: true,
+      _count: { select: { comments: { where: { status: "published" } } } },
+      likes: userId ? { where: { userId }, select: { id: true } } : false,
+      bookmarks: userId
+        ? { where: { userId }, select: { id: true } }
+        : false,
+    },
+  });
 
-    if (!post) return null;
-    if (post.status !== "published") return null;
+  if (!post) return null;
+  if (post.status !== "published") return null;
 
-    return post;
-  } catch {
-    return null;
-  }
+  return post;
 }
 
 async function getLikeCount(slug: string) {
@@ -128,10 +124,7 @@ export async function generateMetadata({
   const post = await getPost(slug, null);
 
   if (!post) {
-    return {
-      title: buildTitle("帖子不存在"),
-      robots: { index: false },
-    };
+    notFound();
   }
 
   return {
@@ -159,15 +152,19 @@ export default async function PostDetailPage({
   const isLoggedIn = !!session?.user;
   const isAdmin = session?.user?.role === "admin";
 
-  const [post, { comments, isLocked }, likeCount] = await Promise.all([
-    getPost(slug, userId),
-    getComments(slug),
-    getLikeCount(slug),
-  ]);
-
+  // Query post FIRST - before any other operations.
+  // If the post doesn't exist, notFound() is called before
+  // any secondary queries or rendering begin.
+  const post = await getPost(slug, userId);
   if (!post) {
     notFound();
   }
+
+  // Secondary queries only run if post exists.
+  const [{ comments, isLocked }, likeCount] = await Promise.all([
+    getComments(slug),
+    getLikeCount(slug),
+  ]);
 
   await incrementViewCount(slug);
 

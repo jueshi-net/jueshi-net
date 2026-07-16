@@ -13,13 +13,9 @@ import { ForumEmptyState } from "@/components/community/forum-empty-state";
 export const dynamic = "force-dynamic";
 
 async function getCategory(key: string) {
-  try {
-    return await prisma.forumCategory.findUnique({
-      where: { key },
-    });
-  } catch {
-    return null;
-  }
+  return await prisma.forumCategory.findUnique({
+    where: { key },
+  });
 }
 
 async function getPosts(categoryId: string, params: { q?: string; page?: number }) {
@@ -63,10 +59,7 @@ export async function generateMetadata({
   const category = await getCategory(key);
 
   if (!category) {
-    return {
-      title: buildTitle("分类不存在"),
-      robots: { index: false },
-    };
+    notFound();
   }
 
   return {
