@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际物流报价单 - 绝世百宝箱</title>
+    <!-- 引入对本地文件更友好的截图库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* 原生 CSS 样式 */
+        :root {
+            --blue: #00469b;
+            --orange: #ff8c00;
+            --gray-light: #f9fafb;
+            --gray-text: #6b7280;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            color: #374151;
+        }
+        /* 控制台样式 */
+        .control-panel {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-print { background-color: var(--blue); margin-right: 10px; }
+        .btn-image { background-color: var(--orange); }
+        .hint-text { font-size: 13px; color: var(--gray-text); }
+
+        /* 报价单主体内容区 */
+        .quotation-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-top: 10px solid var(--blue);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* 头部 */
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-area { display: flex; align-items: center; margin-bottom: 15px; }
+        .logo-box { background: var(--blue); color: white; padding: 5px 10px; font-weight: bold; font-size: 20px; }
+        .logo-divider { width: 4px; height: 35px; background: var(--orange); margin: 0 10px; }
+        .company-name { font-size: 24px; font-weight: bold; }
+        .company-info { font-size: 13px; color: var(--gray-text); line-height: 1.6; }
+        .title-area { text-align: right; }
+        .main-title { font-size: 36px; color: var(--blue); margin: 0 0 10px 0; font-weight: 900; letter-spacing: 2px;}
+        
+        /* 客户信息网格 */
+        .info-grid { display: flex; gap: 30px; margin-bottom: 30px; }
+        .customer-box { flex: 1; background: var(--gray-light); padding: 15px; border-left: 5px solid var(--orange); }
+        .label-sm { font-size: 12px; color: #9ca3af; text-transform: uppercase; margin-bottom: 5px; font-weight: bold;}
+        .customer-name { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        .logistics-details { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detail-item p { margin: 0; font-size: 14px; font-weight: 600; }
+        .detail-item .highlight { color: var(--orange); }
+
+        /* 表格 */
+        .table-container { margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--blue); color: white; text-align: left; padding: 12px; font-size: 14px; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        tr:hover { background-color: var(--gray-light); }
+        .text-right { text-align: right; }
+        
+        /* 动态操作按钮 */
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #ef4444; padding: 5px; border-radius: 4px; }
+        .action-btn:hover { background: #fee2e2; }
+        .add-row-btn { display: inline-flex; align-items: center; background: #e0f2fe; color: #0284c7; border: 1px dashed #7dd3fc; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-top: 10px; transition: 0.2s; }
+        .add-row-btn:hover { background: #bae6fd; }
+
+        /* 汇总 */
+        .summary-area { display: flex; justify-content: flex-end; margin-bottom: 40px; }
+        .summary-box { width: 250px; text-align: right; }
+        .summary-line { display: flex; justify-content: space-between; margin-bottom: 10px; color: var(--gray-text); font-size: 14px; }
+        .summary-total { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 20px; font-weight: bold; color: var(--blue); }
+        .summary-total span:last-child { color: var(--orange); }
+
+        /* 底部条款与签字 */
+        .footer-grid { display: flex; gap: 40px; border-top: 1px solid var(--border); padding-top: 30px; }
+        .terms { flex: 2; font-size: 12px; color: var(--gray-text); line-height: 1.8; }
+        .terms h4 { color: #374151; margin: 0 0 10px 0; }
+        .sign-area { flex: 1; display: flex; justify-content: space-between; align-items: flex-end; }
+        .sign-line { border-top: 1px dashed #ccc; width: 120px; text-align: center; padding-top: 5px; font-size: 12px; color: #9ca3af; }
+        
+        /* 底部横幅 */
+        .bottom-banner { background: var(--blue); color: white; text-align: center; padding: 10px; font-size: 12px; border-radius: 4px; margin-top: 30px; }
+
+        /* 元素可编辑时的提示 */
+        [contenteditable="true"]:hover { background-color: #fef08a; outline: 1px dashed var(--orange); cursor: text; }
+
+        /* 打印模式：隐藏控制台、操作按钮，清除阴影背景 */
+        @media print {
+            body { background: white; padding: 0; }
+            .control-panel, .no-print { display: none !important; }
+            .quotation-card { box-shadow: none; padding: 20px 0; width: 100%; max-width: 100%; border-top: 8px solid var(--blue) !important; }
+            th { background-color: var(--blue) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .logo-box, .bottom-banner { background-color: var(--blue) !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .customer-box { border-left: 5px solid var(--orange) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部控制面板 -->
+    <div class="control-panel">
+        <div>
+            <button class="btn btn-print" onclick="window.print()">🖨️ 打印 / 存为PDF</button>
+            <button class="btn btn-image" onclick="downloadImage()">📸 下载图片</button>
+        </div>
+        <div class="hint-text">💡 提示：点击文字可修改，点击 ➕ 可增加费用项</div>
+    </div>
+
+    <!-- 报价单主体内容区 -->
+    <div class="quotation-card" id="quotation-card">
+        
+        <!-- 头部公司信息 -->
+        <div class="header">
+            <div>
+                <div class="logo-area">
+                    <div class="logo-box">LOGISTICS</div>
+                    <div class="logo-divider"></div>
+                    <div class="company-name" contenteditable="true">集运巴巴 / 您的物流公司</div>
+                </div>
+                <div class="company-info" contenteditable="true">公司地址：广东省深圳市宝安区国际货运中心<br>联系电话：+86-755-XXXX-XXXX<br>企业邮箱：contact@yourcompany.com</div>
+            </div>
+            <div class="title-area">
+                <h1 class="main-title">QUOTATION</h1>
+                <div class="company-info">
+                    报价单号：<span contenteditable="true">QT-260428-01</span><br>
+                    生成日期：<span contenteditable="true" id="current-date"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 客户及航线信息 -->
+        <div class="info-grid">
+            <div class="customer-box">
+                <div class="label-sm">致客户 (TO):</div>
+                <div class="customer-name" contenteditable="true">请输入客户公司名称</div>
+                <div class="company-info" contenteditable="true">联系人：John Doe / 目的地：温哥华</div>
+            </div>
+            <div class="logistics-details">
+                <div class="detail-item">
+                    <div class="label-sm">起运港 (POL)</div>
+                    <p contenteditable="true">中国 深圳 (Shenzhen)</p>
+                </div>
+                <div class="detail-item">
+                    <div class="label-sm">目的港 (POD)</div>
+                    <p contenteditable="true">加拿大 温哥华 (Vancouver)</p>
+                </div>
+                <div class="detail-item">
+                    <div class="label-sm">运输方式</div>
+                    <p contenteditable="true">海运散货 (LCL) - DDP</p>
+                </div>
+                <div class="detail-item">
+                    <div class="label-sm">报价有效期</div>
+                    <p class="highlight" contenteditable="true">15天 (15 Days Valid)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 费用明细表格 -->
+        <div class="table-container">
+            <table id="fee-table">
+                <thead>
+                    <tr>
+                        <th>费用明细 (Description)</th>
+                        <th>单位 (Unit)</th>
+                        <th>数量 (Qty)</th>
+                        <th>单价 (Price)</th>
+                        <th class="text-right">小计 (Subtotal)</th>
+                        <!-- 注意：这列在打印和截图时会被忽略 -->
+                        <th class="no-print text-center" data-html2canvas-ignore="true" style="width: 50px;">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <tr>
+                        <td contenteditable="true">海运费 (Ocean Freight)</td>
+                        <td contenteditable="true">CBM</td>
+                        <td contenteditable="true">5</td>
+                        <td contenteditable="true">¥850.00</td>
+                        <td class="text-right" contenteditable="true">¥4,250.00</td>
+                        <td class="no-print text-center" data-html2canvas-ignore="true">
+                            <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td contenteditable="true">报关及文件费 (Customs & Doc)</td>
+                        <td contenteditable="true">票 (SET)</td>
+                        <td contenteditable="true">1</td>
+                        <td contenteditable="true">¥550.00</td>
+                        <td class="text-right" contenteditable="true">¥550.00</td>
+                        <td class="no-print text-center" data-html2canvas-ignore="true">
+                            <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- 添加行按钮：同样在打印和截图时忽略 -->
+            <button class="no-print add-row-btn" data-html2canvas-ignore="true" onclick="addRow()">
+                ➕ 添加费用项
+            </button>
+        </div>
+
+        <!-- 金额汇总 -->
+        <div class="summary-area">
+            <div class="summary-box">
+                <div class="summary-line">
+                    <span>合计金额:</span>
+                    <span contenteditable="true">¥4,800.00</span>
+                </div>
+                <div class="summary-line">
+                    <span>折扣优惠:</span>
+                    <span contenteditable="true">-¥0.00</span>
+                </div>
+                <div class="summary-total">
+                    <span>总计 Total:</span>
+                    <span contenteditable="true">¥4,800.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 条款及签字 -->
+        <div class="footer-grid">
+            <div class="terms">
+                <h4>⚠️ 业务条款 (Terms & Conditions)</h4>
+                <div contenteditable="true">
+                    1. 付款方式：预付全款，款到发货 (T/T in advance)。<br>
+                    2. 以上报价为普通货物价格，不包含仿牌、纯电池、液体等敏感货附加费。<br>
+                    3. 目的地若产生海关查验，产生的查验费实报实销。<br>
+                    4. 请确保货物包装坚固，易碎品请自行打木架，如遇破损物流方不予赔偿。
+                </div>
+            </div>
+            <div class="sign-area">
+                <div class="sign-line">客户确认签字 (Client)</div>
+                <div class="sign-line">集运巴巴盖章 (Stamp)</div>
+            </div>
+        </div>
+
+        <div class="bottom-banner">
+            销售代表：<span contenteditable="true">陈先生</span> | 业务专线：<span contenteditable="true">138-0000-0000</span> | 您的国际物流专属管家
+        </div>
+    </div>
+
+    <!-- 交互与截图逻辑 -->
+    <script>
+        // 初始化当前日期
+        document.getElementById('current-date').innerText = new Date().toISOString().split('T')[0];
+
+        // 动态添加一行
+        function addRow() {
+            const tbody = document.getElementById('table-body');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td contenteditable="true">新增费用项目</td>
+                <td contenteditable="true">单位</td>
+                <td contenteditable="true">1</td>
+                <td contenteditable="true">¥0.00</td>
+                <td class="text-right" contenteditable="true">¥0.00</td>
+                <td class="no-print text-center" data-html2canvas-ignore="true">
+                    <button class="action-btn" onclick="deleteRow(this)" title="删除此行">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // 删除当前行
+        function deleteRow(btn) {
+            const row = btn.closest('tr');
+            // 如果只剩最后一行了，给个提示
+            if(document.getElementById('table-body').children.length > 1) {
+                row.remove();
+            } else {
+                alert("至少需要保留一项费用！");
+            }
+        }
+
+        // 下载图片逻辑
+        function downloadImage() {
+            const card = document.getElementById('quotation-card');
+            const btn = document.querySelector('.btn-image');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ 正在生成...';
+            btn.disabled = true;
+
+            html2canvas(card, {
+                scale: 2, // 2倍高清图
+                useCORS: true, 
+                backgroundColor: "#ffffff", 
+                logging: false
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const link = document.createElement('a');
+                link.download = '集运巴巴-报价单-' + new Date().getTime() + '.jpg';
+                link.href = imgData;
+                link.click();
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                alert("生成图片失败，请尝试使用浏览器的打印(PDF)功能。");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>

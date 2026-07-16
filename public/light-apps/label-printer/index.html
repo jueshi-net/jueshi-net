@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流标签与唛头打印 - 绝世百宝箱</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 基础重置 */
+        body { margin: 0; padding: 0; background: #eef2f6; font-family: 'Microsoft YaHei', sans-serif; }
+        
+        /* 屏幕显示布局 */
+        .screen-layout { display: flex; height: 100vh; overflow: hidden; }
+
+        /* 预览区 */
+        .preview-wrapper {
+            background-color: #475569;
+            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px;
+        }
+
+        /* 标签卡片 (通用) */
+        .label-card {
+            background: white;
+            box-sizing: border-box; /* 关键：边框含在尺寸内 */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 内容多了切掉，不准撑开 */
+        }
+
+        /* 屏幕预览时的样式 */
+        .preview-mode .label-card {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        /* =========================================
+           🖨️ 打印核心 (V4 改进)
+           ========================================= */
+        @media print {
+            /* 1. 隐藏杂项 */
+            .no-print { display: none !important; }
+            
+            /* 2. 重置容器 */
+            body, html, .screen-layout, .preview-wrapper {
+                height: auto !important;
+                width: 100% !important;
+                overflow: visible !important;
+                background: white !important;
+                display: block !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .zoom-container {
+                transform: none !important;
+            }
+
+            /* 3. 标签打印样式 */
+            .label-card {
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                
+                /* 关键：强制分页 */
+                page-break-after: always !important;
+                break-after: page !important;
+                page-break-inside: avoid !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="screen-layout">
+        
+        <component is="style">
+            @page {
+                size: {{ settings.width }}mm {{ settings.height }}mm;
+                margin: 0mm;
+            }
+        </component>
+
+        <div class="no-print w-full md:w-80 bg-white border-r flex flex-col z-10 shadow-xl">
+            <div class="p-4 bg-indigo-900 text-white flex justify-between items-center">
+                <h1 class="font-bold">⚙️ 物流标签打印</h1>
+                <span class="text-xs bg-indigo-700 px-2 py-1 rounded">防溢出</span>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <div class="border-b pb-4">
+                    <h3 class="font-bold text-gray-700 mb-2">1. 纸张 (mm)</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-xs text-gray-500">宽 W</label><input type="number" v-model="settings.width" class="w-full border p-1 rounded text-center font-bold"></div>
+                        <div><label class="text-xs text-gray-500">高 H</label><input type="number" v-model="settings.height" class="w-full border p-1 rounded text-center font-bold"></div>
+                    </div>
+                </div>
+
+                <div class="bg-yellow-50 p-3 rounded border border-yellow-200">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-yellow-800">底部防溢出留白</label>
+                        <select v-model="settings.safeMargin" class="text-xs border rounded p-1">
+                            <option :value="0">0mm (危险)</option>
+                            <option :value="1">1mm</option>
+                            <option :value="2">2mm (推荐)</option>
+                            <option :value="3">3mm</option>
+                        </select>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">如果打印跑页，请调大此数值。它会让内容比纸张稍微短一点点。</p>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="font-bold text-gray-700">2. 内容编辑</h3>
+                    <div>
+                        <div class="flex justify-between"><span class="text-sm">公司名</span><input type="number" v-model="styles.companySize" class="w-12 border text-center text-xs"></div>
+                        <input type="text" v-model="data.companyName" class="w-full border p-1 rounded">
+                    </div>
+                    <div>
+                        <div class="flex justify-between"><span class="text-sm">唛头</span><input type="number" v-model="styles.markSize" class="w-12 border text-center text-xs"></div>
+                        <textarea v-model="data.marks" rows="4" class="w-full border p-1 rounded font-mono text-sm"></textarea>
+                    </div>
+                    <div class="bg-indigo-50 p-2 rounded border border-indigo-100">
+                        <div class="flex justify-between mb-1"><span class="text-sm font-bold text-indigo-900">打印数量</span><input type="number" v-model="styles.countSize" class="w-12 border text-center text-xs"></div>
+                        <div class="flex gap-2"><input type="number" v-model="data.totalCount" class="flex-1 border p-1 rounded text-center font-bold text-lg text-indigo-700"><span class="self-center text-sm">张</span></div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t">
+                    <label class="text-xs text-gray-500">预览缩放 (不影响打印)</label>
+                    <input type="range" v-model.number="viewScale" min="0.5" max="1.5" step="0.1" class="w-full">
+                </div>
+            </div>
+
+            <div class="p-4 border-t">
+                <button @click="print" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-bold py-3 rounded shadow-lg">立即打印</button>
+            </div>
+        </div>
+
+        <div class="preview-wrapper preview-mode">
+            <div class="zoom-container" :style="{ transform: `scale(${viewScale})`, transformOrigin: 'top center' }">
+                
+                <div v-for="i in data.totalCount" :key="i" class="label-card"
+                     :style="{
+                        width: settings.width + 'mm',
+                        /* 关键公式：内容高度 = 纸张高度 - 安全留白 */
+                        height: (settings.height - settings.safeMargin) + 'mm',
+                        padding: styles.padding + 'mm',
+                        marginBottom: settings.safeMargin + 'mm' /* 预览时补齐视觉高度，打印时忽略 */
+                     }">
+                    
+                    <div class="flex flex-col h-full w-full justify-between">
+                        <div class="font-bold text-center break-words leading-none" :style="{ fontSize: styles.companySize + 'px' }">
+                            {{ data.companyName }}
+                        </div>
+
+                        <div class="flex-1 flex flex-col justify-center whitespace-pre-wrap break-words leading-tight my-1" 
+                             :style="{ fontSize: styles.markSize + 'px' }">
+                            {{ data.marks }}
+                        </div>
+
+                        <div class="font-bold text-center border-t-2 border-black pt-1" 
+                             :style="{ fontSize: styles.countSize + 'px' }">
+                            {{ i }} / {{ data.totalCount }}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, reactive, ref } = Vue
+        createApp({
+            setup() {
+                const viewScale = ref(1.0)
+                const data = reactive({
+                    companyName: '您的物流公司',
+                    marks: '单号: XX8888812345\n渠道: 西马海运\n品名: 家具',
+                    totalCount: 3
+                })
+                const settings = reactive({ 
+                    width: 100, 
+                    height: 150,
+                    safeMargin: 2 // 默认留白 2mm，防止跑页
+                })
+                const styles = reactive({
+                    companySize: 80,
+                    markSize: 36,
+                    countSize: 80,
+                    padding: 5
+                })
+                const print = () => window.print()
+                return { viewScale, data, settings, styles, print }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

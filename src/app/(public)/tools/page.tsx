@@ -8,6 +8,9 @@ import { FileText, ArrowRight, BookOpen, Wrench } from 'lucide-react';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import { PublicCategoryPageFrame } from '@/components/templates/public/PublicCategoryPageFrame';
 import { PageContainer, PageHero, BreadcrumbBar, ContentSection, SectionHeader, PageCTA } from '@/components/design-system';
+import OfficialLightAppCard from '@/components/light-apps/OfficialLightAppCard';
+import { getFeaturedLightApps } from '@/config/official-light-apps';
+import '@/styles/official-light-apps.css';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }): Promise<Metadata> {
   const params = await searchParams;
@@ -108,6 +111,26 @@ export default async function ToolsPage({ searchParams }: { searchParams: Promis
                     </div>
                   </Link>
                 ))}
+              </div>
+            </ContentSection>
+          )}
+
+          {/* Official Light Apps */}
+          {!query && !category && (
+            <ContentSection>
+              <div className="official-light-apps-section">
+                <div className="section-header">
+                  <SectionHeader
+                    title="官方轻应用"
+                    description="专业单据工具，即开即用"
+                  />
+                  <span className="section-badge">NEW</span>
+                </div>
+                <div className="official-light-apps-grid">
+                  {getFeaturedLightApps().map(app => (
+                    <OfficialLightAppCard key={app.slug} app={app} />
+                  ))}
+                </div>
               </div>
             </ContentSection>
           )}

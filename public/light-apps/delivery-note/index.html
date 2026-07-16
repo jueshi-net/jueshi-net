@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物流出货单-最终版</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --blue: #3498db;
+            --orange: #f39c12;
+            --bg: #eef2f5;
+            --text: #333;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: "Microsoft YaHei", sans-serif;
+            margin: 0; padding: 30px;
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text);
+        }
+
+        /* 功能按钮栏 */
+        .toolbar {
+            position: sticky; top: 10px; z-index: 999;
+            display: flex; gap: 15px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .btn {
+            border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; font-size: 13px;
+        }
+        .btn-img { background: var(--orange); }
+        .btn-print { background: var(--blue); }
+        .btn-add { background: #27ae60; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* A4 纸张容器 - 固定宽度确保稳定 */
+        #deliveryNote {
+            background: white; width: 800px; min-height: 1100px;
+            padding: 40px; box-sizing: border-box;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); border-radius: 4px;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 3px solid var(--blue); padding-bottom: 15px; margin-bottom: 30px;
+        }
+        /* --- 修改点：去掉了 border 属性 --- */
+        .logo-box {
+            width: 150px; height: 70px; 
+            /* border: 2px dashed var(--blue);  <-- 删除了这行 */
+            display: flex; align-items: center; justify-content: flex-start; cursor: pointer; background: transparent;
+        }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* 让提示文字稍微淡一点 */
+        .logo-text { font-size: 14px; color: #999; font-weight: bold; background: #f5f5f5; padding: 10px 20px; border-radius: 4px;}
+        
+        .title-box { text-align: right; }
+        h1 { margin: 0; color: var(--blue); font-size: 28px; }
+        .comp-input { 
+            border: none; font-size: 16px; text-align: right; color: var(--orange); 
+            font-weight: bold; width: 300px; outline: none; background: transparent;
+        }
+
+        /* 信息条 */
+        .meta-bar {
+            display: flex; gap: 20px; background: var(--blue); color: white;
+            padding: 10px 20px; border-radius: 4px; margin-bottom: 30px;
+        }
+        .meta-item { display: flex; align-items: center; }
+        .meta-label { font-weight: bold; margin-right: 8px; font-size: 13px; opacity: 0.9; }
+        .meta-input {
+            border: none; background: transparent; color: white; font-weight: bold; 
+            border-bottom: 1px solid rgba(255,255,255,0.3); outline: none; width: 140px;
+        }
+
+        /* 收发货地址 */
+        .address-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;
+        }
+        .addr-box {
+            padding: 15px; background: #fcfcfc; border: 1px solid #eee; border-left-width: 5px;
+        }
+        .sender { border-left-color: var(--blue); }
+        .receiver { border-left-color: var(--orange); }
+        .addr-title { font-weight: bold; margin-bottom: 10px; display: block; font-size: 14px; }
+        .sender .addr-title { color: var(--blue); }
+        .receiver .addr-title { color: var(--orange); }
+        
+        /* 统一输入框样式，增加高度防止截断 */
+        .info-input {
+            width: 100%; border: none; border-bottom: 1px solid #eee; 
+            padding: 8px 0; font-size: 14px; outline: none; background: transparent;
+            line-height: 1.5;
+        }
+        .info-input:focus { border-bottom-color: var(--blue); }
+
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { 
+            text-align: left; background: #f2f7fb; color: var(--blue); 
+            padding: 10px; font-size: 13px; border-bottom: 2px solid #ddd;
+        }
+        td { padding: 5px 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        
+        /* 表格输入框 */
+        .tbl-input {
+            width: 100%; border: none; outline: none; padding: 8px 0; 
+            font-size: 14px; background: transparent; line-height: 1.5;
+        }
+
+        /* 合计 */
+        .total-area { display: flex; justify-content: flex-end; margin-top: 20px; }
+        .total-box {
+            background: var(--orange); color: white; padding: 10px 25px;
+            border-radius: 4px; font-weight: bold; font-size: 16px;
+        }
+        #totalQty { font-size: 22px; margin-left: 10px; }
+
+        /* 签字 */
+        .signatures { margin-top: 50px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
+        .sig-line { border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; color: #666; }
+
+        /* 辅助类 */
+        .no-print { cursor: pointer; color: #e74c3c; border: none; background: none; font-weight: bold;}
+        #hiddenFileInput { display: none; }
+
+        @media print {
+            .toolbar, .no-print { display: none !important; }
+            body { padding: 0; background: white; }
+            #deliveryNote { box-shadow: none; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="file" id="hiddenFileInput" accept="image/*" onchange="handleLogoChange(this)">
+
+    <div class="toolbar">
+        <button class="btn btn-img" onclick="saveAsImage()">📸 保存为图片</button>
+        <button class="btn btn-print" onclick="window.print()">🖨️ 打印/PDF</button>
+        <button class="btn btn-add" onclick="addRow()">➕ 加一行</button>
+    </div>
+
+    <div id="deliveryNote">
+        <div class="header">
+            <div class="logo-box" onclick="document.getElementById('hiddenFileInput').click()">
+                <img id="logoImg" src="" style="display: none;">
+                <span class="logo-text" id="logoPlaceholder">点击上传LOGO</span>
+            </div>
+            <div class="title-box">
+                <h1>出货交接单</h1>
+                <input type="text" class="comp-input" value="您的物流公司名称">
+            </div>
+        </div>
+
+        <div class="meta-bar">
+            <div class="meta-item">
+                <span class="meta-label">单号 NO:</span>
+                <input type="text" id="orderNo" class="meta-input">
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">日期 DATE:</span>
+                <input type="date" id="dateInput" class="meta-input" style="color:white">
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">渠道 VIA:</span>
+                <input type="text" class="meta-input" placeholder="例如: 顺丰速运">
+            </div>
+        </div>
+
+        <div class="address-grid">
+            <div class="addr-box sender">
+                <span class="addr-title">发货方 (SENDER)</span>
+                <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
+                <input type="text" class="info-input" placeholder="联系人及电话">
+                <input type="text" class="info-input" placeholder="详细地址">
+            </div>
+            <div class="addr-box receiver">
+                <span class="addr-title">收货方 (RECEIVER)</span>
+                <input type="text" class="info-input" placeholder="公司名称" style="font-weight: bold;">
+                <input type="text" class="info-input" placeholder="联系人及电话">
+                <input type="text" class="info-input" placeholder="详细地址">
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th width="50">序号</th>
+                    <th width="150">追踪号</th>
+                    <th>品名描述</th>
+                    <th width="80">件数</th>
+                    <th width="120">备注</th>
+                    <th width="50" class="no-print">操作</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr>
+                    <td>1</td>
+                    <td><input type="text" class="tbl-input" placeholder="Tracking No."></td>
+                    <td><input type="text" class="tbl-input" placeholder="Description"></td>
+                    <td><input type="number" class="tbl-input qty" value="1" oninput="calcTotal()"></td>
+                    <td><input type="text" class="tbl-input"></td>
+                    <td class="no-print"><button class="no-print" onclick="delRow(this)">×</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-area">
+            <div class="total-box">
+                合计件数 (Total Qty): <span id="totalQty">1</span>
+            </div>
+        </div>
+
+        <div class="signatures">
+            <div class="sig-line">发货人签字 (Sender)</div>
+            <div class="sig-line">承运人签字 (Carrier)</div>
+            <div class="sig-line">收货人签字 (Receiver)</div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化
+        document.getElementById('dateInput').valueAsDate = new Date();
+        document.getElementById('orderNo').value = 'DN' + Date.now().toString().slice(-8);
+
+        // 处理 Logo 上传
+        function handleLogoChange(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('logoImg').src = e.target.result;
+                    document.getElementById('logoImg').style.display = 'block';
+                    document.getElementById('logoPlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+            input.value = ''; 
+        }
+
+        // 表格操作
+        function addRow() {
+            const tbody = document.getElementById('tableBody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${tbody.rows.length}</td>
+                <td><input type="text" class="tbl-input"></td>
+                <td><input type="text" class="tbl-input"></td>
+                <td><input type="number" class="tbl-input qty" value="1" oninput="calcTotal()"></td>
+                <td><input type="text" class="tbl-input"></td>
+                <td class="no-print"><button class="no-print" onclick="delRow(this)">×</button></td>
+            `;
+            calcTotal();
+        }
+
+        function delRow(btn) {
+            btn.closest('tr').remove();
+            calcTotal();
+            Array.from(document.getElementById('tableBody').rows).forEach((r, i) => r.cells[0].innerText = i + 1);
+        }
+
+        function calcTotal() {
+            let total = 0;
+            document.querySelectorAll('.qty').forEach(i => total += (parseInt(i.value) || 0));
+            document.getElementById('totalQty').innerText = total;
+        }
+
+        // 保存图片（包含文字截断修复）
+        async function saveAsImage() {
+            const btn = document.querySelector('.btn-img');
+            btn.innerText = "正在处理...";
+            const target = document.getElementById('deliveryNote');
+
+            try {
+                const canvas = await html2canvas(target, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    onclone: (clonedDoc) => {
+                        clonedDoc.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+                        clonedDoc.querySelectorAll('input').forEach(input => {
+                            const span = clonedDoc.createElement('span');
+                            span.textContent = input.value || input.placeholder;
+                            span.style.fontSize = window.getComputedStyle(input).fontSize;
+                            span.style.fontWeight = window.getComputedStyle(input).fontWeight;
+                            span.style.color = window.getComputedStyle(input).color;
+                            span.style.fontFamily = window.getComputedStyle(input).fontFamily;
+                            span.style.textAlign = window.getComputedStyle(input).textAlign;
+                            span.style.display = 'block';
+                            span.style.padding = '8px 0';
+                            input.parentNode.replaceChild(span, input);
+                        });
+                    }
+                });
+
+                const link = document.createElement('a');
+                link.download = `出货单_${document.getElementById('orderNo').value}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (err) {
+                alert('生成图片失败，请重试或使用打印PDF功能。');
+                console.error(err);
+            } finally {
+                btn.innerText = "📸 保存为图片";
+            }
+        }
+    </script>
+</body>
+</html>
