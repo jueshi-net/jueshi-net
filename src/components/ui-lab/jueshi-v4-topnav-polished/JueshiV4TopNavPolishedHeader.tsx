@@ -33,7 +33,7 @@ export default function JueshiV4TopNavPolishedHeader({ onMenuClick, menuOpen }: 
               {/* Real Logo */}
               <Link href="/" className="flex items-center flex-shrink-0">
                 <Image
-                  src="/images/brand/jueshi-logo-crab.jpg"
+                  src="/brand/v2/logo-horizontal-color.svg"
                   alt="绝世百宝箱"
                   width={160}
                   height={44}

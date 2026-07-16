@@ -206,7 +206,7 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
   mobileTabs: [
     { key: 'mobile_tab_home', label: '首页', href: '/', icon: 'Home', enabled: true, isCenterAction: false, sortOrder: 10, trackingKey: 'mobile_tab_home' },
     { key: 'mobile_tab_tools', label: '工具', href: '/tools', icon: 'Wrench', enabled: true, isCenterAction: false, sortOrder: 20, trackingKey: 'mobile_tab_tools' },
-    { key: 'mobile_tab_center', label: '百宝箱', href: '/', imageUrl: '/images/brand/jueshi-mobile-tab-center.png', enabled: true, isCenterAction: true, sortOrder: 30, trackingKey: 'mobile_tab_center_home' },
+    { key: 'mobile_tab_center', label: '百宝箱', href: '/', imageUrl: '/brand/v2/app-mark.svg', enabled: true, isCenterAction: true, sortOrder: 30, trackingKey: 'mobile_tab_center_home' },
     { key: 'mobile_tab_checklist', label: '清单', href: '/checklists', icon: 'CheckSquare', enabled: true, isCenterAction: false, sortOrder: 40, trackingKey: 'mobile_tab_checklist' },
     { key: 'mobile_tab_profile', label: '我的', href: '/workspace', icon: 'User', enabled: true, isCenterAction: false, sortOrder: 50, trackingKey: 'mobile_tab_profile' },
   ],
