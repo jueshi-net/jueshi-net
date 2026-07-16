@@ -24,7 +24,7 @@ import { saveTaskChain } from '@/lib/task-chain';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { loadContainerToShipping, markContainerToShippingConsumed, clearContainerToShipping, ContainerToShippingData } from '@/lib/container-shipping-transfer';
 import { loadAddressFromShipping, markAddressFromShippingConsumed, clearAddressFromShipping, AddressToShippingData } from '@/lib/address-shipping-transfer';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolLandingPageShell from '@/components/tools/ToolLandingPageShell';
 
 // ==================== Types ====================
 interface CalcRow {
@@ -410,10 +410,14 @@ export default function ShippingCalculatorPage() {
   const dimUnit = useMeters ? '米 (m)' : '厘米 (cm)';
 
   return (
-    <PublicLandingPageFrame 
+    <ToolLandingPageShell
       title="物流体积 / CBM / 运费计算器"
       subtitle="体积重 · 计费重 · CBM · 费用构成参考"
-      variant="tool"
+      privacyNotice={
+        <span>
+          <strong>免责声明：</strong>运费结果仅供估算，最终费用以承运商、集运公司或实际账单为准。
+        </span>
+      }
     >
       <div className="max-w-7xl mx-auto">
         {/* ===== Dual-column workbench layout (desktop) ===== */}
@@ -1276,6 +1280,6 @@ export default function ShippingCalculatorPage() {
       <AdSlot placement="tool-bottom" className="mt-4 mb-8 max-w-4xl mx-auto" />
 
       <RelatedDiscussionsClient tool="shipping-calculator" />
-    </PublicLandingPageFrame>
+    </ToolLandingPageShell>
   );
 }

@@ -14,7 +14,7 @@ import Link from 'next/link';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { parseAddress, formatEnglishAddress, formatChineseAddress, formatLineByLineAddress, type ParsedAddress } from '@/lib/address-parser';
 import { saveAddressToShipping } from '@/lib/address-shipping-transfer';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolLandingPageShell from '@/components/tools/ToolLandingPageShell';
 
 interface AddressForm {
   country: string;
@@ -323,10 +323,15 @@ export default function AddressFormatterPage() {
   const config = countryConfig[form.country];
 
   return (
-    <PublicLandingPageFrame
+    <ToolLandingPageShell
       title="地址格式生成器"
       subtitle="输入地址信息，生成适合快递/集运填写的规范英文地址格式"
-      variant="tool"
+      privacyNotice={
+        <span>
+          <strong>地址格式仅供整理参考，最终以当地邮政/快递/服务商要求为准。</strong>
+          不同承运商对地址格式可能有额外要求，请在寄送前向服务商确认。
+        </span>
+      }
     >
 
         {/* Disclaimer */}
@@ -773,6 +778,6 @@ export default function AddressFormatterPage() {
             steps={TASK_CHAIN_STEPS['address-formatter']}
           />
         </div>
-    </PublicLandingPageFrame>
+    </ToolLandingPageShell>
   );
 }
