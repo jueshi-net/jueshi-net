@@ -10,7 +10,7 @@ interface OfficialLightAppFrameProps {
 /**
  * 官方轻应用运行容器
  * 
- * 使用 iframe 加载静态 HTML 工具
+ * 只负责 iframe 运行区域，标题/说明/隐私等由 ToolLandingPageShell 提供
  * 安全配置：
  * - sandbox="allow-scripts allow-forms allow-downloads allow-modals"
  * - referrerPolicy="no-referrer"
@@ -86,97 +86,80 @@ export default function OfficialLightAppFrame({ app }: OfficialLightAppFrameProp
 
   return (
     <>
-      <div className={`official-light-app-frame ${isFocused ? 'is-focused' : ''}`}>
-        {/* 工具信息区 */}
-        <div className="app-header">
-          <div className="app-title-row">
-            <span className="app-icon">{app.icon}</span>
-            <h1 className="app-title">{app.name}</h1>
-            <span className="official-badge">官方轻应用</span>
+      {/* iframe 运行区 - 使用现有 Card 样式 */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden" style={{ minHeight: iframeHeight }}>
+        {/* Loading 状态 */}
+        {isLoading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/90 z-10 text-gray-500 text-sm">
+            <div className="w-8 h-8 border-3 border-gray-200 border-t-teal-600 rounded-full animate-spin"></div>
+            <span>正在加载工具...</span>
           </div>
-          <p className="app-description">{app.shortDescription}</p>
-        </div>
+        )}
 
-        {/* 隐私提示 */}
-        <div className="privacy-notice">
-          <i className="fas fa-info-circle"></i>
-          <span>{app.privacyNote}</span>
-        </div>
+        {/* 错误状态 */}
+        {hasError && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/95 z-10 text-red-600 text-sm">
+            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <span>工具加载失败，请刷新页面重试</span>
+          </div>
+        )}
 
-        {/* iframe 运行区 */}
-        <div className="iframe-container" style={{ height: iframeHeight }}>
-          {/* Loading 状态 */}
-          {isLoading && (
-            <div className="iframe-loading">
-              <div className="loading-spinner"></div>
-              <span>正在加载工具...</span>
-            </div>
-          )}
+        <iframe
+          ref={iframeRef}
+          src={iframeSrc}
+          sandbox="allow-scripts allow-forms allow-downloads allow-modals"
+          referrerPolicy="no-referrer"
+          loading="lazy"
+          className="w-full border-0 block"
+          title={app.name}
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          style={{ height: iframeHeight }}
+        />
+      </div>
 
-          {/* 错误状态 */}
-          {hasError && (
-            <div className="iframe-error">
-              <i className="fas fa-exclamation-triangle"></i>
-              <span>工具加载失败，请刷新页面重试</span>
-            </div>
-          )}
-
-          <iframe
-            ref={iframeRef}
-            src={iframeSrc}
-            sandbox="allow-scripts allow-forms allow-downloads allow-modals"
-            referrerPolicy="no-referrer"
-            loading="lazy"
-            className="app-iframe"
-            title={app.name}
-            onLoad={handleIframeLoad}
-            onError={handleIframeError}
-            style={{ height: '100%' }}
-          />
-        </div>
-
-        {/* 专注模式按钮 */}
+      {/* 专注模式按钮 - 使用现有 Button 样式 */}
+      <div className="mt-4">
         <button
-          className="focus-mode-btn"
+          className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 hover:border-teal-300 transition-colors"
           onClick={() => setIsFocused(!isFocused)}
           title={isFocused ? '退出专注模式' : '进入专注模式'}
         >
-          <i className={`fas ${isFocused ? 'fa-compress' : 'fa-expand'}`}></i>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            {isFocused ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+            )}
+          </svg>
           <span>{isFocused ? '退出专注' : '专注使用'}</span>
         </button>
-
-        {/* 使用提示 */}
-        <div className="usage-tips">
-          <h3>使用提示</h3>
-          <ul>
-            <li>所有数据仅在您的浏览器中处理，不会上传到服务器</li>
-            <li>请及时打印或下载您生成的单据</li>
-            <li>刷新页面后数据将丢失，请提前保存</li>
-          </ul>
-        </div>
       </div>
 
       {/* 专注模式覆盖层 */}
       {isFocused && (
-        <div className="focus-overlay">
-          <div className="focus-overlay-header">
-            <span className="focus-overlay-title">{app.name}</span>
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 bg-gray-900 text-white flex-shrink-0">
+            <span className="font-semibold text-sm">{app.name}</span>
             <button
-              className="focus-overlay-close"
+              className="inline-flex items-center gap-2 px-3 py-1.5 border border-white/30 rounded-md bg-transparent text-white text-sm hover:bg-white/10 transition-colors"
               onClick={() => setIsFocused(false)}
             >
-              <i className="fas fa-times"></i>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
               <span>退出专注模式</span>
             </button>
           </div>
-          <div className="focus-overlay-content" style={{ height: `calc(100vh - 60px)` }}>
+          <div className="flex-1 overflow-hidden">
             <iframe
               src={iframeSrc}
               sandbox="allow-scripts allow-forms allow-downloads allow-modals"
               referrerPolicy="no-referrer"
-              className="app-iframe"
+              className="w-full h-full border-0"
               title={`${app.name} - 专注模式`}
-              style={{ width: '100%', height: '100%', border: 0 }}
             />
           </div>
         </div>

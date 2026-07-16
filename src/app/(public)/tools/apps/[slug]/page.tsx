@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getLightAppBySlug, getPublishedLightApps } from '@/config/official-light-apps';
 import OfficialLightAppFrame from '@/components/light-apps/OfficialLightAppFrame';
 import OfficialLightAppCard from '@/components/light-apps/OfficialLightAppCard';
-import Link from 'next/link';
+import ToolLandingPageShell from '@/components/tools/ToolLandingPageShell';
 import '@/styles/official-light-apps.css';
 
 interface Props {
@@ -15,6 +15,8 @@ interface Props {
 /**
  * 官方轻应用详情页面
  * 路由：/tools/apps/[slug]
+ * 
+ * 使用 ToolLandingPageShell 统一页面结构，复用 UI V4 设计系统组件
  */
 export default async function LightAppPage({ params }: Props) {
   const { slug } = await params;
@@ -29,32 +31,30 @@ export default async function LightAppPage({ params }: Props) {
   const otherApps = getPublishedLightApps().filter(a => a.slug !== slug).slice(0, 2);
 
   return (
-    <div className="light-app-page">
-      {/* 返回工具中心 */}
-      <div className="back-link">
-        <Link href="/tools">
-          <i className="fas fa-arrow-left"></i>
-          <span>返回工具中心</span>
-        </Link>
-      </div>
-
-      {/* 主内容区 */}
-      <div className="app-main-content">
-        <OfficialLightAppFrame app={app} />
-      </div>
-
-      {/* 相关推荐 */}
-      {otherApps.length > 0 && (
-        <div className="related-apps">
-          <h2>相关推荐</h2>
-          <div className="related-apps-grid">
+    <ToolLandingPageShell
+      title={app.name}
+      subtitle={app.shortDescription}
+      isOfficialLightApp={true}
+      privacyNotice={app.privacyNote}
+      usageTips={
+        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+          <li>所有数据仅在您的浏览器中处理，不会上传到服务器</li>
+          <li>请及时打印或下载您生成的单据</li>
+          <li>刷新页面后数据将丢失，请提前保存</li>
+        </ul>
+      }
+      relatedTools={
+        otherApps.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {otherApps.map(otherApp => (
               <OfficialLightAppCard key={otherApp.slug} app={otherApp} />
             ))}
           </div>
-        </div>
-      )}
-    </div>
+        ) : null
+      }
+    >
+      <OfficialLightAppFrame app={app} />
+    </ToolLandingPageShell>
   );
 }
 
