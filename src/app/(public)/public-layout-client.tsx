@@ -19,7 +19,7 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isDestinations = pathname === '/destinations';
   const isGuides = pathname === '/guides';
   const isChecklists = pathname === '/checklists';
-  const isTopics = pathname === '/topics';
+  const isTopics = pathname === '/topics' || pathname.startsWith('/topics/');
   const isSearch = pathname === '/search';
   const isStarter = pathname.startsWith('/starter');
   const isPricing = pathname === '/pricing';
@@ -32,9 +32,11 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isBusiness = pathname === '/business';
   const isChangelog = pathname === '/changelog';
   const isShipping = pathname === '/shipping';
+  const isGuidesSlug = pathname.startsWith('/guides/');
+  const isCities = pathname.startsWith('/cities/');
 
-  // 首页、UI Lab、资源页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页使用各自的 shell，跳过公共 Header/Footer
-  if (isUILab || isV4Home || isResources || isResourcesSite || isDestinations || isGuides || isChecklists || isTopics || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
+  // 首页、UI Lab、资源页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页、指南详情、城市详情使用各自的 shell，跳过公共 Header/Footer
+  if (isUILab || isV4Home || isResources || isResourcesSite || isDestinations || isGuides || isGuidesSlug || isChecklists || isTopics || isCities || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
     return <>{children}</>;
   }
 
