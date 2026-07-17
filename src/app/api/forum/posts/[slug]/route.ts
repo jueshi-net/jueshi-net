@@ -251,6 +251,9 @@ export async function PATCH(
     if (post.status === 'published' && !isAdmin) {
       // 作者编辑 published 帖，进入 pending
       newStatus = 'pending';
+    } else if (post.status === 'rejected') {
+      // 作者编辑被驳回的帖子，重新进入审核队列
+      newStatus = 'pending';
     }
 
     // 更新帖子

@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/forum/notifications
 // 标记单条通知为已读（body: { notificationId }）
+// 标记全部已读（body: { markAll: true }）
 export async function POST(request: NextRequest) {
   try {
     const authResult = await requireAuth();
@@ -80,7 +81,19 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
 
     const body = await request.json().catch(() => ({}));
-    const { notificationId } = body;
+    const { notificationId, markAll } = body;
+
+    if (markAll === true) {
+      // Mark all unread notifications as read
+      const result = await prisma.forumNotification.updateMany({
+        where: { userId, isRead: false },
+        data: { isRead: true },
+      });
+      return NextResponse.json({
+        success: true,
+        updated: result.count,
+      });
+    }
 
     if (!notificationId || typeof notificationId !== "string") {
       return NextResponse.json({ error: "缺少 notificationId" }, { status: 400 });

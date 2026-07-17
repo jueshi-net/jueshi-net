@@ -33,6 +33,23 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await adjustHonor(post.userId, 1, "帖子被点赞", "post_liked", post.id, session.user.id).catch(() => {});
     await incrementCommunityStat(post.userId, "helpfulVoteCount").catch(() => {});
 
+    // Create notification for post author
+    if (post.userId !== session.user.id) {
+      try {
+        await prisma.forumNotification.create({
+          data: {
+            userId: post.userId,
+            type: "like",
+            postId: post.id,
+            actorId: session.user.id,
+            message: "有人赞了您的帖子",
+          },
+        });
+      } catch (notifError) {
+        console.error("[Like notification error]", notifError);
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[Like Post Error]", error);

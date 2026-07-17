@@ -196,6 +196,24 @@ export async function POST(
       console.error("[CommunityStat comment increment error]", e);
     }
 
+    // Create notification for post author (if commenter is not the author)
+    if (commentStatus === "published" && post.userId !== session.user.id) {
+      try {
+        await prisma.forumNotification.create({
+          data: {
+            userId: post.userId,
+            type: "reply",
+            postId: post.id,
+            commentId: comment.id,
+            actorId: session.user.id,
+            message: `有新回复了您的帖子「${post.title.slice(0, 30)}」`,
+          },
+        });
+      } catch (notifError) {
+        console.error("[Comment notification error]", notifError);
+      }
+    }
+
     return NextResponse.json({ success: true, comment }, { status: 201 });
   } catch (error) {
     console.error("POST /api/forum/posts/[slug]/comments error:", error);
