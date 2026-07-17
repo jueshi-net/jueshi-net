@@ -12,6 +12,9 @@ export default function robots(): MetadataRoute.Robots {
           "/lp/",
           "/blog/",
           "/resources/",
+          "/bbs",
+          "/bbs/",
+          "/bbs/category/",
         ],
         disallow: [
           "/admin",
@@ -22,6 +25,16 @@ export default function robots(): MetadataRoute.Robots {
           "/auth",
           "/_next",
           "/static",
+          // P4: Forum private pages must not be indexed
+          "/bbs/new",
+          "/bbs/admin",
+          "/bbs/my-posts",
+          "/bbs/operations",
+          "/bbs/notifications",
+          "/bbs/*/edit",
+          // User profile pages - not indexed by default to protect privacy
+          "/profile",
+          // Allow /u/[id] for public profiles (has its own JSON-LD)
         ],
       },
     ],

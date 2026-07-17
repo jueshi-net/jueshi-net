@@ -34,17 +34,31 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await incrementCommunityStat(post.userId, "helpfulVoteCount").catch(() => {});
 
     // Create notification for post author
+    // P4: Deduplication — only create like notification if the author doesn't
+    // already have an unread like notification from this actor for this post.
     if (post.userId !== session.user.id) {
       try {
-        await prisma.forumNotification.create({
-          data: {
+        const existingLikeNotif = await prisma.forumNotification.findFirst({
+          where: {
             userId: post.userId,
             type: "like",
             postId: post.id,
             actorId: session.user.id,
-            message: "有人赞了您的帖子",
+            isRead: false,
           },
+          select: { id: true },
         });
+        if (!existingLikeNotif) {
+          await prisma.forumNotification.create({
+            data: {
+              userId: post.userId,
+              type: "like",
+              postId: post.id,
+              actorId: session.user.id,
+              message: "有人赞了您的帖子",
+            },
+          });
+        }
       } catch (notifError) {
         console.error("[Like notification error]", notifError);
       }

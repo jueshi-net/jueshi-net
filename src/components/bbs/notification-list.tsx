@@ -26,7 +26,7 @@ interface NotificationItem {
   isRead: boolean;
   createdAt: string;
   actor: { id: string; name: string | null; image: string | null } | null;
-  post: { id: string; slug: string; title: string } | null;
+  post: { id: string; slug: string; title: string; isAccessible: boolean } | null;
 }
 
 interface NotificationListProps {
@@ -210,7 +210,6 @@ export function NotificationList({
             {items.map((n) => {
               const config = TYPE_CONFIG[n.type] || { icon: <Bell className="w-4 h-4" />, label: "通知", color: "bg-gray-50 text-gray-500" };
               const postUrl = n.post ? `/bbs/${n.post.slug}` : null;
-
               return (
                 <div
                   key={n.id}
@@ -243,17 +242,27 @@ export function NotificationList({
                       <time className="text-xs text-gray-400" title={new Date(n.createdAt).toLocaleString("zh-CN")}>
                         {formatRelativeTime(n.createdAt)}
                       </time>
-                      {postUrl && (
-                        <Link
-                          href={postUrl}
-                          className="text-xs text-brand hover:underline inline-flex items-center gap-0.5"
-                        >
+                      {postUrl ? (
+                        n.post?.isAccessible ? (
+                          <Link
+                            href={postUrl}
+                            className="text-xs text-brand hover:underline inline-flex items-center gap-0.5"
+                          >
                           <Eye className="w-3 h-3" />
                           {n.post!.title.length > 25
                             ? n.post!.title.slice(0, 25) + "..."
                             : n.post!.title}
                         </Link>
-                      )}
+                        ) : (
+                          <span className="text-xs text-gray-400 inline-flex items-center gap-0.5" title="内容已不可访问">
+                            <AlertCircle className="w-3 h-3" />
+                            {n.post!.title.length > 25
+                              ? n.post!.title.slice(0, 25) + "..."
+                              : n.post!.title}
+                            （内容已不可访问）
+                          </span>
+                        )
+                      ) : null}
                     </div>
                   </div>
 

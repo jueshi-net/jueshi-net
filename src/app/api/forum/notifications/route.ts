@@ -26,6 +26,11 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
+        include: {
+          post: {
+            select: { id: true, slug: true, title: true, status: true },
+          },
+        },
       }),
       prisma.forumNotification.count({ where: { userId } }),
       prisma.forumNotification.count({ where: { userId, isRead: false } }),
@@ -55,6 +60,16 @@ export async function GET(request: NextRequest) {
       isRead: n.isRead,
       createdAt: n.createdAt,
       actor: n.actorId ? actorMap.get(n.actorId) || null : null,
+      // P4: Include post info for notification links; null when post is deleted
+      post: n.post
+        ? {
+            id: n.post.id,
+            slug: n.post.slug,
+            title: n.post.title,
+            // Only show link for published posts; hidden/deleted posts show friendly text
+            isAccessible: n.post.status === "published",
+          }
+        : null,
     }));
 
     return NextResponse.json({

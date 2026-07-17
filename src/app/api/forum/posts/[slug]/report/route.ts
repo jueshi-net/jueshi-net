@@ -25,6 +25,37 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "不能举报自己的内容" }, { status: 400 });
     }
 
+    // P4: Report rate limit - max 10 reports per day per user
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayReportCount = await prisma.forumReport.count({
+      where: {
+        reporterId: session.user.id,
+        createdAt: { gte: todayStart },
+      },
+    });
+    if (todayReportCount >= 10) {
+      return NextResponse.json(
+        { error: "今日举报次数已达上限（10 次）" },
+        { status: 429 }
+      );
+    }
+
+    // P4: Short-time burst limit - max 3 reports per 5 minutes
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const recentReportCount = await prisma.forumReport.count({
+      where: {
+        reporterId: session.user.id,
+        createdAt: { gte: fiveMinutesAgo },
+      },
+    });
+    if (recentReportCount >= 3) {
+      return NextResponse.json(
+        { error: "举报太频繁，请稍后再试" },
+        { status: 429 }
+      );
+    }
+
     // Check existing report
     const existing = await prisma.forumReport.findUnique({
       where: { reporterId_postId: { reporterId: session.user.id, postId: post.id } },

@@ -125,6 +125,9 @@ export async function POST(req: Request) {
     const isDraft = saveAsDraft === true;
     const isAdmin = (session.user as any).role?.toUpperCase() === "ADMIN";
 
+    // Import anti-spam checks
+    const { runContentRiskChecks } = await import("@/lib/community/anti-spam");
+
     // Validate - drafts allow relaxed validation
     if (!isDraft) {
       if (!title || typeof title !== "string") {
@@ -145,6 +148,15 @@ export async function POST(req: Request) {
       if (content.length < 10 || content.length > 3000) {
         return NextResponse.json(
           { error: "内容长度必须在 10-3000 个字符之间" },
+          { status: 400 }
+        );
+      }
+
+      // P4: Anti-spam content risk checks (non-draft posts only)
+      const contentRisk = runContentRiskChecks(content);
+      if (!contentRisk.ok) {
+        return NextResponse.json(
+          { error: contentRisk.error },
           { status: 400 }
         );
       }

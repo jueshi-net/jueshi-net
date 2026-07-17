@@ -6,6 +6,10 @@ import { UserTrustCard, type TrustCardData } from "@/components/community/user-t
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { ArrowLeft, FileText, MessageSquare, Eye } from "lucide-react";
+import {
+  buildProfileJsonLd,
+  renderJsonLd,
+} from "@/lib/community/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -104,8 +108,24 @@ export default async function PublicUserProfilePage({
     },
   });
 
+  // P4: SEO ProfilePage structured data
+  const profileJsonLd = buildProfileJsonLd({
+    userId: info.user.id,
+    name: info.user.name,
+    email: info.user.email,
+    role: info.user.role,
+    honorScore: info.user.honorScore,
+    postCount: info.stat?.postCount || 0,
+    commentCount: info.stat?.commentCount || 0,
+  });
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      {/* P4: SEO ProfilePage JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: renderJsonLd(profileJsonLd) }}
+      />
       <Link
         href="/bbs"
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"

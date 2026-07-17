@@ -31,6 +31,11 @@ import { PostDetailActions } from "@/components/community/post-detail-actions";
 import { RelatedPosts } from "@/components/bbs/related-posts";
 import { maskEmail, formatJoinDate } from "@/lib/community/utils";
 import { ForumEmptyState } from "@/components/community/forum-empty-state";
+import {
+  buildPostJsonLd,
+  buildBreadcrumbJsonLd,
+  renderJsonLd,
+} from "@/lib/community/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -318,9 +323,52 @@ export default async function PostDetailPage({
   const hasBookmarked = post.bookmarks?.length > 0;
   const isAuthor = !!userId && userId === post.user.id;
 
+  // P4: SEO structured data (JSON-LD) — only for published posts
+  const breadcrumbItems = [
+    { title: "首页", href: "/" },
+    { title: "社区论坛", href: "/bbs" },
+    { title: post.category.name, href: `/bbs/category/${post.category.key}` },
+    { title: post.title, current: true },
+  ];
+  const postJsonLd = buildPostJsonLd({
+    slug: post.slug,
+    title: post.title,
+    content: post.content,
+    excerpt: post.excerpt,
+    status: post.status,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    viewCount: post.viewCount,
+    commentCount: post._count.comments,
+    category: {
+      id: post.category.id,
+      key: post.category.key,
+      name: post.category.name,
+    },
+    user: {
+      id: post.user.id,
+      name: post.user.name,
+      email: post.user.email,
+      role: post.user.role,
+      honorScore: post.user.honorScore,
+    },
+  });
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems);
+
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
+        {/* P4: SEO Structured Data (JSON-LD) */}
+        {postJsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: renderJsonLd(postJsonLd) }}
+          />
+        )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: renderJsonLd(breadcrumbJsonLd) }}
+        />
         {/* Breadcrumb bar */}
         <div className="bg-white border-b border-slate-200">
           <div className="max-w-[1200px] mx-auto px-4 py-2.5">

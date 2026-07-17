@@ -90,7 +90,7 @@ export default async function NotificationsPage() {
   const posts = postIds.length
     ? await prisma.forumPost.findMany({
         where: { id: { in: postIds } },
-        select: { id: true, slug: true, title: true },
+        select: { id: true, slug: true, title: true, status: true },
       })
     : [];
   const postMap = new Map(posts.map((p) => [p.id, p]));
@@ -105,7 +105,15 @@ export default async function NotificationsPage() {
     isRead: n.isRead,
     createdAt: n.createdAt.toISOString(),
     actor: n.actorId ? actorMap.get(n.actorId) || null : null,
-    post: n.postId ? postMap.get(n.postId) || null : null,
+    // P4: Include accessibility flag for broken-link handling
+    post: n.postId
+      ? (() => {
+          const p = postMap.get(n.postId);
+          return p
+            ? { id: p.id, slug: p.slug, title: p.title, isAccessible: (p.status as string) === "published" }
+            : null;
+        })()
+      : null,
   }));
 
   return (
