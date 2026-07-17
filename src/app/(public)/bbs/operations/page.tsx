@@ -298,12 +298,55 @@ export default async function OperationsDashboardPage() {
               审核管理
             </Link>
             <Link
+              href="/bbs/rules"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+            >
+              <FileText className="w-4 h-4" />
+              社区规则
+            </Link>
+            <Link
               href="/bbs"
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
             >
               <FileText className="w-4 h-4" />
               论坛首页
             </Link>
+          </div>
+
+          {/* Operations Readiness */}
+          <div className="mt-6 bg-blue-50 rounded-xl border border-blue-100 p-4">
+            <h2 className="text-sm font-bold text-blue-900 mb-3 inline-flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4" />
+              运营待办
+            </h2>
+            <ul className="space-y-2 text-sm text-blue-700">
+              {pendingCount > 0 && (
+                <li>• {pendingCount} 篇帖子待审核</li>
+              )}
+              {pendingReports > 0 && (
+                <li>• {pendingReports} 个举报待处理</li>
+              )}
+              {categoryDistribution.filter((c) => c._count.posts === 0).length > 0 && (
+                <li>
+                  • {categoryDistribution.filter((c) => c._count.posts === 0).length} 个分类暂无内容，建议填充种子内容
+                </li>
+              )}
+              {pendingCount === 0 && pendingReports === 0 && categoryDistribution.filter((c) => c._count.posts === 0).length === 0 && (
+                <li>• 暂无待办事项</li>
+              )}
+            </ul>
+            {categoryDistribution.filter((c) => c._count.posts === 0).length > 0 && (
+              <div className="mt-3 pt-3 border-t border-blue-100">
+                <p className="text-xs text-blue-600 mb-1">空分类（冷启动建议）：</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {categoryDistribution.filter((c) => c._count.posts === 0).map((cat) => (
+                    <span key={cat.id} className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
+                      {cat.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
