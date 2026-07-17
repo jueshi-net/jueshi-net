@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Search, FileText, Tag, Clock, MessageCircle, TrendingUp, Award, BookOpen, Wrench, Lightbulb, Package, Ship, Mail, Medal } from "lucide-react";
+import { Plus, Search, FileText, Tag, Clock, MessageCircle, TrendingUp, Award, BookOpen, Wrench, Lightbulb, Package, Ship, Mail, Medal, CheckCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical } from "@/lib/seo";
@@ -61,6 +61,7 @@ async function getPosts(params: { q?: string; category?: string; page?: number }
     const { q, category, page = 1 } = params;
     const pageSize = 20;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = { status: "published" };
     if (category) where.category = { key: category };
     if (q) where.title = { contains: q, mode: "insensitive" };
@@ -156,12 +157,14 @@ async function getHotTags() {
 export default async function BBSPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; page?: string; created?: string; status?: string }>;
 }) {
   const params = await searchParams;
   const q = params.q || "";
   const category = params.category || "";
   const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
+  const createdFlag = params.created === "1";
+  const postStatus = params.status || "";
 
   const [categories, { posts, total, pageSize }, stats, categoriesWithCounts, topUsers, hotTags] = await Promise.all([
     getCategories(),
@@ -181,6 +184,26 @@ export default async function BBSPage({
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-[1400px] mx-auto px-4 py-6">
+          {/* Post creation success banner */}
+          {createdFlag && (
+            <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-4 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-green-800">
+                  {postStatus === "pending"
+                    ? "帖子已提交，审核通过后将在社区公开"
+                    : "帖子发布成功！"}
+                </p>
+                {postStatus === "pending" && (
+                  <p className="text-xs text-green-600 mt-0.5">
+                    您的帖子正在等待管理员审核，审核通过后其他用户即可看到。
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
           {/* Breadcrumb */}
           <div className="mb-4">
             <BreadcrumbBar items={[

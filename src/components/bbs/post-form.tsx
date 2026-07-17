@@ -115,12 +115,23 @@ export default function PostForm({ categories, initialTitle = "", initialContent
           return;
         }
 
+        // API returns { success: true, post: { id, slug, status, ... } }
+        const post = data.post;
+        if (!post || !post.slug || !post.status) {
+          setErrors({ submit: "发布成功但返回数据异常，请返回论坛查看" });
+          return;
+        }
+
         setSuccess(true);
-        // Redirect to the new post if slug is returned, otherwise to /bbs
-        if (data.slug) {
-          router.push(`/bbs/${data.slug}`);
+
+        // Status-aware redirect:
+        // - published: go directly to the post
+        // - pending/other: go to forum home with status indicator
+        //   (pending posts are not publicly visible and would 404)
+        if (post.status === "published") {
+          router.push(`/bbs/${post.slug}`);
         } else {
-          router.push("/bbs?created=1");
+          router.push(`/bbs?created=1&status=${post.status}`);
         }
       } catch {
         setErrors({ submit: "网络错误，请重试" });
@@ -275,7 +286,10 @@ export default function PostForm({ categories, initialTitle = "", initialContent
       {success && (
         <div className="rounded-lg bg-green-50 border border-green-200 p-4">
           <p className="text-sm text-green-700 font-medium mb-1">
-            🎉 帖子已提交！正在跳转...
+            ✅ 帖子已提交，审核通过后将在社区公开
+          </p>
+          <p className="text-xs text-green-600">
+            正在跳转...
           </p>
         </div>
       )}
