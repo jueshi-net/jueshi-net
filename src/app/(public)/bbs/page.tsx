@@ -445,6 +445,87 @@ export default async function BBSPage({
               )}
             </div>
 
+            {/* Active filter chips + clear all */}
+            {(q || category || tag || featured) && (
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                <span className="text-xs text-gray-500">当前筛选:</span>
+                {q && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 border border-blue-200 text-blue-700">
+                    搜索: {q}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (category) sp.set("category", category);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-blue-400 hover:text-blue-600"
+                      aria-label="清除搜索"
+                    >✕</Link>
+                  </span>
+                )}
+                {category && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 border border-purple-200 text-purple-700">
+                    分类: {categoriesWithCounts.find((c) => c.key === category)?.name || category}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-purple-400 hover:text-purple-600"
+                      aria-label="清除分类"
+                    >✕</Link>
+                  </span>
+                )}
+                {tag && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 border border-blue-200 text-blue-700">
+                    #{tag}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (category) sp.set("category", category);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-blue-400 hover:text-blue-600"
+                      aria-label="清除标签"
+                    >✕</Link>
+                  </span>
+                )}
+                {featured && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 border border-amber-200 text-amber-700">
+                    仅精华
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (category) sp.set("category", category);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-amber-400 hover:text-amber-600"
+                      aria-label="清除精华筛选"
+                    >✕</Link>
+                  </span>
+                )}
+                <Link
+                  href="/bbs"
+                  className="text-xs text-gray-500 hover:text-red-500 underline"
+                >
+                  清除全部
+                </Link>
+              </div>
+            )}
+
             {/* Posts list */}
             {posts.length > 0 ? (
               <div className="space-y-3">
@@ -464,16 +545,30 @@ export default async function BBSPage({
                   <Mail className="w-8 h-8 text-gray-400" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">
-                  {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
+                  {q || category || tag ? "没有找到匹配的帖子" : "暂无帖子"}
                 </h2>
                 <p className="text-sm text-slate-600 mb-5">
-                  {q || category ? "试试其他关键词或分类" : "成为第一个发帖的人吧！"}
+                  {q || category || tag ? "试试调整搜索条件或清除筛选" : "成为第一个发帖的人吧！"}
                 </p>
-                {q || category ? (
-                  <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
-                    返回全部
-                  </Link>
-                ) : isLoggedIn ? (
+                {(q || category || tag) && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+                    <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
+                      清除全部筛选
+                    </Link>
+                    {category && (
+                      <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        浏览全部分类
+                      </Link>
+                    )}
+                    {!q && (
+                      <Link href="/bbs?sort=hot" className="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        看看热门
+                      </Link>
+                    )}
+                  </div>
+                )}
+                {!q && !category && !tag && (isLoggedIn ? (
                   <Link href="/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
                     <Plus className="w-4 h-4" />
                     发布第一个帖子
@@ -482,7 +577,7 @@ export default async function BBSPage({
                   <Link href="/login?callbackUrl=/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
                     登录后发帖
                   </Link>
-                )}
+                ))}
               </div>
             )}
 
