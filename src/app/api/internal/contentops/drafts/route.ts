@@ -220,6 +220,7 @@ export async function POST(request: NextRequest) {
           title: data.title,
           slug: data.slug,
           summary: data.content.quickAnswer,
+          body: JSON.stringify(data.content),
           metadataJson,
           status: 'draft',
           publishedAt: null,
