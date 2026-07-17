@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
     const pageSize = Math.min(50, Math.max(1, parseInt(searchParams.get("pageSize") || "20", 10)));
 
-    const validStatuses = ["pending", "resolved", "dismissed", "all"];
+    const validStatuses = ["pending", "investigating", "resolved", "dismissed", "all"];
     const filterStatus = validStatuses.includes(status) ? status : "pending";
     const filterWhere = filterStatus === "all" ? {} : { status: filterStatus };
 
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/forum/admin/reports - 处理举报
-// body: { reportId: string, action: "resolve" | "dismiss", resolution?: string }
+// body: { reportId: string, action: "investigate" | "resolve" | "dismiss", resolution: string }
 export async function POST(request: NextRequest) {
   try {
     const adminResult = await requireAdmin();
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { reportId, action, resolution } = body as {
       reportId: string;
-      action: "resolve" | "dismiss";
+      action: "investigate" | "resolve" | "dismiss";
       resolution?: string;
     };
 
@@ -79,8 +79,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "缺少 reportId" }, { status: 400 });
     }
 
-    if (!action || !["resolve", "dismiss"].includes(action)) {
+    if (!action || !["investigate", "resolve", "dismiss"].includes(action)) {
       return NextResponse.json({ error: "无效的操作" }, { status: 400 });
+    }
+
+    // resolve and dismiss require a resolution reason
+    if ((action === "resolve" || action === "dismiss") && (!resolution || resolution.trim().length < 2)) {
+      return NextResponse.json({ error: "处理结果至少 2 个字符" }, { status: 400 });
     }
 
     const report = await prisma.forumReport.findUnique({
@@ -91,18 +96,49 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "举报不存在" }, { status: 404 });
     }
 
-    if (report.status !== "pending") {
-      return NextResponse.json({ error: "该举报已处理" }, { status: 409 });
+    // Cannot re-process already resolved/dismissed reports
+    if (report.status === "resolved" || report.status === "dismissed") {
+      return NextResponse.json({ error: "该举报已处理，不能重复处理" }, { status: 409 });
     }
+
+    // investigate can only be applied to pending reports
+    if (action === "investigate" && report.status !== "pending") {
+      return NextResponse.json({ error: "只能对待处理举报进行受理" }, { status: 400 });
+    }
+
+    if (action === "investigate") {
+      // Mark as investigating
+      await prisma.forumReport.update({
+        where: { id: reportId },
+        data: { status: "investigating" },
+      });
+
+      // Log the investigation
+      await prisma.moderationLog.create({
+        data: {
+          adminId,
+          action: "investigate_report",
+          postId: report.postId,
+          commentId: report.commentId,
+          reason: "开始受理举报",
+        },
+      });
+
+      return NextResponse.json({ success: true, action });
+    }
+
+    // resolve or dismiss
+    const newStatus = action === "resolve" ? "resolved" : "dismissed";
+    const trimmedResolution = resolution!.trim();
 
     await prisma.$transaction(async (tx) => {
       await tx.forumReport.update({
         where: { id: reportId },
         data: {
-          status: action === "resolve" ? "resolved" : "dismissed",
+          status: newStatus,
           resolvedBy: adminId,
           resolvedAt: new Date(),
-          resolution: action === "resolve" ? "action_taken" : "no_action",
+          resolution: trimmedResolution,
         },
       });
 
@@ -110,10 +146,10 @@ export async function POST(request: NextRequest) {
       await tx.moderationLog.create({
         data: {
           adminId,
-          action: action === "resolve" ? "reject_report" : "reject_report",
+          action: action === "resolve" ? "resolve_report" : "dismiss_report",
           postId: report.postId,
           commentId: report.commentId,
-          reason: resolution || (action === "resolve" ? "举报成立" : "举报驳回"),
+          reason: trimmedResolution,
         },
       });
 
@@ -127,10 +163,29 @@ export async function POST(request: NextRequest) {
           actorId: adminId,
           message:
             action === "resolve"
-              ? "您的举报已处理，已采取相应措施"
-              : "您的举报已审核，暂未发现违规",
+              ? `您的举报已处理：${trimmedResolution}`
+              : `您的举报已审核：${trimmedResolution}`,
         },
       });
+
+      // Notify post author if resolved with action taken
+      if (action === "resolve" && report.postId) {
+        const post = await tx.forumPost.findUnique({
+          where: { id: report.postId },
+          select: { userId: true, title: true },
+        });
+        if (post) {
+          await tx.forumNotification.create({
+            data: {
+              userId: post.userId,
+              type: "report_resolved",
+              postId: report.postId,
+              actorId: adminId,
+              message: `您的帖子「${post.title}」收到举报处理：${trimmedResolution}`,
+            },
+          });
+        }
+      }
     });
 
     return NextResponse.json({ success: true, action });

@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       Math.max(1, parseInt(searchParams.get("pageSize") || "20", 10))
     );
 
-    // Valid status filters: all, published, pending, rejected, hidden, deleted
+    // Valid status filters: all, published, pending, rejected, hidden, deleted, draft
     const validStatuses = [
       "all",
       "published",
@@ -30,12 +30,13 @@ export async function GET(request: NextRequest) {
       "rejected",
       "hidden",
       "deleted",
+      "draft",
     ];
     const filterStatus = validStatuses.includes(status) ? status : "all";
 
     const where =
       filterStatus === "all"
-        ? { userId }
+        ? { userId, status: { not: "deleted" } }
         : { userId, status: filterStatus };
 
     const [posts, total, counts] = await Promise.all([
@@ -71,6 +72,7 @@ export async function GET(request: NextRequest) {
       rejected: 0,
       hidden: 0,
       deleted: 0,
+      draft: 0,
     };
     for (const c of counts) {
       statusCounts[c.status] = c._count.id;
@@ -170,10 +172,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "无权操作" }, { status: 403 });
     }
 
-    // Can only delete pending or rejected posts (soft delete)
-    if (!["pending", "rejected"].includes(post.status)) {
+    // Can only delete draft, pending, or rejected posts (soft delete)
+    if (!["draft", "pending", "rejected"].includes(post.status)) {
       return NextResponse.json(
-        { error: "只能删除待审核或被驳回的帖子" },
+        { error: "只能删除草稿、待审核或被驳回的帖子" },
         { status: 400 }
       );
     }

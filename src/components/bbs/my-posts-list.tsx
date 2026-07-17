@@ -50,6 +50,7 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: "已驳回",
   hidden: "已隐藏",
   deleted: "已删除",
+  draft: "草稿",
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -58,6 +59,7 @@ const STATUS_COLORS: Record<string, string> = {
   rejected: "bg-red-50 text-red-700 border-red-200",
   hidden: "bg-gray-100 text-gray-700 border-gray-200",
   deleted: "bg-gray-100 text-gray-500 border-gray-200",
+  draft: "bg-blue-50 text-blue-700 border-blue-200",
 };
 
 export function MyPostsList({
@@ -144,6 +146,7 @@ export function MyPostsList({
       <div className="flex flex-wrap gap-2">
         {[
           { key: "all", label: "全部", count: statusCounts.all || 0 },
+          { key: "draft", label: "草稿", count: statusCounts.draft || 0 },
           { key: "published", label: "已发布", count: statusCounts.published || 0 },
           { key: "pending", label: "待审核", count: statusCounts.pending || 0 },
           { key: "rejected", label: "已驳回", count: statusCounts.rejected || 0 },
@@ -295,8 +298,9 @@ export function MyPostsList({
 
               {/* Action buttons */}
               <div className="flex flex-wrap gap-2 mt-3">
-                {/* Edit - available for pending, rejected, published(own) */}
-                {(post.status === "pending" ||
+                {/* Edit - available for draft, pending, rejected, published(own) */}
+                {(post.status === "draft" ||
+                  post.status === "pending" ||
                   post.status === "rejected" ||
                   post.status === "published") && (
                   <Link
@@ -304,12 +308,12 @@ export function MyPostsList({
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium hover:bg-blue-100"
                   >
                     <Edit className="w-3.5 h-3.5" />
-                    {post.status === "rejected" ? "修改并重新提交" : "编辑"}
+                    {post.status === "rejected" ? "修改并重新提交" : post.status === "draft" ? "继续编辑" : "编辑"}
                   </Link>
                 )}
 
                 {/* Preview - for non-published */}
-                {(post.status === "pending" || post.status === "rejected") && (
+                {(post.status === "draft" || post.status === "pending" || post.status === "rejected") && (
                   <Link
                     href={`/bbs/my-posts/${post.slug}`}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-100"
@@ -330,8 +334,8 @@ export function MyPostsList({
                   </Link>
                 )}
 
-                {/* Delete - only pending or rejected */}
-                {(post.status === "pending" || post.status === "rejected") && (
+                {/* Delete - only draft, pending or rejected */}
+                {(post.status === "draft" || post.status === "pending" || post.status === "rejected") && (
                   <button
                     onClick={() => setDeleteId(post.id)}
                     disabled={busy}

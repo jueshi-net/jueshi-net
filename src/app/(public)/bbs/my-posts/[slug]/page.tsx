@@ -67,12 +67,11 @@ async function getPostForAuthor(slug: string, userId: string) {
   });
 
   if (!post) return null;
-
   // Only the author can preview their own non-published posts
   if (post.userId !== userId) return null;
   // Published posts should use the public route
   if (post.status === "published") return null;
-
+  // Drafts, pending, rejected, hidden are all previewable by the author
   return post;
 }
 
@@ -147,6 +146,8 @@ export default async function AuthorPreviewPage({
                 ? "bg-amber-50 border-amber-200"
                 : post.status === "rejected"
                 ? "bg-red-50 border-red-200"
+                : post.status === "draft"
+                ? "bg-blue-50 border-blue-200"
                 : "bg-gray-100 border-gray-200"
             }`}
           >
@@ -158,6 +159,8 @@ export default async function AuthorPreviewPage({
                       ? "text-amber-600"
                       : post.status === "rejected"
                       ? "text-red-600"
+                      : post.status === "draft"
+                      ? "text-blue-600"
                       : "text-gray-600"
                   }`}
                 />
@@ -168,6 +171,8 @@ export default async function AuthorPreviewPage({
                         ? "text-amber-800"
                         : post.status === "rejected"
                         ? "text-red-800"
+                        : post.status === "draft"
+                        ? "text-blue-800"
                         : "text-gray-700"
                     }`}
                   >
@@ -175,6 +180,8 @@ export default async function AuthorPreviewPage({
                       "此帖子正在等待管理员审核，其他用户暂时无法看到"}
                     {post.status === "rejected" &&
                       "此帖子已被驳回，可修改后重新提交"}
+                    {post.status === "draft" &&
+                      "这是草稿，尚未提交审核。点击编辑继续完善后提交。"}
                     {post.status === "hidden" && "此帖子已被隐藏"}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
@@ -182,13 +189,13 @@ export default async function AuthorPreviewPage({
                   </p>
                 </div>
               </div>
-              {(post.status === "rejected" || post.status === "pending") && (
+              {(post.status === "draft" || post.status === "rejected" || post.status === "pending") && (
                 <Link
                   href={`/bbs/${slug}/edit`}
                   className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   <Edit className="w-3.5 h-3.5" />
-                  {post.status === "rejected" ? "修改并重新提交" : "编辑"}
+                  {post.status === "draft" ? "编辑并提交" : post.status === "rejected" ? "修改并重新提交" : "编辑"}
                 </Link>
               )}
             </div>

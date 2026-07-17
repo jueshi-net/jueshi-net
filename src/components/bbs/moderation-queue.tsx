@@ -64,10 +64,15 @@ export function ModerationQueue({
   const [showBatchReject, setShowBatchReject] = useState(false);
   const [message, setMessage] = useState("");
   const [busy, startTransition] = useTransition();
+  const [batchResults, setBatchResults] = useState<{
+    success: number;
+    failed: number;
+    failedItems: { id: string; error: string; title?: string }[];
+  } | null>(null);
 
   function flash(msg: string) {
     setMessage(msg);
-    window.setTimeout(() => setMessage(""), 4000);
+    window.setTimeout(() => setMessage(""), 5000);
   }
 
   function toggleSelect(id: string) {
@@ -160,6 +165,7 @@ export function ModerationQueue({
       flash("请先选择帖子");
       return;
     }
+    setBatchResults(null);
     startTransition(async () => {
       try {
         const res = await fetch("/api/forum/admin/pending", {
@@ -171,8 +177,20 @@ export function ModerationQueue({
           }),
         });
         const data = await res.json();
+
         if (res.ok) {
-          flash(`已批量通过 ${data.processed} 篇`);
+          const failedItems = (data.results || []).filter((r: { success: boolean }) => !r.success);
+          if (data.failed > 0) {
+            setBatchResults({
+              success: data.processed,
+              failed: data.failed,
+              failedItems: failedItems.map((r: { id: string; error: string; title?: string }) => ({ id: r.id, error: r.error, title: r.title })),
+            });
+            flash(`部分成功：${data.processed} 篇通过，${data.failed} 篇失败`);
+          } else {
+            flash(`已批量通过 ${data.processed} 篇`);
+            setSelected(new Set());
+          }
           refresh();
         } else {
           flash(data.error || "操作失败");
@@ -192,6 +210,7 @@ export function ModerationQueue({
       flash("驳回原因至少 2 个字符");
       return;
     }
+    setBatchResults(null);
     startTransition(async () => {
       try {
         const res = await fetch("/api/forum/admin/pending", {
@@ -204,10 +223,22 @@ export function ModerationQueue({
           }),
         });
         const data = await res.json();
+
         if (res.ok) {
-          flash(`已批量驳回 ${data.processed} 篇`);
-          setShowBatchReject(false);
-          setBatchRejectReason("");
+          const failedItems = (data.results || []).filter((r: { success: boolean }) => !r.success);
+          if (data.failed > 0) {
+            setBatchResults({
+              success: data.processed,
+              failed: data.failed,
+              failedItems: failedItems.map((r: { id: string; error: string; title?: string }) => ({ id: r.id, error: r.error, title: r.title })),
+            });
+            flash(`部分成功：${data.processed} 篇驳回，${data.failed} 篇失败`);
+          } else {
+            flash(`已批量驳回 ${data.processed} 篇`);
+            setSelected(new Set());
+            setShowBatchReject(false);
+            setBatchRejectReason("");
+          }
           refresh();
         } else {
           flash(data.error || "操作失败");
@@ -216,6 +247,15 @@ export function ModerationQueue({
         flash("网络错误");
       }
     });
+  }
+
+  // Retry only failed items
+  async function handleRetryFailed() {
+    if (!batchResults || batchResults.failedItems.length === 0) return;
+    const failedIds = batchResults.failedItems.map((f) => f.id);
+    setSelected(new Set(failedIds));
+    setBatchResults(null);
+    flash(`已选择 ${failedIds.length} 个失败项，请重新操作`);
   }
 
   async function handleModerate(
@@ -259,6 +299,36 @@ export function ModerationQueue({
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700 flex items-center gap-2 shadow-lg">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{message}</span>
+        </div>
+      )}
+
+      {/* Batch results panel */}
+      {batchResults && batchResults.failed > 0 && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-sm font-bold text-red-800">
+                部分操作失败：成功 {batchResults.success} 篇，失败 {batchResults.failed} 篇
+              </span>
+            </div>
+            <button
+              onClick={handleRetryFailed}
+              disabled={busy}
+              className="px-3 py-1 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 disabled:opacity-50"
+            >
+              重试失败项
+            </button>
+          </div>
+          <div className="space-y-1">
+            {batchResults.failedItems.map((item) => (
+              <div key={item.id} className="flex items-center gap-2 text-xs text-red-700">
+                <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="font-medium">{item.title || item.id}:</span>
+                <span>{item.error}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

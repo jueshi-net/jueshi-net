@@ -127,50 +127,83 @@ export async function POST(request: NextRequest) {
       select: { id: true, slug: true, title: true, userId: true, status: true },
     });
 
+    // Track which IDs were not found or not in modifiable state
+    const foundIds = new Set(posts.map((p) => p.id));
+    const skipped: { id: string; error: string }[] = [];
+    for (const id of postIds) {
+      if (!foundIds.has(id)) {
+        skipped.push({ id, error: "帖子不存在或状态不允许审核" });
+      }
+    }
+
     if (posts.length === 0) {
-      return NextResponse.json({ error: "没有可审核的帖子" }, { status: 404 });
+      return NextResponse.json({
+        success: false,
+        error: "没有可审核的帖子",
+        results: skipped,
+        processed: 0,
+        failed: skipped.length,
+      }, { status: 404 });
     }
 
     const newStatus = action === "approve" ? "published" : "rejected";
     const modAction = action === "approve" ? "approve" : "reject";
     const trimmedReason = reason?.trim() || null;
 
-    // Use transaction for atomicity
-    await prisma.$transaction(async (tx) => {
-      // Update all posts
-      await tx.forumPost.updateMany({
-        where: { id: { in: posts.map((p) => p.id) } },
-        data: { status: newStatus },
-      });
+    // Process each post individually to track per-item results
+    const results: { id: string; success: boolean; error?: string; title?: string }[] = [];
+    let successCount = 0;
 
-      // Create moderation logs
-      await tx.moderationLog.createMany({
-        data: posts.map((p) => ({
-          adminId,
-          action: modAction,
-          postId: p.id,
-          reason: trimmedReason,
-        })),
-      });
+    for (const post of posts) {
+      try {
+        await prisma.$transaction(async (tx) => {
+          await tx.forumPost.update({
+            where: { id: post.id },
+            data: { status: newStatus },
+          });
 
-      // Create notifications for post authors
-      const notifications = posts.map((p) => ({
-        userId: p.userId,
-        type: action === "approve" ? "post_approved" : "post_rejected",
-        postId: p.id,
-        actorId: adminId,
-        message:
-          action === "approve"
-            ? `您的帖子「${p.title}」已审核通过`
-            : `您的帖子「${p.title}」已被驳回${trimmedReason ? `：${trimmedReason}` : ""}`,
-      }));
+          await tx.moderationLog.create({
+            data: {
+              adminId,
+              action: modAction,
+              postId: post.id,
+              reason: trimmedReason,
+            },
+          });
 
-      await tx.forumNotification.createMany({ data: notifications });
-    });
+          await tx.forumNotification.create({
+            data: {
+              userId: post.userId,
+              type: action === "approve" ? "post_approved" : "post_rejected",
+              postId: post.id,
+              actorId: adminId,
+              message:
+                action === "approve"
+                  ? `您的帖子「${post.title}」已审核通过`
+                  : `您的帖子「${post.title}」已被驳回${trimmedReason ? `：${trimmedReason}` : ""}`,
+            },
+          });
+        });
+        results.push({ id: post.id, success: true, title: post.title });
+        successCount++;
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : "未知错误";
+        results.push({ id: post.id, success: false, error: errMsg, title: post.title });
+      }
+    }
+
+    // Add skipped items to results
+    for (const s of skipped) {
+      results.push({ id: s.id, success: false, error: s.error });
+    }
+
+    const failedCount = results.filter((r) => !r.success).length;
 
     return NextResponse.json({
-      success: true,
-      processed: posts.length,
+      success: failedCount === 0,
+      processed: successCount,
+      failed: failedCount,
+      results,
       action,
     });
   } catch (error) {
