@@ -5,7 +5,7 @@ import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import { ModerationQueue } from "@/components/bbs/moderation-queue";
 import type { Metadata } from "next";
-import { Shield, AlertTriangle } from "lucide-react";
+import { Shield, AlertTriangle, BarChart3 } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -166,11 +166,42 @@ export default async function AdminModerationPage({ searchParams }: PageProps) {
         {/* Main content */}
         <div className="max-w-[1200px] mx-auto px-4 py-6">
           {/* Page header */}
-          <div className="flex items-center gap-2 mb-6">
-            <Shield className="w-6 h-6 text-brand" />
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-              审核管理
-            </h1>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Shield className="w-6 h-6 text-brand" />
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                审核管理
+              </h1>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/bbs/operations"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span className="hidden sm:inline">运营面板</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Stats summary */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="text-xs text-gray-500 mb-0.5">待审核</div>
+              <div className="text-2xl font-bold text-amber-600">{statusCounts.pending || 0}</div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="text-xs text-gray-500 mb-0.5">已驳回</div>
+              <div className="text-2xl font-bold text-red-600">{statusCounts.rejected || 0}</div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="text-xs text-gray-500 mb-0.5">已隐藏</div>
+              <div className="text-2xl font-bold text-gray-600">{statusCounts.hidden || 0}</div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-3">
+              <div className="text-xs text-gray-500 mb-0.5">已发布</div>
+              <div className="text-2xl font-bold text-green-600">{statusCounts.published || 0}</div>
+            </div>
           </div>
 
           <ModerationQueue

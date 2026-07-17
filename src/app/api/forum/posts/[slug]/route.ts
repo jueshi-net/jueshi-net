@@ -208,12 +208,33 @@ export async function PATCH(
 
     // 解析请求体
     const body = await request.json();
-    const { title, content, categoryId } = body;
+    let { title, content, categoryId } = body;
+    const { saveAsDraft, submitForReview } = body as {
+      saveAsDraft?: boolean;
+      submitForReview?: boolean;
+    };
 
-    // 内容校验
-    const validation = validateContent(title, content, categoryId);
-    if (!validation.valid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+    // Validate - drafts and submit from draft allow relaxed validation
+    const isDraftSave = saveAsDraft === true;
+    const isDraftPost = post.status === "draft";
+
+    if (!isDraftSave && !isDraftPost) {
+      if (!title || title.trim().length < 5) {
+        return NextResponse.json({ error: "标题至少 5 个字符" }, { status: 400 });
+      }
+      if (title.length > 200) {
+        return NextResponse.json({ error: "标题最多 200 个字符" }, { status: 400 });
+      }
+      if (!content || content.trim().length < 20) {
+        return NextResponse.json({ error: "内容至少 20 个字符" }, { status: 400 });
+      }
+      if (content.length > 50000) {
+        return NextResponse.json({ error: "内容最多 50000 个字符" }, { status: 400 });
+      }
+    } else {
+      // Draft: allow empty/short content, still trim and cap
+      title = (title || "").trim().slice(0, 200);
+      content = (content || "").trim().slice(0, 50000);
     }
 
     // 检查分类是否存在
@@ -224,17 +245,19 @@ export async function PATCH(
       return NextResponse.json({ error: '分类不存在' }, { status: 400 });
     }
 
-    // 频率限制检查（编辑也算一次操作）
-    const rateLimit = await checkRateLimit(userId, 'post');
-    if (rateLimit.limited) {
-      return NextResponse.json(
-        { error: '编辑过于频繁，请稍后再试' },
-        { status: 429 }
-      );
+    // 频率限制检查（编辑也算一次操作）— 但草稿自动保存不受限制
+    if (!saveAsDraft) {
+      const rateLimit = await checkRateLimit(userId, 'post');
+      if (rateLimit.limited) {
+        return NextResponse.json(
+          { error: '编辑过于频繁，请稍后再试' },
+          { status: 429 }
+        );
+      }
     }
 
-    // 重复内容检测（如果标题和内容都没变，不算重复）
-    if (title !== post.title || content !== post.content) {
+    // 重复内容检测（草稿跳过）
+    if (!saveAsDraft && (title !== post.title || content !== post.content)) {
       const duplicate = await checkDuplicate(userId, title, content);
       if (duplicate.duplicate && duplicate.postId !== post.id) {
         return NextResponse.json(
@@ -245,14 +268,19 @@ export async function PATCH(
     }
 
     // 计算新状态
-    const previousStatus = post.status;
     let newStatus = post.status;
 
-    if (post.status === 'published' && !isAdmin) {
-      // 作者编辑 published 帖，进入 pending
+    if (saveAsDraft) {
+      // Auto-save or explicit draft save: keep as draft
+      newStatus = 'draft';
+    } else if (submitForReview && post.status === 'draft') {
+      // Submit draft for review
+      newStatus = isAdmin ? 'published' : 'pending';
+    } else if (post.status === 'published' && !isAdmin) {
+      // Author editing published post: back to pending
       newStatus = 'pending';
     } else if (post.status === 'rejected') {
-      // 作者编辑被驳回的帖子，重新进入审核队列
+      // Editing rejected post: back to pending
       newStatus = 'pending';
     }
 

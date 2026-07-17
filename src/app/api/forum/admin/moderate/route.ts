@@ -72,6 +72,29 @@ export async function POST(request: NextRequest) {
 
     const trimmedReason = reason?.trim() || null;
 
+    // P4: Idempotency checks — reject no-op moderation actions
+    const postStatus = post.status as string;
+    const idempotencyErrors: Partial<Record<ModAction, string>> = {
+      approve: postStatus === "published" ? "该帖子已是「已发布」状态" : undefined,
+      reject: postStatus === "rejected" ? "该帖子已被驳回" : undefined,
+      hide: postStatus === "hidden" ? "该帖子已隐藏" : undefined,
+      restore: postStatus !== "hidden" ? "该帖子未处于隐藏状态，无需恢复" : undefined,
+      pin: post.isPinned ? "该帖子已置顶" : undefined,
+      unpin: !post.isPinned ? "该帖子未置顶" : undefined,
+      feature: post.isFeatured ? "该帖子已是精华" : undefined,
+      unfeature: !post.isFeatured ? "该帖子不是精华" : undefined,
+      lock: post.isLocked ? "该帖子已锁定" : undefined,
+      unlock: !post.isLocked ? "该帖子未锁定" : undefined,
+    };
+
+    const idempotencyError = idempotencyErrors[modAction];
+    if (idempotencyError) {
+      return NextResponse.json(
+        { error: idempotencyError, noOp: true, currentStatus: post.status },
+        { status: 409 }
+      );
+    }
+
     // Determine new post fields based on action
     const updates: Record<string, unknown> = {};
     let notificationType: string | null = null;

@@ -5,7 +5,11 @@ import { getUserCommunityInfo } from "@/lib/honor-helpers";
 import { UserTrustCard, type TrustCardData } from "@/components/community/user-trust-card";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, MessageSquare, Eye } from "lucide-react";
+import {
+  buildProfileJsonLd,
+  renderJsonLd,
+} from "@/lib/community/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -84,8 +88,44 @@ export default async function PublicUserProfilePage({
     level: info.level,
   };
 
+  // Fetch user's published posts
+  const userPosts = await prisma.forumPost.findMany({
+    where: { userId: id, status: "published" },
+    orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
+    take: 10,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      excerpt: true,
+      viewCount: true,
+      commentCount: true,
+      isPinned: true,
+      isFeatured: true,
+      isSolved: true,
+      createdAt: true,
+      category: { select: { id: true, key: true, name: true } },
+    },
+  });
+
+  // P4: SEO ProfilePage structured data
+  const profileJsonLd = buildProfileJsonLd({
+    userId: info.user.id,
+    name: info.user.name,
+    email: info.user.email,
+    role: info.user.role,
+    honorScore: info.user.honorScore,
+    postCount: info.stat?.postCount || 0,
+    commentCount: info.stat?.commentCount || 0,
+  });
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+      {/* P4: SEO ProfilePage JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: renderJsonLd(profileJsonLd) }}
+      />
       <Link
         href="/bbs"
         className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
@@ -106,6 +146,53 @@ export default async function PublicUserProfilePage({
             <li>🏆 <strong>荣誉值</strong>：可信度背书，不可消费。来自被采纳、被加精、有效举报等。代表社区信任。</li>
           </ul>
           <p className="text-xs text-blue-500">积分余额仅自己可见，不会公开展示。</p>
+        </div>
+      )}
+
+      {/* User's published posts */}
+      {userPosts.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5">
+            <FileText className="w-4 h-4 text-brand" />
+            {isOwnProfile ? "我的帖子" : "TA的帖子"}
+            <span className="text-xs text-gray-400 font-normal">({userPosts.length})</span>
+          </h3>
+          <div className="space-y-2">
+            {userPosts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/bbs/${post.slug}`}
+                className="block group p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium text-gray-700 group-hover:text-brand transition-colors line-clamp-1">
+                      {post.isPinned && <span className="text-red-500 mr-1">📌</span>}
+                      {post.isFeatured && <span className="text-purple-500 mr-1">⭐</span>}
+                      {post.title}
+                    </h4>
+                    {post.excerpt && (
+                      <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                        {post.excerpt}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                      <span>{post.category.name}</span>
+                      <time>{new Date(post.createdAt).toLocaleDateString("zh-CN")}</time>
+                      <span className="inline-flex items-center gap-0.5">
+                        <MessageSquare className="w-3 h-3" />
+                        {post.commentCount}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5">
+                        <Eye className="w-3 h-3" />
+                        {post.viewCount}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

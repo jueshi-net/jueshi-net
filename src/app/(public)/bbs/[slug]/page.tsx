@@ -28,8 +28,14 @@ import CommentSection from "@/components/bbs/comment-section";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import { PostDetailActions } from "@/components/community/post-detail-actions";
+import { RelatedPosts } from "@/components/bbs/related-posts";
 import { maskEmail, formatJoinDate } from "@/lib/community/utils";
 import { ForumEmptyState } from "@/components/community/forum-empty-state";
+import {
+  buildPostJsonLd,
+  buildBreadcrumbJsonLd,
+  renderJsonLd,
+} from "@/lib/community/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -66,15 +72,10 @@ async function getPost(slug: string, userId: string | null) {
   });
 
   if (!post) return null;
-
-  // Published posts are visible to everyone.
-  // Authors can also view their own pending/rejected posts (for editing/resubmit).
-  // Admins can view any post.
-  if (post.status !== "published") {
-    if (!userId) return null;
-    const isAuthor = post.userId === userId;
-    if (!isAuthor) return null;
-  }
+  // Only published posts are served on the public /bbs/[slug] route.
+  // Private preview for pending/rejected/hidden posts is at /bbs/my-posts/[slug] (author)
+  // and /bbs/admin/review/[id] (admin).
+  if (post.status !== "published") return null;
 
   return post;
 }
@@ -322,43 +323,52 @@ export default async function PostDetailPage({
   const hasBookmarked = post.bookmarks?.length > 0;
   const isAuthor = !!userId && userId === post.user.id;
 
+  // P4: SEO structured data (JSON-LD) — only for published posts
+  const breadcrumbItems = [
+    { title: "首页", href: "/" },
+    { title: "社区论坛", href: "/bbs" },
+    { title: post.category.name, href: `/bbs/category/${post.category.key}` },
+    { title: post.title, current: true },
+  ];
+  const postJsonLd = buildPostJsonLd({
+    slug: post.slug,
+    title: post.title,
+    content: post.content,
+    excerpt: post.excerpt,
+    status: post.status,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    viewCount: post.viewCount,
+    commentCount: post._count.comments,
+    category: {
+      id: post.category.id,
+      key: post.category.key,
+      name: post.category.name,
+    },
+    user: {
+      id: post.user.id,
+      name: post.user.name,
+      email: post.user.email,
+      role: post.user.role,
+      honorScore: post.user.honorScore,
+    },
+  });
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems);
+
   return (
     <JueshiV4PublicShell>
       <div className="min-h-screen bg-gray-50">
-        {/* Status banner for author viewing non-published post */}
-        {isAuthor && post.status !== "published" && (
-          <div className={`border-b ${
-            post.status === "pending"
-              ? "bg-amber-50 border-amber-200"
-              : post.status === "rejected"
-              ? "bg-red-50 border-red-200"
-              : "bg-gray-100 border-gray-200"
-          }`}>
-            <div className="max-w-[1200px] mx-auto px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className={`text-sm font-medium ${
-                  post.status === "pending"
-                    ? "text-amber-800"
-                    : post.status === "rejected"
-                    ? "text-red-800"
-                    : "text-gray-700"
-                }`}>
-                  {post.status === "pending" && "⏳ 此帖子正在等待管理员审核"}
-                  {post.status === "rejected" && "❌ 此帖子已被驳回，可修改后重新提交"}
-                  {post.status === "hidden" && "🚫 此帖子已被隐藏"}
-                </p>
-                {(post.status === "rejected" || post.status === "pending") && (
-                  <Link
-                    href={`/bbs/${slug}/edit`}
-                    className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    编辑
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
+        {/* P4: SEO Structured Data (JSON-LD) */}
+        {postJsonLd && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: renderJsonLd(postJsonLd) }}
+          />
         )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: renderJsonLd(breadcrumbJsonLd) }}
+        />
         {/* Breadcrumb bar */}
         <div className="bg-white border-b border-slate-200">
           <div className="max-w-[1200px] mx-auto px-4 py-2.5">
@@ -516,6 +526,15 @@ export default async function PostDetailPage({
                   postId={post.id}
                   isLocked={post.isLocked}
                   isLoggedIn={isLoggedIn}
+                />
+              </Suspense>
+
+              {/* Related posts */}
+              <Suspense fallback={null}>
+                <RelatedPosts
+                  postId={post.id}
+                  categoryId={post.categoryId}
+                  tags={Array.isArray(post.tags) ? (post.tags as string[]) : null}
                 />
               </Suspense>
 

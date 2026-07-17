@@ -58,10 +58,12 @@ export default async function MyPostsPage({ searchParams }: PageProps) {
   }
 
   // Valid status filters
-  const validStatuses = ["all", "published", "pending", "rejected", "hidden", "deleted"];
+  const validStatuses = ["all", "published", "pending", "rejected", "hidden", "deleted", "draft"];
   const filterStatus = validStatuses.includes(status) ? status : "all";
 
-  const where = filterStatus === "all" ? { userId } : { userId, status: filterStatus };
+  const where = filterStatus === "all"
+    ? { userId, status: { not: "deleted" } }
+    : { userId, status: filterStatus };
 
   const [posts, total, counts] = await Promise.all([
     prisma.forumPost.findMany({
@@ -94,6 +96,7 @@ export default async function MyPostsPage({ searchParams }: PageProps) {
     rejected: 0,
     hidden: 0,
     deleted: 0,
+    draft: 0,
   };
   for (const c of counts) {
     statusCounts[c.status] = c._count.id;

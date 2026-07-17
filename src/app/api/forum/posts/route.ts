@@ -40,23 +40,49 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const category = url.searchParams.get("category") || undefined;
   const q = url.searchParams.get("q") || undefined;
+  const tag = url.searchParams.get("tag") || undefined;
+  const sort = url.searchParams.get("sort") || "latest";
+  const featured = url.searchParams.get("featured") === "1" || url.searchParams.get("featured") === "true";
   const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
   const pageSize = Math.min(
     50,
     Math.max(1, parseInt(url.searchParams.get("pageSize") || "20", 10))
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { status: "published" };
   if (category) where.category = { key: category };
-  if (q) where.title = { contains: q, mode: "insensitive" };
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { content: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (tag) where.tags = { has: tag };
+  if (featured) where.isFeatured = true;
+
+  // Determine sort order
+  let orderBy: any[];
+  switch (sort) {
+    case "hot":
+      orderBy = [{ isPinned: "desc" }, { viewCount: "desc" }];
+      break;
+    case "replies":
+      orderBy = [{ isPinned: "desc" }, { commentCount: "desc" }];
+      break;
+    case "featured":
+      orderBy = [{ isFeatured: "desc" }, { createdAt: "desc" }];
+      break;
+    case "latest":
+    default:
+      orderBy = [{ isPinned: "desc" }, { createdAt: "desc" }];
+      break;
+  }
 
   const [posts, total] = await Promise.all([
     prisma.forumPost.findMany({
       where,
-      orderBy: [
-        { isPinned: "desc" },
-        { createdAt: "desc" },
-      ],
+      orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
@@ -86,35 +112,58 @@ export async function POST(req: Request) {
       relatedGuideId,
       relatedChecklistId,
       relatedTaskChainType,
+      saveAsDraft,
     } = body as {
       tags?: string[];
       relatedTool?: string;
       relatedGuideId?: string;
       relatedChecklistId?: string;
       relatedTaskChainType?: string;
+      saveAsDraft?: boolean;
     };
 
-    // Validate
-    if (!title || typeof title !== "string") {
-      return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
-    }
-    title = title.trim();
-    if (title.length < 5 || title.length > 80) {
-      return NextResponse.json(
-        { error: "标题长度必须在 5-80 个字符之间" },
-        { status: 400 }
-      );
-    }
+    const isDraft = saveAsDraft === true;
+    const isAdmin = (session.user as any).role?.toUpperCase() === "ADMIN";
 
-    if (!content || typeof content !== "string") {
-      return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
-    }
-    content = content.trim();
-    if (content.length < 10 || content.length > 3000) {
-      return NextResponse.json(
-        { error: "内容长度必须在 10-3000 个字符之间" },
-        { status: 400 }
-      );
+    // Import anti-spam checks
+    const { runContentRiskChecks } = await import("@/lib/community/anti-spam");
+
+    // Validate - drafts allow relaxed validation
+    if (!isDraft) {
+      if (!title || typeof title !== "string") {
+        return NextResponse.json({ error: "标题不能为空" }, { status: 400 });
+      }
+      title = title.trim();
+      if (title.length < 5 || title.length > 80) {
+        return NextResponse.json(
+          { error: "标题长度必须在 5-80 个字符之间" },
+          { status: 400 }
+        );
+      }
+
+      if (!content || typeof content !== "string") {
+        return NextResponse.json({ error: "内容不能为空" }, { status: 400 });
+      }
+      content = content.trim();
+      if (content.length < 10 || content.length > 3000) {
+        return NextResponse.json(
+          { error: "内容长度必须在 10-3000 个字符之间" },
+          { status: 400 }
+        );
+      }
+
+      // P4: Anti-spam content risk checks (non-draft posts only)
+      const contentRisk = runContentRiskChecks(content);
+      if (!contentRisk.ok) {
+        return NextResponse.json(
+          { error: contentRisk.error },
+          { status: 400 }
+        );
+      }
+    } else {
+      // Draft: allow empty title/content, but still trim
+      title = (title || "").trim().slice(0, 80);
+      content = (content || "").trim().slice(0, 3000);
     }
 
     if (!categoryId || typeof categoryId !== "string") {
@@ -129,62 +178,69 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "分类不存在或已禁用" }, { status: 400 });
     }
 
-    // Rate limit: max 1 post per minute per user
-    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-    const recentPost = await prisma.forumPost.findFirst({
-      where: {
-        userId,
-        createdAt: { gte: oneMinuteAgo },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-    if (recentPost) {
-      return NextResponse.json(
-        { error: "发帖太频繁，请等待 1 分钟" },
-        { status: 429 }
-      );
+    // Drafts bypass all rate limits, duplicate checks, and daily limits
+    if (!isDraft) {
+      // Rate limit: max 1 post per minute per user (excludes drafts)
+      const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+      const recentPost = await prisma.forumPost.findFirst({
+        where: {
+          userId,
+          createdAt: { gte: oneMinuteAgo },
+          status: { not: "draft" },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+      if (recentPost) {
+        return NextResponse.json(
+          { error: "发帖太频繁，请等待 1 分钟" },
+          { status: 429 }
+        );
+      }
+
+      // Duplicate content check: same title+content in last 24 hours
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const duplicatePost = await prisma.forumPost.findFirst({
+        where: {
+          userId,
+          title,
+          content,
+          createdAt: { gte: oneDayAgo },
+        },
+      });
+      if (duplicatePost) {
+        return NextResponse.json(
+          { error: "检测到重复内容，请勿重复发帖" },
+          { status: 409 }
+        );
+      }
+
+      // Daily limit: max 5 non-draft posts per user per day
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const todayCount = await prisma.forumPost.count({
+        where: {
+          userId,
+          createdAt: { gte: today, lt: tomorrow },
+          status: { not: "draft" },
+        },
+      });
+
+      if (todayCount >= 5) {
+        return NextResponse.json(
+          { error: "今日发帖数已达上限（5条）" },
+          { status: 429 }
+        );
+      }
     }
 
-    // Duplicate content check: same title+content in last 24 hours
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const duplicatePost = await prisma.forumPost.findFirst({
-      where: {
-        userId,
-        title,
-        content,
-        createdAt: { gte: oneDayAgo },
-      },
-    });
-    if (duplicatePost) {
-      return NextResponse.json(
-        { error: "检测到重复内容，请勿重复发帖" },
-        { status: 409 }
-      );
-    }
-
-    // Daily limit: max 5 posts per user per day
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const todayCount = await prisma.forumPost.count({
-      where: {
-        userId,
-        createdAt: { gte: today, lt: tomorrow },
-      },
-    });
-
-    if (todayCount >= 5) {
-      return NextResponse.json(
-        { error: "今日发帖数已达上限（5条）" },
-        { status: 429 }
-      );
-    }
-
-    // Determine status: admin users get published, others get pending
-    const isAdmin = (session.user as any).role?.toUpperCase() === "ADMIN";
-    const status = isAdmin ? "published" : "pending";
+    // Determine status
+    // - saveAsDraft: always "draft"
+    // - admin users: "published"
+    // - regular users: "pending"
+    const status = isDraft ? "draft" : isAdmin ? "published" : "pending";
 
     // Generate slug and excerpt
     const slug = await generateUniqueSlug(title);

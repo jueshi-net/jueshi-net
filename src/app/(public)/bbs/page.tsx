@@ -56,23 +56,46 @@ async function getCategoriesWithCounts() {
   }
 }
 
-async function getPosts(params: { q?: string; category?: string; page?: number }) {
+async function getPosts(params: { q?: string; category?: string; tag?: string; sort?: string; featured?: boolean; page?: number }) {
   try {
-    const { q, category, page = 1 } = params;
+    const { q, category, tag, sort = "latest", featured, page = 1 } = params;
     const pageSize = 20;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = { status: "published" };
     if (category) where.category = { key: category };
-    if (q) where.title = { contains: q, mode: "insensitive" };
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: "insensitive" } },
+        { content: { contains: q, mode: "insensitive" } },
+      ];
+    }
+    if (tag) where.tags = { has: tag };
+    if (featured) where.isFeatured = true;
+
+    // Determine sort order
+    let orderBy: any[];
+    switch (sort) {
+      case "hot":
+        // Hot = most views in last 7 days
+        orderBy = [{ isPinned: "desc" }, { viewCount: "desc" }];
+        break;
+      case "replies":
+        orderBy = [{ isPinned: "desc" }, { commentCount: "desc" }];
+        break;
+      case "featured":
+        orderBy = [{ isFeatured: "desc" }, { createdAt: "desc" }];
+        break;
+      case "latest":
+      default:
+        orderBy = [{ isPinned: "desc" }, { createdAt: "desc" }];
+        break;
+    }
 
     const [posts, total] = await Promise.all([
       prisma.forumPost.findMany({
         where,
-        orderBy: [
-          { isPinned: "desc" },
-          { createdAt: "desc" },
-        ],
+        orderBy,
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: {
@@ -157,18 +180,21 @@ async function getHotTags() {
 export default async function BBSPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; category?: string; page?: string; created?: string; status?: string }>;
+  searchParams: Promise<{ q?: string; category?: string; tag?: string; sort?: string; featured?: string; page?: string; created?: string; status?: string }>;
 }) {
   const params = await searchParams;
   const q = params.q || "";
   const category = params.category || "";
+  const tag = params.tag || "";
+  const sort = params.sort || "latest";
+  const featured = params.featured === "1" || params.featured === "true";
   const page = params.page ? Math.max(1, parseInt(params.page, 10)) : 1;
   const createdFlag = params.created === "1";
   const postStatus = params.status || "";
 
   const [categories, { posts, total, pageSize }, stats, categoriesWithCounts, topUsers, hotTags] = await Promise.all([
     getCategories(),
-    getPosts({ q, category, page }),
+    getPosts({ q, category, tag, sort, featured, page }),
     getStats(),
     getCategoriesWithCounts(),
     getTopUsers(),
@@ -370,6 +396,136 @@ export default async function BBSPage({
               </div>
             </div>
 
+            {/* Sort tabs */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {[
+                { key: "latest", label: "最新" },
+                { key: "hot", label: "热门" },
+                { key: "replies", label: "最多回复" },
+                { key: "featured", label: "精华" },
+              ].map((tab) => {
+                const sp = new URLSearchParams();
+                if (q) sp.set("q", q);
+                if (category) sp.set("category", category);
+                if (tag) sp.set("tag", tag);
+                if (featured) sp.set("featured", "1");
+                sp.set("sort", tab.key);
+                const href = `/bbs${sp.toString() ? `?${sp.toString()}` : ""}`;
+                return (
+                  <Link
+                    key={tab.key}
+                    href={href}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      sort === tab.key
+                        ? "bg-brand text-white"
+                        : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {tab.label}
+                  </Link>
+                );
+              })}
+              {/* Active tag filter */}
+              {tag && (
+                <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 border border-blue-200 text-blue-700">
+                  #{tag}
+                  <Link
+                    href={`/bbs?${(() => {
+                      const sp = new URLSearchParams();
+                      if (q) sp.set("q", q);
+                      if (category) sp.set("category", category);
+                      if (sort) sp.set("sort", sort);
+                      return sp.toString();
+                    })()}`}
+                    className="ml-1 text-blue-400 hover:text-blue-600"
+                  >
+                    ✕
+                  </Link>
+                </span>
+              )}
+            </div>
+
+            {/* Active filter chips + clear all */}
+            {(q || category || tag || featured) && (
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                <span className="text-xs text-gray-500">当前筛选:</span>
+                {q && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 border border-blue-200 text-blue-700">
+                    搜索: {q}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (category) sp.set("category", category);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-blue-400 hover:text-blue-600"
+                      aria-label="清除搜索"
+                    >✕</Link>
+                  </span>
+                )}
+                {category && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 border border-purple-200 text-purple-700">
+                    分类: {categoriesWithCounts.find((c) => c.key === category)?.name || category}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-purple-400 hover:text-purple-600"
+                      aria-label="清除分类"
+                    >✕</Link>
+                  </span>
+                )}
+                {tag && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 border border-blue-200 text-blue-700">
+                    #{tag}
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (category) sp.set("category", category);
+                        if (sort) sp.set("sort", sort);
+                        if (featured) sp.set("featured", "1");
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-blue-400 hover:text-blue-600"
+                      aria-label="清除标签"
+                    >✕</Link>
+                  </span>
+                )}
+                {featured && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 border border-amber-200 text-amber-700">
+                    仅精华
+                    <Link
+                      href={`/bbs?${(() => {
+                        const sp = new URLSearchParams();
+                        if (q) sp.set("q", q);
+                        if (category) sp.set("category", category);
+                        if (tag) sp.set("tag", tag);
+                        if (sort) sp.set("sort", sort);
+                        return sp.toString();
+                      })()}`}
+                      className="ml-1 text-amber-400 hover:text-amber-600"
+                      aria-label="清除精华筛选"
+                    >✕</Link>
+                  </span>
+                )}
+                <Link
+                  href="/bbs"
+                  className="text-xs text-gray-500 hover:text-red-500 underline"
+                >
+                  清除全部
+                </Link>
+              </div>
+            )}
+
             {/* Posts list */}
             {posts.length > 0 ? (
               <div className="space-y-3">
@@ -389,16 +545,30 @@ export default async function BBSPage({
                   <Mail className="w-8 h-8 text-gray-400" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 mb-2">
-                  {q || category ? "没有找到匹配的帖子" : "暂无帖子"}
+                  {q || category || tag ? "没有找到匹配的帖子" : "暂无帖子"}
                 </h2>
                 <p className="text-sm text-slate-600 mb-5">
-                  {q || category ? "试试其他关键词或分类" : "成为第一个发帖的人吧！"}
+                  {q || category || tag ? "试试调整搜索条件或清除筛选" : "成为第一个发帖的人吧！"}
                 </p>
-                {q || category ? (
-                  <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
-                    返回全部
-                  </Link>
-                ) : isLoggedIn ? (
+                {(q || category || tag) && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+                    <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
+                      清除全部筛选
+                    </Link>
+                    {category && (
+                      <Link href="/bbs" className="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        浏览全部分类
+                      </Link>
+                    )}
+                    {!q && (
+                      <Link href="/bbs?sort=hot" className="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        看看热门
+                      </Link>
+                    )}
+                  </div>
+                )}
+                {!q && !category && !tag && (isLoggedIn ? (
                   <Link href="/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
                     <Plus className="w-4 h-4" />
                     发布第一个帖子
@@ -407,7 +577,7 @@ export default async function BBSPage({
                   <Link href="/login?callbackUrl=/bbs/new" className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand text-white rounded-lg text-sm font-medium">
                     登录后发帖
                   </Link>
-                )}
+                ))}
               </div>
             )}
 
@@ -415,7 +585,7 @@ export default async function BBSPage({
             {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-center gap-2">
                 {page > 1 && (
-                  <Link href={buildPageUrl("/bbs", page - 1, { q, category })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                  <Link href={buildPageUrl("/bbs", page - 1, { q, category, tag, sort, featured })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
                     上一页
                   </Link>
                 )}
@@ -424,7 +594,7 @@ export default async function BBSPage({
                     return (
                       <Link
                         key={p}
-                        href={buildPageUrl("/bbs", p, { q, category })}
+                        href={buildPageUrl("/bbs", p, { q, category, tag, sort, featured })}
                         className={`px-3 py-2 rounded-lg text-sm font-medium ${
                           p === page ? "bg-brand text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                         }`}
@@ -436,7 +606,7 @@ export default async function BBSPage({
                   return null;
                 })}
                 {page < totalPages && (
-                  <Link href={buildPageUrl("/bbs", page + 1, { q, category })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+                  <Link href={buildPageUrl("/bbs", page + 1, { q, category, tag, sort, featured })} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
                     下一页
                   </Link>
                 )}
@@ -481,10 +651,18 @@ export default async function BBSPage({
                     热门标签
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
-                    {hotTags.map(({ tag, count }) => (
-                      <span key={tag} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                        #{tag} <span className="text-slate-500">{count}</span>
-                      </span>
+                    {hotTags.map(({ tag: t, count }) => (
+                      <Link
+                        key={t}
+                        href={`/bbs?tag=${encodeURIComponent(t)}${sort !== "latest" ? `&sort=${sort}` : ""}`}
+                        className={`px-2 py-1 rounded text-xs transition-colors ${
+                          tag === t
+                            ? "bg-brand text-white"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        #{t} <span className="opacity-75">{count}</span>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -536,11 +714,14 @@ export default async function BBSPage({
 function buildPageUrl(
   base: string,
   page: number,
-  params: { q?: string; category?: string }
+  params: { q?: string; category?: string; tag?: string; sort?: string; featured?: boolean }
 ): string {
   const sp = new URLSearchParams();
   sp.set("page", String(page));
   if (params.q) sp.set("q", params.q);
   if (params.category) sp.set("category", params.category);
+  if (params.tag) sp.set("tag", params.tag);
+  if (params.sort) sp.set("sort", params.sort);
+  if (params.featured) sp.set("featured", "1");
   return `${base}?${sp.toString()}`;
 }

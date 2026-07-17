@@ -70,6 +70,21 @@ export async function POST(
       );
     }
 
+    // P4: Anti-spam content risk checks for comments
+    const { runContentRiskChecks } = await import("@/lib/community/anti-spam");
+    const contentRisk = runContentRiskChecks(content, {
+      maxLinks: 3,
+      maxDupes: 2,
+      maxConsecutive: 15,
+      minRatio: 0.2,
+    });
+    if (!contentRisk.ok) {
+      return NextResponse.json(
+        { error: contentRisk.error },
+        { status: 400 }
+      );
+    }
+
     const post = await prisma.forumPost.findUnique({ where: { slug } });
     if (!post) {
       return NextResponse.json({ error: "帖子不存在" }, { status: 404 });
@@ -197,18 +212,34 @@ export async function POST(
     }
 
     // Create notification for post author (if commenter is not the author)
+    // P4: Deduplication — don't create a notification if the same actor already
+    // has an unread reply notification for this post in the last hour.
     if (commentStatus === "published" && post.userId !== session.user.id) {
       try {
-        await prisma.forumNotification.create({
-          data: {
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        const existingNotif = await prisma.forumNotification.findFirst({
+          where: {
             userId: post.userId,
             type: "reply",
             postId: post.id,
-            commentId: comment.id,
             actorId: session.user.id,
-            message: `有新回复了您的帖子「${post.title.slice(0, 30)}」`,
+            isRead: false,
+            createdAt: { gte: oneHourAgo },
           },
+          select: { id: true },
         });
+        if (!existingNotif) {
+          await prisma.forumNotification.create({
+            data: {
+              userId: post.userId,
+              type: "reply",
+              postId: post.id,
+              commentId: comment.id,
+              actorId: session.user.id,
+              message: `有新回复了您的帖子「${post.title.slice(0, 30)}」`,
+            },
+          });
+        }
       } catch (notifError) {
         console.error("[Comment notification error]", notifError);
       }
