@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ChevronLeft, Plus, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -50,6 +51,148 @@ async function getPosts(categoryId: string, params: { q?: string; page?: number 
   }
 }
 
+/**
+ * Suspense fallback skeleton for the category content area.
+ * Shown while CategoryPostList fetches post data.
+ */
+function CategoryContentSkeleton() {
+  return (
+    <>
+      {/* Stats skeleton */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <div className="h-4 w-32 bg-gray-200 rounded animate-pulse" />
+      </div>
+      {/* Post list skeleton */}
+      <div className="space-y-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-xl border border-gray-200 p-4 md:p-5"
+          >
+            <div className="flex items-start gap-2 mb-2">
+              <div className="h-5 flex-1 max-w-md bg-gray-200 rounded animate-pulse" />
+              <div className="h-5 w-12 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="h-4 w-full bg-gray-200 rounded animate-pulse mb-1" />
+            <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse mb-3" />
+            <div className="flex gap-3">
+              <div className="h-3 w-16 bg-gray-200 rounded-full animate-pulse" />
+              <div className="h-3 w-20 bg-gray-200 rounded animate-pulse" />
+              <div className="h-3 w-24 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/**
+ * Async server component for the category post list.
+ * Fetches posts independently so the main page can render
+ * the category header immediately while posts stream in.
+ *
+ * This component is rendered inside a <Suspense> boundary so it
+ * does NOT block the initial HTTP response. If the category doesn't
+ * exist, notFound() is called in the parent page BEFORE this
+ * component is rendered.
+ */
+async function CategoryPostList({
+  categoryId,
+  categoryKey,
+  q,
+  page,
+}: {
+  categoryId: string;
+  categoryKey: string;
+  q: string;
+  page: number;
+}) {
+  const { posts, total, pageSize } = await getPosts(categoryId, { q, page });
+  const totalPages = Math.ceil(total / pageSize);
+
+  return (
+    <>
+      {/* Stats */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-600">
+            共 <strong className="text-gray-900">{total}</strong> 个帖子
+          </span>
+          <Link
+            href="/bbs"
+            className="inline-flex items-center gap-1 text-brand hover:text-brand-dark transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            返回论坛首页
+          </Link>
+        </div>
+      </div>
+
+      {/* Posts list */}
+      {posts.length > 0 ? (
+        <div className="space-y-3">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={{
+                ...post,
+                createdAt: post.createdAt,
+              }}
+            />
+          ))}
+        </div>
+      ) : q ? (
+        <ForumEmptyState variant="no-search-results" searchQuery={q} categoryKey={categoryKey} />
+      ) : (
+        <ForumEmptyState variant="no-posts" isLoggedIn={false} />
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex items-center justify-center gap-2">
+          {page > 1 && (
+            <Link
+              href={buildPageUrl(`/bbs/category/${categoryKey}`, page - 1, { q })}
+              className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+            >
+              上一页
+            </Link>
+          )}
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
+            if (totalPages <= 7 || p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
+              return (
+                <Link
+                  key={p}
+                  href={buildPageUrl(`/bbs/category/${categoryKey}`, p, { q })}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors ${
+                    p === page
+                      ? "bg-brand text-white"
+                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {p}
+                </Link>
+              );
+            }
+            return null;
+          })}
+
+          {page < totalPages && (
+            <Link
+              href={buildPageUrl(`/bbs/category/${categoryKey}`, page + 1, { q })}
+              className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+            >
+              下一页
+            </Link>
+          )}
+        </div>
+      )}
+    </>
+  );
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -92,10 +235,8 @@ export default async function CategoryPage({
     notFound();
   }
 
-  const { posts, total, pageSize } = await getPosts(category.id, { q, page });
   const session = await auth();
   const isLoggedIn = !!session?.user;
-  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <JueshiV4PublicShell>
@@ -173,82 +314,17 @@ export default async function CategoryPage({
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">
-                共 <strong className="text-gray-900">{total}</strong> 个帖子
-              </span>
-              <Link
-                href="/bbs"
-                className="inline-flex items-center gap-1 text-brand hover:text-brand-dark transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                返回论坛首页
-              </Link>
-            </div>
-          </div>
-
-          {/* Posts list */}
-          {posts.length > 0 ? (
-            <div className="space-y-3">
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  post={{
-                    ...post,
-                    createdAt: post.createdAt,
-                  }}
-                />
-              ))}
-            </div>
-          ) : q ? (
-            <ForumEmptyState variant="no-search-results" searchQuery={q} categoryKey={key} />
-          ) : (
-            <ForumEmptyState variant="no-posts" isLoggedIn={isLoggedIn} />
-          )}
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-6 flex items-center justify-center gap-2">
-              {page > 1 && (
-                <Link
-                  href={buildPageUrl(`/bbs/category/${key}`, page - 1, { q })}
-                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                >
-                  上一页
-                </Link>
-              )}
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
-                if (totalPages <= 7 || p === 1 || p === totalPages || Math.abs(p - page) <= 1) {
-                  return (
-                    <Link
-                      key={p}
-                      href={buildPageUrl(`/bbs/category/${key}`, p, { q })}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors ${
-                        p === page
-                          ? "bg-brand text-white"
-                          : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      {p}
-                    </Link>
-                  );
-                }
-                return null;
-              })}
-
-              {page < totalPages && (
-                <Link
-                  href={buildPageUrl(`/bbs/category/${key}`, page + 1, { q })}
-                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                >
-                  下一页
-                </Link>
-              )}
-            </div>
-          )}
+          {/* Stats + Posts list + Pagination - streamed via Suspense
+              to preserve loading UX without route-level loading.tsx
+              that would cause soft 404 */}
+          <Suspense fallback={<CategoryContentSkeleton />}>
+            <CategoryPostList
+              categoryId={category.id}
+              categoryKey={key}
+              q={q}
+              page={page}
+            />
+          </Suspense>
         </div>
       </div>
     </JueshiV4PublicShell>

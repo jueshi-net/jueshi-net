@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import {
   Eye,
   MessageSquare,
@@ -115,6 +116,146 @@ async function incrementViewCount(slug: string) {
   }
 }
 
+/**
+ * Suspense fallback skeleton for the comments section.
+ * Shown while PostCommentsSection fetches comment data.
+ */
+function CommentsSkeleton() {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+        <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
+      </div>
+      <div className="space-y-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="flex gap-3 pb-3 border-b border-gray-50">
+            <div className="shrink-0 w-8" />
+            <div className="shrink-0 w-9 h-9 bg-gray-200 rounded-full animate-pulse" />
+            <div className="flex-1">
+              <div className="h-4 w-28 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-full bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 w-2/3 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Async server component for the comments section.
+ * Fetches comments independently so the main page can render
+ * the post content immediately while comments stream in.
+ *
+ * This component is rendered inside a <Suspense> boundary so it
+ * does NOT block the initial HTTP response. If the post doesn't
+ * exist, notFound() is called in the parent page BEFORE this
+ * component is rendered.
+ */
+async function PostCommentsSection({
+  slug,
+  postId,
+  isLocked,
+  isLoggedIn,
+}: {
+  slug: string;
+  postId: string;
+  isLocked: boolean;
+  isLoggedIn: boolean;
+}) {
+  const { comments } = await getComments(slug);
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <MessageSquare className="w-5 h-5 text-brand" />
+        <h2 className="text-lg font-bold text-slate-900">
+          回复 ({comments.length})
+        </h2>
+      </div>
+
+      {/* Locked notice */}
+      {isLocked && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-4 text-center">
+          <Lock className="w-5 h-5 text-amber-500 mx-auto mb-1" />
+          <p className="text-sm font-semibold text-slate-700">
+            该帖已锁定，不能继续评论
+          </p>
+        </div>
+      )}
+
+      {/* Floor-style comments */}
+      {comments.length > 0 ? (
+        <div className="space-y-3">
+          {comments.map((comment, index) => (
+            <div
+              key={comment.id}
+              className="flex gap-3 pb-3 border-b border-gray-50 last:border-0"
+            >
+              {/* Floor number */}
+              <div className="shrink-0 w-8 text-right">
+                <span className="text-xs font-bold text-slate-500">
+                  #{index + 2}
+                </span>
+              </div>
+              {/* Avatar */}
+              <div className="shrink-0">
+                <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand">
+                  {(
+                    comment.user.name || comment.user.email
+                  )[0].toUpperCase()}
+                </div>
+              </div>
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-medium text-slate-700">
+                    {comment.user.name ||
+                      maskEmail(comment.user.email)}
+                  </span>
+                  {comment.user.honorScore ? (
+                    <span className="text-xs text-amber-500 inline-flex items-center gap-0.5">
+                      <Award className="w-3 h-3" />
+                      {comment.user.honorScore}
+                    </span>
+                  ) : null}
+                  <time className="text-xs text-slate-500 ml-auto">
+                    {formatDateTime(comment.createdAt)}
+                  </time>
+                </div>
+                <div className="whitespace-pre-wrap break-words text-sm text-slate-700 leading-relaxed">
+                  {comment.content}
+                </div>
+                <div className="flex gap-3 mt-1.5">
+                  <button className="text-xs text-slate-500 hover:text-brand transition-colors inline-flex items-center gap-0.5">
+                    <MessageSquare className="w-3 h-3" /> 赞
+                  </button>
+                  <button className="text-xs text-slate-500 hover:text-red-500 transition-colors inline-flex items-center gap-0.5">
+                    <Shield className="w-3 h-3" /> 举报
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : !isLocked ? (
+        <ForumEmptyState variant="no-comments" />
+      ) : null}
+
+      {/* Reply form */}
+      <CommentSection
+        postId={postId}
+        slug={slug}
+        initialComments={[]}
+        isLocked={isLocked}
+        isLoggedIn={isLoggedIn}
+      />
+    </div>
+  );
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -161,10 +302,10 @@ export default async function PostDetailPage({
   }
 
   // Secondary queries only run if post exists.
-  const [{ comments, isLocked }, likeCount] = await Promise.all([
-    getComments(slug),
-    getLikeCount(slug),
-  ]);
+  // getLikeCount is needed for PostDetailActions in the main render.
+  // Comments are fetched inside a Suspense boundary to allow streaming
+  // without blocking the initial response (and without route-level loading.tsx).
+  const likeCount = await getLikeCount(slug);
 
   await incrementViewCount(slug);
 
@@ -325,92 +466,16 @@ export default async function PostDetailPage({
                 />
               </div>
 
-              {/* Reply floors */}
-              <div className="bg-white rounded-xl border border-slate-200 p-5 md:p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <MessageSquare className="w-5 h-5 text-brand" />
-                  <h2 className="text-lg font-bold text-slate-900">
-                    回复 ({comments.length})
-                  </h2>
-                </div>
-
-                {/* Locked notice */}
-                {isLocked && (
-                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 mb-4 text-center">
-                    <Lock className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-                    <p className="text-sm font-semibold text-slate-700">
-                      该帖已锁定，不能继续评论
-                    </p>
-                  </div>
-                )}
-
-                {/* Floor-style comments */}
-                {comments.length > 0 ? (
-                  <div className="space-y-3">
-                    {comments.map((comment, index) => (
-                      <div
-                        key={comment.id}
-                        className="flex gap-3 pb-3 border-b border-gray-50 last:border-0"
-                      >
-                        {/* Floor number */}
-                        <div className="shrink-0 w-8 text-right">
-                          <span className="text-xs font-bold text-slate-500">
-                            #{index + 2}
-                          </span>
-                        </div>
-                        {/* Avatar */}
-                        <div className="shrink-0">
-                          <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand">
-                            {(
-                              comment.user.name || comment.user.email
-                            )[0].toUpperCase()}
-                          </div>
-                        </div>
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-slate-700">
-                              {comment.user.name ||
-                                maskEmail(comment.user.email)}
-                            </span>
-                            {comment.user.honorScore ? (
-                              <span className="text-xs text-amber-500 inline-flex items-center gap-0.5">
-                                <Award className="w-3 h-3" />
-                                {comment.user.honorScore}
-                              </span>
-                            ) : null}
-                            <time className="text-xs text-slate-500 ml-auto">
-                              {formatDateTime(comment.createdAt)}
-                            </time>
-                          </div>
-                          <div className="whitespace-pre-wrap break-words text-sm text-slate-700 leading-relaxed">
-                            {comment.content}
-                          </div>
-                          <div className="flex gap-3 mt-1.5">
-                            <button className="text-xs text-slate-500 hover:text-brand transition-colors inline-flex items-center gap-0.5">
-                              <MessageSquare className="w-3 h-3" /> 赞
-                            </button>
-                            <button className="text-xs text-slate-500 hover:text-red-500 transition-colors inline-flex items-center gap-0.5">
-                              <Shield className="w-3 h-3" /> 举报
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : !isLocked ? (
-                  <ForumEmptyState variant="no-comments" />
-                ) : null}
-
-                {/* Reply form */}
-                <CommentSection
+              {/* Reply floors - streamed via Suspense to preserve loading UX
+                  without route-level loading.tsx that would cause soft 404 */}
+              <Suspense fallback={<CommentsSkeleton />}>
+                <PostCommentsSection
+                  slug={slug}
                   postId={post.id}
-                  slug={post.slug}
-                  initialComments={[]}
-                  isLocked={isLocked}
+                  isLocked={post.isLocked}
                   isLoggedIn={isLoggedIn}
                 />
-              </div>
+              </Suspense>
 
               {/* Bottom navigation */}
               <div className="flex flex-wrap gap-2 mt-4">
@@ -540,7 +605,7 @@ export default async function PostDetailPage({
                         <MessageSquare className="w-3.5 h-3.5" /> 回复
                       </span>
                       <span className="font-medium text-slate-700">
-                        {comments.length}
+                        {post._count.comments}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
