@@ -18,9 +18,23 @@ import { analyzeAndPlanLocal, modifyPlanLocal, LocalHermesRunResult } from './lo
 // Configuration
 // ============================================================================
 
+// Read bot token from macOS Keychain (plaintext-free storage).
+// Falls back to env var for backwards compatibility.
+function readBotTokenFromKeychain(): string | undefined {
+  try {
+    const token = execSync(
+      'security find-generic-password -s jueshi-contentops-telegram -a fabuxia_bot -w',
+      { encoding: 'utf-8' }
+    ).trim();
+    return token || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const CONFIG = {
   enabled: process.env.CONTENTOPS_BOT_ENABLED === 'true',
-  botToken: process.env.CONTENTOPS_TELEGRAM_BOT_TOKEN,
+  botToken: process.env.CONTENTOPS_TELEGRAM_BOT_TOKEN || readBotTokenFromKeychain(),
   allowProduction: process.env.CONTENTOPS_DRAFT_ALLOW_PRODUCTION === 'true',
   allowedChatIds: (process.env.CONTENTOPS_TELEGRAM_ALLOWED_CHAT_IDS || '').split(',').filter(Boolean),
   publicationAllowed: process.env.CONTENTOPS_PUBLICATION_ALLOWED === 'true',

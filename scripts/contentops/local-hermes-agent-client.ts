@@ -21,7 +21,7 @@ const execAsync = promisify(exec);
 const LOCAL_HERMES_CONFIG = {
   enabled: process.env.LOCAL_HERMES_ENABLED === 'true',
   hermesPath: process.env.LOCAL_HERMES_PATH || 'hermes',
-  timeoutMs: 180000, // 3 minutes for complex content generation
+  timeoutMs: 300000, // 5 minutes for complex content generation/modification
   maxTurns: 1,
 };
 
