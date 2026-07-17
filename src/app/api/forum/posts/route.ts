@@ -40,23 +40,49 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const category = url.searchParams.get("category") || undefined;
   const q = url.searchParams.get("q") || undefined;
+  const tag = url.searchParams.get("tag") || undefined;
+  const sort = url.searchParams.get("sort") || "latest";
+  const featured = url.searchParams.get("featured") === "1" || url.searchParams.get("featured") === "true";
   const page = Math.max(1, parseInt(url.searchParams.get("page") || "1", 10));
   const pageSize = Math.min(
     50,
     Math.max(1, parseInt(url.searchParams.get("pageSize") || "20", 10))
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { status: "published" };
   if (category) where.category = { key: category };
-  if (q) where.title = { contains: q, mode: "insensitive" };
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { content: { contains: q, mode: "insensitive" } },
+    ];
+  }
+  if (tag) where.tags = { has: tag };
+  if (featured) where.isFeatured = true;
+
+  // Determine sort order
+  let orderBy: any[];
+  switch (sort) {
+    case "hot":
+      orderBy = [{ isPinned: "desc" }, { viewCount: "desc" }];
+      break;
+    case "replies":
+      orderBy = [{ isPinned: "desc" }, { commentCount: "desc" }];
+      break;
+    case "featured":
+      orderBy = [{ isFeatured: "desc" }, { createdAt: "desc" }];
+      break;
+    case "latest":
+    default:
+      orderBy = [{ isPinned: "desc" }, { createdAt: "desc" }];
+      break;
+  }
 
   const [posts, total] = await Promise.all([
     prisma.forumPost.findMany({
       where,
-      orderBy: [
-        { isPinned: "desc" },
-        { createdAt: "desc" },
-      ],
+      orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {

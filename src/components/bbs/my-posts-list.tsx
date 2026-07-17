@@ -241,7 +241,12 @@ export function MyPostsList({
                     {post.title}
                   </Link>
                 ) : (
-                  post.title
+                  <Link
+                    href={`/bbs/my-posts/${post.slug}`}
+                    className="hover:text-brand"
+                  >
+                    {post.title}
+                  </Link>
                 )}
               </h3>
 
@@ -300,6 +305,17 @@ export function MyPostsList({
                   >
                     <Edit className="w-3.5 h-3.5" />
                     {post.status === "rejected" ? "修改并重新提交" : "编辑"}
+                  </Link>
+                )}
+
+                {/* Preview - for non-published */}
+                {(post.status === "pending" || post.status === "rejected") && (
+                  <Link
+                    href={`/bbs/my-posts/${post.slug}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-100"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    预览
                   </Link>
                 )}
 

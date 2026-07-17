@@ -461,11 +461,11 @@ export function ModerationQueue({
                   )}
                 </button>
                 <Link
-                  href={`/bbs/${post.slug}`}
+                  href={`/bbs/admin/review/${post.id}`}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium hover:bg-blue-100"
                 >
                   <Eye className="w-3.5 h-3.5" />
-                  查看
+                  审核
                 </Link>
                 {/* Admin moderation actions */}
                 {post.status === "published" && (
