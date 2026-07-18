@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Plus, Search, FileText, Tag, Clock, MessageCircle, TrendingUp, Award, BookOpen, Wrench, Lightbulb, Package, Ship, Mail, Medal, CheckCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { buildTitle, buildCanonical } from "@/lib/seo";
+import { buildTitle, buildCanonical, SITE_URL } from "@/lib/seo";
 import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
 import { CommunityOnboarding } from "@/components/bbs/community-onboarding";
@@ -17,7 +17,13 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: buildTitle("社区"),
   description: "交流海外生活、工具经验、物流问题的社区",
-  alternates: { canonical: buildCanonical("/bbs") },
+  alternates: {
+    canonical: buildCanonical("/bbs"),
+    types: {
+      "application/rss+xml": `${SITE_URL}/bbs/feed.xml`,
+      "application/atom+xml": `${SITE_URL}/bbs/feed.atom`,
+    },
+  },
   openGraph: {
     title: buildTitle("社区"),
     description: "交流海外生活、工具经验、物流问题的社区",

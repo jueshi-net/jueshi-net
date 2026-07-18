@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { buildTitle, buildCanonical } from "@/lib/seo";
+import { buildTitle, buildCanonical, SITE_URL, SITE_NAME } from "@/lib/seo";
 import { formatDateTime } from "@/lib/utils";
 import { PostContent } from "@/components/bbs/post-content";
 import { CategoryBadge } from "@/components/bbs/category-badge";
@@ -29,6 +29,7 @@ import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import { PostDetailActions } from "@/components/community/post-detail-actions";
 import { RelatedPosts } from "@/components/bbs/related-posts";
+import { ShareButtons } from "@/components/bbs/share-buttons";
 import { PostTimeline } from "@/components/bbs/post-timeline";
 import { maskEmail, formatJoinDate } from "@/lib/community/utils";
 import { ForumEmptyState } from "@/components/community/forum-empty-state";
@@ -278,15 +279,38 @@ export async function generateMetadata({
     notFound();
   }
 
+  const description = post.excerpt || post.content.slice(0, 150);
+  const canonical = buildCanonical(`/bbs/${slug}`);
+  const tags = Array.isArray(post.tags) ? (post.tags as string[]) : [];
+  const authorName = post.user.name || "匿名用户";
+
   return {
     title: buildTitle(post.title),
-    description: post.excerpt || post.content.slice(0, 150),
-    alternates: { canonical: buildCanonical(`/bbs/${slug}`) },
+    description,
+    alternates: {
+      canonical,
+      types: {
+        "application/rss+xml": `${SITE_URL}/bbs/feed.xml`,
+        "application/atom+xml": `${SITE_URL}/bbs/feed.atom`,
+      },
+    },
     openGraph: {
-      title: buildTitle(post.title),
-      description: post.excerpt || post.content.slice(0, 150),
-      url: buildCanonical(`/bbs/${slug}`),
+      title: post.title,
+      description,
+      url: canonical,
       type: "article",
+      siteName: SITE_NAME,
+      locale: "zh_CN",
+      publishedTime: post.createdAt.toISOString(),
+      modifiedTime: post.updatedAt.toISOString(),
+      authors: [authorName],
+      section: post.category.name,
+      tags: tags.length > 0 ? tags : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title.slice(0, 70),
+      description: description.slice(0, 200),
     },
   };
 }
@@ -517,6 +541,18 @@ export default async function PostDetailPage({
                   isLoggedIn={isLoggedIn}
                   isAuthor={isAuthor}
                 />
+
+                {/* Share buttons - only for published posts */}
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400 shrink-0">分享：</span>
+                    <ShareButtons
+                      url={buildCanonical(`/bbs/${post.slug}`)}
+                      title={post.title}
+                      description={post.excerpt || post.content.slice(0, 150)}
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Reply floors - streamed via Suspense to preserve loading UX
