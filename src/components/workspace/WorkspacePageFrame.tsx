@@ -22,25 +22,23 @@ export default function WorkspacePageFrame({
     );
   }
 
-  // Both rails: three-column on xl+, two-column on lg (left rail hidden), single on mobile
+  // Both rails: three-column layout
   if (leftRail && rightRail) {
     return (
-      <div className="pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_280px] xl:grid-cols-[260px_minmax(0,1fr)_280px] gap-4">
-          {/* Left rail: hidden on mobile, visible on lg+ */}
-          <div className="hidden lg:block">
-            {leftRail}
-          </div>
-          
-          {/* Main content */}
-          <main className="min-w-0">
-            {children}
-          </main>
-          
-          {/* Right rail: hidden on mobile, visible on lg+ */}
-          <div className="hidden lg:block">
-            {rightRail}
-          </div>
+      <div className="flex gap-4 pb-8">
+        {/* Left rail: 240px, hidden on mobile */}
+        <div className="hidden xl:block w-[240px] flex-shrink-0">
+          {leftRail}
+        </div>
+        
+        {/* Main content: flexible */}
+        <main className="flex-1 min-w-0">
+          {children}
+        </main>
+        
+        {/* Right rail: 260px, hidden on mobile */}
+        <div className="hidden lg:block w-[260px] flex-shrink-0">
+          {rightRail}
         </div>
       </div>
     );
@@ -49,11 +47,11 @@ export default function WorkspacePageFrame({
   // Only right rail: two-column
   if (rightRail) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4 pb-8">
-        <main className="min-w-0">
+      <div className="flex gap-4 pb-8">
+        <main className="flex-1 min-w-0">
           {children}
         </main>
-        <div className="hidden lg:block">
+        <div className="hidden lg:block w-[260px] flex-shrink-0">
           {rightRail}
         </div>
       </div>
@@ -62,11 +60,11 @@ export default function WorkspacePageFrame({
 
   // Only left rail
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-4 pb-8">
-      <div className="hidden lg:block">
+    <div className="flex gap-4 pb-8">
+      <div className="hidden xl:block w-[240px] flex-shrink-0">
         {leftRail}
       </div>
-      <main className="min-w-0">
+      <main className="flex-1 min-w-0">
         {children}
       </main>
     </div>
