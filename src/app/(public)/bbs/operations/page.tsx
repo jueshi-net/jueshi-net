@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { buildTitle } from "@/lib/seo";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
+import { CommunityHealthMetrics } from "@/components/bbs/community-health-metrics";
+import { ModerationGuidance } from "@/components/bbs/moderation-guidance";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -16,6 +18,11 @@ import {
   ThumbsUp,
   AlertTriangle,
   BarChart3,
+  LayoutDashboard,
+  Download,
+  ListFilter,
+  UserCog,
+  HelpCircle,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -286,6 +293,58 @@ export default async function OperationsDashboardPage() {
                 <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Quick links - Admin Workbench Consolidation */}
+          <div className="mt-6">
+            <h2 className="text-sm font-bold text-gray-900 mb-3 inline-flex items-center gap-1.5">
+              <LayoutDashboard className="w-4 h-4 text-brand" />
+              管理工作台
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <Link
+                href="/bbs/admin?status=pending"
+                className="bg-white rounded-xl border border-gray-200 p-3 hover:border-brand/30 hover:shadow-sm transition-all"
+              >
+                <Shield className="w-5 h-5 text-amber-600 mb-2" />
+                <p className="text-sm font-medium text-gray-900">审核管理</p>
+                <p className="text-xs text-gray-500">待审核、驳回、隐藏</p>
+              </Link>
+              <Link
+                href="/bbs/admin/reports"
+                className="bg-white rounded-xl border border-gray-200 p-3 hover:border-brand/30 hover:shadow-sm transition-all"
+              >
+                <Flag className="w-5 h-5 text-red-600 mb-2" />
+                <p className="text-sm font-medium text-gray-900">举报处理</p>
+                <p className="text-xs text-gray-500">用户举报队列</p>
+              </Link>
+              <a
+                href="/api/forum/admin/filtered?status=all&pageSize=20"
+                className="bg-white rounded-xl border border-gray-200 p-3 hover:border-brand/30 hover:shadow-sm transition-all"
+              >
+                <ListFilter className="w-5 h-5 text-blue-600 mb-2" />
+                <p className="text-sm font-medium text-gray-900">筛选搜索</p>
+                <p className="text-xs text-gray-500">多条件筛选帖子</p>
+              </a>
+              <a
+                href="/api/forum/admin/export?status=all"
+                className="bg-white rounded-xl border border-gray-200 p-3 hover:border-brand/30 hover:shadow-sm transition-all"
+              >
+                <Download className="w-5 h-5 text-green-600 mb-2" />
+                <p className="text-sm font-medium text-gray-900">CSV 导出</p>
+                <p className="text-xs text-gray-500">导出帖子数据</p>
+              </a>
+            </div>
+          </div>
+
+          {/* Community Health Metrics */}
+          <div className="mt-6">
+            <CommunityHealthMetrics />
+          </div>
+
+          {/* Moderation Guidance */}
+          <div className="mt-6">
+            <ModerationGuidance />
           </div>
 
           {/* Quick links */}

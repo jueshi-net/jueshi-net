@@ -6,6 +6,7 @@ import Link from "next/link";
 import { BaseButton } from "@/components/ui/base-button";
 import { X, Plus, Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { BbsComposer } from "@/components/bbs/bbs-composer";
+import { PostQualityAssistant } from "@/components/bbs/post-quality-assistant";
 
 type ForumCategory = {
   id: string;
@@ -450,6 +451,9 @@ export default function PostForm({ categories, initialTitle = "", initialContent
           </p>
         </div>
       )}
+
+      {/* Post Quality Assistant */}
+      <PostQualityAssistant title={title} content={content} tagCount={tags.length} categoryId={categoryId} />
 
       {/* Auto-save status indicator (draft mode only) */}
       {isDraftMode && saveStatus !== "idle" && (
