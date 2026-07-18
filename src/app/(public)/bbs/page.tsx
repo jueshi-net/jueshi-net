@@ -7,6 +7,7 @@ import { buildTitle, buildCanonical } from "@/lib/seo";
 import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
 import { CommunityOnboarding } from "@/components/bbs/community-onboarding";
+import { TrendingSidebar } from "@/components/bbs/trending-sidebar";
 import { formatDateTime } from "@/lib/utils";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
@@ -693,6 +694,9 @@ export default async function BBSPage({
                   </div>
                 </div>
               )}
+
+              {/* Trending sidebar - recommendations and rankings */}
+              <TrendingSidebar />
 
               {/* Related tools */}
               <div className="bg-white rounded-xl border border-gray-200 p-4">
