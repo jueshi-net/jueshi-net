@@ -11,11 +11,8 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  try {
-    await requireAdmin();
-  } catch {
-    return NextResponse.json({ error: "未授权" }, { status: 401 });
-  }
+  const guard = await requireAdmin();
+  if (guard instanceof NextResponse) return guard;
 
   const { searchParams } = new URL(request.url);
   const checkBrokenLinks = searchParams.get("brokenLinks") === "1";

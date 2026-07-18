@@ -5,7 +5,7 @@ import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import { ModerationQueue } from "@/components/bbs/moderation-queue";
 import type { Metadata } from "next";
-import { Shield, AlertTriangle, BarChart3 } from "lucide-react";
+import { Shield, AlertTriangle, BarChart3, ScanSearch } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -174,6 +174,13 @@ export default async function AdminModerationPage({ searchParams }: PageProps) {
               </h1>
             </div>
             <div className="flex gap-2">
+              <Link
+                href="/bbs/admin/content-quality"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <ScanSearch className="w-4 h-4" />
+                <span className="hidden sm:inline">内容质量巡检</span>
+              </Link>
               <Link
                 href="/bbs/operations"
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
