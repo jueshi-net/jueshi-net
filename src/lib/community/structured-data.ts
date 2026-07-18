@@ -81,20 +81,63 @@ export function buildPostJsonLd(post: StructuredDataPost) {
 /**
  * Build BreadcrumbList JSON-LD from breadcrumb items.
  */
-export function buildBreadcrumbJsonLd(
-  items: { title: string; href?: string }[]
-) {
-  const baseUrl = buildCanonical("");
-
+export function buildBreadcrumbJsonLd(items: { title: string; href?: string; current?: boolean }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: items.map((item, index) => ({
+    itemListElement: items.map((item, i) => ({
       "@type": "ListItem",
-      position: index + 1,
+      position: i + 1,
       name: item.title,
-      ...(item.href ? { item: `${baseUrl}${item.href}` } : {}),
+      ...(item.href ? { item: buildCanonical(item.href) } : {}),
     })),
+  };
+}
+
+/**
+ * Build ItemList JSON-LD for a list of published posts (e.g., category page).
+ */
+export function buildItemListJsonLd(params: {
+  posts: { slug: string; title: string; createdAt: Date }[];
+  categoryName: string;
+  categoryKey: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${params.categoryName} - 绝世百宝箱`,
+    itemListElement: params.posts.map((post, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: buildCanonical(`/bbs/${post.slug}`),
+      name: post.title,
+    })),
+  };
+}
+
+/**
+ * Build ProfilePage JSON-LD for a user's public profile.
+ */
+export function buildProfilePageJsonLd(params: {
+  userId: string;
+  name: string | null;
+  email: string;
+  honorScore: number;
+  joinedAt: Date;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name: params.name || "匿名用户",
+      identifier: params.userId,
+      description: `绝世百宝箱社区用户，荣誉值 ${params.honorScore}`,
+      memberOf: {
+        "@type": "Organization",
+        name: "绝世百宝箱",
+      },
+    },
   };
 }
 

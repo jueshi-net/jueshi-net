@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ChevronLeft, Plus, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { buildTitle, buildCanonical } from "@/lib/seo";
+import { buildTitle, buildCanonical, SITE_URL } from "@/lib/seo";
 import { PostCard } from "@/components/bbs/post-card";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
@@ -208,7 +208,13 @@ export async function generateMetadata({
   return {
     title: buildTitle(category.name),
     description: category.description || `${category.name} 分类下的帖子`,
-    alternates: { canonical: buildCanonical(`/bbs/category/${key}`) },
+    alternates: {
+      canonical: buildCanonical(`/bbs/category/${key}`),
+      types: {
+        "application/rss+xml": `${SITE_URL}/bbs/category/${key}/feed.xml`,
+        "application/atom+xml": `${SITE_URL}/bbs/category/${key}/feed.atom`,
+      },
+    },
     openGraph: {
       title: buildTitle(category.name),
       description: category.description || `${category.name} 分类下的帖子`,
@@ -266,6 +272,29 @@ export default async function CategoryPage({
                     {category.description}
                   </p>
                 )}
+                {/* RSS/Atom feed links */}
+                <div className="mt-2 flex items-center gap-3">
+                  <a
+                    href={`/bbs/category/${key}/feed.xml`}
+                    className="inline-flex items-center gap-1 text-xs text-orange-600 hover:text-orange-700 hover:underline"
+                    aria-label={`${category.name} RSS 订阅`}
+                  >
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+                    </svg>
+                    RSS
+                  </a>
+                  <a
+                    href={`/bbs/category/${key}/feed.atom`}
+                    className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 hover:underline"
+                    aria-label={`${category.name} Atom 订阅`}
+                  >
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+                    </svg>
+                    Atom
+                  </a>
+                </div>
               </div>
             </div>
           </div>
