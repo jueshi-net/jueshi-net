@@ -29,6 +29,7 @@ import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import { PostDetailActions } from "@/components/community/post-detail-actions";
 import { RelatedPosts } from "@/components/bbs/related-posts";
+import { PostTimeline } from "@/components/bbs/post-timeline";
 import { maskEmail, formatJoinDate } from "@/lib/community/utils";
 import { ForumEmptyState } from "@/components/community/forum-empty-state";
 import {
@@ -745,6 +746,9 @@ export default async function PostDetailPage({
                     </div>
                   </div>
                 )}
+
+                {/* Content Status Timeline */}
+                <PostTimeline slug={slug} canView={isAdmin || post?.userId === session?.user?.id} />
 
                 {/* Related tools */}
                 <div className="bg-white rounded-xl border border-slate-200 p-4">

@@ -127,6 +127,22 @@ export default async function NewPostPage({
                   </ul>
                 </div>
 
+                {/* Community Rules Link */}
+                <div className="bg-blue-50 rounded-xl border border-blue-100 p-3">
+                  <p className="text-xs font-medium text-blue-700 mb-1">
+                    社区规则
+                  </p>
+                  <p className="text-xs text-blue-600 mb-2">
+                    发帖前请阅读社区规则，了解发帖规范、禁止内容和外链政策。
+                  </p>
+                  <Link
+                    href="/bbs/rules"
+                    className="text-xs text-brand font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    查看完整社区规则 →
+                  </Link>
+                </div>
+
                 <div className="bg-white border border-gray-200 rounded-xl p-4">
                   <h3 className="text-sm font-bold text-gray-900 mb-2 inline-flex items-center gap-1.5">
                     <MessageCircle className="w-4 h-4 text-brand" />

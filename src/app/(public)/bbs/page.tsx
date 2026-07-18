@@ -302,13 +302,13 @@ export default async function BBSPage({
 
                   <div className="bg-white rounded-xl border border-gray-200 p-4">
                     <h3 className="text-sm font-bold text-slate-900 mb-2">社区规则</h3>
-                    <ul className="space-y-1.5 text-xs text-slate-600">
-                      <li>• 禁止广告、灰产、引战</li>
-                      <li>• 新帖需审核后展示</li>
-                      <li>• 尊重他人，理性讨论</li>
-                      <li>• 转载请注明出处</li>
+                    <ul className="space-y-1 text-xs text-slate-500">
+                      <li>• 禁止广告/垃圾内容</li>
+                      <li>• 尊重他人，文明发言</li>
+                      <li>• 外链不超过 5 个/帖</li>
+                      <li>• 举报前请阅读规则</li>
                     </ul>
-                    <Link href="/bbs" className="text-xs text-brand hover:underline mt-2 inline-block">
+                    <Link href="/bbs/rules" className="text-xs text-brand hover:underline mt-2 inline-block">
                       查看完整规则 →
                     </Link>
                   </div>
