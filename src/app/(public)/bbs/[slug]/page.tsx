@@ -545,7 +545,7 @@ export default async function PostDetailPage({
                 {/* Share buttons - only for published posts */}
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400 shrink-0">分享：</span>
+                    <span className="text-xs text-slate-500 shrink-0">分享：</span>
                     <ShareButtons
                       url={buildCanonical(`/bbs/${post.slug}`)}
                       title={post.title}

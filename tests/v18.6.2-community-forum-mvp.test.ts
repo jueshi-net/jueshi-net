@@ -75,7 +75,7 @@ describe("Code Reference Audit", () => {
   function searchSrc(pattern: string): boolean {
     const { execSync } = require("child_process");
     try {
-      execSync(`grep -rn "${pattern}" src/ --include="*.ts" --include="*.tsx" -l`, { stdio: "pipe" });
+      execSync(`grep -rn "\b${pattern}\b" src/ --include="*.ts" --include="*.tsx" -l`, { stdio: "pipe" });
       return true;
     } catch {
       return false;

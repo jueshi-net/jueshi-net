@@ -6,6 +6,7 @@ import {
   generateFeedETag,
   getFeedLastModified,
 } from "@/lib/community/feed";
+import { trackForumFeedView } from "@/lib/community/analytics-events";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,9 @@ export async function GET(_req: NextRequest) {
     }
 
     const xml = generateAtomFeed(posts, {});
+
+    // Track feed view (non-blocking)
+    trackForumFeedView({ feedType: "atom", path: "/bbs/feed.atom" }).catch(() => {});
 
     return new Response(xml, {
       headers: {

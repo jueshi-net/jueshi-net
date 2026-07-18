@@ -9,15 +9,17 @@
  * 4. Postal helper functionality
  */
 
+import { describe, it, expect } from 'vitest';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const dbUrl = process.env.DATABASE_URL;
 if (!dbUrl) {
-  console.error('DATABASE_URL is not set');
-  process.exit(2);
-}
-
+  // Script-style integration test - skip gracefully when no database available
+  describe.skip('v18.3.2 Regression Tests (requires DATABASE_URL)', () => {
+    it('skipped - no DATABASE_URL', () => {});
+  });
+} else {
 const adapter = new PrismaPg({ connectionString: dbUrl });
 const prisma = new PrismaClient({ adapter });
 
@@ -351,16 +353,18 @@ async function main() {
 
   if (failed > 0) {
     console.log('❌ TESTS FAILED\n');
-    process.exit(1);
+    throw new Error(`${failed} tests failed`);
   } else {
     console.log('✅ ALL TESTS PASSED\n');
-    process.exit(0);
   }
 }
 
-main()
-  .catch((err) => {
-    console.error('Fatal error:', err);
-    process.exit(2);
-  })
-  .finally(() => prisma.$disconnect());
+// Wrap in vitest test when loaded by vitest, run directly when executed via tsx
+describe('v18.3.2 Regression Tests', () => {
+  it('should pass all integration tests', async () => {
+    await main();
+  });
+});
+
+// Close the else block from the DATABASE_URL guard above
+}

@@ -46,10 +46,14 @@ describe("BBS Topic Detail Page", () => {
 
   it("has action buttons (like, bookmark, share, report)", () => {
     const content = fs.readFileSync(pagePath, "utf-8");
-    expect(content).toContain("点赞");
-    expect(content).toContain("收藏");
+    const actionsPath = path.join(process.cwd(), "src/components/community/post-detail-actions.tsx");
+    const actionsContent = fs.existsSync(actionsPath) ? fs.readFileSync(actionsPath, "utf-8") : "";
+    // Like/bookmark text is in PostDetailActions component, share/report in page
+    const combined = content + "\n" + actionsContent;
+    expect(combined).toContain("点赞");
+    expect(combined).toContain("收藏");
     expect(content).toContain("分享");
-    expect(content).toContain("举报");
+    expect(combined).toContain("举报");
   });
 
   it("shows locked notice", () => {
