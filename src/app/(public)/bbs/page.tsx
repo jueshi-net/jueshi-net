@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth";
 import { buildTitle, buildCanonical } from "@/lib/seo";
 import { PostCard } from "@/components/bbs/post-card";
 import { CategoryBadge } from "@/components/bbs/category-badge";
+import { CommunityOnboarding } from "@/components/bbs/community-onboarding";
 import { formatDateTime } from "@/lib/utils";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
@@ -368,6 +369,9 @@ export default async function BBSPage({
                 <button type="submit" className="px-5 py-2 bg-gray-100 rounded-lg text-sm font-medium hover:bg-gray-200">搜索</button>
               </form>
             </div>
+
+            {/* Community Onboarding for new users */}
+            <CommunityOnboarding />
 
             {/* Stats bar */}
             <div className="grid grid-cols-3 gap-3 mb-4">
