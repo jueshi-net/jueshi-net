@@ -38,7 +38,7 @@ export default function WorkspaceLeftRail({
   const todayChecked = lastCheckinDate === new Date().toISOString().split('T')[0];
 
   return (
-    <aside className="w-full xl:w-[260px] space-y-3">
+    <div className="space-y-3">
       {/* User Identity Card */}
       <div className="bg-gradient-to-br from-[#0A1D6B] via-[#0d2580] to-[#1a3a9f] rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
         {/* Decorative */}
@@ -137,6 +137,6 @@ export default function WorkspaceLeftRail({
           <p className="text-[11px] text-[#6C5DD3] mt-2 font-medium">查看全部勋章 →</p>
         </div>
       </Link>
-    </aside>
+    </div>
   );
 }
