@@ -22,21 +22,25 @@ export default function WorkspacePageFrame({
     );
   }
 
-  // Both rails: three-column on xl, two-column on lg (left rail collapses into top), single on mobile
+  // Both rails: three-column on xl+, two-column on lg (left rail hidden), single on mobile
   if (leftRail && rightRail) {
     return (
       <div className="pb-8">
-        {/* Left rail: visible on xl+, hidden on smaller screens (info merges into top banner) */}
-        <div className="hidden xl:block float-left w-[260px] mr-4">
-          {leftRail}
-        </div>
-        
-        {/* Main + Right rail grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)_280px] xl:grid-cols-[260px_minmax(0,1fr)_280px] gap-4">
+          {/* Left rail: hidden on mobile, visible on lg+ */}
+          <div className="hidden lg:block">
+            {leftRail}
+          </div>
+          
+          {/* Main content */}
           <main className="min-w-0">
             {children}
           </main>
-          {rightRail}
+          
+          {/* Right rail: hidden on mobile, visible on lg+ */}
+          <div className="hidden lg:block">
+            {rightRail}
+          </div>
         </div>
       </div>
     );
@@ -49,15 +53,17 @@ export default function WorkspacePageFrame({
         <main className="min-w-0">
           {children}
         </main>
-        {rightRail}
+        <div className="hidden lg:block">
+          {rightRail}
+        </div>
       </div>
     );
   }
 
   // Only left rail
   return (
-    <div className="pb-8">
-      <div className="hidden xl:block float-left w-[260px] mr-4">
+    <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-4 pb-8">
+      <div className="hidden lg:block">
         {leftRail}
       </div>
       <main className="min-w-0">
