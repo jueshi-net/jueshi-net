@@ -122,6 +122,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: `${article.title} | 绝世百宝箱`,
     description: desc,
+    alternates: { canonical: `https://jueshi.net/guides/${slug}` },
     openGraph: {
       title: article.title,
       description: desc,

@@ -188,19 +188,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    // Published Topics (for community pages)
-    const topics = await prisma.topic.findMany({
-      where: { status: "published" },
-      select: { slug: true, updatedAt: true },
-      orderBy: { updatedAt: "desc" },
-    });
-
-    communityPages = topics.map((t) => ({
-      url: `${BASE_URL}/community/${t.slug}`,
-      lastModified: t.updatedAt,
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    }));
+    // Published Topics (for community pages) - EXCLUDED: /community/* redirects to /bbs/*
+    // Topics are already included in forumPostPages via /bbs/${post.slug}
+    // const topics = await prisma.topic.findMany({
+    //   where: { status: "published" },
+    //   select: { slug: true, updatedAt: true },
+    //   orderBy: { updatedAt: "desc" },
+    // });
+    //
+    // communityPages = topics.map((t) => ({
+    //   url: `${BASE_URL}/community/${t.slug}`,
+    //   lastModified: t.updatedAt,
+    //   changeFrequency: "weekly" as const,
+    //   priority: 0.6,
+    // }));
 
     // Active Forum Categories
     const forumCategories = await prisma.forumCategory.findMany({
