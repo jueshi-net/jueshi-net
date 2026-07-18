@@ -58,7 +58,7 @@ describe("BBS Post Form Component", () => {
     const p = path.join(process.cwd(), "src/components/bbs/post-form.tsx");
     const content = fs.readFileSync(p, "utf-8");
     expect(content).toContain("/bbs/");
-    expect(content).toContain("data.slug");
+    expect(content).toContain("data.post.slug");
   });
 
   it("has category visual selection (not just dropdown)", () => {

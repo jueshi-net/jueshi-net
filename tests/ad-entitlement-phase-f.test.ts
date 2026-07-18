@@ -9,7 +9,7 @@
  * 5. Analytics events tracked correctly
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // Unit tests for the logic (no DB needed)
 describe('Ad Entitlement Phase F', () => {

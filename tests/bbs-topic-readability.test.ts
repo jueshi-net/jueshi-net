@@ -27,7 +27,12 @@ describe("BBS Topic Readability — Text Color Audit", () => {
   });
 
   it("no comments message uses text-slate-500 (not text-gray-400)", () => {
-    expect(content).toContain('text-sm text-slate-500">暂无回复');
+    // No-comments message is rendered by ForumEmptyState component
+    const emptyStatePath = path.join(process.cwd(), "src/components/community/forum-empty-state.tsx");
+    const emptyStateContent = fs.existsSync(emptyStatePath) ? fs.readFileSync(emptyStatePath, "utf-8") : "";
+    expect(content).toContain('ForumEmptyState variant="no-comments"');
+    expect(emptyStateContent).toContain('text-sm text-slate-500');
+    expect(emptyStateContent).toContain('暂无回复');
   });
 
   it("comment timestamps use text-slate-500 (not text-gray-400)", () => {
