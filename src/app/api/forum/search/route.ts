@@ -9,6 +9,7 @@ import {
   calculateSearchRelevance,
   generateEmptySearchSuggestions,
 } from "@/lib/community/search";
+import { trackForumSearch } from "@/lib/community/analytics-events";
 
 export const dynamic = "force-dynamic";
 
@@ -186,6 +187,16 @@ export async function GET(req: NextRequest) {
         .map(([t]) => t);
 
       suggestions = generateEmptySearchSuggestions(q, popularTags, cats);
+    }
+
+    // Track search event (non-blocking, privacy-safe)
+    if (q) {
+      trackForumSearch({
+        keyword: q,
+        category,
+        resultCount: total,
+        path: "/bbs",
+      }).catch(() => {});
     }
 
     return NextResponse.json({
