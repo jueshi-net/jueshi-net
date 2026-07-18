@@ -23,6 +23,7 @@ import {
   ListFilter,
   UserCog,
   HelpCircle,
+  ScanSearch,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -317,6 +318,14 @@ export default async function OperationsDashboardPage() {
                 <Flag className="w-5 h-5 text-red-600 mb-2" />
                 <p className="text-sm font-medium text-gray-900">举报处理</p>
                 <p className="text-xs text-gray-500">用户举报队列</p>
+              </Link>
+              <Link
+                href="/bbs/admin/content-quality"
+                className="bg-white rounded-xl border border-gray-200 p-3 hover:border-brand/30 hover:shadow-sm transition-all"
+              >
+                <ScanSearch className="w-5 h-5 text-indigo-600 mb-2" />
+                <p className="text-sm font-medium text-gray-900">内容质量巡检</p>
+                <p className="text-xs text-gray-500">过期、重复、无回复检测</p>
               </Link>
               <a
                 href="/api/forum/admin/filtered?status=all&pageSize=20"
