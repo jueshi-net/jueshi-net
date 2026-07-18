@@ -14,9 +14,10 @@ interface Task {
 
 interface TodayTasksProps {
   initialTasks?: Task[];
+  embedded?: boolean;
 }
 
-export default function TodayTasks({ initialTasks = [] }: TodayTasksProps) {
+export default function TodayTasks({ initialTasks = [], embedded = false }: TodayTasksProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [loading, setLoading] = useState(false);
 
@@ -69,7 +70,7 @@ export default function TodayTasks({ initialTasks = [] }: TodayTasksProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <div className={embedded ? "p-4" : "bg-white rounded-xl border border-gray-100 p-4"}>
         <div className="animate-pulse space-y-3">
           <div className="h-4 bg-gray-100 rounded w-3/4"></div>
           <div className="h-4 bg-gray-100 rounded w-1/2"></div>
@@ -81,7 +82,7 @@ export default function TodayTasks({ initialTasks = [] }: TodayTasksProps) {
 
   if (tasks.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-6 text-center">
+      <div className={embedded ? "p-6 text-center" : "bg-white rounded-xl border border-gray-100 p-6 text-center"}>
         <CheckSquare className="w-8 h-8 text-gray-300 mx-auto mb-2" />
         <p className="text-sm text-gray-500 mb-1">今天还没有待办</p>
         <p className="text-xs text-gray-400 mb-3">创建一个任务，或从推荐任务开始</p>
@@ -105,7 +106,7 @@ export default function TodayTasks({ initialTasks = [] }: TodayTasksProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div className={embedded ? "" : "bg-white rounded-xl border border-gray-100 overflow-hidden"}>
       <div className="divide-y divide-gray-50">
         {tasks.map(task => (
           <div key={task.id} className="flex items-center gap-3 p-3 hover:bg-gray-50/50 transition-colors">
@@ -130,14 +131,16 @@ export default function TodayTasks({ initialTasks = [] }: TodayTasksProps) {
           </div>
         ))}
       </div>
-      <div className="border-t border-gray-100 p-2 bg-gray-50/50">
-        <Link 
-          href="/workspace/tasks" 
-          className="flex items-center justify-center gap-1 text-xs text-teal-600 hover:text-teal-700 py-1"
-        >
-          查看全部 <ExternalLink className="w-3 h-3" />
-        </Link>
-      </div>
+      {!embedded && (
+        <div className="border-t border-gray-100 p-2 bg-gray-50/50">
+          <Link 
+            href="/workspace/tasks" 
+            className="flex items-center justify-center gap-1 text-xs text-teal-600 hover:text-teal-700 py-1"
+          >
+            查看全部 <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

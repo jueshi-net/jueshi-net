@@ -15,6 +15,7 @@ interface RecentTool {
 
 interface RecentToolsProps {
   userId: string;
+  embedded?: boolean;
 }
 
 // 默认推荐工具
@@ -27,7 +28,7 @@ const DEFAULT_TOOLS = [
   { toolName: 'documents', toolTitle: '单据工具', route: '/tools/documents', icon: <Package className="w-4 h-4" /> },
 ];
 
-export default function RecentTools({ userId }: RecentToolsProps) {
+export default function RecentTools({ userId, embedded = false }: RecentToolsProps) {
   const [tools, setTools] = useState<RecentTool[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +67,7 @@ export default function RecentTools({ userId }: RecentToolsProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <div className={embedded ? "p-4" : "bg-white rounded-xl border border-gray-100 p-4"}>
         <div className="animate-pulse grid grid-cols-2 gap-3">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="h-16 bg-gray-100 rounded"></div>
@@ -77,7 +78,7 @@ export default function RecentTools({ userId }: RecentToolsProps) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div className={embedded ? "" : "bg-white rounded-xl border border-gray-100 overflow-hidden"}>
       <div className="grid grid-cols-2 gap-2 p-3">
         {tools.slice(0, 6).map(tool => (
           <Link
@@ -101,14 +102,16 @@ export default function RecentTools({ userId }: RecentToolsProps) {
           </Link>
         ))}
       </div>
-      <div className="border-t border-gray-100 p-2 bg-gray-50/50">
-        <Link 
-          href="/tools" 
-          className="flex items-center justify-center gap-1 text-xs text-teal-600 hover:text-teal-700 py-1"
-        >
-          去工具中心 <ExternalLink className="w-3 h-3" />
-        </Link>
-      </div>
+      {!embedded && (
+        <div className="border-t border-gray-100 p-2 bg-gray-50/50">
+          <Link 
+            href="/tools" 
+            className="flex items-center justify-center gap-1 text-xs text-teal-600 hover:text-teal-700 py-1"
+          >
+            去工具中心 <ExternalLink className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
