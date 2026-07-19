@@ -55,7 +55,7 @@ export function UserNavSidebar({ className }: { className?: string }) {
         <div className="h-14 flex items-center justify-center border-b border-gray-100/80">
           <Link href="/" className="flex items-center justify-center">
             <img 
-              src="/brand/v2/logo-icon.svg"
+              src="/brand/v2/app-mark.svg"
               alt="绝世百宝箱" 
               className="h-8 w-8 object-contain"
             />
