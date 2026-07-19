@@ -2,11 +2,13 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { BookOpen, Plus, Edit2, Trash2, AlertCircle, CheckCircle, Loader2, Search } from "lucide-react";
+import { QualityBadge, SeoGeoScore } from "@/components/contentops/quality-badge";
 
 type Guide = {
   id: string; slug: string; title: string; summary: string | null;
   category: string; tags: string[]; status: string; sortOrder: number;
   publishedAt: string | null; createdAt: string; updatedAt: string;
+  metadataJson?: any;
 };
 
 const STATUS_OPTIONS = [
@@ -121,6 +123,7 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">slug</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden md:table-cell">分类</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">状态</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">质量</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 hidden lg:table-cell">更新时间</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">操作</th>
             </tr>
@@ -128,7 +131,7 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
           <tbody className="divide-y">
             {guides.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-8 text-gray-400">
+                <td colSpan={7} className="text-center py-8 text-gray-400">
                   暂无指南，点击上方「新建指南」创建
                 </td>
               </tr>
@@ -138,6 +141,16 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
                 const updated = g.updatedAt
                   ? new Date(g.updatedAt).toLocaleDateString("zh-CN")
                   : "—";
+                
+                // Extract quality data from metadataJson
+                const v2Quality = g.metadataJson?.contentOps?.v2Quality;
+                const qualityResult = v2Quality ? {
+                  score: v2Quality.score,
+                  level: v2Quality.level,
+                  issues: Array(v2Quality.issues).fill({ type: 'error', severity: 'error', message: '' }),
+                  warnings: Array(v2Quality.warnings).fill({ type: 'warning', message: '' }),
+                } : null;
+                
                 return (
                   <tr key={g.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -158,6 +171,19 @@ export default function GuidesListClient({ guides: initialGuides }: { guides: Gu
                       >
                         {statusInfo?.label || g.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      {qualityResult ? (
+                        <div className="space-y-1">
+                          <QualityBadge result={qualityResult} />
+                          <SeoGeoScore 
+                            seoScore={v2Quality.seoScore} 
+                            geoScore={v2Quality.geoScore} 
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">未检查</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-500 hidden lg:table-cell text-xs">{updated}</td>
                     <td className="px-4 py-3">

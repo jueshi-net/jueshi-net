@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { prisma } from '@/lib/prisma';
+import { checkContentQuality, calculateSeoScore, calculateGeoScore } from '@/lib/contentops/quality-checker';
 
 // HMAC verification
 function verifyHmacSignature(payload: string, signature: string, secret: string): boolean {
@@ -201,6 +202,50 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    // V2 Quality Check
+    const qualityCheck = checkContentQuality({
+      title: data.title,
+      summary: data.summary || data.content.intro || data.content.quickAnswer,
+      body: data.content.body || JSON.stringify(data.content),
+      contentType: data.contentType,
+      seoTitle: data.seoTitle || data.title,
+      seoDescription: data.seoDescription || data.summary,
+      canonicalUrl: data.canonicalUrl,
+      faq: data.content.faq,
+      structuredData: data.content.structuredData,
+      internalLinks: data.content.internalLinks,
+      sourceFacts: data.content.sourceFacts,
+      metadataJson: { groups: data.content.groups },
+    });
+
+    const seoScore = calculateSeoScore({
+      title: data.title,
+      summary: data.summary || data.content.intro || data.content.quickAnswer,
+      contentType: data.contentType,
+      seoTitle: data.seoTitle || data.title,
+      seoDescription: data.seoDescription || data.summary,
+      canonicalUrl: data.canonicalUrl,
+    });
+
+    const geoScore = calculateGeoScore({
+      title: data.title,
+      contentType: data.contentType,
+      faq: data.content.faq,
+      structuredData: data.content.structuredData,
+      internalLinks: data.content.internalLinks,
+    });
+
+    // Add quality metadata
+    metadataJson.contentOps.v2Quality = {
+      score: qualityCheck.score,
+      level: qualityCheck.level,
+      seoScore,
+      geoScore,
+      issues: qualityCheck.issues.length,
+      warnings: qualityCheck.warnings.length,
+      checkedAt: new Date().toISOString(),
+    };
+
     let draft: any;
     
     if (data.contentType === 'topic') {
@@ -266,6 +311,15 @@ export async function POST(request: NextRequest) {
       status: 'draft',
       publishedAt: null,
       robots: 'noindex,nofollow',
+      // V2 Quality Results
+      qualityCheck: {
+        score: qualityCheck.score,
+        level: qualityCheck.level,
+        seoScore,
+        geoScore,
+        issues: qualityCheck.issues,
+        warnings: qualityCheck.warnings,
+      },
     });
 
   } catch (error: any) {
