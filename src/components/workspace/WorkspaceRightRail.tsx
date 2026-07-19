@@ -27,20 +27,30 @@ interface Memo {
 
 interface WorkspaceRightRailProps {
   unreadNotifs: number;
-  tasks: Task[];
-  profiles: CompanyProfile[];
-  recentMemos: Memo[];
+  tasks?: Task[];
+  profiles?: CompanyProfile[];
+  recentMemos?: Memo[];
+  badgeCount?: number;
+  userId?: string;
+  hiddenSections?: string[];
 }
 
 export default function WorkspaceRightRail({
   unreadNotifs,
-  tasks,
-  profiles,
-  recentMemos,
+  tasks = [],
+  profiles = [],
+  recentMemos = [],
+  badgeCount,
+  userId,
+  hiddenSections = [],
 }: WorkspaceRightRailProps) {
+  const showNotifications = !hiddenSections.includes('notifications');
+  const showMemos = !hiddenSections.includes('memos');
+
   return (
     <aside className="w-full lg:w-[280px] space-y-3">
       {/* Notifications */}
+      {showNotifications && (
       <div className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">通知</h3>
@@ -66,6 +76,7 @@ export default function WorkspaceRightRail({
           <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
         </Link>
       </div>
+      )}
 
       {/* Today Tasks */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -140,7 +151,7 @@ export default function WorkspaceRightRail({
       </div>
 
       {/* Recent Memos */}
-      {recentMemos.length > 0 && (
+      {showMemos && recentMemos.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-gray-900">备忘录</h3>
