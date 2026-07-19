@@ -393,5 +393,123 @@
 
 ---
 
+## User Identity System Baseline
+
+**状态**: 🔒 **FROZEN**  
+**基线版本**: commit `2026-07-19`  
+**组件**: `src/components/user/UserIdentityCard.tsx`
+
+### 概述
+
+全站统一的用户身份展示系统，用于所有需要展示用户信息的场景：
+- Workspace 用户信息卡
+- Forum 用户信息
+- 排行榜用户展示
+- 评论区用户信息
+- 其他业务模块
+
+### 数据接口
+
+```typescript
+interface UserDisplayData {
+  // 基础信息
+  displayName: string;
+  email?: string;
+  avatarUrl?: string;
+  
+  // 等级信息
+  levelKey: string;
+  levelLabel: string;
+  growthValue: number;
+  progressToNext?: number;
+  remainingToNext?: number;
+  nextLevelKey?: string | null;
+  
+  // 积分与状态
+  points: number;
+  checkinStreak?: number;
+  badgeCount?: number;
+  isMember: boolean;
+  
+  // 可选扩展
+  memberUntil?: string | null;
+}
+```
+
+### 尺寸规格
+
+| 尺寸 | 用途 | 显示内容 | 宽度 |
+|------|------|----------|------|
+| **lg** | Workspace 左栏 | 头像、昵称、邮箱、等级、进度条、统计数据 | 220px |
+| **md** | 标准展示 | 头像、昵称、邮箱、等级、积分 | 自适应 |
+| **sm** | 紧凑展示 | 头像、昵称、等级 | 自适应 |
+
+### 等级颜色配置
+
+| 等级 | 背景色 | 文字色 | 边框色 |
+|------|--------|--------|--------|
+| lv1 新手 | gray-100 | gray-700 | gray-200 |
+| lv2 进阶 | blue-100 | blue-700 | blue-200 |
+| lv3 精英 | purple-100 | purple-700 | purple-200 |
+| lv4 大师 | amber-100 | amber-700 | amber-200 |
+| lv5 传奇 | rose-100 | rose-700 | rose-200 |
+
+### 使用示例
+
+```tsx
+import UserIdentityCard, { UserDisplayData } from '@/components/user/UserIdentityCard';
+
+const userData: UserDisplayData = {
+  displayName: '用户昵称',
+  email: 'user@example.com',
+  levelKey: 'lv2',
+  levelLabel: 'Lv.2 进阶',
+  growthValue: 250,
+  points: 100,
+  checkinStreak: 5,
+  badgeCount: 3,
+  isMember: true,
+  progressToNext: 50,
+};
+
+// 大尺寸（Workspace 左栏）
+<UserIdentityCard user={userData} size="lg" />
+
+// 中尺寸（标准展示）
+<UserIdentityCard user={userData} size="md" />
+
+// 小尺寸（紧凑展示）
+<UserIdentityCard user={userData} size="sm" />
+
+// 可点击卡片
+<UserIdentityCard user={userData} size="md" href="/workspace/member" />
+```
+
+### 冻结规则
+
+**禁止操作**:
+- ❌ 修改数据接口结构
+- ❌ 修改等级颜色配置
+- ❌ 修改尺寸规格
+- ❌ 删除现有展示元素
+- ❌ 硬编码用户数据
+
+**允许操作**:
+- ✅ 新增可选字段（保持向后兼容）
+- ✅ 调整样式细节（不改变布局）
+- ✅ 新增尺寸变体（如 xs、xl）
+- ✅ 接入新的业务模块
+
+### 接入清单
+
+| 模块 | 状态 | 尺寸 | 说明 |
+|------|------|------|------|
+| Workspace LeftRail | ✅ 已接入 | lg | 用户资产栏 |
+| Forum 用户信息 | ⏳ 待接入 | md | 帖子作者信息 |
+| 排行榜 | ⏳ 待接入 | sm | 用户排名展示 |
+| 评论区 | ⏳ 待接入 | sm | 评论者信息 |
+
+---
+
 **Status**: ✅ **BASELINE ESTABLISHED**  
 **Next Action**: 所有 Workspace 修改必须遵循此基线文档

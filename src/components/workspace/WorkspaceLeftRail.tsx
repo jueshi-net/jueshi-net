@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Star, TrendingUp, Zap, Calendar, Award, Crown, CheckCircle2 } from 'lucide-react';
+import { Award, CheckCircle2 } from 'lucide-react';
 import CheckinButton from '@/components/user/CheckinButton';
+import UserIdentityCard, { UserDisplayData } from '@/components/user/UserIdentityCard';
 
 interface WorkspaceLeftRailProps {
   displayName: string;
@@ -37,71 +38,31 @@ export default function WorkspaceLeftRail({
 }: WorkspaceLeftRailProps) {
   const todayChecked = lastCheckinDate === new Date().toISOString().split('T')[0];
 
+  // 构建用户数据
+  const userDisplayData: UserDisplayData = {
+    displayName,
+    email,
+    levelLabel,
+    levelKey: levelLabel.split(' ')[0]?.toLowerCase() || 'lv1',
+    growthValue,
+    points,
+    checkinStreak,
+    badgeCount,
+    isMember,
+    progressToNext,
+    remainingToNext,
+    nextLevelKey,
+  };
+
   return (
     <div className="space-y-3">
-      {/* User Identity Card */}
-      <div className="bg-gradient-to-br from-[#0A1D6B] via-[#0d2580] to-[#1a3a9f] rounded-xl p-4 text-white shadow-lg relative overflow-hidden">
-        {/* Decorative */}
-        <div className="absolute top-0 right-0 w-20 h-20 bg-white/5 rounded-full -translate-y-6 translate-x-6" />
-        
-        <div className="relative">
-          {/* Avatar placeholder */}
-          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3 border-2 border-white/30">
-            <span className="text-xl font-bold">{displayName.charAt(0).toUpperCase()}</span>
-          </div>
-          
-          <h2 className="text-base font-bold truncate mb-0.5">{displayName}</h2>
-          <p className="text-white/60 text-[11px] truncate mb-3">{email}</p>
-          
-          {isMember && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-400/20 text-amber-300 text-[10px] font-semibold rounded-full border border-amber-400/30 mb-3">
-              <Crown className="w-3 h-3" />
-              会员
-            </span>
-          )}
-          
-          {/* Level Badge */}
-          <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 mb-3">
-            <Star className="w-3.5 h-3.5 text-amber-300" />
-            <span className="font-semibold text-xs">{levelLabel}</span>
-          </div>
-          
-          {/* Progress Bar */}
-          <div className="mb-3">
-            <div className="flex items-center justify-between text-[10px] text-white/60 mb-1">
-              <span>成长进度</span>
-              <span>{progressToNext}%</span>
-            </div>
-            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all"
-                style={{ width: `${progressToNext}%` }}
-              />
-            </div>
-            {nextLevelKey && (
-              <p className="text-[10px] text-white/50 mt-1">
-                距下一级还需 {remainingToNext} 成长值
-              </p>
-            )}
-          </div>
-          
-          {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10">
-            <div className="text-center">
-              <p className="text-lg font-bold">{points}</p>
-              <p className="text-[10px] text-white/60">积分</p>
-            </div>
-            <div className="text-center border-l border-r border-white/10">
-              <p className="text-lg font-bold">{checkinStreak}</p>
-              <p className="text-[10px] text-white/60">连续</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold">{badgeCount}</p>
-              <p className="text-[10px] text-white/60">勋章</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* 用户身份卡 - 使用公共组件 */}
+      <UserIdentityCard 
+        user={userDisplayData} 
+        size="lg" 
+        showProgress={true}
+        showStats={true}
+      />
 
       {/* Checkin Card */}
       <div className="bg-white rounded-xl border border-gray-100 p-4">
