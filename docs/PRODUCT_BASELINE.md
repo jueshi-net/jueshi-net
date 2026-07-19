@@ -6,43 +6,40 @@
 
 ---
 
-## Workspace Desktop Layout — 四区域 SaaS Layout
+## Workspace Desktop Layout — 三栏 SaaS Layout
 
-**CORRECTION**: Workspace Desktop Layout 是 **四区域布局**，不是三栏。
+**CORRECTION**: Workspace Desktop Layout 是 **三栏布局**，Global Sidebar 属于 App Shell 外层。
 
 ### 布局结构
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Global Header (公共)                      │
-├──────────┬──────────┬──────────────────────┬────────────────┤
-│          │          │                      │                │
-│  Global  │  User    │   Main Workspace     │   Right        │
-│ Sidebar  │  Asset   │   (flex-1)           │   Assistant    │
-│ (导航)   │  Rail    │                      │   Rail         │
-│          │ (240px)  │   - 指标卡片         │   (260px)      │
-│          │          │   - 快速操作         │                │
-│          │          │   - 最近单据         │   - 通知       │
-│          │          │   - 任务链           │   - 今日待办   │
-│          │          │   - 常用工具         │   - 公司资料   │
-│          │          │                      │   - 备忘录     │
-│          │          │                      │                │
-├──────────┴──────────┴──────────────────────┴────────────────┤
-│                    Global Footer (公共)                      │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        App Shell (外层)                          │
+│  ┌──────────┬──────────────────────────────────────────────────┐│
+│  │          │                                                  ││
+│  │  Global  │         Workspace Layout (内层三栏)              ││
+│  │ Sidebar  │  ┌──────────┬──────────────────┬──────────────┐ ││
+│  │ (导航)   │  │          │                  │              │ ││
+│  │ (App     │  │  User    │   Main           │   Right      │ ││
+│  │  Shell)  │  │  Asset   │   Workspace      │   Assistant  │ ││
+│  │          │  │  Rail    │   (flex-1)       │   Rail       │ ││
+│  │          │  │ (240px)  │                  │   (260px)    │ ││
+│  │          │  │          │   - 指标卡片     │              │ ││
+│  │          │  │          │   - 快速操作     │   - 通知     │ ││
+│  │          │  │          │   - 最近单据     │   - 今日待办 │ ││
+│  │          │  │          │   - 任务链       │   - 公司资料 │ ││
+│  │          │  │          │   - 常用工具     │   - 备忘录   │ ││
+│  │          │  │          │                  │              │ ││
+│  │          │  └──────────┴──────────────────┴──────────────┘ ││
+│  │          │                                                  ││
+│  └──────────┴──────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### 四个区域定义
+### Workspace 三栏定义
 
-#### 1. Global Sidebar（全局导航）
-- **位置**: 最左侧
-- **宽度**: 固定（由公共布局控制）
-- **内容**: 主导航菜单、品牌 Logo、用户入口
-- **状态**: 🔒 **FROZEN** — 禁止修改
-- **文件**: `src/app/(workspace)/layout.tsx`, `src/components/public/`
-
-#### 2. User Asset Rail（用户资产栏）
-- **位置**: Global Sidebar 右侧
+#### 1. User Asset Rail（用户资产栏）
+- **位置**: Workspace 左侧
 - **宽度**: 240px
 - **显示条件**: `xl` 断点（>= 1280px）
 - **内容**: 
@@ -54,8 +51,8 @@
 - **文件**: `src/components/workspace/WorkspaceLeftRail.tsx`
 - **验收版本**: commit `4cdb6ff`
 
-#### 3. Main Workspace（主工作区）
-- **位置**: 中间区域
+#### 2. Main Workspace（主工作区）
+- **位置**: Workspace 中间
 - **宽度**: `flex-1`（自适应）
 - **内容**:
   - 移动端用户横幅（xl 以下显示）
@@ -68,8 +65,8 @@
 - **文件**: `src/app/(workspace)/workspace/page.tsx`
 - **验收版本**: commit `4cdb6ff`
 
-#### 4. Right Assistant Rail（右助手栏）
-- **位置**: 最右侧
+#### 3. Right Assistant Rail（右助手栏）
+- **位置**: Workspace 右侧
 - **宽度**: 260px
 - **显示条件**: `lg` 断点（>= 1024px）
 - **内容**:
@@ -80,6 +77,16 @@
 - **状态**: ✅ **EXTENDABLE** — 允许添加新的辅助信息模块
 - **文件**: `src/components/workspace/WorkspaceRightRail.tsx`
 - **验收版本**: commit `4cdb6ff`
+
+### App Shell 外层
+
+#### Global Sidebar（全局导航）
+- **位置**: App Shell 最左侧（Workspace 外层）
+- **宽度**: 固定（由公共布局控制）
+- **内容**: 主导航菜单、品牌 Logo、用户入口
+- **状态**: 🔒 **FROZEN** — 禁止修改
+- **文件**: `src/app/(workspace)/layout.tsx`, `src/components/public/`
+- **说明**: 属于 App Shell，不属于 Workspace Layout
 
 ---
 
@@ -211,11 +218,13 @@
 
 ## 响应式规则
 
-| 屏幕宽度 | 显示区域 | 布局 |
-|---------|---------|------|
-| **>= 1280px (xl+)** | Global Sidebar + User Asset Rail + Main Workspace + Right Assistant Rail | 四区域完整布局 |
-| **1024-1279px (lg-xl)** | Global Sidebar + Main Workspace + Right Assistant Rail | 三区域（隐藏 User Asset Rail） |
-| **< 1024px (mobile)** | Global Sidebar + Main Workspace | 两区域（隐藏左右 Rail） |
+| 屏幕宽度 | Workspace 显示 | 布局 |
+|---------|---------------|------|
+| **>= 1280px (xl+)** | User Asset Rail + Main Workspace + Right Assistant Rail | 三栏完整布局 |
+| **1024-1279px (lg-xl)** | Main Workspace + Right Assistant Rail | 两栏（隐藏 User Asset Rail） |
+| **< 1024px (mobile)** | Main Workspace | 单栏（隐藏左右 Rail） |
+
+**注意**: Global Sidebar 始终显示（属于 App Shell，不受 Workspace 响应式规则影响）
 
 ---
 
@@ -225,24 +234,24 @@
 
 以下区域和文件已验收，**禁止修改**：
 
-1. **Global Sidebar**
-   - 禁止删除、合并、重新设计
-   - 禁止修改导航结构
-   - 文件: `src/app/(workspace)/layout.tsx`
-
-2. **User Asset Rail**
+1. **User Asset Rail**
    - 禁止删除或隐藏
    - 禁止修改用户信息展示逻辑
    - 禁止修改等级、签到、勋章组件
    - 文件: `src/components/workspace/WorkspaceLeftRail.tsx`
    - 验收版本: `4cdb6ff`
 
-3. **WorkspacePageFrame**
-   - 禁止修改三栏/四栏布局结构
+2. **WorkspacePageFrame**
+   - 禁止修改三栏布局结构
    - 禁止修改响应式断点规则
    - 禁止修改宽度定义（240px / 260px）
    - 文件: `src/components/workspace/WorkspacePageFrame.tsx`
    - 验收版本: `4cdb6ff`
+
+3. **Global Sidebar**（属于 App Shell）
+   - 禁止删除、合并、重新设计
+   - 禁止修改导航结构
+   - 文件: `src/app/(workspace)/layout.tsx`
 
 ### ✅ EXTENDABLE（允许扩展）
 
@@ -265,12 +274,13 @@
 
 ### ❌ NEVER DO
 
-1. **禁止将四区域合并为三栏**
-   - Workspace Desktop Layout 是四区域，不是三栏
-   - 不要在任何文档或代码注释中称其为"三栏布局"
+1. **禁止将三栏改为其他布局**
+   - Workspace Desktop Layout 是三栏布局
+   - 不要修改为两栏、四栏或其他结构
 
 2. **禁止删除 Global Sidebar**
-   - Global Sidebar 是全局导航，禁止删除或隐藏
+   - Global Sidebar 属于 App Shell，是全局导航
+   - 禁止删除或隐藏
    - 禁止将其与 User Asset Rail 合并
 
 3. **禁止修改响应式断点**
@@ -296,11 +306,11 @@
 
 | 文件 | 作用 | 状态 |
 |------|------|------|
-| `src/components/workspace/WorkspacePageFrame.tsx` | 四区域布局框架 | 🔒 FROZEN |
+| `src/components/workspace/WorkspacePageFrame.tsx` | 三栏布局框架 | 🔒 FROZEN |
 | `src/components/workspace/WorkspaceLeftRail.tsx` | User Asset Rail | 🔒 FROZEN |
 | `src/components/workspace/WorkspaceRightRail.tsx` | Right Assistant Rail | ✅ EXTENDABLE |
 | `src/app/(workspace)/workspace/page.tsx` | Main Workspace 内容 | ✅ EXTENDABLE |
-| `src/app/(workspace)/layout.tsx` | Workspace 布局（包含 Global Sidebar） | 🔒 FROZEN |
+| `src/app/(workspace)/layout.tsx` | App Shell（包含 Global Sidebar） | 🔒 FROZEN |
 
 ### 验收版本
 
@@ -314,9 +324,9 @@
 
 | 日期 | 变更 | 说明 |
 |------|------|------|
+| 2026-07-19 | 修正 Workspace 定义 | 明确 Workspace 是三栏布局，Global Sidebar 属于 App Shell 外层 |
 | 2026-07-19 | 新增 Homepage V4 Baseline | 明确首页冻结范围，基线版本 UI V4 Home Candidate V2 |
 | 2026-07-19 | 新增 Public Shell Baseline | 明确公共外壳冻结范围，建立变更请求流程 |
-| 2026-07-19 | 修正文档 | 明确 Workspace Desktop Layout 是四区域，不是三栏 |
 | 2026-07-19 | 验收版本 | commit `4cdb6ff` 作为基线 |
 
 ---
@@ -335,14 +345,21 @@
 
 在修改 Workspace 相关代码前，必须确认：
 
-- [ ] 是否修改了 Global Sidebar？→ ❌ 禁止
 - [ ] 是否修改了 User Asset Rail？→ ❌ 禁止
-- [ ] 是否修改了 WorkspacePageFrame 布局结构？→ ❌ 禁止
+- [ ] 是否修改了 WorkspacePageFrame 三栏布局结构？→ ❌ 禁止
 - [ ] 是否修改了响应式断点？→ ❌ 禁止
 - [ ] 是否修改了 Rail 宽度？→ ❌ 禁止
 - [ ] 是否删除了现有功能模块？→ ❌ 禁止
 - [ ] 是否在 Main Workspace 添加新功能？→ ✅ 允许
 - [ ] 是否在 Right Assistant Rail 添加新功能？→ ✅ 允许
+
+### App Shell 检查
+
+在修改 App Shell 相关代码前，必须确认：
+
+- [ ] 是否修改了 Global Sidebar？→ ❌ 禁止
+- [ ] 是否删除了 Global Sidebar？→ ❌ 禁止
+- [ ] 是否将 Global Sidebar 与 Workspace 合并？→ ❌ 禁止
 
 ### Homepage V4 检查
 
