@@ -33,20 +33,37 @@ function verifySignature(request: NextRequest, body: string): boolean {
   const queryString = url.search || '';
   const payload = `${method}:${path}${queryString}:${body}`;
 
+  console.log('[ContentOps Bridge] Verifying signature:', {
+    method,
+    path,
+    queryString,
+    bodyLength: body.length,
+    payloadPreview: payload.substring(0, 100),
+  });
+
   const expectedSignature = createHmac('sha256', BRIDGE_SECRET)
     .update(payload)
     .digest('hex');
+
+  console.log('[ContentOps Bridge] Expected signature:', expectedSignature.substring(0, 20) + '...');
+  console.log('[ContentOps Bridge] Received signature:', signature.substring(0, 20) + '...');
 
   try {
     const sigBuffer = Buffer.from(signature, 'hex');
     const expectedBuffer = Buffer.from(expectedSignature, 'hex');
     
     if (sigBuffer.length !== expectedBuffer.length) {
+      console.error('[ContentOps Bridge] Signature length mismatch');
       return false;
     }
     
-    return timingSafeEqual(sigBuffer, expectedBuffer);
-  } catch {
+    const isValid = timingSafeEqual(sigBuffer, expectedBuffer);
+    if (!isValid) {
+      console.error('[ContentOps Bridge] Signature verification failed');
+    }
+    return isValid;
+  } catch (error) {
+    console.error('[ContentOps Bridge] Signature verification error:', error);
     return false;
   }
 }
