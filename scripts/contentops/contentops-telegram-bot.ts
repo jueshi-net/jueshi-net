@@ -217,7 +217,7 @@ async function startBot() {
   });
 
   // Handle /new
-  bot.onText(/\/new(?:\s+(.+))?/, (msg, match) => {
+  bot.onText(/\/new(?:\s+(.+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -232,20 +232,45 @@ async function startBot() {
       return;
     }
 
-    const session = getSession(chatId);
-    session.currentTitle = title;
-    session.state = 'DRAFT';
-    session.mode = 'editing_body';
+    try {
+      // 调用 Bridge API 创建草稿
+      const res = await fetchBridgeApi({
+        title,
+        targetEnvironment: 'staging',
+      });
 
-    bot.sendMessage(chatId, `
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('[ContentOps Bot] Create draft failed:', error);
+        bot.sendMessage(chatId, `❌ 创建草稿失败: ${error.code || 'UNKNOWN'}`);
+        return;
+      }
+
+      const draft = await res.json();
+      const session = getSession(chatId);
+      session.currentDraftId = draft.id;
+      session.currentTitle = title;
+      session.state = 'DRAFT';
+      session.mode = 'editing_body';
+
+      bot.sendMessage(chatId, `
 📝 新草稿已创建
 
 标题: ${title}
-状态: DRAFT
+Draft ID: \`${draft.id}\`
+状态: ${draft.state}
+当前版本: v${draft.version}
 
-请发送正文内容，或使用:
+后续可用命令:
+/status - 查看状态
+/drafts - 列出草稿
+/review - 质量检查
 /cancel - 取消
-    `);
+      `, { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Create draft error:', error);
+      bot.sendMessage(chatId, '❌ 创建草稿失败，请稍后重试');
+    }
   });
 
   // Handle /drafts
@@ -258,15 +283,24 @@ async function startBot() {
     }
 
     try {
+      const payload = '';
+      const signature = signPayload(`GET:${new URL(CONFIG.bridgeUrl).pathname}?limit=10:${payload}`);
+      
       const res = await fetch(`${CONFIG.bridgeUrl}?limit=10`, {
         headers: { 
           'Content-Type': 'application/json',
-          'X-ContentOps-Signature': signPayload(''),
+          'X-ContentOps-Signature': signature,
         },
       });
       
       if (!res.ok) {
-        bot.sendMessage(chatId, '获取草稿失败');
+        const error = await res.json().catch(() => ({ error: 'Unknown error', code: 'UNKNOWN' }));
+        console.error('[ContentOps Bot] List drafts failed:', {
+          status: res.status,
+          code: error.code,
+          message: error.error,
+        });
+        bot.sendMessage(chatId, `❌ 获取草稿失败 [${error.code || res.status}]`);
         return;
       }
 
@@ -274,17 +308,18 @@ async function startBot() {
       const drafts = data.drafts || [];
 
       if (drafts.length === 0) {
-        bot.sendMessage(chatId, '暂无草稿');
+        bot.sendMessage(chatId, '📭 暂无草稿\n\n使用 /new <标题> 创建新草稿');
         return;
       }
 
       const list = drafts.map((d: any, i: number) => 
-        `${i + 1}. ${d.title}\n   ID: \`${d.id}\`\n   状态: ${d.state || 'DRAFT'}`
+        `${i + 1}. ${d.title}\n   ID: \`${d.id}\`\n   状态: ${d.state}\n   版本: v${d.version}`
       ).join('\n\n');
 
       bot.sendMessage(chatId, `📋 最近草稿:\n\n${list}`, { parse_mode: 'Markdown' });
     } catch (error) {
-      bot.sendMessage(chatId, '获取草稿失败');
+      console.error('[ContentOps Bot] List drafts error:', error);
+      bot.sendMessage(chatId, '❌ 获取草稿失败，请稍后重试');
     }
   });
 

@@ -1,333 +1,265 @@
-// POST /api/internal/contentops/drafts - Create draft via bridge (internal API)
-// Requires HMAC authentication
+/**
+ * ContentOps Bridge API
+ * Telegram Bot 与 Web 共享的草稿管理接口
+ * 
+ * 认证方式：HMAC-SHA256 签名
+ * 路径：/api/internal/contentops/drafts
+ */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { prisma } from '@/lib/prisma';
-import { checkContentQuality, calculateSeoScore, calculateGeoScore } from '@/lib/contentops/quality-checker';
+import { createDraft, listDrafts, getDraft, updateDraft } from '@/lib/contentops/draft-manager';
 
-// HMAC verification
-function verifyHmacSignature(payload: string, signature: string, secret: string): boolean {
-  const expectedSignature = createHmac('sha256', secret)
+const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET || '';
+
+/**
+ * 验证 HMAC 签名
+ */
+function verifySignature(request: NextRequest, body: string): boolean {
+  if (!BRIDGE_SECRET) {
+    console.error('[ContentOps Bridge] BRIDGE_SECRET not configured');
+    return false;
+  }
+
+  const signature = request.headers.get('X-ContentOps-Signature');
+  if (!signature) {
+    console.error('[ContentOps Bridge] Missing signature header');
+    return false;
+  }
+
+  const method = request.method;
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const queryString = url.search || '';
+  const payload = `${method}:${path}${queryString}:${body}`;
+
+  const expectedSignature = createHmac('sha256', BRIDGE_SECRET)
     .update(payload)
     .digest('hex');
-  
+
   try {
-    return timingSafeEqual(
-      Buffer.from(signature, 'hex'),
-      Buffer.from(expectedSignature, 'hex')
-    );
+    const sigBuffer = Buffer.from(signature, 'hex');
+    const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+    
+    if (sigBuffer.length !== expectedBuffer.length) {
+      return false;
+    }
+    
+    return timingSafeEqual(sigBuffer, expectedBuffer);
   } catch {
     return false;
   }
 }
 
-// Schema validation for topic
-function validateTopicSchema(data: any): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (!data.title) errors.push('title is required');
-  if (!data.intro) errors.push('intro is required');
-  if (!data.categories || data.categories.length < 4) {
-    errors.push('categories must have at least 4 items');
-  }
-  if (!data.resources || data.resources.length < 8) {
-    errors.push('resources must have at least 8 items');
-  }
-  
-  // Check S/A/B/C rating
-  if (data.resources) {
-    const hasRating = data.resources.some((r: any) => 
-      ['S', 'A', 'B', 'C'].includes(r.ratingTier)
+/**
+ * GET /api/internal/contentops/drafts
+ * 列出草稿
+ */
+export async function GET(request: NextRequest) {
+  // 验证签名
+  if (!verifySignature(request, '')) {
+    console.error('[ContentOps Bridge] Invalid signature');
+    return NextResponse.json(
+      { error: 'Unauthorized', code: 'INVALID_SIGNATURE' },
+      { status: 401 }
     );
-    if (!hasRating) errors.push('resources must have S/A/B/C rating');
   }
-  
-  if (!data.scenarioMap) errors.push('scenarioMap is required');
-  if (!data.comparisonTable) errors.push('comparisonTable is required');
-  if (!data.faq || data.faq.length < 5) errors.push('faq must have at least 5 items');
-  if (!data.pitfalls || data.pitfalls.length < 5) errors.push('pitfalls must have at least 5 items');
-  if (!data.internalLinks || data.internalLinks.length < 5) {
-    errors.push('internalLinks must have at least 5 items');
-  }
-  if (!data.relatedTools || data.relatedTools.length < 3) {
-    errors.push('relatedTools must have at least 3 items');
-  }
-  
-  return { valid: errors.length === 0, errors };
-}
 
-// Schema validation for guide
-function validateGuideSchema(data: any): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (!data.quickAnswer) errors.push('quickAnswer is required');
-  if (!data.sections || data.sections.length < 6) {
-    errors.push('sections must have at least 6 items');
-  }
-  if (!data.faq || data.faq.length < 5) errors.push('faq must have at least 5 items');
-  if (!data.pitfalls || data.pitfalls.length < 5) errors.push('pitfalls must have at least 5 items');
-  if (!data.internalLinks || data.internalLinks.length < 5) {
-    errors.push('internalLinks must have at least 5 items');
-  }
-  if (!data.relatedTools || data.relatedTools.length < 3) {
-    errors.push('relatedTools must have at least 3 items');
-  }
-  
-  return { valid: errors.length === 0, errors };
-}
-
-// Schema validation for checklist
-function validateChecklistSchema(data: any): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (!data.groups || data.groups.length < 4) {
-    errors.push('groups must have at least 4 items');
-  }
-  if (!data.faq || data.faq.length < 5) errors.push('faq must have at least 5 items');
-  if (!data.pitfalls || data.pitfalls.length < 5) errors.push('pitfalls must have at least 5 items');
-  
-  return { valid: errors.length === 0, errors };
-}
-
-export async function POST(request: NextRequest) {
   try {
-    // Verify HMAC authentication
-    const signature = request.headers.get('x-contentops-signature');
-    if (!signature) {
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    const result = await listDrafts({ limit, offset });
+
+    return NextResponse.json({
+      drafts: result.drafts.map((d) => ({
+        id: d.id,
+        title: d.title,
+        state: d.state,
+        version: d.version,
+        targetEnvironment: d.targetEnvironment,
+        createdAt: d.createdAt.toISOString(),
+        updatedAt: d.updatedAt.toISOString(),
+      })),
+      total: result.total,
+    });
+  } catch (error) {
+    console.error('[ContentOps Bridge] GET error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', code: 'LIST_FAILED' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/internal/contentops/drafts
+ * 创建新草稿
+ */
+export async function POST(request: NextRequest) {
+  let body = '';
+  try {
+    body = await request.text();
+  } catch {
+    body = '';
+  }
+
+  // 验证签名
+  if (!verifySignature(request, body)) {
+    console.error('[ContentOps Bridge] Invalid signature');
+    return NextResponse.json(
+      { error: 'Unauthorized', code: 'INVALID_SIGNATURE' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const data = JSON.parse(body);
+    const { title, body: draftBody, targetEnvironment } = data;
+
+    if (!title) {
       return NextResponse.json(
-        { error: 'Missing signature' },
-        { status: 401 }
+        { error: 'Title is required', code: 'MISSING_TITLE' },
+        { status: 400 }
       );
     }
 
-    const body = await request.text();
-    const secret = process.env.CONTENTOPS_BRIDGE_SECRET;
-    
-    if (!secret) {
-      console.error('[DraftBridge] CONTENTOPS_BRIDGE_SECRET not configured');
-      return NextResponse.json(
-        { error: 'Bridge not configureded' },
-        { status: 500 }
-      );
-    }
+    const draft = await createDraft({
+      title,
+      body: draftBody,
+      targetEnvironment: targetEnvironment || 'staging',
+    });
 
-    if (!verifyHmacSignature(body, signature, secret)) {
+    return NextResponse.json({
+      id: draft.id,
+      title: draft.title,
+      state: draft.state,
+      version: draft.version,
+      targetEnvironment: draft.targetEnvironment,
+      createdAt: draft.createdAt.toISOString(),
+    }, { status: 201 });
+  } catch (error) {
+    console.error('[ContentOps Bridge] POST error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', code: 'CREATE_FAILED' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PUT /api/internal/contentops/drafts/[id]
+ * 更新草稿
+ */
+export async function PUT(request: NextRequest) {
+  let body = '';
+  try {
+    body = await request.text();
+  } catch {
+    body = '';
+  }
+
+  // 验证签名
+  if (!verifySignature(request, body)) {
+    console.error('[ContentOps Bridge] Invalid signature');
+    return NextResponse.json(
+      { error: 'Unauthorized', code: 'INVALID_SIGNATURE' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const draftId = searchParams.get('id');
+
+    if (!draftId) {
       return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
+        { error: 'Draft ID is required', code: 'MISSING_ID' },
+        { status: 400 }
       );
     }
 
     const data = JSON.parse(body);
-    
-    // Validate common fields
-    const commonErrors: string[] = [];
-    if (!data.traceId) commonErrors.push('traceId is required');
-    if (!data.localHermesRunId) commonErrors.push('localHermesRunId is required');
-    if (data.gatewayLocation !== 'local_mac') {
-      commonErrors.push('gatewayLocation must be local_mac');
-    }
-    if (data.planningUsed !== true) commonErrors.push('planningUsed must be true');
-    if (data.fallbackUsed !== false) commonErrors.push('fallbackUsed must be false');
-    if (!['checklist', 'guide', 'topic'].includes(data.contentType)) {
-      commonErrors.push('contentType must be checklist, guide, or topic');
-    }
-    if (data.schemaType !== data.contentType) {
-      commonErrors.push('schemaType must match contentType');
-    }
-    if (!data.qualityGate || data.qualityGate.pass !== true) {
-      commonErrors.push('qualityGate must pass');
-    }
-    
-    if (commonErrors.length > 0) {
+    const { title, body: draftBody, state } = data;
+
+    const draft = await updateDraft(draftId, {
+      title,
+      body: draftBody,
+      state,
+    });
+
+    if (!draft) {
       return NextResponse.json(
-        { error: 'Validation failed', details: commonErrors },
-        { status: 400 }
+        { error: 'Draft not found', code: 'NOT_FOUND' },
+        { status: 404 }
       );
     }
-
-    // If validateOnly=true, skip schema validation and database creation
-    if (data.validateOnly === true) {
-      console.log('[DraftBridge] Validate-only request:', {
-        contentType: data.contentType,
-        traceId: data.traceId,
-        localHermesRunId: data.localHermesRunId,
-      });
-      
-      return NextResponse.json({
-        success: true,
-        validateOnly: true,
-        contentType: data.contentType,
-        traceId: data.traceId,
-        localHermesRunId: data.localHermesRunId,
-        message: 'Validation passed (validate-only mode)',
-      });
-    }
-
-    // Validate schema-specific fields
-    let schemaValidation: { valid: boolean; errors: string[] };
-    
-    if (data.contentType === 'topic') {
-      schemaValidation = validateTopicSchema(data.content);
-    } else if (data.contentType === 'guide') {
-      schemaValidation = validateGuideSchema(data.content);
-    } else if (data.contentType === 'checklist') {
-      schemaValidation = validateChecklistSchema(data.content);
-    } else {
-      return NextResponse.json(
-        { error: 'Unsupported content type' },
-        { status: 400 }
-      );
-    }
-
-    if (!schemaValidation.valid) {
-      return NextResponse.json(
-        { error: 'Schema validation failed', details: schemaValidation.errors },
-        { status: 400 }
-      );
-    }
-
-    // Create draft in database
-    const metadataJson = {
-      contentOps: {
-        gatewayLocation: data.gatewayLocation,
-        localHermesRunId: data.localHermesRunId,
-        planningUsed: data.planningUsed,
-        fallbackUsed: data.fallbackUsed,
-        traceId: data.traceId,
-        qualityScore: data.qualityGate.score,
-        testStatus: data.testStatus || null,
-        v2Mvp: true,
-      },
-    };
-
-    // V2 Quality Check
-    const qualityCheck = checkContentQuality({
-      title: data.title,
-      summary: data.summary || data.content.intro || data.content.quickAnswer,
-      body: data.content.body || JSON.stringify(data.content),
-      contentType: data.contentType,
-      seoTitle: data.seoTitle || data.title,
-      seoDescription: data.seoDescription || data.summary,
-      canonicalUrl: data.canonicalUrl,
-      faq: data.content.faq,
-      structuredData: data.content.structuredData,
-      internalLinks: data.content.internalLinks,
-      sourceFacts: data.content.sourceFacts,
-      metadataJson: { groups: data.content.groups },
-    });
-
-    const seoScore = calculateSeoScore({
-      title: data.title,
-      summary: data.summary || data.content.intro || data.content.quickAnswer,
-      contentType: data.contentType,
-      seoTitle: data.seoTitle || data.title,
-      seoDescription: data.seoDescription || data.summary,
-      canonicalUrl: data.canonicalUrl,
-    });
-
-    const geoScore = calculateGeoScore({
-      title: data.title,
-      contentType: data.contentType,
-      faq: data.content.faq,
-      structuredData: data.content.structuredData,
-      internalLinks: data.content.internalLinks,
-    });
-
-    // Add quality metadata
-    metadataJson.contentOps.v2Quality = {
-      score: qualityCheck.score,
-      level: qualityCheck.level,
-      seoScore,
-      geoScore,
-      issues: qualityCheck.issues.length,
-      warnings: qualityCheck.warnings.length,
-      checkedAt: new Date().toISOString(),
-    };
-
-    let draft: any;
-    
-    if (data.contentType === 'topic') {
-      draft = await prisma.topic.create({
-        data: {
-          title: data.title,
-          slug: data.slug,
-          summary: data.content.intro,
-          metadataJson,
-          status: 'draft',
-          publishedAt: null,
-        },
-      });
-    } else if (data.contentType === 'guide') {
-      draft = await prisma.guide.create({
-        data: {
-          title: data.title,
-          slug: data.slug,
-          summary: data.content.quickAnswer,
-          body: JSON.stringify(data.content),
-          metadataJson,
-          status: 'draft',
-          publishedAt: null,
-          robots: 'noindex,nofollow',
-        },
-      });
-    } else if (data.contentType === 'checklist') {
-      draft = await prisma.checklist.create({
-        data: {
-          title: data.title,
-          slug: data.slug,
-          summary: data.summary || '',
-          metadataJson,
-          status: 'draft',
-          publishedAt: null,
-          robots: 'noindex,nofollow',
-        },
-      });
-    }
-
-    // Generate admin URLs
-    const adminEditUrl = `https://jueshi.net/admin/contentops/${data.contentType}s/${draft.id}/edit`;
-    const adminPreviewUrl = `https://jueshi.net/${data.contentType}s/${draft.slug}?preview=true`;
-
-    // Log audit
-    console.log('[DraftBridge] Draft created:', {
-      id: draft.id,
-      type: data.contentType,
-      slug: draft.slug,
-      traceId: data.traceId,
-      localHermesRunId: data.localHermesRunId,
-    });
 
     return NextResponse.json({
-      success: true,
-      draftId: draft.id,
-      slug: draft.slug,
-      type: data.contentType,
-      adminEditUrl,
-      adminPreviewUrl,
-      traceId: data.traceId,
-      localHermesRunId: data.localHermesRunId,
-      status: 'draft',
-      publishedAt: null,
-      robots: 'noindex,nofollow',
-      // V2 Quality Results
-      qualityCheck: {
-        score: qualityCheck.score,
-        level: qualityCheck.level,
-        seoScore,
-        geoScore,
-        issues: qualityCheck.issues,
-        warnings: qualityCheck.warnings,
-      },
+      id: draft.id,
+      title: draft.title,
+      state: draft.state,
+      version: draft.version,
+      updatedAt: draft.updatedAt.toISOString(),
     });
-
-  } catch (error: any) {
-    console.error('[DraftBridge] Error:', error.message);
-    
-    // Don't expose database errors
+  } catch (error) {
+    console.error('[ContentOps Bridge] PUT error:', error);
     return NextResponse.json(
-      { error: 'Draft creation failed' },
+      { error: 'Internal server error', code: 'UPDATE_FAILED' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/internal/contentops/drafts/[id]
+ * 获取单个草稿
+ */
+export async function GET_BY_ID(request: NextRequest) {
+  // 验证签名
+  if (!verifySignature(request, '')) {
+    console.error('[ContentOps Bridge] Invalid signature');
+    return NextResponse.json(
+      { error: 'Unauthorized', code: 'INVALID_SIGNATURE' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const draftId = searchParams.get('id');
+
+    if (!draftId) {
+      return NextResponse.json(
+        { error: 'Draft ID is required', code: 'MISSING_ID' },
+        { status: 400 }
+      );
+    }
+
+    const draft = await getDraft(draftId);
+
+    if (!draft) {
+      return NextResponse.json(
+        { error: 'Draft not found', code: 'NOT_FOUND' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      id: draft.id,
+      title: draft.title,
+      body: draft.body,
+      state: draft.state,
+      version: draft.version,
+      targetEnvironment: draft.targetEnvironment,
+      createdAt: draft.createdAt.toISOString(),
+      updatedAt: draft.updatedAt.toISOString(),
+    });
+  } catch (error) {
+    console.error('[ContentOps Bridge] GET_BY_ID error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', code: 'GET_FAILED' },
       { status: 500 }
     );
   }
