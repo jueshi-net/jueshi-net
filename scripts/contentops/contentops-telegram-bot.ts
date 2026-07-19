@@ -25,6 +25,7 @@
 
 import TelegramBot from 'node-telegram-bot-api';
 import { execSync } from 'child_process';
+import { createHmac } from 'crypto';
 
 // ============================================================================
 // Configuration
@@ -42,9 +43,22 @@ function readBotTokenFromKeychain(): string | undefined {
   }
 }
 
+function readBridgeSecretFromKeychain(): string | undefined {
+  try {
+    const secret = execSync(
+      'security find-generic-password -s jueshi-contentops -a contentops-bridge -w',
+      { encoding: 'utf-8' }
+    ).trim();
+    return secret || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 const CONFIG = {
   enabled: process.env.CONTENTOPS_BOT_ENABLED === 'true',
   botToken: process.env.CONTENTOPS_TELEGRAM_BOT_TOKEN || readBotTokenFromKeychain(),
+  bridgeSecret: process.env.CONTENTOPS_BRIDGE_SECRET || readBridgeSecretFromKeychain(),
   // Security: Production is ALWAYS disabled in bot
   allowProduction: false,
   // Allowlist
@@ -59,6 +73,7 @@ const RUNTIME_INFO = {
   version: 'v1.0',
 };
 
+// ============================================================================
 // ============================================================================
 // Secret Redaction
 // ============================================================================
@@ -77,6 +92,35 @@ function redactSecrets(text: string): string {
     redacted = redacted.replace(pattern, '[REDACTED]');
   }
   return redacted;
+}
+
+// ============================================================================
+// HMAC Signature for Bridge API
+// ============================================================================
+
+function signPayload(payload: string): string {
+  if (!CONFIG.bridgeSecret) {
+    throw new Error('Bridge secret not configured');
+  }
+  return createHmac('sha256', CONFIG.bridgeSecret)
+    .update(payload)
+    .digest('hex');
+}
+
+async function fetchBridgeApi(body: any): Promise<any> {
+  const payload = JSON.stringify(body);
+  const signature = signPayload(payload);
+  
+  const res = await fetch(CONFIG.bridgeUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-ContentOps-Signature': signature,
+    },
+    body: payload,
+  });
+  
+  return res;
 }
 
 // ============================================================================
@@ -215,7 +259,10 @@ async function startBot() {
 
     try {
       const res = await fetch(`${CONFIG.bridgeUrl}?limit=10`, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-ContentOps-Signature': signPayload(''),
+        },
       });
       
       if (!res.ok) {
@@ -258,13 +305,9 @@ async function startBot() {
     }
 
     try {
-      const res = await fetch(CONFIG.bridgeUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'quality_check',
-          id: session.currentDraftId,
-        }),
+      const res = await fetchBridgeApi({
+        action: 'quality_check',
+        id: session.currentDraftId,
       });
 
       const data = await res.json();
@@ -314,14 +357,10 @@ ${data.qualityCheck.issues.join('\n')}
     `);
 
     try {
-      const res = await fetch(CONFIG.bridgeUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'publish',
-          id: session.currentDraftId,
-          target: 'staging',
-        }),
+      const res = await fetchBridgeApi({
+        action: 'publish',
+        id: session.currentDraftId,
+        target: 'staging',
       });
 
       const data = await res.json();

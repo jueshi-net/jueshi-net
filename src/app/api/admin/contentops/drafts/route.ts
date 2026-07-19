@@ -1,8 +1,9 @@
-// ContentOps V1 — Admin API
+// ContentOps V1.1 — Admin API
 // GET/POST /api/admin/contentops/drafts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { 
   listDrafts, 
   getDraft, 
@@ -14,6 +15,36 @@ import {
 } from '@/lib/contentops/draft-manager';
 import { publishToEnvironment, isProductionPublishAllowed } from '@/lib/contentops/publish-adapter';
 import { ContentState, ContentType } from '@/lib/contentops/types';
+
+// ============================================================================
+// HMAC Verification for Bot API
+// ============================================================================
+
+function verifyHmacSignature(payload: string, signature: string, secret: string): boolean {
+  const expectedSignature = createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  
+  try {
+    return timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function verifyBotRequest(request: NextRequest): Promise<boolean> {
+  const signature = request.headers.get('X-ContentOps-Signature');
+  if (!signature) return false;
+  
+  const secret = process.env.CONTENTOPS_BRIDGE_SECRET;
+  if (!secret) return false;
+  
+  const body = await request.clone().text();
+  return verifyHmacSignature(body, signature, secret);
+}
 
 // GET /api/admin/contentops/drafts - List drafts
 export async function GET(request: NextRequest) {
