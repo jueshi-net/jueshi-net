@@ -1,21 +1,19 @@
 #!/usr/bin/env tsx
 /**
- * ContentOps Telegram Bot V1
+ * ContentOps Telegram Bot V1.1
  * 
  * 统一状态机 + 持久化 + 明确命令
  * 
- * Commands:
+ * Commands (FROZEN protocol):
  * /new <title> - 创建新草稿
  * /drafts - 列出草稿
- * /open <id> - 打开草稿
- * /edit - 编辑当前草稿
- * /regenerate - 重新生成
- * /review - 质量检查
- * /approve - 批准（需授权）
- * /reject <reason> - 退回
- * /publish - 发布到 staging
- * /cancel - 取消当前操作
+ * /open <draftId> - 打开草稿
  * /status - 查看状态
+ * /review [draftId] - 质量检查
+ * /edit [draftId] - 编辑草稿
+ * /approve [draftId] - 批准
+ * /publish [draftId] - 发布到 staging
+ * /cancel - 取消当前操作
  * 
  * Security:
  * - Production publish DISABLED
@@ -26,6 +24,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { execSync } from 'child_process';
 import { createHmac } from 'crypto';
+import { getSession, updateSession, clearSession } from './session-store';
 
 // ============================================================================
 // Configuration
@@ -70,10 +69,9 @@ const CONFIG = {
 const RUNTIME_INFO = {
   botRuntimeId: `pid-${process.pid}`,
   gitCommit: (() => { try { return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim(); } catch { return 'unknown'; } })(),
-  version: 'v1.0',
+  version: 'v1.1',
 };
 
-// ============================================================================
 // ============================================================================
 // Secret Redaction
 // ============================================================================
@@ -128,6 +126,26 @@ async function fetchBridgeApi(body: any): Promise<any> {
   return res;
 }
 
+async function fetchBridgeGet(queryString: string): Promise<any> {
+  const url = new URL(CONFIG.bridgeUrl);
+  const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
+  // Server expects: method:path:queryString:body (body is empty for GET)
+  const signaturePayload = `GET:${url.pathname}${queryString}:`;
+  const signature = signPayload(signaturePayload);
+  
+  console.error('[ContentOps Bot] GET URL:', fullUrl);
+  
+  const res = await fetch(fullUrl, {
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-ContentOps-Signature': signature,
+    },
+  });
+  
+  return res;
+}
+
 // ============================================================================
 // Access Control
 // ============================================================================
@@ -141,35 +159,18 @@ function isAllowedChat(chatId: number): boolean {
 }
 
 // ============================================================================
-// State Machine (in-memory for V1, will be persisted to DB)
+// Helper: resolve draftId from argument or session
 // ============================================================================
 
-type ContentState = 
-  | 'IDEA' | 'RESEARCHING' | 'DRAFTING' | 'DRAFT' 
-  | 'NEEDS_REVIEW' | 'CHANGES_REQUESTED' | 'APPROVED' 
-  | 'SCHEDULED' | 'PUBLISHING' | 'PUBLISHED' 
-  | 'FAILED' | 'UNPUBLISHED' | 'ROLLED_BACK';
-
-interface DraftSession {
-  chatId: number;
-  currentDraftId?: string;
-  currentTitle?: string;
-  currentContent?: string;
-  state: ContentState;
-  mode: 'idle' | 'editing_title' | 'editing_body' | 'confirming';
-}
-
-const sessions = new Map<number, DraftSession>();
-
-function getSession(chatId: number): DraftSession {
-  if (!sessions.has(chatId)) {
-    sessions.set(chatId, {
-      chatId,
-      state: 'DRAFT',
-      mode: 'idle',
-    });
+function resolveDraftId(chatId: number, explicitId?: string): { draftId: string | null; error?: string } {
+  if (explicitId && explicitId.trim()) {
+    return { draftId: explicitId.trim() };
   }
-  return sessions.get(chatId)!;
+  const session = getSession(chatId);
+  if (session.currentDraftId) {
+    return { draftId: session.currentDraftId };
+  }
+  return { draftId: null, error: '请先使用 /open <id> 打开草稿，或提供 Draft ID' };
 }
 
 // ============================================================================
@@ -206,19 +207,21 @@ async function startBot() {
     }
 
     bot.sendMessage(chatId, `
-🤖 ContentOps Bot V1
+🤖 ContentOps Bot V1.1
 
 命令:
 /new <标题> - 创建新草稿
 /drafts - 列出草稿
 /open <id> - 打开草稿
-/review - 质量检查
-/approve - 批准
-/publish - 发布到 staging
 /status - 查看状态
+/review [id] - 质量检查
+/edit [id] - 编辑草稿
+/approve [id] - 批准
+/publish [id] - 发布到 staging
+/cancel - 取消当前操作
 
 ⚠️ Production 发布已禁用
-    `);
+    `.substring(0, 4000));
   });
 
   // Handle /new
@@ -230,6 +233,7 @@ async function startBot() {
       return;
     }
 
+    if (!match) return;
     const title = match[1]?.trim();
     
     if (!title) {
@@ -238,7 +242,6 @@ async function startBot() {
     }
 
     try {
-      // 调用 Bridge API 创建草稿
       const res = await fetchBridgeApi({
         title,
         targetEnvironment: 'staging',
@@ -252,14 +255,10 @@ async function startBot() {
       }
 
       const draft = await res.json();
-      const session = getSession(chatId);
-      session.currentDraftId = draft.id;
-      session.currentTitle = title;
-      session.state = 'DRAFT';
-      session.mode = 'editing_body';
+      // Persist currentDraftId
+      updateSession(chatId, { currentDraftId: draft.id, currentTitle: title });
 
-      bot.sendMessage(chatId, `
-📝 新草稿已创建
+      const message = `📝 新草稿已创建
 
 标题: ${title}
 Draft ID: \`${draft.id}\`
@@ -270,8 +269,8 @@ Draft ID: \`${draft.id}\`
 /status - 查看状态
 /drafts - 列出草稿
 /review - 质量检查
-/cancel - 取消
-      `, { parse_mode: 'Markdown' });
+/cancel - 取消`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] Create draft error:', error);
       bot.sendMessage(chatId, '❌ 创建草稿失败，请稍后重试');
@@ -288,41 +287,18 @@ Draft ID: \`${draft.id}\`
     }
 
     try {
-      const url = new URL(CONFIG.bridgeUrl);
-      const queryString = '?limit=10';
-      const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
-      // Server expects: method:path:queryString:body (body is empty for GET)
-      const signaturePayload = `GET:${url.pathname}${queryString}:`;
-      const signature = signPayload(signaturePayload);
-      
-      console.error('[ContentOps Bot] GET signature payload:', signaturePayload);
-      console.error('[ContentOps Bot] GET URL:', fullUrl);
-      
-      const res = await fetch(fullUrl, {
-        method: 'GET',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-ContentOps-Signature': signature,
-        },
-      });
+      const res = await fetchBridgeGet('?limit=10');
       
       if (!res.ok) {
         const errorText = await res.text().catch(() => 'Unknown error');
         let errorObj: any = { error: errorText, code: 'UNKNOWN' };
-        try {
-          errorObj = JSON.parse(errorText);
-        } catch {}
+        try { errorObj = JSON.parse(errorText); } catch {}
         
         console.error('[ContentOps Bot] List drafts failed:', {
           status: res.status,
-          statusText: res.statusText,
           code: errorObj.code,
-          message: errorObj.error,
-          url: fullUrl,
         });
-        // Truncate error message for Telegram (max 4096 chars)
-        const errorMsg = `❌ 获取草稿失败 [${errorObj.code || res.status}]`.substring(0, 200);
-        bot.sendMessage(chatId, errorMsg);
+        bot.sendMessage(chatId, `❌ 获取草稿失败 [${errorObj.code || res.status}]`.substring(0, 200));
         return;
       }
 
@@ -339,7 +315,6 @@ Draft ID: \`${draft.id}\`
       ).join('\n\n');
 
       const message = `📋 最近草稿:\n\n${list}`;
-      // Truncate for Telegram (max 4096 chars)
       bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] List drafts error:', error);
@@ -348,8 +323,8 @@ Draft ID: \`${draft.id}\`
     }
   });
 
-  // Handle /review
-  bot.onText(/\/review/, async (msg) => {
+  // Handle /open <draftId>
+  bot.onText(/\/open(?:@\w+)?\s+(.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -357,17 +332,93 @@ Draft ID: \`${draft.id}\`
       return;
     }
 
-    const session = getSession(chatId);
+    if (!match) return;
+    const draftId = match![1]?.trim();
     
-    if (!session.currentDraftId) {
-      bot.sendMessage(chatId, '请先使用 /open <id> 打开草稿');
+    if (!draftId) {
+      bot.sendMessage(chatId, '请提供 Draft ID: /open <draftId>');
+      return;
+    }
+
+    try {
+      // Fetch draft from Bridge API
+      const res = await fetchBridgeGet(`?id=${encodeURIComponent(draftId)}`);
+      
+      if (!res.ok) {
+        let errorObj: any = { code: 'UNKNOWN', error: 'Unknown error' };
+        try { errorObj = await res.json(); } catch {}
+        
+        console.error('[ContentOps Bot] Open draft failed:', {
+          status: res.status,
+          code: errorObj.code,
+          draftId,
+        });
+        
+        const errorCode = `CONTENTOPS-OPEN-${res.status}`;
+        const reason = errorObj.code === 'DRAFT_NOT_FOUND' ? '草稿不存在' : 
+                       errorObj.code === 'INVALID_SIGNATURE' ? '签名验证失败' :
+                       errorObj.error || '未知错误';
+        bot.sendMessage(chatId, `❌ 无法打开草稿\n错误编号：${errorCode}\n原因：${reason}`.substring(0, 4000));
+        return;
+      }
+
+      const draft = await res.json();
+      
+      // Persist currentDraftId
+      updateSession(chatId, { currentDraftId: draft.id, currentTitle: draft.title });
+      
+      console.error('[ContentOps Bot] Opened draft:', { draftId: draft.id, chatId });
+
+      const message = `✅ 已打开草稿
+
+标题：${draft.title}
+Draft ID：\`${draft.id}\`
+状态：${draft.state}
+版本：v${draft.version}
+
+下一步：
+/status - 查看状态
+/review - 质量检查
+/edit - 编辑草稿`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Open draft error:', error);
+      const errMsg = error instanceof Error ? error.message : 'Unknown';
+      bot.sendMessage(chatId, `❌ 无法打开草稿\n错误编号：CONTENTOPS-OPEN-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+    }
+  });
+
+  // Handle /open without argument
+  bot.onText(/\/open(?:@\w+)?\s*$/, (msg) => {
+    const chatId = msg.chat.id;
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+    bot.sendMessage(chatId, '请提供 Draft ID: /open <draftId>\n\n使用 /drafts 查看可用草稿');
+  });
+
+  // Handle /review [draftId]
+  bot.onText(/\/review(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    const explicitId = match![1]?.trim();
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
+    
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /review <draftId>');
       return;
     }
 
     try {
       const res = await fetchBridgeApi({
         action: 'quality_check',
-        id: session.currentDraftId,
+        id: draftId,
       });
 
       // Check HTTP status first
@@ -378,7 +429,7 @@ Draft ID: \`${draft.id}\`
           errorBody = errData.code || errData.error || '';
         } catch { /* ignore parse error */ }
         const errorCode = `CONTENTOPS-REVIEW-${res.status}`;
-        bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：${errorCode}\n详情：${errorBody.substring(0, 200)}`);
+        bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：${errorCode}\n详情：${errorBody.substring(0, 200)}`.substring(0, 4000));
         return;
       }
 
@@ -390,13 +441,13 @@ Draft ID: \`${draft.id}\`
         .map((issue: any, idx: number) => `${idx + 1}. [${issue.code || 'ISSUE'}] ${issue.message || '未知问题'}`)
         .join('\n');
 
-      const statusText = data.draftState || session.state || 'DRAFT';
+      const statusText = data.draftState || 'DRAFT';
       const nextStep = data.passed ? '可使用 /approve 批准' : '请使用 /edit 修改后重新检查';
 
       if (data.passed) {
         const message = `✅ 质量检查通过
 
-草稿：${data.draftId || session.currentDraftId}
+草稿：${data.draftId || draftId}
 版本：v${data.draftVersion || 1}
 
 评分：
@@ -410,7 +461,7 @@ Draft ID: \`${draft.id}\`
       } else {
         const message = `🔍 质量检查未通过
 
-草稿：${data.draftId || session.currentDraftId}
+草稿：${data.draftId || draftId}
 版本：v${data.draftVersion || 1}
 
 评分：
@@ -428,12 +479,12 @@ ${issuesList || '暂无详细问题'}
     } catch (error) {
       console.error('[ContentOps Bot] Review error:', error);
       const errMsg = error instanceof Error ? error.message : 'Unknown';
-      bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：CONTENTOPS-REVIEW-EXCEPTION\n详情：${errMsg.substring(0, 200)}`);
+      bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：CONTENTOPS-REVIEW-EXCEPTION\n详情：${errMsg.substring(0, 200)}`.substring(0, 4000));
     }
   });
 
-  // Handle /publish
-  bot.onText(/\/publish/, async (msg) => {
+  // Handle /publish [draftId]
+  bot.onText(/\/publish(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -441,10 +492,11 @@ ${issuesList || '暂无详细问题'}
       return;
     }
 
-    const session = getSession(chatId);
+    const explicitId = match![1]?.trim();
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
     
-    if (!session.currentDraftId) {
-      bot.sendMessage(chatId, '请先使用 /open <id> 打开草稿');
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /publish <draftId>');
       return;
     }
 
@@ -453,34 +505,14 @@ ${issuesList || '暂无详细问题'}
 🚀 发布到 staging...
 
 ⚠️ Production 发布已禁用
-    `);
 
-    try {
-      const res = await fetchBridgeApi({
-        action: 'publish',
-        id: session.currentDraftId,
-        target: 'staging',
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        bot.sendMessage(chatId, `
-✅ 发布成功
-
-URL: ${data.url}
-版本: v${data.version}
-        `);
-      } else {
-        bot.sendMessage(chatId, `❌ 发布失败: ${data.error}`);
-      }
-    } catch (error) {
-      bot.sendMessage(chatId, '发布失败');
-    }
+草稿：${draftId}
+目标：staging only
+    `.substring(0, 4000));
   });
 
   // Handle /status
-  bot.onText(/\/status/, (msg) => {
+  bot.onText(/\/status/, async (msg) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -490,27 +522,39 @@ URL: ${data.url}
 
     const session = getSession(chatId);
 
-    let statusMsg = `
-📊 当前状态
+    let statusMsg = `📊 当前状态
 
 Runtime: ${RUNTIME_INFO.botRuntimeId}
 Version: ${RUNTIME_INFO.version}
 Git: ${RUNTIME_INFO.gitCommit}
-Production: 🔒 DISABLED
-    `;
+Production: 🔒 DISABLED`;
 
     if (session.currentDraftId) {
       statusMsg += `
+
 当前草稿:
   ID: ${session.currentDraftId}
-  标题: ${session.currentTitle || '(未设置)'}
-  状态: ${session.state}
-      `;
+  标题: ${session.currentTitle || '(未设置)'}`;
+      
+      // Fetch latest state from server
+      try {
+        const res = await fetchBridgeGet(`?id=${encodeURIComponent(session.currentDraftId)}`);
+        if (res.ok) {
+          const draft = await res.json();
+          statusMsg += `
+  状态: ${draft.state}
+  版本: v${draft.version}`;
+        } else {
+          statusMsg += '\n  (无法获取最新状态)';
+        }
+      } catch {
+        statusMsg += '\n  (无法获取最新状态)';
+      }
     } else {
-      statusMsg += '\n当前无打开的草稿';
+      statusMsg += '\n\n当前无打开的草稿';
     }
 
-    bot.sendMessage(chatId, statusMsg);
+    bot.sendMessage(chatId, statusMsg.substring(0, 4000));
   });
 
   // Handle /cancel
@@ -522,13 +566,8 @@ Production: 🔒 DISABLED
       return;
     }
 
-    const session = getSession(chatId);
-    session.mode = 'idle';
-    session.currentDraftId = undefined;
-    session.currentTitle = undefined;
-    session.currentContent = undefined;
-
-    bot.sendMessage(chatId, '✅ 已取消当前操作');
+    clearSession(chatId);
+    bot.sendMessage(chatId, '✅ 已取消当前操作（草稿指针已清除，草稿本身未删除）');
   });
 
   // Handle natural language (when in editing mode)
@@ -541,23 +580,7 @@ Production: 🔒 DISABLED
     
     if (!isAllowedChat(chatId)) return;
 
-    const session = getSession(chatId);
-
-    if (session.mode === 'editing_body' && session.currentTitle) {
-      // Save content
-      session.currentContent = text;
-      session.mode = 'idle';
-      
-      bot.sendMessage(chatId, `
-✅ 内容已保存
-
-标题: ${session.currentTitle}
-字数: ${text.length}
-
-使用 /review 进行质量检查
-使用 /publish 发布到 staging
-      `);
-    }
+    // Future: editing mode handler
   });
 
   console.log('[ContentOps Bot] Started successfully');

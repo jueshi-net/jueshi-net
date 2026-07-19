@@ -85,6 +85,30 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
+
+    // Single draft fetch: GET /api/internal/contentops/drafts?id=<draftId>
+    const singleId = searchParams.get('id');
+    if (singleId) {
+      const draft = await getDraft(singleId);
+      if (!draft) {
+        return NextResponse.json(
+          { error: 'Draft not found', code: 'DRAFT_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        id: draft.id,
+        title: draft.title,
+        body: draft.body,
+        state: draft.state,
+        version: draft.version,
+        targetEnvironment: draft.targetEnvironment,
+        createdAt: draft.createdAt.toISOString(),
+        updatedAt: draft.updatedAt.toISOString(),
+      });
+    }
+
+    // List drafts: GET /api/internal/contentops/drafts?limit=N&offset=M
     const limit = parseInt(searchParams.get('limit') || '10');
     const offset = parseInt(searchParams.get('offset') || '0');
 
