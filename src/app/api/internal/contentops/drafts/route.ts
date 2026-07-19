@@ -33,7 +33,7 @@ function verifySignature(request: NextRequest, body: string): boolean {
   const queryString = url.search || '';
   const payload = `${method}:${path}${queryString}:${body}`;
 
-  console.log('[ContentOps Bridge] Verifying signature:', {
+  console.error('[ContentOps Bridge] Verifying signature:', {
     method,
     path,
     queryString,
@@ -45,8 +45,8 @@ function verifySignature(request: NextRequest, body: string): boolean {
     .update(payload)
     .digest('hex');
 
-  console.log('[ContentOps Bridge] Expected signature:', expectedSignature.substring(0, 20) + '...');
-  console.log('[ContentOps Bridge] Received signature:', signature.substring(0, 20) + '...');
+  console.error('[ContentOps Bridge] Expected signature:', expectedSignature.substring(0, 20) + '...');
+  console.error('[ContentOps Bridge] Received signature:', signature.substring(0, 20) + '...');
 
   try {
     const sigBuffer = Buffer.from(signature, 'hex');
