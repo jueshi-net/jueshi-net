@@ -83,6 +83,132 @@
 
 ---
 
+## Homepage V4 Baseline
+
+**状态**: 🔒 **FROZEN**  
+**基线版本**: UI V4 Home Candidate V2
+
+### 冻结范围
+
+| 模块 | 说明 | 状态 |
+|------|------|------|
+| **Header 结构** | 顶部导航栏、Logo、搜索框、用户入口 | 🔒 FROZEN |
+| **Hero 区域** | 首页主视觉、标题、副标题、CTA 按钮 | 🔒 FROZEN |
+| **首页工具入口布局** | 工具分类、卡片布局、图标样式 | 🔒 FROZEN |
+| **品牌视觉** | 颜色方案、字体、图标风格、品牌元素 | 🔒 FROZEN |
+| **BottomTab** | 移动端底部导航栏 | 🔒 FROZEN |
+| **Footer 结构** | 页脚布局、链接分类、版权信息 | 🔒 FROZEN |
+| **首页核心信息架构** | 内容层级、信息流、用户路径 | 🔒 FROZEN |
+
+### 禁止操作
+
+❌ **禁止修改整体布局**
+- 禁止改变页面整体结构
+- 禁止调整模块顺序
+- 禁止修改响应式断点
+
+❌ **禁止修改导航结构**
+- 禁止修改 Header 导航项
+- 禁止修改 BottomTab 导航项
+- 禁止修改导航交互逻辑
+
+❌ **禁止删除已有入口**
+- 禁止删除任何工具入口
+- 禁止删除任何内容分类
+- 禁止删除任何 CTA 按钮
+
+❌ **禁止改变品牌视觉**
+- 禁止修改品牌颜色
+- 禁止修改 Logo 样式
+- 禁止修改图标风格
+
+### 允许操作
+
+✅ **新增运营模块**
+- 允许添加新的运营活动区域
+- 允许添加限时活动入口
+- 允许添加推荐位
+
+✅ **新增内容入口**
+- 允许添加新的内容分类
+- 允许添加新的文章入口
+- 允许添加新的资源导航
+
+✅ **新增活动位**
+- 允许添加 Banner 广告位
+- 允许添加推广区域
+- 允许添加合作品牌展示
+
+### 核心文件
+
+| 文件 | 作用 | 状态 |
+|------|------|------|
+| `src/app/(public)/page.tsx` | 首页主页面 | 🔒 FROZEN |
+| `src/components/public/Header.tsx` | 顶部导航 | 🔒 FROZEN |
+| `src/components/public/Footer.tsx` | 页脚 | 🔒 FROZEN |
+| `src/components/public/BottomTab.tsx` | 移动端底部导航 | 🔒 FROZEN |
+| `src/components/public/Hero.tsx` | Hero 区域 | 🔒 FROZEN |
+
+---
+
+## Public Shell Baseline
+
+**状态**: 🔒 **FROZEN**  
+**变更流程**: 必须提交 `SHARED_CHANGE_REQUESTS`
+
+### 包含组件
+
+| 组件 | 说明 | 状态 |
+|------|------|------|
+| **JueshiV4PublicShell** | 公共布局外壳 | 🔒 FROZEN |
+| **Header** | 顶部导航栏 | 🔒 FROZEN |
+| **Footer** | 页脚 | 🔒 FROZEN |
+| **BottomTab** | 移动端底部导航 | 🔒 FROZEN |
+| **BreadcrumbBar** | 面包屑导航 | 🔒 FROZEN |
+| **公共 Container 规范** | 内容容器、间距、最大宽度 | 🔒 FROZEN |
+
+### 变更规则
+
+❌ **禁止任何业务 Agent 直接修改**
+- 禁止业务开发直接修改 Public Shell 组件
+- 禁止绕过变更流程修改公共组件
+- 禁止在业务代码中覆盖公共样式
+
+✅ **变更流程**
+1. 提交 `SHARED_CHANGE_REQUESTS` 文档
+2. 说明修改原因和影响范围
+3. 经过产品和技术评审
+4. 在 staging 环境验证
+5. 获得用户批准后才能合并
+
+### 核心文件
+
+| 文件 | 作用 | 状态 |
+|------|------|------|
+| `src/app/(public)/public-layout-client.tsx` | 公共布局客户端 | 🔒 FROZEN |
+| `src/components/public/JueshiV4PublicShell.tsx` | 公共外壳组件 | 🔒 FROZEN |
+| `src/components/public/Header.tsx` | 顶部导航 | 🔒 FROZEN |
+| `src/components/public/Footer.tsx` | 页脚 | 🔒 FROZEN |
+| `src/components/public/BottomTab.tsx` | 移动端底部导航 | 🔒 FROZEN |
+| `src/components/public/BreadcrumbBar.tsx` | 面包屑导航 | 🔒 FROZEN |
+
+### 变更请求模板
+
+如需修改 Public Shell，必须在 `SHARED_CHANGE_REQUESTS.md` 中提交：
+
+```markdown
+## 变更请求
+
+**组件**: [组件名称]
+**修改内容**: [具体修改]
+**修改原因**: [为什么需要修改]
+**影响范围**: [影响哪些页面]
+**替代方案**: [是否有其他方案]
+**风险评估**: [可能的风险]
+```
+
+---
+
 ## 响应式规则
 
 | 屏幕宽度 | 显示区域 | 布局 |
@@ -188,6 +314,8 @@
 
 | 日期 | 变更 | 说明 |
 |------|------|------|
+| 2026-07-19 | 新增 Homepage V4 Baseline | 明确首页冻结范围，基线版本 UI V4 Home Candidate V2 |
+| 2026-07-19 | 新增 Public Shell Baseline | 明确公共外壳冻结范围，建立变更请求流程 |
 | 2026-07-19 | 修正文档 | 明确 Workspace Desktop Layout 是四区域，不是三栏 |
 | 2026-07-19 | 验收版本 | commit `4cdb6ff` 作为基线 |
 
@@ -203,6 +331,8 @@
 
 ## 审计检查清单
 
+### Workspace 检查
+
 在修改 Workspace 相关代码前，必须确认：
 
 - [ ] 是否修改了 Global Sidebar？→ ❌ 禁止
@@ -213,6 +343,36 @@
 - [ ] 是否删除了现有功能模块？→ ❌ 禁止
 - [ ] 是否在 Main Workspace 添加新功能？→ ✅ 允许
 - [ ] 是否在 Right Assistant Rail 添加新功能？→ ✅ 允许
+
+### Homepage V4 检查
+
+在修改首页相关代码前，必须确认：
+
+- [ ] 是否修改了 Header 结构？→ ❌ 禁止
+- [ ] 是否修改了 Hero 区域？→ ❌ 禁止
+- [ ] 是否修改了首页工具入口布局？→ ❌ 禁止
+- [ ] 是否修改了品牌视觉？→ ❌ 禁止
+- [ ] 是否修改了 BottomTab？→ ❌ 禁止
+- [ ] 是否修改了 Footer 结构？→ ❌ 禁止
+- [ ] 是否修改了首页核心信息架构？→ ❌ 禁止
+- [ ] 是否新增了运营模块？→ ✅ 允许
+- [ ] 是否新增了内容入口？→ ✅ 允许
+- [ ] 是否新增了活动位？→ ✅ 允许
+
+### Public Shell 检查
+
+在修改公共外壳组件前，必须确认：
+
+- [ ] 是否修改了 JueshiV4PublicShell？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否修改了 Header？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否修改了 Footer？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否修改了 BottomTab？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否修改了 BreadcrumbBar？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否修改了公共 Container 规范？→ ❌ 禁止（需提交变更请求）
+- [ ] 是否提交了 SHARED_CHANGE_REQUESTS？→ ✅ 必须
+- [ ] 是否经过产品和技术评审？→ ✅ 必须
+- [ ] 是否在 staging 环境验证？→ ✅ 必须
+- [ ] 是否获得用户批准？→ ✅ 必须
 
 ---
 
