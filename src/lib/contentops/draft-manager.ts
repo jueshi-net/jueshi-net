@@ -154,6 +154,8 @@ export async function getDraft(draftId: string): Promise<ContentOpsDraft | null>
 
 /**
  * 更新草稿
+ * Returns updated draft with previousVersion and versionHistory support.
+ * If body is identical to current, returns null with isDuplicate flag.
  */
 export async function updateDraft(
   draftId: string,
@@ -162,7 +164,7 @@ export async function updateDraft(
     body?: string;
     state?: ContentOpsDraft['state'];
   }
-): Promise<ContentOpsDraft | null> {
+): Promise<ContentOpsDraft & { previousVersion: number; isDuplicate?: boolean } | null> {
   const article = await prisma.article.findFirst({
     where: {
       category: 'contentops-draft',
@@ -177,7 +179,44 @@ export async function updateDraft(
   }
 
   const metadata = parseMetadata(article.seoDescription);
-  const newVersion = (metadata.contentOpsVersion || 1) + 1;
+  const currentVersion = metadata.contentOpsVersion || 1;
+  const currentBody = article.content || '';
+
+  // Duplicate detection: if body is provided and identical, don't create new version
+  if (updates.body !== undefined && updates.body === currentBody && !updates.title && !updates.state) {
+    return {
+      id: draftId,
+      title: article.title,
+      body: article.content,
+      state: (metadata.contentOpsStatus as ContentOpsDraft['state']) || 'DRAFT',
+      version: currentVersion,
+      targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+      contentOpsManaged: true,
+      contentOpsDraftId: draftId,
+      contentOpsStatus: metadata.contentOpsStatus || 'DRAFT',
+      contentOpsVersion: currentVersion,
+      createdAt: article.createdAt,
+      updatedAt: article.updatedAt,
+      previousVersion: currentVersion,
+      isDuplicate: true,
+    };
+  }
+
+  const newVersion = currentVersion + 1;
+
+  // Build version history: store snapshot of previous version
+  const existingHistory: Array<{ version: number; body: string; title: string; updatedAt: string }> = 
+    metadata.versionHistory || [];
+  
+  const historyEntry = {
+    version: currentVersion,
+    body: currentBody,
+    title: article.title,
+    updatedAt: article.updatedAt.toISOString(),
+  };
+  
+  // Keep last 20 versions to avoid unbounded growth
+  const versionHistory = [...existingHistory, historyEntry].slice(-20);
 
   const updatedArticle = await prisma.article.update({
     where: { id: article.id },
@@ -188,6 +227,7 @@ export async function updateDraft(
         ...metadata,
         contentOpsStatus: updates.state || metadata.contentOpsStatus,
         contentOpsVersion: newVersion,
+        versionHistory,
         updatedAt: new Date().toISOString(),
       }),
     },
@@ -206,7 +246,29 @@ export async function updateDraft(
     contentOpsVersion: newVersion,
     createdAt: updatedArticle.createdAt,
     updatedAt: updatedArticle.updatedAt,
+    previousVersion: currentVersion,
   };
+}
+
+/**
+ * 获取版本历史
+ */
+export async function getVersionHistory(draftId: string): Promise<Array<{ version: number; body: string; title: string; updatedAt: string }> | null> {
+  const article = await prisma.article.findFirst({
+    where: {
+      category: 'contentops-draft',
+      seoDescription: {
+        contains: draftId,
+      },
+    },
+  });
+
+  if (!article) {
+    return null;
+  }
+
+  const metadata = parseMetadata(article.seoDescription);
+  return metadata.versionHistory || [];
 }
 
 /**

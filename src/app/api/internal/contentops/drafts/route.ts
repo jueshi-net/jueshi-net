@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { createDraft, listDrafts, getDraft, updateDraft } from '@/lib/contentops/draft-manager';
+import { createDraft, listDrafts, getDraft, updateDraft, getVersionHistory } from '@/lib/contentops/draft-manager';
 import { checkContentQuality, calculateSeoScore, calculateGeoScore } from '@/lib/contentops/quality-checker';
 
 const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET || '';
@@ -89,6 +89,30 @@ export async function GET(request: NextRequest) {
     // Single draft fetch: GET /api/internal/contentops/drafts?id=<draftId>
     const singleId = searchParams.get('id');
     if (singleId) {
+      // Version history request
+      const action = searchParams.get('action');
+      if (action === 'version_history') {
+        const history = await getVersionHistory(singleId);
+        if (history === null) {
+          return NextResponse.json(
+            { error: 'Draft not found', code: 'DRAFT_NOT_FOUND' },
+            { status: 404 }
+          );
+        }
+        // Also get current version for reference
+        const currentDraft = await getDraft(singleId);
+        return NextResponse.json({
+          draftId: singleId,
+          currentVersion: currentDraft?.version || 0,
+          history: history.map(h => ({
+            version: h.version,
+            title: h.title,
+            updatedAt: h.updatedAt,
+            bodyLength: h.body.length,
+          })),
+        });
+      }
+
       const draft = await getDraft(singleId);
       if (!draft) {
         return NextResponse.json(
@@ -295,11 +319,26 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // Handle duplicate detection
+    if (draft.isDuplicate) {
+      return NextResponse.json({
+        id: draft.id,
+        title: draft.title,
+        state: draft.state,
+        version: draft.version,
+        previousVersion: draft.previousVersion,
+        isDuplicate: true,
+        updatedAt: draft.updatedAt.toISOString(),
+        message: '内容未变更，未创建新版本',
+      });
+    }
+
     return NextResponse.json({
       id: draft.id,
       title: draft.title,
       state: draft.state,
       version: draft.version,
+      previousVersion: draft.previousVersion,
       updatedAt: draft.updatedAt.toISOString(),
     });
   } catch (error) {

@@ -704,6 +704,22 @@ Production: 🔒 DISABLED`;
 
       const updated = await res.json();
       const newVersion = updated.version;
+      const previousVersion = updated.previousVersion;
+      
+      // Handle duplicate detection
+      if (updated.isDuplicate) {
+        bot.sendMessage(chatId, `⚠️ 内容未变更
+
+Draft ID：\`${draftId}\`
+当前版本：v${newVersion}
+
+未创建新版本（内容与当前版本相同）。
+
+下一步：
+/review - 质量检查
+/status - 查看状态`.substring(0, 4000), { parse_mode: 'Markdown' });
+        return;
+      }
       
       // Exit editing mode, keep currentDraftId
       updateSession(chatId, { 
@@ -711,12 +727,13 @@ Production: 🔒 DISABLED`;
         editingDraftId: undefined,
       });
 
-      console.error('[ContentOps Bot] Draft saved:', { draftId, newVersion, chatId });
+      console.error('[ContentOps Bot] Draft saved:', { draftId, newVersion, previousVersion, chatId });
 
       const message = `✅ 草稿已保存
 
 Draft ID：\`${draftId}\`
 新版本：v${newVersion}
+上一版本：v${previousVersion}
 状态：DRAFT
 
 下一步：
