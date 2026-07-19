@@ -320,7 +320,9 @@ Draft ID: \`${draft.id}\`
           message: errorObj.error,
           url: fullUrl,
         });
-        bot.sendMessage(chatId, `❌ 获取草稿失败 [${errorObj.code || res.status}]\n\n${errorObj.error || ''}`);
+        // Truncate error message for Telegram (max 4096 chars)
+        const errorMsg = `❌ 获取草稿失败 [${errorObj.code || res.status}]`.substring(0, 200);
+        bot.sendMessage(chatId, errorMsg);
         return;
       }
 
@@ -332,15 +334,17 @@ Draft ID: \`${draft.id}\`
         return;
       }
 
-      const list = drafts.map((d: any, i: number) => 
+      const list = drafts.slice(0, 5).map((d: any, i: number) => 
         `${i + 1}. ${d.title}\n   ID: \`${d.id}\`\n   状态: ${d.state}\n   版本: v${d.version}`
       ).join('\n\n');
 
-      bot.sendMessage(chatId, `📋 最近草稿:\n\n${list}`, { parse_mode: 'Markdown' });
+      const message = `📋 最近草稿:\n\n${list}`;
+      // Truncate for Telegram (max 4096 chars)
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] List drafts error:', error);
       const errMsg = error instanceof Error ? error.message : 'Unknown error';
-      bot.sendMessage(chatId, `❌ 获取草稿失败: ${errMsg}`);
+      bot.sendMessage(chatId, `❌ 获取草稿失败: ${errMsg.substring(0, 200)}`);
     }
   });
 
@@ -366,26 +370,65 @@ Draft ID: \`${draft.id}\`
         id: session.currentDraftId,
       });
 
+      // Check HTTP status first
+      if (!res.ok) {
+        let errorBody = '';
+        try {
+          const errData = await res.json();
+          errorBody = errData.code || errData.error || '';
+        } catch { /* ignore parse error */ }
+        const errorCode = `CONTENTOPS-REVIEW-${res.status}`;
+        bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：${errorCode}\n详情：${errorBody.substring(0, 200)}`);
+        return;
+      }
+
       const data = await res.json();
 
+      // Build structured response
+      const issuesList = (data.issues || [])
+        .slice(0, 10)
+        .map((issue: any, idx: number) => `${idx + 1}. [${issue.code || 'ISSUE'}] ${issue.message || '未知问题'}`)
+        .join('\n');
+
+      const statusText = data.draftState || session.state || 'DRAFT';
+      const nextStep = data.passed ? '可使用 /approve 批准' : '请使用 /edit 修改后重新检查';
+
       if (data.passed) {
-        bot.sendMessage(chatId, `
-✅ 质量检查通过
+        const message = `✅ 质量检查通过
 
-分数: ${data.qualityCheck.score}
-SEO: ${data.qualityCheck.seoScore}
-GEO: ${data.qualityCheck.geoScore}
-        `);
+草稿：${data.draftId || session.currentDraftId}
+版本：v${data.draftVersion || 1}
+
+评分：
+- 内容质量：${data.qualityScore ?? '-'}/100
+- SEO：${data.seoScore ?? '-'}/100
+- GEO：${data.geoScore ?? '-'}/100
+
+当前状态：${statusText}
+下一步：${nextStep}`;
+        bot.sendMessage(chatId, message.substring(0, 4000));
       } else {
-        bot.sendMessage(chatId, `
-❌ 质量检查未通过
+        const message = `🔍 质量检查未通过
 
-问题:
-${data.qualityCheck.issues.join('\n')}
-        `);
+草稿：${data.draftId || session.currentDraftId}
+版本：v${data.draftVersion || 1}
+
+评分：
+- 内容质量：${data.qualityScore ?? 0}/100
+- SEO：${data.seoScore ?? 0}/100
+- GEO：${data.geoScore ?? 0}/100
+
+需要修改：
+${issuesList || '暂无详细问题'}
+
+当前状态：${statusText}
+下一步：${nextStep}`;
+        bot.sendMessage(chatId, message.substring(0, 4000));
       }
     } catch (error) {
-      bot.sendMessage(chatId, '质量检查失败');
+      console.error('[ContentOps Bot] Review error:', error);
+      const errMsg = error instanceof Error ? error.message : 'Unknown';
+      bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：CONTENTOPS-REVIEW-EXCEPTION\n详情：${errMsg.substring(0, 200)}`);
     }
   });
 

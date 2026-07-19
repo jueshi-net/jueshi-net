@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { createDraft, listDrafts, getDraft, updateDraft } from '@/lib/contentops/draft-manager';
+import { checkContentQuality, calculateSeoScore, calculateGeoScore } from '@/lib/contentops/quality-checker';
 
 const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET || '';
 
@@ -133,6 +134,63 @@ export async function POST(request: NextRequest) {
 
   try {
     const data = JSON.parse(body);
+
+    // Handle quality_check action
+    if (data.action === 'quality_check') {
+      const draftId = data.id;
+      if (!draftId) {
+        return NextResponse.json(
+          { error: 'Draft ID is required', code: 'MISSING_DRAFT_ID' },
+          { status: 400 }
+        );
+      }
+
+      const draft = await getDraft(draftId);
+      if (!draft) {
+        return NextResponse.json(
+          { error: 'Draft not found', code: 'DRAFT_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+
+      // Build content metadata for quality checker (safe for empty/null fields)
+      const contentMetadata = {
+        title: draft.title || '',
+        body: draft.body || '',
+        summary: '',
+        contentType: 'guide' as const,
+        seoTitle: '',
+        seoDescription: '',
+        faq: [],
+        internalLinks: [],
+        sourceFacts: [],
+      };
+
+      // Run quality checks (all null-safe)
+      const qualityResult = checkContentQuality(contentMetadata);
+      const seoScore = calculateSeoScore(contentMetadata);
+      const geoScore = calculateGeoScore(contentMetadata);
+
+      // Build issues list for bot display
+      const allIssues = [
+        ...qualityResult.issues.map(i => ({ code: i.type.toUpperCase(), message: i.message })),
+        ...qualityResult.warnings.map(w => ({ code: w.type.toUpperCase(), message: w.message })),
+      ];
+
+      return NextResponse.json({
+        passed: qualityResult.level !== 'poor' && qualityResult.score >= 60,
+        qualityScore: qualityResult.score,
+        seoScore,
+        geoScore,
+        level: qualityResult.level,
+        issues: allIssues,
+        draftId: draft.id,
+        draftState: draft.state,
+        draftVersion: draft.version,
+      });
+    }
+
+    // Default: create new draft
     const { title, body: draftBody, targetEnvironment } = data;
 
     if (!title) {
