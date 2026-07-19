@@ -2,7 +2,7 @@
   "cookies": [
     {
       "name": "__Host-authjs.csrf-token",
-      "value": "fe5e1d933fc5ddb6d87276eb0031c607af1dc0e7a92a99fd4db969201c362cd6%7Cdb1ae12bca531ca93d161681bde75dcfdf487dfbe02fb5f06438405b7425144a",
+      "value": "4d9b5756cc2990930dc60732159c9ff5b7f4cdbd5de2e72918952d741edbe0e2%7C33a10599a1df1a703f23740cafa7094b7ae4d523d00cb0395da1793617e3257d",
       "domain": "i.jueshi.net",
       "path": "/",
       "expires": -1,
@@ -12,7 +12,7 @@
     },
     {
       "name": "__Secure-authjs.callback-url",
-      "value": "https%3A%2F%2Fjueshi.net",
+      "value": "https%3A%2F%2Fi.jueshi.net%2Flogin",
       "domain": "i.jueshi.net",
       "path": "/",
       "expires": -1,
@@ -22,10 +22,10 @@
     },
     {
       "name": "__Secure-authjs.session-token",
-      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..nmuxvu1MopQk7EV4W0w2zw.i3SSonx2ELpon1K3k0ss1E-cOOxvjXEaMGgU5Sb8iMk9G_bDVUCqhuJ70HtMCllVWGmkWmFvJrvZtt7LFyLW6wqVBsI4sNYXG00m_wWozrGD1PUSlAczD1D38XwuIMpx9yIoXDuexlHl46JVMlabg3mOITdfxm1dls6MXhDT5NEP7emhseasI72O56ibl1sQkAEvGAMXk9fG3Rv97sUqiI4-RogA2ybHRojkA53xF3o7IvL9HctwbYQuzZNMfhbpLyGNHlWUhycYSvbv9Md9p-dbV8_68sPsnmqlGF08cNjZyB9FMp-klMbE-F9UOZlj.lECKGnAjsu6YkF1e0j63VQvRj3NKjQBzOCtZa-Ny4CY",
+      "value": "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoiUm8zZ3ItNzhVS0RQdFBaNTh4bmxDVERPYm9IcDd5SlNnVmU4emFLTEt3Szd6Z1IxckFHd0p2RkJ4a3BLaHRNOUlKMU5PYUNyYkRnOFAxMDFoUU9aSncifQ..5SMUxzQyUEdm8H1ILdSOXg.dr-6KBLmhQnNpIX6gtOxE-hJZuIYNKXWCPAMAGW93weUE_53Zf4OXpAsUXIibqTEg3rm_VryTrt97C23VYJSL8PbAY6-txvtk3RlVopqAnB_AGJeswiriJT8PPRiltYGiD6mNHniKUOn2fCKhYct-WRjRQq9ZT2vLKwK2csi2lnfvyO18aZyA2vNe81GZJ5U-B9IfCf5hBllCDJY0nA-bn34RLiC3IcowiAtA1D76hAMGnLzJApN5_iKVHj14rjdUx5Xa38WR2kHU8F_mUugPl11Yn7uGe1V4KKruQTvkzGokDPeYlaDXPdKcJLfXLQL.GogCQeZssDnoCYkt9ojVKLjSQFX_xDebwvHqewOBBpY",
       "domain": "i.jueshi.net",
       "path": "/",
-      "expires": 1786531411.238397,
+      "expires": 1787045036.63351,
       "httpOnly": true,
       "secure": true,
       "sameSite": "Lax"
@@ -37,7 +37,7 @@
       "localStorage": [
         {
           "name": "__bxb_stime",
-          "value": "1783939410773"
+          "value": "1784453036379"
         },
         {
           "name": "theme",
@@ -45,11 +45,11 @@
         },
         {
           "name": "__bxb_sid",
-          "value": "3d596627-2c38-4246-8bc4-c1a4da7d270d"
+          "value": "801b7be1-1d07-4354-ab86-e3809e39a633"
         },
         {
           "name": "__bxb_aid",
-          "value": "e2693abc-90f9-4f63-86f4-15bd57c82c00"
+          "value": "df6dd7ef-5064-420d-8df6-3acef0f0928d"
         }
       ]
     }

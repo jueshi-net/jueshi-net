@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getUserCommunityInfo } from "@/lib/honor-helpers";
-import { UserTrustCard, type TrustCardData } from "@/components/community/user-trust-card";
 import { UserProfileTabs } from "@/components/community/user-profile-tabs";
+import UserIdentityCard, { type UserDisplayData } from "@/components/user/UserIdentityCard";
 import { auth } from "@/lib/auth";
 import JueshiV4PublicShell from "@/components/layout/JueshiV4PublicShell";
 import { BreadcrumbBar } from "@/components/design-system/BreadcrumbBar";
@@ -15,13 +15,11 @@ import {
   Star,
   CheckCircle,
   Award,
-  TrendingUp,
   Calendar,
   MapPin,
   Shield,
   Lock,
 } from "lucide-react";
-import { formatDateTime } from "@/lib/utils";
 import {
   buildProfileJsonLd,
   renderJsonLd,
@@ -93,34 +91,6 @@ export default async function PublicUserProfilePage({
     );
   }
 
-  const trustCardData: TrustCardData = {
-    user: {
-      id: info.user.id,
-      name: info.user.name,
-      image: info.user.image,
-      role: info.user.role,
-      membershipTier: info.user.membershipTier,
-      growthValue: info.user.growthValue,
-      levelKey: info.user.levelKey,
-      honorScore: info.user.honorScore,
-      points: info.user.points,
-      createdAt: info.user.createdAt.toISOString(),
-    },
-    profile: info.profile
-      ? {
-          displayName: info.profile.displayName,
-          bio: info.profile.bio,
-          locationText: info.profile.locationText,
-          publicTitle: info.profile.publicTitle,
-          isPublic: info.profile.isPublic,
-          joinedAtDisplayMode: info.profile.joinedAtDisplayMode,
-        }
-      : null,
-    stat: info.stat,
-    badges: info.badges,
-    level: info.level,
-  };
-
   // Fetch user's published posts
   const userPosts = await prisma.forumPost.findMany({
     where: { userId: id, status: "published" },
@@ -191,14 +161,16 @@ export default async function PublicUserProfilePage({
   // Calculate growth progress
   const currentLevel = info.level;
   const currentLevelIndex = allLevels.findIndex((l) => l.key === (info.user.levelKey || "lv1"));
+  const currentLevelFromAll = currentLevelIndex >= 0 ? allLevels[currentLevelIndex] : null;
   const nextLevel = currentLevelIndex >= 0 && currentLevelIndex < allLevels.length - 1
     ? allLevels[currentLevelIndex + 1]
     : null;
   const growthMin = currentLevel.minGrowth;
-  const growthMax = nextLevel?.minGrowth || (currentLevel.maxGrowth || growthMin);
+  const growthMax = nextLevel?.minGrowth || currentLevelFromAll?.maxGrowth || growthMin;
   const growthProgress = growthMax > growthMin
     ? Math.min(100, Math.round(((info.user.growthValue - growthMin) / (growthMax - growthMin)) * 100))
     : 100;
+  const remainingToNext = nextLevel ? Math.max(0, growthMax - info.user.growthValue) : undefined;
 
   // Display name
   const displayName = info.profile?.displayName || info.user.name || "匿名用户";
@@ -206,6 +178,27 @@ export default async function PublicUserProfilePage({
   const isMember = info.user.membershipTier !== "free";
   const joinDateMode = info.profile?.joinedAtDisplayMode || "date";
   const joinDateText = formatJoinDate(info.user.createdAt.toISOString(), joinDateMode);
+
+  // Security: only fetch email for the profile owner
+  const userEmail = isOwnProfile
+    ? (await prisma.user.findUnique({ where: { id }, select: { email: true } }))?.email
+    : undefined;
+
+  // Build unified UserDisplayData for UserIdentityCard
+  const userData: UserDisplayData = {
+    displayName,
+    email: userEmail,
+    avatarUrl: info.user.image || undefined,
+    levelKey: info.user.levelKey || "lv1",
+    levelLabel: currentLevel.name,
+    growthValue: info.user.growthValue,
+    progressToNext: growthProgress,
+    remainingToNext,
+    nextLevelKey: nextLevel?.key || null,
+    points: info.user.points,
+    badgeCount: info.badges.length,
+    isMember,
+  };
 
   // Stats
   const stat = info.stat;
@@ -220,7 +213,7 @@ export default async function PublicUserProfilePage({
   const profileJsonLd = buildProfileJsonLd({
     userId: info.user.id,
     name: info.user.name,
-    email: info.user.email,
+    email: userEmail || "",
     role: info.user.role,
     honorScore: info.user.honorScore,
     postCount: info.stat?.postCount || 0,
@@ -262,111 +255,48 @@ export default async function PublicUserProfilePage({
 
           {/* Two-column layout */}
           <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
-            {/* Left: User identity card */}
+            {/* Left: Unified identity card + Forum-specific extras */}
             <aside className="space-y-4">
-              {/* Identity card */}
+              {/* Unified UserIdentityCard (shared component) */}
+              <UserIdentityCard
+                user={userData}
+                size="md"
+                showProgress={true}
+                showStats={isOwnProfile}
+              />
+
+              {/* Forum-specific extras (not in shared component) */}
               <div className="bg-white rounded-xl border border-border shadow-card p-5 space-y-4">
-                {/* Avatar + name */}
-                <div className="flex flex-col items-center text-center">
-                  {info.user.image ? (
-                    <img
-                      src={info.user.image}
-                      alt={displayName}
-                      className="w-20 h-20 rounded-full object-cover border-2 border-gray-100 mb-3"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand to-brand-light flex items-center justify-center text-white font-bold text-2xl mb-3">
-                      {displayName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <h1 className="text-lg font-bold text-title">
-                    {displayName}
-                  </h1>
-                  {info.profile?.publicTitle && (
-                    <p className="text-sm text-gray-500 mt-0.5">
-                      {info.profile.publicTitle}
-                    </p>
-                  )}
-                  {/* Role badges */}
-                  <div className="flex items-center gap-1.5 mt-2 flex-wrap justify-center">
-                    {isAdmin && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 border border-red-200">
-                        <Shield className="w-3 h-3" />
-                        管理员
-                      </span>
-                    )}
-                    {isMember && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200">
-                        <Star className="w-3 h-3" />
-                        {info.user.membershipTier === "premium" ? "高级会员" : "会员"}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Level badge */}
-                <div className="flex items-center justify-center">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border bg-brand/5 text-brand border-brand/20">
-                    <span>{currentLevel.iconText}</span>
-                    {currentLevel.name}
-                  </span>
-                </div>
-
-                {/* Growth progress */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="inline-flex items-center gap-1 text-gray-500">
-                      <TrendingUp className="w-3.5 h-3.5" />
-                      成长值
-                    </span>
-                    <span className="font-semibold text-title">
-                      {info.user.growthValue}
-                      {nextLevel && (
-                        <span className="text-gray-400 font-normal">
-                          {" "}/ {growthMax}
-                        </span>
-                      )}
+                {/* Admin badge */}
+                {isAdmin && (
+                  <div className="flex justify-center">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                      <Shield className="w-3 h-3" />
+                      管理员
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-brand to-accent rounded-full transition-all"
-                      style={{ width: `${growthProgress}%` }}
-                    />
-                  </div>
-                  {nextLevel ? (
-                    <p className="text-[10px] text-gray-400 text-center">
-                      距 {nextLevel.name} 还需 {Math.max(0, growthMax - info.user.growthValue)} 成长值
-                    </p>
-                  ) : (
-                    <p className="text-[10px] text-gray-400 text-center">
-                      已达到最高等级
-                    </p>
-                  )}
-                </div>
+                )}
 
-                {/* Honor + Growth stats */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border-light">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-amber-500">
-                      <Award className="w-4 h-4" />
-                      <span className="text-lg font-bold">{info.user.honorScore}</span>
-                    </div>
-                    <span className="text-xs text-gray-400">荣誉值</span>
+                {/* Honor score (Forum-specific, not in UserIdentityCard) */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-1 text-amber-500">
+                    <Award className="w-4 h-4" />
+                    <span className="text-lg font-bold">{info.user.honorScore}</span>
                   </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-brand">
-                      <TrendingUp className="w-4 h-4" />
-                      <span className="text-lg font-bold">{info.user.growthValue}</span>
-                    </div>
-                    <span className="text-xs text-gray-400">成长值</span>
-                  </div>
+                  <span className="text-xs text-gray-400">荣誉值</span>
                 </div>
 
                 {/* Bio */}
                 {info.profile?.bio && (
                   <p className="text-sm text-gray-600 leading-relaxed pt-2 border-t border-border-light">
                     {info.profile.bio}
+                  </p>
+                )}
+
+                {/* Public title */}
+                {info.profile?.publicTitle && (
+                  <p className="text-sm text-gray-500 text-center pt-2 border-t border-border-light">
+                    {info.profile.publicTitle}
                   </p>
                 )}
 
@@ -404,13 +334,6 @@ export default async function PublicUserProfilePage({
                         </span>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Own profile: points (not public) */}
-                {isOwnProfile && (
-                  <div className="pt-2 border-t border-border-light text-xs text-gray-400">
-                    积分余额：{info.user.points}（仅自己可见）
                   </div>
                 )}
               </div>
