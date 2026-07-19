@@ -1,16 +1,13 @@
 "use client";
 
 import {
-  Shield,
-  Star,
-  Award,
-  TrendingUp,
   Calendar,
   MessageSquare,
   ThumbsUp,
   CheckCircle2,
-  Flag,
 } from "lucide-react";
+import UserIdentityCard from "@/components/user/UserIdentityCard";
+import type { UserDisplayData } from "@/components/user/UserIdentityCard";
 
 export interface TrustCardData {
   user: {
@@ -92,8 +89,30 @@ function getDaysSince(dateStr: string): number {
 }
 
 /**
+ * Map TrustCardData to UserDisplayData for UserIdentityCard.
+ */
+function toDisplayData(data: TrustCardData): UserDisplayData {
+  const { user, profile, level } = data;
+  return {
+    displayName: profile?.displayName || user.name || "匿名用户",
+    avatarUrl: user.image || undefined,
+    publicTitle: profile?.publicTitle || null,
+    levelKey: user.levelKey || "lv1",
+    levelLabel: level.name,
+    levelIcon: level.iconText,
+    growthValue: user.growthValue,
+    points: user.points,
+    isMember: user.membershipTier !== "free",
+    membershipTier: user.membershipTier,
+    isAdmin: user.role === "admin",
+    honorScore: user.honorScore,
+  };
+}
+
+/**
  * 用户可信名片 — 展示注册时间、等级、荣誉值、勋章、社区统计
- * 不泄露邮箱、手机号、积分余额（除非本人查看）
+ * 身份展示委托给 UserIdentityCard（全站唯一身份组件）
+ * 本组件只负责社区专属内容：统计、勋章、加入时间、简介
  */
 export function UserTrustCard({
   data,
@@ -104,72 +123,27 @@ export function UserTrustCard({
   isOwnProfile?: boolean;
   compact?: boolean;
 }) {
-  const { user, profile, stat, badges, level } = data;
+  const { user, profile, stat, badges } = data;
   const joinDateMode = profile?.joinedAtDisplayMode || "date";
   const joinDateText = formatJoinDate(user.createdAt, joinDateMode);
   const daysSince = getDaysSince(user.createdAt);
-  const displayName = profile?.displayName || user.name || "匿名用户";
-  const isAdmin = user.role === "admin";
-  const isMember = user.membershipTier !== "free";
   const topBadges = badges.slice(0, compact ? 4 : 8);
 
   return (
     <div className={`rounded-xl border border-gray-200 bg-white ${compact ? "p-3" : "p-5"} space-y-3`}>
-      {/* Header: avatar + name + title */}
-      <div className="flex items-start gap-3">
-        {user.image ? (
-          <img
-            src={user.image}
-            alt={displayName}
-            className={`${compact ? "w-10 h-10" : "w-14 h-14"} rounded-full object-cover border-2 border-gray-100`}
-          />
-        ) : (
-          <div className={`${compact ? "w-10 h-10" : "w-14 h-14"} rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white font-bold ${compact ? "text-sm" : "text-lg"}`}>
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`font-semibold ${compact ? "text-sm" : "text-base"} text-gray-900 truncate`}>
-              {displayName}
-            </span>
-            {isAdmin && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 border border-red-200">
-                <Shield className="w-3 h-3" />
-                管理员
-              </span>
-            )}
-            {isMember && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700 border border-amber-200">
-                <Star className="w-3 h-3" />
-                {user.membershipTier === "premium" ? "高级会员" : "会员"}
-              </span>
-            )}
-          </div>
-          {profile?.publicTitle && (
-            <p className="text-sm text-gray-500 truncate">{profile.publicTitle}</p>
-          )}
-          {profile?.locationText && (
-            <p className="text-xs text-gray-400">📍 {profile.locationText}</p>
-          )}
-        </div>
-      </div>
+      {/* Identity section — delegated to UserIdentityCard */}
+      <UserIdentityCard
+        user={toDisplayData(data)}
+        size={compact ? "sm" : "md"}
+        showHonor
+        showMembership
+        showPublicTitle
+      />
 
-      {/* Level + Honor + Growth */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border ${getColorClass(level.color)}`}>
-          <span>{level.iconText}</span>
-          {level.name}
-        </span>
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-          <Award className="w-3 h-3" />
-          荣誉 {user.honorScore}
-        </span>
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-          <TrendingUp className="w-3 h-3" />
-          成长 {user.growthValue}
-        </span>
-      </div>
+      {/* Location (community-specific) */}
+      {profile?.locationText && (
+        <p className="text-xs text-gray-400">📍 {profile.locationText}</p>
+      )}
 
       {/* Join date */}
       {joinDateText && (

@@ -26,6 +26,8 @@ import {
   UserTrustCard,
   type TrustCardData,
 } from "@/components/community/user-trust-card";
+import UserIdentityCard from "@/components/user/UserIdentityCard";
+import { toUserDisplayData } from "@/lib/community/user-display";
 
 /* ----------------------------- Types ----------------------------- */
 
@@ -111,34 +113,6 @@ function timeAgo(iso: string): string {
   const day = Math.floor(hr / 24);
   if (day < 30) return `${day} 天前`;
   return new Date(iso).toLocaleDateString("zh-CN");
-}
-
-function Avatar({
-  name,
-  image,
-  size = "md",
-}: {
-  name: string | null;
-  image: string | null;
-  size?: "sm" | "md";
-}) {
-  const dim = size === "sm" ? "w-8 h-8 text-xs" : "w-10 h-10 text-sm";
-  if (image) {
-    return (
-      <img
-        src={image}
-        alt={name || ""}
-        className={`${dim} rounded-full object-cover flex-shrink-0`}
-      />
-    );
-  }
-  return (
-    <div
-      className={`${dim} rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white font-bold flex-shrink-0`}
-    >
-      {(name || "?").charAt(0).toUpperCase()}
-    </div>
-  );
 }
 
 /* --------------------------- Component --------------------------- */
@@ -564,15 +538,17 @@ export function TopicDetailClient({
           </div>
         ) : (
           <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
-            <Avatar name={post.user.name} image={post.user.image} />
-            <div className="min-w-0">
-              <div className="font-medium text-gray-900 truncate">
-                {post.user.name || "匿名"}
-              </div>
-              <div className="text-xs text-gray-400">
-                荣誉 {post.user.honorScore}
-              </div>
-            </div>
+            <Link href={`/u/${post.user.id}`}>
+              <UserIdentityCard
+                user={toUserDisplayData({
+                  name: post.user.name,
+                  image: post.user.image,
+                  honorScore: post.user.honorScore,
+                })}
+                size="sm"
+                showHonor
+              />
+            </Link>
           </div>
         )}
 
@@ -805,7 +781,6 @@ export function TopicDetailClient({
           const isAccepted =
             comment.isAccepted || comment.id === acceptedCommentId;
           const floor = floorMap.get(comment.id) ?? 0;
-          const commentAdmin = comment.user.role === "admin";
           return (
             <div
               key={comment.id}
@@ -820,30 +795,18 @@ export function TopicDetailClient({
                   #{floor}
                 </span>
                 <Link href={`/u/${comment.user.id}`} className="flex-shrink-0">
-                  <Avatar
-                    name={comment.user.name}
-                    image={comment.user.image}
+                  <UserIdentityCard
+                    user={toUserDisplayData({
+                      name: comment.user.name,
+                      image: comment.user.image,
+                      honorScore: comment.user.honorScore,
+                      levelKey: comment.user.levelKey,
+                      role: comment.user.role,
+                    })}
                     size="sm"
+                    showHonor
                   />
                 </Link>
-                <Link
-                  href={`/u/${comment.user.id}`}
-                  className="font-medium text-sm text-gray-900 hover:underline min-w-0 truncate"
-                >
-                  {comment.user.name || "匿名"}
-                </Link>
-                {commentAdmin && (
-                  <Shield className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
-                )}
-                {comment.user.levelKey && (
-                  <span className="px-1.5 py-0.5 rounded text-xs bg-teal-50 text-teal-700 flex-shrink-0">
-                    {comment.user.levelKey}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-0.5 text-xs text-emerald-600 flex-shrink-0">
-                  <Award className="w-3 h-3" />
-                  {comment.user.honorScore}
-                </span>
                 {isAccepted && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-200 text-green-800 flex-shrink-0">
                     <CheckCircle className="w-3 h-3" /> 已采纳

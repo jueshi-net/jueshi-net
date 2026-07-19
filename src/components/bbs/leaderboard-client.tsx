@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Trophy, TrendingUp, Award, MessageCircle, Crown } from "lucide-react";
+import UserIdentityCard from "@/components/user/UserIdentityCard";
+import { toUserDisplayData } from "@/lib/community/user-display";
 
 interface LeaderboardEntry {
   userId: string;
@@ -22,22 +24,6 @@ const TYPE_CONFIG: Record<LeaderboardType, { label: string; icon: typeof Trophy;
   growth: { label: "成长榜", icon: Trophy, unit: "成长值" },
   answers: { label: "热心解答", icon: MessageCircle, unit: "采纳" },
 };
-
-function getLevelLabel(levelKey: string | null): string {
-  const levels: Record<string, string> = {
-    lv1: "新手",
-    lv2: "初级",
-    lv3: "中级",
-    lv4: "高级",
-    lv5: "专家",
-    lv6: "资深",
-    lv7: "达人",
-    lv8: "导师",
-    lv9: "传奇",
-    lv10: "支柱",
-  };
-  return levels[levelKey || ""] || "成员";
-}
 
 function getRankStyle(rank: number): string {
   if (rank === 1) return "bg-amber-50 border-amber-200";
@@ -171,34 +157,17 @@ export function LeaderboardClient() {
                   )}
                 </div>
 
-                {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-brand/10 flex items-center justify-center shrink-0 overflow-hidden">
-                  {entry.avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={entry.avatar}
-                      alt={entry.displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm font-medium text-brand">
-                      {entry.displayName.charAt(0)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Name + level */}
-                <div className="flex-1 min-w-0">
-                  <Link
-                    href={`/u/${entry.userId}`}
-                    className="text-sm font-medium text-gray-900 hover:text-brand truncate block"
-                  >
-                    {entry.displayName}
-                  </Link>
-                  <span className="text-xs text-slate-400">
-                    {getLevelLabel(entry.levelKey)}
-                  </span>
-                </div>
+                {/* User identity */}
+                <Link href={`/u/${entry.userId}`} className="flex-1 min-w-0">
+                  <UserIdentityCard
+                    user={toUserDisplayData({
+                      name: entry.displayName,
+                      image: entry.avatar,
+                      levelKey: entry.levelKey,
+                    })}
+                    size="sm"
+                  />
+                </Link>
 
                 {/* Score */}
                 <div className="flex items-center gap-1.5 shrink-0">

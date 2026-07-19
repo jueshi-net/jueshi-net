@@ -32,6 +32,8 @@ import { RelatedPosts } from "@/components/bbs/related-posts";
 import { ShareButtons } from "@/components/bbs/share-buttons";
 import { PostTimeline } from "@/components/bbs/post-timeline";
 import { maskEmail, formatJoinDate } from "@/lib/community/utils";
+import { toUserDisplayData } from "@/lib/community/user-display";
+import UserIdentityCard from "@/components/user/UserIdentityCard";
 import { ForumEmptyState } from "@/components/community/forum-empty-state";
 import {
   buildPostJsonLd,
@@ -106,7 +108,7 @@ async function getComments(slug: string) {
       where: { postId: post.id, status: "published" },
       orderBy: { createdAt: "asc" },
       include: {
-        user: { select: { name: true, email: true, honorScore: true } },
+        user: { select: { id: true, name: true, email: true, honorScore: true, levelKey: true, membershipTier: true, role: true } },
       },
     });
 
@@ -211,27 +213,26 @@ async function PostCommentsSection({
                   #{index + 2}
                 </span>
               </div>
-              {/* Avatar */}
+              {/* Author identity */}
               <div className="shrink-0">
-                <div className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand">
-                  {(
-                    comment.user.name || comment.user.email
-                  )[0].toUpperCase()}
-                </div>
+                <Link href={`/u/${comment.user.id}`}>
+                  <UserIdentityCard
+                    user={toUserDisplayData({
+                      name: comment.user.name,
+                      email: comment.user.email,
+                      honorScore: comment.user.honorScore,
+                      levelKey: comment.user.levelKey,
+                      membershipTier: comment.user.membershipTier,
+                      role: comment.user.role,
+                    })}
+                    size="sm"
+                    showHonor
+                  />
+                </Link>
               </div>
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-slate-700">
-                    {comment.user.name ||
-                      maskEmail(comment.user.email)}
-                  </span>
-                  {comment.user.honorScore ? (
-                    <span className="text-xs text-amber-500 inline-flex items-center gap-0.5">
-                      <Award className="w-3 h-3" />
-                      {comment.user.honorScore}
-                    </span>
-                  ) : null}
                   <time className="text-xs text-slate-500 ml-auto">
                     {formatDateTime(comment.createdAt)}
                   </time>
@@ -456,20 +457,22 @@ export default async function PostDetailPage({
 
                 {/* Author + time */}
                 <div className="flex items-center gap-3 text-sm text-slate-500 pb-3 border-b border-gray-100">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-sm font-bold text-brand shrink-0">
-                      {displayName[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="font-medium text-slate-700">
-                        {displayName}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        {post.user.honorScore ? `荣誉 ${post.user.honorScore}` : ""} 成长值{" "}
-                        {post.user.growthValue || 0}
-                      </div>
-                    </div>
-                  </div>
+                  <Link href={`/u/${post.user.id}`} className="shrink-0">
+                    <UserIdentityCard
+                      user={toUserDisplayData({
+                        name: post.user.name,
+                        email: post.user.email,
+                        levelKey: post.user.levelKey,
+                        growthValue: post.user.growthValue,
+                        honorScore: post.user.honorScore,
+                        membershipTier: post.user.membershipTier,
+                        role: post.user.role,
+                      })}
+                      size="sm"
+                      showHonor
+                      showMembership
+                    />
+                  </Link>
                   <span className="inline-flex items-center gap-1 ml-auto text-xs">
                     <Calendar className="w-3.5 h-3.5" />
                     <time dateTime={post.createdAt.toISOString()}>

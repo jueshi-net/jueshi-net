@@ -157,7 +157,7 @@ export default function UserIdentityCard({
   const content = (() => {
     switch (size) {
       case 'sm':
-        // 紧凑模式：头像 + 昵称 + 等级
+        // 紧凑模式：头像 + 昵称 + 等级 + 可选荣誉
         return (
           <div className="flex items-center gap-2">
             <Avatar sizeClass="w-8 h-8 text-sm" />
@@ -167,6 +167,12 @@ export default function UserIdentityCard({
                 <LevelBadge compact />
                 {showMembership && isMember && <MemberBadge compact />}
                 {isAdmin && <AdminBadge />}
+                {showHonor && honorScore !== undefined && honorScore > 0 && (
+                  <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-500">
+                    <Award className="w-2.5 h-2.5" />
+                    {honorScore}
+                  </span>
+                )}
               </div>
             </div>
           </div>
