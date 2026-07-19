@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import { getDocumentType } from '@/lib/documents/document-types';
 
 interface Props {
-  params: { type: string };
+  params: Promise<{ type: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { type } = params;
+  const { type } = await params;
   const docType = getDocumentType(type);
   
   if (!docType) {
