@@ -49,21 +49,21 @@ export function UserNavSidebar({ className }: { className?: string }) {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-56 bg-white border-r border-gray-100/80 h-full flex-shrink-0`}>
-        {/* Brand Logo */}
-        <div className="h-14 flex items-center px-5 border-b border-gray-100/80">
-          <Link href="/" className="flex items-center gap-2.5">
+      {/* Desktop sidebar - Compact V2 */}
+      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-[88px] bg-white border-r border-gray-100/80 h-full flex-shrink-0`}>
+        {/* Brand Logo - Compact */}
+        <div className="h-14 flex items-center justify-center border-b border-gray-100/80">
+          <Link href="/" className="flex items-center justify-center">
             <img 
-              src="/brand/v2/logo-horizontal-color.svg"
+              src="/brand/v2/logo-icon.svg"
               alt="绝世百宝箱" 
-              className="h-9 w-auto object-contain"
+              className="h-8 w-8 object-contain"
             />
           </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="space-y-1 flex-1 overflow-y-auto p-4">
+        {/* Navigation - Icons Only with Tooltip */}
+        <nav className="flex-1 overflow-y-auto py-4 flex flex-col items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -72,22 +72,31 @@ export function UserNavSidebar({ className }: { className?: string }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
+                className={`group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? `${theme.bg} ${theme.text} font-semibold shadow-sm`
+                    ? `${theme.bg} ${theme.text} shadow-sm`
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? theme.text : 'text-gray-400'}`} />
-                <span>{label}</span>
-                {isActive && <div className={`ml-auto w-1.5 h-1.5 rounded-full ${theme.dot}`} />}
+                <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? theme.text : 'text-gray-400 group-hover:text-gray-600'}`} />
+                
+                {/* Tooltip */}
+                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  {label}
+                </div>
+                
+                {/* Active indicator */}
+                {isActive && <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l ${theme.bg}`} />}
               </Link>
             );
           })}
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-gray-100 px-4">
-          <p className="text-[10px] text-gray-300 text-center">绝世百宝箱 v1.20.42.6.6</p>
+        {/* Footer - Simplified */}
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-center pb-4">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0A1D6B] to-[#1a3a9f] flex items-center justify-center">
+            <span className="text-white text-[10px] font-bold">绝</span>
+          </div>
         </div>
       </aside>
     </>
