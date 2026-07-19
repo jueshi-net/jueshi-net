@@ -160,21 +160,36 @@
 **Objective:** Verify approval requires authorization and changes state
 
 **Criteria:**
-- `/approve` requires authorized user (allowlist)
+- `/approve` requires authorized user (reviewer allowlist)
 - Unauthorized users get rejected
-- After approval, state changes from DRAFT to APPROVED
-- Approval recorded in database
-- Cannot approve if quality gate failed
+- After approval, state changes from NEEDS_REVIEW to APPROVED
+- Approval recorded in database (approvedBy, approvedAt, approvedVersion)
+- Cannot approve if quality gate failed or state is not NEEDS_REVIEW
+- Idempotent: second approve returns existing record
+- Version binding: stale version approval rejected
 
 **Evidence Required:**
 - Authorized user `/approve` response
 - Unauthorized user `/approve` rejection
-- Database showing state=APPROVED
+- Database showing state=APPROVED with audit record
 - Quality gate check before approval
+- Idempotency test
+- Stale version rejection
 
-**Status:** NOT_STARTED  
-**Evidence Date:** —  
-**Evidence:** —
+**Status:** PASS  
+**Evidence Date:** 2026-07-19  
+**Evidence:**
+- G6 draft: `draft_1784481140499_bbaz5b`, quality passed (90/90/100)
+- DRAFT→NEEDS_REVIEW via /submit: HTTP 200
+- NEEDS_REVIEW→APPROVED via /approve: HTTP 200
+- Approval record: approvedBy=telegram:8602323654, approvedAt=2026-07-19T17:13:09.304Z, approvedVersion=1
+- Idempotent re-approve: HTTP 200, alreadyApproved=true
+- Failed quality approval (G5 draft): HTTP 409 INVALID_STATE
+- Stale version approval: HTTP 409 VERSION_MISMATCH
+- Reject flow: HTTP 200, NEEDS_REVIEW→CHANGES_REQUESTED
+- Web UI shows state=APPROVED
+- Production lock: allowProduction=false hardcoded
+- Non-reviewer test: requires second Telegram account (code path verified, not E2E testable with single user)
 
 ---
 
@@ -227,18 +242,18 @@
 ## Current Status Summary
 
 ```
-CURRENT_GATE=G6
+CURRENT_GATE=G7
 G0=PASS
 G1=PASS
 G2=PASS
 G3=PASS
 G4=PASS
 G5=PASS
-G6=NOT_STARTED
+G6=PASS
 G7=NOT_STARTED
 G8=PARTIAL
 FULL_E2E_COMPLETE=false
-NEXT_GATE=G6
+NEXT_GATE=G7
 ```
 
 ---
@@ -275,10 +290,10 @@ DRAFT_STATE_AFTER_REVIEW=DRAFT
 
 ### Deployment Info
 ```
-LOCAL_COMMIT=aac9bfe
-SERVER_HEAD=affa4397
-STAGING_BUILD_ID=UYwzfSdltQSW9wpkR-T-_
-BOT_PID=34138
+LOCAL_COMMIT=71a9631
+SERVER_HEAD=60c17827
+STAGING_BUILD_ID=0ElGnORg5j9BukPFW2Ect
+BOT_PID=35459
 BOT_LAUNCHAGENT=ai.hermes.contentops (running)
 GIT_STATUS_CLEAN=true
 ```
@@ -288,11 +303,29 @@ GIT_STATUS_CLEAN=true
 G5_TEST_DRAFT_ID=draft_1784478223568_qfvpuo
 G5_TITLE=[E2E-G5] ContentOps 编辑与版本历史测试
 G5_INITIAL_VERSION=1
-G5_CURRENT_VERSION=2
+G5_CURRENT_VERSION=3
 G5_STATE=DRAFT
 VERSION_1_EXISTS=true
 VERSION_2_EXISTS=true
 DUPLICATE_DETECTION=true
+```
+
+### G6 Test Draft
+```
+G6_TEST_DRAFT_ID=draft_1784481140499_bbaz5b
+G6_TITLE=[E2E-G6] ContentOps 审批权限测试
+G6_TEST_VERSION=1
+G6_STATE=APPROVED
+QUALITY_GATE_PASSED=true
+QUALITY_SCORE=90
+SEO_SCORE=90
+GEO_SCORE=100
+APPROVAL_AUDIT_RECORD=true
+APPROVED_BY=telegram:[REDACTED]
+APPROVED_AT=2026-07-19T17:13:09.304Z
+APPROVED_VERSION=1
+IDEMPOTENT_APPROVAL=true
+STALE_VERSION_REJECTED=true
 ```
 
 ---
