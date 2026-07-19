@@ -32,6 +32,7 @@ export default function robots(): MetadataRoute.Robots {
           "/bbs/my-reports",
           "/bbs/my-comments",
           "/bbs/my-bookmarks",
+          "/bbs/my-badges",
           "/bbs/operations",
           "/bbs/notifications",
           "/bbs/*/edit",

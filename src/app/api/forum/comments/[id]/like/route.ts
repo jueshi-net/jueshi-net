@@ -41,6 +41,10 @@ export async function POST(
     await adjustHonor(comment.userId, 1, "评论被点赞", "comment_liked", comment.id, session.user.id).catch(() => {});
     await incrementCommunityStat(comment.userId, "helpfulVoteCount").catch(() => {});
 
+    // V1.5: Check if author qualifies for forum_helpful_50 badge (fire-and-forget)
+    const { checkAndGrantForumBadges } = await import("@/lib/community/forum-badges");
+    checkAndGrantForumBadges(comment.userId).catch(() => {});
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[Like Comment Error]", error);

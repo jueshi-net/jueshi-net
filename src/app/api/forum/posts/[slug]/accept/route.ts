@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth-guard";
 import { adjustHonor, incrementCommunityStat } from "@/lib/honor-helpers";
+import { addGrowthValue } from "@/lib/growth-helpers";
+import { checkAndGrantForumBadges } from "@/lib/community/forum-badges";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +102,17 @@ export async function POST(
         tx
       );
 
+      // V1.5: 给评论作者 +10 成长值（成长值联动）
+      await addGrowthValue(
+        comment.userId,
+        10,
+        "forum_answer_accepted",
+        "回答被采纳为最佳答案",
+        "forum_comment",
+        comment.id,
+        tx
+      ).catch(() => {});
+
       // 通知评论作者：你的回答被采纳了
       await tx.forumNotification.create({
         data: {
@@ -128,6 +141,9 @@ export async function POST(
     await incrementCommunityStat(comment.userId, "acceptedAnswerCount", 1).catch(
       () => {}
     );
+
+    // V1.5: 检查并授予勋章（fire-and-forget，不阻塞主流程）
+    checkAndGrantForumBadges(comment.userId).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error) {

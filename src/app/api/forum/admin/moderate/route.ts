@@ -8,6 +8,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-guard";
+import { adjustHonor, incrementCommunityStat } from "@/lib/honor-helpers";
+import { addGrowthValue } from "@/lib/growth-helpers";
+import { grantPostReward } from "@/lib/forum-rewards";
+import { checkAndGrantForumBadges } from "@/lib/community/forum-badges";
 
 export const dynamic = "force-dynamic";
 
@@ -179,7 +183,51 @@ export async function POST(request: NextRequest) {
           },
         });
       }
+
+      // ─── V1.5: Incentive Loop ────────────────────────────
+
+      if (modAction === "feature") {
+        // 加精：+20 荣誉值 + +30 成长值 + CommunityStat + 勋章检查
+        await adjustHonor(
+          post.userId,
+          20,
+          "post_featured",
+          `帖子「${post.title}」被加精`,
+          post.id,
+          adminId,
+          tx
+        ).catch(() => {});
+
+        await addGrowthValue(
+          post.userId,
+          30,
+          "forum_post_featured",
+          `帖子「${post.title}」被加精`,
+          "forum_post",
+          post.id,
+          tx
+        ).catch(() => {});
+
+        await incrementCommunityStat(post.userId, "featuredPostCount", 1, tx).catch(() => {});
+      }
+
+      if (modAction === "approve" && postStatus === "pending") {
+        // 审核通过：发放成长值奖励（grantPostReward 内部含防重复）
+        // 注意：只在 pending -> published 时发放，避免重复
+        try {
+          await grantPostReward(post.id, post.userId);
+        } catch (e) {
+          console.error("[Moderate approve reward error]", e);
+        }
+      }
     });
+
+    // ─── V1.5: Post-transaction badge checks (fire-and-forget) ───
+    // Badge checks run after the transaction to avoid blocking and use fresh data.
+    // They are non-critical - failure doesn't affect the moderation action.
+    if (modAction === "feature" || modAction === "approve") {
+      checkAndGrantForumBadges(post.userId).catch(() => {});
+    }
 
     return NextResponse.json({ success: true, action: modAction, postId });
   } catch (error) {
