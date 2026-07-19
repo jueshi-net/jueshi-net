@@ -40,7 +40,7 @@
 
 #### 1. User Asset Rail（用户资产栏）
 - **位置**: Workspace 左侧
-- **宽度**: 240px
+- **宽度**: 220px（优化后，原 240px）
 - **显示条件**: `xl` 断点（>= 1280px）
 - **内容**: 
   - 用户身份卡片（头像、姓名、邮箱）
@@ -49,7 +49,7 @@
   - 勋章展示
 - **状态**: 🔒 **FROZEN** — 核心用户信息展示
 - **文件**: `src/components/workspace/WorkspaceLeftRail.tsx`
-- **验收版本**: commit `4cdb6ff`
+- **验收版本**: commit `73b02df`
 
 #### 2. Main Workspace（主工作区）
 - **位置**: Workspace 中间
@@ -63,11 +63,11 @@
   - 常用工具
 - **状态**: ✅ **EXTENDABLE** — 允许添加新的功能模块
 - **文件**: `src/app/(workspace)/workspace/page.tsx`
-- **验收版本**: commit `4cdb6ff`
+- **验收版本**: commit `73b02df`
 
 #### 3. Right Assistant Rail（右助手栏）
 - **位置**: Workspace 右侧
-- **宽度**: 260px
+- **宽度**: 240px（优化后，原 260px）
 - **显示条件**: `lg` 断点（>= 1024px）
 - **内容**:
   - 通知卡片
@@ -76,7 +76,7 @@
   - 备忘录
 - **状态**: ✅ **EXTENDABLE** — 允许添加新的辅助信息模块
 - **文件**: `src/components/workspace/WorkspaceRightRail.tsx`
-- **验收版本**: commit `4cdb6ff`
+- **验收版本**: commit `73b02df`
 
 ### App Shell 外层
 
@@ -244,9 +244,9 @@
 2. **WorkspacePageFrame**
    - 禁止修改三栏布局结构
    - 禁止修改响应式断点规则
-   - 禁止修改宽度定义（240px / 260px）
+   - 禁止修改宽度定义（220px / 240px）
    - 文件: `src/components/workspace/WorkspacePageFrame.tsx`
-   - 验收版本: `4cdb6ff`
+   - 验收版本: commit `73b02df`
 
 3. **Global Sidebar**（属于 App Shell）
    - 禁止删除、合并、重新设计
@@ -289,8 +289,8 @@
    - 禁止修改这些断点值
 
 4. **禁止修改 Rail 宽度**
-   - User Asset Rail: 240px（固定）
-   - Right Assistant Rail: 260px（固定）
+   - User Asset Rail: 220px（固定）
+   - Right Assistant Rail: 240px（固定）
    - 禁止修改这些宽度值
 
 5. **禁止删除现有功能模块**
@@ -314,8 +314,8 @@
 
 ### 验收版本
 
-- **Commit**: `4cdb6ff`
-- **Message**: `fix(workspace): fix left rail container tag`
+- **Commit**: `73b02df`
+- **Message**: `fix(workspace): optimize 3-column layout proportions for modern SaaS design`
 - **Date**: 2026-07-19
 
 ---
@@ -324,10 +324,10 @@
 
 | 日期 | 变更 | 说明 |
 |------|------|------|
+| 2026-07-19 | 优化三栏比例 | User Asset Rail 240px→220px, Right Assistant Rail 260px→240px, gap-4→gap-3 |
 | 2026-07-19 | 修正 Workspace 定义 | 明确 Workspace 是三栏布局，Global Sidebar 属于 App Shell 外层 |
 | 2026-07-19 | 新增 Homepage V4 Baseline | 明确首页冻结范围，基线版本 UI V4 Home Candidate V2 |
 | 2026-07-19 | 新增 Public Shell Baseline | 明确公共外壳冻结范围，建立变更请求流程 |
-| 2026-07-19 | 验收版本 | commit `4cdb6ff` 作为基线 |
 
 ---
 
