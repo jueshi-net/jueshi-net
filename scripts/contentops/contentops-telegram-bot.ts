@@ -109,7 +109,12 @@ function signPayload(payload: string): string {
 
 async function fetchBridgeApi(body: any): Promise<any> {
   const payload = JSON.stringify(body);
-  const signature = signPayload(payload);
+  const url = new URL(CONFIG.bridgeUrl);
+  // Server expects: method:path:queryString:body
+  const signaturePayload = `POST:${url.pathname}:${payload}`;
+  const signature = signPayload(signaturePayload);
+  
+  console.error('[ContentOps Bot] POST signature payload:', signaturePayload.substring(0, 80) + '...');
   
   const res = await fetch(CONFIG.bridgeUrl, {
     method: 'POST',
@@ -283,10 +288,18 @@ Draft ID: \`${draft.id}\`
     }
 
     try {
-      const payload = '';
-      const signature = signPayload(`GET:${new URL(CONFIG.bridgeUrl).pathname}?limit=10:${payload}`);
+      const url = new URL(CONFIG.bridgeUrl);
+      const queryString = '?limit=10';
+      const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
+      // Server expects: method:path:queryString:body (body is empty for GET)
+      const signaturePayload = `GET:${url.pathname}${queryString}:`;
+      const signature = signPayload(signaturePayload);
       
-      const res = await fetch(`${CONFIG.bridgeUrl}?limit=10`, {
+      console.error('[ContentOps Bot] GET signature payload:', signaturePayload);
+      console.error('[ContentOps Bot] GET URL:', fullUrl);
+      
+      const res = await fetch(fullUrl, {
+        method: 'GET',
         headers: { 
           'Content-Type': 'application/json',
           'X-ContentOps-Signature': signature,
@@ -294,13 +307,20 @@ Draft ID: \`${draft.id}\`
       });
       
       if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: 'Unknown error', code: 'UNKNOWN' }));
+        const errorText = await res.text().catch(() => 'Unknown error');
+        let errorObj: any = { error: errorText, code: 'UNKNOWN' };
+        try {
+          errorObj = JSON.parse(errorText);
+        } catch {}
+        
         console.error('[ContentOps Bot] List drafts failed:', {
           status: res.status,
-          code: error.code,
-          message: error.error,
+          statusText: res.statusText,
+          code: errorObj.code,
+          message: errorObj.error,
+          url: fullUrl,
         });
-        bot.sendMessage(chatId, `❌ 获取草稿失败 [${error.code || res.status}]`);
+        bot.sendMessage(chatId, `❌ 获取草稿失败 [${errorObj.code || res.status}]\n\n${errorObj.error || ''}`);
         return;
       }
 
@@ -319,7 +339,8 @@ Draft ID: \`${draft.id}\`
       bot.sendMessage(chatId, `📋 最近草稿:\n\n${list}`, { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] List drafts error:', error);
-      bot.sendMessage(chatId, '❌ 获取草稿失败，请稍后重试');
+      const errMsg = error instanceof Error ? error.message : 'Unknown error';
+      bot.sendMessage(chatId, `❌ 获取草稿失败: ${errMsg}`);
     }
   });
 
