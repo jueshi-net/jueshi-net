@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth-guard";
+import { adjustHonor, incrementCommunityStat } from "@/lib/honor-helpers";
 
 export const dynamic = "force-dynamic";
 
@@ -185,6 +186,22 @@ export async function POST(request: NextRequest) {
             },
           });
         }
+      }
+
+      // ─── V1.5: 举报采纳激励 ────────────────────────────
+      // 举报被采纳(resolve)时，给举报人 +5 荣誉值
+      if (action === "resolve") {
+        await adjustHonor(
+          report.reporterId,
+          5,
+          "report_accepted",
+          `举报被采纳：${trimmedResolution}`,
+          report.id,
+          adminId,
+          tx
+        ).catch(() => {});
+
+        await incrementCommunityStat(report.reporterId, "reportAcceptedCount", 1, tx).catch(() => {});
       }
     });
 

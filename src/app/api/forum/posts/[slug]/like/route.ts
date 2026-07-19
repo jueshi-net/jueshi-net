@@ -33,6 +33,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     await adjustHonor(post.userId, 1, "帖子被点赞", "post_liked", post.id, session.user.id).catch(() => {});
     await incrementCommunityStat(post.userId, "helpfulVoteCount").catch(() => {});
 
+    // V1.5: Check if author qualifies for forum_helpful_50 badge (fire-and-forget)
+    const { checkAndGrantForumBadges } = await import("@/lib/community/forum-badges");
+    checkAndGrantForumBadges(post.userId).catch(() => {});
+
     // Create notification for post author
     // P4: Deduplication — only create like notification if the author doesn't
     // already have an unread like notification from this actor for this post.

@@ -6,7 +6,7 @@ import BreadcrumbBar from "@/components/design-system/BreadcrumbBar";
 import { MyPostsList } from "@/components/bbs/my-posts-list";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { User, Bookmark, MessageCircle, Bell } from "lucide-react";
+import { User, Bookmark, MessageCircle, Bell, Award, Trophy } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -201,6 +201,20 @@ export default async function MyPostsPage({ searchParams }: PageProps) {
               >
                 <MessageCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">我的评论</span>
+              </Link>
+              <Link
+                href="/bbs/my-badges"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <Award className="w-4 h-4" />
+                <span className="hidden sm:inline">我的勋章</span>
+              </Link>
+              <Link
+                href="/bbs/leaderboard"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+              >
+                <Trophy className="w-4 h-4" />
+                <span className="hidden sm:inline">排行榜</span>
               </Link>
               <Link
                 href="/bbs/notifications"
