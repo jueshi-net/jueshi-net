@@ -13,9 +13,9 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 
   return (
     <WorkspaceProviders>
-      <div className="flex min-h-screen bg-[#F6F8FC]">
+      <div className="flex min-h-screen bg-[#F6F8FC] overflow-x-hidden">
         <UserNavSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
           <TopBar />
           <main className="flex-1 overflow-y-auto md:pb-0 pb-16">{children}</main>
         </div>

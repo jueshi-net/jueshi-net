@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -46,13 +47,25 @@ export function UserNavSidebar({ className }: { className?: string }) {
   const { workspaceTitle } = useUserPreferences();
   const pathname = usePathname();
   const theme = getTheme();
+  const [tooltip, setTooltip] = useState<{ label: string; top: number; left: number } | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  const showTooltip = useCallback((e: React.MouseEvent, label: string) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setTooltip({ label, top: rect.top + rect.height / 2, left: rect.right + 8 });
+  }, []);
+
+  const hideTooltip = useCallback(() => setTooltip(null), []);
 
   return (
     <>
       {/* Desktop sidebar - Compact V2 */}
-      <aside className={`${className ?? 'hidden lg:flex'} flex-col w-[88px] bg-white border-r border-gray-100/80 h-full flex-shrink-0`}>
+      <aside
+        className={`${className ?? 'hidden lg:flex'} flex-col w-[88px] bg-white border-r border-gray-100/80 h-screen flex-shrink-0 overflow-visible relative z-[60]`}
+        style={{ minWidth: '88px', maxWidth: '88px' }}
+      >
         {/* Brand Logo - Compact */}
-        <div className="h-14 flex items-center justify-center border-b border-gray-100/80">
+        <div className="h-14 flex items-center justify-center border-b border-gray-100/80 flex-shrink-0">
           <Link href="/" className="flex items-center justify-center">
             <img 
               src="/brand/v2/app-mark.svg"
@@ -62,8 +75,8 @@ export function UserNavSidebar({ className }: { className?: string }) {
           </Link>
         </div>
 
-        {/* Navigation - Icons Only with Tooltip */}
-        <nav className="flex-1 overflow-y-auto py-4 flex flex-col items-center gap-1">
+        {/* Navigation - Icons Only with Fixed Tooltip */}
+        <nav ref={navRef} className="flex-1 overflow-y-auto overflow-x-hidden py-4 flex flex-col items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -72,18 +85,15 @@ export function UserNavSidebar({ className }: { className?: string }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 ${
+                className={`group relative flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-200 flex-shrink-0 ${
                   isActive
                     ? `${theme.bg} ${theme.text} shadow-sm`
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
+                onMouseEnter={(e) => showTooltip(e, label)}
+                onMouseLeave={hideTooltip}
               >
                 <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? theme.text : 'text-gray-400 group-hover:text-gray-600'}`} />
-                
-                {/* Tooltip */}
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  {label}
-                </div>
                 
                 {/* Active indicator */}
                 {isActive && <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l ${theme.bg}`} />}
@@ -93,12 +103,26 @@ export function UserNavSidebar({ className }: { className?: string }) {
         </nav>
 
         {/* Footer - Simplified */}
-        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-center pb-4">
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-center pb-4 flex-shrink-0">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0A1D6B] to-[#1a3a9f] flex items-center justify-center">
             <span className="text-white text-[10px] font-bold">绝</span>
           </div>
         </div>
       </aside>
+
+      {/* Fixed-position Tooltip Portal - rendered outside sidebar stacking context */}
+      {tooltip && (
+        <div
+          className="fixed pointer-events-none z-[9999] px-2.5 py-1.5 bg-gray-900 text-white text-xs rounded-lg shadow-xl whitespace-nowrap"
+          style={{
+            top: tooltip.top,
+            left: tooltip.left,
+            transform: 'translateY(-50%)',
+          }}
+        >
+          {tooltip.label}
+        </div>
+      )}
     </>
   );
 }
