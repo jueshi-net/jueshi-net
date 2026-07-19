@@ -60,8 +60,10 @@ const CONFIG = {
   bridgeSecret: process.env.CONTENTOPS_BRIDGE_SECRET || readBridgeSecretFromKeychain(),
   // Security: Production is ALWAYS disabled in bot
   allowProduction: false,
-  // Allowlist
+  // Allowlist for basic bot usage (create, edit, review)
   allowedChatIds: (process.env.CONTENTOPS_TELEGRAM_ALLOWED_CHAT_IDS || '').split(',').filter(Boolean),
+  // Reviewer allowlist for approve/reject (separate from basic allowlist)
+  reviewerChatIds: (process.env.CONTENTOPS_TELEGRAM_REVIEWER_CHAT_IDS || '').split(',').filter(Boolean),
   // Bridge URL for staging
   bridgeUrl: process.env.CONTENTOPS_BRIDGE_URL || 'https://i.jueshi.net/api/internal/contentops/drafts',
 };
@@ -69,7 +71,7 @@ const CONFIG = {
 const RUNTIME_INFO = {
   botRuntimeId: `pid-${process.pid}`,
   gitCommit: (() => { try { return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim(); } catch { return 'unknown'; } })(),
-  version: 'v1.1',
+  version: 'v1.2',
 };
 
 // ============================================================================
@@ -180,6 +182,15 @@ function isAllowedChat(chatId: number): boolean {
   return CONFIG.allowedChatIds.includes(String(chatId));
 }
 
+function isReviewer(chatId: number): boolean {
+  // If reviewer allowlist is empty, fall back to main allowlist
+  // (for single-user setups where the operator is also the reviewer)
+  if (CONFIG.reviewerChatIds.length === 0) {
+    return isAllowedChat(chatId);
+  }
+  return CONFIG.reviewerChatIds.includes(String(chatId));
+}
+
 // ============================================================================
 // Helper: resolve draftId from argument or session
 // ============================================================================
@@ -229,7 +240,7 @@ async function startBot() {
     }
 
     bot.sendMessage(chatId, `
-🤖 ContentOps Bot V1.1
+🤖 ContentOps Bot V1.2
 
 命令:
 /new <标题> - 创建新草稿
@@ -238,7 +249,9 @@ async function startBot() {
 /status - 查看状态
 /review [id] - 质量检查
 /edit [id] - 编辑草稿
-/approve [id] - 批准
+/submit [id] - 提交审核
+/approve [id] - 批准（审核人）
+/reject [id] <原因> - 拒绝（审核人）
 /publish [id] - 发布到 staging
 /cancel - 取消当前操作
 
@@ -525,7 +538,7 @@ Draft ID：\`${draft.id}\`
         .join('\n');
 
       const statusText = data.draftState || 'DRAFT';
-      const nextStep = data.passed ? '可使用 /approve 批准' : '请使用 /edit 修改后重新检查';
+      const nextStep = data.passed ? '可使用 /submit 提交审核' : '请使用 /edit 修改后重新检查';
 
       if (data.passed) {
         const message = `✅ 质量检查通过
@@ -563,6 +576,188 @@ ${issuesList || '暂无详细问题'}
       console.error('[ContentOps Bot] Review error:', error);
       const errMsg = error instanceof Error ? error.message : 'Unknown';
       bot.sendMessage(chatId, `❌ 质量检查执行失败\n错误编号：CONTENTOPS-REVIEW-EXCEPTION\n详情：${errMsg.substring(0, 200)}`.substring(0, 4000));
+    }
+  });
+
+  // Handle /submit [draftId] - Submit for review (DRAFT → NEEDS_REVIEW)
+  bot.onText(/\/submit(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    if (!match) return;
+    const explicitId = match[1]?.trim();
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
+    
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /submit <draftId>');
+      return;
+    }
+
+    try {
+      const res = await fetchBridgeApi({
+        action: 'submit_for_review',
+        id: draftId,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Unknown', code: 'UNKNOWN' }));
+        const errorCode = `CONTENTOPS-SUBMIT-${res.status}`;
+        bot.sendMessage(chatId, `❌ 提交审核失败\n错误编号：${errorCode}\n原因：${(errData.error || '').substring(0, 200)}`.substring(0, 4000));
+        return;
+      }
+
+      const data = await res.json();
+      const message = `📤 已提交审核\n\nDraft ID：\`${draftId}\`\n状态：${data.state}\n版本：v${data.version}\n\n下一步：\n/review - 质量检查\n等待审核人 /approve`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Submit error:', error);
+      bot.sendMessage(chatId, '❌ 提交审核失败，请稍后重试');
+    }
+  });
+
+  // Handle /approve [draftId] - Approve draft (NEEDS_REVIEW → APPROVED)
+  bot.onText(/\/approve(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    // Check reviewer permission
+    if (!isReviewer(chatId)) {
+      bot.sendMessage(chatId, `❌ 无审批权限\n错误编号：CONTENTOPS-APPROVE-403\n原因：您的账号不在审核人列表中`);
+      return;
+    }
+
+    if (!match) return;
+    const explicitId = match[1]?.trim();
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
+    
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /approve <draftId>');
+      return;
+    }
+
+    try {
+      // First check quality gate
+      const qualityRes = await fetchBridgeApi({
+        action: 'quality_check',
+        id: draftId,
+      });
+
+      if (!qualityRes.ok) {
+        const errData = await qualityRes.json().catch(() => ({ error: 'Unknown' }));
+        bot.sendMessage(chatId, `❌ 质量检查失败\n错误编号：CONTENTOPS-APPROVE-QUALITY\n原因：${(errData.error || '').substring(0, 200)}`.substring(0, 4000));
+        return;
+      }
+
+      const qualityData = await qualityRes.json();
+      
+      if (!qualityData.passed) {
+        bot.sendMessage(chatId, `❌ 无法批准\n错误编号：CONTENTOPS-APPROVE-409\n原因：质量门禁未通过或当前状态不是 NEEDS_REVIEW\n\n质量评分：${qualityData.qualityScore}/100\n当前状态：${qualityData.draftState}\n\n请先使用 /edit 修改内容后重新 /review`.substring(0, 4000));
+        return;
+      }
+
+      // Get current version for binding
+      const getRes = await fetchBridgeGet(`?id=${encodeURIComponent(draftId)}`);
+      if (!getRes.ok) {
+        bot.sendMessage(chatId, '❌ 无法获取草稿信息');
+        return;
+      }
+      const draft = await getRes.json();
+
+      // Check state is NEEDS_REVIEW
+      if (draft.state !== 'NEEDS_REVIEW' && draft.state !== 'APPROVED') {
+        bot.sendMessage(chatId, `❌ 无法批准\n错误编号：CONTENTOPS-APPROVE-409\n原因：状态必须是 NEEDS_REVIEW，当前为 ${draft.state}`.substring(0, 4000));
+        return;
+      }
+
+      // Execute approval
+      const res = await fetchBridgeApi({
+        action: 'approve',
+        id: draftId,
+        approvedBy: `telegram:${chatId}`,
+        reviewerChatId: String(chatId),
+        approvalSource: 'telegram',
+        expectedVersion: draft.version,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Unknown', code: 'UNKNOWN' }));
+        const errorCode = `CONTENTOPS-APPROVE-${res.status}`;
+        bot.sendMessage(chatId, `❌ 批准失败\n错误编号：${errorCode}\n原因：${(errData.error || '').substring(0, 200)}`.substring(0, 4000));
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.alreadyApproved) {
+        bot.sendMessage(chatId, `ℹ️ 草稿已批准\n\nDraft ID：\`${draftId}\`\n批准版本：v${data.version}\n当前状态：APPROVED\n\n（重复审批，未创建新记录）`.substring(0, 4000), { parse_mode: 'Markdown' });
+      } else {
+        const message = `✅ 草稿已批准\n\nDraft ID：\`${draftId}\`\n批准版本：v${data.version}\n当前状态：APPROVED\n\n下一步：\n/publish - 发布到 staging`;
+        bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+      }
+    } catch (error) {
+      console.error('[ContentOps Bot] Approve error:', error);
+      const errMsg = error instanceof Error ? error.message : 'Unknown';
+      bot.sendMessage(chatId, `❌ 批准执行失败\n错误编号：CONTENTOPS-APPROVE-EXCEPTION\n详情：${errMsg.substring(0, 200)}`.substring(0, 4000));
+    }
+  });
+
+  // Handle /reject <draftId> <reason> - Reject draft (NEEDS_REVIEW → CHANGES_REQUESTED)
+  bot.onText(/\/reject(?:@\w+)?(?:\s+(\S+))?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    // Check reviewer permission
+    if (!isReviewer(chatId)) {
+      bot.sendMessage(chatId, `❌ 无审批权限\n错误编号：CONTENTOPS-REJECT-403\n原因：您的账号不在审核人列表中`);
+      return;
+    }
+
+    if (!match) return;
+    const explicitId = match[1]?.trim();
+    const reason = match[2]?.trim() || '审核人要求修改';
+    
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
+    
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /reject <draftId> <原因>');
+      return;
+    }
+
+    try {
+      const res = await fetchBridgeApi({
+        action: 'reject',
+        id: draftId,
+        rejectedBy: `telegram:${chatId}`,
+        reviewerChatId: String(chatId),
+        reason,
+        rejectionSource: 'telegram',
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: 'Unknown', code: 'UNKNOWN' }));
+        const errorCode = `CONTENTOPS-REJECT-${res.status}`;
+        bot.sendMessage(chatId, `❌ 拒绝失败\n错误编号：${errorCode}\n原因：${(errData.error || '').substring(0, 200)}`.substring(0, 4000));
+        return;
+      }
+
+      const data = await res.json();
+      const message = `🔙 草稿已拒绝\n\nDraft ID：\`${draftId}\`\n版本：v${data.version}\n状态：${data.state}\n原因：${reason}\n\n下一步：\n/edit - 修改内容\n/submit - 重新提交审核`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Reject error:', error);
+      bot.sendMessage(chatId, '❌ 拒绝执行失败，请稍后重试');
     }
   });
 

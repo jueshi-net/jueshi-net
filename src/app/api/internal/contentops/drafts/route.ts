@@ -201,17 +201,20 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Build content metadata for quality checker (safe for empty/null fields)
+      // Use stored qualityMetadata if available
+      const qm = draft.qualityMetadata || {};
       const contentMetadata = {
         title: draft.title || '',
         body: draft.body || '',
-        summary: '',
-        contentType: 'guide' as const,
-        seoTitle: '',
-        seoDescription: '',
-        faq: [],
-        internalLinks: [],
-        sourceFacts: [],
+        summary: qm.summary || qm.seoDescription || '',
+        contentType: (qm.contentType || 'guide') as 'guide' | 'topic' | 'checklist',
+        seoTitle: qm.seoTitle || '',
+        seoDescription: qm.seoDescription || '',
+        faq: qm.faq || [],
+        internalLinks: qm.internalLinks || [],
+        sourceFacts: qm.sourceFacts || [],
+        structuredData: qm.structuredData,
+        canonicalUrl: qm.canonicalUrl,
       };
 
       // Run quality checks (all null-safe)
@@ -238,8 +241,97 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Handle submit_for_review action (DRAFT → NEEDS_REVIEW)
+    if (data.action === 'submit_for_review') {
+      const { submitForReview } = await import('@/lib/contentops/draft-manager');
+      const draftId = data.id;
+      if (!draftId) {
+        return NextResponse.json(
+          { error: 'Draft ID is required', code: 'MISSING_DRAFT_ID' },
+          { status: 400 }
+        );
+      }
+      const result = await submitForReview(draftId);
+      if (!result.success) {
+        const status = result.errorCode === 'DRAFT_NOT_FOUND' ? 404 : 409;
+        return NextResponse.json(
+          { error: result.error, code: result.errorCode },
+          { status }
+        );
+      }
+      return NextResponse.json({
+        id: result.draft!.id,
+        state: result.draft!.state,
+        version: result.draft!.version,
+      });
+    }
+
+    // Handle approve action
+    if (data.action === 'approve') {
+      const { approveDraft } = await import('@/lib/contentops/draft-manager');
+      const draftId = data.id;
+      if (!draftId) {
+        return NextResponse.json(
+          { error: 'Draft ID is required', code: 'MISSING_DRAFT_ID' },
+          { status: 400 }
+        );
+      }
+      const result = await approveDraft(draftId, {
+        approvedBy: data.approvedBy || 'unknown',
+        reviewerChatId: data.reviewerChatId,
+        approvalSource: data.approvalSource || 'telegram',
+        expectedVersion: data.expectedVersion,
+      });
+      if (!result.success) {
+        const status = result.errorCode === 'DRAFT_NOT_FOUND' ? 404 : 
+                       result.errorCode === 'INVALID_STATE' ? 409 :
+                       result.errorCode === 'VERSION_MISMATCH' ? 409 : 500;
+        return NextResponse.json(
+          { error: result.error, code: result.errorCode },
+          { status }
+        );
+      }
+      return NextResponse.json({
+        id: result.draft!.id,
+        state: result.draft!.state,
+        version: result.draft!.version,
+        alreadyApproved: result.alreadyApproved || false,
+        approvalRecord: result.draft!.approvalRecord,
+      });
+    }
+
+    // Handle reject action
+    if (data.action === 'reject') {
+      const { rejectDraft } = await import('@/lib/contentops/draft-manager');
+      const draftId = data.id;
+      if (!draftId) {
+        return NextResponse.json(
+          { error: 'Draft ID is required', code: 'MISSING_DRAFT_ID' },
+          { status: 400 }
+        );
+      }
+      const result = await rejectDraft(draftId, {
+        rejectedBy: data.rejectedBy || 'unknown',
+        reviewerChatId: data.reviewerChatId,
+        reason: data.reason || '',
+        rejectionSource: data.rejectionSource || 'telegram',
+      });
+      if (!result.success) {
+        const status = result.errorCode === 'DRAFT_NOT_FOUND' ? 404 : 409;
+        return NextResponse.json(
+          { error: result.error, code: result.errorCode },
+          { status }
+        );
+      }
+      return NextResponse.json({
+        id: result.draft!.id,
+        state: result.draft!.state,
+        version: result.draft!.version,
+      });
+    }
+
     // Default: create new draft
-    const { title, body: draftBody, targetEnvironment } = data;
+    const { title, body: draftBody, targetEnvironment, qualityMetadata } = data;
 
     if (!title) {
       return NextResponse.json(
@@ -252,6 +344,7 @@ export async function POST(request: NextRequest) {
       title,
       body: draftBody,
       targetEnvironment: targetEnvironment || 'staging',
+      qualityMetadata,
     });
 
     return NextResponse.json({
@@ -304,12 +397,13 @@ export async function PUT(request: NextRequest) {
     }
 
     const data = JSON.parse(body);
-    const { title, body: draftBody, state } = data;
+    const { title, body: draftBody, state, qualityMetadata } = data;
 
     const draft = await updateDraft(draftId, {
       title,
       body: draftBody,
       state,
+      qualityMetadata,
     });
 
     if (!draft) {

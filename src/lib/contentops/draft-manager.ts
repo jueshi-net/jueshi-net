@@ -9,7 +9,7 @@ export interface ContentOpsDraft {
   id: string;
   title: string;
   body: string;
-  state: 'IDEA' | 'DRAFT' | 'REVIEW' | 'APPROVED' | 'PUBLISHED' | 'FAILED';
+  state: 'IDEA' | 'DRAFT' | 'NEEDS_REVIEW' | 'APPROVED' | 'PUBLISHED' | 'CHANGES_REQUESTED' | 'FAILED';
   version: number;
   targetEnvironment: 'staging' | 'production';
   contentOpsManaged: boolean;
@@ -18,6 +18,30 @@ export interface ContentOpsDraft {
   contentOpsVersion: number;
   createdAt: Date;
   updatedAt: Date;
+  // Quality metadata (stored in seoDescription JSON)
+  qualityMetadata?: QualityMetadata;
+  // Approval metadata
+  approvalRecord?: ApprovalRecord;
+}
+
+export interface QualityMetadata {
+  seoTitle?: string;
+  seoDescription?: string;
+  summary?: string;
+  contentType?: 'guide' | 'topic' | 'checklist';
+  faq?: Array<{ question: string; answer: string }>;
+  internalLinks?: Array<{ url: string; title: string }>;
+  sourceFacts?: Array<{ fact: string; source?: string; verified?: boolean }>;
+  structuredData?: any;
+  canonicalUrl?: string;
+}
+
+export interface ApprovalRecord {
+  approvedBy: string;
+  approvedAt: string;
+  approvedVersion: number;
+  approvalSource: 'telegram' | 'web';
+  reviewerChatId?: string;
 }
 
 /**
@@ -27,6 +51,7 @@ export async function createDraft(params: {
   title: string;
   body?: string;
   targetEnvironment?: 'staging' | 'production';
+  qualityMetadata?: QualityMetadata;
 }): Promise<ContentOpsDraft> {
   const draftId = `draft_${Date.now()}_${Math.random().toString(36).substring(7)}`;
   
@@ -46,6 +71,7 @@ export async function createDraft(params: {
         contentOpsStatus: 'DRAFT',
         contentOpsVersion: 1,
         targetEnvironment: params.targetEnvironment || 'staging',
+        qualityMetadata: params.qualityMetadata || {},
         createdAt: new Date().toISOString(),
       }),
     },
@@ -64,6 +90,7 @@ export async function createDraft(params: {
     contentOpsVersion: 1,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
+    qualityMetadata: params.qualityMetadata || {},
   };
 }
 
@@ -149,6 +176,8 @@ export async function getDraft(draftId: string): Promise<ContentOpsDraft | null>
     contentOpsVersion: metadata.contentOpsVersion || 1,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
+    qualityMetadata: metadata.qualityMetadata || {},
+    approvalRecord: metadata.approvalRecord || undefined,
   };
 }
 
@@ -163,6 +192,7 @@ export async function updateDraft(
     title?: string;
     body?: string;
     state?: ContentOpsDraft['state'];
+    qualityMetadata?: QualityMetadata;
   }
 ): Promise<ContentOpsDraft & { previousVersion: number; isDuplicate?: boolean } | null> {
   const article = await prisma.article.findFirst({
@@ -228,6 +258,7 @@ export async function updateDraft(
         contentOpsStatus: updates.state || metadata.contentOpsStatus,
         contentOpsVersion: newVersion,
         versionHistory,
+        qualityMetadata: updates.qualityMetadata || metadata.qualityMetadata || {},
         updatedAt: new Date().toISOString(),
       }),
     },
@@ -269,6 +300,279 @@ export async function getVersionHistory(draftId: string): Promise<Array<{ versio
 
   const metadata = parseMetadata(article.seoDescription);
   return metadata.versionHistory || [];
+}
+
+/**
+ * 批准草稿
+ * Requires: state=NEEDS_REVIEW, quality passed
+ * Records: approvedBy, approvedAt, approvedVersion, approvalSource
+ */
+export async function approveDraft(
+  draftId: string,
+  approval: {
+    approvedBy: string;
+    reviewerChatId?: string;
+    approvalSource: 'telegram' | 'web';
+    expectedVersion?: number;
+  }
+): Promise<{
+  success: boolean;
+  draft?: ContentOpsDraft;
+  error?: string;
+  errorCode?: string;
+  alreadyApproved?: boolean;
+}> {
+  const article = await prisma.article.findFirst({
+    where: {
+      category: 'contentops-draft',
+      seoDescription: {
+        contains: draftId,
+      },
+    },
+  });
+
+  if (!article) {
+    return { success: false, error: 'Draft not found', errorCode: 'DRAFT_NOT_FOUND' };
+  }
+
+  const metadata = parseMetadata(article.seoDescription);
+  const currentState = metadata.contentOpsStatus || 'DRAFT';
+  const currentVersion = metadata.contentOpsVersion || 1;
+
+  // Idempotency: if already approved with same version, return existing record
+  if (currentState === 'APPROVED' && metadata.approvalRecord) {
+    const existingApproval = metadata.approvalRecord as ApprovalRecord;
+    if (existingApproval.approvedVersion === currentVersion) {
+      return {
+        success: true,
+        alreadyApproved: true,
+        draft: {
+          id: draftId,
+          title: article.title,
+          body: article.content,
+          state: 'APPROVED',
+          version: currentVersion,
+          targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+          contentOpsManaged: true,
+          contentOpsDraftId: draftId,
+          contentOpsStatus: 'APPROVED',
+          contentOpsVersion: currentVersion,
+          createdAt: article.createdAt,
+          updatedAt: article.updatedAt,
+          approvalRecord: existingApproval,
+        },
+      };
+    }
+  }
+
+  // State validation: must be NEEDS_REVIEW
+  if (currentState !== 'NEEDS_REVIEW') {
+    return {
+      success: false,
+      error: `状态必须是 NEEDS_REVIEW，当前为 ${currentState}`,
+      errorCode: 'INVALID_STATE',
+    };
+  }
+
+  // Version binding: if expectedVersion provided, check it matches
+  if (approval.expectedVersion !== undefined && approval.expectedVersion !== currentVersion) {
+    return {
+      success: false,
+      error: `版本不匹配：期望 v${approval.expectedVersion}，当前 v${currentVersion}`,
+      errorCode: 'VERSION_MISMATCH',
+    };
+  }
+
+  // Create approval record
+  const approvalRecord: ApprovalRecord = {
+    approvedBy: approval.approvedBy,
+    approvedAt: new Date().toISOString(),
+    approvedVersion: currentVersion,
+    approvalSource: approval.approvalSource,
+    reviewerChatId: approval.reviewerChatId,
+  };
+
+  const updatedArticle = await prisma.article.update({
+    where: { id: article.id },
+    data: {
+      seoDescription: JSON.stringify({
+        ...metadata,
+        contentOpsStatus: 'APPROVED',
+        approvalRecord,
+        updatedAt: new Date().toISOString(),
+      }),
+    },
+  });
+
+  return {
+    success: true,
+    draft: {
+      id: draftId,
+      title: updatedArticle.title,
+      body: updatedArticle.content,
+      state: 'APPROVED',
+      version: currentVersion,
+      targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+      contentOpsManaged: true,
+      contentOpsDraftId: draftId,
+      contentOpsStatus: 'APPROVED',
+      contentOpsVersion: currentVersion,
+      createdAt: updatedArticle.createdAt,
+      updatedAt: updatedArticle.updatedAt,
+      approvalRecord,
+    },
+  };
+}
+
+/**
+ * 拒绝草稿（要求修改）
+ * Requires: state=NEEDS_REVIEW
+ * Transitions to: CHANGES_REQUESTED
+ */
+export async function rejectDraft(
+  draftId: string,
+  rejection: {
+    rejectedBy: string;
+    reviewerChatId?: string;
+    reason: string;
+    rejectionSource: 'telegram' | 'web';
+  }
+): Promise<{
+  success: boolean;
+  draft?: ContentOpsDraft;
+  error?: string;
+  errorCode?: string;
+}> {
+  const article = await prisma.article.findFirst({
+    where: {
+      category: 'contentops-draft',
+      seoDescription: {
+        contains: draftId,
+      },
+    },
+  });
+
+  if (!article) {
+    return { success: false, error: 'Draft not found', errorCode: 'DRAFT_NOT_FOUND' };
+  }
+
+  const metadata = parseMetadata(article.seoDescription);
+  const currentState = metadata.contentOpsStatus || 'DRAFT';
+  const currentVersion = metadata.contentOpsVersion || 1;
+
+  // State validation: must be NEEDS_REVIEW
+  if (currentState !== 'NEEDS_REVIEW') {
+    return {
+      success: false,
+      error: `状态必须是 NEEDS_REVIEW，当前为 ${currentState}`,
+      errorCode: 'INVALID_STATE',
+    };
+  }
+
+  const rejectionRecord = {
+    rejectedBy: rejection.rejectedBy,
+    rejectedAt: new Date().toISOString(),
+    rejectedVersion: currentVersion,
+    reason: rejection.reason,
+    rejectionSource: rejection.rejectionSource,
+    reviewerChatId: rejection.reviewerChatId,
+  };
+
+  const updatedArticle = await prisma.article.update({
+    where: { id: article.id },
+    data: {
+      seoDescription: JSON.stringify({
+        ...metadata,
+        contentOpsStatus: 'CHANGES_REQUESTED',
+        rejectionRecord,
+        updatedAt: new Date().toISOString(),
+      }),
+    },
+  });
+
+  return {
+    success: true,
+    draft: {
+      id: draftId,
+      title: updatedArticle.title,
+      body: updatedArticle.content,
+      state: 'CHANGES_REQUESTED',
+      version: currentVersion,
+      targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+      contentOpsManaged: true,
+      contentOpsDraftId: draftId,
+      contentOpsStatus: 'CHANGES_REQUESTED',
+      contentOpsVersion: currentVersion,
+      createdAt: updatedArticle.createdAt,
+      updatedAt: updatedArticle.updatedAt,
+    },
+  };
+}
+
+/**
+ * 提交审核（DRAFT → NEEDS_REVIEW）
+ */
+export async function submitForReview(draftId: string): Promise<{
+  success: boolean;
+  draft?: ContentOpsDraft;
+  error?: string;
+  errorCode?: string;
+}> {
+  const article = await prisma.article.findFirst({
+    where: {
+      category: 'contentops-draft',
+      seoDescription: {
+        contains: draftId,
+      },
+    },
+  });
+
+  if (!article) {
+    return { success: false, error: 'Draft not found', errorCode: 'DRAFT_NOT_FOUND' };
+  }
+
+  const metadata = parseMetadata(article.seoDescription);
+  const currentState = metadata.contentOpsStatus || 'DRAFT';
+
+  if (currentState !== 'DRAFT' && currentState !== 'CHANGES_REQUESTED') {
+    return {
+      success: false,
+      error: `状态必须是 DRAFT 或 CHANGES_REQUESTED，当前为 ${currentState}`,
+      errorCode: 'INVALID_STATE',
+    };
+  }
+
+  const currentVersion = metadata.contentOpsVersion || 1;
+
+  const updatedArticle = await prisma.article.update({
+    where: { id: article.id },
+    data: {
+      seoDescription: JSON.stringify({
+        ...metadata,
+        contentOpsStatus: 'NEEDS_REVIEW',
+        submittedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    },
+  });
+
+  return {
+    success: true,
+    draft: {
+      id: draftId,
+      title: updatedArticle.title,
+      body: updatedArticle.content,
+      state: 'NEEDS_REVIEW',
+      version: currentVersion,
+      targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+      contentOpsManaged: true,
+      contentOpsDraftId: draftId,
+      contentOpsStatus: 'NEEDS_REVIEW',
+      contentOpsVersion: currentVersion,
+      createdAt: updatedArticle.createdAt,
+      updatedAt: updatedArticle.updatedAt,
+    },
+  };
 }
 
 /**
