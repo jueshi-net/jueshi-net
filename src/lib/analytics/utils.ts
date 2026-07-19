@@ -217,6 +217,20 @@ export function isValidEventType(eventType: string): boolean {
     'community_article_view',
     'community_cta_click',
     'community_tool_continue',
+    
+    // Workspace: Products
+    'product_library_open',
+    'product_csv_import',
+    'product_csv_import_failed',
+    'product_item_insert',
+    
+    // Workspace: Member
+    'reward_redeem',
+    'ad_entitlement_view',
+    'ad_entitlement_apply',
+    
+    // Workspace: Invites
+    'invite_code_generate',
   ];
   
   return allowedEventTypes.includes(eventType);
