@@ -18,6 +18,8 @@ interface SessionRecord {
   chatId: number;
   currentDraftId?: string;
   currentTitle?: string;
+  mode?: 'IDLE' | 'EDITING';
+  editingDraftId?: string;
   updatedAt: string;
 }
 
@@ -66,7 +68,7 @@ export function getSession(chatId: number): SessionRecord {
 
 export function updateSession(
   chatId: number,
-  updates: { currentDraftId?: string; currentTitle?: string }
+  updates: { currentDraftId?: string; currentTitle?: string; mode?: 'IDLE' | 'EDITING'; editingDraftId?: string }
 ): SessionRecord {
   const store = loadStore();
   const key = String(chatId);
@@ -79,6 +81,12 @@ export function updateSession(
   if (updates.currentTitle !== undefined) {
     store[key].currentTitle = updates.currentTitle;
   }
+  if (updates.mode !== undefined) {
+    store[key].mode = updates.mode;
+  }
+  if (updates.editingDraftId !== undefined) {
+    store[key].editingDraftId = updates.editingDraftId;
+  }
   store[key].updatedAt = new Date().toISOString();
   saveStore(store);
   return store[key];
@@ -90,6 +98,8 @@ export function clearSession(chatId: number): void {
   if (store[key]) {
     store[key].currentDraftId = undefined;
     store[key].currentTitle = undefined;
+    store[key].mode = undefined;
+    store[key].editingDraftId = undefined;
     store[key].updatedAt = new Date().toISOString();
     saveStore(store);
   }

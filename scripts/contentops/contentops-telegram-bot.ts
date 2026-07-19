@@ -146,6 +146,28 @@ async function fetchBridgeGet(queryString: string): Promise<any> {
   return res;
 }
 
+async function fetchBridgePut(queryString: string, body: any): Promise<any> {
+  const payload = JSON.stringify(body);
+  const url = new URL(CONFIG.bridgeUrl);
+  const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
+  // Server expects: method:path:queryString:body
+  const signaturePayload = `PUT:${url.pathname}${queryString}:${payload}`;
+  const signature = signPayload(signaturePayload);
+  
+  console.error('[ContentOps Bot] PUT URL:', fullUrl);
+  
+  const res = await fetch(fullUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-ContentOps-Signature': signature,
+    },
+    body: payload,
+  });
+  
+  return res;
+}
+
 // ============================================================================
 // Access Control
 // ============================================================================
@@ -398,6 +420,67 @@ Draft ID：\`${draft.id}\`
     bot.sendMessage(chatId, '请提供 Draft ID: /open <draftId>\n\n使用 /drafts 查看可用草稿');
   });
 
+  // Handle /edit [draftId]
+  bot.onText(/\/edit(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    if (!match) return;
+    const explicitId = match[1]?.trim();
+    const { draftId, error } = resolveDraftId(chatId, explicitId);
+    
+    if (!draftId) {
+      bot.sendMessage(chatId, error || '请先使用 /open <id> 打开草稿，或 /edit <draftId>');
+      return;
+    }
+
+    try {
+      // Fetch draft to confirm it exists and get current version
+      const res = await fetchBridgeGet(`?id=${encodeURIComponent(draftId)}`);
+      
+      if (!res.ok) {
+        let errorObj: any = { code: 'UNKNOWN', error: 'Unknown error' };
+        try { errorObj = await res.json(); } catch {}
+        
+        const errorCode = `CONTENTOPS-EDIT-${res.status}`;
+        const reason = errorObj.code === 'DRAFT_NOT_FOUND' ? '草稿不存在' : 
+                       errorObj.error || '未知错误';
+        bot.sendMessage(chatId, `❌ 无法进入编辑模式\n错误编号：${errorCode}\n原因：${reason}`.substring(0, 4000));
+        return;
+      }
+
+      const draft = await res.json();
+      
+      // Set editing mode
+      updateSession(chatId, { 
+        mode: 'EDITING', 
+        editingDraftId: draftId,
+        currentDraftId: draftId,
+        currentTitle: draft.title,
+      });
+      
+      console.error('[ContentOps Bot] Edit mode entered:', { draftId, chatId, version: draft.version });
+
+      const message = `✏️ 已进入编辑模式
+
+标题：${draft.title}
+Draft ID：\`${draft.id}\`
+当前版本：v${draft.version}
+
+请发送新的完整正文。
+/cancel - 退出编辑`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Edit error:', error);
+      const errMsg = error instanceof Error ? error.message : 'Unknown';
+      bot.sendMessage(chatId, `❌ 无法进入编辑模式\n错误编号：CONTENTOPS-EDIT-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+    }
+  });
+
   // Handle /review [draftId]
   bot.onText(/\/review(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
@@ -566,12 +649,24 @@ Production: 🔒 DISABLED`;
       return;
     }
 
-    clearSession(chatId);
-    bot.sendMessage(chatId, '✅ 已取消当前操作（草稿指针已清除，草稿本身未删除）');
+    const session = getSession(chatId);
+    
+    if (session.mode === 'EDITING') {
+      // Just exit editing mode, keep currentDraftId
+      updateSession(chatId, { 
+        mode: 'IDLE',
+        editingDraftId: undefined,
+      });
+      bot.sendMessage(chatId, '✅ 已退出编辑模式（草稿未修改，指针保留）');
+    } else {
+      // Clear everything
+      clearSession(chatId);
+      bot.sendMessage(chatId, '✅ 已取消当前操作（草稿指针已清除，草稿本身未删除）');
+    }
   });
 
   // Handle natural language (when in editing mode)
-  bot.on('message', (msg) => {
+  bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text || '';
     
@@ -580,7 +675,59 @@ Production: 🔒 DISABLED`;
     
     if (!isAllowedChat(chatId)) return;
 
-    // Future: editing mode handler
+    const session = getSession(chatId);
+
+    // Only process text if in EDITING mode
+    if (session.mode !== 'EDITING' || !session.editingDraftId) {
+      return;
+    }
+
+    const draftId = session.editingDraftId;
+    const previousVersion = session.currentTitle ? undefined : undefined; // We'll get this from server
+
+    try {
+      // Update draft body via PUT
+      const res = await fetchBridgePut(
+        `?id=${encodeURIComponent(draftId)}`,
+        { body: text }
+      );
+
+      if (!res.ok) {
+        let errorObj: any = { code: 'UNKNOWN', error: 'Unknown error' };
+        try { errorObj = await res.json(); } catch {}
+        
+        const errorCode = `CONTENTOPS-SAVE-${res.status}`;
+        const reason = errorObj.error || '保存失败';
+        bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：${errorCode}\n原因：${reason}`.substring(0, 4000));
+        return;
+      }
+
+      const updated = await res.json();
+      const newVersion = updated.version;
+      
+      // Exit editing mode, keep currentDraftId
+      updateSession(chatId, { 
+        mode: 'IDLE',
+        editingDraftId: undefined,
+      });
+
+      console.error('[ContentOps Bot] Draft saved:', { draftId, newVersion, chatId });
+
+      const message = `✅ 草稿已保存
+
+Draft ID：\`${draftId}\`
+新版本：v${newVersion}
+状态：DRAFT
+
+下一步：
+/review - 质量检查
+/status - 查看状态`;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Save draft error:', error);
+      const errMsg = error instanceof Error ? error.message : 'Unknown';
+      bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：CONTENTOPS-SAVE-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+    }
   });
 
   console.log('[ContentOps Bot] Started successfully');

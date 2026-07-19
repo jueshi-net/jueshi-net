@@ -115,11 +115,9 @@
 - Database query showing state unchanged
 - Issue list with codes (e.g., CONTENT_LENGTH, SEO, GEO)
 
-**Status:** PARTIAL  
+**Status:** PASS  
 **Evidence Date:** 2026-07-19  
-**Evidence:** Direct API test returned HTTP 200, passed=false, qualityScore=35, seoScore=60, geoScore=70, 7 issues with codes; Draft state remains DRAFT; **Telegram bot retest pending**
-
-**Blocker:** User must test `/open draft_1784473544700_hun099` + `/review` in Telegram to verify bot response format
+**Evidence:** Direct API test returned HTTP 200, passed=false, qualityScore=35, seoScore=60, geoScore=70, 7 issues with codes; Draft state remains DRAFT; **Telegram bot retest PASS** - user confirmed structured response with scores and issues list
 
 ---
 
@@ -216,18 +214,18 @@
 ## Current Status Summary
 
 ```
-CURRENT_GATE=G4
+CURRENT_GATE=G5
 G0=PASS
 G1=PASS
 G2=PASS
 G3=PARTIAL
-G4=PARTIAL
+G4=PASS
 G5=NOT_STARTED
 G6=NOT_STARTED
 G7=NOT_STARTED
 G8=PARTIAL
 FULL_E2E_COMPLETE=false
-NEXT_GATE=G4 (pending Telegram retest)
+NEXT_GATE=G5
 ```
 
 ---
@@ -309,11 +307,11 @@ LAUNCHAGENT=ai.hermes.contentops (running)
 - [ ] User confirms state shows: DRAFT
 
 ### G4 Completion
-- [ ] User sends `/open draft_1784473544700_hun099` in Telegram
-- [ ] User sends `/review` in Telegram
-- [ ] Bot returns structured response (not "质量检查失败")
-- [ ] Response includes scores and issues list
-- [ ] Screenshot or text captured
+- [x] User sends `/open draft_1784473544700_hun099` in Telegram
+- [x] User sends `/review` in Telegram
+- [x] Bot returns structured response (not "质量检查失败")
+- [x] Response includes scores and issues list
+- [x] Screenshot or text captured
 
 ### G8 Completion
 - [ ] Test unauthorized chat ID access
