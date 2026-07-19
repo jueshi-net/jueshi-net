@@ -39,7 +39,6 @@ export async function createDraft(params: {
       excerpt: '',
       status: 'draft', // 不公开
       category: 'contentops-draft', // 隔离标识
-      tags: ['contentops', 'draft'],
       // 使用 seoDescription 存储元数据 JSON
       seoDescription: JSON.stringify({
         contentOpsManaged: true,
