@@ -129,6 +129,8 @@ export async function GET(request: NextRequest) {
         targetEnvironment: draft.targetEnvironment,
         createdAt: draft.createdAt.toISOString(),
         updatedAt: draft.updatedAt.toISOString(),
+        qualityMetadata: draft.qualityMetadata || {},
+        approvalRecord: draft.approvalRecord || null,
       });
     }
 
