@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Star, Crown, TrendingUp } from 'lucide-react';
+import { Star, Crown, TrendingUp, Award } from 'lucide-react';
 
 /**
  * User Identity System - 统一用户身份展示组件
@@ -24,10 +24,12 @@ export interface UserDisplayData {
   displayName: string;
   email?: string;
   avatarUrl?: string;
+  publicTitle?: string | null; // 公开头衔（社区场景）
   
   // 等级信息
   levelKey: string;
   levelLabel: string;
+  levelIcon?: string; // 等级图标文字（如 🌱、🌿）
   growthValue: number;
   progressToNext?: number;
   remainingToNext?: number;
@@ -38,6 +40,9 @@ export interface UserDisplayData {
   checkinStreak?: number;
   badgeCount?: number;
   isMember: boolean;
+  membershipTier?: string; // 'free' | 'member' | 'premium' | 'enterprise'
+  isAdmin?: boolean;
+  honorScore?: number; // 社区荣誉值
   
   // 可选扩展
   memberUntil?: string | null;
@@ -49,6 +54,9 @@ export interface UserIdentityCardProps {
   showCheckin?: boolean;
   showProgress?: boolean;
   showStats?: boolean;
+  showHonor?: boolean; // 显示荣誉值
+  showMembership?: boolean; // 显示会员等级标签
+  showPublicTitle?: boolean; // 显示公开头衔
   href?: string; // 如果提供，整个卡片可点击
   className?: string;
 }
@@ -68,6 +76,9 @@ export default function UserIdentityCard({
   showCheckin = false,
   showProgress = true,
   showStats = true,
+  showHonor = false,
+  showMembership = false,
+  showPublicTitle = false,
   href,
   className = '',
 }: UserIdentityCardProps) {
@@ -75,8 +86,10 @@ export default function UserIdentityCard({
     displayName,
     email,
     avatarUrl,
+    publicTitle,
     levelLabel,
     levelKey,
+    levelIcon,
     growthValue,
     progressToNext = 0,
     remainingToNext,
@@ -85,9 +98,21 @@ export default function UserIdentityCard({
     checkinStreak = 0,
     badgeCount = 0,
     isMember,
+    membershipTier,
+    isAdmin,
+    honorScore,
   } = user;
 
   const levelColor = LEVEL_COLORS[levelKey] || LEVEL_COLORS.lv1;
+
+  // Membership label helper
+  const getMembershipLabel = () => {
+    if (!isMember) return null;
+    if (membershipTier === 'premium') return '高级会员';
+    if (membershipTier === 'enterprise') return '企业会员';
+    if (membershipTier === 'member') return '会员';
+    return '会员';
+  };
 
   // 头像组件
   const Avatar = ({ sizeClass }: { sizeClass: string }) => (
@@ -101,19 +126,31 @@ export default function UserIdentityCard({
   );
 
   // 会员徽章
-  const MemberBadge = () => isMember ? (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-400/20 text-amber-300 text-[10px] font-semibold rounded-full border border-amber-400/30">
-      <Crown className="w-3 h-3" />
-      会员
-    </span>
-  ) : null;
+  const MemberBadge = ({ compact = false }: { compact?: boolean }) => {
+    const label = getMembershipLabel();
+    if (!label) return null;
+    return (
+      <span className={`inline-flex items-center gap-1 ${compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-1.5 py-0.5 text-[10px]'} bg-amber-50 text-amber-600 font-semibold rounded-full border border-amber-200`}>
+        <Crown className={`${compact ? 'w-2.5 h-2.5' : 'w-3 h-3'}`} />
+        {label}
+      </span>
+    );
+  };
 
   // 等级徽章
   const LevelBadge = ({ compact = false }: { compact?: boolean }) => (
     <div className={`inline-flex items-center gap-1 ${compact ? 'px-2 py-0.5' : 'px-2.5 py-1'} ${levelColor.bg} ${levelColor.text} ${levelColor.border} border rounded-full`}>
+      {levelIcon && <span className={`${compact ? 'text-[10px]' : 'text-xs'}`}>{levelIcon}</span>}
       <Star className={`${compact ? 'w-3 h-3' : 'w-3.5 h-3.5'}`} />
       <span className={`font-semibold ${compact ? 'text-[10px]' : 'text-xs'}`}>{levelLabel}</span>
     </div>
+  );
+
+  // 管理员徽章
+  const AdminBadge = () => (
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200">
+      管理员
+    </span>
   );
 
   // 内容区域
@@ -126,11 +163,12 @@ export default function UserIdentityCard({
             <Avatar sizeClass="w-8 h-8 text-sm" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-              <div className="mt-0.5">
+              <div className="mt-0.5 flex items-center gap-1 flex-wrap">
                 <LevelBadge compact />
+                {showMembership && isMember && <MemberBadge compact />}
+                {isAdmin && <AdminBadge />}
               </div>
             </div>
-            {isMember && <MemberBadge />}
           </div>
         );
 
@@ -151,22 +189,44 @@ export default function UserIdentityCard({
                 )}
               </div>
               
-              {/* 昵称和邮箱 */}
+              {/* 昵称和头衔 */}
               <h2 className="text-base font-bold truncate mb-0.5">{displayName}</h2>
+              {showPublicTitle && publicTitle && (
+                <p className="text-white/60 text-[11px] truncate mb-0.5">{publicTitle}</p>
+              )}
               {email && <p className="text-white/60 text-[11px] truncate mb-3">{email}</p>}
               
-              {/* 会员徽章 */}
-              {isMember && (
-                <div className="mb-3">
-                  <MemberBadge />
+              {/* 徽章行 */}
+              <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                {/* 等级 */}
+                <div className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-lg px-2.5 py-1">
+                  {levelIcon && <span className="text-xs">{levelIcon}</span>}
+                  <Star className="w-3.5 h-3.5 text-amber-300" />
+                  <span className="font-semibold text-xs">{levelLabel}</span>
+                </div>
+                {/* 会员 */}
+                {showMembership && isMember && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-400/20 text-amber-300 text-[10px] font-semibold rounded-full border border-amber-400/30">
+                    <Crown className="w-3 h-3" />
+                    {getMembershipLabel()}
+                  </span>
+                )}
+                {/* 管理员 */}
+                {isAdmin && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-400/20 text-red-300 text-[10px] font-semibold rounded-full border border-red-400/30">
+                    管理员
+                  </span>
+                )}
+              </div>
+              
+              {/* 荣誉值 */}
+              {showHonor && honorScore !== undefined && honorScore > 0 && (
+                <div className="flex items-center gap-1.5 mb-3 bg-white/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5">
+                  <Award className="w-3.5 h-3.5 text-amber-300" />
+                  <span className="text-xs text-white/60">荣誉值</span>
+                  <span className="font-bold text-xs text-amber-300">{honorScore}</span>
                 </div>
               )}
-              
-              {/* 等级 */}
-              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm rounded-lg px-2.5 py-1.5 mb-3">
-                <Star className="w-3.5 h-3.5 text-amber-300" />
-                <span className="font-semibold text-xs">{levelLabel}</span>
-              </div>
               
               {/* 进度条 */}
               {showProgress && progressToNext > 0 && (
@@ -218,17 +278,27 @@ export default function UserIdentityCard({
             <div className="flex items-start gap-3">
               <Avatar sizeClass="w-12 h-12 text-lg" />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-0.5">
                   <p className="text-sm font-semibold text-gray-900 truncate">{displayName}</p>
-                  {isMember && <MemberBadge />}
+                  {showMembership && isMember && <MemberBadge compact />}
+                  {isAdmin && <AdminBadge />}
                 </div>
+                {showPublicTitle && publicTitle && (
+                  <p className="text-xs text-gray-500 truncate mb-1">{publicTitle}</p>
+                )}
                 {email && <p className="text-xs text-gray-500 truncate mb-2">{email}</p>}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <LevelBadge />
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <TrendingUp className="w-3 h-3" />
                     <span>{growthValue}</span>
                   </div>
+                  {showHonor && honorScore !== undefined && honorScore > 0 && (
+                    <div className="flex items-center gap-1 text-xs text-amber-500">
+                      <Award className="w-3 h-3" />
+                      <span>{honorScore}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -505,9 +505,25 @@ const userData: UserDisplayData = {
 | 模块 | 状态 | 尺寸 | 说明 |
 |------|------|------|------|
 | Workspace LeftRail | ✅ 已接入 | lg | 用户资产栏 |
-| Forum 用户信息 | ⏳ 待接入 | md | 帖子作者信息 |
+| CommunityProfileCard | ✅ 已接入 | md | 社区用户名片（组合容器） |
+| Forum 用户信息 | ⏳ 待接入 | sm | 帖子作者信息 |
 | 排行榜 | ⏳ 待接入 | sm | 用户排名展示 |
 | 评论区 | ⏳ 待接入 | sm | 评论者信息 |
+
+### 所有权规则
+
+**UserIdentityCard 是全站唯一用户身份展示模块。**
+
+1. **唯一性**：所有用户身份信息（头像、昵称、等级、会员、积分、荣誉值、成长进度）必须通过 UserIdentityCard 渲染，禁止在其他组件中重复实现。
+2. **维护权**：Default Agent 是 UserIdentityCard 的唯一维护者。任何修改必须回归所有使用位置。
+3. **调用方式**：Forum / Workspace / 其他业务模块只能调用 UserIdentityCard，不得复制其内部逻辑。
+4. **场景差异**：通过 props（size、showHonor、showMembership、showPublicTitle 等）和外层组合实现场景差异。
+5. **组合模式**：业务场景（如社区名片）使用组合容器模式，将 UserIdentityCard 作为子组件嵌入，容器只负责场景专属内容（签到、任务、勋章等）。
+6. **回归要求**：修改 UserIdentityCard 后必须验证：
+   - Workspace LeftRail（lg 尺寸）
+   - CommunityProfileCard（md 尺寸）
+   - 无头像、无徽章用户的降级显示
+   - Console error = 0
 
 ---
 
