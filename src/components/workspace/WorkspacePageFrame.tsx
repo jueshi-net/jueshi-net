@@ -25,19 +25,19 @@ export default function WorkspacePageFrame({
   // Both rails: three-column layout
   if (leftRail && rightRail) {
     return (
-      <div className="flex gap-4 pb-8">
-        {/* Left rail: 240px, hidden on mobile */}
-        <div className="hidden xl:block w-[240px] flex-shrink-0">
+      <div className="flex gap-3 pb-8">
+        {/* Left rail: User Asset Rail, hidden on mobile */}
+        <div className="hidden xl:block w-[220px] flex-shrink-0">
           {leftRail}
         </div>
         
-        {/* Main content: flexible */}
+        {/* Main content: Main Workspace, flexible */}
         <main className="flex-1 min-w-0">
           {children}
         </main>
         
-        {/* Right rail: 260px, hidden on mobile */}
-        <div className="hidden lg:block w-[260px] flex-shrink-0">
+        {/* Right rail: Right Assistant Rail, hidden on mobile */}
+        <div className="hidden lg:block w-[240px] flex-shrink-0">
           {rightRail}
         </div>
       </div>
