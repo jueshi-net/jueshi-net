@@ -119,50 +119,22 @@ async function publishGuide(
     const slug = draft.slug || `contentops-${draft.id.replace(/[^a-z0-9]/g, '-').toLowerCase()}`;
     
     // Check if guide already exists (idempotency)
+    // Note: Idempotency is managed at Draft Manager level via publishRecord
+    // This adapter only creates the Guide record
     const existingGuide = await prisma.guide.findUnique({ where: { slug } });
     if (existingGuide) {
-      // Verify seoDescription contains matching ContentOps metadata
-      const seoDesc = existingGuide.seoDescription || '';
-      const isContentOpsManaged = seoDesc.includes(`"sourceDraftId":"${draft.id}"`);
-      const isSameVersion = seoDesc.includes(`"sourceVersion":${draft.version}`) || 
-                           seoDesc.includes(`"sourceVersion":"${draft.version}"`);
-      
-      if (isContentOpsManaged && isSameVersion) {
-        // True idempotent replay
-        return {
-          success: true,
-          url: `${baseUrl}/guides/${slug}`,
-          contentId: existingGuide.id,
-          version: draft.version,
-          timestamp,
-        };
-      } else {
-        // Slug conflict - different content with same slug
-        return {
-          success: false,
-          error: 'CONTENTOPS_SLUG_CONFLICT: Guide with same slug exists but metadata does not match',
-          timestamp,
-        };
-      }
+      // Guide with same slug exists - this should not happen if Draft Manager
+      // properly checks publishRecord before calling publish
+      return {
+        success: false,
+        error: 'CONTENTOPS_SLUG_CONFLICT: Guide with same slug already exists',
+        timestamp,
+      };
     }
 
-    // Store ContentOps metadata in seoDescription (JSON format)
-    const contentOpsMetadata = {
-      contentOpsManaged: true,
-      sourceDraftId: draft.id,
-      sourceVersion: draft.version,
-      publishKey: `staging:guide:${draft.id}:v${draft.version}`,
-      targetEnvironment: 'staging',
-      publishedAt: timestamp.toISOString(),
-      publishedBy: 'contentops-bot',
-    };
-    
-    const seoDescription = draft.seoDescription || draft.summary || '';
-    const combinedSeoDescription = seoDescription 
-      ? `${seoDescription}\n\n<!-- ContentOps: ${JSON.stringify(contentOpsMetadata)} -->`
-      : `<!-- ContentOps: ${JSON.stringify(contentOpsMetadata)} -->`;
-
     // Create new Guide record
+    // Note: Only write fields that exist in the database schema
+    // metadataJson column does not exist in staging database (migration not applied)
     const guide = await prisma.guide.create({
       data: {
         title: draft.title,
@@ -178,7 +150,7 @@ async function publishGuide(
         status: 'published',
         author: 'ContentOps Bot',
         seoTitle: draft.seoTitle || draft.title,
-        seoDescription: combinedSeoDescription,
+        seoDescription: draft.seoDescription || draft.summary || '',
         robots: 'noindex,nofollow', // Staging: noindex
         sortOrder: 0,
         publishedAt: timestamp,

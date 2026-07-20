@@ -622,14 +622,69 @@ export async function publishDraft(draftId: string, options: {
   const currentState = metadata.contentOpsStatus || 'DRAFT';
   const currentVersion = metadata.contentOpsVersion || 1;
 
-  // Idempotency: if already published, return existing record
+  // Idempotency: if already published, verify Guide still exists
   if (currentState === 'PUBLISHED' && metadata.publishRecord) {
-    return {
-      success: true,
-      draft: buildDraftFromArticle(article, draftId, metadata),
-      alreadyPublished: true,
-      publishRecord: metadata.publishRecord,
-    };
+    const publishRecord = metadata.publishRecord;
+    
+    // Verify the Guide record still exists in database
+    try {
+      const guide = await prisma.guide.findUnique({ 
+        where: { id: publishRecord.contentId } 
+      });
+      
+      if (guide && guide.slug === article.slug) {
+        // Guide exists and slug matches - true idempotent replay
+        return {
+          success: true,
+          draft: buildDraftFromArticle(article, draftId, metadata),
+          alreadyPublished: true,
+          publishRecord,
+        };
+      } else if (guide) {
+        // Guide exists but slug mismatch - data inconsistency
+        return {
+          success: false,
+          error: '数据不一致：Guide slug 与 publishRecord 不匹配',
+          errorCode: 'CONTENTOPS_PUBLISH_DATA_INCONSISTENCY',
+        };
+      } else {
+        // Guide not found - published content was deleted or never created
+        const failedRecord = {
+          publishKey: publishRecord.publishKey,
+          failedAt: new Date().toISOString(),
+          failedBy: 'system',
+          failureReason: 'CONTENTOPS_PUBLISH_TARGET_MISSING: Published Guide record not found',
+          failedStep: 'GUIDE_VERIFICATION',
+          targetEnvironment: 'staging',
+          approvedVersion: currentVersion,
+          originalPublishRecord: publishRecord,
+        };
+        
+        await prisma.article.update({
+          where: { id: article.id },
+          data: {
+            seoDescription: JSON.stringify({
+              ...metadata,
+              contentOpsStatus: 'FAILED',
+              failedRecord,
+              updatedAt: new Date().toISOString(),
+            }),
+          },
+        });
+        
+        return {
+          success: false,
+          error: '已发布的 Guide 记录不存在，需要重新发布',
+          errorCode: 'CONTENTOPS_PUBLISH_TARGET_MISSING',
+        };
+      }
+    } catch (error: any) {
+      return {
+        success: false,
+        error: `验证 Guide 记录失败: ${error.message}`,
+        errorCode: 'CONTENTOPS_GUIDE_VERIFICATION_FAILED',
+      };
+    }
   }
 
   // State validation: must be APPROVED
