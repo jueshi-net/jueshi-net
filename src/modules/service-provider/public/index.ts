@@ -57,31 +57,75 @@ export {
   registerServiceProviderBlocks,
 } from "../blocks";
 
-// ---- Round 2 stubs (typed, ready for implementation) ----
+// ---- Queries (safe public read layer) ----
 
-/**
- * serviceProviderApi — HTTP API surface.
- * Round 2 will populate this with real route handlers:
- *   - listProviders, getProvider, createProvider, updateProvider
- *   - submitForReview, verifyProvider, rejectProvider
- *   - listServices, createService, publishService
- */
-export const serviceProviderApi = {
-  // Round 2: CRUD endpoints
-  _status: "skeleton" as const,
+import {
+  listPublicProviders,
+  getPublicProviderBySlug,
+  getPublicProviderServices,
+  getPublicServiceBySlug,
+  listPublicCategories,
+  getTrustCard,
+  getRelatedProviders,
+  isProviderFavorited,
+} from "../application/queries";
+
+export {
+  listPublicProviders,
+  getPublicProviderBySlug,
+  getPublicProviderServices,
+  getPublicServiceBySlug,
+  listPublicCategories,
+  getTrustCard,
+  getRelatedProviders,
+  isProviderFavorited,
 };
 
-/**
- * serviceProviderQueries — server-side read queries.
- * Round 2 will populate this with Prisma queries:
- *   - listProviders(filters) -> Provider[]
- *   - getProviderBySlug(slug) -> Provider | null
- *   - getProviderServices(providerId) -> Service[]
- *   - searchProviders(query) -> Provider[]
- */
+export type {
+  PublicProviderDTO,
+  PublicServiceDTO,
+  PublicCategoryDTO,
+  PublicVerificationDTO,
+  TrustCardDTO,
+  ProviderFilterParams,
+  PaginatedResult,
+} from "../domain/public-dto";
+
+// ---- Application Services ----
+
+export {
+  createProviderApplication,
+  updateProviderProfile,
+  submitProviderForReview,
+  approveProvider,
+  rejectProvider,
+  suspendProvider,
+  createProviderService,
+  submitProviderService,
+  publishProviderService,
+  createServiceInquiry,
+  addProviderMember,
+  removeProviderMember,
+  prefillProviderApplicationFromCompanyProfile,
+} from "../application";
+
+// ---- API surface ----
+
+export const serviceProviderApi = {
+  _status: "live" as const,
+};
+
+// ---- Queries barrel for convenience ----
+
 export const serviceProviderQueries = {
-  // Round 2: Prisma-backed queries
-  _status: "skeleton" as const,
+  listPublicProviders,
+  getPublicProviderBySlug,
+  getPublicProviderServices,
+  getPublicServiceBySlug,
+  listPublicCategories,
+  getTrustCard,
+  getRelatedProviders,
+  isProviderFavorited,
 };
 
 // ---- One-call boot ----
