@@ -455,10 +455,27 @@ export async function POST(request: NextRequest) {
 
     // Handle generate action — create and execute a generation job
     if (data.action === 'generate') {
-      const { isAiGenerationEnabled } = await import('@/lib/contentops/content-generation-provider');
+      const { isAiGenerationEnabled, isUsingRealProvider, checkProviderHealth } = await import('@/lib/contentops/content-generation-provider');
+      
+      // Check if AI is enabled
       if (!isAiGenerationEnabled()) {
         return NextResponse.json(
           { error: 'AI generation not configured', code: 'AI_NOT_CONFIGURED' },
+          { status: 503 }
+        );
+      }
+      
+      // Check if we're using a real provider (not fallback)
+      if (!isUsingRealProvider()) {
+        // Fallback provider is not allowed in production flow
+        const health = await checkProviderHealth();
+        return NextResponse.json(
+          { 
+            error: 'Real AI provider unavailable. DeepSeek API may have insufficient balance.', 
+            code: 'CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE',
+            provider: health.provider,
+            providerError: health.error,
+          },
           { status: 503 }
         );
       }
@@ -488,6 +505,12 @@ export async function POST(request: NextRequest) {
       // Save as draft if completed successfully
       if (completedJob.status === 'COMPLETED' && completedJob.content) {
         const draftResult = await saveGeneratedContentAsDraft(job.id);
+        
+        // Count valid sources (exclude FACT_RESEARCH_UNAVAILABLE)
+        const validSources = (completedJob.content.sources || []).filter(
+          s => s.title !== 'FACT_RESEARCH_UNAVAILABLE' && s.title !== 'FACT_RESEARCH_UNVAILABLE'
+        );
+        
         return NextResponse.json({
           jobId: completedJob.id,
           status: completedJob.status,
@@ -501,7 +524,8 @@ export async function POST(request: NextRequest) {
             seoTitle: completedJob.content.seoTitle,
             seoDescription: completedJob.content.seoDescription,
             faqCount: completedJob.content.faq?.length || 0,
-            sourceCount: completedJob.content.sources?.length || 0,
+            sourceCount: validSources.length,
+            sourceResearchAvailable: validSources.length > 0,
             internalLinkCount: completedJob.content.internalLinks?.length || 0,
           } : null,
           qualityResult: completedJob.qualityResult,
@@ -529,10 +553,26 @@ export async function POST(request: NextRequest) {
 
     // Handle revise action — create revision job for existing draft
     if (data.action === 'revise') {
-      const { isAiGenerationEnabled } = await import('@/lib/contentops/content-generation-provider');
+      const { isAiGenerationEnabled, isUsingRealProvider, checkProviderHealth } = await import('@/lib/contentops/content-generation-provider');
+      
+      // Check if AI is enabled
       if (!isAiGenerationEnabled()) {
         return NextResponse.json(
           { error: 'AI generation not configured', code: 'AI_NOT_CONFIGURED' },
+          { status: 503 }
+        );
+      }
+      
+      // Check if we're using a real provider (not fallback)
+      if (!isUsingRealProvider()) {
+        const health = await checkProviderHealth();
+        return NextResponse.json(
+          { 
+            error: 'Real AI provider unavailable. DeepSeek API may have insufficient balance.', 
+            code: 'CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE',
+            provider: health.provider,
+            providerError: health.error,
+          },
           { status: 503 }
         );
       }

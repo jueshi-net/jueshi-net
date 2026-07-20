@@ -564,12 +564,18 @@ ${currentContent.substring(0, 6000)}${currentContent.length > 6000 ? '...(已截
 // ============================================================================
 
 let providerInstance: ContentGenerationProvider | null = null;
+let providerHealthChecked = false;
+let providerHealthOk = false;
 
 export function getContentGenerationProvider(): ContentGenerationProvider {
   if (!providerInstance) {
-    // Always use fallback for now since DeepSeek has insufficient balance
-    // When API is funded, switch to: if (AI_CONFIG.enabled && AI_CONFIG.apiKey) new DeepSeekProvider()
-    providerInstance = new LocalFallbackProvider();
+    // Try DeepSeek if configured
+    if (AI_CONFIG.enabled && AI_CONFIG.apiKey) {
+      providerInstance = new DeepSeekProvider();
+    } else {
+      // No real provider configured, use fallback
+      providerInstance = new LocalFallbackProvider();
+    }
   }
   return providerInstance;
 }
@@ -577,6 +583,79 @@ export function getContentGenerationProvider(): ContentGenerationProvider {
 export function isAiGenerationEnabled(): boolean {
   // Enable if either DeepSeek is configured OR fallback is available
   return (AI_CONFIG.enabled && !!AI_CONFIG.apiKey) || true; // fallback always available
+}
+
+/**
+ * Check if the active provider can actually generate content.
+ * Returns false if DeepSeek has insufficient balance or other errors.
+ */
+export async function checkProviderHealth(): Promise<{
+  healthy: boolean;
+  provider: string;
+  model: string;
+  error?: string;
+}> {
+  const provider = getContentGenerationProvider();
+  
+  // If using fallback provider, it's always "healthy" but not real
+  if (provider instanceof LocalFallbackProvider) {
+    return {
+      healthy: true,
+      provider: 'local-fallback',
+      model: 'template-v1',
+      error: 'Using local fallback - not a real AI model',
+    };
+  }
+  
+  // Check cached health status
+  if (providerHealthChecked) {
+    return {
+      healthy: providerHealthOk,
+      provider: 'deepseek',
+      model: AI_CONFIG.model,
+      error: providerHealthOk ? undefined : 'DeepSeek API unavailable (cached)',
+    };
+  }
+  
+  // Test DeepSeek with a minimal request
+  try {
+    const result = await provider.generateBrief('test', { contentType: 'guide' });
+    providerHealthChecked = true;
+    
+    if (result.success) {
+      providerHealthOk = true;
+      return {
+        healthy: true,
+        provider: result.provider,
+        model: result.model,
+      };
+    } else {
+      providerHealthOk = false;
+      return {
+        healthy: false,
+        provider: result.provider || 'unknown',
+        model: result.model || 'unknown',
+        error: result.error || 'Unknown error',
+      };
+    }
+  } catch (error: any) {
+    providerHealthChecked = true;
+    providerHealthOk = false;
+    return {
+      healthy: false,
+      provider: 'deepseek',
+      model: AI_CONFIG.model,
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Check if we're using a real AI provider (not fallback).
+ */
+export function isUsingRealProvider(): boolean {
+  const provider = getContentGenerationProvider();
+  return provider instanceof DeepSeekProvider;
 }
 
 // ============================================================================

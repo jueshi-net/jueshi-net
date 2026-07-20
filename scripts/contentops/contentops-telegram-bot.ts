@@ -334,6 +334,8 @@ async function startBot() {
         
         if (error.code === 'AI_NOT_CONFIGURED') {
           bot.sendMessage(chatId, `❌ AI 内容生成未配置\n\n错误编号：CONTENTOPS-GENERATE-503\n原因：AI 模型服务未启用\n\n请联系管理员配置 AI_API_KEY`);
+        } else if (error.code === 'CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE') {
+          bot.sendMessage(chatId, `❌ AI 模型服务不可用\n\n错误编号：CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE\n原因：真实 AI 模型无法调用\n详情：${(error.providerError || 'DeepSeek API 余额不足或网络错误').substring(0, 200)}\n\n当前状态：\n- 生成任务已暂停\n- 等待模型服务恢复后可重试\n\n请联系管理员检查 AI_API_KEY 配置或充值 API 余额`);
         } else {
           bot.sendMessage(chatId, `❌ 内容生成失败\n\n错误编号：${error.code || 'CONTENTOPS-GENERATE-500'}\n原因：${(error.error || '').substring(0, 200)}`);
         }

@@ -6,6 +6,8 @@ export interface QualityCheckResult {
   level: 'excellent' | 'good' | 'fair' | 'poor';
   issues: QualityIssue[];
   warnings: QualityWarning[];
+  hardFail: boolean; // true if content_length or other critical error exists
+  hardFailReasons: string[]; // reasons for hard fail
 }
 
 export interface QualityIssue {
@@ -37,9 +39,9 @@ export interface ContentMetadata {
 
 // 内容长度要求
 const CONTENT_LENGTH_REQUIREMENTS = {
-  guide: 1500, // 指南 >= 1500 中文字符
+  guide: 1800, // 指南 >= 1800 中文字符 (matching requestedLength spec)
   topic: 2000, // 专题 >= 2000 中文字符
-  checklist: 0, // 清单需要结构化检查
+  checklist: 800, // 清单 >= 800 中文字符
 };
 
 // 计算中文字符数
@@ -294,11 +296,18 @@ export function checkContentQuality(content: ContentMetadata): QualityCheckResul
       suggestion: getSuggestion(i),
     }));
   
+  // Hard fail: content_length errors are critical and must block passing
+  const hardFailReasons = issues
+    .filter(i => i.type === 'content_length')
+    .map(i => i.message);
+  
   return {
     score,
     level,
     issues,
     warnings,
+    hardFail: hardFailReasons.length > 0,
+    hardFailReasons,
   };
 }
 

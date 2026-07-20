@@ -492,12 +492,23 @@ function runQualityCheck(
   const seoScore = calculateSeoScore(contentMetadata);
   const geoScore = calculateGeoScore(contentMetadata);
 
-  const passed = qualityResult.level !== 'poor' && qualityResult.score >= 60;
+  // Hard fail: content_length errors must block passing regardless of score
+  // Also check score threshold and level
+  const passed = !qualityResult.hardFail && qualityResult.level !== 'poor' && qualityResult.score >= 60;
 
   const issues = [
     ...qualityResult.issues.map(i => ({ code: i.type.toUpperCase(), message: i.message })),
     ...qualityResult.warnings.map(w => ({ code: w.type.toUpperCase(), message: w.message })),
   ];
+
+  // Add hard fail reasons to issues if present
+  if (qualityResult.hardFail) {
+    for (const reason of qualityResult.hardFailReasons) {
+      if (!issues.find(i => i.message === reason)) {
+        issues.push({ code: 'HARD_FAIL', message: reason });
+      }
+    }
+  }
 
   return {
     passed,
