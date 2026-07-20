@@ -39,12 +39,14 @@ async function bridgeApi(action, data = {}) {
   const body = JSON.stringify({ action, ...data });
   const url = new URL(BRIDGE_URL);
   const signature = signPayload('POST', url.pathname, body);
+  const isHttps = url.protocol === 'https:';
+  const client = isHttps ? https : http;
 
   return new Promise((resolve, reject) => {
     const options = {
       hostname: url.hostname,
-      port: url.port || 443,
-      path: url.pathname,
+      port: url.port || (isHttps ? 443 : 80),
+      path: url.pathname + url.search,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ async function bridgeApi(action, data = {}) {
       },
     };
 
-    const req = https.request(options, (res) => {
+    const req = client.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
