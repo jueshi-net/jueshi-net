@@ -35,6 +35,54 @@ else
     exit 1
 fi
 
+# ============================================================
+# STAGING DATABASE GUARD — prevents connecting to wrong database
+# ============================================================
+echo "=== [0.5/5] Staging database target guard ==="
+
+# Parse DATABASE_URL from .env.staging (local copy or remote)
+STAGING_ENV_FILE=".env.staging"
+if [ ! -f "$STAGING_ENV_FILE" ]; then
+    echo "❌ STAGING_DATABASE_GUARD_FAILED: .env.staging not found locally"
+    exit 21
+fi
+
+# Extract database name from DATABASE_URL (safe: no password/user output)
+STAGING_DB_NAME=$(grep '^DATABASE_URL=' "$STAGING_ENV_FILE" | \
+    sed 's/^DATABASE_URL=//' | \
+    sed 's/^"//' | sed 's/"$//' | \
+    sed 's/^postgresql:\/\///' | sed 's/^postgres:\/\///' | \
+    sed 's/^[^@]*@//' | \
+    sed 's/^[^/]*\///' | \
+    sed 's/?.*$//')
+
+if [ -z "$STAGING_DB_NAME" ]; then
+    echo "❌ STAGING_DATABASE_GUARD_FAILED: Could not parse database name from DATABASE_URL"
+    exit 22
+fi
+
+# Forbidden database names for staging
+FORBIDDEN_NAMES="bxb_prod xixiong_prod xixiong_production postgres"
+for forbidden in $FORBIDDEN_NAMES; do
+    if [ "$STAGING_DB_NAME" = "$forbidden" ]; then
+        echo "❌ STAGING_DATABASE_GUARD_FAILED: DATABASE_URL points to forbidden database"
+        echo "   Parsed database name: $STAGING_DB_NAME"
+        echo "   Expected: xixiong_staging"
+        echo "   Forbidden: $FORBIDDEN_NAMES"
+        exit 23
+    fi
+done
+
+# Must be exactly xixiong_staging
+if [ "$STAGING_DB_NAME" != "xixiong_staging" ]; then
+    echo "❌ STAGING_DATABASE_GUARD_FAILED: Database name mismatch"
+    echo "   Parsed database name: $STAGING_DB_NAME"
+    echo "   Expected: xixiong_staging"
+    exit 24
+fi
+
+echo "✅ Database guard: staging DB = xixiong_staging (confirmed)"
+
 echo "=== [1/5] Sync code to staging ==="
 rsync -avz --progress \
     --exclude='node_modules' \
@@ -59,8 +107,31 @@ ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +
 echo "=== [4/5] Build ==="
 ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +a && unset NODE_ENV && npm run build"
 
-echo "=== [5/5] Restart PM2 ==="
-ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +a && PORT=3001 pm2 restart $PM2_APP --update-env && pm2 save"
+echo "=== [5/5] Restart PM2 (stale-env-safe) ==="
+# Delete old process and start fresh to prevent stale DATABASE_URL pollution
+# This fixes the incident where PM2 retained old bxb_prod DATABASE_URL
+ssh "$STAGING_SERVER" "cd $STAGING_DIR && \
+    set -a && source .env.staging && set +a && \
+    export NODE_ENV=production && \
+    export PORT=3001 && \
+    pm2 delete $PM2_APP 2>/dev/null || true && \
+    pm2 start npm --name $PM2_APP -- start && \
+    pm2 save"
+
+# Verify PM2 environment after restart
+echo "=== [5.5/5] Post-restart PM2 environment verification ==="
+REMOTE_DB_NAME=$(ssh "$STAGING_SERVER" "cd $STAGING_DIR && \
+    pm2 env \$(pm2 jlist 2>/dev/null | python3 -c 'import sys,json;d=json.load(sys.stdin);[print(p[\"pm_id\"]) for p in d if p[\"name\"]==\"$PM2_APP\"]' 2>/dev/null) 2>/dev/null | \
+    grep '^DATABASE_URL:' | \
+    sed 's/^DATABASE_URL:.*\\///' | sed 's/?.*$//' | sed 's/.*@//'")
+
+if [ "$REMOTE_DB_NAME" != "xixiong_staging" ]; then
+    echo "❌ POST-RESTART GUARD FAILED: PM2 DATABASE_URL still points to wrong database"
+    echo "   Parsed remote DB name: $REMOTE_DB_NAME"
+    echo "   Expected: xixiong_staging"
+    exit 25
+fi
+echo "✅ Post-restart guard: PM2 DATABASE_URL → xixiong_staging (confirmed)"
 
 echo "=== [6/6] Write deployment manifest ==="
 LOCAL_COMMIT=$(git rev-parse HEAD)
