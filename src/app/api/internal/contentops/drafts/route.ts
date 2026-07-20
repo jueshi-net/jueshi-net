@@ -479,6 +479,20 @@ export async function POST(request: NextRequest) {
           { status: 503 }
         );
       }
+      
+      // Pre-flight health check: verify the real provider can actually make API calls
+      const health = await checkProviderHealth();
+      if (!health.healthy) {
+        return NextResponse.json(
+          { 
+            error: 'Real AI provider unavailable. DeepSeek API may have insufficient balance.', 
+            code: 'CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE',
+            provider: health.provider,
+            providerError: health.error,
+          },
+          { status: 503 }
+        );
+      }
 
       const { createGenerationJob, executeGenerationJob, saveGeneratedContentAsDraft } = 
         await import('@/lib/contentops/generation-job-manager');
@@ -566,6 +580,20 @@ export async function POST(request: NextRequest) {
       // Check if we're using a real provider (not fallback)
       if (!isUsingRealProvider()) {
         const health = await checkProviderHealth();
+        return NextResponse.json(
+          { 
+            error: 'Real AI provider unavailable. DeepSeek API may have insufficient balance.', 
+            code: 'CONTENTOPS-MODEL-PROVIDER-UNAVAILABLE',
+            provider: health.provider,
+            providerError: health.error,
+          },
+          { status: 503 }
+        );
+      }
+      
+      // Pre-flight health check
+      const health = await checkProviderHealth();
+      if (!health.healthy) {
         return NextResponse.json(
           { 
             error: 'Real AI provider unavailable. DeepSeek API may have insufficient balance.', 
