@@ -99,7 +99,7 @@ rsync -avz --progress \
     ./ "$STAGING_SERVER:$STAGING_DIR/"
 
 echo "=== [2/5] Install dependencies ==="
-ssh "$STAGING_SERVER" "cd $STAGING_DIR && npm ci --ignore-scripts && npm install --include=dev"
+ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +a && npm ci --ignore-scripts && npm install --include=dev --ignore-scripts"
 
 echo "=== [3/5] Prisma generate ==="
 ssh "$STAGING_SERVER" "cd $STAGING_DIR && set -a && source .env.staging && set +a && npx prisma generate"
