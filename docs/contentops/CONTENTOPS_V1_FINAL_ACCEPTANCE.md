@@ -38,16 +38,24 @@ ContentOps V1 完整 E2E 验收通过，所有 Gate (G0-G8) 均已 PASS。
 
 ### Commit Chain
 ```
-dd9b652 → 17ae056 → 4794360
+dd9b652 → 17ae056 → 4794360 → 4cad5c3 → 0323ec4
 ```
 
 ### Final Staging Commit
-- **FEATURE_COMMIT:** dd9b652 (G8 idempotent metadata validation)
-- **FINAL_STAGING_COMMIT:** 17ae056 (deployed, includes type fix)
-- **SERVER_HEAD:** 17ae056 (via rsync deployment)
-- **DEPLOYED_COMMIT_FILE:** 17ae056
-- **STAGING_BUILD_ID:** PA-9vxpO35iuG4EQ0VaZl
+- **FEATURE_COMMIT:** 0323ec4 (staging database guard + PM2 stale-env protection)
+- **FINAL_STAGING_COMMIT:** 0323ec4
+- **DEPLOYED_COMMIT_FILE:** 0323ec4
+- **STAGING_BUILD_ID:** Vd9L68epS8EHNaWn4ThiZ
 - **BUILD_SOURCE_MATCH_SERVER_HEAD:** true
+
+### Incident History
+
+#### G7 Soft 404 Incident (RESOLVED)
+- **Root Cause:** PM2 retained old DATABASE_URL pointing to bxb_prod instead of xixiong_staging
+- **Fix:** Delete+start PM2 with sourced .env.staging, added runtime guards
+- **Guards Added:** deploy-staging.sh database guard, prisma.ts runtime assertion
+- **Test Coverage:** scripts/test-database-guard.sh (14 tests, all pass)
+- **Full incident report:** docs/contentops/CONTENTOPS_STAGING_DB_ENV_INCIDENT.md
 
 ### Commit Details
 
