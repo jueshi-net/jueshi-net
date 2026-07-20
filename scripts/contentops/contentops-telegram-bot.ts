@@ -183,12 +183,50 @@ function isAllowedChat(chatId: number): boolean {
 }
 
 function isReviewer(chatId: number): boolean {
-  // If reviewer allowlist is empty, fall back to main allowlist
-  // (for single-user setups where the operator is also the reviewer)
-  if (CONFIG.reviewerChatIds.length === 0) {
-    return isAllowedChat(chatId);
-  }
+  // Strict check: only users in reviewerChatIds can approve/reject/publish
+  // No fallback to allowedChatIds - reviewer allowlist must be explicitly configured
   return CONFIG.reviewerChatIds.includes(String(chatId));
+}
+
+// Helper function to generate next step suggestions based on draft state
+function getNextStepsForState(state: string, chatId: number): string {
+  const isReviewerUser = isReviewer(chatId);
+  
+  switch (state) {
+    case 'DRAFT':
+    case 'CHANGES_REQUESTED':
+      return `下一步：
+/edit - 编辑草稿
+/review - 质量检查
+/submit - 提交审核`;
+    case 'NEEDS_REVIEW':
+      if (isReviewerUser) {
+        return `下一步：
+/approve - 批准草稿
+/reject <原因> - 拒绝草稿`;
+      } else {
+        return `当前状态：等待审核
+请联系审核人处理`;
+      }
+    case 'APPROVED':
+      if (isReviewerUser) {
+        return `下一步：
+/publish - 发布到 staging`;
+      } else {
+        return `当前状态：已批准，等待发布`;
+      }
+    case 'PUBLISHED':
+      return `草稿已发布`;
+    case 'FAILED':
+      if (isReviewerUser) {
+        return `下一步：
+/publish - 重试发布`;
+      } else {
+        return `当前状态：发布失败，请联系审核人`;
+      }
+    default:
+      return `当前状态：${state}`;
+  }
 }
 
 // ============================================================================
@@ -404,6 +442,7 @@ Draft ID: \`${draft.id}\`
       
       console.error('[ContentOps Bot] Opened draft:', { draftId: draft.id, chatId });
 
+      const nextSteps = getNextStepsForState(draft.state, chatId);
       const message = `✅ 已打开草稿
 
 标题：${draft.title}
@@ -411,10 +450,7 @@ Draft ID：\`${draft.id}\`
 状态：${draft.state}
 版本：v${draft.version}
 
-下一步：
-/status - 查看状态
-/review - 质量检查
-/edit - 编辑草稿`;
+${nextSteps}`;
       bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] Open draft error:', error);
@@ -538,7 +574,7 @@ Draft ID：\`${draft.id}\`
         .join('\n');
 
       const statusText = data.draftState || 'DRAFT';
-      const nextStep = data.passed ? '可使用 /submit 提交审核' : '请使用 /edit 修改后重新检查';
+      const nextSteps = getNextStepsForState(statusText, chatId);
 
       if (data.passed) {
         const message = `✅ 质量检查通过
@@ -552,7 +588,7 @@ Draft ID：\`${draft.id}\`
 - GEO：${data.geoScore ?? '-'}/100
 
 当前状态：${statusText}
-下一步：${nextStep}`;
+${nextSteps}`;
         bot.sendMessage(chatId, message.substring(0, 4000));
       } else {
         const message = `🔍 质量检查未通过
@@ -569,7 +605,7 @@ Draft ID：\`${draft.id}\`
 ${issuesList || '暂无详细问题'}
 
 当前状态：${statusText}
-下一步：${nextStep}`;
+${nextSteps}`;
         bot.sendMessage(chatId, message.substring(0, 4000));
       }
     } catch (error) {
@@ -611,7 +647,14 @@ ${issuesList || '暂无详细问题'}
       }
 
       const data = await res.json();
-      const message = `📤 已提交审核\n\nDraft ID：\`${draftId}\`\n状态：${data.state}\n版本：v${data.version}\n\n下一步：\n/review - 质量检查\n等待审核人 /approve`;
+      const nextSteps = getNextStepsForState(data.state, chatId);
+      const message = `📤 已提交审核
+
+Draft ID：\`${draftId}\`
+状态：${data.state}
+版本：v${data.version}
+
+${nextSteps}`;
       bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] Submit error:', error);
@@ -697,9 +740,22 @@ ${issuesList || '暂无详细问题'}
       const data = await res.json();
 
       if (data.alreadyApproved) {
-        bot.sendMessage(chatId, `ℹ️ 草稿已批准\n\nDraft ID：\`${draftId}\`\n批准版本：v${data.version}\n当前状态：APPROVED\n\n（重复审批，未创建新记录）`.substring(0, 4000), { parse_mode: 'Markdown' });
+        bot.sendMessage(chatId, `ℹ️ 草稿已批准
+
+Draft ID：\`${draftId}\`
+批准版本：v${data.version}
+当前状态：APPROVED
+
+（重复审批，未创建新记录）`.substring(0, 4000), { parse_mode: 'Markdown' });
       } else {
-        const message = `✅ 草稿已批准\n\nDraft ID：\`${draftId}\`\n批准版本：v${data.version}\n当前状态：APPROVED\n\n下一步：\n/publish - 发布到 staging`;
+        const nextSteps = getNextStepsForState('APPROVED', chatId);
+        const message = `✅ 草稿已批准
+
+Draft ID：\`${draftId}\`
+批准版本：v${data.version}
+当前状态：APPROVED
+
+${nextSteps}`;
         bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
       }
     } catch (error) {
@@ -753,7 +809,15 @@ ${issuesList || '暂无详细问题'}
       }
 
       const data = await res.json();
-      const message = `🔙 草稿已拒绝\n\nDraft ID：\`${draftId}\`\n版本：v${data.version}\n状态：${data.state}\n原因：${reason}\n\n下一步：\n/edit - 修改内容\n/submit - 重新提交审核`;
+      const nextSteps = getNextStepsForState(data.state, chatId);
+      const message = `🔙 草稿已拒绝
+
+Draft ID：\`${draftId}\`
+版本：v${data.version}
+状态：${data.state}
+原因：${reason}
+
+${nextSteps}`;
       bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
       console.error('[ContentOps Bot] Reject error:', error);
@@ -767,6 +831,12 @@ ${issuesList || '暂无详细问题'}
     
     if (!isAllowedChat(chatId)) {
       bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    // Check reviewer permission for publish
+    if (!isReviewer(chatId)) {
+      bot.sendMessage(chatId, `❌ 无发布权限\n错误编号：CONTENTOPS-PUBLISH-403\n原因：您的账号不在审核人列表中`);
       return;
     }
 
@@ -865,6 +935,10 @@ Production: 🔒 DISABLED`;
           statusMsg += `
   状态: ${draft.state}
   版本: v${draft.version}`;
+          
+          // Add next steps based on state
+          const nextSteps = getNextStepsForState(draft.state, chatId);
+          statusMsg += `\n\n${nextSteps}`;
         } else {
           statusMsg += '\n  (无法获取最新状态)';
         }
