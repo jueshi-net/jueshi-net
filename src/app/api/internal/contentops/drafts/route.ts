@@ -28,43 +28,67 @@ function verifySignature(request: NextRequest, body: string): boolean {
     return false;
   }
 
-  const method = request.method;
+  const method = request.method.toUpperCase();
   const url = new URL(request.url);
   const path = url.pathname;
-  const queryString = url.search || '';
-  const payload = `${method}:${path}${queryString}:${body}`;
-
-  console.error('[ContentOps Bridge] Verifying signature:', {
-    method,
-    path,
-    queryString,
-    bodyLength: body.length,
-    payloadPreview: payload.substring(0, 100),
-  });
+  // Query string 不参与签名（固定协议）
+  const payload = `${method}:${path}:${body}`;
 
   const expectedSignature = createHmac('sha256', BRIDGE_SECRET)
     .update(payload)
     .digest('hex');
 
-  console.error('[ContentOps Bridge] Expected signature:', expectedSignature.substring(0, 20) + '...');
-  console.error('[ContentOps Bridge] Received signature:', signature.substring(0, 20) + '...');
+  // 安全日志：只记录指纹，不记录完整签名
+  const expectedFingerprint = expectedSignature.substring(0, 8);
+  const receivedFingerprint = signature.substring(0, 8);
+
+  // 验证签名格式
+  if (!/^[0-9a-fA-F]{64}$/.test(signature)) {
+    console.error('[ContentOps Bridge] Malformed signature', {
+      requestId: request.headers.get('x-request-id'),
+      signatureFormatValid: false,
+      errorCode: 'MALFORMED_SIGNATURE',
+    });
+    return false;
+  }
 
   try {
     const sigBuffer = Buffer.from(signature, 'hex');
     const expectedBuffer = Buffer.from(expectedSignature, 'hex');
     
     if (sigBuffer.length !== expectedBuffer.length) {
-      console.error('[ContentOps Bridge] Signature length mismatch');
+      console.error('[ContentOps Bridge] Signature length mismatch', {
+        requestId: request.headers.get('x-request-id'),
+        signaturePresent: true,
+        signatureFormatValid: true,
+        expectedFingerprint,
+        receivedFingerprint,
+        errorCode: 'MALFORMED_SIGNATURE',
+      });
       return false;
     }
     
     const isValid = timingSafeEqual(sigBuffer, expectedBuffer);
     if (!isValid) {
-      console.error('[ContentOps Bridge] Signature verification failed');
+      console.error('[ContentOps Bridge] Signature verification failed', {
+        requestId: request.headers.get('x-request-id'),
+        signaturePresent: true,
+        signatureFormatValid: true,
+        expectedFingerprint,
+        receivedFingerprint,
+        errorCode: 'INVALID_SIGNATURE',
+      });
     }
     return isValid;
   } catch (error) {
-    console.error('[ContentOps Bridge] Signature verification error:', error);
+    console.error('[ContentOps Bridge] Signature verification error', {
+      requestId: request.headers.get('x-request-id'),
+      signaturePresent: !!signature,
+      signatureFormatValid: /^[0-9a-fA-F]{64}$/.test(signature),
+      expectedFingerprint,
+      receivedFingerprint,
+      errorCode: 'VERIFICATION_ERROR',
+    });
     return false;
   }
 }
