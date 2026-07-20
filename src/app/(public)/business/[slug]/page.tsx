@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
-    return { title: "未找到 - 绝世百宝箱", robots: { index: false, follow: false } };
+    notFound();
   }
   const { slug } = await params;
   const provider = await getPublicProviderBySlug(slug);
