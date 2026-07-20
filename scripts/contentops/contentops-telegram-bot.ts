@@ -233,6 +233,131 @@ function getNextStepsForState(state: string, chatId: number): string {
 // Helper: resolve draftId from argument or session
 // ============================================================================
 
+// ============================================================================
+// Natural Language Task Parser
+// ============================================================================
+
+interface ParsedTask {
+  contentType: 'guide' | 'checklist' | 'topic';
+  executionMode: 'draft_only' | 'review_required' | 'publish_when_validated' | 'schedule_when_validated' | 'publish_now';
+  targetEnvironment: 'staging' | 'production';
+  topic: string;
+  audience?: string;
+  country?: string;
+  city?: string;
+  industry?: string;
+  tone?: string;
+  requiredSections?: string[];
+  specialRequirements?: string;
+  scheduledAt?: string;
+  publishInstruction?: string;
+}
+
+function parseTaskIntent(text: string): ParsedTask {
+  const lower = text.toLowerCase();
+  
+  // Detect content type
+  let contentType: 'guide' | 'checklist' | 'topic' = 'guide';
+  if (lower.includes('清单') || lower.includes('检查') || lower.includes('checklist')) {
+    contentType = 'checklist';
+  } else if (lower.includes('专题') || lower.includes('topic') || lower.includes('汇总')) {
+    contentType = 'topic';
+  } else if (lower.includes('指南') || lower.includes('教程') || lower.includes('guide') || lower.includes('怎么写') || lower.includes('如何')) {
+    contentType = 'guide';
+  }
+
+  // Detect execution mode
+  let executionMode: ParsedTask['executionMode'] = 'review_required';
+  if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
+    executionMode = 'publish_now';
+  } else if (lower.includes('定时发布') || lower.includes('安排发布') || lower.includes('schedule')) {
+    executionMode = 'schedule_when_validated';
+  } else if (lower.includes('自动发布') || lower.includes('检查通过后发布')) {
+    executionMode = 'publish_when_validated';
+  } else if (lower.includes('等我审核') || lower.includes('等待审核') || lower.includes('放后台')) {
+    executionMode = 'review_required';
+  } else if (lower.includes('只要草稿') || lower.includes('不发布')) {
+    executionMode = 'draft_only';
+  }
+
+  // Detect target environment
+  let targetEnvironment: 'staging' | 'production' = 'staging';
+  // Production requires explicit authorization, never auto-detect
+
+  // Detect scheduling
+  let scheduledAt: string | undefined;
+  const timeMatch = text.match(/(\d{1,2})[点时:](\d{0,2})?(分)?/);
+  if (timeMatch && (lower.includes('明天') || lower.includes('今晚') || lower.includes('晚上') || lower.includes('分钟后'))) {
+    // Simple time parsing (would need more sophisticated NLP in production)
+    const now = new Date();
+    if (lower.includes('分钟后')) {
+      const mins = parseInt(text.match(/(\d+)\s*分钟/)?.[1] || '10');
+      scheduledAt = new Date(now.getTime() + mins * 60000).toISOString();
+    } else if (lower.includes('明天')) {
+      const hour = parseInt(timeMatch[1] || '9');
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
+      scheduledAt = tomorrow.toISOString();
+    } else if (lower.includes('今晚') || lower.includes('晚上')) {
+      const hour = parseInt(timeMatch[1] || '20');
+      const today = new Date(now);
+      today.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
+      if (today < now) today.setDate(today.getDate() + 1);
+      scheduledAt = today.toISOString();
+    }
+  }
+
+  // Detect country/city
+  let country: string | undefined;
+  let city: string | undefined;
+  const countryPatterns = [
+    { pattern: /新加坡/, country: '新加坡' },
+    { pattern: /日本/, country: '日本' },
+    { pattern: /韩国/, country: '韩国' },
+    { pattern: /美国/, country: '美国' },
+    { pattern: /英国/, country: '英国' },
+    { pattern: /澳洲|澳大利亚/, country: '澳大利亚' },
+    { pattern: /加拿大/, country: '加拿大' },
+  ];
+  for (const cp of countryPatterns) {
+    if (cp.pattern.test(text)) {
+      country = cp.country;
+      break;
+    }
+  }
+
+  // Detect audience
+  let audience: string | undefined;
+  if (lower.includes('留学生')) audience = '留学生';
+  else if (lower.includes('华人')) audience = '海外华人';
+  else if (lower.includes('新手') || lower.includes('第一次')) audience = '初次使用者';
+
+  // Extract topic (remove command-like prefixes)
+  let topic = text
+    .replace(/^(写|做|创建|生成|帮我|请)/, '')
+    .replace(/一篇|一个|一份/, '')
+    .replace(/(关于|有关)/, '')
+    .trim();
+  
+  // If topic is too short, use the full text
+  if (topic.length < 5) {
+    topic = text.trim();
+  }
+
+  return {
+    contentType,
+    executionMode,
+    targetEnvironment,
+    topic,
+    audience,
+    country,
+    city,
+    scheduledAt,
+    publishInstruction: executionMode === 'publish_now' ? 'publish_immediately' : undefined,
+  };
+}
+
 function resolveDraftId(chatId: number, explicitId?: string): { draftId: string | null; error?: string } {
   if (explicitId && explicitId.trim()) {
     return { draftId: explicitId.trim() };
@@ -1262,73 +1387,115 @@ Production: 🔒 DISABLED`;
 
     const session = getSession(chatId);
 
-    // Only process text if in EDITING mode
-    if (session.mode !== 'EDITING' || !session.editingDraftId) {
+    // If in EDITING mode, save as draft body
+    if (session.mode === 'EDITING' && session.editingDraftId) {
+      const draftId = session.editingDraftId;
+
+      try {
+        // Update draft body via PUT
+        const res = await fetchBridgePut(
+          `?id=${encodeURIComponent(draftId)}`,
+          { body: text }
+        );
+
+        if (!res.ok) {
+          let errorObj: any = { code: 'UNKNOWN', error: 'Unknown error' };
+          try { errorObj = await res.json(); } catch {}
+          
+          const errorCode = `CONTENTOPS-SAVE-${res.status}`;
+          const reason = errorObj.error || '保存失败';
+          bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：${errorCode}\n原因：${reason}`.substring(0, 4000));
+          return;
+        }
+
+        const updated = await res.json();
+        const newVersion = updated.version;
+        const previousVersion = updated.previousVersion;
+        
+        // Handle duplicate detection
+        if (updated.isDuplicate) {
+          bot.sendMessage(chatId, `⚠️ 内容未变更\n\nDraft ID：\`${draftId}\`\n当前版本：v${newVersion}\n\n未创建新版本（内容与当前版本相同）。\n\n下一步：\n/review - 质量检查\n/status - 查看状态`.substring(0, 4000), { parse_mode: 'Markdown' });
+          return;
+        }
+        
+        // Exit editing mode, keep currentDraftId
+        updateSession(chatId, { 
+          mode: 'IDLE',
+          editingDraftId: undefined,
+        });
+
+        console.error('[ContentOps Bot] Draft saved:', { draftId, newVersion, previousVersion, chatId });
+
+        const message = `✅ 草稿已保存\n\nDraft ID：\`${draftId}\`\n新版本：v${newVersion}\n上一版本：v${previousVersion}\n状态：DRAFT\n\n下一步：\n/review - 质量检查\n/status - 查看状态`;
+        bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+      } catch (error) {
+        console.error('[ContentOps Bot] Save draft error:', error);
+        const errMsg = error instanceof Error ? error.message : 'Unknown';
+        bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：CONTENTOPS-SAVE-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+      }
       return;
     }
 
-    const draftId = session.editingDraftId;
-    const previousVersion = session.currentTitle ? undefined : undefined; // We'll get this from server
+    // ============================================================================
+    // Natural Language Task Routing (Autonomous Agent)
+    // ============================================================================
+    
+    // Treat non-command text as a content task
+    if (text.trim().length < 5) {
+      bot.sendMessage(chatId, '请输入具体的内容任务，例如：\n\n"写一篇第一次使用国际集运的完整指南"\n"做一份新加坡留学生租房检查清单"');
+      return;
+    }
 
     try {
-      // Update draft body via PUT
-      const res = await fetchBridgePut(
-        `?id=${encodeURIComponent(draftId)}`,
-        { body: text }
-      );
-
-      if (!res.ok) {
-        let errorObj: any = { code: 'UNKNOWN', error: 'Unknown error' };
-        try { errorObj = await res.json(); } catch {}
-        
-        const errorCode = `CONTENTOPS-SAVE-${res.status}`;
-        const reason = errorObj.error || '保存失败';
-        bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：${errorCode}\n原因：${reason}`.substring(0, 4000));
-        return;
-      }
-
-      const updated = await res.json();
-      const newVersion = updated.version;
-      const previousVersion = updated.previousVersion;
+      // Parse task intent
+      const parsed = parseTaskIntent(text);
       
-      // Handle duplicate detection
-      if (updated.isDuplicate) {
-        bot.sendMessage(chatId, `⚠️ 内容未变更
+      // Notify user: task received
+      const ackMessage = `📝 任务已接收\n\n任务 ID：待创建\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：PARSING_TASK`;
+      const ackMsg = await bot.sendMessage(chatId, ackMessage.substring(0, 4000));
 
-Draft ID：\`${draftId}\`
-当前版本：v${newVersion}
-
-未创建新版本（内容与当前版本相同）。
-
-下一步：
-/review - 质量检查
-/status - 查看状态`.substring(0, 4000), { parse_mode: 'Markdown' });
-        return;
-      }
-      
-      // Exit editing mode, keep currentDraftId
-      updateSession(chatId, { 
-        mode: 'IDLE',
-        editingDraftId: undefined,
+      // Create task via Bridge API
+      const taskResult = await fetchBridgeApi({
+        action: 'create_task',
+        chatId: String(chatId),
+        messageId: msg.message_id,
+        rawInput: text,
+        contentType: parsed.contentType,
+        executionMode: parsed.executionMode,
+        targetEnvironment: parsed.targetEnvironment,
+        topic: parsed.topic,
+        audience: parsed.audience,
+        country: parsed.country,
+        city: parsed.city,
+        industry: parsed.industry,
+        tone: parsed.tone,
+        requiredSections: parsed.requiredSections,
+        specialRequirements: parsed.specialRequirements,
+        scheduledAt: parsed.scheduledAt,
+        publishInstruction: parsed.publishInstruction,
       });
 
-      console.error('[ContentOps Bot] Draft saved:', { draftId, newVersion, previousVersion, chatId });
+      if (taskResult.error) {
+        bot.sendMessage(chatId, `❌ 任务创建失败\n错误：${taskResult.error}\n编号：${taskResult.code || 'TASK_CREATE_FAILED'}`.substring(0, 4000));
+        return;
+      }
 
-      const message = `✅ 草稿已保存
+      // Update acknowledgment with task ID
+      const taskId = taskResult.taskId;
+      const updateMessage = `✅ 任务已创建\n\n任务 ID：\`${taskId}\`\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：等待处理\n\n系统将自动处理此任务，完成后通知您。`;
+      
+      await bot.editMessageText(updateMessage.substring(0, 4000), {
+        chat_id: chatId,
+        message_id: ackMsg.message_id,
+        parse_mode: 'Markdown',
+      });
 
-Draft ID：\`${draftId}\`
-新版本：v${newVersion}
-上一版本：v${previousVersion}
-状态：DRAFT
+      console.error('[ContentOps Bot] Task created:', { taskId, chatId, contentType: parsed.contentType });
 
-下一步：
-/review - 质量检查
-/status - 查看状态`;
-      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
-      console.error('[ContentOps Bot] Save draft error:', error);
+      console.error('[ContentOps Bot] Task creation error:', error);
       const errMsg = error instanceof Error ? error.message : 'Unknown';
-      bot.sendMessage(chatId, `❌ 草稿保存失败\n错误编号：CONTENTOPS-SAVE-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+      bot.sendMessage(chatId, `❌ 任务创建失败\n错误编号：CONTENTOPS-TASK-CREATE-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
     }
   });
 

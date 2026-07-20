@@ -739,6 +739,130 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ jobId: job.id, status: job.status });
     }
 
+    // ============================================================================
+    // Task Actions (Autonomous Agent)
+    // ============================================================================
+
+    if (data.action === 'create_task') {
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const task = await taskManager.createTask({
+        chatId: data.chatId,
+        messageId: data.messageId || 0,
+        rawInput: data.rawInput || data.topic || '',
+        contentType: data.contentType,
+        executionMode: data.executionMode,
+        targetEnvironment: data.targetEnvironment,
+        topic: data.topic,
+        audience: data.audience,
+        country: data.country,
+        city: data.city,
+        industry: data.industry,
+        tone: data.tone,
+        requiredSections: data.requiredSections,
+        specialRequirements: data.specialRequirements,
+        scheduledAt: data.scheduledAt,
+        publishInstruction: data.publishInstruction,
+        sourceRequirement: data.sourceRequirement,
+      });
+      return NextResponse.json({
+        taskId: task.id,
+        status: task.status,
+        contentType: task.contentType,
+        executionMode: task.executionMode,
+        targetEnvironment: task.targetEnvironment,
+        topic: task.topic,
+        createdAt: task.createdAt,
+      }, { status: 201 });
+    }
+
+    if (data.action === 'get_task') {
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const taskId = data.taskId;
+      if (!taskId) {
+        return NextResponse.json(
+          { error: 'Task ID is required', code: 'MISSING_TASK_ID' },
+          { status: 400 }
+        );
+      }
+      const task = await taskManager.getTask(taskId);
+      if (!task) {
+        return NextResponse.json(
+          { error: 'Task not found', code: 'TASK_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(task);
+    }
+
+    if (data.action === 'update_task') {
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const taskId = data.taskId;
+      if (!taskId) {
+        return NextResponse.json(
+          { error: 'Task ID is required', code: 'MISSING_TASK_ID' },
+          { status: 400 }
+        );
+      }
+      const task = await taskManager.updateTaskStatus(
+        taskId,
+        data.status,
+        data.step,
+        data.data
+      );
+      if (!task) {
+        return NextResponse.json(
+          { error: 'Task not found', code: 'TASK_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        taskId: task.id,
+        status: task.status,
+        currentStep: task.currentStep,
+        updatedAt: task.updatedAt,
+      });
+    }
+
+    if (data.action === 'list_tasks') {
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const chatId = data.chatId;
+      if (chatId) {
+        const tasks = await taskManager.getTasksByChatId(chatId);
+        return NextResponse.json({ tasks: tasks.map(t => ({
+          id: t.id,
+          status: t.status,
+          contentType: t.contentType,
+          topic: t.topic,
+          draftId: t.draftId,
+          createdAt: t.createdAt,
+          completedAt: t.completedAt,
+        }))});
+      }
+      // List all pending tasks (for cron job)
+      const tasks = await taskManager.getPendingTasks(data.limit || 5);
+      return NextResponse.json({ tasks: tasks.map(t => ({
+        id: t.id,
+        status: t.status,
+        contentType: t.contentType,
+        topic: t.topic,
+        currentStep: t.currentStep,
+        createdAt: t.createdAt,
+      }))});
+    }
+
+    if (data.action === 'cancel_task') {
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const taskId = data.taskId;
+      if (!taskId) {
+        return NextResponse.json(
+          { error: 'Task ID is required', code: 'MISSING_TASK_ID' },
+          { status: 400 }
+        );
+      }
+      await taskManager.cancelTask(taskId);
+      return NextResponse.json({ taskId, status: 'CANCELLED' });
+    }
+
     // Default: create new draft
     const { title, body: draftBody, targetEnvironment, qualityMetadata } = data;
 
