@@ -49,7 +49,13 @@ function loadDrafts(): DraftStore {
   try {
     if (fs.existsSync(DRAFTS_FILE)) {
       const data = fs.readFileSync(DRAFTS_FILE, 'utf-8');
-      return JSON.parse(data);
+      const store = JSON.parse(data);
+      // Convert date strings back to Date objects
+      Object.values(store.drafts).forEach(draft => {
+        draft.createdAt = new Date(draft.createdAt);
+        draft.updatedAt = new Date(draft.updatedAt);
+      });
+      return store;
     }
   } catch (error) {
     console.error('[DraftManager] Failed to load drafts:', error);
