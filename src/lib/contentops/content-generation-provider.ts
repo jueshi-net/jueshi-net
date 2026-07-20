@@ -4,7 +4,8 @@
  * Abstraction layer for AI-powered content generation.
  * Supports brief generation, outline, full draft, revision, SEO, FAQ.
  * 
- * Provider: DeepSeek (configurable via env)
+ * Provider: OpenAI-compatible (configurable via env)
+ * Supports: DashScope/Qwen, DeepSeek, or any OpenAI-compatible endpoint.
  * No direct model vendor binding in business code.
  */
 
@@ -102,15 +103,17 @@ const AI_CONFIG = {
   apiBaseUrl: process.env.AI_API_BASE_URL || 'https://api.deepseek.com/v1',
   apiKey: process.env.AI_API_KEY || '',
   model: process.env.AI_MODEL || 'deepseek-chat',
+  providerName: process.env.AI_PROVIDER_NAME || 'openai-compatible',
   timeoutMs: 60000,
   maxRetries: 2,
 };
 
 // ============================================================================
-// DeepSeek Provider Implementation
+// OpenAI-Compatible Provider Implementation
+// (Works with DashScope/Qwen, DeepSeek, or any OpenAI-compatible endpoint)
 // ============================================================================
 
-class DeepSeekProvider implements ContentGenerationProvider {
+class OpenAICompatibleProvider implements ContentGenerationProvider {
   private async callModel(
     systemPrompt: string,
     userPrompt: string,
@@ -253,7 +256,7 @@ class DeepSeekProvider implements ContentGenerationProvider {
           createdBy: 'ai-generation',
           createdAt: new Date().toISOString(),
         },
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         tokenUsage: result.tokenUsage,
@@ -264,7 +267,7 @@ class DeepSeekProvider implements ContentGenerationProvider {
         success: false,
         error: error.message,
         errorCode: error.message.startsWith('CONTENTOPS-') ? error.message : 'CONTENTOPS-GENERATE-001',
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         latencyMs: Date.now() - startTime,
@@ -313,7 +316,7 @@ class DeepSeekProvider implements ContentGenerationProvider {
       return {
         success: true,
         outline,
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         tokenUsage: result.tokenUsage,
@@ -324,7 +327,7 @@ class DeepSeekProvider implements ContentGenerationProvider {
         success: false,
         error: error.message,
         errorCode: error.message.startsWith('CONTENTOPS-') ? error.message : 'CONTENTOPS-GENERATE-001',
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         latencyMs: Date.now() - startTime,
@@ -420,7 +423,7 @@ ${outlineText}
           sources: content.sources || [],
           internalLinks: content.internalLinks || [],
         },
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         tokenUsage: result.tokenUsage,
@@ -431,7 +434,7 @@ ${outlineText}
         success: false,
         error: error.message,
         errorCode: error.message.startsWith('CONTENTOPS-') ? error.message : 'CONTENTOPS-GENERATE-001',
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         latencyMs: Date.now() - startTime,
@@ -515,7 +518,7 @@ ${currentContent.substring(0, 6000)}${currentContent.length > 6000 ? '...(已截
           wordCount,
         },
         revisionSummary: revised.revisionSummary || '修改完成',
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         tokenUsage: result.tokenUsage,
@@ -526,7 +529,7 @@ ${currentContent.substring(0, 6000)}${currentContent.length > 6000 ? '...(已截
         success: false,
         error: error.message,
         errorCode: error.message.startsWith('CONTENTOPS-') ? error.message : 'CONTENTOPS-GENERATE-001',
-        provider: 'deepseek',
+        provider: AI_CONFIG.providerName,
         model: AI_CONFIG.model,
         requestId,
         latencyMs: Date.now() - startTime,
@@ -539,7 +542,7 @@ ${currentContent.substring(0, 6000)}${currentContent.length > 6000 ? '...(已截
     return {
       success: true,
       content,
-      provider: 'deepseek',
+      provider: AI_CONFIG.providerName,
       model: AI_CONFIG.model,
       requestId: `seo_${Date.now()}`,
       latencyMs: 0,
@@ -551,7 +554,7 @@ ${currentContent.substring(0, 6000)}${currentContent.length > 6000 ? '...(已截
     return {
       success: true,
       content,
-      provider: 'deepseek',
+      provider: AI_CONFIG.providerName,
       model: AI_CONFIG.model,
       requestId: `faq_${Date.now()}`,
       latencyMs: 0,
@@ -569,9 +572,9 @@ let providerHealthOk = false;
 
 export function getContentGenerationProvider(): ContentGenerationProvider {
   if (!providerInstance) {
-    // Try DeepSeek if configured
+    // Try OpenAI-compatible provider if configured (DashScope, DeepSeek, etc.)
     if (AI_CONFIG.enabled && AI_CONFIG.apiKey) {
-      providerInstance = new DeepSeekProvider();
+      providerInstance = new OpenAICompatibleProvider();
     } else {
       // No real provider configured, use fallback
       providerInstance = new LocalFallbackProvider();
@@ -611,9 +614,9 @@ export async function checkProviderHealth(): Promise<{
   if (providerHealthChecked) {
     return {
       healthy: providerHealthOk,
-      provider: 'deepseek',
+      provider: AI_CONFIG.providerName,
       model: AI_CONFIG.model,
-      error: providerHealthOk ? undefined : 'DeepSeek API unavailable (cached)',
+      error: providerHealthOk ? undefined : 'AI provider unavailable (cached)',
     };
   }
   
@@ -643,7 +646,7 @@ export async function checkProviderHealth(): Promise<{
     providerHealthOk = false;
     return {
       healthy: false,
-      provider: 'deepseek',
+      provider: AI_CONFIG.providerName,
       model: AI_CONFIG.model,
       error: error.message,
     };
@@ -655,7 +658,7 @@ export async function checkProviderHealth(): Promise<{
  */
 export function isUsingRealProvider(): boolean {
   const provider = getContentGenerationProvider();
-  return provider instanceof DeepSeekProvider;
+  return provider instanceof OpenAICompatibleProvider;
 }
 
 // ============================================================================
