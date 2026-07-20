@@ -131,6 +131,8 @@ export async function GET(request: NextRequest) {
         updatedAt: draft.updatedAt.toISOString(),
         qualityMetadata: draft.qualityMetadata || {},
         approvalRecord: draft.approvalRecord || null,
+        publishRecord: draft.publishRecord || null,
+        publishedUrl: draft.publishedUrl || null,
       });
     }
 
@@ -329,6 +331,41 @@ export async function POST(request: NextRequest) {
         id: result.draft!.id,
         state: result.draft!.state,
         version: result.draft!.version,
+      });
+    }
+
+    // Handle publish action
+    if (data.action === 'publish') {
+      const { publishDraft } = await import('@/lib/contentops/draft-manager');
+      const draftId = data.id;
+      if (!draftId) {
+        return NextResponse.json(
+          { error: 'Draft ID is required', code: 'MISSING_DRAFT_ID' },
+          { status: 400 }
+        );
+      }
+      const result = await publishDraft(draftId, {
+        publishedBy: data.publishedBy || 'unknown',
+        publishSource: data.publishSource || 'telegram',
+        expectedVersion: data.expectedVersion,
+      });
+      if (!result.success) {
+        const status = result.errorCode === 'DRAFT_NOT_FOUND' ? 404 : 
+                       result.errorCode === 'INVALID_STATE' ? 409 :
+                       result.errorCode === 'VERSION_MISMATCH' ? 409 : 500;
+        return NextResponse.json(
+          { error: result.error, code: result.errorCode },
+          { status }
+        );
+      }
+      return NextResponse.json({
+        id: result.draft!.id,
+        state: result.draft!.state,
+        version: result.draft!.version,
+        alreadyPublished: result.alreadyPublished || false,
+        publishRecord: result.publishRecord,
+        publishedUrl: result.publishRecord?.publishedUrl,
+        contentId: result.publishRecord?.contentId,
       });
     }
 

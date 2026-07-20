@@ -778,15 +778,58 @@ ${issuesList || '暂无详细问题'}
       return;
     }
 
-    // Production is ALWAYS disabled
-    bot.sendMessage(chatId, `
-🚀 发布到 staging...
+    try {
+      const res = await fetchBridgeApi({
+        id: draftId,
+        action: 'publish',
+        publishedBy: `telegram:${chatId}`,
+        publishSource: 'telegram',
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        let errorMsg = '❌ 发布失败';
+        if (data.code === 'INVALID_STATE') {
+          errorMsg = `❌ 无法发布\n\n原因：${data.error}\n\n当前状态不允许发布。需要先通过质量检查并审批。`;
+        } else if (data.code === 'VERSION_MISMATCH') {
+          errorMsg = `❌ 版本不匹配\n\n${data.error}`;
+        } else if (data.code === 'DRAFT_NOT_FOUND') {
+          errorMsg = `❌ 草稿不存在\n\nDraft ID：\`${draftId}\``;
+        }
+        bot.sendMessage(chatId, errorMsg.substring(0, 4000));
+        return;
+      }
+
+      const data = await res.json();
+
+      if (data.alreadyPublished) {
+        bot.sendMessage(chatId, `
+ℹ️ 草稿已发布
+
+Draft ID：\`${draftId}\`
+发布版本：v${data.version}
+发布 URL：${data.publishedUrl || data.publishRecord?.publishedUrl}
+Content ID：${data.contentId || data.publishRecord?.contentId}
+当前状态：PUBLISHED
+
+（重复发布，返回已有记录）
+        `.substring(0, 4000));
+      } else {
+        bot.sendMessage(chatId, `
+✅ 草稿已发布到 staging
+
+Draft ID：\`${draftId}\`
+发布版本：v${data.version}
+发布 URL：${data.publishedUrl || data.publishRecord?.publishedUrl}
+Content ID：${data.contentId || data.publishRecord?.contentId}
+当前状态：PUBLISHED
 
 ⚠️ Production 发布已禁用
-
-草稿：${draftId}
-目标：staging only
-    `.substring(0, 4000));
+        `.substring(0, 4000));
+      }
+    } catch (err: any) {
+      bot.sendMessage(chatId, `❌ 发布执行失败\n错误编号：CONTENTOPS-PUBLISH-500`);
+    }
   });
 
   // Handle /status

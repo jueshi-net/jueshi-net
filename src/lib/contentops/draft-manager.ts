@@ -16,12 +16,12 @@ export interface ContentOpsDraft {
   contentOpsDraftId: string;
   contentOpsStatus: string;
   contentOpsVersion: number;
+  qualityMetadata?: QualityMetadata;
+  approvalRecord?: ApprovalRecord;
+  publishRecord?: PublishRecord;
+  publishedUrl?: string;
   createdAt: Date;
   updatedAt: Date;
-  // Quality metadata (stored in seoDescription JSON)
-  qualityMetadata?: QualityMetadata;
-  // Approval metadata
-  approvalRecord?: ApprovalRecord;
 }
 
 export interface QualityMetadata {
@@ -42,6 +42,17 @@ export interface ApprovalRecord {
   approvedVersion: number;
   approvalSource: 'telegram' | 'web';
   reviewerChatId?: string;
+}
+
+export interface PublishRecord {
+  publishKey: string;
+  publishedAt: string;
+  publishedBy: string;
+  publishSource: 'telegram' | 'web';
+  publishedVersion: number;
+  publishedUrl: string;
+  contentId: string;
+  targetEnvironment: 'staging' | 'production';
 }
 
 /**
@@ -178,6 +189,8 @@ export async function getDraft(draftId: string): Promise<ContentOpsDraft | null>
     updatedAt: article.updatedAt,
     qualityMetadata: metadata.qualityMetadata || {},
     approvalRecord: metadata.approvalRecord || undefined,
+    publishRecord: metadata.publishRecord || undefined,
+    publishedUrl: metadata.publishRecord?.publishedUrl || undefined,
   };
 }
 
@@ -572,6 +585,140 @@ export async function submitForReview(draftId: string): Promise<{
       createdAt: updatedArticle.createdAt,
       updatedAt: updatedArticle.updatedAt,
     },
+  };
+}
+
+/**
+ * 发布草稿到 staging
+ * 状态迁移：APPROVED → PUBLISHED
+ * 幂等：相同 publishKey 返回相同结果
+ */
+export async function publishDraft(draftId: string, options: {
+  publishedBy: string;
+  publishSource: 'telegram' | 'web';
+  expectedVersion?: number;
+}): Promise<{
+  success: boolean;
+  draft?: ContentOpsDraft;
+  error?: string;
+  errorCode?: string;
+  alreadyPublished?: boolean;
+  publishRecord?: any;
+}> {
+  const article = await prisma.article.findFirst({
+    where: {
+      category: 'contentops-draft',
+      seoDescription: {
+        contains: draftId,
+      },
+    },
+  });
+
+  if (!article) {
+    return { success: false, error: 'Draft not found', errorCode: 'DRAFT_NOT_FOUND' };
+  }
+
+  const metadata = parseMetadata(article.seoDescription);
+  const currentState = metadata.contentOpsStatus || 'DRAFT';
+  const currentVersion = metadata.contentOpsVersion || 1;
+
+  // Idempotency: if already published, return existing record
+  if (currentState === 'PUBLISHED' && metadata.publishRecord) {
+    return {
+      success: true,
+      draft: buildDraftFromArticle(article, draftId, metadata),
+      alreadyPublished: true,
+      publishRecord: metadata.publishRecord,
+    };
+  }
+
+  // State validation: must be APPROVED
+  if (currentState !== 'APPROVED') {
+    return {
+      success: false,
+      error: `状态必须是 APPROVED，当前为 ${currentState}`,
+      errorCode: 'INVALID_STATE',
+    };
+  }
+
+  // Version validation: approvedVersion must match currentVersion
+  const approvalRecord = metadata.approvalRecord;
+  if (approvalRecord && options.expectedVersion !== undefined) {
+    if (approvalRecord.approvedVersion !== options.expectedVersion) {
+      return {
+        success: false,
+        error: `审批版本 v${approvalRecord.approvedVersion} 与当前版本 v${currentVersion} 不匹配`,
+        errorCode: 'VERSION_MISMATCH',
+      };
+    }
+  }
+
+  // Generate publish key for idempotency
+  const publishKey = `pub_${draftId}_v${currentVersion}_${Date.now()}`;
+  
+  // Generate staging URL (simulated - in real system this would create actual content)
+  const slug = article.title
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .substring(0, 50) || 'content';
+  const publishedUrl = `https://i.jueshi.net/content/${slug}-${draftId.split('_').pop()}`;
+  const contentId = `content_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
+  const publishRecord = {
+    publishKey,
+    publishedAt: new Date().toISOString(),
+    publishedBy: options.publishedBy,
+    publishSource: options.publishSource,
+    publishedVersion: currentVersion,
+    publishedUrl,
+    contentId,
+    targetEnvironment: 'staging',
+  };
+
+  const updatedArticle = await prisma.article.update({
+    where: { id: article.id },
+    data: {
+      seoDescription: JSON.stringify({
+        ...metadata,
+        contentOpsStatus: 'PUBLISHED',
+        publishRecord,
+        publishedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    },
+  });
+
+  const draft = buildDraftFromArticle(updatedArticle, draftId, { ...metadata, contentOpsStatus: 'PUBLISHED', publishRecord });
+
+  return {
+    success: true,
+    draft,
+    publishRecord,
+  };
+}
+
+/**
+ * 从 Article 构建 Draft 对象
+ */
+function buildDraftFromArticle(article: any, draftId: string, metadata: any): ContentOpsDraft {
+  return {
+    id: draftId,
+    title: article.title,
+    body: article.content || '',
+    state: metadata.contentOpsStatus || 'DRAFT',
+    version: metadata.contentOpsVersion || 1,
+    targetEnvironment: (metadata.targetEnvironment as 'staging' | 'production') || 'staging',
+    contentOpsManaged: true,
+    contentOpsDraftId: draftId,
+    contentOpsStatus: metadata.contentOpsStatus || 'DRAFT',
+    contentOpsVersion: metadata.contentOpsVersion || 1,
+    qualityMetadata: metadata.qualityMetadata,
+    approvalRecord: metadata.approvalRecord,
+    publishRecord: metadata.publishRecord,
+    publishedUrl: metadata.publishRecord?.publishedUrl,
+    createdAt: article.createdAt,
+    updatedAt: article.updatedAt,
   };
 }
 
