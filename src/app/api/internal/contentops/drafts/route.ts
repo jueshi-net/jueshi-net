@@ -863,6 +863,82 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ taskId, status: 'CANCELLED' });
     }
 
+    // ============================================================================
+    // Scheduler Actions
+    // ============================================================================
+
+    if (data.action === 'create_schedule') {
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      const { taskId, draftId, scheduledAtUtc, scheduledTimezone, scheduledAtOriginal, targetEnvironment, contentType } = data;
+      if (!taskId || !draftId || !scheduledAtUtc) {
+        return NextResponse.json(
+          { error: 'taskId, draftId, and scheduledAtUtc are required', code: 'MISSING_PARAMS' },
+          { status: 400 }
+        );
+      }
+      const schedule = await scheduler.createSchedule({
+        taskId,
+        draftId,
+        scheduledAtUtc,
+        scheduledTimezone: scheduledTimezone || 'Asia/Shanghai',
+        scheduledAtOriginal: scheduledAtOriginal || scheduledAtUtc,
+        targetEnvironment: targetEnvironment || 'staging',
+        contentType: contentType || 'guide',
+      });
+      return NextResponse.json(schedule, { status: 201 });
+    }
+
+    if (data.action === 'list_schedules') {
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      const status = data.status;
+      const schedules = await scheduler.listSchedules(status);
+      return NextResponse.json({ schedules });
+    }
+
+    if (data.action === 'get_schedule') {
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      const scheduleId = data.scheduleId;
+      if (!scheduleId) {
+        return NextResponse.json(
+          { error: 'Schedule ID is required', code: 'MISSING_SCHEDULE_ID' },
+          { status: 400 }
+        );
+      }
+      const schedule = await scheduler.getSchedule(scheduleId);
+      if (!schedule) {
+        return NextResponse.json(
+          { error: 'Schedule not found', code: 'SCHEDULE_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(schedule);
+    }
+
+    if (data.action === 'cancel_schedule') {
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      const scheduleId = data.scheduleId;
+      if (!scheduleId) {
+        return NextResponse.json(
+          { error: 'Schedule ID is required', code: 'MISSING_SCHEDULE_ID' },
+          { status: 400 }
+        );
+      }
+      const schedule = await scheduler.cancelSchedule(scheduleId);
+      if (!schedule) {
+        return NextResponse.json(
+          { error: 'Schedule not found', code: 'SCHEDULE_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json(schedule);
+    }
+
+    if (data.action === 'process_due_schedules') {
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      const due = await scheduler.processDue();
+      return NextResponse.json({ dueSchedules: due, count: due.length });
+    }
+
     // Default: create new draft
     const { title, body: draftBody, targetEnvironment, qualityMetadata } = data;
 
