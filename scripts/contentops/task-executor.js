@@ -131,7 +131,7 @@ async function generateContent(task) {
 }
 
 async function generateGuide(task) {
-  const { topic, audience, country, requiredSections, specialRequirements } = task;
+  const { topic, audience, country, city, requiredSections, specialRequirements } = task;
   
   // Generate a comprehensive guide
   const title = topic;
@@ -493,7 +493,7 @@ async function processTask(task) {
     });
 
     // Step 4: Create backend draft
-    const draftResult = await bridgeApi('create', {
+    const draftResult = await bridgeApi('', {
       title: content.title,
       body: JSON.stringify(content),
       targetEnvironment: task.targetEnvironment || 'staging',
