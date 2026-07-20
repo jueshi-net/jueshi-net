@@ -48,7 +48,7 @@ async function loadForumData() {
     for (const s of commentStats) commentStatsMap[s.status] = s._count.status;
 
     return {
-      posts: posts.map((p) => ({
+      posts: posts.map((p: any) => ({
         id: p.id,
         title: p.title,
         slug: p.slug,
