@@ -653,8 +653,8 @@ export async function publishDraft(draftId: string, options: {
     }
   }
 
-  // Generate publish key for idempotency
-  const publishKey = `pub_${draftId}_v${currentVersion}_${Date.now()}`;
+  // Generate stable publish key for idempotency (no timestamps or random values)
+  const publishKey = `staging:${draftId}:v${currentVersion}`;
   
   // Generate staging URL (simulated - in real system this would create actual content)
   const slug = article.title
@@ -663,7 +663,8 @@ export async function publishDraft(draftId: string, options: {
     .replace(/^-|-$/g, '')
     .substring(0, 50) || 'content';
   const publishedUrl = `https://i.jueshi.net/content/${slug}-${draftId.split('_').pop()}`;
-  const contentId = `content_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+  // Stable content ID based on draft ID and version
+  const contentId = `content_${draftId.replace(/[^a-z0-9]/g, '')}_v${currentVersion}`;
 
   const publishRecord = {
     publishKey,
