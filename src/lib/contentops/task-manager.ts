@@ -1,62 +1,42 @@
 /**
  * ContentOps Task Manager
  * 
- * Persistent task storage and state management.
+ * Persistent task storage using JSON file (no DB migration needed).
  * Tasks survive server restarts and can be resumed.
  */
 
-import { prisma } from '../prisma';
-import type { ContentOpsTask, CreateTaskInput, TaskStatus, TaskStep } from './task-types';
+import * as fs from 'fs';
+import * as path from 'path';
+import type { ContentOpsTask, CreateTaskInput, TaskStatus } from './task-types';
 
 // ============================================================================
-// Task Storage (using Content table with category='contentops-task')
+// File-based Storage
 // ============================================================================
 
-interface TaskRecord {
-  id: string;
-  chatId: string;
-  messageId: number;
-  rawInput: string;
-  contentType: string;
-  executionMode: string;
-  targetEnvironment: string;
-  topic: string;
-  audience?: string;
-  country?: string;
-  city?: string;
-  industry?: string;
-  tone?: string;
-  requiredSections?: string[];
-  specialRequirements?: string;
-  scheduledAt?: string;
-  publishInstruction?: string;
-  sourceRequirement?: string;
-  status: TaskStatus;
-  currentStep: string;
-  stepHistory: any[];
-  brief?: any;
-  outline?: any;
-  content?: any;
-  cleanedContent?: any;
-  seo?: any;
-  geo?: any;
-  internalLinks?: any[];
-  sources?: any[];
-  qualityReport?: any;
-  draftId?: string;
-  version?: number;
-  publishedUrl?: string;
-  executor: string;
-  provider?: string;
-  model?: string;
-  retryCount: number;
-  maxRetries: number;
-  resumeAt?: string;
-  createdAt: string;
-  updatedAt: string;
-  completedAt?: string;
-  errorCode?: string;
-  errorMessage?: string;
+const TASKS_FILE = path.join(process.cwd(), '.contentops-tasks.json');
+
+interface TaskStore {
+  tasks: Record<string, ContentOpsTask>;
+}
+
+function loadTasks(): TaskStore {
+  try {
+    if (fs.existsSync(TASKS_FILE)) {
+      const data = fs.readFileSync(TASKS_FILE, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.error('[TaskManager] Failed to load tasks:', error);
+  }
+  return { tasks: {} };
+}
+
+function saveTasks(store: TaskStore): void {
+  try {
+    fs.writeFileSync(TASKS_FILE, JSON.stringify(store, null, 2), 'utf-8');
+  } catch (error) {
+    console.error('[TaskManager] Failed to save tasks:', error);
+  }
 }
 
 // ============================================================================
@@ -70,7 +50,7 @@ export class TaskManager {
   async createTask(input: CreateTaskInput): Promise<ContentOpsTask> {
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     
-    const record: TaskRecord = {
+    const task: ContentOpsTask = {
       id: taskId,
       chatId: input.chatId,
       messageId: input.messageId,
@@ -103,42 +83,20 @@ export class TaskManager {
       updatedAt: new Date().toISOString(),
     };
 
-    // Store in Content table with category='contentops-task'
-    await prisma.content.create({
-      data: {
-        title: `[Task] ${record.topic.substring(0, 50)}`,
-        slug: taskId,
-        category: 'contentops-task',
-        status: 'draft',
-        language: 'zh-CN',
-        body: JSON.stringify(record),
-        seoDescription: JSON.stringify({
-          taskId,
-          chatId: record.chatId,
-          status: record.status,
-          contentType: record.contentType,
-        }),
-      },
-    });
+    const store = loadTasks();
+    store.tasks[taskId] = task;
+    saveTasks(store);
 
-    return this.recordToTask(record);
+    console.log(`[TaskManager] Created task: ${taskId} (${task.contentType}: ${task.topic})`);
+    return task;
   }
 
   /**
    * Get a task by ID
    */
   async getTask(taskId: string): Promise<ContentOpsTask | null> {
-    const content = await prisma.content.findFirst({
-      where: {
-        slug: taskId,
-        category: 'contentops-task',
-      },
-    });
-
-    if (!content) return null;
-
-    const record: TaskRecord = JSON.parse(content.body);
-    return this.recordToTask(record);
+    const store = loadTasks();
+    return store.tasks[taskId] || null;
   }
 
   /**
@@ -150,7 +108,8 @@ export class TaskManager {
     step?: string,
     data?: any
   ): Promise<ContentOpsTask | null> {
-    const task = await this.getTask(taskId);
+    const store = loadTasks();
+    const task = store.tasks[taskId];
     if (!task) return null;
 
     // Update step history
@@ -176,25 +135,14 @@ export class TaskManager {
       Object.assign(task, data);
     }
 
-    if (status === 'COMPLETED' || status === 'PUBLISHED') {
+    if (status === 'COMPLETED' || status === 'PUBLISHED' || status === 'AWAITING_REVIEW') {
       task.completedAt = new Date().toISOString();
     }
 
-    // Save back
-    const record = this.taskToRecord(task);
-    await prisma.content.update({
-      where: { slug: taskId, category: 'contentops-task' },
-      data: {
-        body: JSON.stringify(record),
-        seoDescription: JSON.stringify({
-          taskId,
-          chatId: task.chatId,
-          status: task.status,
-          contentType: task.contentType,
-        }),
-      },
-    });
+    store.tasks[taskId] = task;
+    saveTasks(store);
 
+    console.log(`[TaskManager] Updated task ${taskId}: status=${status}, step=${step || task.currentStep}`);
     return task;
   }
 
@@ -202,44 +150,41 @@ export class TaskManager {
    * Get pending tasks (for cron job processing)
    */
   async getPendingTasks(limit = 5): Promise<ContentOpsTask[]> {
-    const contents = await prisma.content.findMany({
-      where: {
-        category: 'contentops-task',
-        status: 'draft',
-      },
-      orderBy: { createdAt: 'asc' },
-      take: limit,
-    });
+    const store = loadTasks();
+    const allTasks = Object.values(store.tasks);
+    
+    const pendingStatuses: TaskStatus[] = [
+      'RECEIVED',
+      'PARSING',
+      'SELECTING_CONTRACT',
+      'RESEARCHING',
+      'GENERATING_BRIEF',
+      'GENERATING_STRUCTURE',
+      'GENERATING_CONTENT',
+      'CLEANING_CONTENT',
+      'GENERATING_SEO',
+      'GENERATING_GEO',
+      'MATCHING_LINKS',
+      'VALIDATING_FACTS',
+      'QUALITY_CHECKING',
+      'AUTO_REVISING',
+      'CREATING_DRAFT',
+    ];
 
-    const tasks: ContentOpsTask[] = [];
-    for (const content of contents) {
-      const record: TaskRecord = JSON.parse(content.body);
-      // Only include tasks that need processing
-      if (this.isTaskPending(record.status)) {
-        tasks.push(this.recordToTask(record));
-      }
-    }
-
-    return tasks;
+    return allTasks
+      .filter(t => pendingStatuses.includes(t.status))
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+      .slice(0, limit);
   }
 
   /**
    * Get tasks by chat ID
    */
   async getTasksByChatId(chatId: string): Promise<ContentOpsTask[]> {
-    const contents = await prisma.content.findMany({
-      where: {
-        category: 'contentops-task',
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    return contents
-      .map(c => {
-        const record: TaskRecord = JSON.parse(c.body);
-        return this.recordToTask(record);
-      })
-      .filter(t => t.chatId === chatId);
+    const store = loadTasks();
+    return Object.values(store.tasks)
+      .filter(t => t.chatId === chatId)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
   /**
@@ -266,129 +211,6 @@ export class TaskManager {
     await this.updateTaskStatus(taskId, 'PAUSED_PROVIDER', undefined, {
       resumeAt: resumeAt || new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     });
-  }
-
-  // ============================================================================
-  // Utilities
-  // ============================================================================
-
-  private isTaskPending(status: TaskStatus): boolean {
-    const pendingStatuses: TaskStatus[] = [
-      'RECEIVED',
-      'PARSING',
-      'SELECTING_CONTRACT',
-      'RESEARCHING',
-      'GENERATING_BRIEF',
-      'GENERATING_STRUCTURE',
-      'GENERATING_CONTENT',
-      'CLEANING_CONTENT',
-      'GENERATING_SEO',
-      'GENERATING_GEO',
-      'MATCHING_LINKS',
-      'VALIDATING_FACTS',
-      'QUALITY_CHECKING',
-      'AUTO_REVISING',
-      'CREATING_DRAFT',
-    ];
-    return pendingStatuses.includes(status);
-  }
-
-  private recordToTask(record: TaskRecord): ContentOpsTask {
-    return {
-      id: record.id,
-      chatId: record.chatId,
-      messageId: record.messageId,
-      rawInput: record.rawInput,
-      contentType: record.contentType as any,
-      executionMode: record.executionMode as any,
-      targetEnvironment: record.targetEnvironment as any,
-      topic: record.topic,
-      audience: record.audience,
-      country: record.country,
-      city: record.city,
-      industry: record.industry,
-      tone: record.tone,
-      requiredSections: record.requiredSections,
-      specialRequirements: record.specialRequirements,
-      scheduledAt: record.scheduledAt,
-      publishInstruction: record.publishInstruction,
-      sourceRequirement: record.sourceRequirement,
-      status: record.status,
-      currentStep: record.currentStep,
-      stepHistory: record.stepHistory,
-      brief: record.brief,
-      outline: record.outline,
-      content: record.content,
-      cleanedContent: record.cleanedContent,
-      seo: record.seo,
-      geo: record.geo,
-      internalLinks: record.internalLinks,
-      sources: record.sources,
-      qualityReport: record.qualityReport,
-      draftId: record.draftId,
-      version: record.version,
-      publishedUrl: record.publishedUrl,
-      executor: record.executor as any,
-      provider: record.provider,
-      model: record.model,
-      retryCount: record.retryCount,
-      maxRetries: record.maxRetries,
-      resumeAt: record.resumeAt,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-      completedAt: record.completedAt,
-      errorCode: record.errorCode,
-      errorMessage: record.errorMessage,
-    };
-  }
-
-  private taskToRecord(task: ContentOpsTask): TaskRecord {
-    return {
-      id: task.id,
-      chatId: task.chatId,
-      messageId: task.messageId,
-      rawInput: task.rawInput,
-      contentType: task.contentType,
-      executionMode: task.executionMode,
-      targetEnvironment: task.targetEnvironment,
-      topic: task.topic,
-      audience: task.audience,
-      country: task.country,
-      city: task.city,
-      industry: task.industry,
-      tone: task.tone,
-      requiredSections: task.requiredSections,
-      specialRequirements: task.specialRequirements,
-      scheduledAt: task.scheduledAt,
-      publishInstruction: task.publishInstruction,
-      sourceRequirement: task.sourceRequirement,
-      status: task.status,
-      currentStep: task.currentStep,
-      stepHistory: task.stepHistory,
-      brief: task.brief,
-      outline: task.outline,
-      content: task.content,
-      cleanedContent: task.cleanedContent,
-      seo: task.seo,
-      geo: task.geo,
-      internalLinks: task.internalLinks,
-      sources: task.sources,
-      qualityReport: task.qualityReport,
-      draftId: task.draftId,
-      version: task.version,
-      publishedUrl: task.publishedUrl,
-      executor: task.executor,
-      provider: task.provider,
-      model: task.model,
-      retryCount: task.retryCount,
-      maxRetries: task.maxRetries,
-      resumeAt: task.resumeAt,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      completedAt: task.completedAt,
-      errorCode: task.errorCode,
-      errorMessage: task.errorMessage,
-    };
   }
 }
 
