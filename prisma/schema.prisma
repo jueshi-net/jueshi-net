@@ -7,30 +7,30 @@ datasource db {
 }
 
 model User {
-  id                     String               @id @default(cuid())
+  id                     String                @id @default(cuid())
   name                   String?
-  email                  String               @unique
+  email                  String                @unique
   emailVerified          DateTime?
   image                  String?
   password               String?
-  role                   String               @default("user") // 权限角色：admin/user
-  membershipTier         String               @default("free") @map("membership_tier") // 会员等级：free/member/premium/enterprise
-  points                 Int                  @default(0) // 积分缓存
-  checkinStreak          Int                  @default(0) // 连续签到天数
+  role                   String                @default("user") // 权限角色：admin/user
+  membershipTier         String                @default("free") @map("membership_tier") // 会员等级：free/member/premium/enterprise
+  points                 Int                   @default(0) // 积分缓存
+  checkinStreak          Int                   @default(0) // 连续签到天数
   lastCheckinDate        String? // 最后一次签到日期 YYYY-MM-DD
   memberUntil            DateTime? // 会员体验到期时间
-  profileType            String?              @map("profile_type") // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
-  growthValue            Int                  @default(0) @map("growth_value") // v1.20.19: 成长值（不可消费）
-  levelKey               String?              @default("lv1") @map("level_key") // v1.20.19: 当前等级 key (不建 FK，避免数据漂移)
-  badges                 String[]             @default([]) @map("badges") // v1.21: 勋章标识 ['BLACK_GOLD_PIONEER']
-  isPremium              Boolean              @default(false) @map("is_premium") // v1.28.6: 付费门控 (免费用户收藏上限20)
+  profileType            String?               @map("profile_type") // 工作台身份: merchant/overseas_chinese/student/ai_learner/logistics
+  growthValue            Int                   @default(0) @map("growth_value") // v1.20.19: 成长值（不可消费）
+  levelKey               String?               @default("lv1") @map("level_key") // v1.20.19: 当前等级 key (不建 FK，避免数据漂移)
+  badges                 String[]              @default([]) @map("badges") // v1.21: 勋章标识 ['BLACK_GOLD_PIONEER']
+  isPremium              Boolean               @default(false) @map("is_premium") // v1.28.6: 付费门控 (免费用户收藏上限20)
   // Stripe subscription fields
-  stripeCustomerId       String?              @unique @map("stripe_customer_id")
-  stripeSubscriptionId   String?              @unique @map("stripe_subscription_id")
-  stripePriceId          String?              @map("stripe_price_id")
-  stripeCurrentPeriodEnd DateTime?            @map("stripe_current_period_end")
-  createdAt              DateTime             @default(now())
-  updatedAt              DateTime             @default(now()) @updatedAt
+  stripeCustomerId       String?               @unique @map("stripe_customer_id")
+  stripeSubscriptionId   String?               @unique @map("stripe_subscription_id")
+  stripePriceId          String?               @map("stripe_price_id")
+  stripeCurrentPeriodEnd DateTime?             @map("stripe_current_period_end")
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @default(now()) @updatedAt
   workbenchLinks         WorkbenchLink[]
   toolFavorites          ToolFavorite[]
   toolReviews            ToolReview[]
@@ -58,31 +58,38 @@ model User {
   toolDocumentDrafts     ToolDocumentDraft[]
   userWidgetConfigs      UserWidgetConfig[]
   userCustomNavs         UserCustomNav[]
-  forumPosts           ForumPost[]
-  forumComments        ForumComment[]
+  forumPosts             ForumPost[]
+  forumComments          ForumComment[]
   userOnboardingState    UserOnboardingState?
   userFavorites          UserFavorite[]
   documentHistories      DocumentHistory[]
   taskChainDrafts        TaskChainDraft[]
   passwordResetTokens    PasswordResetToken[]
   couponEntitlements     CouponEntitlement[]
-  honorScore            Int                  @default(0) @map("honor_score") // v18.6.1: 荣誉值（不可消费，可信度背书）
-  communityProfile      UserCommunityProfile?
-  honorLogs             HonorLog[]
-  communityStat         CommunityStat?
-  forumLikes            ForumLike[]
-  forumBookmarks        ForumBookmark[]
-  forumReports          ForumReport[]
-  forumNotifications    ForumNotification[]
-  moderationLogs        ModerationLog[]
-  
+  honorScore             Int                   @default(0) @map("honor_score") // v18.6.1: 荣誉值（不可消费，可信度背书）
+  communityProfile       UserCommunityProfile?
+  honorLogs              HonorLog[]
+  communityStat          CommunityStat?
+  forumLikes             ForumLike[]
+  forumBookmarks         ForumBookmark[]
+  forumReports           ForumReport[]
+  forumNotifications     ForumNotification[]
+  moderationLogs         ModerationLog[]
+
   // v1.20.42.12.0: 用户邀请系统
-  inviteCodes            InviteCode[]         @relation("UserInviteCodes")
-  inviterRedemptions     InviteRedemption[]   @relation("InviterRedemptions")
-  inviteeRedemptions     InviteRedemption[]   @relation("InviteeRedemptions")
-  rewardGrants           RewardGrant[]
-  adApplications         AdApplication[]
-  productItems           ProductItem[]
+  inviteCodes        InviteCode[]       @relation("UserInviteCodes")
+  inviterRedemptions InviteRedemption[] @relation("InviterRedemptions")
+  inviteeRedemptions InviteRedemption[] @relation("InviteeRedemptions")
+  rewardGrants       RewardGrant[]
+  adApplications     AdApplication[]
+  productItems       ProductItem[]
+
+  // ─── v1.20.42.18: Service Provider module back-relations ───
+  serviceProviders    ServiceProvider[]
+  providerMemberships ProviderMember[]
+  providerInquiries   ProviderInquiry[]
+  providerFavorites   ProviderFavorite[]
+  providerReports     ProviderReport[]
 
   @@map("users")
 }
@@ -142,15 +149,15 @@ model VerificationToken {
 }
 
 model PasswordResetToken {
-  id         String    @id @default(cuid())
-  userId     String    @map("user_id")
-  tokenHash  String    @unique @map("token_hash")
-  expiresAt  DateTime  @map("expires_at")
-  usedAt     DateTime? @map("used_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  requestIp  String?   @map("request_ip")
-  userAgent  String?   @map("user_agent")
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  requestIp String?   @map("request_ip")
+  userAgent String?   @map("user_agent")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
@@ -399,12 +406,12 @@ model AdCampaign {
 model AdCreative {
   id           String   @id @default(cuid())
   campaignId   String   @map("campaign_id")
-  title        String   // 内部备注，如"夏季促销-横幅A"
+  title        String // 内部备注，如"夏季促销-横幅A"
   creativeType String   @map("creative_type") // image / html / text / native
   imageUrl     String?  @map("image_url")
   targetUrl    String?  @map("target_url")
   codeSnippet  String?  @map("code_snippet") @db.Text
-  headline     String?  // 文案标题
+  headline     String? // 文案标题
   bodyText     String?  @map("body_text") @db.Text
   ctaText      String?  @map("cta_text") // 按钮文案
   isActive     Boolean  @default(true) @map("is_active")
@@ -420,24 +427,24 @@ model AdCreative {
 // ─── v1.20.42.13.3: Ad Entitlement Application (用户广告权益申请) ───
 
 model AdApplication {
-  id              String    @id @default(cuid())
-  userId          String    @map("user_id")
-  rewardGrantId   String?   @map("reward_grant_id")  // 关联的 AD_SLOT_DAYS 权益
-  placementKey    String    @map("placement_key")     // 选择的广告位 key
-  description     String    @db.Text                  // 申请说明
-  materialUrl     String?   @map("material_url")      // 素材 URL（上传后存储）
-  materialType    String    @default("image") @map("material_type") // image / html / text
-  startDate       DateTime? @map("start_date")
-  endDate         DateTime? @map("end_date")
-  status          String    @default("PENDING")       // PENDING / APPROVED / REJECTED / ACTIVE / EXPIRED
-  reviewNote      String?   @map("review_note") @db.Text
-  reviewedBy      String?   @map("reviewed_by")
-  reviewedAt      DateTime? @map("reviewed_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  rewardGrantId String?   @map("reward_grant_id") // 关联的 AD_SLOT_DAYS 权益
+  placementKey  String    @map("placement_key") // 选择的广告位 key
+  description   String    @db.Text // 申请说明
+  materialUrl   String?   @map("material_url") // 素材 URL（上传后存储）
+  materialType  String    @default("image") @map("material_type") // image / html / text
+  startDate     DateTime? @map("start_date")
+  endDate       DateTime? @map("end_date")
+  status        String    @default("PENDING") // PENDING / APPROVED / REJECTED / ACTIVE / EXPIRED
+  reviewNote    String?   @map("review_note") @db.Text
+  reviewedBy    String?   @map("reviewed_by")
+  reviewedAt    DateTime? @map("reviewed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  user            User        @relation(fields: [userId], references: [id])
-  rewardGrant     RewardGrant? @relation(fields: [rewardGrantId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+  rewardGrant RewardGrant? @relation(fields: [rewardGrantId], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -448,21 +455,21 @@ model AdApplication {
 // ─── v1.20.42.6.16: Ad Event Log (impression/click) ───
 
 model AdEvent {
-  id             String   @id @default(cuid())
-  campaignId     String   @map("campaign_id")
-  placementKey   String   @map("placement_key")
-  creativeId     String?  @map("creative_id")
-  eventType      String   @map("event_type") // impression / click
-  pageType       String?  @map("page_type")
-  pagePath       String?  @map("page_path")
-  userId         String?  @map("user_id")
-  sessionId      String?  @map("session_id")
-  country        String?
-  device         String?
-  referrer       String?  @db.Text
-  ipHash         String?  @map("ip_hash") // SHA-256 hash, 不存明文 IP
-  userAgentHash  String?  @map("user_agent_hash") // SHA-256 hash
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  id            String   @id @default(cuid())
+  campaignId    String   @map("campaign_id")
+  placementKey  String   @map("placement_key")
+  creativeId    String?  @map("creative_id")
+  eventType     String   @map("event_type") // impression / click
+  pageType      String?  @map("page_type")
+  pagePath      String?  @map("page_path")
+  userId        String?  @map("user_id")
+  sessionId     String?  @map("session_id")
+  country       String?
+  device        String?
+  referrer      String?  @db.Text
+  ipHash        String?  @map("ip_hash") // SHA-256 hash, 不存明文 IP
+  userAgentHash String?  @map("user_agent_hash") // SHA-256 hash
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp(6)
 
   @@index([campaignId, createdAt])
   @@index([placementKey, eventType, createdAt])
@@ -482,14 +489,14 @@ model InviteCode {
   expiresAt DateTime? @map("expires_at") // 过期时间（NULL=永不过期）
   createdBy String?   @map("created_by") // 创建者（admin email）
   note      String? // 备注说明
-  
+
   // v1.20.42.12.0: 用户邀请系统扩展
   ownerUserId String? @map("owner_user_id") // 邀请码所有者（NULL=管理员公共码）
-  source      String  @default("ADMIN")     // 来源：ADMIN/USER
-  status      String  @default("ACTIVE")    // 状态：ACTIVE/PAUSED/EXPIRED
-  
+  source      String  @default("ADMIN") // 来源：ADMIN/USER
+  status      String  @default("ACTIVE") // 状态：ACTIVE/PAUSED/EXPIRED
+
   // 关系
-  owner       User?   @relation("UserInviteCodes", fields: [ownerUserId], references: [id])
+  owner       User?              @relation("UserInviteCodes", fields: [ownerUserId], references: [id])
   redemptions InviteRedemption[]
 
   @@index([isActive, code])
@@ -500,21 +507,21 @@ model InviteCode {
 
 // v1.20.42.12.0: 邀请关系记录
 model InviteRedemption {
-  id             String    @id @default(cuid())
-  inviteCodeId   String    @map("invite_code_id")
-  inviterUserId  String    @map("inviter_user_id")  // 邀请人
-  inviteeUserId  String    @map("invitee_user_id")  // 被邀请人
-  status         String    @default("REGISTERED")   // REGISTERED/QUALIFIED/REWARDED/REJECTED
-  qualifiedAt    DateTime? @map("qualified_at")     // 符合条件时间
-  rewardedAt     DateTime? @map("rewarded_at")      // 奖励发放时间
-  rejectReason   String?   @map("reject_reason")
-  createdAt      DateTime  @default(now()) @map("created_at")
+  id            String    @id @default(cuid())
+  inviteCodeId  String    @map("invite_code_id")
+  inviterUserId String    @map("inviter_user_id") // 邀请人
+  inviteeUserId String    @map("invitee_user_id") // 被邀请人
+  status        String    @default("REGISTERED") // REGISTERED/QUALIFIED/REWARDED/REJECTED
+  qualifiedAt   DateTime? @map("qualified_at") // 符合条件时间
+  rewardedAt    DateTime? @map("rewarded_at") // 奖励发放时间
+  rejectReason  String?   @map("reject_reason")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
   // 关系
-  inviteCode     InviteCode @relation(fields: [inviteCodeId], references: [id])
-  inviter        User       @relation("InviterRedemptions", fields: [inviterUserId], references: [id])
-  invitee        User       @relation("InviteeRedemptions", fields: [inviteeUserId], references: [id])
-  rewardGrants   RewardGrant[]
+  inviteCode   InviteCode    @relation(fields: [inviteCodeId], references: [id])
+  inviter      User          @relation("InviterRedemptions", fields: [inviterUserId], references: [id])
+  invitee      User          @relation("InviteeRedemptions", fields: [inviteeUserId], references: [id])
+  rewardGrants RewardGrant[]
 
   @@unique([inviteeUserId]) // 一个被邀请人只能绑定一个邀请人
   @@index([inviterUserId])
@@ -526,20 +533,20 @@ model InviteRedemption {
 // v1.20.42.12.0: 奖励规则配置
 model RewardRule {
   id                   String    @id @default(cuid())
-  name                 String    // 规则名称
-  trigger              String    // 触发条件：INVITE_REGISTER_SUCCESS/INVITE_QUALIFIED
-  rewardType           String    @map("reward_type")  // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
+  name                 String // 规则名称
+  trigger              String // 触发条件：INVITE_REGISTER_SUCCESS/INVITE_QUALIFIED
+  rewardType           String    @map("reward_type") // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
   rewardValue          Int       @map("reward_value") // 奖励数值
   rewardMetadata       Json?     @map("reward_metadata") // 额外元数据
   enabled              Boolean   @default(true)
   startsAt             DateTime? @map("starts_at")
   endsAt               DateTime? @map("ends_at")
   maxRewardsPerInviter Int?      @map("max_rewards_per_inviter") // 每个邀请人最多奖励次数
-  maxRewardsTotal      Int?      @map("max_rewards_total")       // 全局最多奖励次数
+  maxRewardsTotal      Int?      @map("max_rewards_total") // 全局最多奖励次数
   createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt            DateTime  @updatedAt @map("updated_at")
 
-  rewardGrants         RewardGrant[]
+  rewardGrants RewardGrant[]
 
   @@index([enabled])
   @@index([trigger])
@@ -548,29 +555,29 @@ model RewardRule {
 
 // v1.20.42.12.0: 奖励发放记录
 model RewardGrant {
-  id                String    @id @default(cuid())
-  userId            String    @map("user_id")
-  inviteRedemptionId String?  @map("invite_redemption_id")
-  rewardRuleId      String    @map("reward_rule_id")
-  rewardType        String    @map("reward_type")  // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
-  rewardValue       Int       @map("reward_value")
-  rewardMetadata    Json?     @map("reward_metadata")
-  status            String    @default("PENDING")  // PENDING/GRANTED/FAILED/REVOKED
-  grantedAt         DateTime? @map("granted_at")
-  expiresAt         DateTime? @map("expires_at")   // 权益过期时间
-  failureReason     String?   @map("failure_reason")
-  createdAt         DateTime  @default(now()) @map("created_at")
+  id                 String    @id @default(cuid())
+  userId             String    @map("user_id")
+  inviteRedemptionId String?   @map("invite_redemption_id")
+  rewardRuleId       String    @map("reward_rule_id")
+  rewardType         String    @map("reward_type") // MEMBER_DAYS/AD_SLOT_DAYS/POINTS/GROWTH/BADGE/CUSTOM_ENTITLEMENT
+  rewardValue        Int       @map("reward_value")
+  rewardMetadata     Json?     @map("reward_metadata")
+  status             String    @default("PENDING") // PENDING/GRANTED/FAILED/REVOKED
+  grantedAt          DateTime? @map("granted_at")
+  expiresAt          DateTime? @map("expires_at") // 权益过期时间
+  failureReason      String?   @map("failure_reason")
+  createdAt          DateTime  @default(now()) @map("created_at")
 
   // 关系
-  user              User              @relation(fields: [userId], references: [id])
-  inviteRedemption  InviteRedemption? @relation(fields: [inviteRedemptionId], references: [id])
-  rewardRule        RewardRule        @relation(fields: [rewardRuleId], references: [id])
-  adApplications    AdApplication[]
+  user             User              @relation(fields: [userId], references: [id])
+  inviteRedemption InviteRedemption? @relation(fields: [inviteRedemptionId], references: [id])
+  rewardRule       RewardRule        @relation(fields: [rewardRuleId], references: [id])
+  adApplications   AdApplication[]
 
+  @@unique([inviteRedemptionId, rewardRuleId]) // 幂等：同一邀请关系只能发放同一规则一次
   @@index([userId])
   @@index([status])
   @@index([rewardType])
-  @@unique([inviteRedemptionId, rewardRuleId]) // 幂等：同一邀请关系只能发放同一规则一次
   @@map("reward_grants")
 }
 
@@ -773,7 +780,7 @@ model PostalCode {
 
 model HSCode {
   id            String   @id @default(cuid())
-  code          String   
+  code          String
   level         Int
   parentId      String?
   description   String
@@ -817,24 +824,24 @@ model EventLog {
   path      String? // 页面路径，如 /tools/tracking
   sessionId String? // 匿名 sessionId（localStorage 生成，不关联用户身份）
   createdAt DateTime @default(now())
-  
+
   // v1.20.42.10.0 Analytics MVP 扩展字段
-  userId        String?  // 关联登录用户（可选）
-  anonymousId   String?  // 匿名用户标识（可选，用于跨 session 追踪）
-  referrer      String?  // 完整来源 URL（可选）
+  userId         String? // 关联登录用户（可选）
+  anonymousId    String? // 匿名用户标识（可选，用于跨 session 追踪）
+  referrer       String? // 完整来源 URL（可选）
   referrerDomain String? // 来源域名（可选）
-  utmSource     String?  // UTM source（可选）
-  utmMedium     String?  // UTM medium（可选）
-  utmCampaign   String?  // UTM campaign（可选）
-  utmTerm       String?  // UTM term（可选）
-  utmContent    String?  // UTM content（可选）
-  deviceType    String?  // 设备类型：desktop / mobile / tablet（可选）
-  browser       String?  // 浏览器名称（可选）
-  os            String?  // 操作系统（可选）
-  country       String?  // 国家/地区（可选）
-  ipHash        String?  // IP 哈希（可选，不存明文 IP）
-  durationMs    Int?     // 停留时间毫秒（可选）
-  metadata      Json?    // 扩展元数据（可选，JSON 格式）
+  utmSource      String? // UTM source（可选）
+  utmMedium      String? // UTM medium（可选）
+  utmCampaign    String? // UTM campaign（可选）
+  utmTerm        String? // UTM term（可选）
+  utmContent     String? // UTM content（可选）
+  deviceType     String? // 设备类型：desktop / mobile / tablet（可选）
+  browser        String? // 浏览器名称（可选）
+  os             String? // 操作系统（可选）
+  country        String? // 国家/地区（可选）
+  ipHash         String? // IP 哈希（可选，不存明文 IP）
+  durationMs     Int? // 停留时间毫秒（可选）
+  metadata       Json? // 扩展元数据（可选，JSON 格式）
 
   @@index([eventType])
   @@index([toolName])
@@ -905,30 +912,30 @@ model UserTask {
 
 // 积分兑换商品配置
 model RewardItem {
-  id          String       @id @default(cuid())
-  code        String       @unique // word_export_1x, word_export_3x, member_1day, no_branding_1x
+  id          String  @id @default(cuid())
+  code        String  @unique // word_export_1x, word_export_3x, member_1day, no_branding_1x
   name        String // 显示名称
   description String? // 说明
   costPoints  Int // 兑换所需积分
   rewardType  String // word_export_coupon / member_trial / no_branding_coupon
   rewardValue Int // 券数量或天数
-  enabled     Boolean      @default(true)
-  sortOrder   Int          @default(0)
-  
+  enabled     Boolean @default(true)
+  sortOrder   Int     @default(0)
+
   // v1.20.42.18.4.3: 限制机制
-  stockLimit     Int?      @map("stock_limit")     // 总库存限制，null=无限制
-  stockUsed      Int       @default(0) @map("stock_used") // 已使用库存
-  perUserLimit   Int       @default(1) @map("per_user_limit") // 每人限兑次数
-  cooldownHours  Int       @default(0) @map("cooldown_hours") // 冷却期（小时）
-  startAt        DateTime? @map("start_at") // 开始时间
-  endAt          DateTime? @map("end_at") // 结束时间
-  requiresApproval Boolean @default(false) @map("requires_approval") // 需要审核
-  
+  stockLimit       Int?      @map("stock_limit") // 总库存限制，null=无限制
+  stockUsed        Int       @default(0) @map("stock_used") // 已使用库存
+  perUserLimit     Int       @default(1) @map("per_user_limit") // 每人限兑次数
+  cooldownHours    Int       @default(0) @map("cooldown_hours") // 冷却期（小时）
+  startAt          DateTime? @map("start_at") // 开始时间
+  endAt            DateTime? @map("end_at") // 结束时间
+  requiresApproval Boolean   @default(false) @map("requires_approval") // 需要审核
+
   // v1.20.42.18.4.3: 履约信息
-  fulfillmentType   String? @map("fulfillment_type")   // auto / manual / none
+  fulfillmentType   String? @map("fulfillment_type") // auto / manual / none
   fulfillmentStatus String? @map("fulfillment_status") // implemented / partial / not_implemented
-  inactiveReason    String? @map("inactive_reason")    // 禁用原因说明
-  
+  inactiveReason    String? @map("inactive_reason") // 禁用原因说明
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   userRewards UserReward[]
@@ -940,25 +947,25 @@ model RewardItem {
 
 // 用户已兑换权益
 model UserReward {
-  id           String     @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
   rewardItemId String
   rewardType   String // 冗余字段，便于查询
   rewardValue  Int // 券数量或天数
-  status       String     @default("pending") // pending / active / used / expired / rejected
+  status       String    @default("pending") // pending / active / used / expired / rejected
   expiresAt    DateTime?
   usedAt       DateTime?
-  
+
   // v1.20.42.18.4.3: 审核和履约
-  auditStatus   String    @default("auto") @map("audit_status") // auto / pending / approved / rejected
-  auditNote     String?   @map("audit_note")
-  pointsCost    Int       @map("points_cost") // 消耗积分
-  grantId       String?   @map("grant_id") // 关联的 RewardGrant ID
-  failureReason String?   @map("failure_reason")
-  
-  createdAt    DateTime   @default(now())
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  rewardItem   RewardItem @relation(fields: [rewardItemId], references: [id])
+  auditStatus   String  @default("auto") @map("audit_status") // auto / pending / approved / rejected
+  auditNote     String? @map("audit_note")
+  pointsCost    Int     @map("points_cost") // 消耗积分
+  grantId       String? @map("grant_id") // 关联的 RewardGrant ID
+  failureReason String? @map("failure_reason")
+
+  createdAt  DateTime   @default(now())
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardItem RewardItem @relation(fields: [rewardItemId], references: [id])
 
   @@index([userId])
   @@index([status])
@@ -970,19 +977,19 @@ model UserReward {
 
 // v1.20.42.18.4.3: 券类权益
 model CouponEntitlement {
-  id          String   @id @default(cuid())
-  userId      String   @map("user_id")
-  couponType  String   @map("coupon_type") // word_export / no_branding
-  quantity    Int      // 券数量
-  usedCount   Int      @default(0) @map("used_count") // 已使用数量
-  status      String   @default("active") // active / used / expired
-  expiresAt   DateTime? @map("expires_at")
-  sourceRewardId String? @map("source_reward_id") // 来源 UserReward ID
-  
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id             String    @id @default(cuid())
+  userId         String    @map("user_id")
+  couponType     String    @map("coupon_type") // word_export / no_branding
+  quantity       Int // 券数量
+  usedCount      Int       @default(0) @map("used_count") // 已使用数量
+  status         String    @default("active") // active / used / expired
+  expiresAt      DateTime? @map("expires_at")
+  sourceRewardId String?   @map("source_reward_id") // 来源 UserReward ID
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId])
   @@index([couponType])
   @@index([status])
@@ -1096,7 +1103,7 @@ model Topic {
   publishedAt        DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
+  metadataJson       Json? // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   items    TopicItem[]
   sections TopicSection[]
@@ -1441,7 +1448,7 @@ model DestinationGuide {
   destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
   title         String
   description   String      @db.Text
-  websiteUrl    String?     @map("website_url")  // 服务商官网
+  websiteUrl    String?     @map("website_url") // 服务商官网
   type          String // guide | regulation | tax | logistics | customs
   sortOrder     Int         @default(0) @map("sort_order")
   createdAt     DateTime    @default(now()) @map("created_at")
@@ -1458,7 +1465,7 @@ model DestinationService {
   title         String
   category      String // 仓储 | 物流 | 报关 | 税务 | 合规 | 代购
   description   String      @db.Text
-  websiteUrl    String?     @map("website_url")  // 服务商官网
+  websiteUrl    String?     @map("website_url") // 服务商官网
   sortOrder     Int         @default(0) @map("sort_order")
   createdAt     DateTime    @default(now()) @map("created_at")
 
@@ -1500,13 +1507,13 @@ model UserFavorite {
 
 // ─── v1.36.0: Document History (单据历史) ───
 model DocumentHistory {
-  id             String   @id @default(cuid())
-  userId         String   @map("user_id")
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  documentType   String   @map("document_type") // pi / ci / packing-list / label...
-  documentData   String   @map("document_data") @db.Text // JSON string
-  documentNo     String?  @map("document_no")
-  createdAt      DateTime @default(now()) @map("created_at")
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentType String   @map("document_type") // pi / ci / packing-list / label...
+  documentData String   @map("document_data") @db.Text // JSON string
+  documentNo   String?  @map("document_no")
+  createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([userId])
   @@index([userId, documentType])
@@ -1521,6 +1528,7 @@ model HomepageConfig {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   updatedBy String?  @map("updated_by")
+
   @@map("homepage_configs")
 }
 
@@ -1545,9 +1553,9 @@ model ToolMetricDaily {
 model AdPlacement {
   id          String   @id @default(cuid())
   key         String   @unique // e.g. home.hero_below, tool.result_below
-  name        String   // Display name, e.g. "首页首屏下方"
+  name        String // Display name, e.g. "首页首屏下方"
   pageType    String   @map("page_type") // home / tool / article / topic / landing / yellowpage / task / workspace
-  zone        String   // hero_below / sidebar / result_below / content_mid / footer / native_card
+  zone        String // hero_below / sidebar / result_below / content_mid / footer / native_card
   device      String   @default("all") // all / desktop / mobile
   description String?
   isActive    Boolean  @default(true) @map("is_active")
@@ -1563,29 +1571,29 @@ model AdPlacement {
 // ─── v1.20.42.6.14: Landing Page Configuration (Admin only, no public rendering yet) ───
 
 model LandingPage {
-  id               String   @id @default(cuid())
-  slug             String   @unique
-  title            String
-  seoTitle         String?  @map("seo_title")
-  seoDescription   String?  @map("seo_description") @db.Text
-  pageType         String   @map("page_type") // country / tool / topic / guide / city / postal / landing
-  status           String   @default("draft") // draft / published / hidden
-  heroSection      Json?    @map("hero_section") // {title, subtitle, ctaText, ctaUrl, backgroundImage}
-  primaryTool      String?  @map("primary_tool") // Tool slug
-  relatedTools     String[] @map("related_tools") // Tool slugs
-  relatedTopics    String[] @map("related_topics") // Topic slugs
-  relatedArticles  String[] @map("related_articles") // Article slugs
-  faqItems         Json?    @map("faq_items") // [{question, answer}]
-  officialLinks    Json?    @map("official_links") // [{label, url, icon}]
-  adPlacements     Json?    @map("ad_placements") // [{placementKey, enabled, campaignIds}]
-  ctaConfig        Json?    @map("cta_config") // {text, url, style}
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-  publishedAt      DateTime? @map("published_at")
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  seoTitle        String?   @map("seo_title")
+  seoDescription  String?   @map("seo_description") @db.Text
+  pageType        String    @map("page_type") // country / tool / topic / guide / city / postal / landing
+  status          String    @default("draft") // draft / published / hidden
+  heroSection     Json?     @map("hero_section") // {title, subtitle, ctaText, ctaUrl, backgroundImage}
+  primaryTool     String?   @map("primary_tool") // Tool slug
+  relatedTools    String[]  @map("related_tools") // Tool slugs
+  relatedTopics   String[]  @map("related_topics") // Topic slugs
+  relatedArticles String[]  @map("related_articles") // Article slugs
+  faqItems        Json?     @map("faq_items") // [{question, answer}]
+  officialLinks   Json?     @map("official_links") // [{label, url, icon}]
+  adPlacements    Json?     @map("ad_placements") // [{placementKey, enabled, campaignIds}]
+  ctaConfig       Json?     @map("cta_config") // {text, url, style}
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  publishedAt     DateTime? @map("published_at")
 
   // v1.20.42.13.2: Block visibility and order controls
-  blockVisibility  Json?    @map("block_visibility") // {hero: true, primaryTool: true, relatedTools: true, ...}
-  blockOrder       Json?    @map("block_order") // ["hero", "primaryTool", "relatedTools", ...]
+  blockVisibility Json? @map("block_visibility") // {hero: true, primaryTool: true, relatedTools: true, ...}
+  blockOrder      Json? @map("block_order") // ["hero", "primaryTool", "relatedTools", ...]
 
   @@index([status])
   @@index([pageType])
@@ -1596,30 +1604,30 @@ model LandingPage {
 // ─── v1.20.42.6.43: Task Chain Draft (Cross-tool workflow persistence) ───
 
 model TaskChainDraft {
-  id                 String    @id @default(cuid())
-  userId             String    @map("user_id")
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  id     String @id @default(cuid())
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // Core fields
-  title              String
-  status             String    @default("active") // active / completed / archived / deleted
-  sourceTool         String    @map("source_tool") // Tool that initiated the task chain
-  lastActiveTool     String?   @map("last_active_tool") // Last tool user interacted with
-  
+  title          String
+  status         String  @default("active") // active / completed / archived / deleted
+  sourceTool     String  @map("source_tool") // Tool that initiated the task chain
+  lastActiveTool String? @map("last_active_tool") // Last tool user interacted with
+
   // Context data (JSON)
-  context            Json      // Task chain context: { productName, hsCode, declaredValue, currency, destinationCountry, postalCode, addressText, ... }
-  linkedDraftHints   Json?     @map("linked_draft_hints") // Lightweight draft associations: [{ toolKey, draftId, createdAt }]
-  
+  context          Json // Task chain context: { productName, hsCode, declaredValue, currency, destinationCountry, postalCode, addressText, ... }
+  linkedDraftHints Json? @map("linked_draft_hints") // Lightweight draft associations: [{ toolKey, draftId, createdAt }]
+
   // Timestamps
-  createdAt          DateTime  @default(now()) @map("created_at")
-  updatedAt          DateTime  @updatedAt @map("updated_at")
-  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   // Optional lifecycle fields
-  completedAt        DateTime? @map("completed_at")
-  archivedAt         DateTime? @map("archived_at")
-  expiresAt          DateTime? @map("expires_at")
-  deletedAt          DateTime? @map("deleted_at")
-  
+  completedAt DateTime? @map("completed_at")
+  archivedAt  DateTime? @map("archived_at")
+  expiresAt   DateTime? @map("expires_at")
+  deletedAt   DateTime? @map("deleted_at")
+
   @@index([userId])
   @@index([userId, status])
   @@index([createdAt])
@@ -1630,18 +1638,18 @@ model TaskChainDraft {
 // ─── Forum System (Restored from v1.20.39) ───
 
 model ForumCategory {
-  id          String        @id @default(cuid())
-  key         String        @unique  // overseas-life / tools / logistics / feedback / general
-  name        String        // 分类名称
-  description String?       // 分类描述
-  iconText    String?       @map("icon_text")  // 图标文字/emoji
-  color       String?       // 颜色
-  sortOrder   Int           @default(0) @map("sort_order")
-  isActive    Boolean       @default(true) @map("is_active")
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  id          String   @id @default(cuid())
+  key         String   @unique // overseas-life / tools / logistics / feedback / general
+  name        String // 分类名称
+  description String? // 分类描述
+  iconText    String?  @map("icon_text") // 图标文字/emoji
+  color       String? // 颜色
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  posts       ForumPost[]
+  posts ForumPost[]
 
   @@index([key])
   @@index([isActive])
@@ -1649,43 +1657,43 @@ model ForumCategory {
 }
 
 model ForumPost {
-  id               String           @id @default(cuid())
-  slug             String           @unique  // URL-friendly slug
-  userId           String           @map("user_id")
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId       String           @map("category_id")
-  category         ForumCategory    @relation(fields: [categoryId], references: [id])
-  title            String           // 帖子标题
-  content          String           // 帖子内容（纯文本）
-  excerpt          String?          // 摘要
-  status           String           @default("pending")  // published / pending / hidden / deleted
-  isPinned         Boolean          @default(false) @map("is_pinned")
-  isLocked         Boolean          @default(false) @map("is_locked")
-  viewCount        Int              @default(0) @map("view_count")
-  commentCount     Int              @default(0) @map("comment_count")
-  lastCommentAt    DateTime?        @map("last_comment_at")
-  lastCommentUserId String?         @map("last_comment_user_id")
-  ipHash           String?          @map("ip_hash")
-  userAgent        String?          @map("user_agent")
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
-  rewardGrantedAt  DateTime?        @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
-  tags             Json?            // 标签数组 ["shipping","cbm"]
-  isSolved         Boolean          @default(false) @map("is_solved")
-  acceptedCommentId String?         @map("accepted_comment_id")
-  isFeatured       Boolean          @default(false) @map("is_featured")  // 加精
-  relatedTool      String?          @map("related_tool")  // 关联工具 slug
-  relatedGuideId   String?          @map("related_guide_id")
-  relatedChecklistId String?        @map("related_checklist_id")
-  relatedTaskChainType String?      @map("related_task_chain_type")
+  id                   String        @id @default(cuid())
+  slug                 String        @unique // URL-friendly slug
+  userId               String        @map("user_id")
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId           String        @map("category_id")
+  category             ForumCategory @relation(fields: [categoryId], references: [id])
+  title                String // 帖子标题
+  content              String // 帖子内容（纯文本）
+  excerpt              String? // 摘要
+  status               String        @default("pending") // published / pending / hidden / deleted
+  isPinned             Boolean       @default(false) @map("is_pinned")
+  isLocked             Boolean       @default(false) @map("is_locked")
+  viewCount            Int           @default(0) @map("view_count")
+  commentCount         Int           @default(0) @map("comment_count")
+  lastCommentAt        DateTime?     @map("last_comment_at")
+  lastCommentUserId    String?       @map("last_comment_user_id")
+  ipHash               String?       @map("ip_hash")
+  userAgent            String?       @map("user_agent")
+  createdAt            DateTime      @default(now()) @map("created_at")
+  updatedAt            DateTime      @updatedAt @map("updated_at")
+  rewardGrantedAt      DateTime?     @map("reward_granted_at") // 成长值奖励已发放时间（防重复）
+  tags                 Json? // 标签数组 ["shipping","cbm"]
+  isSolved             Boolean       @default(false) @map("is_solved")
+  acceptedCommentId    String?       @map("accepted_comment_id")
+  isFeatured           Boolean       @default(false) @map("is_featured") // 加精
+  relatedTool          String?       @map("related_tool") // 关联工具 slug
+  relatedGuideId       String?       @map("related_guide_id")
+  relatedChecklistId   String?       @map("related_checklist_id")
+  relatedTaskChainType String?       @map("related_task_chain_type")
 
-  comments         ForumComment[]
-  likes            ForumLike[]
-  bookmarks        ForumBookmark[]
-  reports          ForumReport[]
-  acceptedComment  ForumComment?    @relation("AcceptedComment", fields: [acceptedCommentId], references: [id])
-  notifications    ForumNotification[]
-  moderationLogs   ModerationLog[]
+  comments        ForumComment[]
+  likes           ForumLike[]
+  bookmarks       ForumBookmark[]
+  reports         ForumReport[]
+  acceptedComment ForumComment?       @relation("AcceptedComment", fields: [acceptedCommentId], references: [id])
+  notifications   ForumNotification[]
+  moderationLogs  ModerationLog[]
 
   @@index([status])
   @@index([categoryId])
@@ -1699,24 +1707,24 @@ model ForumPost {
 }
 
 model ForumComment {
-  id        String     @id @default(cuid())
-  postId    String     @map("post_id")
-  post      ForumPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId    String     @map("user_id")
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  content   String     // 评论内容
-  status    String     @default("published")  // published / pending / hidden / deleted
-  ipHash    String?    @map("ip_hash")
-  userAgent String?    @map("user_agent")
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  rewardGrantedAt DateTime? @map("reward_granted_at")  // 成长值奖励已发放时间（防重复）
-  floorNumber    Int       @default(0) @map("floor_number")
-  isAccepted     Boolean   @default(false) @map("is_accepted")
+  id              String    @id @default(cuid())
+  postId          String    @map("post_id")
+  post            ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content         String // 评论内容
+  status          String    @default("published") // published / pending / hidden / deleted
+  ipHash          String?   @map("ip_hash")
+  userAgent       String?   @map("user_agent")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  rewardGrantedAt DateTime? @map("reward_granted_at") // 成长值奖励已发放时间（防重复）
+  floorNumber     Int       @default(0) @map("floor_number")
+  isAccepted      Boolean   @default(false) @map("is_accepted")
 
-  likes            ForumLike[]
-  reports          ForumReport[]
-  acceptedByPosts  ForumPost[] @relation("AcceptedComment")
+  likes           ForumLike[]
+  reports         ForumReport[]
+  acceptedByPosts ForumPost[]   @relation("AcceptedComment")
 
   @@index([postId])
   @@index([userId])
@@ -1749,7 +1757,7 @@ model ProductItem {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, isActive])
@@ -1762,29 +1770,29 @@ model ProductItem {
 
 // v1.20.42.18.4.7: 内容页面架构后台化 — Guide 模型
 model Guide {
-  id                 String    @id @default(cuid())
-  title              String
-  slug               String    @unique
-  summary            String?   @db.Text
-  body               String    @db.Text
-  category           String    @default("general") // shipping / customs / logistics / life / business / templates
-  tags               String[]  @default([])
-  relatedTools       String[]  @default([]) // Tool slugs
-  relatedTopics      String[]  @default([]) // Topic slugs
-  relatedChecklists  String[]  @default([]) // Checklist slugs
-  relatedGuides      String[]  @default([]) // Guide slugs
-  status             String    @default("draft") // draft / published / archived
-  coverImage         String?
-  author             String?
-  seoTitle           String?
-  seoDescription     String?   @db.Text
-  canonicalUrl       String?
-  robots             String    @default("index,follow")
-  sortOrder          Int       @default(0)
-  publishedAt        DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
+  id                String    @id @default(cuid())
+  title             String
+  slug              String    @unique
+  summary           String?   @db.Text
+  body              String    @db.Text
+  category          String    @default("general") // shipping / customs / logistics / life / business / templates
+  tags              String[]  @default([])
+  relatedTools      String[]  @default([]) // Tool slugs
+  relatedTopics     String[]  @default([]) // Topic slugs
+  relatedChecklists String[]  @default([]) // Checklist slugs
+  relatedGuides     String[]  @default([]) // Guide slugs
+  status            String    @default("draft") // draft / published / archived
+  coverImage        String?
+  author            String?
+  seoTitle          String?
+  seoDescription    String?   @db.Text
+  canonicalUrl      String?
+  robots            String    @default("index,follow")
+  sortOrder         Int       @default(0)
+  publishedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  metadataJson      Json? // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   @@index([status])
   @@index([category])
@@ -1794,26 +1802,26 @@ model Guide {
 
 // v1.20.42.18.4.7: 内容页面架构后台化 — Checklist 模型
 model Checklist {
-  id                 String    @id @default(cuid())
-  title              String
-  slug               String    @unique
-  summary            String?   @db.Text
-  steps              Json      // [{ title, description, completed, optional, toolLink }]
-  relatedTools       String[]  @default([]) // Tool slugs
-  relatedTaskChain   String?   // Task chain template key
-  relatedGuides      String[]  @default([]) // Guide slugs
-  relatedTopics      String[]  @default([]) // Topic slugs
-  status             String    @default("draft") // draft / published / archived
-  coverImage         String?
-  seoTitle           String?
-  seoDescription     String?   @db.Text
-  canonicalUrl       String?
-  robots             String    @default("index,follow")
-  sortOrder          Int       @default(0)
-  publishedAt        DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  metadataJson       Json?     // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
+  id               String    @id @default(cuid())
+  title            String
+  slug             String    @unique
+  summary          String?   @db.Text
+  steps            Json // [{ title, description, completed, optional, toolLink }]
+  relatedTools     String[]  @default([]) // Tool slugs
+  relatedTaskChain String? // Task chain template key
+  relatedGuides    String[]  @default([]) // Guide slugs
+  relatedTopics    String[]  @default([]) // Topic slugs
+  status           String    @default("draft") // draft / published / archived
+  coverImage       String?
+  seoTitle         String?
+  seoDescription   String?   @db.Text
+  canonicalUrl     String?
+  robots           String    @default("index,follow")
+  sortOrder        Int       @default(0)
+  publishedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  metadataJson     Json? // v1.20.42.18.6.16.6.72: ContentOps metadata bridge
 
   @@index([status])
   @@index([slug])
@@ -1857,18 +1865,18 @@ model HonorLog {
 }
 
 model CommunityStat {
-  id                    String    @id @default(cuid())
-  userId                String    @unique @map("user_id")
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postCount             Int       @default(0) @map("post_count")
-  commentCount          Int       @default(0) @map("comment_count")
-  acceptedAnswerCount   Int       @default(0) @map("accepted_answer_count")
-  featuredPostCount     Int       @default(0) @map("featured_post_count")
-  helpfulVoteCount      Int       @default(0) @map("helpful_vote_count")
-  reportAcceptedCount   Int       @default(0) @map("report_accepted_count")
-  violationCount        Int       @default(0) @map("violation_count")
-  lastActiveAt          DateTime? @map("last_active_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
+  id                  String    @id @default(cuid())
+  userId              String    @unique @map("user_id")
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postCount           Int       @default(0) @map("post_count")
+  commentCount        Int       @default(0) @map("comment_count")
+  acceptedAnswerCount Int       @default(0) @map("accepted_answer_count")
+  featuredPostCount   Int       @default(0) @map("featured_post_count")
+  helpfulVoteCount    Int       @default(0) @map("helpful_vote_count")
+  reportAcceptedCount Int       @default(0) @map("report_accepted_count")
+  violationCount      Int       @default(0) @map("violation_count")
+  lastActiveAt        DateTime? @map("last_active_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
 
   @@map("community_stats")
 }
@@ -1876,14 +1884,14 @@ model CommunityStat {
 // v1.20.42.18.6.2: Forum MVP — likes, bookmarks, reports, moderation
 
 model ForumLike {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId    String?  @map("post_id")
-  post      ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  commentId String?  @map("comment_id")
+  id        String        @id @default(cuid())
+  userId    String        @map("user_id")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String?       @map("post_id")
+  post      ForumPost?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?       @map("comment_id")
   comment   ForumComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime      @default(now()) @map("created_at")
 
   @@unique([userId, postId])
   @@unique([userId, commentId])
@@ -1893,12 +1901,12 @@ model ForumLike {
 }
 
 model ForumBookmark {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  postId    String   @map("post_id")
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String    @map("post_id")
   post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   @@unique([userId, postId])
   @@index([userId])
@@ -1907,20 +1915,20 @@ model ForumBookmark {
 }
 
 model ForumReport {
-  id          String   @id @default(cuid())
-  reporterId  String   @map("reporter_id")
-  reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
-  postId      String?  @map("post_id")
-  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  commentId   String?  @map("comment_id")
+  id          String        @id @default(cuid())
+  reporterId  String        @map("reporter_id")
+  reporter    User          @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  postId      String?       @map("post_id")
+  post        ForumPost?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId   String?       @map("comment_id")
   comment     ForumComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  reason      String   // spam / abuse / harassment / illegal / other
+  reason      String // spam / abuse / harassment / illegal / other
   description String?
-  status      String   @default("pending") // pending / resolved / dismissed
-  resolvedBy  String?  @map("resolved_by")
-  resolvedAt  DateTime? @map("resolved_at")
-  resolution  String?  // action_taken / no_action
-  createdAt   DateTime @default(now()) @map("created_at")
+  status      String        @default("pending") // pending / resolved / dismissed
+  resolvedBy  String?       @map("resolved_by")
+  resolvedAt  DateTime?     @map("resolved_at")
+  resolution  String? // action_taken / no_action
+  createdAt   DateTime      @default(now()) @map("created_at")
 
   @@unique([reporterId, postId])
   @@unique([reporterId, commentId])
@@ -1932,17 +1940,17 @@ model ForumReport {
 
 /// v18.6.4: Forum notifications — minimal notification system
 model ForumNotification {
-  id          String   @id @default(cuid())
-  userId      String   @map("user_id")  // 接收者
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type        String   // reply / like / accepted / featured / report_resolved
-  postId      String?  @map("post_id")
-  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  commentId   String?  @map("comment_id")
-  actorId     String?  @map("actor_id")  // 触发者
-  message     String   // 通知文案
-  isRead      Boolean  @default(false) @map("is_read")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id        String     @id @default(cuid())
+  userId    String     @map("user_id") // 接收者
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // reply / like / accepted / featured / report_resolved
+  postId    String?    @map("post_id")
+  post      ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?    @map("comment_id")
+  actorId   String?    @map("actor_id") // 触发者
+  message   String // 通知文案
+  isRead    Boolean    @default(false) @map("is_read")
+  createdAt DateTime   @default(now()) @map("created_at")
 
   @@index([userId])
   @@index([isRead])
@@ -1952,18 +1960,234 @@ model ForumNotification {
 
 /// v18.6.4: Moderation log — audit trail for admin actions
 model ModerationLog {
-  id          String   @id @default(cuid())
-  adminId     String   @map("admin_id")
-  admin       User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
-  action      String   // pin / unpin / feature / unfeature / lock / unlock / hide / restore / accept / reject_report
-  postId      String?  @map("post_id")
-  post        ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  commentId   String?  @map("comment_id")
-  reason      String?
-  createdAt   DateTime @default(now()) @map("created_at")
+  id        String     @id @default(cuid())
+  adminId   String     @map("admin_id")
+  admin     User       @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action    String // pin / unpin / feature / unfeature / lock / unlock / hide / restore / accept / reject_report
+  postId    String?    @map("post_id")
+  post      ForumPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  commentId String?    @map("comment_id")
+  reason    String?
+  createdAt DateTime   @default(now()) @map("created_at")
 
   @@index([adminId])
   @@index([postId])
   @@index([createdAt(sort: Desc)])
   @@map("moderation_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// v1.20.42.18: Service Provider Module (Round 2A)
+// ═══════════════════════════════════════════════════════════════
+// ProviderReview is DEFERRED (PROVIDER_REVIEW_STATUS=DEFERRED).
+// Do NOT create ProviderReview in this round.
+// ═══════════════════════════════════════════════════════════════
+
+/// Service Provider — public yellow-pages entity (organization | professional | official).
+/// Distinct from UserCompanyProfile (private tool data for document prefill).
+model ServiceProvider {
+  id                 String    @id @default(cuid())
+  ownerUserId        String    @map("owner_user_id")
+  owner              User      @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  providerType       String    @map("provider_type") // organization | professional | official
+  displayName        String    @map("display_name")
+  slug               String    @unique
+  avatarUrl          String?   @map("avatar_url")
+  coverUrl           String?   @map("cover_url")
+  description        String?   @db.Text
+  languages          String[]  @default([])
+  countries          String[]  @default([])
+  cities             String[]  @default([])
+  serviceAreas       String[]  @default([]) @map("service_areas")
+  contactPreference  String    @default("inquiry") @map("contact_preference") // inquiry | email | phone | website
+  status             String    @default("draft") // draft | pending_review | approved | suspended | rejected
+  verificationStatus String    @default("unverified") @map("verification_status") // unverified | pending | verified | rejected
+  claimedAt          DateTime? @map("claimed_at")
+  submittedAt        DateTime? @map("submitted_at")
+  approvedAt         DateTime? @map("approved_at")
+  rejectedAt         DateTime? @map("rejected_at")
+  rejectionReason    String?   @map("rejection_reason") @db.Text
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  members       ProviderMember[]
+  services      ProviderService[]
+  verifications ProviderVerification[]
+  inquiries     ProviderInquiry[]
+  favorites     ProviderFavorite[]
+  reports       ProviderReport[]
+
+  @@index([ownerUserId])
+  @@index([providerType])
+  @@index([status])
+  @@index([verificationStatus])
+  @@map("service_providers")
+}
+
+/// Provider Member — team membership with role-based access.
+model ProviderMember {
+  id         String          @id @default(cuid())
+  providerId String          @map("provider_id")
+  provider   ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  userId     String          @map("user_id")
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       String          @default("VIEWER") // OWNER | ADMIN | EDITOR | VIEWER
+  status     String          @default("active") // active | invited | removed
+  invitedBy  String?         @map("invited_by")
+  invitedAt  DateTime?       @map("invited_at")
+  acceptedAt DateTime?       @map("accepted_at")
+  createdAt  DateTime        @default(now()) @map("created_at")
+  updatedAt  DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  @@unique([providerId, userId])
+  @@index([userId])
+  @@map("provider_members")
+}
+
+/// Provider Service — a service item offered by a provider.
+/// Renamed from "Service" to avoid conflicts with a generic service concept.
+model ProviderService {
+  id               String          @id @default(cuid())
+  providerId       String          @map("provider_id")
+  provider         ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  categoryId       String          @map("category_id")
+  category         ServiceCategory @relation(fields: [categoryId], references: [id])
+  title            String
+  slug             String          @unique
+  summary          String?         @db.Text
+  description      String?         @db.Text
+  serviceCountries String[]        @default([]) @map("service_countries")
+  serviceCities    String[]        @default([]) @map("service_cities")
+  languages        String[]        @default([])
+  priceMode        String          @default("quote") @map("price_mode") // quote | fixed | range | hourly
+  priceFrom        Decimal?        @map("price_from") @db.Decimal(10, 2)
+  currency         String          @default("USD")
+  deliveryMode     String?         @map("delivery_mode") // online | offline | hybrid
+  status           String          @default("draft") // draft | pending_review | published | suspended
+  sortOrder        Int             @default(0) @map("sort_order")
+  submittedAt      DateTime?       @map("submitted_at")
+  publishedAt      DateTime?       @map("published_at")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  inquiries ProviderInquiry[]
+
+  @@index([providerId])
+  @@index([categoryId])
+  @@index([status])
+  @@map("provider_services")
+}
+
+/// Service Category — backend-configurable taxonomy.
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  icon        String?
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  services ProviderService[]
+
+  @@map("service_categories")
+}
+
+/// Provider Verification — identity/business/professional/platform verification records.
+model ProviderVerification {
+  id          String          @id @default(cuid())
+  providerId  String          @map("provider_id")
+  provider    ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  type        String // identity | business | professional | platform
+  status      String          @default("pending") // pending | verified | rejected
+  evidenceUrl String?         @map("evidence_url")
+  verifiedBy  String?         @map("verified_by")
+  verifiedAt  DateTime?       @map("verified_at")
+  notes       String?         @db.Text
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  @@index([providerId])
+  @@index([type])
+  @@map("provider_verifications")
+}
+
+/// Provider Inquiry — consultation lead from a user.
+model ProviderInquiry {
+  id              String           @id @default(cuid())
+  requesterUserId String           @map("requester_user_id")
+  requester       User             @relation(fields: [requesterUserId], references: [id], onDelete: Cascade)
+  providerId      String           @map("provider_id")
+  provider        ServiceProvider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  serviceId       String?          @map("service_id")
+  service         ProviderService? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  sourceType      String           @default("direct") @map("source_type") // direct | tool | guide | country | block
+  sourceId        String?          @map("source_id")
+  message         String?          @db.Text
+  status          String           @default("new") // new | contacted | resolved | closed
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @default(now()) @updatedAt @map("updated_at")
+
+  @@index([providerId, status])
+  @@index([requesterUserId])
+  @@map("provider_inquiries")
+}
+
+/// Provider Favorite — user bookmarks a provider.
+model ProviderFavorite {
+  id         String          @id @default(cuid())
+  userId     String          @map("user_id")
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerId String          @map("provider_id")
+  provider   ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  createdAt  DateTime        @default(now()) @map("created_at")
+
+  @@unique([userId, providerId])
+  @@index([userId])
+  @@map("provider_favorites")
+}
+
+/// Provider Report — user-submitted reports against a provider.
+model ProviderReport {
+  id             String          @id @default(cuid())
+  reporterUserId String          @map("reporter_user_id")
+  reporter       User            @relation(fields: [reporterUserId], references: [id], onDelete: Cascade)
+  providerId     String          @map("provider_id")
+  provider       ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  category       String // spam | fraud | inaccurate | inappropriate | other
+  reason         String          @db.Text
+  status         String          @default("pending") // pending | investigating | resolved | dismissed
+  resolution     String?         @db.Text
+  resolvedBy     String?         @map("resolved_by")
+  resolvedAt     DateTime?       @map("resolved_at")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @default(now()) @updatedAt @map("updated_at")
+
+  @@index([providerId])
+  @@index([status])
+  @@map("provider_reports")
+}
+
+/// Domain Event Outbox — persistent event store for reliable async processing.
+/// Events are written in the same DB transaction as the domain change,
+/// then processed by an outbox worker that publishes to the in-process event bus.
+model DomainEventOutbox {
+  id            String    @id @default(cuid())
+  eventId       String    @unique @map("event_id") // idempotency key
+  eventType     String    @map("event_type")
+  aggregateType String    @map("aggregate_type")
+  aggregateId   String    @map("aggregate_id")
+  payloadJson   String    @map("payload_json") @db.Text
+  status        String    @default("PENDING") // PENDING | PROCESSING | PROCESSED | FAILED
+  attempts      Int       @default(0)
+  availableAt   DateTime  @default(now()) @map("available_at")
+  processedAt   DateTime? @map("processed_at")
+  lastError     String?   @map("last_error") @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([status, availableAt])
+  @@map("domain_event_outbox")
 }
