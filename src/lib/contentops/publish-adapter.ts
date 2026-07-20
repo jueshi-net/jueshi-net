@@ -121,14 +121,13 @@ async function publishGuide(
     // Check if guide already exists (idempotency)
     const existingGuide = await prisma.guide.findUnique({ where: { slug } });
     if (existingGuide) {
-      // Verify metadata matches for true idempotency
-      const metadata = existingGuide.metadataJson as any;
-      if (
-        metadata?.contentOpsManaged === true &&
-        metadata?.sourceDraftId === draft.id &&
-        metadata?.sourceVersion === draft.version &&
-        metadata?.targetEnvironment === 'staging'
-      ) {
+      // Verify seoDescription contains matching ContentOps metadata
+      const seoDesc = existingGuide.seoDescription || '';
+      const isContentOpsManaged = seoDesc.includes(`"sourceDraftId":"${draft.id}"`);
+      const isSameVersion = seoDesc.includes(`"sourceVersion":${draft.version}`) || 
+                           seoDesc.includes(`"sourceVersion":"${draft.version}"`);
+      
+      if (isContentOpsManaged && isSameVersion) {
         // True idempotent replay
         return {
           success: true,
@@ -147,6 +146,22 @@ async function publishGuide(
       }
     }
 
+    // Store ContentOps metadata in seoDescription (JSON format)
+    const contentOpsMetadata = {
+      contentOpsManaged: true,
+      sourceDraftId: draft.id,
+      sourceVersion: draft.version,
+      publishKey: `staging:guide:${draft.id}:v${draft.version}`,
+      targetEnvironment: 'staging',
+      publishedAt: timestamp.toISOString(),
+      publishedBy: 'contentops-bot',
+    };
+    
+    const seoDescription = draft.seoDescription || draft.summary || '';
+    const combinedSeoDescription = seoDescription 
+      ? `${seoDescription}\n\n<!-- ContentOps: ${JSON.stringify(contentOpsMetadata)} -->`
+      : `<!-- ContentOps: ${JSON.stringify(contentOpsMetadata)} -->`;
+
     // Create new Guide record
     const guide = await prisma.guide.create({
       data: {
@@ -163,19 +178,10 @@ async function publishGuide(
         status: 'published',
         author: 'ContentOps Bot',
         seoTitle: draft.seoTitle || draft.title,
-        seoDescription: draft.seoDescription || draft.summary || '',
+        seoDescription: combinedSeoDescription,
         robots: 'noindex,nofollow', // Staging: noindex
         sortOrder: 0,
         publishedAt: timestamp,
-        metadataJson: {
-          contentOpsManaged: true,
-          sourceDraftId: draft.id,
-          sourceVersion: draft.version,
-          publishKey: `staging:guide:${draft.id}:v${draft.version}`,
-          targetEnvironment: 'staging',
-          publishedAt: timestamp.toISOString(),
-          publishedBy: 'contentops-bot',
-        },
       },
     });
 
