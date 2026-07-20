@@ -71,6 +71,16 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 async function runtimeSchemaAssertion(): Promise<void> {
   if (globalForPrisma.prismaStartupAsserted) return;
   
+  // Skip in non-staging environments (preview, production has its own guards)
+  const envMarker = process.env.JUESHI_ENVIRONMENT || process.env.NODE_ENV;
+  const isStaging = dbUrl.includes("xixiong_staging") || 
+                    process.env.PORT === "3001" ||
+                    (envMarker && envMarker.includes("staging"));
+  if (!isStaging || process.env.PREVIEW_MODE === "true") {
+    globalForPrisma.prismaStartupAsserted = true;
+    return;
+  }
+  
   try {
     const result = await prisma.$queryRaw<Array<{ db_name: string; has_metadata: boolean }>>`
       SELECT 
