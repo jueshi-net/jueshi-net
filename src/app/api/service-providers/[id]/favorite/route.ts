@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth, requireAdmin } from "@/lib/auth-guard";
 import { isFeatureEnabled } from "@/platform";
+import { favoriteProvider } from "@/modules/service-provider/public";
 
 async function checkFeature() {
   if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
@@ -17,8 +18,6 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { prisma } from "@/lib/prisma";
-
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const disabled = await checkFeature();
   if (disabled) return disabled;
@@ -27,12 +26,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const userId = (guard as any).session.user.id;
   const { id } = await params;
   try {
-    const existing = await prisma.providerFavorite.findUnique({ where: { userId_providerId: { userId, providerId: id } } });
-    if (existing) {
-      await prisma.providerFavorite.delete({ where: { userId_providerId: { userId, providerId: id } } });
-      return NextResponse.json({ success: true, data: { favorited: false } });
-    }
-    await prisma.providerFavorite.create({ data: { userId, providerId: id } });
-    return NextResponse.json({ success: true, data: { favorited: true } });
+    const result = await favoriteProvider(userId, id);
+    return NextResponse.json({ success: true, data: result });
   } catch (err) { return handleError(err); }
 }

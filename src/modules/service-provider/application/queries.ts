@@ -384,3 +384,15 @@ export async function isProviderFavorited(
   });
   return count > 0;
 }
+
+// ─── Management queries (authenticated, NOT public DTO) ───
+
+/**
+ * Get a provider by ID for management purposes (workspace/admin).
+ * Returns full data including services, members, verifications.
+ * Caller is responsible for auth/permission checks.
+ */
+export async function getProviderForManagement(id: string) {
+  const { providerRepository } = await import("../infrastructure");
+  return providerRepository.findById(id, true);
+}

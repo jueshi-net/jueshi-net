@@ -17,8 +17,8 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { createServiceInquiry } from "@/modules/service-provider/application";
-import { processOutbox } from "@/modules/service-provider/infrastructure";
+import { createServiceInquiry } from "@/modules/service-provider/public";
+import { processServiceProviderOutbox } from "@/modules/service-provider/public";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const disabled = await checkFeature();
@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       message: body.message,
     });
     // Process outbox asynchronously (fire-and-forget)
-    processOutbox(5).catch(() => {});
+    processServiceProviderOutbox(5).catch(() => {});
     return NextResponse.json({ success: true, data: result }, { status: 201 });
   } catch (err) { return handleError(err); }
 }

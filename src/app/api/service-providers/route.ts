@@ -17,19 +17,14 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { prisma } from "@/lib/prisma";
-import { createProviderApplication } from "@/modules/service-provider/application";
+import { createProviderApplication, listPublicProviders } from "@/modules/service-provider/public";
 
 export async function GET() {
   const disabled = await checkFeature();
   if (disabled) return disabled;
   try {
-    const providers = await prisma.serviceProvider.findMany({
-      where: { status: "approved" },
-      take: 50,
-      orderBy: { createdAt: "desc" },
-    });
-    return NextResponse.json({ success: true, data: providers });
+    const result = await listPublicProviders({ pageSize: 50 });
+    return NextResponse.json({ success: true, data: result.items, total: result.total });
   } catch (err) { return handleError(err); }
 }
 

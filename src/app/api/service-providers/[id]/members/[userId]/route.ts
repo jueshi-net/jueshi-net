@@ -17,7 +17,7 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { removeProviderMember } from "@/modules/service-provider/application";
+import { removeProviderMember } from "@/modules/service-provider/public";
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string; userId: string }> }) {
   const disabled = await checkFeature();

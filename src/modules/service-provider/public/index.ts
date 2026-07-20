@@ -68,7 +68,12 @@ import {
   getTrustCard,
   getRelatedProviders,
   isProviderFavorited,
+  getProviderForManagement,
 } from "../application/queries";
+import {
+  favoriteProvider,
+  reportProvider,
+} from "../application/interaction-service";
 
 export {
   listPublicProviders,
@@ -79,6 +84,7 @@ export {
   getTrustCard,
   getRelatedProviders,
   isProviderFavorited,
+  getProviderForManagement,
 };
 
 export type {
@@ -103,6 +109,7 @@ export {
   createProviderService,
   submitProviderService,
   publishProviderService,
+  updateProviderService,
   createServiceInquiry,
   addProviderMember,
   removeProviderMember,
@@ -126,7 +133,19 @@ export const serviceProviderQueries = {
   getTrustCard,
   getRelatedProviders,
   isProviderFavorited,
+  getProviderForManagement,
 };
+
+// ---- Interaction services (favorite, report) ----
+
+export {
+  favoriteProvider,
+  reportProvider,
+};
+
+// ---- Outbox processing (for API routes) ----
+
+export { processOutbox as processServiceProviderOutbox } from "../infrastructure";
 
 // ---- One-call boot ----
 

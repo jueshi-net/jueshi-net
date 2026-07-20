@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth, requireAdmin } from "@/lib/auth-guard";
 import { isFeatureEnabled } from "@/platform";
+import { updateProviderProfile, getProviderForManagement } from "@/modules/service-provider/public";
 
 async function checkFeature() {
   if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
@@ -17,15 +18,12 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { prisma } from "@/lib/prisma";
-import { updateProviderProfile } from "@/modules/service-provider/application";
-
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const disabled = await checkFeature();
   if (disabled) return disabled;
   const { id } = await params;
   try {
-    const provider = await prisma.serviceProvider.findUnique({ where: { id }, include: { services: true, members: true } });
+    const provider = await getProviderForManagement(id);
     if (!provider) return NextResponse.json({ success: false, error: "Provider not found" }, { status: 404 });
     return NextResponse.json({ success: true, data: provider });
   } catch (err) { return handleError(err); }

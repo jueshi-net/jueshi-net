@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth, requireAdmin } from "@/lib/auth-guard";
 import { isFeatureEnabled } from "@/platform";
+import { reportProvider } from "@/modules/service-provider/public";
 
 async function checkFeature() {
   if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
@@ -17,9 +18,6 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { prisma } from "@/lib/prisma";
-import { publishEvent } from "@/platform";
-
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const disabled = await checkFeature();
   if (disabled) return disabled;
@@ -30,8 +28,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   try {
     const { category, reason } = await req.json();
     if (!category || !reason) return NextResponse.json({ success: false, error: "category and reason required" }, { status: 400 });
-    const report = await prisma.providerReport.create({ data: { reporterUserId: userId, providerId: id, category, reason } });
-    await publishEvent("provider.reported", "service-provider", { providerId: id, reporterUserId: userId, reason });
+    const report = await reportProvider(userId, id, category, reason);
     return NextResponse.json({ success: true, data: report }, { status: 201 });
   } catch (err) { return handleError(err); }
 }

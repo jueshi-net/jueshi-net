@@ -17,7 +17,7 @@ function handleError(err: unknown) {
   return NextResponse.json({ success: false, error: "Internal error" }, { status: 500 });
 }
 
-import { submitProviderForReview } from "@/modules/service-provider/application";
+import { submitProviderForReview } from "@/modules/service-provider/public";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const disabled = await checkFeature();
