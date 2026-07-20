@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import type { Session } from "next-auth";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -57,15 +58,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch session on the server and pass it to SessionProvider.
+  // This eliminates the client-side /api/auth/session fetch that causes
+  // aborted-fetch console errors during server-side redirects.
+  let session: Session | null = null;
+  try {
+    const { auth } = await import("@/lib/auth");
+    session = await auth();
+  } catch {
+    // Auth not available (e.g. during build) — SessionProvider falls back to null.
+  }
+
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={cn(inter.className, "min-h-screen bg-[#f8fafc] antialiased")}>
-        <Providers>
+        <Providers session={session}>
           <AnalyticsProvider>
             <CommandMenuProvider>
               {children}

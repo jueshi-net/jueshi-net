@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
+// Mock prisma before any service-provider imports that trigger the import chain:
+// public -> application/queries -> infrastructure/db -> lib/prisma
+// lib/prisma throws if DATABASE_URL is not set, crashing the test file.
+vi.mock("@/lib/prisma", () => ({
+  prisma: {},
+}));
+
 import {
   defineFlag,
   setAdminOverride,

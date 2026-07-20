@@ -110,3 +110,4 @@ logs/
 .hermes/pipeline/proposals/
 .hermes/pipeline/locks/
 .patch-backups/
+.preview-pgdata/
