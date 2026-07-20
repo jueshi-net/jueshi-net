@@ -15,6 +15,9 @@ import { serviceMetadata, serviceJsonLd, breadcrumbJsonLd } from "@/modules/serv
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
+    return { title: "未找到 - 绝世百宝箱", robots: { index: false, follow: false } };
+  }
   const { slug } = await params;
   const service = await getPublicServiceBySlug(slug);
   if (!service) return { title: "未找到 - 绝世百宝箱" };

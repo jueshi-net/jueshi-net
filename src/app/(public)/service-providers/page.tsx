@@ -20,6 +20,9 @@ import { SortSelect } from "@/modules/service-provider/ui/sort-select";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
+  if (!isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
+    return { title: "未找到 - 绝世百宝箱", robots: { index: false, follow: false } };
+  }
   const categories = await listPublicCategories();
   return directoryMetadata(categories);
 }

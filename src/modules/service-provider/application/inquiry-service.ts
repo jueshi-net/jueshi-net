@@ -20,8 +20,9 @@ export async function createServiceInquiry(
     sourceType?: string;
     sourceId?: string;
     message?: string;
+    requestId?: string;
   }
-): Promise<{ inquiryId: string; outboxEventId: string }> {
+): Promise<{ inquiryId: string; outboxEventId: string; idempotentReplay: boolean }> {
   // 1. Capability check
   if (!can("service.request", { userId, userRole: "user", moduleFlagEnabled: true })) {
     throw new Error("Forbidden: service.request");
@@ -46,7 +47,36 @@ export async function createServiceInquiry(
     if (service.status !== "published") throw new Error("Service is not available for inquiries");
   }
 
-  // 4. Create inquiry + outbox in SAME transaction
+  // 4. Idempotency check - look for existing inquiry with same content within 10 minutes
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+  const normalizedMessage = (input.message ?? "").trim();
+  const existingInquiry = await prisma.providerInquiry.findFirst({
+    where: {
+      requesterUserId: userId,
+      providerId: input.providerId,
+      serviceId: input.serviceId ?? null,
+      sourceType: input.sourceType ?? "direct",
+      sourceId: input.sourceId ?? null,
+      message: normalizedMessage,
+      createdAt: { gte: tenMinutesAgo },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (existingInquiry) {
+    // Find the corresponding outbox entry
+    const outboxEntry = await prisma.domainEventOutbox.findFirst({
+      where: { aggregateId: existingInquiry.id },
+      orderBy: { createdAt: "desc" },
+    });
+    return {
+      inquiryId: existingInquiry.id,
+      outboxEventId: outboxEntry?.eventId ?? "",
+      idempotentReplay: true,
+    };
+  }
+
+  // 5. Create inquiry + outbox in SAME transaction
   const inquiryId = `inq_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   const outboxEventId = `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
@@ -60,7 +90,7 @@ export async function createServiceInquiry(
         serviceId: input.serviceId ?? null,
         sourceType: input.sourceType ?? "direct",
         sourceId: input.sourceId ?? null,
-        message: input.message ?? "",
+        message: normalizedMessage,
         status: "new",
       },
     });
@@ -79,7 +109,8 @@ export async function createServiceInquiry(
           serviceId: input.serviceId ?? null,
           sourceType: input.sourceType ?? "direct",
           sourceId: input.sourceId ?? null,
-          message: input.message ?? "",
+          message: normalizedMessage,
+          requestId: input.requestId ?? null,
         }),
         status: "PENDING",
       },
@@ -88,5 +119,5 @@ export async function createServiceInquiry(
     return inquiry;
   });
 
-  return { inquiryId: result.id, outboxEventId };
+  return { inquiryId: result.id, outboxEventId, idempotentReplay: false };
 }

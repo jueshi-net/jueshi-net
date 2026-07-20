@@ -41,7 +41,8 @@ describe("Feature Disabled: FEATURE_SERVICE_PROVIDER=false", () => {
     _resetActions();
     _resetCapabilities();
     _resetEvents();
-    // Ensure flag is OFF (default)
+    // Ensure flag is OFF (default) - delete env var to prevent override
+    delete process.env.FEATURE_SERVICE_PROVIDER;
     defineFlag("FEATURE_SERVICE_PROVIDER", false);
     registerServiceProvider();
   });

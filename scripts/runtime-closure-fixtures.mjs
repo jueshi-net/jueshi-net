@@ -36,6 +36,9 @@ async function main() {
     { email: "e2e-sp-platform-admin@test.jueshi.net", name: PREFIX + "PlatformAdmin", role: "admin" },
     { email: "e2e-sp-ordinary@test.jueshi.net", name: PREFIX + "Ordinary", role: "user" },
     { email: "e2e-sp-unrelated@test.jueshi.net", name: PREFIX + "Unrelated", role: "user" },
+    // New members for member management testing (NOT members of any provider)
+    { email: "e2e-sp-new-member-1@test.jueshi.net", name: PREFIX + "NewMember1", role: "user" },
+    { email: "e2e-sp-new-member-2@test.jueshi.net", name: PREFIX + "NewMember2", role: "user" },
   ];
 
   const users = {};

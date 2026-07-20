@@ -35,9 +35,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       sourceType: body.sourceType || "direct",
       sourceId: body.sourceId,
       message: body.message,
+      requestId: body.requestId,
     });
-    // Process outbox asynchronously (fire-and-forget)
-    processServiceProviderOutbox(5).catch(() => {});
-    return NextResponse.json({ success: true, data: result }, { status: 201 });
+    // Outbox is processed by the standalone worker (scripts/outbox-worker-preview.mjs)
+    // which writes EventLog + calls notification adapter before marking PROCESSED
+    return NextResponse.json(
+      { success: true, data: result },
+      { status: result.idempotentReplay ? 200 : 201 }
+    );
   } catch (err) { return handleError(err); }
 }

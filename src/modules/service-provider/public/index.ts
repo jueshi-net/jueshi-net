@@ -113,6 +113,7 @@ export {
   createServiceInquiry,
   addProviderMember,
   removeProviderMember,
+  updateProviderMemberRole,
   prefillProviderApplicationFromCompanyProfile,
 } from "../application";
 
