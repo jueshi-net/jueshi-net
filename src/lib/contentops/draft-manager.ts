@@ -656,24 +656,64 @@ export async function publishDraft(draftId: string, options: {
   // Generate stable publish key for idempotency (no timestamps or random values)
   const publishKey = `staging:${draftId}:v${currentVersion}`;
   
-  // Generate staging URL (simulated - in real system this would create actual content)
-  const slug = article.title
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .substring(0, 50) || 'content';
-  const publishedUrl = `https://i.jueshi.net/content/${slug}-${draftId.split('_').pop()}`;
-  // Stable content ID based on draft ID and version
-  const contentId = `content_${draftId.replace(/[^a-z0-9]/g, '')}_v${currentVersion}`;
+  // Build ContentDraft for publish adapter
+  const contentDraft = {
+    id: draftId,
+    title: article.title,
+    slug: article.slug,
+    summary: metadata.qualityMetadata?.summary || '',
+    body: article.content,
+    contentType: metadata.qualityMetadata?.contentType || 'guide',
+    version: currentVersion,
+    state: currentState,
+    targetEnvironment: 'staging' as const,
+    seoTitle: metadata.qualityMetadata?.seoTitle,
+    seoDescription: metadata.qualityMetadata?.seoDescription,
+  };
 
+  // Call publish adapter to create real content
+  const { publishToEnvironment } = await import('./publish-adapter');
+  const publishResult = await publishToEnvironment(contentDraft);
+
+  if (!publishResult.success) {
+    // Mark as FAILED
+    const failedRecord = {
+      publishKey,
+      failedAt: new Date().toISOString(),
+      failedBy: options.publishedBy,
+      failureReason: publishResult.error,
+      targetEnvironment: 'staging',
+      approvedVersion: currentVersion,
+    };
+
+    await prisma.article.update({
+      where: { id: article.id },
+      data: {
+        seoDescription: JSON.stringify({
+          ...metadata,
+          contentOpsStatus: 'FAILED',
+          failedRecord,
+          updatedAt: new Date().toISOString(),
+        }),
+      },
+    });
+
+    return {
+      success: false,
+      error: publishResult.error || 'Publish failed',
+      errorCode: 'PUBLISH_FAILED',
+    };
+  }
+
+  // Success: create publish record with real content ID and URL
   const publishRecord = {
     publishKey,
     publishedAt: new Date().toISOString(),
     publishedBy: options.publishedBy,
     publishSource: options.publishSource,
     publishedVersion: currentVersion,
-    publishedUrl,
-    contentId,
+    publishedUrl: publishResult.url,
+    contentId: publishResult.contentId,
     targetEnvironment: 'staging',
   };
 

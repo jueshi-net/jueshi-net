@@ -2,6 +2,7 @@
 // 只实现 staging 发布，production 保留关闭
 
 import { ContentDraft, PublishResult, PublishTarget } from './types';
+import { prisma } from '@/lib/prisma';
 
 const PRODUCTION_PUBLISH_ENABLED = process.env.CONTENTOPS_PRODUCTION_PUBLISH_ENABLED === 'true';
 
@@ -87,24 +88,123 @@ async function publishToStaging(
     }
   }
 
-  // Generate content URL based on type
-  const contentPath = getContentPath(draft);
-  const publishUrl = `${baseUrl}${contentPath}`;
+  // Route to content-type specific publisher
+  switch (draft.contentType) {
+    case 'guide':
+      return await publishGuide(draft, baseUrl, timestamp);
+    case 'topic':
+      return await publishTopic(draft, baseUrl, timestamp);
+    case 'checklist':
+      return await publishChecklist(draft, baseUrl, timestamp);
+    default:
+      return {
+        success: false,
+        error: `Unsupported content type: ${draft.contentType}`,
+        timestamp,
+      };
+  }
+}
 
-  // In a real implementation, this would:
-  // 1. Create/update the content record in staging DB
-  // 2. Trigger revalidation
-  // 3. Verify the page is accessible
-  
-  // For now, simulate successful publish
-  // The actual content is already in DB via draft bridge
-  // We just need to update status and verify URL
+/**
+ * Publish Guide to staging
+ * Creates real Guide record in database
+ */
+async function publishGuide(
+  draft: ContentDraft,
+  baseUrl: string,
+  timestamp: Date
+): Promise<PublishResult> {
+  try {
+    // Generate stable slug for staging
+    const slug = draft.slug || `contentops-${draft.id.replace(/[^a-z0-9]/g, '-').toLowerCase()}`;
+    
+    // Check if guide already exists (idempotency)
+    const existingGuide = await prisma.guide.findUnique({ where: { slug } });
+    if (existingGuide) {
+      // Return existing guide
+      return {
+        success: true,
+        url: `${baseUrl}/guides/${slug}`,
+        contentId: existingGuide.id,
+        version: draft.version,
+        timestamp,
+      };
+    }
 
+    // Create new Guide record
+    const guide = await prisma.guide.create({
+      data: {
+        title: draft.title,
+        slug,
+        summary: draft.summary || '',
+        body: draft.body || '',
+        category: 'general',
+        tags: [],
+        relatedTools: [],
+        relatedTopics: [],
+        relatedChecklists: [],
+        relatedGuides: [],
+        status: 'published',
+        author: 'ContentOps Bot',
+        seoTitle: draft.seoTitle || draft.title,
+        seoDescription: draft.seoDescription || draft.summary || '',
+        robots: 'noindex,nofollow', // Staging: noindex
+        sortOrder: 0,
+        publishedAt: timestamp,
+        metadataJson: {
+          contentOpsManaged: true,
+          sourceDraftId: draft.id,
+          sourceVersion: draft.version,
+          publishKey: `staging:guide:${draft.id}:v${draft.version}`,
+          targetEnvironment: 'staging',
+          publishedAt: timestamp.toISOString(),
+          publishedBy: 'contentops-bot',
+        },
+      },
+    });
+
+    return {
+      success: true,
+      url: `${baseUrl}/guides/${slug}`,
+      contentId: guide.id,
+      version: draft.version,
+      timestamp,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: `Failed to publish guide: ${error.message}`,
+      timestamp,
+    };
+  }
+}
+
+/**
+ * Publish Topic to staging (placeholder)
+ */
+async function publishTopic(
+  draft: ContentDraft,
+  baseUrl: string,
+  timestamp: Date
+): Promise<PublishResult> {
   return {
-    success: true,
-    url: publishUrl,
-    contentId: draft.id,
-    version: draft.version,
+    success: false,
+    error: 'Topic publishing not yet implemented',
+    timestamp,
+  };
+}
+
+/**
+ * Publish Checklist to staging (placeholder)
+ */
+async function publishChecklist(
+  draft: ContentDraft,
+  baseUrl: string,
+  timestamp: Date
+): Promise<PublishResult> {
+  return {
+    success: false,
+    error: 'Checklist publishing not yet implemented',
     timestamp,
   };
 }
