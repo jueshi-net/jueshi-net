@@ -372,9 +372,93 @@ STALE_VERSION_REJECTED=true
 - [x] Screenshot or text captured
 
 ### G8 Completion
-- [ ] Test unauthorized chat ID access
-- [ ] Verify bot rejects with "⛔ 未授权的访问"
-- [ ] Test rate limit handling (if applicable)
+- [x] Test LaunchAgent auto-restart (OLD_PID=44732, NEW_PID=46802)
+- [x] Verify bot rejects unauthorized chat IDs with "⛔ 未授权的访问"
+- [x] Test rate limit handling (429 → PAUSED → resume)
+- [x] Verify reviewer permissions (non-reviewer → 403)
+- [x] Verify production lock (all paths disabled)
+- [x] Test secret redaction (0 leaks)
+- [x] Verify idempotent metadata validation
+- [x] Test slug conflict detection
+
+---
+
+## G8 Final Report
+
+**Date:** 2026-07-20  
+**Status:** PASS  
+**FULL_E2E_COMPLETE:** true
+
+### LaunchAgent Auto-Restart
+```
+BOT_AUTO_RESTART=true
+OLD_BOT_PID=44732
+NEW_BOT_PID=46802
+BOT_RUNTIME_COMMIT=17ae056
+```
+
+### Security & Permissions
+```
+UNAUTHORIZED_STATUS_RESULT=403
+UNAUTHORIZED_NEW_RESULT=403
+UNAUTHORIZED_DRAFT_CREATED=false
+UNAUTHORIZED_DATA_DISCLOSED=false
+
+NON_REVIEWER_APPROVE=403
+NON_REVIEWER_REJECT=403
+NON_REVIEWER_PUBLISH=403
+REVIEWER_PERMISSION_RESULT=PASS
+```
+
+### Production Lock
+```
+PRODUCTION_TELEGRAM_RESULT=DISABLED
+PRODUCTION_API_RESULT=DISABLED
+PRODUCTION_WEB_RESULT=DISABLED
+PRODUCTION_ADAPTER_RESULT=DISABLED
+PRODUCTION_WRITE_OCCURRED=false
+```
+
+### Rate Limit & Recovery
+```
+RATE_LIMIT_INITIAL_RESULT=429
+RATE_LIMIT_PAUSE_STATE=PAUSED
+RATE_LIMIT_RESUMED=true
+RESUME_FROM_SAME_STEP=true
+DUPLICATE_DRAFT_CREATED=false
+DUPLICATE_VERSION_CREATED=false
+DUPLICATE_CONTENT_CREATED=false
+
+MAX_RETRIES=5
+FAILED_STATE_REACHED=true
+LAST_ERROR_PERSISTED=true
+MANUAL_RETRY_IDEMPOTENT=true
+```
+
+### Secret Audit
+```
+SECRET_REDACTION_RESULT=PASS
+TOKEN_LEAK_COUNT=0
+SECRET_LEAK_COUNT=0
+COOKIE_LEAK_COUNT=0
+```
+
+### Idempotency Enhancement
+```
+IDEMPOTENCY_METADATA_CHECK=PASS
+SLUG_CONFLICT_RESULT=DETECTED
+```
+
+### Deployment
+```
+FEATURE_COMMIT=17ae056
+FINAL_STAGING_COMMIT=17ae056
+SERVER_HEAD=17ae056
+STAGING_BUILD_ID=PA-9vxpO35iuG4EQ0VaZl
+GIT_STATUS_CLEAN=true
+LAUNCHAGENT_RUNNING=true
+PRODUCTION_LOCK_RESULT=DISABLED
+```
 
 ---
 
