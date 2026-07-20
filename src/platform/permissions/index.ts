@@ -25,7 +25,10 @@ export interface CapabilityContext {
 
 type CapabilityChecker = (ctx: CapabilityContext) => boolean;
 
-const capabilityCheckers = new Map<string, CapabilityChecker>();
+// Use globalThis to share state across Next.js module bundles (production mode)
+const _g = globalThis as unknown as { __capabilityCheckers?: Map<string, CapabilityChecker> };
+const capabilityCheckers = _g.__capabilityCheckers ?? new Map<string, CapabilityChecker>();
+if (_g) _g.__capabilityCheckers = capabilityCheckers;
 
 /**
  * Register a capability checker. If a capability is already registered the

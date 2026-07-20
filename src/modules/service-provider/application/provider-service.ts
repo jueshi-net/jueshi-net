@@ -98,7 +98,13 @@ export async function updateProviderProfile(
 
   const isOwner = provider.ownerUserId === userId;
   if (!can("provider.edit", ctx(userId, userRole, isOwner))) {
-    throw new Error("Forbidden: provider.edit");
+    // Also check provider membership (ADMIN/EDITOR members can edit)
+    const member = await prisma.providerMember.findUnique({
+      where: { providerId_userId: { providerId, userId } },
+    });
+    if (!member || member.status !== "active" || (member.role !== "ADMIN" && member.role !== "EDITOR")) {
+      throw new Error("Forbidden: provider.edit");
+    }
   }
 
   return prisma.serviceProvider.update({

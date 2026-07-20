@@ -20,10 +20,15 @@ export interface FeatureFlagConfig {
   description?: string;
 }
 
-const flagDefaults = new Map<string, boolean>();
-const adminOverrides = new Map<string, boolean>();
-const userWhitelists = new Map<string, Set<string>>();
-const emergencyOff = new Set<string>();
+const _gf = globalThis as any;
+if (!_gf.__flagDefaults) _gf.__flagDefaults = new Map<string, boolean>();
+if (!_gf.__adminOverrides) _gf.__adminOverrides = new Map<string, boolean>();
+if (!_gf.__userWhitelists) _gf.__userWhitelists = new Map<string, Set<string>>();
+if (!_gf.__emergencyOff) _gf.__emergencyOff = new Set<string>();
+const flagDefaults = _gf.__flagDefaults;
+const adminOverrides = _gf.__adminOverrides;
+const userWhitelists = _gf.__userWhitelists;
+const emergencyOff = _gf.__emergencyOff;
 
 /** Register a flag with a default value. Safe to call multiple times. */
 export function defineFlag(

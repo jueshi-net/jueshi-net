@@ -36,7 +36,9 @@ export interface ActionDefinition {
   ) => Promise<ActionResult>;
 }
 
-const actions = new Map<string, ActionDefinition>();
+const _ga = globalThis as any;
+if (!_ga.__actions) _ga.__actions = new Map<string, ActionDefinition>();
+const actions = _ga.__actions;
 
 /** Register an action. Idempotent — re-registration updates the definition. */
 export function registerAction(action: ActionDefinition): void {

@@ -5,7 +5,15 @@ export async function addProviderMember(userId: string, userRole: string, provid
   const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
   if (!provider) throw new Error("Provider not found");
   const isOwner = provider.ownerUserId === userId;
-  if (!can("provider.manage", { userId, userRole, isOwner })) throw new Error("Forbidden");
+  if (!can("provider.manage", { userId, userRole, isOwner })) {
+    // Also check provider membership (OWNER/ADMIN members can manage)
+    const member = await prisma.providerMember.findUnique({
+      where: { providerId_userId: { providerId, userId } },
+    });
+    if (!member || member.status !== "active" || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+      throw new Error("Forbidden");
+    }
+  }
   if (!["ADMIN", "EDITOR", "VIEWER"].includes(role)) throw new Error("Invalid role");
   return prisma.providerMember.upsert({
     where: { providerId_userId: { providerId, userId: targetUserId } },
@@ -18,8 +26,16 @@ export async function removeProviderMember(userId: string, userRole: string, pro
   const provider = await prisma.serviceProvider.findUnique({ where: { id: providerId } });
   if (!provider) throw new Error("Provider not found");
   const isOwner = provider.ownerUserId === userId;
-  if (!can("provider.manage", { userId, userRole, isOwner })) throw new Error("Forbidden");
-  const member = await prisma.providerMember.findUnique({ where: { providerId_userId: { providerId, userId: targetUserId } } });
-  if (member?.role === "OWNER") throw new Error("Cannot remove owner");
+  if (!can("provider.manage", { userId, userRole, isOwner })) {
+    // Also check provider membership (OWNER/ADMIN members can manage)
+    const member = await prisma.providerMember.findUnique({
+      where: { providerId_userId: { providerId, userId } },
+    });
+    if (!member || member.status !== "active" || (member.role !== "OWNER" && member.role !== "ADMIN")) {
+      throw new Error("Forbidden");
+    }
+  }
+  const targetMember = await prisma.providerMember.findUnique({ where: { providerId_userId: { providerId, userId: targetUserId } } });
+  if (targetMember?.role === "OWNER") throw new Error("Forbidden: cannot remove owner");
   return prisma.providerMember.delete({ where: { providerId_userId: { providerId, userId: targetUserId } } });
 }

@@ -28,8 +28,11 @@ export interface PlatformEvent {
 
 export type EventHandler = (event: PlatformEvent) => Promise<void> | void;
 
-const subscribers = new Map<string, Set<EventHandler>>();
-const eventLog: PlatformEvent[] = [];
+const _ge = globalThis as any;
+if (!_ge.__eventSubscribers) _ge.__eventSubscribers = new Map<string, Set<EventHandler>>();
+if (!_ge.__eventLog) _ge.__eventLog = [];
+const subscribers = _ge.__eventSubscribers;
+const eventLog: PlatformEvent[] = _ge.__eventLog;
 let eventCounter = 0;
 
 /**

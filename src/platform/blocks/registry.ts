@@ -25,7 +25,9 @@ export interface BlockDefinition {
   props?: Record<string, unknown>;
 }
 
-const blocks = new Map<string, BlockDefinition>();
+const _gb = globalThis as any;
+if (!_gb.__blocks) _gb.__blocks = new Map<string, BlockDefinition>();
+const blocks = _gb.__blocks;
 
 /**
  * Injected checker that consults the module registry for feature-flag state.
