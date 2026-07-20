@@ -129,9 +129,17 @@ async function runTests() {
   const querySig = computeSignature('GET', ENDPOINT, '');
   if (await testRequest('Test 9: query string 不参与签名', 'GET', `${ENDPOINT}?action=list_tasks`, '', querySig, 200)) passed++;
 
-  // Test 10: 旧 Secret 失败（需要配置不同的 secret）
-  // 这个测试需要手动配置，跳过
-  console.log('⏭️  Test 10: 旧 Secret 失败（需要手动配置）');
+  // Test 10: 旧 Secret 失败、新 Secret 成功
+  total++;
+  const OLD_SECRET = 'e102c23017e532ce08f833e20aeafae44ad874bd6df12b2a5ca11134044c936f';
+  const oldSecretSig = createHmac('sha256', OLD_SECRET)
+    .update(`GET:${ENDPOINT}:`)
+    .digest('hex');
+  if (await testRequest('Test 10a: 旧 Secret 失败', 'GET', ENDPOINT, '', oldSecretSig, 401, 'INVALID_SIGNATURE')) passed++;
+  
+  total++;
+  const newSecretSig = computeSignature('GET', ENDPOINT, '');
+  if (await testRequest('Test 10b: 新 Secret 成功', 'GET', ENDPOINT, '', newSecretSig, 200)) passed++;
 
   console.log(`\n测试结果: ${passed}/${total} 通过`);
   
