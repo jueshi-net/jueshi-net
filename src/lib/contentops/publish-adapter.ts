@@ -121,14 +121,30 @@ async function publishGuide(
     // Check if guide already exists (idempotency)
     const existingGuide = await prisma.guide.findUnique({ where: { slug } });
     if (existingGuide) {
-      // Return existing guide
-      return {
-        success: true,
-        url: `${baseUrl}/guides/${slug}`,
-        contentId: existingGuide.id,
-        version: draft.version,
-        timestamp,
-      };
+      // Verify metadata matches for true idempotency
+      const metadata = existingGuide.metadataJson as any;
+      if (
+        metadata?.contentOpsManaged === true &&
+        metadata?.sourceDraftId === draft.id &&
+        metadata?.sourceVersion === draft.version &&
+        metadata?.targetEnvironment === 'staging'
+      ) {
+        // True idempotent replay
+        return {
+          success: true,
+          url: `${baseUrl}/guides/${slug}`,
+          contentId: existingGuide.id,
+          version: draft.version,
+          timestamp,
+        };
+      } else {
+        // Slug conflict - different content with same slug
+        return {
+          success: false,
+          error: 'CONTENTOPS_SLUG_CONFLICT: Guide with same slug exists but metadata does not match',
+          timestamp,
+        };
+      }
     }
 
     // Create new Guide record
