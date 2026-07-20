@@ -88,6 +88,90 @@ export async function GET(request: NextRequest) {
 
     // Single draft fetch: GET /api/internal/contentops/drafts?id=<draftId>
     const singleId = searchParams.get('id');
+
+    // Generation jobs listing: GET ?action=generation_jobs
+    const action = searchParams.get('action');
+    if (action === 'generation_jobs') {
+      const { listGenerationJobs } = await import('@/lib/contentops/generation-job-manager');
+      const limit = parseInt(searchParams.get('limit') || '20');
+      const status = searchParams.get('status') as any;
+      const result = await listGenerationJobs({ limit, status });
+      return NextResponse.json({
+        jobs: result.jobs.map(j => ({
+          id: j.id,
+          topic: j.topic,
+          contentType: j.contentType,
+          status: j.status,
+          currentStep: j.currentStep,
+          draftId: j.draftId,
+          revisionCount: j.revisionCount,
+          qualityResult: j.qualityResult,
+          error: j.error,
+          errorCode: j.errorCode,
+          provider: j.provider,
+          model: j.model,
+          totalLatencyMs: j.totalLatencyMs,
+          createdBy: j.createdBy,
+          createdAt: j.createdAt,
+          updatedAt: j.updatedAt,
+          completedAt: j.completedAt,
+        })),
+        total: result.total,
+      });
+    }
+
+    // Generation job status: GET ?action=generation_job_status&jobId=<id>
+    if (action === 'generation_job_status') {
+      const jobId = searchParams.get('jobId');
+      if (!jobId) {
+        return NextResponse.json(
+          { error: 'Job ID is required', code: 'MISSING_JOB_ID' },
+          { status: 400 }
+        );
+      }
+      const { getGenerationJob } = await import('@/lib/contentops/generation-job-manager');
+      const job = await getGenerationJob(jobId);
+      if (!job) {
+        return NextResponse.json(
+          { error: 'Job not found', code: 'JOB_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({
+        id: job.id,
+        topic: job.topic,
+        contentType: job.contentType,
+        status: job.status,
+        currentStep: job.currentStep,
+        draftId: job.draftId,
+        brief: job.brief,
+        outline: job.outline,
+        content: job.content ? {
+          title: job.content.title,
+          wordCount: job.content.wordCount,
+          summary: job.content.summary,
+          seoTitle: job.content.seoTitle,
+          seoDescription: job.content.seoDescription,
+          faqCount: job.content.faq?.length || 0,
+          sourceCount: job.content.sources?.length || 0,
+          internalLinkCount: job.content.internalLinks?.length || 0,
+        } : null,
+        qualityResult: job.qualityResult,
+        revisionCount: job.revisionCount,
+        error: job.error,
+        errorCode: job.errorCode,
+        provider: job.provider,
+        model: job.model,
+        tokenUsage: job.tokenUsage,
+        totalLatencyMs: job.totalLatencyMs,
+        retryCount: job.retryCount,
+        resumeAt: job.resumeAt,
+        createdBy: job.createdBy,
+        createdAt: job.createdAt,
+        completedAt: job.completedAt,
+      });
+    }
+
     if (singleId) {
       // Version history request
       const action = searchParams.get('action');
@@ -367,6 +451,224 @@ export async function POST(request: NextRequest) {
         publishedUrl: result.publishRecord?.publishedUrl,
         contentId: result.publishRecord?.contentId,
       });
+    }
+
+    // Handle generate action — create and execute a generation job
+    if (data.action === 'generate') {
+      const { isAiGenerationEnabled } = await import('@/lib/contentops/content-generation-provider');
+      if (!isAiGenerationEnabled()) {
+        return NextResponse.json(
+          { error: 'AI generation not configured', code: 'AI_NOT_CONFIGURED' },
+          { status: 503 }
+        );
+      }
+
+      const { createGenerationJob, executeGenerationJob, saveGeneratedContentAsDraft } = 
+        await import('@/lib/contentops/generation-job-manager');
+
+      const topic = data.topic;
+      if (!topic) {
+        return NextResponse.json(
+          { error: 'Topic is required', code: 'MISSING_TOPIC' },
+          { status: 400 }
+        );
+      }
+
+      // Create job
+      const job = await createGenerationJob({
+        topic,
+        contentType: data.contentType || 'guide',
+        createdBy: data.createdBy || 'telegram',
+        existingDraftId: data.existingDraftId,
+      });
+
+      // Execute synchronously (for now — can be made async later)
+      const completedJob = await executeGenerationJob(job.id);
+
+      // Save as draft if completed successfully
+      if (completedJob.status === 'COMPLETED' && completedJob.content) {
+        const draftResult = await saveGeneratedContentAsDraft(job.id);
+        return NextResponse.json({
+          jobId: completedJob.id,
+          status: completedJob.status,
+          draftId: draftResult.draftId,
+          brief: completedJob.brief,
+          outline: completedJob.outline,
+          content: completedJob.content ? {
+            title: completedJob.content.title,
+            wordCount: completedJob.content.wordCount,
+            summary: completedJob.content.summary,
+            seoTitle: completedJob.content.seoTitle,
+            seoDescription: completedJob.content.seoDescription,
+            faqCount: completedJob.content.faq?.length || 0,
+            sourceCount: completedJob.content.sources?.length || 0,
+            internalLinkCount: completedJob.content.internalLinks?.length || 0,
+          } : null,
+          qualityResult: completedJob.qualityResult,
+          revisionCount: completedJob.revisionCount,
+          provider: completedJob.provider,
+          model: completedJob.model,
+          tokenUsage: completedJob.tokenUsage,
+          totalLatencyMs: completedJob.totalLatencyMs,
+        });
+      }
+
+      // Return job status (may be FAILED or PAUSED)
+      return NextResponse.json({
+        jobId: completedJob.id,
+        status: completedJob.status,
+        error: completedJob.error,
+        errorCode: completedJob.errorCode,
+        failedStep: completedJob.failedStep,
+        retryCount: completedJob.retryCount,
+        resumeAt: completedJob.resumeAt,
+        provider: completedJob.provider,
+        model: completedJob.model,
+      }, completedJob.status === 'FAILED' ? { status: 500 } : { status: 200 });
+    }
+
+    // Handle revise action — create revision job for existing draft
+    if (data.action === 'revise') {
+      const { isAiGenerationEnabled } = await import('@/lib/contentops/content-generation-provider');
+      if (!isAiGenerationEnabled()) {
+        return NextResponse.json(
+          { error: 'AI generation not configured', code: 'AI_NOT_CONFIGURED' },
+          { status: 503 }
+        );
+      }
+
+      const { createGenerationJob, executeGenerationJob, saveGeneratedContentAsDraft } = 
+        await import('@/lib/contentops/generation-job-manager');
+      const { getDraft } = await import('@/lib/contentops/draft-manager');
+
+      const draftId = data.id;
+      const instructions = data.instructions;
+
+      if (!draftId || !instructions) {
+        return NextResponse.json(
+          { error: 'Draft ID and instructions are required', code: 'MISSING_PARAMS' },
+          { status: 400 }
+        );
+      }
+
+      // Get existing draft
+      const draft = await getDraft(draftId);
+      if (!draft) {
+        return NextResponse.json(
+          { error: 'Draft not found', code: 'DRAFT_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+
+      // Get or reconstruct brief from draft metadata
+      const qm = draft.qualityMetadata || {};
+      const brief = {
+        topic: draft.title,
+        contentType: (qm.contentType || 'guide') as 'guide' | 'topic' | 'checklist',
+        targetAudience: '海外华人和留学生',
+        searchIntent: 'informational',
+        tone: '专业、清晰、实用',
+        language: 'zh-CN',
+        country: '',
+        primaryKeyword: '',
+        secondaryKeywords: [],
+        requiredSections: [],
+        excludedClaims: [],
+        requestedLength: '1800-3000 中文字',
+        sourceRequirements: '',
+        internalLinkRequirements: '',
+        createdBy: 'ai-revision',
+        createdAt: new Date().toISOString(),
+      };
+
+      // Create revision job
+      const job = await createGenerationJob({
+        topic: draft.title,
+        contentType: qm.contentType || 'guide',
+        createdBy: data.createdBy || 'telegram',
+        revisionInstructions: instructions,
+        existingDraftId: draftId,
+      });
+
+      // Pre-populate brief and content for revision-only flow
+      const { updateGenerationJob } = 
+        await import('@/lib/contentops/generation-job-manager');
+      const provider = (await import('@/lib/contentops/content-generation-provider')).getContentGenerationProvider();
+
+      // Execute revision directly
+      const reviseResult = await provider.reviseDraft(draft.body, brief, instructions);
+
+      if (!reviseResult.success) {
+        await updateGenerationJob(job.id, {
+          status: 'FAILED',
+          error: reviseResult.error,
+          errorCode: reviseResult.errorCode,
+          failedStep: 'REVISING',
+          completedAt: new Date().toISOString(),
+        });
+
+        return NextResponse.json({
+          jobId: job.id,
+          status: 'FAILED',
+          error: reviseResult.error,
+          errorCode: reviseResult.errorCode,
+        }, { status: 500 });
+      }
+
+      // Update draft with revised content
+      const { updateDraft } = await import('@/lib/contentops/draft-manager');
+      const updatedDraft = await updateDraft(draftId, {
+        title: reviseResult.content?.title || draft.title,
+        body: reviseResult.content?.body || draft.body,
+        qualityMetadata: {
+          ...qm,
+          seoTitle: reviseResult.content?.seoTitle || qm.seoTitle,
+          seoDescription: reviseResult.content?.seoDescription || qm.seoDescription,
+          summary: reviseResult.content?.summary || qm.summary,
+        },
+      });
+
+      await updateGenerationJob(job.id, {
+        status: 'COMPLETED',
+        content: reviseResult.content || undefined,
+        revisionCount: 1,
+        draftId,
+        completedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({
+        jobId: job.id,
+        status: 'COMPLETED',
+        draftId,
+        version: updatedDraft?.version,
+        previousVersion: updatedDraft?.previousVersion,
+        revisionSummary: reviseResult.revisionSummary,
+        wordCount: reviseResult.content?.wordCount,
+        provider: reviseResult.provider,
+        model: reviseResult.model,
+        tokenUsage: reviseResult.tokenUsage,
+        latencyMs: reviseResult.latencyMs,
+      });
+    }
+
+    // Handle cancel_generation action
+    if (data.action === 'cancel_generation') {
+      const { cancelGenerationJob } = await import('@/lib/contentops/generation-job-manager');
+      const jobId = data.jobId;
+      if (!jobId) {
+        return NextResponse.json(
+          { error: 'Job ID is required', code: 'MISSING_JOB_ID' },
+          { status: 400 }
+        );
+      }
+      const job = await cancelGenerationJob(jobId);
+      if (!job) {
+        return NextResponse.json(
+          { error: 'Job not found', code: 'JOB_NOT_FOUND' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ jobId: job.id, status: job.status });
     }
 
     // Default: create new draft

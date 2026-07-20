@@ -110,7 +110,12 @@ async function runtimeSchemaAssertion(): Promise<void> {
 }
 
 // Run assertion on first import (non-blocking but will fail first query if wrong)
-if (process.env.NODE_ENV === "production" || process.env.PORT === "3001") {
+// Skip during build time (no database available)
+const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' || 
+                    process.env.BUILD_TIME === 'true' ||
+                    process.argv.some(arg => arg.includes('next') && arg.includes('build'));
+
+if (!isBuildTime && (process.env.NODE_ENV === "production" || process.env.PORT === "3001")) {
   runtimeSchemaAssertion().catch((err) => {
     console.error("[Prisma] Startup assertion error:", err.message);
     // Don't crash the process, but log the error prominently

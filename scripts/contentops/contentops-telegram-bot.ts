@@ -71,7 +71,7 @@ const CONFIG = {
 const RUNTIME_INFO = {
   botRuntimeId: `pid-${process.pid}`,
   gitCommit: (() => { try { return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim(); } catch { return 'unknown'; } })(),
-  version: 'v1.2',
+  version: 'v1.3',
 };
 
 // ============================================================================
@@ -278,15 +278,18 @@ async function startBot() {
     }
 
     bot.sendMessage(chatId, `
-🤖 ContentOps Bot V1.2
+🤖 ContentOps Bot V1.3 (AI Authoring)
 
 命令:
-/new <标题> - 创建新草稿
+/new <选题> - AI 自动生成完整文章
+/revise <要求> - AI 修改当前草稿
+/brief - 查看写作 Brief
+/outline - 查看文章大纲
 /drafts - 列出草稿
 /open <id> - 打开草稿
 /status - 查看状态
 /review [id] - 质量检查
-/edit [id] - 编辑草稿
+/edit [id] - 手动编辑草稿
 /submit [id] - 提交审核
 /approve [id] - 批准（审核人）
 /reject [id] <原因> - 拒绝（审核人）
@@ -297,8 +300,8 @@ async function startBot() {
     `.substring(0, 4000));
   });
 
-  // Handle /new
-  bot.onText(/\/new(?:\s+(.+))?/, async (msg, match) => {
+  // Handle /new — AI auto-generates complete content from topic
+  bot.onText(/\/new(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -307,46 +310,288 @@ async function startBot() {
     }
 
     if (!match) return;
-    const title = match[1]?.trim();
+    const topic = match[1]?.trim();
     
-    if (!title) {
-      bot.sendMessage(chatId, '请提供标题: /new <标题>');
+    if (!topic) {
+      bot.sendMessage(chatId, '请提供选题: /new <选题>\n\n示例：/new 新加坡敏感货清关运输指南');
+      return;
+    }
+
+    // Immediately acknowledge — generation takes time
+    const ackMsg = await bot.sendMessage(chatId, `⏳ 正在为选题生成完整内容...\n\n选题：${topic}\n\n步骤：\n1. 分析选题 → 生成写作 Brief\n2. 生成文章大纲\n3. 撰写完整正文\n4. 生成 SEO 字段\n5. 质量检查\n\n请稍候（约 30-60 秒）...`);
+
+    try {
+      const res = await fetchBridgeApi({
+        action: 'generate',
+        topic,
+        contentType: 'guide',
+        createdBy: `telegram:${chatId}`,
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error', code: 'UNKNOWN' }));
+        console.error('[ContentOps Bot] Generate failed:', error);
+        
+        if (error.code === 'AI_NOT_CONFIGURED') {
+          bot.sendMessage(chatId, `❌ AI 内容生成未配置\n\n错误编号：CONTENTOPS-GENERATE-503\n原因：AI 模型服务未启用\n\n请联系管理员配置 AI_API_KEY`);
+        } else {
+          bot.sendMessage(chatId, `❌ 内容生成失败\n\n错误编号：${error.code || 'CONTENTOPS-GENERATE-500'}\n原因：${(error.error || '').substring(0, 200)}`);
+        }
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.status === 'COMPLETED' && result.draftId) {
+        // Persist currentDraftId
+        updateSession(chatId, { currentDraftId: result.draftId, currentTitle: result.content?.title || topic });
+
+        const qualityInfo = result.qualityResult ? 
+          `\n质量评分：\n- 内容质量：${result.qualityResult.qualityScore}/100\n- SEO：${result.qualityResult.seoScore}/100\n- GEO：${result.qualityResult.geoScore}/100` : '';
+
+        const message = `✅ 内容生成完成
+
+📝 标题：${result.content?.title || topic}
+Draft ID：\`${result.draftId}\`
+版本：v1
+字数：${result.content?.wordCount || 0} 字
+Job ID：\`${result.jobId}\`
+
+内容摘要：
+${(result.content?.summary || '').substring(0, 200)}
+
+📊 生成统计：
+- FAQ：${result.content?.faqCount || 0} 条
+- 来源：${result.content?.sourceCount || 0} 条
+- 内链建议：${result.content?.internalLinkCount || 0} 条
+- 自动修订轮数：${result.revisionCount || 0}
+- 模型耗时：${result.totalLatencyMs || 0}ms
+${qualityInfo}
+
+下一步：
+/review - 质量检查
+/brief - 查看写作 Brief
+/outline - 查看文章大纲
+/revise <修改要求> - AI 改稿
+/submit - 提交审核`;
+        bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+      } else if (result.status === 'PAUSED_RATE_LIMIT') {
+        bot.sendMessage(chatId, `⏸️ 内容生成已暂停（遇到速率限制）
+
+Job ID：\`${result.jobId}\`
+步骤：${result.failedStep}
+重试次数：${result.retryCount}
+恢复时间：${result.resumeAt ? new Date(result.resumeAt).toLocaleString('zh-CN') : '30 分钟后'}
+
+系统将在恢复后自动继续。`);
+      } else {
+        bot.sendMessage(chatId, `❌ 内容生成失败
+
+Job ID：\`${result.jobId}\`
+状态：${result.status}
+步骤：${result.failedStep || '未知'}
+错误：${(result.error || '').substring(0, 200)}
+错误编号：${result.errorCode || 'CONTENTOPS-GENERATE-001'}`);
+      }
+    } catch (error) {
+      console.error('[ContentOps Bot] Generate error:', error);
+      bot.sendMessage(chatId, '❌ 内容生成执行失败\n\n错误编号：CONTENTOPS-GENERATE-EXCEPTION\n请稍后重试');
+    }
+  });
+
+  // Handle /revise <instructions> — AI revises current draft
+  bot.onText(/\/revise(?:@\w+)?(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    if (!match || !match[1]?.trim()) {
+      bot.sendMessage(chatId, '请提供修改要求：/revise <修改要求>\n\n示例：/revise 增加酒水、液体和电池三类敏感货的分别说明');
+      return;
+    }
+
+    const instructions = match[1].trim();
+    const session = getSession(chatId);
+    const draftId = session.currentDraftId;
+
+    if (!draftId) {
+      bot.sendMessage(chatId, '❌ 没有当前草稿\n\n请先使用 /new <选题> 创建草稿，或 /open <draftId> 打开草稿');
+      return;
+    }
+
+    const ackMsg = await bot.sendMessage(chatId, `⏳ 正在修改草稿...\n\nDraft ID：\`${draftId}\`\n修改要求：${instructions.substring(0, 100)}${instructions.length > 100 ? '...' : ''}\n\n请稍候...`);
+
+    try {
+      const res = await fetchBridgeApi({
+        action: 'revise',
+        id: draftId,
+        instructions,
+        createdBy: `telegram:${chatId}`,
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: 'Unknown error', code: 'UNKNOWN' }));
+        bot.sendMessage(chatId, `❌ 修改失败\n\n错误编号：${error.code || 'CONTENTOPS-REVISE-500'}\n原因：${(error.error || '').substring(0, 200)}`);
+        return;
+      }
+
+      const result = await res.json();
+
+      if (result.status === 'COMPLETED') {
+        const message = `✅ 已完成修改
+
+Draft ID：\`${draftId}\`
+上一版本：v${result.previousVersion}
+新版本：v${result.version}
+主要修改：${result.revisionSummary || '已按要求修改'}
+当前字数：${result.wordCount || 0} 字
+Job ID：\`${result.jobId}\`
+
+下一步：
+/review - 质量检查
+/revise <修改要求> - 继续修改
+/submit - 提交审核`;
+        bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+      } else {
+        bot.sendMessage(chatId, `❌ 修改失败\n\nJob ID：\`${result.jobId}\`\n状态：${result.status}\n错误：${(result.error || '').substring(0, 200)}`);
+      }
+    } catch (error) {
+      console.error('[ContentOps Bot] Revise error:', error);
+      bot.sendMessage(chatId, '❌ 修改执行失败\n\n错误编号：CONTENTOPS-REVISE-EXCEPTION\n请稍后重试');
+    }
+  });
+
+  // Handle /brief — show writing brief for current draft
+  bot.onText(/\/brief(?:@\w+)?/, async (msg) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    const session = getSession(chatId);
+    if (!session.currentDraftId) {
+      bot.sendMessage(chatId, '❌ 没有当前草稿\n\n请先使用 /new <选题> 创建草稿');
       return;
     }
 
     try {
-      const res = await fetchBridgeApi({
-        title,
-        targetEnvironment: 'staging',
-      });
-
+      // Get generation job for this draft
+      const res = await fetchBridgeGet(`?action=generation_jobs&limit=5`);
       if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('[ContentOps Bot] Create draft failed:', error);
-        bot.sendMessage(chatId, `❌ 创建草稿失败: ${error.code || 'UNKNOWN'}`);
+        bot.sendMessage(chatId, '❌ 无法获取写作 Brief');
         return;
       }
 
-      const draft = await res.json();
-      // Persist currentDraftId
-      updateSession(chatId, { currentDraftId: draft.id, currentTitle: title });
+      const data = await res.json();
+      const job = (data.jobs || []).find((j: any) => j.draftId === session.currentDraftId);
 
-      const message = `📝 新草稿已创建
+      if (!job) {
+        bot.sendMessage(chatId, '❌ 未找到写作 Brief\n\n该草稿可能不是通过 /new 自动生成的');
+        return;
+      }
 
-标题: ${title}
-Draft ID: \`${draft.id}\`
-状态: ${draft.state}
-当前版本: v${draft.version}
+      // Get full job details with brief
+      const jobRes = await fetchBridgeGet(`?action=generation_job_status&jobId=${encodeURIComponent(job.id)}`);
+      if (!jobRes.ok) {
+        bot.sendMessage(chatId, '❌ 无法获取 Brief 详情');
+        return;
+      }
 
-后续可用命令:
-/status - 查看状态
-/drafts - 列出草稿
-/review - 质量检查
-/cancel - 取消`;
+      const jobDetail = await jobRes.json();
+      const brief = jobDetail.brief;
+
+      if (!brief) {
+        bot.sendMessage(chatId, '❌ 该 Job 没有写作 Brief');
+        return;
+      }
+
+      const message = `📋 写作 Brief
+
+主题：${brief.topic}
+内容类型：${brief.contentType}
+目标读者：${brief.targetAudience}
+搜索意图：${brief.searchIntent}
+语调：${brief.tone}
+语言：${brief.language}
+目标国家：${brief.country || '未指定'}
+
+🔑 关键词：
+- 主要：${brief.primaryKeyword}
+- 次要：${(brief.secondaryKeywords || []).join(', ')}
+
+📏 要求：
+- 字数：${brief.requestedLength}
+- 必须章节：${(brief.requiredSections || []).join(', ')}
+- 排除内容：${(brief.excludedClaims || []).join(', ') || '无'}
+
+Job ID：\`${job.id}\``;
       bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
     } catch (error) {
-      console.error('[ContentOps Bot] Create draft error:', error);
-      bot.sendMessage(chatId, '❌ 创建草稿失败，请稍后重试');
+      console.error('[ContentOps Bot] Brief error:', error);
+      bot.sendMessage(chatId, '❌ 获取 Brief 失败');
+    }
+  });
+
+  // Handle /outline — show article outline
+  bot.onText(/\/outline(?:@\w+)?/, async (msg) => {
+    const chatId = msg.chat.id;
+    
+    if (!isAllowedChat(chatId)) {
+      bot.sendMessage(chatId, '⛔ 未授权的访问');
+      return;
+    }
+
+    const session = getSession(chatId);
+    if (!session.currentDraftId) {
+      bot.sendMessage(chatId, '❌ 没有当前草稿\n\n请先使用 /new <选题> 创建草稿');
+      return;
+    }
+
+    try {
+      const res = await fetchBridgeGet(`?action=generation_jobs&limit=5`);
+      if (!res.ok) {
+        bot.sendMessage(chatId, '❌ 无法获取文章大纲');
+        return;
+      }
+
+      const data = await res.json();
+      const job = (data.jobs || []).find((j: any) => j.draftId === session.currentDraftId);
+
+      if (!job) {
+        bot.sendMessage(chatId, '❌ 未找到文章大纲\n\n该草稿可能不是通过 /new 自动生成的');
+        return;
+      }
+
+      const jobRes = await fetchBridgeGet(`?action=generation_job_status&jobId=${encodeURIComponent(job.id)}`);
+      if (!jobRes.ok) {
+        bot.sendMessage(chatId, '❌ 无法获取大纲详情');
+        return;
+      }
+
+      const jobDetail = await jobRes.json();
+      const outline = jobDetail.outline;
+
+      if (!outline || outline.length === 0) {
+        bot.sendMessage(chatId, '❌ 该 Job 没有文章大纲');
+        return;
+      }
+
+      const outlineText = outline.map((section: any, i: number) => {
+        const prefix = section.level === 2 ? `${i + 1}.` : '  -';
+        const points = section.keyPoints ? `\n     要点：${section.keyPoints.join('、')}` : '';
+        return `${prefix} ${section.heading}${points}`;
+      }).join('\n');
+
+      const message = `📑 文章大纲\n\n${outlineText}\n\nJob ID：\`${job.id}\``;
+      bot.sendMessage(chatId, message.substring(0, 4000), { parse_mode: 'Markdown' });
+    } catch (error) {
+      console.error('[ContentOps Bot] Outline error:', error);
+      bot.sendMessage(chatId, '❌ 获取大纲失败');
     }
   });
 
@@ -953,7 +1198,7 @@ Production: 🔒 DISABLED`;
   });
 
   // Handle /cancel
-  bot.onText(/\/cancel/, (msg) => {
+  bot.onText(/\/cancel/, async (msg) => {
     const chatId = msg.chat.id;
     
     if (!isAllowedChat(chatId)) {
@@ -970,10 +1215,36 @@ Production: 🔒 DISABLED`;
         editingDraftId: undefined,
       });
       bot.sendMessage(chatId, '✅ 已退出编辑模式（草稿未修改，指针保留）');
-    } else {
-      // Clear everything
+    } else if (session.currentDraftId) {
+      // Try to cancel any active generation job for this draft
+      try {
+        const res = await fetchBridgeGet(`?action=generation_jobs&limit=5`);
+        if (res.ok) {
+          const data = await res.json();
+          const activeJob = (data.jobs || []).find(
+            (j: any) => j.draftId === session.currentDraftId && 
+            !['COMPLETED', 'FAILED', 'CANCELLED'].includes(j.status)
+          );
+          
+          if (activeJob) {
+            await fetchBridgeApi({
+              action: 'cancel_generation',
+              jobId: activeJob.id,
+            });
+            bot.sendMessage(chatId, `✅ 已取消生成任务\n\nJob ID：\`${activeJob.id}\`\n草稿指针保留`);
+            return;
+          }
+        }
+      } catch {
+        // Ignore errors, fall through to default cancel
+      }
+      
+      // Default: clear session
       clearSession(chatId);
       bot.sendMessage(chatId, '✅ 已取消当前操作（草稿指针已清除，草稿本身未删除）');
+    } else {
+      clearSession(chatId);
+      bot.sendMessage(chatId, '✅ 已取消当前操作');
     }
   });
 
