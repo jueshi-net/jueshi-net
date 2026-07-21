@@ -95,6 +95,46 @@ function redactSecrets(text: string): string {
 }
 
 // ============================================================================
+// Telegram Message Helpers — Plain Text (No Parse Mode)
+// ============================================================================
+
+/**
+ * Send plain text message to Telegram (no parse_mode).
+ * Use this for all messages containing dynamic fields to avoid parse entity errors.
+ */
+async function sendContentOpsPlainText(
+  bot: TelegramBot,
+  chatId: number,
+  message: string,
+  options?: { disable_link_preview?: boolean }
+): Promise<void> {
+  try {
+    await bot.sendMessage(chatId, message.substring(0, 4000));
+  } catch (error: any) {
+    // Log error but don't throw - notification failure shouldn't break task flow
+    console.error('[ContentOps Bot] Plain text send failed:', {
+      chatId,
+      error: error.message?.substring(0, 200),
+      code: error.code,
+    });
+  }
+}
+
+/**
+ * Map internal execution mode enum to user-friendly display text.
+ */
+function mapExecutionModeToDisplay(mode: string): string {
+  const modeMap: Record<string, string> = {
+    'draft_only': '仅创建草稿',
+    'review_required': '等待人工审核',
+    'publish_when_validated': '校验通过后发布',
+    'schedule_when_validated': '校验通过后定时发布',
+    'publish_now': '立即发布',
+  };
+  return modeMap[mode] || mode;
+}
+
+// ============================================================================
 // HMAC Signature for Bridge API
 // ============================================================================
 
@@ -1400,11 +1440,13 @@ Production: 🔒 DISABLED`;
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text || '';
-    const updateId = msg.update_id;
+    // Note: update_id is not available in 'message' event, only in 'update' event
+    // For duplicate prevention, we use message_id instead
+    const messageId = msg.message_id;
     
     // Skip duplicate updates (prevent duplicate task creation)
-    if (updateId && isDuplicateUpdate(updateId)) {
-      console.error('[ContentOps Bot] Duplicate update ignored:', updateId);
+    if (messageId && isDuplicateUpdate(messageId)) {
+      console.error('[ContentOps Bot] Duplicate message ignored:', messageId);
       return;
     }
     
@@ -1478,8 +1520,15 @@ Production: 🔒 DISABLED`;
       // Parse task intent
       const parsed = parseTaskIntent(text);
       
-      // Notify user: task received
-      const ackMessage = `📝 任务已接收\n\n任务 ID：待创建\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：PARSING_TASK`;
+      // Notify user: task received (plain text, no parse_mode)
+      const ackMessage = `📝 任务已接收
+
+识别类型：${parsed.contentType}
+执行方式：${mapExecutionModeToDisplay(parsed.executionMode)}
+目标环境：${parsed.targetEnvironment}
+主题：${parsed.topic}
+当前阶段：正在创建任务`;
+      
       const ackMsg = await bot.sendMessage(chatId, ackMessage.substring(0, 4000));
 
       // Create task via Bridge API
@@ -1504,18 +1553,30 @@ Production: 🔒 DISABLED`;
       });
 
       if (taskResult.error) {
-        bot.sendMessage(chatId, `❌ 任务创建失败\n错误：${taskResult.error}\n编号：${taskResult.code || 'TASK_CREATE_FAILED'}`.substring(0, 4000));
+        // Task creation failed - send plain text error
+        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
+
+错误：${taskResult.error}
+编号：${taskResult.code || 'TASK_CREATE_FAILED'}`);
         return;
       }
 
-      // Update acknowledgment with task ID
+      // Update acknowledgment with task ID (plain text, no parse_mode)
       const taskId = taskResult.taskId;
-      const updateMessage = `✅ 任务已创建\n\n任务 ID：\`${taskId}\`\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：等待处理\n\n系统将自动处理此任务，完成后通知您。`;
+      const updateMessage = `✅ 任务创建成功
+
+任务 ID：${taskId}
+识别类型：${parsed.contentType}
+执行方式：${mapExecutionModeToDisplay(parsed.executionMode)}
+目标环境：${parsed.targetEnvironment}
+主题：${parsed.topic}
+当前阶段：等待执行
+
+系统将自动处理此任务，完成后通知您。`;
       
       await bot.editMessageText(updateMessage.substring(0, 4000), {
         chat_id: chatId,
         message_id: ackMsg.message_id,
-        parse_mode: 'Markdown',
       });
 
       console.error('[ContentOps Bot] Task created:', { taskId, chatId, contentType: parsed.contentType });
@@ -1540,19 +1601,22 @@ Production: 🔒 DISABLED`;
         console.error('[ContentOps Bot] Job written to inbox:', inboxPath);
         
         // Kickstart one-shot worker
-        const { execSync } = await import('child_process');
-        const workerScript = `${process.cwd()}/scripts/contentops/hermes-contentops-worker.ts`;
+        const childProcess = await import('child_process');
+        const execSyncFn = childProcess.execSync!;
+        const cwd = process.cwd() || '/Users/chq/xixiong-saas';
+        const workerScript = `${cwd}/scripts/contentops/hermes-contentops-worker.ts`;
         
         // Use launchctl kickstart if available, otherwise run directly
         try {
-          execSync(`launchctl kickstart -k gui/${process.getuid()}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, { 
+          const uid = process.getuid() || 0;
+          execSyncFn(`launchctl kickstart -k gui/${uid}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, { 
             stdio: 'ignore',
             timeout: 5000
           });
           console.error('[ContentOps Bot] Worker kickstarted');
         } catch (kickstartError) {
           // If launchctl fails, run worker directly in background
-          execSync(`node ${workerScript} > /dev/null 2>&1 &`, { stdio: 'ignore' });
+          execSyncFn(`node ${workerScript} > /dev/null 2>&1 &`, { stdio: 'ignore' });
           console.error('[ContentOps Bot] Worker started in background');
         }
       } catch (wakeupError) {
@@ -1563,7 +1627,11 @@ Production: 🔒 DISABLED`;
     } catch (error) {
       console.error('[ContentOps Bot] Task creation error:', error);
       const errMsg = error instanceof Error ? error.message : 'Unknown';
-      bot.sendMessage(chatId, `❌ 任务创建失败\n错误编号：CONTENTOPS-TASK-CREATE-EXCEPTION\n原因：${errMsg.substring(0, 200)}`.substring(0, 4000));
+      // Send plain text error (no parse_mode)
+      await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
+
+错误编号：CONTENTOPS-TASK-CREATE-EXCEPTION
+原因：${errMsg.substring(0, 200)}`);
     }
   });
 
