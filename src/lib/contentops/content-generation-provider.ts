@@ -113,7 +113,7 @@ const AI_CONFIG = {
 // (Works with DashScope/Qwen, DeepSeek, or any OpenAI-compatible endpoint)
 // ============================================================================
 
-class OpenAICompatibleProvider implements ContentGenerationProvider {
+export class OpenAICompatibleProvider implements ContentGenerationProvider {
   private async callModel(
     systemPrompt: string,
     userPrompt: string,
