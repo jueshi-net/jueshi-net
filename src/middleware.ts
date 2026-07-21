@@ -69,6 +69,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
+  // Redirect non-existent routes referenced by V4 design system components
+  // to their actual destinations, preventing RSC prefetch 404 console errors.
+  if (pathname === "/badges") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/workspace/member";
+    return NextResponse.redirect(url, 307);
+  }
+  if (pathname === "/tasks") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/workspace/tasks";
+    return NextResponse.redirect(url, 307);
+  }
+  if (pathname === "/contact") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url, 307);
+  }
+
   // Feature-flag 404: service-provider routes when module is off.
   if (isServiceProviderRoute(pathname) && isFeatureOff("FEATURE_SERVICE_PROVIDER")) {
     return notFoundResponse();
@@ -93,6 +111,9 @@ export const config = {
     "/tools/quote",
     "/tools/quote-sheet",
     "/community",
+    "/badges",
+    "/tasks",
+    "/contact",
     "/service-providers/:path*",
     "/business/:path*",
     "/professional/:path*",
