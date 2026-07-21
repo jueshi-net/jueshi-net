@@ -298,7 +298,15 @@ function parseTaskIntent(text: string): ParsedTask {
   let executionMode: ParsedTask['executionMode'] = 'review_required';
   if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
     executionMode = 'publish_now';
-  } else if (lower.includes('定时发布') || lower.includes('安排发布') || lower.includes('schedule')) {
+  } else if (
+    lower.includes('定时发布') || 
+    lower.includes('安排发布') || 
+    lower.includes('schedule') ||
+    // Match "安排...发布" pattern (e.g., "安排十分钟后发布")
+    (lower.includes('安排') && lower.includes('发布')) ||
+    // Match "X分钟后发布" pattern
+    /\d+\s*分钟后.*发布/.test(lower)
+  ) {
     executionMode = 'schedule_when_validated';
   } else if (lower.includes('自动发布') || lower.includes('检查通过后发布')) {
     executionMode = 'publish_when_validated';
@@ -314,25 +322,31 @@ function parseTaskIntent(text: string): ParsedTask {
 
   // Detect scheduling
   let scheduledAt: string | undefined;
-  const timeMatch = text.match(/(\d{1,2})[点时:](\d{0,2})?(分)?/);
-  if (timeMatch && (lower.includes('明天') || lower.includes('今晚') || lower.includes('晚上') || lower.includes('分钟后'))) {
-    // Simple time parsing (would need more sophisticated NLP in production)
-    const now = new Date();
-    if (lower.includes('分钟后')) {
-      const mins = parseInt(text.match(/(\d+)\s*分钟/)?.[1] || '10');
-      scheduledAt = new Date(now.getTime() + mins * 60000).toISOString();
-    } else if (lower.includes('明天')) {
-      const hour = parseInt(timeMatch[1] || '9');
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
-      scheduledAt = tomorrow.toISOString();
-    } else if (lower.includes('今晚') || lower.includes('晚上')) {
-      const hour = parseInt(timeMatch[1] || '20');
-      const today = new Date(now);
-      today.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
-      if (today < now) today.setDate(today.getDate() + 1);
-      scheduledAt = today.toISOString();
+  
+  // Check for "X分钟后" pattern first (doesn't require time marker)
+  const minsMatch = text.match(/(\d+)\s*分钟/);
+  if (minsMatch && (lower.includes('后发布') || lower.includes('后发送'))) {
+    const mins = parseInt(minsMatch[1]);
+    scheduledAt = new Date(Date.now() + mins * 60000).toISOString();
+  } else {
+    // Check for specific time patterns
+    const timeMatch = text.match(/(\d{1,2})[点时:](\d{0,2})?(分)?/);
+    if (timeMatch && (lower.includes('明天') || lower.includes('今晚') || lower.includes('晚上'))) {
+      // Simple time parsing (would need more sophisticated NLP in production)
+      const now = new Date();
+      if (lower.includes('明天')) {
+        const hour = parseInt(timeMatch[1] || '9');
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
+        scheduledAt = tomorrow.toISOString();
+      } else if (lower.includes('今晚') || lower.includes('晚上')) {
+        const hour = parseInt(timeMatch[1] || '20');
+        const today = new Date(now);
+        today.setHours(hour, parseInt(timeMatch[2] || '0'), 0, 0);
+        if (today < now) today.setDate(today.getDate() + 1);
+        scheduledAt = today.toISOString();
+      }
     }
   }
 

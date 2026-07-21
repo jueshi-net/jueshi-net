@@ -335,7 +335,59 @@ function buildGeneratePrompt(job) {
   const contentType = job.contentType || 'guide';
   const userInput = job.rawUserInput || '';
   
-  // Simplified prompt - only essential requirements
+  // Content-type specific prompts
+  if (contentType === 'checklist') {
+    return `Generate a checklist in Chinese for overseas Chinese audience.
+
+Topic: ${userInput}
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "title": "清单标题(≤24字)",
+  "slug": "url-slug",
+  "summary": "摘要",
+  "contentType": "checklist",
+  "audience": "目标受众",
+  "groups": [
+    {
+      "name": "分组名称",
+      "description": "分组描述",
+      "items": [
+        {
+          "title": "检查项标题",
+          "description": "详细说明",
+          "required": true,
+          "completionCondition": "完成条件",
+          "riskNote": "风险提示",
+          "sortOrder": 1
+        }
+      ]
+    }
+  ],
+  "seo": {
+    "primaryKeyword": "主关键词",
+    "secondaryKeywords": ["词1", "词2"],
+    "metaTitle": "SEO标题",
+    "metaDescription": "SEO描述"
+  },
+  "geo": {
+    "targetAudience": "受众",
+    "targetCountries": ["国家"]
+  },
+  "sources": [{"url": "https://...", "title": "标题", "publisher": "来源"}],
+  "faq": [{"question": "问题", "answer": "答案"}]
+}
+
+Requirements:
+- Chinese content only
+- At least 4 groups
+- At least 20 total items across all groups
+- Each item must have: title, description, required, completionCondition
+- Real sources when possible
+- No deployment/DB/shell commands`;
+  }
+  
+  // Default guide prompt
   return `Generate ${contentType} content in Chinese for overseas Chinese audience.
 
 Topic: ${userInput}
