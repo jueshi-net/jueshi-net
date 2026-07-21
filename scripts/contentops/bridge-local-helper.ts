@@ -132,8 +132,14 @@ async function main() {
 
     const result = await response.text();
     
+    // 包装响应为 {status, body} 格式
+    const wrappedResponse = {
+      status: response.status,
+      body: JSON.parse(result),
+    };
+    
     // 输出结果到 stdout
-    console.log(result);
+    console.log(JSON.stringify(wrappedResponse));
     
     // 退出码反映 HTTP 状态
     if (response.status >= 200 && response.status < 300) {
