@@ -1617,7 +1617,7 @@ Production: 🔒 DISABLED`;
           return;
         }
         const cwd = process.cwd() || '/Users/chq/xixiong-saas';
-        const workerScript = `${cwd}/scripts/contentops/hermes-contentops-worker.ts`;
+        const workerScript = `${cwd}/scripts/contentops/hermes-contentops-worker-mac.js`;
         
         // Use launchctl kickstart if available, otherwise run directly
         try {

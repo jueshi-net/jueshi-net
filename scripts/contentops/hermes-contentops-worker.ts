@@ -28,7 +28,11 @@ const FAILED_DIR = path.join(JOBS_DIR, 'failed');
 const LOG_DIR = path.join(HOME_DIR, '.jueshi-contentops/logs');
 const LOCK_FILE = path.join(JOBS_DIR, 'worker.lock');
 
-const JOB_TIMEOUT_MS = parseInt(process.env.HERMES_JOB_TIMEOUT_MS || '180000'); // 3 minutes
+// Tiered timeouts
+const HERMES_PROCESS_START_TIMEOUT_MS = parseInt(process.env.HERMES_PROCESS_START_TIMEOUT_MS || '30000'); // 30s
+const HERMES_FIRST_OUTPUT_TIMEOUT_MS = parseInt(process.env.HERMES_FIRST_OUTPUT_TIMEOUT_MS || '120000'); // 2min
+const HERMES_TOTAL_TIMEOUT_MS = parseInt(process.env.HERMES_TOTAL_TIMEOUT_MS || '600000'); // 10min
+const JOB_TIMEOUT_MS = parseInt(process.env.HERMES_JOB_TIMEOUT_MS || '900000'); // 15min total
 
 // ============================================================================
 // Singleton Lock
