@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const { slug } = await params;
   const service = await getPublicServiceBySlug(slug);
-  if (!service) return { title: "未找到 - 绝世百宝箱" };
+  if (!service) notFound();
   return serviceMetadata(service);
 }
 

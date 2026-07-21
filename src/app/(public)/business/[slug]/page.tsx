@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const { slug } = await params;
   const provider = await getPublicProviderBySlug(slug);
-  if (!provider) return { title: "未找到 - 绝世百宝箱" };
+  if (!provider) notFound();
   return providerMetadata(provider);
 }
 

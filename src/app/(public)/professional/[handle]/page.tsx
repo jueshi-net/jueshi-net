@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
   }
   const { handle } = await params;
   const provider = await getPublicProviderBySlug(handle);
-  if (!provider) return { title: "未找到 - 绝世百宝箱" };
+  if (!provider) notFound();
   return providerMetadata(provider);
 }
 
