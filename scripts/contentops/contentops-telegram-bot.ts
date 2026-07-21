@@ -1510,7 +1510,7 @@ Production: 🔒 DISABLED`;
 
       // Update acknowledgment with task ID
       const taskId = taskResult.taskId;
-      const updateMessage = `✅ 任务已创建\\n\\n任务 ID：\\`${taskId}\\`\\n识别类型：${parsed.contentType}\\n执行方式：${parsed.executionMode}\\n目标环境：${parsed.targetEnvironment}\\n主题：${parsed.topic}\\n当前阶段：等待处理\\n\\n系统将自动处理此任务，完成后通知您。`;
+      const updateMessage = `✅ 任务已创建\n\n任务 ID：\`${taskId}\`\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：等待处理\n\n系统将自动处理此任务，完成后通知您。`;
       
       await bot.editMessageText(updateMessage.substring(0, 4000), {
         chat_id: chatId,
