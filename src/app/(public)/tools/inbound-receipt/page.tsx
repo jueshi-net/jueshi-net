@@ -7,7 +7,7 @@ import { ArrowLeft, Save, Printer, FileText, Plus, Trash2, Loader2, Building2, E
 import CompanyProfilePicker, { CompanyProfile } from "@/components/document-tools/company-profile-picker";
 import ToolHistoryPanel from "@/components/document-tools/tool-history-panel";
 import { useDraftLoader } from "@/lib/use-draft-loader";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 
 interface CargoLine {
   id: string;
@@ -146,10 +146,8 @@ export default function InboundReceiptPage() {
   };
 
   return (
-    <PublicLandingPageFrame
-      title="入库单"
+    <ToolWorkspaceShell title="入库单"
       subtitle="仓库入库单据管理工具"
-      variant="tool"
     >
       <div className="flex flex-wrap items-center gap-2 mb-4">
         {currentDocId && <ToolHistoryPanel documentId={currentDocId} toolKey="inbound_receipt" onRestore={handleRestore} />}
@@ -261,6 +259,6 @@ export default function InboundReceiptPage() {
           )}
         </div>
         </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

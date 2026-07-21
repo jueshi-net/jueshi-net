@@ -25,7 +25,7 @@ import { FAQSection } from '@/components/faq-section';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { trackEvent } from '@/lib/analytics';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 
 const CATEGORIES = [
   "常用地址",
@@ -360,10 +360,8 @@ export default function MemoPage() {
     });
 
   return (
-    <PublicLandingPageFrame 
-      title="跨境工作便签"
+    <ToolWorkspaceShell title="跨境工作便签"
       subtitle="数据保存在当前浏览器，安全私密"
-      variant="tool"
     >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
@@ -707,6 +705,6 @@ export default function MemoPage() {
           <AdSlot placement="tool-memo-bottom" className="mt-8 mb-8" />
         </div>
       </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

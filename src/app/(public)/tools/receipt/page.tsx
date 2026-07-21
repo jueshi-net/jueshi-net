@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 interface ReceiptItem {
@@ -78,10 +78,8 @@ export default function ReceiptPage() {
   };
 
   return (
-    <PublicLandingPageFrame
-      title="收据生成器"
+    <ToolWorkspaceShell title="收据生成器"
       subtitle="快速生成专业收款收据，支持PDF导出"
-      variant="tool"
     >
       <div className={cardStyles.base + " space-y-6"}>
         {/* Basic Info */}
@@ -177,6 +175,6 @@ export default function ReceiptPage() {
         { question: "收据可以作为报销凭证吗？", answer: "取决于公司财务政策。部分公司接受收据作为小额报销凭证，但大额支出通常需要正式发票。" },
         { question: "可以修改已生成的收据吗？", answer: "收据生成后可以重新编辑并导出新的 PDF。建议保留所有版本的记录，避免重复编号。" },
       ]} />
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

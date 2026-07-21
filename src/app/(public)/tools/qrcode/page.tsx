@@ -4,7 +4,7 @@ import { QrCode, Download, Copy, Link as LinkIcon } from "lucide-react";
 import { AdSlot } from "@/components/ad-slot";
 import { SafeAdSlot } from "@/components/ads/SafeAdSlot";
 import { FAQSection } from "@/components/faq-section";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 
 export default function QRCodePage() {
@@ -32,10 +32,8 @@ export default function QRCodePage() {
   };
 
   return (
-    <PublicLandingPageFrame
-      title="二维码生成器"
+    <ToolWorkspaceShell title="二维码生成器"
       subtitle="为链接、文本生成二维码"
-      variant="tool"
     >
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -146,6 +144,6 @@ export default function QRCodePage() {
           { question: "生成的二维码可以商用吗？", answer: "QR Code 是公开标准，可以自由使用。但请确保链接内容合法合规。" },
         ]} />
       </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

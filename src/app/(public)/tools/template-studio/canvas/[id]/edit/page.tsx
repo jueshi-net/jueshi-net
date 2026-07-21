@@ -1,7 +1,7 @@
 "use client";
 
 import CanvasEditorFull from "../../../canvas-editor-full";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 import "../../../canvas-print.css";
 
 export default function CanvasTemplateEditPage({
@@ -11,12 +11,11 @@ export default function CanvasTemplateEditPage({
 }) {
   // Use client-side rendering to get params
   return (
-    <PublicLandingPageFrame
-      title="编辑画布模板"
+    <ToolWorkspaceShell title="编辑画布模板"
       subtitle="修改可视化单据模板"
     >
       <CanvasEditClient params={params} />
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }
 

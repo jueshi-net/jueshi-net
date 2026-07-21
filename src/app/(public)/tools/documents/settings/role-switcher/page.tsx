@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Users, Check } from 'lucide-react';
 import { getRoleInfo, setRole, type UserRole } from '@/lib/membership/permissions';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
-import PublicLandingPageFrame from '@/components/templates/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 
 const roles: { role: UserRole; label: string; desc: string; color: string }[] = [
   { role: 'guest', label: '游客', desc: '3份草稿，默认模板样式，导出PDF/PNG', color: 'gray' },
