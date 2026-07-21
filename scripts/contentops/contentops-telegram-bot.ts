@@ -23,8 +23,8 @@
 
 import TelegramBot from 'node-telegram-bot-api';
 import { execSync } from 'child_process';
-import { createHmac } from 'crypto';
 import { getSession, updateSession, clearSession } from './session-store';
+import { stagingHelperClient } from '../../src/lib/contentops/staging-helper-client';
 
 // ============================================================================
 // Configuration
@@ -42,30 +42,20 @@ function readBotTokenFromKeychain(): string | undefined {
   }
 }
 
-function readBridgeSecretFromKeychain(): string | undefined {
-  try {
-    const secret = execSync(
-      'security find-generic-password -s jueshi-contentops -a contentops-bridge -w',
-      { encoding: 'utf-8' }
-    ).trim();
-    return secret || undefined;
-  } catch {
-    return undefined;
-  }
-}
+// readBridgeSecretFromKeychain removed - Bot no longer holds Bridge Secret
+// All Bridge requests go through staging-helper-client via SSH
 
 const CONFIG = {
   enabled: process.env.CONTENTOPS_BOT_ENABLED === 'true',
   botToken: process.env.CONTENTOPS_TELEGRAM_BOT_TOKEN || readBotTokenFromKeychain(),
-  bridgeSecret: process.env.CONTENTOPS_BRIDGE_SECRET || readBridgeSecretFromKeychain(),
+  // bridgeSecret removed - Bot no longer holds Bridge Secret
+  // bridgeUrl removed - All requests go through staging-helper-client via SSH
   // Security: Production is ALWAYS disabled in bot
   allowProduction: false,
   // Allowlist for basic bot usage (create, edit, review)
   allowedChatIds: (process.env.CONTENTOPS_TELEGRAM_ALLOWED_CHAT_IDS || '').split(',').filter(Boolean),
   // Reviewer allowlist for approve/reject (separate from basic allowlist)
   reviewerChatIds: (process.env.CONTENTOPS_TELEGRAM_REVIEWER_CHAT_IDS || '').split(',').filter(Boolean),
-  // Bridge URL for staging
-  bridgeUrl: process.env.CONTENTOPS_BRIDGE_URL || 'https://i.jueshi.net/api/internal/contentops/drafts',
 };
 
 const RUNTIME_INFO = {
@@ -138,76 +128,74 @@ function mapExecutionModeToDisplay(mode: string): string {
 // HMAC Signature for Bridge API
 // ============================================================================
 
-function signPayload(payload: string): string {
-  if (!CONFIG.bridgeSecret) {
-    throw new Error('Bridge secret not configured');
-  }
-  return createHmac('sha256', CONFIG.bridgeSecret)
-    .update(payload)
-    .digest('hex');
-}
+// signPayload removed - Bot no longer signs requests directly
+// All Bridge requests go through staging-helper-client via SSH
 
 async function fetchBridgeApi(body: any): Promise<any> {
-  const payload = JSON.stringify(body);
-  const url = new URL(CONFIG.bridgeUrl);
-  // Server expects: method:path:queryString:body
-  const signaturePayload = `POST:${url.pathname}:${payload}`;
-  const signature = signPayload(signaturePayload);
-  
-  console.error('[ContentOps Bot] POST signature payload:', signaturePayload.substring(0, 80) + '...');
-  
-  const res = await fetch(CONFIG.bridgeUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-ContentOps-Signature': signature,
-    },
-    body: payload,
-  });
-  
-  return res;
+  try {
+    const response = await stagingHelperClient.request({
+      method: 'POST',
+      pathname: '/api/internal/contentops/drafts',
+      body: body
+    });
+    
+    console.error('[ContentOps Bot] Helper response status:', response.status);
+    
+    // Return a fetch-like response object for compatibility
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      json: async () => response.body,
+      text: async () => JSON.stringify(response.body)
+    };
+  } catch (error) {
+    console.error('[ContentOps Bot] Helper request failed:', error);
+    throw error;
+  }
 }
 
 async function fetchBridgeGet(queryString: string): Promise<any> {
-  const url = new URL(CONFIG.bridgeUrl);
-  const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
-  // Server expects: method:path:queryString:body (body is empty for GET)
-  const signaturePayload = `GET:${url.pathname}${queryString}:`;
-  const signature = signPayload(signaturePayload);
-  
-  console.error('[ContentOps Bot] GET URL:', fullUrl);
-  
-  const res = await fetch(fullUrl, {
-    method: 'GET',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-ContentOps-Signature': signature,
-    },
-  });
-  
-  return res;
+  try {
+    const response = await stagingHelperClient.request({
+      method: 'GET',
+      pathname: `/api/internal/contentops/drafts${queryString}`,
+      body: {}
+    });
+    
+    console.error('[ContentOps Bot] Helper GET response status:', response.status);
+    
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      json: async () => response.body,
+      text: async () => JSON.stringify(response.body)
+    };
+  } catch (error) {
+    console.error('[ContentOps Bot] Helper GET request failed:', error);
+    throw error;
+  }
 }
 
 async function fetchBridgePut(queryString: string, body: any): Promise<any> {
-  const payload = JSON.stringify(body);
-  const url = new URL(CONFIG.bridgeUrl);
-  const fullUrl = `${CONFIG.bridgeUrl}${queryString}`;
-  // Server expects: method:path:queryString:body
-  const signaturePayload = `PUT:${url.pathname}${queryString}:${payload}`;
-  const signature = signPayload(signaturePayload);
-  
-  console.error('[ContentOps Bot] PUT URL:', fullUrl);
-  
-  const res = await fetch(fullUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-ContentOps-Signature': signature,
-    },
-    body: payload,
-  });
-  
-  return res;
+  try {
+    const response = await stagingHelperClient.request({
+      method: 'PUT',
+      pathname: `/api/internal/contentops/drafts${queryString}`,
+      body: body
+    });
+    
+    console.error('[ContentOps Bot] Helper PUT response status:', response.status);
+    
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      json: async () => response.body,
+      text: async () => JSON.stringify(response.body)
+    };
+  } catch (error) {
+    console.error('[ContentOps Bot] Helper PUT request failed:', error);
+    throw error;
+  }
 }
 
 // ============================================================================
@@ -1660,7 +1648,9 @@ Production: 🔒 DISABLED`;
     }
   });
 
-  console.log('[ContentOps Bot] Started successfully');
+  console.error(`[ContentOps Bot] Started successfully`);
+    console.error(`[ContentOps Bot] Transport: SSH staging-helper-client`);
+    console.error(`[ContentOps Bot] Bridge Secret: NOT held by Mac Bot`);
 }
 
 // Start the bot

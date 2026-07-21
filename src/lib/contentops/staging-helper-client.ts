@@ -1,0 +1,115 @@
+/**
+ * ContentOps Staging Helper Client
+ * 
+ * 通过单次 SSH 调用 staging-local helper
+ * 不使用长期 SSH tunnel
+ * 不在 Mac 上存储 Bridge Secret
+ */
+
+import { spawn } from 'child_process';
+
+export interface HelperRequest {
+  method?: string;
+  pathname?: string;
+  body: any;
+}
+
+export interface HelperResponse {
+  status: number;
+  body: any;
+}
+
+export class StagingHelperClient {
+  private sshHost = 'deploy@192.129.155.149';
+  private helperPath = '/home/deploy/xixiong-saas-staging/scripts/contentops/bridge-local-helper.ts';
+  private connectTimeout = 10000; // 10 seconds
+  private commandTimeout = 30000; // 30 seconds
+
+  async request(req: HelperRequest): Promise<HelperResponse> {
+    const requestJson = JSON.stringify(req.body);
+    
+    return new Promise((resolve, reject) => {
+      const args = [
+        '-o', 'BatchMode=yes',
+        '-o', `ConnectTimeout=${this.connectTimeout / 1000}`,
+        this.sshHost,
+        `cd /home/deploy/xixiong-saas-staging && export $(grep -v '^#' .env.local | xargs) && npx tsx ${this.helperPath}`
+      ];
+
+      const child = spawn('ssh', args, {
+        stdio: ['pipe', 'pipe', 'pipe']
+      });
+
+      let stdout = '';
+      let stderr = '';
+      let timeoutId: NodeJS.Timeout;
+
+      // Command timeout
+      timeoutId = setTimeout(() => {
+        child.kill('SIGTERM');
+        reject(new Error('CONTENTOPS-SSH-TIMEOUT'));
+      }, this.commandTimeout);
+
+      child.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      // Write request to stdin
+      child.stdin.write(requestJson);
+      child.stdin.end();
+
+      child.on('close', (code) => {
+        clearTimeout(timeoutId);
+
+        if (code === null) {
+          reject(new Error('CONTENTOPS-HELPER-EXEC: SSH process killed'));
+          return;
+        }
+
+        // Parse response
+        try {
+          const response: HelperResponse = JSON.parse(stdout.trim());
+          resolve(response);
+        } catch (error) {
+          reject(new Error(`CONTENTOPS-HELPER-INVALID-JSON: ${stdout.substring(0, 200)}`));
+        }
+      });
+
+      child.on('error', (error) => {
+        clearTimeout(timeoutId);
+        reject(new Error(`CONTENTOPS-SSH-CONNECT: ${error.message}`));
+      });
+    });
+  }
+
+  async createTask(taskData: any): Promise<HelperResponse> {
+    return this.request({
+      method: 'POST',
+      pathname: '/api/internal/contentops/drafts',
+      body: taskData
+    });
+  }
+
+  async getTask(taskId: string): Promise<HelperResponse> {
+    return this.request({
+      method: 'GET',
+      pathname: `/api/internal/contentops/drafts?taskId=${taskId}`,
+      body: {}
+    });
+  }
+
+  async listTasks(): Promise<HelperResponse> {
+    return this.request({
+      method: 'GET',
+      pathname: '/api/internal/contentops/drafts',
+      body: {}
+    });
+  }
+}
+
+// Singleton instance
+export const stagingHelperClient = new StagingHelperClient();
