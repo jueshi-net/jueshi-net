@@ -495,7 +495,7 @@ export default async function WorkspacePage() {
             {taskChains.slice(0, 3).map((chain) => (
               <Link
                 key={chain.id}
-                href={`/workspace/task-chains/${chain.id}`}
+                href={`/workspace/task-chains/shipping/${chain.id}`}
                 className="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
