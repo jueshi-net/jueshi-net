@@ -35,9 +35,20 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
   const isGuidesSlug = pathname.startsWith('/guides/');
   const isCities = pathname.startsWith('/cities/');
 
+  // Service Provider Yellow Pages routes - use JueshiV4PublicShell
+  const isServiceProviders = pathname === '/service-providers' || pathname.startsWith('/service-providers');
+  const isBusinessSlug = pathname.startsWith('/business/');
+  const isProfessional = pathname.startsWith('/professional/');
+  const isServicesSlug = pathname.startsWith('/services/');
+
   // 首页、UI Lab、资源页、目的地页、指南页、清单页、专题页、搜索页、新手资源、定价页、社区页、反馈页、帮助页、支付成功页、AI工具页、数据分析页、商业页、更新日志页、跨境寄送页、指南详情、城市详情使用各自的 shell，跳过公共 Header/Footer
   if (isUILab || isV4Home || isResources || isResourcesSite || isDestinations || isGuides || isGuidesSlug || isChecklists || isTopics || isCities || isSearch || isStarter || isPricing || isBBS || isFeedback || isHelp || isPaymentSuccess || isAiTools || isAnalytics || isBusiness || isChangelog || isShipping) {
     return <>{children}</>;
+  }
+
+  // 服务商黄页页面使用 JueshiV4PublicShell，统一品牌 Header 和底栏
+  if (isServiceProviders || isBusinessSlug || isProfessional || isServicesSlug) {
+    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
   }
 
   // 工具子页面（/tools/*）使用 JueshiV4PublicShell，统一品牌 Header 和底栏

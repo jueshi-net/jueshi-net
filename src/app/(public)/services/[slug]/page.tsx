@@ -65,23 +65,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
     : `/business/${service.providerSlug}`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdService) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumbs) }} />
 
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="mb-4 flex items-center gap-1.5 text-xs text-gray-400">
-          <Link href="/" className="hover:text-gray-600">首页</Link>
-          <span>/</span>
-          <Link href="/service-providers" className="hover:text-gray-600">服务商</Link>
-          <span>/</span>
-          <Link href={providerHref} className="hover:text-gray-600">{service.providerDisplayName}</Link>
-          <span>/</span>
-          <span className="text-gray-600">{service.title}</span>
-        </nav>
-
-        {/* Main card */}
+{/* Main card */}
         <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-6">
           <div className="flex items-center gap-2">
             <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{service.categoryName}</span>

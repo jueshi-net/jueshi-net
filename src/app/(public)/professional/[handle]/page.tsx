@@ -53,21 +53,12 @@ export default async function ProfessionalDetailPage({ params }: { params: Promi
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProf) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumbs) }} />
 
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <nav className="mb-4 flex items-center gap-1.5 text-xs text-gray-400">
-          <Link href="/" className="hover:text-gray-600">首页</Link>
-          <span>/</span>
-          <Link href="/service-providers" className="hover:text-gray-600">服务商</Link>
-          <span>/</span>
-          <span className="text-gray-600">{provider.displayName}</span>
-        </nav>
-
-        <div className="flex flex-col gap-6 lg:flex-row">
+<div className="flex flex-col gap-6 lg:flex-row">
           {/* Main */}
           <div className="min-w-0 flex-1">
             {/* Header */}
@@ -146,7 +137,7 @@ export default async function ProfessionalDetailPage({ params }: { params: Promi
             </div>
 
             {/* Services */}
-            {services.length > 0 && (
+            {services.length > 0 ? (
               <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">
                 <h2 className="mb-3 text-base font-semibold text-gray-900">服务项目 ({services.length})</h2>
                 <div className="space-y-3">
@@ -173,6 +164,10 @@ export default async function ProfessionalDetailPage({ params }: { params: Promi
                     </Link>
                   ))}
                 </div>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5 text-center">
+                <p className="text-sm text-gray-400">暂未发布服务项目</p>
               </div>
             )}
 

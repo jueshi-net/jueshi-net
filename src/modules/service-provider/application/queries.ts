@@ -143,6 +143,9 @@ export async function listPublicProviders(
 
   const where: Record<string, unknown> = {
     status: "approved", // Only approved providers are public
+    // Exclude E2E/test fixtures from public display
+    slug: { not: { startsWith: "e2e-" } },
+    displayName: { not: { startsWith: "E2E_" } },
   };
 
   if (params.q) {
@@ -222,6 +225,8 @@ export async function getPublicProviderBySlug(
   });
 
   if (!row || row.status !== "approved") return null;
+  // Exclude E2E/test fixtures from public display
+  if (row.slug.startsWith("e2e-") || row.displayName.startsWith("E2E_")) return null;
   return toPublicProvider(row as unknown as ProviderRow, (row as any)._count?.services ?? 0);
 }
 
@@ -262,6 +267,8 @@ export async function getPublicServiceBySlug(
 
   if (!row || row.status !== "published") return null;
   if (!row.provider || row.provider.status !== "approved") return null;
+  // Exclude E2E/test fixtures from public display
+  if (row.slug.startsWith("e2e-") || row.provider.slug.startsWith("e2e-")) return null;
 
   return toPublicService(row as unknown as ServiceRow);
 }
@@ -269,7 +276,12 @@ export async function getPublicServiceBySlug(
 /** List all active service categories with provider counts. */
 export async function listPublicCategories(): Promise<PublicCategoryDTO[]> {
   const categories = await prisma.serviceCategory.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      // Exclude E2E/test categories from public display
+      slug: { not: { startsWith: "e2e-" } },
+      name: { not: { startsWith: "E2E_" } },
+    },
     orderBy: { sortOrder: "asc" },
     include: {
       _count: {

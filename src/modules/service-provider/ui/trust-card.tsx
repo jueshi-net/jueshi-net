@@ -65,18 +65,18 @@ export function ProviderTrustCard({ trust }: { trust: TrustCardDTO }) {
       {/* Trust Facts */}
       <div className="mt-4 grid grid-cols-3 gap-3 border-t border-gray-100 pt-3">
         <div className="text-center">
-          <div className="text-lg font-semibold text-gray-900">{trust.serviceCount}</div>
+          <div className="text-lg font-semibold text-gray-900">{trust.serviceCount > 0 ? trust.serviceCount : "—"}</div>
           <div className="text-xs text-gray-400">服务项目</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-gray-900">
-            {trust.claimedAt ? new Date(trust.claimedAt).toLocaleDateString("zh-CN", { year: "numeric", month: "short" }) : "—"}
+            {trust.claimedAt ? new Date(trust.claimedAt).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" }) : "—"}
           </div>
           <div className="text-xs text-gray-400">认领时间</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-gray-900">
-            {trust.approvedAt ? new Date(trust.approvedAt).toLocaleDateString("zh-CN", { year: "numeric", month: "short" }) : "—"}
+            {trust.approvedAt ? new Date(trust.approvedAt).toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" }) : "—"}
           </div>
           <div className="text-xs text-gray-400">通过审核</div>
         </div>

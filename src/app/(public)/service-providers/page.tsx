@@ -88,7 +88,7 @@ export default async function ServiceProvidersPage({
   const jsonLdItemList = itemListJsonLd(result.items, categories);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumbs) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }} />
 
@@ -120,10 +120,10 @@ export default async function ServiceProvidersPage({
           </form>
 
           {/* Category quick links */}
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <Link
               href="/service-providers"
-              className={`rounded-full px-3 py-1 text-xs font-medium ${!params.categoryId ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+              className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${!params.categoryId ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
             >
               全部分类
             </Link>
