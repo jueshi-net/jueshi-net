@@ -69,6 +69,7 @@ export function WorkspaceProviderClient({
               <div className="mb-3">
                 <Link
                   href={`/api/service-providers/${provider.id}/services`}
+                  prefetch={false}
                   className="inline-block rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
                 >
                   + 创建服务
