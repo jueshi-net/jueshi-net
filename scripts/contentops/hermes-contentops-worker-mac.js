@@ -178,6 +178,7 @@ function moveToFailed(jobPath, error) {
 
 function callHermesAgent(job) {
   return new Promise((resolve, reject) => {
+    const startTime = Date.now();
     const hermesRunId = `hermes-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
     
     // Build prompt based on job type
@@ -215,44 +216,28 @@ function callHermesAgent(job) {
     
     const timeout = setTimeout(() => {
       child.kill('SIGTERM');
-      reject(new Error('Hermes Agent call timed out'));
-    }, JOB_TIMEOUT_MS);
+      reject(new Error('HERMES_CLI_TIMEOUT'));
+    }, HERMES_TIMEOUT_MS);
     
     child.on('close', (code) => {
       clearTimeout(timeout);
       
       if (code !== 0) {
-        log('error', 'Hermes Agent call failed', { jobId: job.jobId, code, stderr: stderr.substring(0, 500) });
-        reject(new Error(`Hermes Agent exited with code ${code}`));
+        reject(new Error(`HERMES_CLI_EXIT_${code}: ${stderr.substring(0, 500)}`));
         return;
       }
       
-      // Parse result
-      let parsed;
-      try {
-        // Remove markdown code blocks if present
-        const cleaned = stdout.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        parsed = JSON.parse(cleaned);
-      } catch (parseError) {
-        log('error', 'Failed to parse Hermes response as JSON', { 
-          jobId: job.jobId, 
-          response: stdout.substring(0, 500),
-          error: parseError.message 
-        });
-        reject(new Error('Hermes response is not valid JSON'));
-        return;
-      }
+      // Remove warning lines before parsing
+      const cleanedOutput = stdout
+        .split('\n')
+        .filter(line => !line.startsWith('Warning:'))
+        .join('\n')
+        .trim();
       
-      // Add metadata
-      parsed.hermesRunId = hermesRunId;
-      parsed.gatewayUsed = true;
-      parsed.planningUsed = true;
-      parsed.fallbackUsed = false;
-      parsed.timestamp = new Date().toISOString();
-      
-      log('info', 'Hermes Agent call successful', { jobId: job.jobId, hermesRunId });
-      
-      resolve(parsed);
+      resolve({
+        content: cleanedOutput,
+        latencyMs: Date.now() - startTime
+      });
     });
     
     child.on('error', (error) => {
