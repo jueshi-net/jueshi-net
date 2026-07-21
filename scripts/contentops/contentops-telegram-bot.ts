@@ -393,6 +393,27 @@ async function startBot() {
 
   const bot = new TelegramBot(CONFIG.botToken, { polling: true });
 
+  // ============================================================================
+  // Update ID Deduplication (prevent duplicate task creation)
+  // ============================================================================
+  const processedUpdateIds = new Set<number>();
+  const MAX_PROCESSED_UPDATES = 10000; // Prevent memory leak
+  
+  function isDuplicateUpdate(updateId: number): boolean {
+    if (processedUpdateIds.has(updateId)) {
+      return true;
+    }
+    processedUpdateIds.add(updateId);
+    // Cleanup old entries to prevent memory leak
+    if (processedUpdateIds.size > MAX_PROCESSED_UPDATES) {
+      const iterator = processedUpdateIds.values();
+      for (let i = 0; i < MAX_PROCESSED_UPDATES / 2; i++) {
+        processedUpdateIds.delete(iterator.next().value);
+      }
+    }
+    return false;
+  }
+
   // Handle /start
   bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
@@ -1379,6 +1400,13 @@ Production: 🔒 DISABLED`;
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text || '';
+    const updateId = msg.update_id;
+    
+    // Skip duplicate updates (prevent duplicate task creation)
+    if (updateId && isDuplicateUpdate(updateId)) {
+      console.error('[ContentOps Bot] Duplicate update ignored:', updateId);
+      return;
+    }
     
     // Skip commands
     if (text.startsWith('/')) return;
