@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { isFeatureEnabled } from "@/platform";
 import { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -10,7 +11,11 @@ import {
   Plus, ArrowRight,
   ListChecks,
   Bookmark,
-  Activity
+  Activity,
+  Store,
+  MessageSquare,
+  Settings,
+  Eye,
 } from "lucide-react";
 import CheckinButton from "@/components/user/CheckinButton";
 import TodayTasks from "@/components/user/TodayTasks";
@@ -104,12 +109,31 @@ export default async function WorkspacePage() {
     prisma.userCompanyProfile.count({ where: { userId } }),
     prisma.inviteRedemption.count({ where: { inviterUserId: userId } }),
     prisma.taskChainDraft.findMany({ where: { userId }, orderBy: { updatedAt: "desc" }, take: 3 }).catch(() => []),
+    // Service provider membership query (only if feature enabled)
+    isFeatureEnabled("FEATURE_SERVICE_PROVIDER")
+      ? prisma.providerMember.findFirst({
+          where: { userId, status: "active" },
+          include: {
+            provider: {
+              select: {
+                id: true,
+                displayName: true,
+                slug: true,
+                status: true,
+                verificationStatus: true,
+                _count: { select: { inquiries: true, services: true } },
+              },
+            },
+          },
+        }).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const [
     userRes, favToolsRes, navLinksRes, docHistoryRes, companyProfilesRes,
     tasksRes, badgeCountRes, memosRes, unreadNotifsRes,
     docCountRes, companyCountRes, inviteCountRes, taskChainsRes,
+    providerMemberRes,
   ] = results;
 
   const user = userRes.status === "fulfilled" ? userRes.value : null;
@@ -125,6 +149,8 @@ export default async function WorkspacePage() {
   const companyCount = companyCountRes.status === "fulfilled" ? companyCountRes.value : 0;
   const inviteCount = inviteCountRes.status === "fulfilled" ? inviteCountRes.value : 0;
   const taskChains = taskChainsRes.status === "fulfilled" ? taskChainsRes.value : [];
+  const providerMembership = providerMemberRes.status === "fulfilled" ? providerMemberRes.value : null;
+  const serviceProviderEnabled = isFeatureEnabled("FEATURE_SERVICE_PROVIDER");
 
   const displayName = user?.name?.split("@")[0] || user?.email?.split("@")[0] || "用户";
   const isMember = user?.memberUntil && new Date(user.memberUntil) > new Date();
@@ -324,6 +350,59 @@ export default async function WorkspacePage() {
           </Link>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════════════
+          SERVICE PROVIDER ENTRY (Feature-gated)
+          ═══════════════════════════════════════════════════════ */}
+      {serviceProviderEnabled && (
+        <section className="mb-4">
+          {providerMembership?.provider ? (
+            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                    <Store className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900">我的服务商主页</h3>
+                    <p className="text-[11px] text-gray-500">{providerMembership.provider.displayName}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">
+                  {providerMembership.role === "OWNER" ? "所有者" : providerMembership.role === "ADMIN" ? "管理员" : providerMembership.role === "EDITOR" ? "编辑" : "查看者"}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 divide-x divide-gray-50">
+                <Link href="/workspace/provider" className="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors">
+                  <Settings className="w-4 h-4 text-gray-400 mb-1" />
+                  <span className="text-[11px] text-gray-600">管理资料</span>
+                </Link>
+                <Link href="/workspace/provider" className="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors">
+                  <Store className="w-4 h-4 text-gray-400 mb-1" />
+                  <span className="text-[11px] text-gray-600">管理服务</span>
+                </Link>
+                <Link href="/workspace/provider" className="flex flex-col items-center py-3 hover:bg-gray-50 transition-colors">
+                  <MessageSquare className="w-4 h-4 text-gray-400 mb-1" />
+                  <span className="text-[11px] text-gray-600">查看咨询</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-gray-100 p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center">
+                  <Store className="w-4 h-4 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">服务商入驻</p>
+                  <p className="text-[11px] text-gray-500">在黄页展示您的专业服务</p>
+                </div>
+              </div>
+              <p className="text-[11px] text-gray-400">服务商入驻功能正在内测</p>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ═══════════════════════════════════════════════════════
           RECENT DOCUMENTS
