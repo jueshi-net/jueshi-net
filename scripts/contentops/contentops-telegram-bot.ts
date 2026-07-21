@@ -1555,11 +1555,19 @@ Production: 🔒 DISABLED`;
       // Check HTTP status first
       if (!taskResponse.ok) {
         const errorData = await taskResponse.json().catch(() => ({ error: 'Unknown error', code: 'TASK_CREATE_FAILED' }));
-        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
-
-错误：${errorData.error || 'Unknown'}
-编号：${errorData.code || 'TASK_CREATE_FAILED'}`);
-        console.error('[ContentOps Bot] Task creation failed:', { status: taskResponse.status, error: errorData });
+        // Map internal errors to user-safe messages
+        let userMessage = '❌ 任务创建失败\n\n';
+        if (taskResponse.status === 401 || errorData.code === 'INVALID_SIGNATURE') {
+          userMessage += '错误编号：CONTENTOPS-BRIDGE-AUTH\n系统内部通信验证失败，任务尚未创建，请稍后重试。';
+        } else if (taskResponse.status === 404) {
+          userMessage += '错误编号：CONTENTOPS-BRIDGE-NOT-FOUND\n系统服务暂时不可用，请稍后重试。';
+        } else if (taskResponse.status >= 500) {
+          userMessage += '错误编号：CONTENTOPS-BRIDGE-ERROR\n系统内部错误，任务尚未创建，请稍后重试。';
+        } else {
+          userMessage += `错误编号：${errorData.code || 'TASK_CREATE_FAILED'}\n任务创建失败，请稍后重试。`;
+        }
+        await sendContentOpsPlainText(bot, chatId, userMessage);
+        console.error('[ContentOps Bot] Task creation failed:', { status: taskResponse.status, code: errorData.code, error: errorData.error });
         return;
       }
 
