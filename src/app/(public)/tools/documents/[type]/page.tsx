@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 import {
   ArrowLeft, Save, Printer, Download, FileText, Image, Crown,
   Plus, Trash2, ChevronDown, Building2, AlertTriangle, Eye,
@@ -845,9 +845,15 @@ export default function DocumentEditorPage() {
   ];
 
   return (
-    <PublicLandingPageFrame
+    <ToolWorkspaceShell
       title={docType?.titleZh || "单据工具"}
       subtitle={docType?.titleEn || ""}
+      breadcrumbs={[
+        { title: '首页', href: '/' },
+        { title: '工具中心', href: '/tools' },
+        { title: '单据工具', href: '/tools/documents' },
+        { title: docType?.titleZh || '单据', current: true },
+      ]}
     >
     <div>
       {/* Task Chain Prefill Banner */}
@@ -940,7 +946,7 @@ export default function DocumentEditorPage() {
 
       {/* Top bar */}
       <div className="bg-white border-b sticky top-0 z-40 no-print">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/tools/documents/drafts" className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1" title="我的草稿">
               <Clock className="w-4 h-4" />
@@ -1020,10 +1026,10 @@ export default function DocumentEditorPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6 print-block">
           {/* Form panel - shown on desktop always, on mobile only in edit tab */}
-          <div className={`w-full lg:w-1/2 no-print ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
+          <div className={`w-full lg:w-[42%] no-print ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
             {/* Mobile: Task Chain Generator button */}
             <div className="lg:hidden mb-4">
               <TaskChainGeneratorButton
@@ -1430,7 +1436,7 @@ export default function DocumentEditorPage() {
           </div>
 
           {/* Preview panel - shown on desktop always, on mobile in preview/export tabs */}
-          <div className={`w-full lg:w-1/2 print-full-width ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
+          <div className={`w-full lg:w-[58%] print-full-width ${(mobileTab === 'preview' || mobileTab === 'export') ? 'block' : 'hidden lg:block'}`}>
             <div className="lg:sticky lg:top-20">
               {mobileTab === 'export' && (
                 <div className="flex flex-wrap gap-2 mb-4 no-print">
@@ -1721,6 +1727,6 @@ export default function DocumentEditorPage() {
         </div>
       </div>
     </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

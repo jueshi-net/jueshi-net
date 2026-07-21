@@ -8,7 +8,7 @@ import { FAQSection } from "@/components/faq-section";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
 import { saveContainerToShipping } from "@/lib/container-shipping-transfer";
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 
 const containerTypes = [
   { name: "20GP", length: 5.9, width: 2.35, height: 2.39, volume: 33.2, maxWeight: 21770, useCase: "小批量普货、样品单、个人物品", icon: "📦", color: "blue" },
@@ -233,10 +233,8 @@ export default function ContainerCalculatorPage() {
   });
 
   return (
-    <PublicLandingPageFrame 
-      title="集装箱计算器"
+    <ToolWorkspaceShell title="集装箱计算器"
       subtitle="计算货物可装箱数和空间利用率"
-      variant="tool"
     >
       <div className="max-w-7xl mx-auto">
         {/* Input */}
@@ -809,6 +807,6 @@ export default function ContainerCalculatorPage() {
             { question: "为什么实际装货量通常低于理论容积？", answer: "因为货物包装不规则、间隙、托盘占用空间等原因，实际装货量通常为理论容积的 80-90%。建议预留 10-15% 的空间余量。" },
           ]} />
       </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

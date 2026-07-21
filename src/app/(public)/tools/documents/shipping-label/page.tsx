@@ -1,4 +1,4 @@
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 import type { Metadata } from 'next';
 import { buildCanonical, buildTitle } from '@/lib/seo';
 import Link from 'next/link';
@@ -69,8 +69,7 @@ const LABEL_TYPES = [
 
 export default function LabelHubPage() {
   return (
-    <PublicLandingPageFrame
-      title="标签生成中心"
+    <ToolWorkspaceShell title="标签生成中心"
       subtitle="外箱唛头、入库标签、合箱标签、托盘标签 — 支持热敏纸尺寸与批量箱号自动生成"
     >
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -108,6 +107,6 @@ export default function LabelHubPage() {
           </div>
         </div>
       </div>
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 import { AdSlot } from '@/components/ad-slot';
 import { FAQSection } from '@/components/faq-section';
 import { buttonVariants, inputStyles, cardStyles, labelStyles } from "@/lib/ui-styles";
@@ -153,10 +153,8 @@ export default function CustomsGenerator() {
   };
 
   return (
-    <PublicLandingPageFrame
-      title="报关单生成器"
+    <ToolWorkspaceShell title="报关单生成器"
       subtitle="快速生成商业发票和报关单据"
-      variant="tool"
     >
       <div className="flex justify-end mb-4">
         <button
@@ -510,6 +508,6 @@ export default function CustomsGenerator() {
       {/* Ads */}
       <AdSlot placement="tool-customs-generator-bottom" className="mb-6" />
       <AdSlot placement="tool-bottom" className="mb-8" />
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

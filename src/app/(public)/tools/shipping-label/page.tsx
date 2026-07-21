@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import ShippingLabelClient from "./shipping-label-client";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 
 export const metadata: Metadata = {
   title: "唛头标签打印 — Shipping Label | 绝世百宝箱",
@@ -10,12 +10,11 @@ export const metadata: Metadata = {
 export default async function ShippingLabelPage({ searchParams }: { searchParams: Promise<{ draftId?: string }> }) {
   const params = await searchParams;
   return (
-    <PublicLandingPageFrame
+    <ToolWorkspaceShell
       title="唛头标签打印"
       subtitle="在线生成唛头/物流标签，支持分页打印"
-      variant="tool"
     >
       <ShippingLabelClient draftId={params.draftId || null} />
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }

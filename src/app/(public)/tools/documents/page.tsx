@@ -7,7 +7,7 @@ import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
 import RecentlyUsedWidget from "@/components/recently-used-docs";
 import ToolReviewServer from "@/components/tools/tool-review-server";
-import { PublicLandingPageFrame } from '@/components/templates/public/PublicLandingPageFrame';
+import ToolWorkspaceShell from '@/components/tools/ToolWorkspaceShell';
 
 /** Get tool maturity status */
 function getToolMaturity(key: string): "stable" | "beta" {
@@ -58,11 +58,8 @@ export default async function DocumentsHubPage() {
     .slice(0, 7);
 
   return (
-    <PublicLandingPageFrame
-      title="外贸与物流单据模板"
-      description="收录常用外贸、集运、仓库、报关相关单据模板。已上线的在线工具可直接填写、保存和导出。"
-      icon={<FileText className="w-6 h-6" />}
-      variant="content"
+    <ToolWorkspaceShell title="外贸与物流单据模板"
+      subtitle="收录常用外贸、集运、仓库、报关相关单据模板。已上线的在线工具可直接填写、保存和导出。"
     >
         {/* ===== SCENARIO CARDS ===== */}
         <div className="-mt-6 relative z-10 mb-8">
@@ -93,7 +90,7 @@ export default async function DocumentsHubPage() {
 
         {/* Ad Slot */}
         <div className="mb-8">
-          <AdSlot placement="documents-home-top" variant="banner" />
+          <AdSlot placement="documents-home-top" />
         </div>
 
         {/* Recently used widget */}
@@ -262,7 +259,7 @@ export default async function DocumentsHubPage() {
         {/* Tool Reviews */}
         <ToolReviewServer toolKey="documents" />
 
-        <AdSlot placement="footer" variant="banner" className="mt-8 mb-8" />
-      </PublicLandingPageFrame>
+        <AdSlot placement="footer" className="mt-8 mb-8" />
+      </ToolWorkspaceShell>
     );
 }

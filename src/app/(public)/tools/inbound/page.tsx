@@ -6,7 +6,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { AdSlot } from "@/components/ad-slot";
 import { FAQSection } from "@/components/faq-section";
-import { PublicLandingPageFrame } from "@/components/templates/public/PublicLandingPageFrame";
+import ToolWorkspaceShell from "@/components/tools/ToolWorkspaceShell";
 
 interface InboundItem {
   id: string;
@@ -66,10 +66,8 @@ export default function InboundPage() {
   };
 
   return (
-    <PublicLandingPageFrame
-      title="入库单生成器"
+    <ToolWorkspaceShell title="入库单生成器"
       subtitle="仓库入库单据制作，支持PDF导出"
-      variant="tool"
     >
       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -106,6 +104,6 @@ export default function InboundPage() {
         { question: "数据会保存到云端吗？", answer: "入库数据仅保存在浏览器本地存储（localStorage）中，不会上传到服务器。清除浏览器数据会导致数据丢失，建议定期导出备份。" },
         { question: "如何导出入库记录？", answer: "点击「导出」按钮可将所有入库记录导出为 JSON 文件。需要恢复时，使用「导入」功能选择之前导出的文件即可。" },
       ]} />
-    </PublicLandingPageFrame>
+    </ToolWorkspaceShell>
   );
 }
