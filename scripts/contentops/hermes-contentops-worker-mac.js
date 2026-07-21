@@ -26,7 +26,12 @@ const FAILED_DIR = path.join(JOBS_DIR, 'failed');
 const LOG_DIR = path.join(HOME_DIR, '.jueshi-contentops/logs');
 const LOCK_FILE = path.join(JOBS_DIR, 'worker.lock');
 
-const JOB_TIMEOUT_MS = parseInt(process.env.HERMES_JOB_TIMEOUT_MS || '180000'); // 3 minutes
+// Tiered timeouts
+const HERMES_PROCESS_START_TIMEOUT_MS = parseInt(process.env.HERMES_PROCESS_START_TIMEOUT_MS || '30000'); // 30s
+const HERMES_FIRST_OUTPUT_TIMEOUT_MS = parseInt(process.env.HERMES_FIRST_OUTPUT_TIMEOUT_MS || '120000'); // 2min
+const HERMES_TOTAL_TIMEOUT_MS = parseInt(process.env.HERMES_TOTAL_TIMEOUT_MS || '600000'); // 10min
+const JOB_TIMEOUT_MS = parseInt(process.env.HERMES_JOB_TIMEOUT_MS || '900000'); // 15min total
+
 const HERMES_AGENT_PATH = process.env.HERMES_AGENT_PATH || path.join(HOME_DIR, '.hermes/hermes-agent/venv/bin/hermes');
 const WORKING_DIR = process.env.HERMES_WORKING_DIR || path.join(HOME_DIR, 'xixiong-saas');
 
@@ -180,6 +185,7 @@ function callHermesAgent(job) {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     const hermesRunId = `hermes-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
+    const jobId = job.jobId || 'unknown';
     
     // Build prompt based on job type
     let prompt = '';
@@ -193,36 +199,105 @@ function callHermesAgent(job) {
       return;
     }
     
-    log('info', 'Calling Hermes Agent', { jobId: job.jobId, hermesRunId, contentType: job.contentType });
+    log('info', 'WORKER_STARTED', { jobId, hermesRunId, contentType: job.contentType });
     
-    // Use spawn instead of execSync to avoid shell injection and handle large prompts
-    const args = ['chat', '-q', prompt, '-Q', '--max-turns', '5'];
+    // Use spawn with detached process group for proper cleanup
+    const args = ['chat', '-q', prompt, '-Q', '--max-turns', '1'];
     const child = spawn(HERMES_AGENT_PATH, args, {
       cwd: WORKING_DIR,
       env: { ...process.env },
-      stdio: ['ignore', 'pipe', 'pipe']
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true // Create new process group for cleanup
     });
     
     let stdout = '';
     let stderr = '';
+    let firstOutputReceived = false;
+    let processClosed = false;
     
+    // Track first output
     child.stdout.on('data', (data) => {
+      if (!firstOutputReceived) {
+        firstOutputReceived = true;
+        const elapsedMs = Date.now() - startTime;
+        log('info', 'HERMES_FIRST_OUTPUT_RECEIVED', { jobId, elapsedMs });
+        clearTimeout(firstOutputTimeout);
+      }
       stdout += data.toString();
     });
     
     child.stderr.on('data', (data) => {
+      if (!firstOutputReceived) {
+        firstOutputReceived = true;
+        const elapsedMs = Date.now() - startTime;
+        log('info', 'HERMES_FIRST_OUTPUT_RECEIVED', { jobId, elapsedMs, source: 'stderr' });
+        clearTimeout(firstOutputTimeout);
+      }
       stderr += data.toString();
     });
     
-    const timeout = setTimeout(() => {
-      child.kill('SIGTERM');
-      reject(new Error('HERMES_CLI_TIMEOUT'));
-    }, JOB_TIMEOUT_MS);
+    // Process start timeout
+    const startTimeout = setTimeout(() => {
+      if (!firstOutputReceived) {
+        log('error', 'HERMES_PROCESS_START_TIMEOUT', { jobId, timeoutMs: HERMES_PROCESS_START_TIMEOUT_MS });
+        cleanupAndReject('HERMES_PROCESS_START_TIMEOUT');
+      }
+    }, HERMES_PROCESS_START_TIMEOUT_MS);
     
-    child.on('close', (code) => {
-      clearTimeout(timeout);
+    // First output timeout
+    const firstOutputTimeout = setTimeout(() => {
+      if (!firstOutputReceived) {
+        log('error', 'HERMES_FIRST_OUTPUT_TIMEOUT', { jobId, timeoutMs: HERMES_FIRST_OUTPUT_TIMEOUT_MS });
+        cleanupAndReject('HERMES_FIRST_OUTPUT_TIMEOUT');
+      }
+    }, HERMES_FIRST_OUTPUT_TIMEOUT_MS);
+    
+    // Total timeout
+    const totalTimeout = setTimeout(() => {
+      log('error', 'HERMES_TOTAL_TIMEOUT', { jobId, timeoutMs: HERMES_TOTAL_TIMEOUT_MS, elapsedMs: Date.now() - startTime });
+      cleanupAndReject('HERMES_TOTAL_TIMEOUT');
+    }, HERMES_TOTAL_TIMEOUT_MS);
+    
+    function cleanupAndReject(errorCode) {
+      if (processClosed) return;
+      processClosed = true;
       
-      if (code !== 0) {
+      clearTimeout(startTimeout);
+      clearTimeout(firstOutputTimeout);
+      clearTimeout(totalTimeout);
+      
+      // Kill process group
+      try {
+        if (child.pid) {
+          process.kill(-child.pid, 'SIGTERM');
+          // Wait 5 seconds, then SIGKILL
+          setTimeout(() => {
+            try {
+              process.kill(-child.pid, 'SIGKILL');
+            } catch (e) {
+              // Process already exited
+            }
+          }, 5000);
+        }
+      } catch (e) {
+        // Process group may not exist
+      }
+      
+      reject(new Error(errorCode));
+    }
+    
+    child.on('close', (code, signal) => {
+      if (processClosed) return;
+      processClosed = true;
+      
+      clearTimeout(startTimeout);
+      clearTimeout(firstOutputTimeout);
+      clearTimeout(totalTimeout);
+      
+      const elapsedMs = Date.now() - startTime;
+      log('info', 'HERMES_PROCESS_CLOSED', { jobId, code, signal, elapsedMs });
+      
+      if (code !== 0 && code !== null) {
         reject(new Error(`HERMES_CLI_EXIT_${code}: ${stderr.substring(0, 500)}`));
         return;
       }
@@ -236,104 +311,67 @@ function callHermesAgent(job) {
       
       resolve({
         content: cleanedOutput,
-        latencyMs: Date.now() - startTime
+        latencyMs: elapsedMs
       });
     });
     
     child.on('error', (error) => {
-      clearTimeout(timeout);
-      log('error', 'Hermes Agent spawn failed', { jobId: job.jobId, error: error.message });
-      reject(error);
+      if (processClosed) return;
+      processClosed = true;
+      
+      clearTimeout(startTimeout);
+      clearTimeout(firstOutputTimeout);
+      clearTimeout(totalTimeout);
+      
+      log('error', 'HERMES_SPAWN_FAILED', { jobId, error: error.message });
+      reject(new Error(`HERMES_CLI_SPAWN_FAILED: ${error.message}`));
     });
+    
+    log('info', 'HERMES_PROCESS_STARTED', { jobId, pid: child.pid });
   });
 }
 
 function buildGeneratePrompt(job) {
   const contentType = job.contentType || 'guide';
+  const userInput = job.rawUserInput || '';
   
-  return `You are a content generation AI for a Chinese website targeting overseas Chinese and international students.
+  // Simplified prompt - only essential requirements
+  return `Generate ${contentType} content in Chinese for overseas Chinese audience.
 
-Generate ${contentType} content based on the following user input.
+Topic: ${userInput}
 
-User input:
-${job.rawUserInput}
-
-You must respond with valid JSON only, no markdown, no explanation.
-
-The JSON structure must include:
+Return ONLY valid JSON (no markdown, no explanation):
 {
-  "title": "SEO-friendly title in Chinese, max 24 chars",
-  "slug": "url-friendly-slug",
-  "summary": "brief summary",
+  "title": "SEO标题(≤24字)",
+  "slug": "url-slug",
+  "summary": "摘要",
   "contentType": "${contentType}",
-  "content": { ... content specific to type ... },
+  "content": {
+    "body": "Markdown正文(≥1800字)",
+    "audience": "目标受众",
+    "steps": ["步骤1", "步骤2"],
+    "pitfalls": ["注意事项"]
+  },
   "seo": {
-    "primaryKeyword": "primary keyword",
-    "secondaryKeywords": ["keyword1", "keyword2"],
-    "metaTitle": "meta title",
-    "metaDescription": "meta description"
+    "primaryKeyword": "主关键词",
+    "secondaryKeywords": ["词1", "词2"],
+    "metaTitle": "SEO标题",
+    "metaDescription": "SEO描述"
   },
   "geo": {
-    "targetAudience": "audience",
-    "targetCountries": ["country1"],
-    "audienceStage": "stage"
+    "targetAudience": "受众",
+    "targetCountries": ["国家"]
   },
-  "sources": [{"url": "https://...", "title": "source title", "publisher": "publisher"}],
-  "faq": [{"question": "Q", "answer": "A"}]
-}
-
-Content type specific requirements:
-
-For GUIDE:
-{
-  "content": {
-    "excerpt": "brief excerpt",
-    "body": "full markdown body with sections",
-    "sections": [{"heading": "section title", "content": "section content"}]
-  }
-}
-
-For CHECKLIST:
-{
-  "content": {
-    "groups": [
-      {
-        "title": "group title",
-        "items": [
-          {
-            "title": "item title",
-            "description": "item description",
-            "required": true,
-            "completionCondition": "how to know it's done",
-            "riskNote": "risk warning if any"
-          }
-        ]
-      }
-    ],
-    "pitfalls": [{"title": "title", "description": "description"}]
-  }
-}
-
-For TOPIC:
-{
-  "content": {
-    "hero": "hero section",
-    "subtopics": [{"title": "title", "description": "description"}],
-    "relatedTools": [{"name": "name", "url": "https://...", "description": "description"}],
-    "relatedGuides": [{"title": "title", "url": "/guides/slug"}],
-    "relatedChecklists": [{"title": "title", "url": "/checklists/slug"}],
-    "relatedResources": [{"title": "title", "url": "https://..."}],
-    "blockConfiguration": [{"type": "block type", "content": "..."}]
-  }
+  "sources": [{"url": "https://...", "title": "标题", "publisher": "来源"}],
+  "faq": [{"question": "问题", "answer": "答案"}]
 }
 
 Requirements:
-- All content must be in Chinese
-- Include real, verifiable sources when possible
-- Do not publish content
-- Do not execute database operations
-- Do not execute deployment
-- Do not execute shell commands`;
+- Chinese content only
+- Body ≥1800 characters
+- 5+ FAQ items
+- Real sources when possible
+- No deployment/DB/shell commands`;
 }
 
 function buildModifyPrompt(job) {
@@ -374,13 +412,21 @@ async function processJob(jobPath) {
     return false;
   }
   
+  const jobId = job.jobId || 'unknown';
+  const startTime = Date.now();
+  
   try {
+    log('info', 'JOB_PROCESSING_STARTED', { jobId, jobType: job.jobType, contentType: job.contentType });
+    
     const result = await callHermesAgent(job);
     
+    const hermesDurationMs = Date.now() - startTime;
+    log('info', 'HERMES_JSON_PARSED', { jobId, durationMs: hermesDurationMs, contentLength: result.content.length });
+    
     // Write result to outbox
-    const resultFile = path.join(OUTBOX_DIR, `${job.jobId}.json`);
+    const resultFile = path.join(OUTBOX_DIR, `${jobId}.json`);
     fs.writeFileSync(resultFile, JSON.stringify(result, null, 2));
-    log('info', 'Result written to outbox', { jobId: job.jobId });
+    log('info', 'JOB_COMPLETED', { jobId, durationMs: hermesDurationMs });
     
     // Clean up processing file
     try {
@@ -391,9 +437,23 @@ async function processJob(jobPath) {
     
     return true;
   } catch (error) {
+    const durationMs = Date.now() - startTime;
+    log('error', 'JOB_FAILED', { jobId, durationMs, error: error.message, retryable: isRetryableError(error.message) });
     moveToFailed(processingPath, error.message);
     return false;
   }
+}
+
+function isRetryableError(errorMessage) {
+  const retryablePatterns = [
+    'HERMES_PROCESS_START_TIMEOUT',
+    'HERMES_FIRST_OUTPUT_TIMEOUT',
+    'HERMES_TOTAL_TIMEOUT',
+    'HERMES_CLI_SPAWN_FAILED',
+    'ECONNREFUSED',
+    'ETIMEDOUT'
+  ];
+  return retryablePatterns.some(pattern => errorMessage.includes(pattern));
 }
 
 // ============================================================================
