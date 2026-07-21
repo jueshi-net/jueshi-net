@@ -1532,7 +1532,7 @@ Production: 🔒 DISABLED`;
       const ackMsg = await bot.sendMessage(chatId, ackMessage.substring(0, 4000));
 
       // Create task via Bridge API
-      const taskResult = await fetchBridgeApi({
+      const taskResponse = await fetchBridgeApi({
         action: 'create_task',
         chatId: String(chatId),
         messageId: msg.message_id,
@@ -1552,17 +1552,30 @@ Production: 🔒 DISABLED`;
         publishInstruction: parsed.publishInstruction,
       });
 
-      if (taskResult.error) {
-        // Task creation failed - send plain text error
+      // Check HTTP status first
+      if (!taskResponse.ok) {
+        const errorData = await taskResponse.json().catch(() => ({ error: 'Unknown error', code: 'TASK_CREATE_FAILED' }));
         await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
 
-错误：${taskResult.error}
-编号：${taskResult.code || 'TASK_CREATE_FAILED'}`);
+错误：${errorData.error || 'Unknown'}
+编号：${errorData.code || 'TASK_CREATE_FAILED'}`);
+        console.error('[ContentOps Bot] Task creation failed:', { status: taskResponse.status, error: errorData });
         return;
       }
 
-      // Update acknowledgment with task ID (plain text, no parse_mode)
+      // Parse JSON response
+      const taskResult = await taskResponse.json();
+
+      // Validate task ID exists
       const taskId = taskResult.taskId;
+      if (!taskId || typeof taskId !== 'string') {
+        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
+
+错误编号：CONTENTOPS-TASK-ID-MISSING
+任务未进入执行队列，请稍后重试。`);
+        console.error('[ContentOps Bot] Task ID missing in response:', taskResult);
+        return;
+      }
       const updateMessage = `✅ 任务创建成功
 
 任务 ID：${taskId}
@@ -1602,13 +1615,17 @@ Production: 🔒 DISABLED`;
         
         // Kickstart one-shot worker
         const childProcess = await import('child_process');
-        const execSyncFn = childProcess.execSync!;
+        const execSyncFn = childProcess.execSync;
+        if (!execSyncFn) {
+          console.error('[ContentOps Bot] execSync not available');
+          return;
+        }
         const cwd = process.cwd() || '/Users/chq/xixiong-saas';
         const workerScript = `${cwd}/scripts/contentops/hermes-contentops-worker.ts`;
         
         // Use launchctl kickstart if available, otherwise run directly
         try {
-          const uid = process.getuid() || 0;
+          const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
           execSyncFn(`launchctl kickstart -k gui/${uid}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, { 
             stdio: 'ignore',
             timeout: 5000
