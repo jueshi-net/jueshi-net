@@ -1510,7 +1510,7 @@ Production: 🔒 DISABLED`;
 
       // Update acknowledgment with task ID
       const taskId = taskResult.taskId;
-      const updateMessage = `✅ 任务已创建\n\n任务 ID：\`${taskId}\`\n识别类型：${parsed.contentType}\n执行方式：${parsed.executionMode}\n目标环境：${parsed.targetEnvironment}\n主题：${parsed.topic}\n当前阶段：等待处理\n\n系统将自动处理此任务，完成后通知您。`;
+      const updateMessage = `✅ 任务已创建\\n\\n任务 ID：\\`${taskId}\\`\\n识别类型：${parsed.contentType}\\n执行方式：${parsed.executionMode}\\n目标环境：${parsed.targetEnvironment}\\n主题：${parsed.topic}\\n当前阶段：等待处理\\n\\n系统将自动处理此任务，完成后通知您。`;
       
       await bot.editMessageText(updateMessage.substring(0, 4000), {
         chat_id: chatId,
@@ -1519,6 +1519,46 @@ Production: 🔒 DISABLED`;
       });
 
       console.error('[ContentOps Bot] Task created:', { taskId, chatId, contentType: parsed.contentType });
+
+      // Event wakeup: Write job to inbox and kickstart worker
+      try {
+        const jobData = {
+          jobId: taskId,
+          jobType: 'contentops_generate',
+          contentType: parsed.contentType,
+          rawUserInput: text,
+          task: taskResult.task,
+          createdAt: new Date().toISOString(),
+        };
+        
+        const jobsDir = process.env.HERMES_JOBS_DIR || `${process.env.HOME}/.jueshi-contentops/jobs`;
+        const inboxPath = `${jobsDir}/inbox/${taskId}.json`;
+        
+        // Write job file
+        const fs = await import('fs');
+        fs.writeFileSync(inboxPath, JSON.stringify(jobData, null, 2));
+        console.error('[ContentOps Bot] Job written to inbox:', inboxPath);
+        
+        // Kickstart one-shot worker
+        const { execSync } = await import('child_process');
+        const workerScript = `${process.cwd()}/scripts/contentops/hermes-contentops-worker-mac.js`;
+        
+        // Use launchctl kickstart if available, otherwise run directly
+        try {
+          execSync(`launchctl kickstart -k gui/${process.getuid()}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, { 
+            stdio: 'ignore',
+            timeout: 5000
+          });
+          console.error('[ContentOps Bot] Worker kickstarted');
+        } catch (kickstartError) {
+          // If launchctl fails, run worker directly in background
+          execSync(`node ${workerScript} > /dev/null 2>&1 &`, { stdio: 'ignore' });
+          console.error('[ContentOps Bot] Worker started in background');
+        }
+      } catch (wakeupError) {
+        console.error('[ContentOps Bot] Failed to wakeup worker:', wakeupError);
+        // Non-fatal: task is created, worker can be started manually
+      }
 
     } catch (error) {
       console.error('[ContentOps Bot] Task creation error:', error);
