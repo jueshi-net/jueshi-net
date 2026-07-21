@@ -217,7 +217,7 @@ function callHermesAgent(job) {
     const timeout = setTimeout(() => {
       child.kill('SIGTERM');
       reject(new Error('HERMES_CLI_TIMEOUT'));
-    }, HERMES_TIMEOUT_MS);
+    }, JOB_TIMEOUT_MS);
     
     child.on('close', (code) => {
       clearTimeout(timeout);
