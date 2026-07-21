@@ -139,7 +139,12 @@ export class HermesContentExecutor implements ContentExecutor {
       // Parse JSON output
       let parsed: any;
       try {
-        const cleaned = rawOutput.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        // Clean markdown code blocks and warning messages
+        const cleaned = rawOutput
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?/g, '')
+          .replace(/^Warning:.*\n?/gm, '') // Remove warning lines
+          .trim();
         parsed = JSON.parse(cleaned);
       } catch (parseError) {
         throw new Error('HERMES_CLI_INVALID_JSON: ' + rawOutput.substring(0, 500));
