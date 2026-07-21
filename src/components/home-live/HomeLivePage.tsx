@@ -133,7 +133,7 @@ const AD_PLACEMENTS = {
 };
 
 // Header 组件
-function HomeLiveHeader() {
+function HomeLiveHeader({ serviceProviderEnabled = false }: { serviceProviderEnabled?: boolean }) {
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated' && !!session?.user;
   const displayName = session?.user?.name || session?.user?.email || '用户';
@@ -152,6 +152,9 @@ function HomeLiveHeader() {
               <Link href="/checklists" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">清单</Link>
               <Link href="/guides" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">指南</Link>
               <Link href="/resources" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">资源</Link>
+              {serviceProviderEnabled && (
+                <Link href="/service-providers" className="px-3 py-2 rounded-lg text-sm font-medium text-[#808191] hover:text-[#11142D] hover:bg-[#F3F5FA]">服务商</Link>
+              )}
             </nav>
           </div>
           <div className="hidden md:flex flex-1 max-w-md mx-8">
@@ -807,7 +810,7 @@ function HomeLiveBottomTab() {
 }
 
 // 主页面组件
-export default function HomeLivePage() {
+export default function HomeLivePage({ serviceProviderEnabled = false }: { serviceProviderEnabled?: boolean }) {
   return (
     <div className="min-h-screen bg-[#F6F8FC]">
       {/* Dev marker */}
@@ -815,7 +818,7 @@ export default function HomeLivePage() {
         🔧 DEV MODE - HomeLivePage | modules: full-v4-content-restored
       </div>
       
-      <HomeLiveHeader />
+      <HomeLiveHeader serviceProviderEnabled={serviceProviderEnabled} />
       
       <main className="pb-24 md:pb-8">
         <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-6 md:py-8">
@@ -854,6 +857,26 @@ export default function HomeLivePage() {
           <div className="mb-10">
             <HomeLiveAdGrid placements={AD_PLACEMENTS.afterTasksImage} columns={4} rows={1} variant="image" title="服务商推荐" description="专业服务提供商" />
           </div>
+          
+          {/* 7.5. 服务商入口 */}
+          {serviceProviderEnabled && (
+            <section className="mb-10">
+              <div className="bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] rounded-2xl p-6 md:p-8 text-white shadow-lg">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="text-center md:text-left">
+                    <h2 className="text-xl font-bold mb-2">找服务商</h2>
+                    <p className="text-sm text-white/80">查找跨境物流、报关清关、留学安居和海外专业服务</p>
+                  </div>
+                  <Link
+                    href="/service-providers"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#6C5DD3] rounded-xl text-sm font-bold hover:bg-white/90 transition-colors whitespace-nowrap"
+                  >
+                    浏览服务商<ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
           
           {/* 8. 社区论坛 */}
           <HomeLiveCommunitySection />

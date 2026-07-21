@@ -8,7 +8,7 @@ import MobileBottomNav from '@/components/mobile/MobileBottomNav';
 import JueshiV4PublicShell from '@/components/layout/JueshiV4PublicShell';
 import { cn } from '@/lib/utils';
 
-export function PublicLayoutClient({ children }: { children: React.ReactNode }) {
+export function PublicLayoutClient({ children, serviceProviderEnabled = false }: { children: React.ReactNode; serviceProviderEnabled?: boolean }) {
   const pathname = usePathname();
   const isUILab = pathname.startsWith('/ui-lab');
   const isV4Home = pathname === '/';
@@ -48,17 +48,17 @@ export function PublicLayoutClient({ children }: { children: React.ReactNode }) 
 
   // 服务商黄页页面使用 JueshiV4PublicShell，统一品牌 Header 和底栏
   if (isServiceProviders || isBusinessSlug || isProfessional || isServicesSlug) {
-    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
+    return <JueshiV4PublicShell serviceProviderEnabled={serviceProviderEnabled}>{children}</JueshiV4PublicShell>;
   }
 
   // 工具子页面（/tools/*）使用 JueshiV4PublicShell，统一品牌 Header 和底栏
   if (isToolsSubpage) {
-    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
+    return <JueshiV4PublicShell serviceProviderEnabled={serviceProviderEnabled}>{children}</JueshiV4PublicShell>;
   }
 
   // 工具中心（/tools）也使用 JueshiV4PublicShell，避免双 Header
   if (isTools) {
-    return <JueshiV4PublicShell>{children}</JueshiV4PublicShell>;
+    return <JueshiV4PublicShell serviceProviderEnabled={serviceProviderEnabled}>{children}</JueshiV4PublicShell>;
   }
 
   return (

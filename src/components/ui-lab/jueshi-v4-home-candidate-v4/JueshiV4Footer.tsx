@@ -43,7 +43,8 @@ const userLinks = [
   { label: '社区', href: '/community' },
 ];
 
-export default function JueshiV4Footer() {
+export default function JueshiV4Footer(props: { serviceProviderEnabled?: boolean }) {
+  const serviceProviderEnabled = props.serviceProviderEnabled === true;
   // 从配置读取
   const config = DEFAULT_BUTTONS;
   const loginButton = config.footerLoginButton;
@@ -148,6 +149,13 @@ export default function JueshiV4Footer() {
           <div>
             <h4 className="text-sm font-semibold mb-4">资源导航</h4>
             <ul className="space-y-2">
+              {serviceProviderEnabled && (
+                <li>
+                  <Link href="/service-providers" className="text-sm text-white/60 hover:text-white transition-colors">
+                    服务商目录
+                  </Link>
+                </li>
+              )}
               {resourceLinks.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-sm text-white/60 hover:text-white transition-colors">

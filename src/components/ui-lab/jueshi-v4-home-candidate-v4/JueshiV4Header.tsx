@@ -10,6 +10,7 @@ import { DEFAULT_BUTTONS, type NavItemConfig, type ButtonConfig } from './homepa
 interface HeaderProps {
   onMenuClick: () => void;
   menuOpen: boolean;
+  serviceProviderEnabled?: boolean;
 }
 
 // 图标映射
@@ -20,7 +21,10 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   X,
 };
 
-export default function JueshiV4Header({ onMenuClick, menuOpen }: HeaderProps) {
+export default function JueshiV4Header(props: HeaderProps) {
+  const onMenuClick = props.onMenuClick;
+  const menuOpen = props.menuOpen;
+  const serviceProviderEnabled = props.serviceProviderEnabled === true;
   const [activeNav, setActiveNav] = useState('home');
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated' && !!session?.user;
@@ -28,7 +32,7 @@ export default function JueshiV4Header({ onMenuClick, menuOpen }: HeaderProps) {
   
   // 从配置读取
   const config = DEFAULT_BUTTONS;
-  const navItems = config.headerNav.filter(item => item.enabled).sort((a, b) => a.sortOrder - b.sortOrder);
+  const navItems = config.headerNav.filter(item => item.enabled && (item.key !== 'nav_service_providers' || serviceProviderEnabled)).sort((a, b) => a.sortOrder - b.sortOrder);
   const searchPlaceholder = config.headerSearchPlaceholder;
   const checkinButton = config.headerCheckinButton;
   const loginButton = config.headerLoginButton;

@@ -1,4 +1,5 @@
 import JueshiV4HomeCandidateV4Shell from '@/components/ui-lab/jueshi-v4-home-candidate-v4/JueshiV4HomeCandidateV4Shell';
+import { isFeatureEnabled } from '@/platform';
 
 export const metadata = {
   title: '绝世百宝箱 - 海外华人的实用工具箱',
@@ -8,5 +9,6 @@ export const metadata = {
 };
 
 export default function HomePage() {
-  return <JueshiV4HomeCandidateV4Shell />;
+  const serviceProviderEnabled = isFeatureEnabled('FEATURE_SERVICE_PROVIDER');
+  return <JueshiV4HomeCandidateV4Shell serviceProviderEnabled={serviceProviderEnabled} />;
 }

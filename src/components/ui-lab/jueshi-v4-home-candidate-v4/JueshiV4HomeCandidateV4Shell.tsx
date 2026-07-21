@@ -129,7 +129,8 @@ const AD_PLACEMENTS = {
   ],
 };
 
-export default function JueshiV4HomeCandidateV4Shell() {
+export default function JueshiV4HomeCandidateV4Shell(props: { serviceProviderEnabled?: boolean } = {}) {
+  const serviceProviderEnabled = props.serviceProviderEnabled === true;
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
@@ -139,6 +140,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
       <JueshiV4Header
         onMenuClick={() => setMenuOpen(!menuOpen)}
         menuOpen={menuOpen}
+        serviceProviderEnabled={serviceProviderEnabled}
       />
 
       {/* Main content */}
@@ -228,6 +230,26 @@ export default function JueshiV4HomeCandidateV4Shell() {
             />
           </div>
 
+          {/* 10.5. 服务商入口 */}
+          {serviceProviderEnabled && (
+            <section className="mb-10">
+              <div className="bg-gradient-to-br from-[#6C5DD3] to-[#3F8CFF] rounded-2xl p-6 md:p-8 text-white shadow-lg">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="text-center md:text-left">
+                    <h2 className="text-xl font-bold mb-2">找服务商</h2>
+                    <p className="text-sm text-white/80">查找跨境物流、报关清关、留学安居和海外专业服务</p>
+                  </div>
+                  <a
+                    href="/service-providers"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#6C5DD3] rounded-xl text-sm font-bold hover:bg-white/90 transition-colors whitespace-nowrap"
+                  >
+                    浏览服务商
+                  </a>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* 11. 社区论坛 */}
           <JueshiV4CommunitySection />
 
@@ -267,7 +289,7 @@ export default function JueshiV4HomeCandidateV4Shell() {
       </main>
 
       {/* Footer - V4 专属，消费配置 */}
-      <JueshiV4Footer />
+      <JueshiV4Footer serviceProviderEnabled={serviceProviderEnabled} />
 
       {/* Bottom navigation - V4 专属，消费配置 */}
       <JueshiV4BottomTab activeTab={activeTab} onTabChange={setActiveTab} />

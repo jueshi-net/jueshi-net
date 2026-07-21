@@ -8,6 +8,7 @@ import JueshiV4Footer from '@/components/ui-lab/jueshi-v4-home-candidate-v4/Jues
 
 interface JueshiV4PublicShellProps {
   children: React.ReactNode;
+  serviceProviderEnabled?: boolean;
 }
 
 /**
@@ -16,7 +17,9 @@ interface JueshiV4PublicShellProps {
  * 用于所有需要 V4 Header/Footer 的公共页面（如 /resources, /tools, /guides 等）
  * 管理移动端菜单状态，确保 Header 的 mobile menu 正常工作
  */
-export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellProps) {
+export default function JueshiV4PublicShell(props: JueshiV4PublicShellProps) {
+  const children = props.children;
+  const serviceProviderEnabled = props.serviceProviderEnabled === true;
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const pathname = usePathname();
@@ -33,6 +36,8 @@ export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellPro
       setActiveTab('mobile_tab_profile');
     } else if (pathname.startsWith('/bbs') || pathname.startsWith('/community')) {
       setActiveTab('mobile_tab_community');
+    } else if (pathname.startsWith('/service-providers') || pathname.startsWith('/business/') || pathname.startsWith('/professional/') || pathname.startsWith('/services/')) {
+      setActiveTab('mobile_tab_home'); // 服务商归入首页分类
     } else {
       setActiveTab('mobile_tab_home'); // 默认
     }
@@ -42,10 +47,10 @@ export default function JueshiV4PublicShell({ children }: JueshiV4PublicShellPro
 
   return (
     <>
-      <JueshiV4Header onMenuClick={handleMenuClick} menuOpen={menuOpen} />
+      <JueshiV4Header onMenuClick={handleMenuClick} menuOpen={menuOpen} serviceProviderEnabled={serviceProviderEnabled} />
       <main className="flex-1 pb-20">{children}</main>
       <JueshiV4BottomTab activeTab={activeTab} onTabChange={setActiveTab} />
-      <JueshiV4Footer />
+      <JueshiV4Footer serviceProviderEnabled={serviceProviderEnabled} />
     </>
   );
 }

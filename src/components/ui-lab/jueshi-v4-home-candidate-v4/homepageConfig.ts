@@ -163,6 +163,7 @@ export const DEFAULT_BUTTONS: HomepageButtonConfig = {
     { key: 'nav_country', label: '国家', href: '/destinations', enabled: true, external: false, sortOrder: 55, trackingKey: 'header_nav_country', priority: 'core' },
     { key: 'nav_workbench', label: '我的工作台', href: '/workspace', enabled: true, icon: 'LayoutDashboard', external: false, sortOrder: 56, trackingKey: 'header_nav_workbench', priority: 'core' },
     { key: 'nav_topics', label: '专题', href: '/topics', enabled: true, external: false, sortOrder: 60, trackingKey: 'header_nav_topics', priority: 'extended' },
+    { key: 'nav_service_providers', label: '服务商', href: '/service-providers', enabled: true, external: false, sortOrder: 65, trackingKey: 'header_nav_service_providers', priority: 'extended' },
     { key: 'nav_community', label: '社区', href: '/community', enabled: true, external: false, sortOrder: 70, trackingKey: 'header_nav_community', priority: 'extended' },
   ],
   headerSearchPlaceholder: '搜索工具、指南、资源、国家、城市...',

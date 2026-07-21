@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { isFeatureEnabled } from "@/platform";
 
 const BASE_URL = "https://jueshi.net";
 
@@ -234,5 +235,43 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("[sitemap] DB fetch failed, returning static pages + tools only");
   }
 
-  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages, ...forumCategoryPages, ...forumPostPages];
+  // Service Provider pages (only when feature is enabled)
+  let serviceProviderPages: MetadataRoute.Sitemap = [];
+  if (isFeatureEnabled("FEATURE_SERVICE_PROVIDER")) {
+    try {
+      const providers = await prisma.serviceProvider.findMany({
+        where: { status: "approved", slug: { not: { startsWith: "e2e-" } } },
+        select: { slug: true, providerType: true, updatedAt: true },
+      });
+      serviceProviderPages = providers.map((p) => ({
+        url: `${BASE_URL}/${p.providerType === "PROFESSIONAL" ? "professional" : "business"}/${p.slug}`,
+        lastModified: p.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      }));
+
+      const services = await prisma.providerService.findMany({
+        where: { status: "published", slug: { not: { startsWith: "e2e-" } } },
+        select: { slug: true, updatedAt: true },
+      });
+      serviceProviderPages.push(...services.map((s) => ({
+        url: `${BASE_URL}/services/${s.slug}`,
+        lastModified: s.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.5,
+      })));
+
+      // Directory page
+      serviceProviderPages.push({
+        url: `${BASE_URL}/service-providers`,
+        lastModified: now,
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      });
+    } catch {
+      console.error("[sitemap] Service Provider fetch failed");
+    }
+  }
+
+  return [...staticPages, ...tools, ...quoteSheetPage, ...articlePages, ...lpPages, ...checklistPages, ...communityPages, ...forumCategoryPages, ...forumPostPages, ...serviceProviderPages];
 }

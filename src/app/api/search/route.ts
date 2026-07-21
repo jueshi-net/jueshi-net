@@ -72,7 +72,28 @@ export async function GET(req: NextRequest) {
       results = results.slice(0, 50);
     }
 
-    return NextResponse.json({ success: true, data: results });
+    // Service Provider search (only when feature is enabled)
+    const serviceProviderResults: any[] = [];
+    if (process.env.FEATURE_SERVICE_PROVIDER === "true" && query) {
+      try {
+        const { listPublicProviders } = await import("@/modules/service-provider/public");
+        const providerResult = await listPublicProviders({ q: query, pageSize: 10 });
+        for (const p of providerResult.items) {
+          serviceProviderResults.push({
+            id: p.id,
+            title: p.displayName,
+            description: p.description || "",
+            url: p.providerType === "PROFESSIONAL" ? `/professional/${p.slug}` : `/business/${p.slug}`,
+            category: { name: "服务商" },
+            type: "service_provider",
+          });
+        }
+      } catch {
+        // Service provider search failed, continue with link results
+      }
+    }
+
+    return NextResponse.json({ success: true, data: [...results, ...serviceProviderResults] });
   } catch {
     return NextResponse.json({ success: false, error: "Failed to search" }, { status: 500 });
   }
