@@ -1541,7 +1541,7 @@ Production: 🔒 DISABLED`;
         
         // Kickstart one-shot worker
         const { execSync } = await import('child_process');
-        const workerScript = `${process.cwd()}/scripts/contentops/hermes-contentops-worker-mac.js`;
+        const workerScript = `${process.cwd()}/scripts/contentops/hermes-contentops-worker.ts`;
         
         // Use launchctl kickstart if available, otherwise run directly
         try {
