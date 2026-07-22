@@ -215,7 +215,7 @@ async function processJob(jobPath: string): Promise<boolean> {
       targetEnvironment: job.targetEnvironment || 'staging',
       rawInput: job.rawUserInput || job.userInstruction || '',
       topic: job.topic || '',
-      status: 'GENERATING_CONTENT',
+      status: TASK_STATUS.RUNNING,
       currentStep: 'hermes-execution',
       stepHistory: [],
       executor: 'hermes-agent',

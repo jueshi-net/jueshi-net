@@ -471,7 +471,10 @@ async function startBot() {
     if (processedUpdateIds.size > MAX_PROCESSED_UPDATES) {
       const iterator = processedUpdateIds.values();
       for (let i = 0; i < MAX_PROCESSED_UPDATES / 2; i++) {
-        processedUpdateIds.delete(iterator.next().value);
+        const value = iterator.next().value;
+        if (value !== undefined) {
+          processedUpdateIds.delete(value);
+        }
       }
     }
     return false;
