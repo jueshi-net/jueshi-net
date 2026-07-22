@@ -70,12 +70,22 @@ export class StagingHelperClient {
           return;
         }
 
-        // Parse response
+        // Parse response - extract only the last valid JSON object from stdout
         try {
-          const response: HelperResponse = JSON.parse(stdout.trim());
+          // Try to find the last complete JSON object in stdout
+          const jsonMatch = stdout.match(/\{[\s\S]*\}\s*$/);
+          if (!jsonMatch) {
+            throw new Error('No JSON object found in stdout');
+          }
+          
+          const response: HelperResponse = JSON.parse(jsonMatch[0]);
           resolve(response);
         } catch (error) {
-          reject(new Error(`CONTENTOPS-HELPER-INVALID-JSON: ${stdout.substring(0, 200)}`));
+          // Log stderr for debugging but don't include in error message
+          if (stderr) {
+            console.error('[StagingHelper] stderr:', stderr.substring(0, 500));
+          }
+          reject(new Error(`CONTENTOPS-HELPER-INVALID-JSON: exit=${code}, stdout_len=${stdout.length}`));
         }
       });
 

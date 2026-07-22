@@ -18,7 +18,7 @@ import { createHmac } from 'crypto';
 import * as fs from 'fs';
 
 const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET;
-const BRIDGE_URL = 'http://127.0.0.1:3001';
+const BRIDGE_URL = 'http://127.0.0.1:3000';
 const ENDPOINT = '/api/internal/contentops/drafts';
 
 // 允许的 action 白名单
@@ -132,14 +132,26 @@ async function main() {
 
     const result = await response.text();
     
-    // 包装响应为 {status, body} 格式
+    // 包装响应为统一格式
+    let responseBody: any;
+    try {
+      responseBody = JSON.parse(result);
+    } catch (error) {
+      responseBody = { error: 'Invalid JSON response from Bridge' };
+    }
+    
     const wrappedResponse = {
+      ok: response.status >= 200 && response.status < 300,
       status: response.status,
-      body: JSON.parse(result),
+      data: response.status >= 200 && response.status < 300 ? responseBody : undefined,
+      error: response.status >= 400 ? {
+        code: `HTTP_${response.status}`,
+        message: responseBody.error || responseBody.message || 'Request failed'
+      } : undefined
     };
     
-    // 输出结果到 stdout
-    console.log(JSON.stringify(wrappedResponse));
+    // 只输出纯 JSON 到 stdout，所有日志到 stderr
+    process.stdout.write(JSON.stringify(wrappedResponse) + '\n');
     
     // 退出码反映 HTTP 状态
     if (response.status >= 200 && response.status < 300) {
@@ -156,6 +168,17 @@ async function main() {
   } catch (error) {
     console.error('Error: Request failed');
     console.error(error);
+    
+    // 输出错误 JSON 到 stdout
+    const errorResponse = {
+      ok: false,
+      status: 500,
+      error: {
+        code: 'CONTENTOPS_HELPER_ERROR',
+        message: 'Request to Bridge failed'
+      }
+    };
+    process.stdout.write(JSON.stringify(errorResponse) + '\n');
     process.exit(14);
   }
 }
