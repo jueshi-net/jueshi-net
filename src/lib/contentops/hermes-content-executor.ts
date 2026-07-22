@@ -13,6 +13,13 @@ import * as os from 'os';
 import { ContentNormalizer, CleaningResult } from './content-normalizer';
 import { getContract, type ContentContract } from './contract-registry';
 import type { ContentType, ContentOpsTask } from './task-types';
+import { 
+  extractJsonFromMarkdown, 
+  extractNestedContent, 
+  validateRawModelDraft, 
+  normalizeFieldAliases, 
+  hasMinimalViability 
+} from './raw-model-draft-contract';
 
 // ============================================================================
 // Types
@@ -136,23 +143,58 @@ export class HermesContentExecutor implements ContentExecutor {
       // Call Hermes CLI
       const { content: rawOutput, latencyMs } = await callHermesCLI(prompt);
       
+      // Save raw output for debugging (if enabled)
+      if (process.env.CONTENTOPS_SAVE_RAW_OUTPUT === 'true') {
+        const fs = await import('fs');
+        const path = await import('path');
+        const os = await import('os');
+        const rawDir = path.join(os.homedir(), '.jueshi-contentops/raw-outputs');
+        if (!fs.existsSync(rawDir)) {
+          fs.mkdirSync(rawDir, { recursive: true });
+        }
+        const rawFile = path.join(rawDir, `${hermesRunId}.json`);
+        fs.writeFileSync(rawFile, JSON.stringify({
+          hermesRunId,
+          contentType,
+          taskId: (task as any).taskId || task.id || 'unknown',
+          timestamp: new Date().toISOString(),
+          rawOutput,
+        }, null, 2));
+      }
+      
+      // Extract JSON from markdown/code fence
+      const extractedJson = extractJsonFromMarkdown(rawOutput);
+      
       // Parse JSON output
       let parsed: any;
       try {
-        // Clean markdown code blocks and warning messages
-        const cleaned = rawOutput
-          .replace(/```json\n?/g, '')
-          .replace(/```\n?/g, '')
-          .replace(/^Warning:.*\n?/gm, '') // Remove warning lines
-          .trim();
-        parsed = JSON.parse(cleaned);
+        parsed = JSON.parse(extractedJson);
       } catch (parseError) {
         throw new Error('HERMES_CLI_INVALID_JSON: ' + rawOutput.substring(0, 500));
       }
       
-      // Run through normalizer
+      // Extract nested content if present
+      parsed = extractNestedContent(parsed);
+      
+      // Validate against Raw Model Draft Contract
+      const rawValidation = validateRawModelDraft(parsed);
+      if (!rawValidation.success) {
+        console.error('[HermesExecutor] Raw contract validation failed:', rawValidation.errors);
+        // Continue anyway - normalizer will attempt to fix
+      }
+      
+      // Normalize field aliases
+      const normalized = normalizeFieldAliases(parsed);
+      
+      // Check minimal viability
+      const viability = hasMinimalViability(normalized);
+      if (!viability.viable) {
+        throw new Error(`RAW_MODEL_NOT_VIABLE: ${viability.reason}`);
+      }
+      
+      // Run through normalizer with normalized data
       const normalizer = new ContentNormalizer(contentType);
-      const cleaningResult = normalizer.clean(parsed);
+      const cleaningResult = normalizer.clean(normalized);
       
       // Validate against contract
       const contract = getContract(contentType);
