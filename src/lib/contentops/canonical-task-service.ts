@@ -273,7 +273,7 @@ export class CanonicalTaskService {
   private async wakeupWorker(): Promise<void> {
     const { execSync } = await import('child_process');
     const cwd = process.cwd() || path.join(os.homedir(), 'xixiong-saas');
-    const workerScript = path.join(cwd, 'scripts/contentops/hermes-contentops-worker-mac.js');
+    const workerScript = path.join(cwd, 'scripts/contentops/hermes-contentops-worker.ts');
 
     try {
       const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
