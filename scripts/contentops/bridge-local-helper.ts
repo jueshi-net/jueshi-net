@@ -43,6 +43,10 @@ const ALLOWED_ACTIONS = [
   'generate',
   'generation_jobs',
   'generation_job_status',
+  'audit_contentops_task',
+  'update_content_status',
+  'update_task_metadata',
+  'auto_revise_checklist',
 ];
 
 function computeSignature(method: string, path: string, body: string): string {
