@@ -24,6 +24,7 @@ const ENDPOINT = '/api/internal/contentops/drafts';
 // 允许的 action 白名单
 const ALLOWED_ACTIONS = [
   'create_task',
+  'resume_task',
   'list_tasks',
   'get_task',
   'update_task',
