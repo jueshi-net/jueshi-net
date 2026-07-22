@@ -12,7 +12,15 @@ const crypto = require('crypto');
 
 const HOME_DIR = os.homedir();
 const OUTBOX_DIR = path.join(HOME_DIR, '.jueshi-contentops/jobs/outbox');
-const BRIDGE_SECRET='21b48adb20b6e168387d26d0b3b0a05f96be7be71698ccd83eedf7c2740e23e7';
+// SECURITY: Bridge Secret removed - use staging-helper-client instead
+// This script is deprecated and should not be used
+const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET || '';
+
+if (!BRIDGE_SECRET) {
+  console.error('ERROR: CONTENTOPS_BRIDGE_SECRET not set');
+  console.error('This script is deprecated. Use staging-helper-client instead.');
+  process.exit(1);
+}
 
 function generateHMAC(payload, path) {
   const body = JSON.stringify(payload);
