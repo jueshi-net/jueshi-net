@@ -174,18 +174,152 @@ async function publishGuide(
 }
 
 /**
- * Publish Topic to staging (placeholder)
+ * Publish Topic to staging
+ * Creates real Topic record in database via Bridge API
  */
 async function publishTopic(
   draft: ContentDraft,
   baseUrl: string,
   timestamp: Date
 ): Promise<PublishResult> {
-  return {
-    success: false,
-    error: 'Topic publishing not yet implemented',
-    timestamp,
-  };
+  try {
+    // Generate stable slug for staging
+    const slug = draft.slug || `topic-${draft.id.replace(/[^a-z0-9]/g, '-').toLowerCase()}`;
+    
+    // Check if topic already exists (idempotency)
+    const existingTopic = await prisma.topic.findUnique({ where: { slug } });
+    if (existingTopic) {
+      return {
+        success: false,
+        error: 'CONTENTOPS_SLUG_CONFLICT: Topic with same slug already exists',
+        timestamp,
+      };
+    }
+
+    // Extract content from draft qualityMetadata or body
+    const qm = (draft as any).qualityMetadata || {};
+    const content = qm.originalContent || {};
+    
+    // Build items from subtopics/related content
+    const topicItems = [];
+    const subtopics = content.subtopics || [];
+    for (let i = 0; i < subtopics.length; i++) {
+      const sub = subtopics[i];
+      topicItems.push({
+        name: sub.title || '',
+        description: sub.description || '',
+        category: sub.type || 'resource',
+        officialUrl: sub.url || '',
+        sortOrder: i,
+      });
+    }
+    
+    // Build sections from hero, FAQ, CTA
+    const topicSections = [];
+    let sectionOrder = 0;
+    
+    if (content.hero) {
+      topicSections.push({
+        type: 'intro',
+        title: content.hero.headline || draft.title,
+        content: content.hero.description || draft.summary || '',
+        sortOrder: sectionOrder++,
+      });
+    }
+    
+    if (content.faq && content.faq.length > 0) {
+      topicSections.push({
+        type: 'faq',
+        title: '常见问题',
+        content: JSON.stringify(content.faq),
+        sortOrder: sectionOrder++,
+      });
+    }
+    
+    if (content.cta) {
+      topicSections.push({
+        type: 'cta',
+        title: content.cta.text || '了解更多',
+        content: content.cta.url || '',
+        sortOrder: sectionOrder++,
+      });
+    }
+    
+    // Build metadata
+    const metadataJson = {
+      taskId: draft.id,
+      contentType: 'topic',
+      source: 'contentops-publish-adapter',
+      originalContent: content,
+      subtopicCount: subtopics.length,
+      faqCount: content.faq?.length || 0,
+      sourceFactCount: content.sources?.length || 0,
+      internalLinkCount: content.internalLinks?.length || 0,
+      blockConfiguration: content.blockConfiguration || {
+        hero: !!content.hero,
+        tools: (content.relatedTools || []).length > 0,
+        guides: (content.relatedGuides || []).length > 0,
+        checklists: (content.relatedChecklists || []).length > 0,
+        officialResources: (content.relatedResources || []).length > 0,
+        faq: (content.faq || []).length > 0,
+        internalLinks: (content.internalLinks || []).length > 0,
+      },
+    };
+
+    // Create new Topic record
+    const topic = await prisma.topic.create({
+      data: {
+        title: draft.title,
+        slug,
+        subtitle: content.hero?.subheadline || '',
+        summary: draft.summary || '',
+        status: 'published',
+        templateType: 'rating_list',
+        heroBadges: content.heroBadges || [],
+        suitableFor: content.audience ? [content.audience] : [],
+        tags: content.seo?.keywords || [],
+        seoTitle: content.seo?.title || draft.seoTitle || draft.title,
+        seoDescription: content.seo?.description || draft.seoDescription || '',
+        metadataJson: metadataJson as any,
+        publishedAt: timestamp,
+        items: {
+          create: topicItems.map(item => ({
+            name: item.name,
+            description: item.description,
+            category: item.category,
+            officialUrl: item.officialUrl,
+            sortOrder: item.sortOrder,
+          })),
+        },
+        sections: {
+          create: topicSections.map(section => ({
+            type: section.type,
+            title: section.title,
+            content: section.content,
+            sortOrder: section.sortOrder,
+          })),
+        },
+      },
+      include: {
+        items: true,
+        sections: true,
+      },
+    });
+
+    return {
+      success: true,
+      url: `${baseUrl}/topics/${slug}`,
+      contentId: topic.id,
+      version: draft.version,
+      timestamp,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: `Failed to publish topic: ${error.message}`,
+      timestamp,
+    };
+  }
 }
 
 /**

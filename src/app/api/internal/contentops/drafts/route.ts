@@ -1588,6 +1588,129 @@ export async function POST(request: NextRequest) {
         }, { status: 201 });
       }
       
+      if (contentType === 'topic') {
+        // Map topic content to Topic model
+        const content = data.content || {};
+        
+        // Build items from subtopics/related content
+        const topicItems = [];
+        const subtopics = content.subtopics || [];
+        for (let i = 0; i < subtopics.length; i++) {
+          const sub = subtopics[i];
+          topicItems.push({
+            name: sub.title || '',
+            description: sub.description || '',
+            category: sub.type || 'resource',
+            officialUrl: sub.url || '',
+            sortOrder: i,
+          });
+        }
+        
+        // Build sections from hero, FAQ, CTA
+        const topicSections = [];
+        let sectionOrder = 0;
+        
+        if (content.hero) {
+          topicSections.push({
+            type: 'intro',
+            title: content.hero.headline || title,
+            content: content.hero.description || content.summary || '',
+            sortOrder: sectionOrder++,
+          });
+        }
+        
+        if (content.faq && content.faq.length > 0) {
+          topicSections.push({
+            type: 'faq',
+            title: '常见问题',
+            content: JSON.stringify(content.faq),
+            sortOrder: sectionOrder++,
+          });
+        }
+        
+        if (content.cta) {
+          topicSections.push({
+            type: 'cta',
+            title: content.cta.text || '了解更多',
+            content: content.cta.url || '',
+            sortOrder: sectionOrder++,
+          });
+        }
+        
+        // Build metadata
+        const metadataJson = {
+          taskId: data.taskId,
+          contentType: 'topic',
+          source: 'contentops-bridge',
+          originalContent: content,
+          subtopicCount: subtopics.length,
+          faqCount: content.faq?.length || 0,
+          sourceFactCount: content.sources?.length || 0,
+          internalLinkCount: content.internalLinks?.length || 0,
+          blockConfiguration: content.blockConfiguration || {
+            hero: !!content.hero,
+            tools: (content.relatedTools || []).length > 0,
+            guides: (content.relatedGuides || []).length > 0,
+            checklists: (content.relatedChecklists || []).length > 0,
+            officialResources: (content.relatedResources || []).length > 0,
+            faq: (content.faq || []).length > 0,
+            internalLinks: (content.internalLinks || []).length > 0,
+          },
+        };
+        
+        const topic = await prisma.topic.create({
+          data: {
+            title,
+            slug,
+            subtitle: content.hero?.subheadline || '',
+            summary: content.summary || '',
+            status: 'draft',
+            templateType: 'rating_list',
+            heroBadges: content.heroBadges || [],
+            suitableFor: content.audience ? [content.audience] : [],
+            tags: content.seo?.keywords || [],
+            seoTitle: content.seo?.title || content.seoTitle || title,
+            seoDescription: content.seo?.description || content.seoDescription || '',
+            metadataJson: metadataJson as Prisma.InputJsonValue,
+            items: {
+              create: topicItems.map(item => ({
+                name: item.name,
+                description: item.description,
+                category: item.category,
+                officialUrl: item.officialUrl,
+                sortOrder: item.sortOrder,
+              })),
+            },
+            sections: {
+              create: topicSections.map(section => ({
+                type: section.type,
+                title: section.title,
+                content: section.content,
+                sortOrder: section.sortOrder,
+              })),
+            },
+          },
+          include: {
+            items: true,
+            sections: true,
+          },
+        });
+        
+        return NextResponse.json({
+          id: topic.id,
+          title: topic.title,
+          slug: topic.slug,
+          contentType: 'topic',
+          state: 'DRAFT',
+          subtopicCount: topic.items.length,
+          sectionCount: topic.sections.length,
+          faqCount: content.faq?.length || 0,
+          sourceFactCount: content.sources?.length || 0,
+          internalLinkCount: content.internalLinks?.length || 0,
+          createdAt: topic.createdAt.toISOString(),
+        }, { status: 201 });
+      }
+      
       // For other content types, fall through to generic draft
       return NextResponse.json(
         { error: `Content type "${contentType}" not yet supported for backend draft`, code: 'UNSUPPORTED_CONTENT_TYPE' },
