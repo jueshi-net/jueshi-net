@@ -283,44 +283,68 @@ ${task.rawInput}
 
 You must respond with valid JSON only, no markdown, no explanation.
 
-The JSON structure must include:
+CRITICAL: You must include ALL of the following fields at the TOP LEVEL of your JSON response:
 {
   "title": "SEO-friendly title in Chinese, max 24 chars",
-  "slug": "url-friendly-slug",
-  "summary": "brief summary",
+  "slug": "url-friendly-slug-in-english",
+  "summary": "brief summary in Chinese, 100-200 chars",
   "contentType": "${contentType}",
+  "audience": "target audience description in Chinese",
+  "body": "full markdown body with H2/H3 sections, at least 1800 Chinese characters",
   "seo": {
-    "title": "SEO title",
-    "description": "SEO description",
-    "keywords": ["keyword1", "keyword2"]
+    "title": "SEO title in Chinese",
+    "description": "SEO description in Chinese",
+    "keywords": ["keyword1", "keyword2", "keyword3"]
   },
   "geo": {
-    "targetCountry": "country",
-    "targetAudience": "audience",
-    "searchIntent": "intent"
+    "targetCountry": "country name",
+    "targetAudience": "audience description",
+    "searchIntent": "informational|transactional|navigational"
   },
-  "sources": [{"url": "https://...", "title": "source title", "publisher": "publisher", "sourceType": "official"}],
-  "faq": [{"question": "Q", "answer": "A"}],
-  "internalLinks": [{"url": "/path", "title": "title", "reason": "reason"}]
+  "sources": [{"url": "https://...", "title": "source title", "publisher": "publisher name", "sourceType": "official|news|blog"}],
+  "faq": [{"question": "Q in Chinese", "answer": "A in Chinese"}],
+  "internalLinks": [{"url": "/path", "title": "link title", "reason": "why this link is relevant"}]
 }`;
 
     if (contentType === 'guide') {
       return basePrompt + `
 
-For GUIDE, the content must include:
+For GUIDE content type, you MUST also include these additional fields:
 {
-  "content": {
-    "body": "full markdown body with H2/H3 sections",
-    "audience": "target audience description",
-    "steps": ["step1", "step2"],
-    "pitfalls": ["pitfall1", "pitfall2"]
-  }
+  "steps": ["step 1 description", "step 2 description", "step 3 description"],
+  "pitfalls": ["pitfall 1 description", "pitfall 2 description"]
+}
+
+COMPLETE EXAMPLE for GUIDE:
+{
+  "title": "国际集运完整指南",
+  "slug": "international-shipping-guide",
+  "summary": "详细解读国际集运流程、费用计算、包装要求和常见问题",
+  "contentType": "guide",
+  "audience": "海外华人、留学生、跨境电商从业者",
+  "body": "## 什么是国际集运\\n\\n国际集运是指...",
+  "seo": {
+    "title": "2026国际集运完整指南_费用流程包装一文搞定",
+    "description": "国际集运完整指南，涵盖费用计算、包装要求、报关流程",
+    "keywords": ["国际集运", "海外华人", "留学生", "跨境电商"]
+  },
+  "geo": {
+    "targetCountry": "中国",
+    "targetAudience": "海外华人及留学生",
+    "searchIntent": "informational"
+  },
+  "sources": [{"url": "https://example.com", "title": "国际物流指南", "publisher": "物流协会", "sourceType": "official"}],
+  "faq": [{"question": "国际集运需要多长时间？", "answer": "通常需要7-15个工作日"}],
+  "internalLinks": [{"url": "/tools/shipping-calculator", "title": "运费计算器", "reason": "帮助计算集运费用"}],
+  "steps": ["选择集运公司", "打包物品", "填写报关单", "支付运费"],
+  "pitfalls": ["禁止寄送违禁品", "注意包装防震", "保留运输凭证"]
 }
 
 Requirements:
 - Body must be at least 1800 Chinese characters
-- Include at least 5 FAQ items
-- Include real, verifiable sources
+- Include at least 3 FAQ items
+- Include at least 2 real, verifiable sources
+- Include at least 2 internal links
 - All content must be in Chinese`;
     }
     
