@@ -243,6 +243,13 @@ async function processJob(jobPath: string): Promise<boolean> {
       normalizerRemainingBlockingIssues: result.normalizerRemainingBlockingIssues,
     });
     
+    // Save raw model output for debugging (if available)
+    if (result.rawModelOutput) {
+      const rawOutputFile = path.join(FAILED_DIR, `${job.jobId}.raw-output.json`);
+      fs.writeFileSync(rawOutputFile, JSON.stringify(result.rawModelOutput, null, 2));
+      log('info', 'Raw model output saved', { jobId: job.jobId, file: rawOutputFile });
+    }
+    
     // Check if contract validation passed
     if (!result.contractValidationPassed) {
       throw new Error('CONTRACT_VALIDATION_FAILED: ' + result.contractErrors.join(', '));

@@ -55,6 +55,9 @@ export interface StructuredContentResult {
   contractErrors: string[];
   contractWarnings: string[];
   
+  // Raw model output (for debugging)
+  rawModelOutput?: any;
+  
   // Error handling
   error?: string;
   errorCode?: string;
@@ -232,6 +235,8 @@ export class HermesContentExecutor implements ContentExecutor {
         contractValidationPassed,
         contractErrors,
         contractWarnings,
+        
+        rawModelOutput: parsed,
       };
       
       return result;
