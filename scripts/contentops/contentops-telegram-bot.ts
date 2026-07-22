@@ -165,11 +165,13 @@ async function fetchBridgeGet(queryString: string): Promise<any> {
     
     console.error('[ContentOps Bot] Helper GET response status:', response.status);
     
+    // bridge-local-helper returns { ok, status, data, error }
+    // data contains the actual Bridge API response
     return {
       ok: response.status >= 200 && response.status < 300,
       status: response.status,
-      json: async () => response.body,
-      text: async () => JSON.stringify(response.body)
+      json: async () => response.data || response.body,
+      text: async () => JSON.stringify(response.data || response.body)
     };
   } catch (error) {
     console.error('[ContentOps Bot] Helper GET request failed:', error);
