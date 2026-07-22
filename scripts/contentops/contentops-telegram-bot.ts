@@ -284,20 +284,32 @@ interface ParsedTask {
 function parseTaskIntent(text: string): ParsedTask {
   const lower = text.toLowerCase();
   
-  // Detect content type
+  // Detect content type with priority: topic > checklist > guide
+  // "专题" must have higher priority than "清单" because topic may contain checklist blocks
   let contentType: 'guide' | 'checklist' | 'topic' = 'guide';
-  if (lower.includes('清单') || lower.includes('检查') || lower.includes('checklist')) {
-    contentType = 'checklist';
-  } else if (lower.includes('专题') || lower.includes('topic') || lower.includes('汇总')) {
+  if (lower.includes('专题') || lower.includes('topic') || lower.includes('汇总') || lower.includes('主题聚合')) {
     contentType = 'topic';
+  } else if (lower.includes('清单') || lower.includes('检查') || lower.includes('checklist')) {
+    // Only match checklist if NOT a topic request
+    // Check for explicit checklist intent phrases
+    const explicitChecklist = /做.*清单|创建.*清单|生成.*清单|checklist|分成.*检查项目|检查项目/.test(lower);
+    if (explicitChecklist) {
+      contentType = 'checklist';
+    }
   } else if (lower.includes('指南') || lower.includes('教程') || lower.includes('guide') || lower.includes('怎么写') || lower.includes('如何')) {
     contentType = 'guide';
   }
 
   // Detect execution mode
   let executionMode: ParsedTask['executionMode'] = 'review_required';
-  if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
-    executionMode = 'publish_now';
+  // "检查通过后直接发布" or "验证通过后发布" → publish_when_validated
+  if (lower.includes('检查通过后') || lower.includes('验证通过后') || lower.includes('质量通过后') || lower.includes('检查通过后发布')) {
+    executionMode = 'publish_when_validated';
+  } else if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
+    // Only true "publish now" if NOT qualified by "检查通过后"
+    if (!lower.includes('检查通过后') && !lower.includes('验证通过后')) {
+      executionMode = 'publish_now';
+    }
   } else if (
     lower.includes('定时发布') || 
     lower.includes('安排发布') || 
@@ -375,12 +387,21 @@ function parseTaskIntent(text: string): ParsedTask {
   else if (lower.includes('华人')) audience = '海外华人';
   else if (lower.includes('新手') || lower.includes('第一次')) audience = '初次使用者';
 
-  // Extract topic (remove command-like prefixes)
+  // Extract topic (remove command-like prefixes and normalize)
   let topic = text
     .replace(/^(写|做|创建|生成|帮我|请)/, '')
     .replace(/一篇|一个|一份/, '')
     .replace(/(关于|有关)/, '')
     .trim();
+  
+  // Remove outer quotes (Chinese or English)
+  topic = topic.replace(/^[""「『【]+/, '').replace(/[""」』】]+$/, '');
+  
+  // Remove meaningless numbering prefixes like "1." "2." etc.
+  topic = topic.replace(/^\d+\.\s*/, '');
+  
+  // Remove duplicate periods
+  topic = topic.replace(/\.{2,}/g, '.');
   
   // If topic is too short, use the full text
   if (topic.length < 5) {
@@ -1576,16 +1597,28 @@ Production: 🔒 DISABLED`;
       // Parse JSON response
       const taskResult = await taskResponse.json();
 
-      // Validate task ID exists
-      const taskId = taskResult.taskId;
-      if (!taskId || typeof taskId !== 'string') {
+      // Validate response schema: { ok: true, data: { task: { id, contentType, status }, job: { id, status } } }
+      if (!taskResult.ok || !taskResult.data || !taskResult.data.task || !taskResult.data.task.id) {
         await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
 
-错误编号：CONTENTOPS-TASK-ID-MISSING
+错误编号：CONTENTOPS-TASK-RESPONSE-INVALID
 任务未进入执行队列，请稍后重试。`);
-        console.error('[ContentOps Bot] Task ID missing in response:', taskResult);
+        console.error('[ContentOps Bot] Task response invalid:', taskResult);
         return;
       }
+
+      // Validate job was enqueued
+      if (!taskResult.data.job || !taskResult.data.job.id) {
+        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
+
+错误编号：CONTENTOPS-JOB-ENQUEUE-FAILED
+任务已创建但未进入执行队列，请稍后重试。`);
+        console.error('[ContentOps Bot] Job enqueue failed:', taskResult);
+        return;
+      }
+
+      const taskId = taskResult.data.task.id;
+      const jobId = taskResult.data.job.id;
       const updateMessage = `✅ 任务创建成功
 
 任务 ID：${taskId}
