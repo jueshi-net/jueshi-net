@@ -5,7 +5,11 @@
 
 const https = require('https');
 
-const BOT_TOKEN='8897682946:***';
+// Read Bot Token from Keychain
+const BOT_TOKEN = require('child_process').execSync(
+  'security find-generic-password -s jueshi-contentops-telegram -a fabuxia_bot -w',
+  { encoding: 'utf-8' }
+).trim();
 const CHAT_ID='8602323654'; // User's Telegram chat ID from memory
 
 const message = `✅ 任务处理完成
