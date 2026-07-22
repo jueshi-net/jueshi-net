@@ -13,7 +13,11 @@ import * as path from 'path';
 import * as os from 'os';
 import { HermesContentExecutor } from '../../src/lib/contentops/hermes-content-executor';
 import { getContentPublishAdapter } from '../../src/lib/contentops/content-publish-adapters';
-import type { ContentOpsTask } from '../../src/lib/contentops/task-types';
+import type { ContentOpsTask } from '../../src/lib/contentops/contracts/task-contract';
+import { TASK_STATUS, isValidTaskStatus } from '../../src/lib/contentops/contracts/task-contract';
+import { JOB_STATUS, isValidJobStatus } from '../../src/lib/contentops/contracts/job-contract';
+import { isValidContentType } from '../../src/lib/contentops/contracts/content-types';
+import { isValidExecutionMode } from '../../src/lib/contentops/contracts/execution-modes';
 
 // ============================================================================
 // Configuration — Mac mini paths

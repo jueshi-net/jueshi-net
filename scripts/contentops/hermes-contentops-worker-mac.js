@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 /**
+ * @deprecated This worker is deprecated. Use hermes-contentops-worker.ts instead.
+ * This file is preserved for rollback purposes only.
+ * 
  * Hermes ContentOps Worker — Mac mini Edition
  * 
  * One-shot worker that processes jobs from inbox and exits.
@@ -7,6 +10,8 @@
  * 
  * V2-MVP: v1.20.42.18.6.21.12.0
  */
+
+console.warn('[DEPRECATED] hermes-contentops-worker-mac.js is deprecated. Use hermes-contentops-worker.ts instead.');
 
 const fs = require('fs');
 const path = require('path');

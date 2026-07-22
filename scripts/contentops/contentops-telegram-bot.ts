@@ -25,6 +25,9 @@ import TelegramBot from 'node-telegram-bot-api';
 import { execSync } from 'child_process';
 import { getSession, updateSession, clearSession } from './session-store';
 import { stagingHelperClient } from '../../src/lib/contentops/staging-helper-client';
+import { ContentType, isValidContentType } from '../../src/lib/contentops/contracts/content-types';
+import { ExecutionMode, isValidExecutionMode, getExecutionModeDisplayName } from '../../src/lib/contentops/contracts/execution-modes';
+import { parseCreateTaskResponse, safeExtractTaskId, safeExtractJobId } from '../../src/lib/contentops/bridge-response-parser';
 
 // ============================================================================
 // Configuration
@@ -112,16 +115,10 @@ async function sendContentOpsPlainText(
 
 /**
  * Map internal execution mode enum to user-friendly display text.
+ * Uses shared contract for consistency.
  */
 function mapExecutionModeToDisplay(mode: string): string {
-  const modeMap: Record<string, string> = {
-    'draft_only': '仅创建草稿',
-    'review_required': '等待人工审核',
-    'publish_when_validated': '校验通过后发布',
-    'schedule_when_validated': '校验通过后定时发布',
-    'publish_now': '立即发布',
-  };
-  return modeMap[mode] || mode;
+  return getExecutionModeDisplayName(mode as ExecutionMode);
 }
 
 // ============================================================================
@@ -269,8 +266,8 @@ function getNextStepsForState(state: string, chatId: number): string {
 // ============================================================================
 
 interface ParsedTask {
-  contentType: 'guide' | 'checklist' | 'topic';
-  executionMode: 'draft_only' | 'review_required' | 'publish_when_validated' | 'schedule_when_validated' | 'publish_now';
+  contentType: ContentType;
+  executionMode: ExecutionMode;
   targetEnvironment: 'staging' | 'production';
   topic: string;
   audience?: string;
@@ -289,7 +286,7 @@ function parseTaskIntent(text: string): ParsedTask {
   
   // Detect content type with priority: topic > checklist > guide
   // "专题" must have higher priority than "清单" because topic may contain checklist blocks
-  let contentType: 'guide' | 'checklist' | 'topic' = 'guide';
+  let contentType: ContentType = 'guide';
   if (lower.includes('专题') || lower.includes('topic') || lower.includes('汇总') || lower.includes('主题聚合')) {
     contentType = 'topic';
   } else if (lower.includes('清单') || lower.includes('检查') || lower.includes('checklist')) {

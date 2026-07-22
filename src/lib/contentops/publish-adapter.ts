@@ -3,6 +3,7 @@
 
 import { ContentDraft, PublishResult, PublishTarget } from './types';
 import { prisma } from '@/lib/prisma';
+import { CONTENT_TYPES, isValidContentType, ContentType } from './contracts/content-types';
 
 const PRODUCTION_PUBLISH_ENABLED = process.env.CONTENTOPS_PRODUCTION_PUBLISH_ENABLED === 'true';
 

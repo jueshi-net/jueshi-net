@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 /**
+ * @deprecated This worker is deprecated. Use hermes-contentops-worker.ts instead.
+ * This file is preserved for rollback purposes only.
+ * 
  * Hermes ContentOps Worker
  * 
  * Listens to jobs/inbox, calls Hermes Agent, writes results to jobs/outbox.
  * 
  * V2-MVP: v1.20.42.18.6.16.6.84.4.8.2
  */
+
+console.warn('[DEPRECATED] hermes-contentops-worker.js is deprecated. Use hermes-contentops-worker.ts instead.');
 
 const fs = require('fs');
 const path = require('path');
