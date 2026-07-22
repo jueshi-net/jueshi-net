@@ -963,6 +963,178 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ dueSchedules: due, count: due.length });
     }
 
+    // ============================================================================
+    // Audit Actions (Read-only, for evidence collection)
+    // ============================================================================
+
+    if (data.action === 'audit_contentops_task') {
+      const { prisma } = await import('@/lib/prisma');
+      const { taskManager } = await import('@/lib/contentops/task-manager');
+      const { scheduler } = await import('@/lib/contentops/scheduler');
+      
+      const taskId = data.taskId;
+      const contentId = data.contentId;
+      
+      if (!taskId && !contentId) {
+        return NextResponse.json(
+          { error: 'taskId or contentId is required', code: 'MISSING_PARAMS' },
+          { status: 400 }
+        );
+      }
+      
+      // Get task record
+      let task = null;
+      if (taskId) {
+        task = await taskManager.getTask(taskId);
+      }
+      
+      // Get content record (Checklist or Guide)
+      let content = null;
+      if (contentId) {
+        // Try Checklist first
+        const checklist = await prisma.checklist.findUnique({
+          where: { id: contentId },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            status: true,
+            publishedAt: true,
+            createdAt: true,
+            seoTitle: true,
+            seoDescription: true,
+            canonicalUrl: true,
+            steps: true,
+            metadataJson: true,
+          }
+        });
+        
+        if (checklist) {
+          const metadata = checklist.metadataJson as any || {};
+          const contentOps = metadata.contentOps || {};
+          const steps = (checklist.steps as any[]) || [];
+          
+          content = {
+            id: checklist.id,
+            type: 'checklist',
+            status: checklist.status,
+            publishedAt: checklist.publishedAt?.toISOString() || null,
+            slug: checklist.slug,
+            groupsCount: metadata.groupCount || new Set(steps.map(s => s.metadata?.group)).size,
+            itemsCount: metadata.itemCount || steps.length,
+            faqCount: contentOps.faq?.length || 0,
+            seoPresent: !!(checklist.seoTitle || checklist.seoDescription),
+            canonicalPresent: !!checklist.canonicalUrl,
+            jsonLdPresent: !!contentOps.structuredData,
+            internalLinkCount: contentOps.internalLinks?.length || 0,
+            sourceFactCount: contentOps.sourceFacts?.length || 0,
+          };
+        } else {
+          // Try Guide
+          const guide = await prisma.guide.findUnique({
+            where: { id: contentId },
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              status: true,
+              publishedAt: true,
+              seoTitle: true,
+              seoDescription: true,
+              canonicalUrl: true,
+              metadataJson: true,
+            }
+          });
+          
+          if (guide) {
+            const metadata = guide.metadataJson as any || {};
+            const contentOps = metadata.contentOps || {};
+            
+            content = {
+              id: guide.id,
+              type: 'guide',
+              status: guide.status,
+              publishedAt: guide.publishedAt?.toISOString() || null,
+              slug: guide.slug,
+              faqCount: contentOps.faq?.length || 0,
+              seoPresent: !!(guide.seoTitle || guide.seoDescription),
+              canonicalPresent: !!guide.canonicalUrl,
+              jsonLdPresent: !!contentOps.structuredData,
+              internalLinkCount: contentOps.internalLinks?.length || 0,
+              sourceFactCount: contentOps.sourceFacts?.length || 0,
+            };
+          }
+        }
+      }
+      
+      // Get schedule records
+      let schedule = null;
+      if (taskId) {
+        const schedules = await scheduler.listSchedules();
+        const taskSchedules = schedules.filter(s => s.taskId === taskId);
+        
+        if (taskSchedules.length > 0) {
+          const latest = taskSchedules[taskSchedules.length - 1];
+          schedule = {
+            count: taskSchedules.length,
+            status: latest.status,
+            originalScheduledAt: latest.scheduledAtOriginal,
+            effectiveScheduledAt: latest.scheduledAtUtc,
+            executedAt: latest.executedAt || null,
+            publishAttemptCount: latest.publishAttemptCount || 0,
+            duplicatePublishCount: latest.duplicatePublishCount || 0,
+            recoveryMode: latest.recoveryMode || null,
+          };
+        }
+      }
+      
+      // Get draft statistics
+      let drafts = null;
+      if (taskId) {
+        const allDrafts = await prisma.contentDraft.findMany({
+          where: {
+            OR: [
+              { qualityMetadata: { path: ['taskId'], equals: taskId } },
+              { qualityMetadata: { path: ['contentOps', 'taskId'], equals: taskId } },
+            ]
+          },
+          select: {
+            state: true,
+            qualityMetadata: true,
+          }
+        });
+        
+        const activeCount = allDrafts.filter(d => d.state === 'DRAFT' || d.state === 'NEEDS_REVIEW').length;
+        const invalidAwaitingReviewCount = allDrafts.filter(d => 
+          d.state === 'NEEDS_REVIEW' && 
+          (d.qualityMetadata as any)?.qualityResult?.passed === false
+        ).length;
+        const supersededCount = allDrafts.filter(d => 
+          d.state === 'SUPERSEDED' || d.state === 'ARCHIVED'
+        ).length;
+        
+        drafts = {
+          activeCount,
+          invalidAwaitingReviewCount,
+          supersededCount,
+        };
+      }
+      
+      return NextResponse.json({
+        task: task ? {
+          id: task.id,
+          contentType: task.contentType,
+          executionMode: task.executionMode,
+          status: task.status,
+          scheduledAt: task.scheduledAt || null,
+          currentStep: task.currentStep,
+        } : null,
+        content,
+        schedule,
+        drafts,
+      });
+    }
+
     // Handle create_backend_draft action — save directly to content model
     if (data.action === 'create_backend_draft') {
       const { prisma } = await import('@/lib/prisma');
