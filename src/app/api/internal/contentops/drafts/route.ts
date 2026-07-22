@@ -33,14 +33,6 @@ function verifySignature(request: NextRequest, body: string): boolean {
   const path = url.pathname;
   // Query string 不参与签名（固定协议）
   const payload = `${method}:${path}:${body}`;
-  
-  // Debug log
-  console.error('[ContentOps Bridge] Signature debug:', {
-    method,
-    path,
-    bodyLength: body.length,
-    payloadPreview: payload.substring(0, 100),
-  });
 
   const expectedSignature = createHmac('sha256', BRIDGE_SECRET)
     .update(payload)
@@ -290,6 +282,13 @@ export async function POST(request: NextRequest) {
   } catch {
     body = '';
   }
+
+  // Debug: log body info
+  console.error('[ContentOps Bridge] Body info:', {
+    bodyLength: body.length,
+    bodyBytes: Buffer.from(body).length,
+    bodyPreview: body.substring(0, 50),
+  });
 
   // 验证签名
   if (!verifySignature(request, body)) {
@@ -1185,15 +1184,23 @@ export async function POST(request: NextRequest) {
           });
         }
         
+        // Build update data
+        const updateData: any = {
+          status: newStatus,
+          metadataJson: {
+            ...metadata,
+            auditHistory,
+          }
+        };
+        
+        // If publishing, set publishedAt
+        if (newStatus === 'published' && !checklist.publishedAt) {
+          updateData.publishedAt = new Date();
+        }
+        
         const updated = await prisma.checklist.update({
           where: { id: contentId },
-          data: {
-            status: newStatus,
-            metadataJson: {
-              ...metadata,
-              auditHistory,
-            }
-          },
+          data: updateData,
           select: {
             id: true,
             status: true,
