@@ -1604,52 +1604,11 @@ Production: 🔒 DISABLED`;
 
       console.error('[ContentOps Bot] Task created:', { taskId, chatId, contentType: parsed.contentType });
 
-      // Event wakeup: Write job to inbox and kickstart worker
-      try {
-        const jobData = {
-          jobId: taskId,
-          jobType: 'contentops_generate',
-          contentType: parsed.contentType,
-          rawUserInput: text,
-          task: taskResult.task,
-          createdAt: new Date().toISOString(),
-        };
-        
-        const jobsDir = process.env.HERMES_JOBS_DIR || `${process.env.HOME}/.jueshi-contentops/jobs`;
-        const inboxPath = `${jobsDir}/inbox/${taskId}.json`;
-        
-        // Write job file
-        const fs = await import('fs');
-        fs.writeFileSync(inboxPath, JSON.stringify(jobData, null, 2));
-        console.error('[ContentOps Bot] Job written to inbox:', inboxPath);
-        
-        // Kickstart one-shot worker
-        const childProcess = await import('child_process');
-        const execSyncFn = childProcess.execSync;
-        if (!execSyncFn) {
-          console.error('[ContentOps Bot] execSync not available');
-          return;
-        }
-        const cwd = process.cwd() || '/Users/chq/xixiong-saas';
-        const workerScript = `${cwd}/scripts/contentops/hermes-contentops-worker-mac.js`;
-        
-        // Use launchctl kickstart if available, otherwise run directly
-        try {
-          const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
-          execSyncFn(`launchctl kickstart -k gui/${uid}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, { 
-            stdio: 'ignore',
-            timeout: 5000
-          });
-          console.error('[ContentOps Bot] Worker kickstarted');
-        } catch (kickstartError) {
-          // If launchctl fails, run worker directly in background
-          execSyncFn(`node ${workerScript} > /dev/null 2>&1 &`, { stdio: 'ignore' });
-          console.error('[ContentOps Bot] Worker started in background');
-        }
-      } catch (wakeupError) {
-        console.error('[ContentOps Bot] Failed to wakeup worker:', wakeupError);
-        // Non-fatal: task is created, worker can be started manually
-      }
+      // Canonical task service (via Bridge API) has already:
+      // 1. Created task record
+      // 2. Enqueued job atomically to inbox
+      // 3. Kicked off worker wakeup
+      // No need to manually write job file or wakeup worker here
 
     } catch (error) {
       console.error('[ContentOps Bot] Task creation error:', error);

@@ -11,6 +11,7 @@
 
 export type TaskStatus =
   | 'RECEIVED'           // Task received, parsing
+  | 'QUEUED'             // Task created and job enqueued to inbox
   | 'PARSING'            // Extracting intent and parameters
   | 'SELECTING_CONTRACT' // Choosing content type contract
   | 'RESEARCHING'        // Gathering information
@@ -32,6 +33,7 @@ export type TaskStatus =
   | 'PAUSED_PROVIDER'    // Paused: provider unavailable
   | 'PAUSED_RATE_LIMIT'  // Paused: rate limited
   | 'FAILED'             // Failed (see error)
+  | 'FAILED_ENQUEUE'     // Task created but job enqueue failed (recoverable)
   | 'CANCELLED';         // Cancelled by user
 
 export type ContentType = 'guide' | 'checklist' | 'topic';

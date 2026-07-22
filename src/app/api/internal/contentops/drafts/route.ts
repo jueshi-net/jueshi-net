@@ -775,8 +775,8 @@ export async function POST(request: NextRequest) {
     // ============================================================================
 
     if (data.action === 'create_task') {
-      const { taskManager } = await import('@/lib/contentops/task-manager');
-      const task = await taskManager.createTask({
+      const { canonicalTaskService } = await import('@/lib/contentops/canonical-task-service');
+      const result = await canonicalTaskService.createAndEnqueueContentOpsTask({
         chatId: data.chatId,
         messageId: data.messageId || 0,
         rawInput: data.rawInput || data.topic || '',
@@ -795,15 +795,55 @@ export async function POST(request: NextRequest) {
         publishInstruction: data.publishInstruction,
         sourceRequirement: data.sourceRequirement,
       });
+      
+      if (!result.ok) {
+        return NextResponse.json({
+          ok: false,
+          taskId: result.taskId,
+          recoverable: result.recoverable,
+          error: result.error,
+        }, { status: 500 });
+      }
+      
       return NextResponse.json({
-        taskId: task.id,
-        status: task.status,
-        contentType: task.contentType,
-        executionMode: task.executionMode,
-        targetEnvironment: task.targetEnvironment,
-        topic: task.topic,
-        createdAt: task.createdAt,
+        ok: true,
+        taskId: result.taskId,
+        status: result.task?.status,
+        contentType: result.task?.contentType,
+        executionMode: result.task?.executionMode,
+        targetEnvironment: result.task?.targetEnvironment,
+        topic: result.task?.topic,
+        enqueueStatus: result.enqueueStatus,
+        createdAt: result.task?.createdAt,
       }, { status: 201 });
+    }
+
+    if (data.action === 'resume_task') {
+      const { canonicalTaskService } = await import('@/lib/contentops/canonical-task-service');
+      const taskId = data.taskId;
+      if (!taskId) {
+        return NextResponse.json(
+          { error: 'Task ID is required', code: 'MISSING_TASK_ID' },
+          { status: 400 }
+        );
+      }
+      const result = await canonicalTaskService.resumeExistingTask(taskId);
+      
+      if (!result.ok) {
+        return NextResponse.json({
+          ok: false,
+          taskId: result.taskId,
+          recoverable: result.recoverable,
+          error: result.error,
+        }, { status: 500 });
+      }
+      
+      return NextResponse.json({
+        ok: true,
+        taskId: result.taskId,
+        status: result.task?.status,
+        enqueueStatus: result.enqueueStatus,
+      });
     }
 
     if (data.action === 'get_task') {
