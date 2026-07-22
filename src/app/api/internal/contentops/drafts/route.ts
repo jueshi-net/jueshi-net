@@ -963,6 +963,90 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ dueSchedules: due, count: due.length });
     }
 
+    // Handle create_backend_draft action — save directly to content model
+    if (data.action === 'create_backend_draft') {
+      const { prisma } = await import('@/lib/prisma');
+      const { Prisma } = await import('@prisma/client');
+      
+      const contentType = data.contentType || 'guide';
+      const title = data.title;
+      
+      if (!title) {
+        return NextResponse.json(
+          { error: 'Title is required', code: 'MISSING_TITLE' },
+          { status: 400 }
+        );
+      }
+      
+      // Generate slug from title
+      const slug = title
+        .toLowerCase()
+        .replace(/[^\w\u4e00-\u9fa5]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        + '-' + Date.now().toString(36);
+      
+      if (contentType === 'checklist') {
+        // Map checklist content to Checklist model
+        const content = data.content || {};
+        const groups = content.groups || [];
+        
+        // Convert groups/items to steps format
+        const steps = groups.flatMap((group: any, groupIndex: number) => {
+          const items = group.items || [];
+          return items.map((item: any, itemIndex: number) => ({
+            title: item.title || '',
+            description: item.description || '',
+            completed: false,
+            optional: !item.required,
+            metadata: {
+              group: group.name || group.title || `Group ${groupIndex + 1}`,
+              groupDescription: group.description || '',
+              completionCondition: item.completionCondition || '',
+              riskNote: item.riskNote || '',
+              sortOrder: item.sortOrder ?? (groupIndex * 100 + itemIndex),
+            }
+          }));
+        });
+        
+        const checklist = await prisma.checklist.create({
+          data: {
+            title,
+            slug,
+            summary: content.summary || content.description || '',
+            steps: steps as Prisma.InputJsonValue,
+            status: 'draft',
+            seoTitle: content.seoTitle || title,
+            seoDescription: content.seoDescription || '',
+            metadataJson: {
+              taskId: data.taskId,
+              contentType: 'checklist',
+              source: 'contentops-bridge',
+              originalContent: content,
+              groupCount: groups.length,
+              itemCount: steps.length,
+            },
+          },
+        });
+        
+        return NextResponse.json({
+          id: checklist.id,
+          title: checklist.title,
+          slug: checklist.slug,
+          contentType: 'checklist',
+          state: 'DRAFT',
+          groupCount: groups.length,
+          itemCount: steps.length,
+          createdAt: checklist.createdAt.toISOString(),
+        }, { status: 201 });
+      }
+      
+      // For other content types, fall through to generic draft
+      return NextResponse.json(
+        { error: `Content type "${contentType}" not yet supported for backend draft`, code: 'UNSUPPORTED_CONTENT_TYPE' },
+        { status: 400 }
+      );
+    }
+
     // Default: create new draft
     const { title, body: draftBody, targetEnvironment, qualityMetadata } = data;
 
