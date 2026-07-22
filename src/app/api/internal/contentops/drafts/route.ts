@@ -799,22 +799,29 @@ export async function POST(request: NextRequest) {
       if (!result.ok) {
         return NextResponse.json({
           ok: false,
-          taskId: result.taskId,
-          recoverable: result.recoverable,
           error: result.error,
+          recoverable: result.recoverable,
         }, { status: 500 });
       }
       
+      // Return nested structure expected by Bot: { ok: true, data: { task: { id, ... }, job: { id, ... } } }
       return NextResponse.json({
         ok: true,
-        taskId: result.taskId,
-        status: result.task?.status,
-        contentType: result.task?.contentType,
-        executionMode: result.task?.executionMode,
-        targetEnvironment: result.task?.targetEnvironment,
-        topic: result.task?.topic,
-        enqueueStatus: result.enqueueStatus,
-        createdAt: result.task?.createdAt,
+        data: {
+          task: {
+            id: result.taskId,
+            status: result.task?.status,
+            contentType: result.task?.contentType,
+            executionMode: result.task?.executionMode,
+            targetEnvironment: result.task?.targetEnvironment,
+            topic: result.task?.topic,
+            createdAt: result.task?.createdAt,
+          },
+          job: {
+            id: result.taskId, // Job ID is same as task ID for atomic enqueue
+            status: result.enqueueStatus || 'QUEUED',
+          },
+        },
       }, { status: 201 });
     }
 
