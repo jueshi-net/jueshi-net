@@ -33,6 +33,14 @@ function verifySignature(request: NextRequest, body: string): boolean {
   const path = url.pathname;
   // Query string 不参与签名（固定协议）
   const payload = `${method}:${path}:${body}`;
+  
+  // Debug log
+  console.error('[ContentOps Bridge] Signature debug:', {
+    method,
+    path,
+    bodyLength: body.length,
+    payloadPreview: payload.substring(0, 100),
+  });
 
   const expectedSignature = createHmac('sha256', BRIDGE_SECRET)
     .update(payload)
