@@ -18,7 +18,7 @@ import { createHmac } from 'crypto';
 import * as fs from 'fs';
 
 const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET;
-const BRIDGE_URL = 'http://127.0.0.1:3000';
+const BRIDGE_URL = 'http://127.0.0.1:3001';
 const ENDPOINT = '/api/internal/contentops/drafts';
 
 // 允许的 action 白名单
