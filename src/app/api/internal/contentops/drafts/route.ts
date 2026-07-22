@@ -1088,36 +1088,42 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // Get draft statistics
+      // Get draft statistics (from file-based storage)
       let drafts = null;
       if (taskId) {
-        const allDrafts = await prisma.contentDraft.findMany({
-          where: {
-            OR: [
-              { qualityMetadata: { path: ['taskId'], equals: taskId } },
-              { qualityMetadata: { path: ['contentOps', 'taskId'], equals: taskId } },
-            ]
-          },
-          select: {
-            state: true,
-            qualityMetadata: true,
-          }
-        });
-        
-        const activeCount = allDrafts.filter(d => d.state === 'DRAFT' || d.state === 'NEEDS_REVIEW').length;
-        const invalidAwaitingReviewCount = allDrafts.filter(d => 
-          d.state === 'NEEDS_REVIEW' && 
-          (d.qualityMetadata as any)?.qualityResult?.passed === false
-        ).length;
-        const supersededCount = allDrafts.filter(d => 
-          d.state === 'SUPERSEDED' || d.state === 'ARCHIVED'
-        ).length;
-        
-        drafts = {
-          activeCount,
-          invalidAwaitingReviewCount,
-          supersededCount,
-        };
+        try {
+          const { listDrafts } = await import('@/lib/contentops/draft-manager');
+          const allDraftsResult = await listDrafts({ limit: 1000 });
+          const allDrafts = allDraftsResult.drafts;
+          
+          // Filter drafts by taskId in qualityMetadata
+          const taskDrafts = allDrafts.filter(d => {
+            const qm = d.qualityMetadata || {};
+            return qm.taskId === taskId || qm.contentOps?.taskId === taskId;
+          });
+          
+          const activeCount = taskDrafts.filter(d => d.state === 'DRAFT' || d.state === 'NEEDS_REVIEW').length;
+          const invalidAwaitingReviewCount = taskDrafts.filter(d => 
+            d.state === 'NEEDS_REVIEW' && 
+            d.qualityMetadata?.qualityResult?.passed === false
+          ).length;
+          const supersededCount = taskDrafts.filter(d => 
+            d.state === 'SUPERSEDED' || d.state === 'ARCHIVED'
+          ).length;
+          
+          drafts = {
+            activeCount,
+            invalidAwaitingReviewCount,
+            supersededCount,
+          };
+        } catch (error) {
+          console.error('[Audit] Failed to load drafts:', error);
+          drafts = {
+            activeCount: 0,
+            invalidAwaitingReviewCount: 0,
+            supersededCount: 0,
+          };
+        }
       }
       
       return NextResponse.json({
