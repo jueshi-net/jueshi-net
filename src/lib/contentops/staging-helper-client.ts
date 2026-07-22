@@ -16,7 +16,9 @@ export interface HelperRequest {
 
 export interface HelperResponse {
   status: number;
-  body: any;
+  body?: any; // Legacy field for backward compatibility
+  data?: any; // Actual response data from Bridge API
+  error?: any; // Error information if request failed
 }
 
 export class StagingHelperClient {
