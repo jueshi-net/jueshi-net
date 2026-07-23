@@ -38,7 +38,7 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
     
     const child = spawn('ssh', [
       stagingHost,
-      `cd /home/deploy/xixiong-saas-staging && node --loader ts-node/esm ${helperPath}`,
+      `cd /home/deploy/xixiong-saas-staging && npx tsx ${helperPath}`,
       action,
       JSON.stringify(payload)
     ], {
