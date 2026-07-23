@@ -98,45 +98,91 @@ async function processOutbox(token, notified) {
   const files = fs.readdirSync(OUTBOX_DIR).filter(f => f.endsWith('.json'));
   
   for (const file of files) {
-    const taskId = path.basename(file, '.json');
+    const fileTaskId = path.basename(file, '.json');
     
-    // Skip if already notified
-    if (notified[taskId]) {
-      continue;
-    }
-
     try {
       const outboxData = JSON.parse(fs.readFileSync(path.join(OUTBOX_DIR, file), 'utf-8'));
-      const content = JSON.parse(outboxData.content);
       
-      // Extract chatId from job data or use default
+      // Use notificationId for idempotency (new schema) or fall back to taskId (old schema)
+      const notificationId = outboxData.notificationId || `terminal:${fileTaskId}:completed`;
+      const taskId = outboxData.jobId || fileTaskId;
+      
+      // Skip if already notified (idempotent)
+      if (notified[notificationId]) {
+        continue;
+      }
+      
+      // Parse content — handle both new schema (content as JSON string) and old schema
+      let content;
+      try {
+        content = typeof outboxData.content === 'string' ? JSON.parse(outboxData.content) : outboxData.content;
+      } catch {
+        content = { contentType: outboxData.contentType || 'unknown', title: 'Untitled' };
+      }
+      
+      if (!content) {
+        content = { contentType: outboxData.contentType || 'unknown', title: 'Untitled' };
+      }
+      
+      // Extract chatId
       const chatId = outboxData.chatId || '8602323654';
+      const backendContentId = outboxData.backendContentId || outboxData.draftId || 'N/A';
+      const executionMode = outboxData.executionMode || content.executionMode || 'review_required';
+      
+      // Determine status text based on executionMode
+      let statusText;
+      let statusEmoji;
+      switch (executionMode) {
+        case 'publish_now':
+          statusText = '已发布';
+          statusEmoji = '🚀';
+          break;
+        case 'draft_only':
+          statusText = '已保存为草稿';
+          statusEmoji = '📝';
+          break;
+        case 'review_required':
+        default:
+          statusText = '等待人工审核';
+          statusEmoji = '✅';
+          break;
+      }
+      
+      // Content type display name
+      const contentTypeName = {
+        'guide': '操作指南',
+        'checklist': '检查清单',
+        'topic': '专题',
+        'tool': '工具',
+      }[content.contentType] || content.contentType || '内容';
       
       // Build notification message
-      const message = `✅ 任务处理完成
+      const message = `${statusEmoji} 任务处理完成
 
-内容类型：${content.contentType === 'guide' ? '操作指南' : content.contentType}
-标题：${content.title}
+内容类型：${contentTypeName}
+标题：${content.title || 'N/A'}
 任务 ID：${taskId}
-后台内容 ID：${outboxData.backendContentId || 'N/A'}
-内容长度：${content.content.body.length} 字符
-质量检查：通过
-当前状态：等待人工审核
-后台入口：https://i.jueshi.net/admin/contentops`;
+后台内容 ID：${backendContentId}
+当前状态：${statusText}
+公开状态：${executionMode === 'publish_now' ? '已发布' : '未发布'}
+后台入口：https://i.jueshi.net/admin/content-ops`;
 
       // Send notification
       await sendTelegramMessage(token, chatId, message);
       
-      // Mark as notified
-      notified[taskId] = {
+      // Mark as notified using notificationId for idempotency
+      notified[notificationId] = {
         notifiedAt: new Date().toISOString(),
-        backendContentId: outboxData.backendContentId,
+        taskId: taskId,
+        backendContentId: backendContentId,
+        executionMode: executionMode,
       };
       
-      console.log(`[Notification] Sent for task: ${taskId}`);
+      console.log(`[Notification] Sent: ${notificationId} for task: ${taskId}`);
       
     } catch (error) {
       console.error(`[Notification] Failed for ${file}:`, error.message);
+      // Don't mark as notified — will retry on next cycle
     }
   }
   

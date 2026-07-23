@@ -274,9 +274,22 @@ async function processJob(jobPath: string): Promise<boolean> {
       publishedUrl: publishResult.publishedUrl,
     });
     
-    // Write result to outbox
+    // Write result to outbox with notification-compatible schema
+    const notificationId = `terminal:${job.jobId}:completed`;
     const resultFile = path.join(OUTBOX_DIR, `${job.jobId}.json`);
-    fs.writeFileSync(resultFile, JSON.stringify({
+    const outboxPayload = {
+      // Notification dispatcher fields
+      notificationId,
+      chatId: job.chatId || task.chatId || '8602323654',
+      backendContentId: publishResult.draftId || `draft_${job.jobId}`,
+      // Content summary for notification message
+      content: JSON.stringify({
+        contentType: result.contentType,
+        title: result.title || result.normalizedOutput?.title || job.topic || 'Untitled',
+        executionMode: task.executionMode,
+        status: task.executionMode === 'publish_now' ? 'PUBLISHED' : 'AWAITING_REVIEW',
+      }),
+      // Worker metadata
       jobId: job.jobId,
       success: true,
       contentType: result.contentType,
@@ -287,10 +300,12 @@ async function processJob(jobPath: string): Promise<boolean> {
       normalizerFixedCount: result.normalizerFixedCount,
       normalizerRemainingBlockingIssues: result.normalizerRemainingBlockingIssues,
       contractValidationPassed: result.contractValidationPassed,
+      executionMode: task.executionMode,
       completedAt: new Date().toISOString(),
-    }, null, 2));
+    };
+    fs.writeFileSync(resultFile, JSON.stringify(outboxPayload, null, 2));
     
-    log('info', 'Result written to outbox', { jobId: job.jobId });
+    log('info', 'Result written to outbox with notification', { jobId: job.jobId, notificationId });
     
     // Clean up processing file
     try {
