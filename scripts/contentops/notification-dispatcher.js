@@ -96,12 +96,39 @@ async function processOutbox(token, notified) {
   }
 
   const files = fs.readdirSync(OUTBOX_DIR).filter(f => f.endsWith('.json'));
+  const now = Date.now();
+  const MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
   
   for (const file of files) {
     const fileTaskId = path.basename(file, '.json');
+    const filePath = path.join(OUTBOX_DIR, file);
     
     try {
-      const outboxData = JSON.parse(fs.readFileSync(path.join(OUTBOX_DIR, file), 'utf-8'));
+      const outboxData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      
+      // Startup protection: only process notifications with schemaVersion
+      if (!outboxData.schemaVersion) {
+        console.error(`[Notification] Skipping legacy notification without schemaVersion: ${file}`);
+        // Move to archive instead of sending
+        const archiveDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/outbox-archive');
+        if (!fs.existsSync(archiveDir)) {
+          fs.mkdirSync(archiveDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(archiveDir, file));
+        continue;
+      }
+      
+      // Time window protection: only process recent notifications
+      const createdAt = outboxData.createdAt ? new Date(outboxData.createdAt).getTime() : 0;
+      if (createdAt && (now - createdAt) > MAX_AGE_MS) {
+        console.error(`[Notification] Skipping stale notification (>${MAX_AGE_MS/1000}s old): ${file}`);
+        const archiveDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/outbox-archive');
+        if (!fs.existsSync(archiveDir)) {
+          fs.mkdirSync(archiveDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(archiveDir, file));
+        continue;
+      }
       
       // Use task-based idempotency key for terminal notifications
       // Strip status suffix (:completed/:failed) to prevent duplicate sends
@@ -117,6 +144,13 @@ async function processOutbox(token, notified) {
       
       // Skip if already notified (idempotent)
       if (notified[notificationId]) {
+        console.log(`[Notification] Already sent, skipping: ${notificationId}`);
+        // Move to completed
+        const completedDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/outbox-completed');
+        if (!fs.existsSync(completedDir)) {
+          fs.mkdirSync(completedDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(completedDir, file));
         continue;
       }
       
@@ -132,9 +166,29 @@ async function processOutbox(token, notified) {
         content = { contentType: outboxData.contentType || 'unknown', title: 'Untitled' };
       }
       
+      // Malformed notification detection: fail closed
+      const backendContentId = outboxData.backendContentId || outboxData.draftId;
+      const resolvedTaskId = outboxData.taskId || outboxData.jobId || fileTaskId;
+      const isMalformed = 
+        !resolvedTaskId ||
+        content.title === 'Untitled' ||
+        content.contentType === 'unknown' ||
+        !backendContentId ||
+        backendContentId === 'N/A' ||
+        backendContentId === 'draft_undefined';
+      
+      if (isMalformed) {
+        console.error(`[Notification] Malformed notification detected, moving to failed-notifications: ${file}`);
+        const failedDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/failed-notifications');
+        if (!fs.existsSync(failedDir)) {
+          fs.mkdirSync(failedDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(failedDir, `${file}.malformed`));
+        continue;
+      }
+      
       // Extract chatId
       const chatId = outboxData.chatId || '8602323654';
-      const backendContentId = outboxData.backendContentId || outboxData.draftId || 'N/A';
       const executionMode = outboxData.executionMode || content.executionMode || 'review_required';
       
       // Determine status text based on executionMode and success

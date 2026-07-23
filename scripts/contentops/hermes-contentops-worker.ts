@@ -195,6 +195,10 @@ function emitFailureNotification(job: any, error: string) {
     const notificationId = `terminal:${taskId}`;
     
     const outboxPayload = {
+      // Schema version for startup protection
+      schemaVersion: 2,
+      createdAt: new Date().toISOString(),
+      // Notification dispatcher fields
       notificationId,
       chatId,
       backendContentId: null,
@@ -317,6 +321,9 @@ async function processJob(jobPath: string): Promise<boolean> {
     const notificationId = `terminal:${job.jobId}`;
     const resultFile = path.join(OUTBOX_DIR, `${job.jobId}.json`);
     const outboxPayload = {
+      // Schema version for startup protection
+      schemaVersion: 2,
+      createdAt: new Date().toISOString(),
       // Notification dispatcher fields
       notificationId,
       chatId: job.chatId || task.chatId || '8602323654',
