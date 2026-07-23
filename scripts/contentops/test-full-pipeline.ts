@@ -1,220 +1,57 @@
-#!/usr/bin/env tsx
-/**
- * ContentOps Full Pipeline Test - Simplified
- * 
- * Tests complete flow: Bot → Helper → Bridge → Worker → Backend
- */
-
+import { ContentNormalizer } from '../../src/lib/contentops/content-normalizer';
+import { getContract } from '../../src/lib/contentops/contract-registry';
+import { enrichContent, mergeEnrichedContent } from '../../src/lib/contentops/content-enricher';
+import { extractJsonFromMarkdown, extractNestedContent, normalizeFieldAliases, hasMinimalViability } from '../../src/lib/contentops/raw-model-draft-contract';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { execSync } from 'child_process';
-import { stagingHelperClient } from '../../src/lib/contentops/staging-helper-client';
 
-const HOME_DIR = os.homedir();
-const JOBS_DIR = path.join(HOME_DIR, '.jueshi-contentops/jobs');
-const INBOX_DIR = path.join(JOBS_DIR, 'inbox');
+const rawFile = path.join(os.homedir(), '.jueshi-contentops/jobs/failed/task_1784785126031_7n34mb.raw-output.json');
+const rawOutput = JSON.parse(fs.readFileSync(rawFile, 'utf-8'));
 
-async function testFullPipeline(runIndex: number) {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`Full Pipeline Test Run ${runIndex}`);
-  console.log(`${'='.repeat(60)}\n`);
-  
-  const startTime = Date.now();
-  const idempotencyKey = `test-pipeline-${Date.now()}-${runIndex}`;
-  const rawInput = '写一篇第一次使用国际集运的完整操作指南，讲清楚下单、入仓、申报、付款和收货';
-  
-  try {
-    // Step 1: Create task via staging helper
-    console.log('[1/5] Creating task via staging helper...');
-    const createTaskResponse = await stagingHelperClient.createTask({
-      action: 'create_task',
-      rawInput,
-      contentType: 'guide',
-      executionMode: 'draft_only',
-      targetEnvironment: 'staging',
-      idempotencyKey,
-    });
-    
-    console.log(`  ✓ Status: ${createTaskResponse.status}`);
-    
-    if (createTaskResponse.status !== 201) {
-      throw new Error(`Task creation failed: ${createTaskResponse.status}`);
-    }
-    
-    const taskId = createTaskResponse.data?.data?.task?.id || createTaskResponse.data?.taskId || createTaskResponse.body?.taskId;
-    if (!taskId) {
-      console.error('[Test] Full response:', JSON.stringify(createTaskResponse, null, 2));
-      throw new Error('Task ID missing from response');
-    }
-    console.log(`  ✓ TaskId: ${taskId}`);
-    
-    // Step 2: Write job to inbox
-    console.log('[2/5] Writing job to inbox...');
-    if (!fs.existsSync(INBOX_DIR)) {
-      fs.mkdirSync(INBOX_DIR, { recursive: true });
-    }
-    
-    const jobData = {
-      taskId,
-      contentType: 'guide',
-      executionMode: 'draft_only',
-      targetEnvironment: 'staging',
-      rawInput,
-      idempotencyKey,
-      createdAt: new Date().toISOString(),
-    };
-    
-    const jobPath = path.join(INBOX_DIR, `${taskId}.json`);
-    fs.writeFileSync(jobPath, JSON.stringify(jobData, null, 2));
-    console.log(`  ✓ Job written: ${jobPath}`);
-    
-    // Step 3: Wake worker
-    console.log('[3/5] Waking worker...');
-    try {
-      execSync('launchctl kickstart -k gui/$(id -u)/ai.hermes.contentops-worker', {
-        stdio: 'pipe',
-      });
-      console.log('  ✓ Worker kicked');
-    } catch (error: any) {
-      console.log(`  ⚠ Worker kickstart failed (may already be running): ${error.message}`);
-    }
-    
-    // Step 4: Wait for worker to process
-    console.log('[4/5] Waiting for worker to process...');
-    const maxWait = 60000; // 60 seconds
-    const checkInterval = 2000; // 2 seconds
-    let elapsed = 0;
-    
-    while (elapsed < maxWait) {
-      await new Promise(resolve => setTimeout(resolve, checkInterval));
-      elapsed += checkInterval;
-      
-      // Check if job is still in inbox
-      if (!fs.existsSync(jobPath)) {
-        console.log(`  ✓ Job processed after ${elapsed}ms`);
-        break;
-      }
-      
-      // Check if job moved to outbox
-      const outboxPath = path.join(JOBS_DIR, 'outbox', `${taskId}.json`);
-      if (fs.existsSync(outboxPath)) {
-        console.log(`  ✓ Job moved to outbox after ${elapsed}ms`);
-        break;
-      }
-      
-      // Check if job failed
-      const failedPath = path.join(JOBS_DIR, 'failed', `${taskId}.json`);
-      if (fs.existsSync(failedPath)) {
-        throw new Error('Job failed');
-      }
-      
-      if (elapsed % 10000 === 0) {
-        console.log(`  ... waiting (${elapsed}ms)`);
-      }
-    }
-    
-    if (elapsed >= maxWait) {
-      throw new Error(`Worker timeout after ${maxWait}ms`);
-    }
-    
-    // Step 5: Verify backend draft
-    console.log('[5/5] Verifying backend draft...');
-    const verifyResponse = await stagingHelperClient.getTask(taskId);
-    console.log(`  ✓ Verify status: ${verifyResponse.status}`);
-    
-    // For draft_only mode, the draft ID is generated locally as draft_${taskId}
-    const draftId = 'draft_only' === 'draft_only' 
-      ? `draft_${taskId}` 
-      : (verifyResponse.data?.draft?.id || verifyResponse.body?.draft?.id || verifyResponse.data?.id || verifyResponse.body?.id);
-    const draftStatus = verifyResponse.data?.draft?.status || verifyResponse.body?.draft?.status || verifyResponse.data?.status || verifyResponse.body?.status || 'DRAFT';
-    
-    if (!draftId) {
-      console.error('[Test] Verify response:', JSON.stringify(verifyResponse, null, 2));
-      throw new Error('Draft ID missing from response');
-    }
-    
-    console.log(`  ✓ DraftId: ${draftId}`);
-    console.log(`  ✓ Draft status: ${draftStatus}`);
-    
-    const totalTime = Date.now() - startTime;
-    console.log(`\n✅ Pipeline run ${runIndex} completed in ${totalTime}ms`);
-    console.log(`   TaskId: ${taskId}`);
-    console.log(`   DraftId: ${draftId}`);
-    
-    return {
-      success: true,
-      taskId,
-      draftId,
-      totalTime,
-    };
-  } catch (error: any) {
-    const totalTime = Date.now() - startTime;
-    console.error(`\n❌ Pipeline run ${runIndex} failed after ${totalTime}ms`);
-    console.error(`   Error: ${error.message}`);
-    
-    return {
-      success: false,
-      error: error.message,
-      totalTime,
-    };
-  }
-}
+console.log('=== Step 1: Extract nested content ===');
+let parsed = extractNestedContent(rawOutput);
+console.log('Keys after extract:', Object.keys(parsed));
 
-async function main() {
-  console.log('\n=== ContentOps Full Pipeline Test ===\n');
-  
-  const results = [];
-  
-  // Run 3 times
-  for (let i = 1; i <= 3; i++) {
-    const result = await testFullPipeline(i);
-    results.push(result);
-    
-    // Wait 3 seconds between runs
-    if (i < 3) {
-      console.log('\nWaiting 3 seconds before next run...');
-      await new Promise(resolve => setTimeout(resolve, 3000));
-    }
-  }
-  
-  // Summary
-  console.log(`\n\n${'='.repeat(60)}`);
-  console.log('Test Summary');
-  console.log(`${'='.repeat(60)}\n`);
-  
-  const successCount = results.filter(r => r.success).length;
-  const failCount = results.filter(r => !r.success).length;
-  
-  console.log(`Total runs: ${results.length}`);
-  console.log(`Success: ${successCount}`);
-  console.log(`Failed: ${failCount}`);
-  
-  if (successCount > 0) {
-    console.log('\nSuccessful runs:');
-    results.filter(r => r.success).forEach((r, i) => {
-      console.log(`  ${i + 1}. TaskId: ${r.taskId}`);
-      console.log(`     DraftId: ${r.draftId}`);
-      console.log(`     Time: ${r.totalTime}ms`);
-    });
-  }
-  
-  if (failCount > 0) {
-    console.log('\nFailed runs:');
-    results.filter(r => !r.success).forEach((r, i) => {
-      console.log(`  ${i + 1}. Error: ${r.error}`);
-      console.log(`     Time: ${r.totalTime}ms`);
-    });
-  }
-  
-  console.log(`\n${'='.repeat(60)}`);
-  console.log('Test Complete');
-  console.log(`${'='.repeat(60)}\n`);
-  
-  process.exit(failCount > 0 ? 1 : 0);
-}
+console.log('\n=== Step 2: Normalize field aliases ===');
+parsed = normalizeFieldAliases(parsed);
+console.log('Keys after alias normalization:', Object.keys(parsed));
 
-main().catch(error => {
-  console.error('Fatal error:', error);
-  process.exit(1);
+console.log('\n=== Step 3: Check viability ===');
+const viability = hasMinimalViability(parsed, 'topic');
+console.log('Viable:', viability.viable, viability.reason || '');
+
+console.log('\n=== Step 4: Run normalizer ===');
+const normalizer = new ContentNormalizer('topic');
+const cleaningResult = normalizer.clean(parsed);
+console.log('Fixed:', cleaningResult.fixedCount, 'Remaining:', cleaningResult.remainingCount);
+console.log('Content keys after normalize:', Object.keys(cleaningResult.content));
+
+console.log('\n=== Step 5: Enrich ===');
+const enriched = enrichContent({
+  contentType: 'topic',
+  ...cleaningResult.content,
+  taskId: 'task_1784785126031_7n34mb',
+  topic: '新加坡留学生第一次租房',
+  targetAudience: '留学生',
+  targetEnvironment: 'staging',
 });
+console.log('Enriched keys:', Object.keys(enriched));
+console.log('Enriched title:', enriched.title);
+console.log('Enriched slug:', enriched.slug);
+
+console.log('\n=== Step 6: Merge ===');
+const finalContent = mergeEnrichedContent(cleaningResult.content, enriched, {
+  executionMode: 'review_required',
+});
+console.log('Final content keys:', Object.keys(finalContent));
+console.log('Final title:', finalContent.title);
+console.log('Final slug:', finalContent.slug);
+console.log('Final summary:', finalContent.summary?.substring(0, 50));
+
+console.log('\n=== Step 7: Contract validation ===');
+const contract = getContract('topic');
+const structureValidation = contract.validateStructure(finalContent);
+const qualityValidation = contract.validateQuality(finalContent);
+console.log('Structure errors:', structureValidation.errors);
+console.log('Quality errors:', qualityValidation.errors);
