@@ -83,21 +83,8 @@ async function verifyBackendContentExists(
     const { execSync } = require('child_process');
     const stagingHost = process.env.STAGING_SSH_HOST || 'deploy@192.129.155.149';
     
-    // Build the API endpoint based on content type
-    let apiPath: string;
-    switch (contentType) {
-      case 'guide':
-        apiPath = `/api/contentops/guides/${backendContentId}`;
-        break;
-      case 'checklist':
-        apiPath = `/api/contentops/checklists/${backendContentId}`;
-        break;
-      case 'topic':
-        apiPath = `/api/contentops/topics/${backendContentId}`;
-        break;
-      default:
-        return null;
-    }
+    // Use the internal drafts API with id query parameter
+    const apiPath = `/api/internal/contentops/drafts?id=${encodeURIComponent(backendContentId)}`;
     
     const checkCmd = `ssh ${stagingHost} "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000${apiPath}"`;
     const httpCode = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 }).trim();

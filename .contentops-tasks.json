@@ -839,6 +839,48 @@
       "errorMessage": "FAKE_DRAFT_ID_REJECTED: draft_1784819375288_gd3fai",
       "failureStage": "finalizer",
       "failedAt": "2026-07-23T15:09:31.533Z"
+    },
+    "task_1784819466245_huk7t2": {
+      "id": "task_1784819466245_huk7t2",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T15:11:06.245Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:11:14.344Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T15:11:14.344Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:11:16.806Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T15:11:16.806Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T15:11:06.245Z",
+      "updatedAt": "2026-07-23T15:11:16.806Z",
+      "errorCode": "CONTENT_NOT_FOUND",
+      "errorMessage": "BACKEND_CONTENT_NOT_FOUND: draft_1784819475389_1zqu6",
+      "failureStage": "finalizer",
+      "failedAt": "2026-07-23T15:11:14.343Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T15:11:16.806Z"
     }
   }
 }
