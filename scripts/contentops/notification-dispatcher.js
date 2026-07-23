@@ -129,23 +129,29 @@ async function processOutbox(token, notified) {
       const backendContentId = outboxData.backendContentId || outboxData.draftId || 'N/A';
       const executionMode = outboxData.executionMode || content.executionMode || 'review_required';
       
-      // Determine status text based on executionMode
+      // Determine status text based on executionMode and success
       let statusText;
       let statusEmoji;
-      switch (executionMode) {
-        case 'publish_now':
-          statusText = '已发布';
-          statusEmoji = '🚀';
-          break;
-        case 'draft_only':
-          statusText = '已保存为草稿';
-          statusEmoji = '📝';
-          break;
-        case 'review_required':
-        default:
-          statusText = '等待人工审核';
-          statusEmoji = '✅';
-          break;
+      
+      if (outboxData.success === false || content.status === 'FAILED') {
+        statusText = '处理失败';
+        statusEmoji = '❌';
+      } else {
+        switch (executionMode) {
+          case 'publish_now':
+            statusText = '已发布';
+            statusEmoji = '🚀';
+            break;
+          case 'draft_only':
+            statusText = '已保存为草稿';
+            statusEmoji = '📝';
+            break;
+          case 'review_required':
+          default:
+            statusText = '等待人工审核';
+            statusEmoji = '✅';
+            break;
+        }
       }
       
       // Content type display name
@@ -154,18 +160,35 @@ async function processOutbox(token, notified) {
         'checklist': '检查清单',
         'topic': '专题',
         'tool': '工具',
-      }[content.contentType] || content.contentType || '内容';
+      };
+      const displayName = contentTypeName[content.contentType] || content.contentType || '内容';
       
       // Build notification message
-      const message = `${statusEmoji} 任务处理完成
+      let message;
+      if (outboxData.success === false || content.status === 'FAILED') {
+        // Failure notification
+        const errorInfo = outboxData.error || content.error || '未知错误';
+        message = `${statusEmoji} 任务处理失败
 
-内容类型：${contentTypeName}
+内容类型：${displayName}
+标题：${content.title || 'N/A'}
+任务 ID：${taskId}
+失败阶段：Worker 运行处理
+错误信息：${errorInfo.substring(0, 100)}
+当前状态：未保存、未发布
+后台入口：https://i.jueshi.net/admin/content-ops`;
+      } else {
+        // Success notification
+        message = `${statusEmoji} 任务处理完成
+
+内容类型：${displayName}
 标题：${content.title || 'N/A'}
 任务 ID：${taskId}
 后台内容 ID：${backendContentId}
 当前状态：${statusText}
 公开状态：${executionMode === 'publish_now' ? '已发布' : '未发布'}
 后台入口：https://i.jueshi.net/admin/content-ops`;
+      }
 
       // Send notification
       await sendTelegramMessage(token, chatId, message);

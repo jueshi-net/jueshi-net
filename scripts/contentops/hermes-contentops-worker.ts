@@ -168,19 +168,58 @@ function moveToProcessing(jobPath: string): string | null {
   }
 }
 
-function moveToFailed(jobPath: string, error: string) {
-  const jobId = path.basename(jobPath);
-  const failedPath = path.join(FAILED_DIR, jobId);
+function moveToFailed(jobPath: string, error: string, job?: any) {
+  const jobId = path.basename(jobPath, '.json');
+  const failedPath = path.join(FAILED_DIR, path.basename(jobPath));
   
   try {
-    const job = JSON.parse(fs.readFileSync(jobPath, 'utf-8'));
-    job.failedAt = new Date().toISOString();
-    job.error = error;
-    fs.writeFileSync(failedPath, JSON.stringify(job, null, 2));
+    const jobData = job || JSON.parse(fs.readFileSync(jobPath, 'utf-8'));
+    jobData.failedAt = new Date().toISOString();
+    jobData.error = error;
+    fs.writeFileSync(failedPath, JSON.stringify(jobData, null, 2));
     fs.unlinkSync(jobPath);
     log('error', 'Job moved to failed', { jobId, error });
+    
+    // Emit failure terminal notification to outbox
+    emitFailureNotification(jobData, error);
   } catch (e: any) {
     log('error', 'Failed to move job to failed', { jobId, error: e.message });
+  }
+}
+
+function emitFailureNotification(job: any, error: string) {
+  try {
+    const taskId = job.jobId || job.id || job.task?.id || 'unknown';
+    const chatId = job.chatId || job.task?.chatId || '8602323654';
+    const contentType = job.contentType || job.task?.contentType || 'unknown';
+    const notificationId = `terminal:${taskId}:failed`;
+    
+    const outboxPayload = {
+      notificationId,
+      chatId,
+      backendContentId: null,
+      content: JSON.stringify({
+        contentType,
+        title: job.topic || job.task?.topic || 'Untitled',
+        executionMode: job.executionMode || job.task?.executionMode || 'review_required',
+        status: 'FAILED',
+        error: error,
+      }),
+      jobId: taskId,
+      success: false,
+      contentType,
+      draftId: null,
+      publishedUrl: null,
+      executionMode: job.executionMode || job.task?.executionMode || 'review_required',
+      error,
+      failedAt: new Date().toISOString(),
+    };
+    
+    const resultFile = path.join(OUTBOX_DIR, `${taskId}.json`);
+    fs.writeFileSync(resultFile, JSON.stringify(outboxPayload, null, 2));
+    log('info', 'Failure notification written to outbox', { taskId, notificationId });
+  } catch (e: any) {
+    log('error', 'Failed to emit failure notification', { error: e.message });
   }
 }
 

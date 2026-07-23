@@ -471,6 +471,32 @@
       "maxRetries": 3,
       "createdAt": "2026-07-23T04:09:50.971Z",
       "updatedAt": "2026-07-23T04:09:50.977Z"
+    },
+    "task_1784797553630_n5xw5d": {
+      "id": "task_1784797553630_n5xw5d",
+      "chatId": "8602323654",
+      "messageId": 269,
+      "rawInput": "做一个新加坡留学生第一次租房专题，包含租房工具、完整指南、签约检查清单和政府官方资源，生成完成后保存到 staging 后台等我审核，不要直接发布。",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "新加坡留学生第一次租房专题，包含租房工具、完整指南、签约检查清单和政府官方资源，生成完成后保存到 staging 后台等我审核，不要直接发布。",
+      "audience": "留学生",
+      "country": "新加坡",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T09:05:53.630Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T09:05:53.631Z",
+      "updatedAt": "2026-07-23T09:05:53.639Z"
     }
   }
 }
