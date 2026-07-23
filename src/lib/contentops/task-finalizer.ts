@@ -196,10 +196,12 @@ export async function finalizeContentOpsTaskSuccess(
   }
   
   // Step 2: Verify backend content exists (skip for draft_only mode and smoke tests)
+  console.log(`[Finalizer] Checking backend verification: source=${input.source}, executionMode=${input.executionMode}, backendContentId=${input.backendContentId}`);
   const isSmokeTest = input.source === 'internal_runtime_smoke' ||
                       (input.executionMode !== 'draft_only' && 
                        input.backendContentId.startsWith('draft_') && 
                        !input.backendContentId.match(/^draft_task_\\d+_[a-z0-9]+$/));
+  console.log(`[Finalizer] isSmokeTest=${isSmokeTest}`);
   
   if (input.executionMode !== 'draft_only' && !isSmokeTest) {
     const verification = await verifyBackendContentExists(input.backendContentId, input.contentType);
