@@ -73,7 +73,7 @@ export interface ContentExecutor {
 
 const HERMES_CLI_PATH = process.env.HERMES_CLI_PATH || path.join(os.homedir(), '.hermes/hermes-agent/venv/bin/hermes');
 const HERMES_WORKING_DIR = process.env.HERMES_WORKING_DIR || path.join(os.homedir(), 'xixiong-saas');
-const HERMES_TIMEOUT_MS = parseInt(process.env.HERMES_TIMEOUT_MS || '180000'); // 3 minutes
+const HERMES_TIMEOUT_MS = parseInt(process.env.HERMES_TIMEOUT_MS || '300000'); // 5 minutes
 const HERMES_MAX_TURNS = parseInt(process.env.HERMES_MAX_TURNS || '5');
 
 // ============================================================================
