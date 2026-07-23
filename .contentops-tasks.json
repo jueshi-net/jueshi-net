@@ -563,6 +563,80 @@
       "failedAt": "2026-07-23T14:25:43.656Z",
       "archivedTest": true,
       "smokeTestCompletedAt": "2026-07-23T14:25:45.675Z"
+    },
+    "task_1784816804902_f10c4f": {
+      "id": "task_1784816804902_f10c4f",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T14:26:44.902Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:26:45.209Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T14:26:45.209Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:26:47.227Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T14:26:47.227Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T14:26:44.903Z",
+      "updatedAt": "2026-07-23T14:26:47.227Z",
+      "contentId": "draft_task_1784816804902_f10c4f",
+      "completedAt": "2026-07-23T14:26:45.209Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T14:26:47.227Z"
+    },
+    "task_1784818437319_rn8zcr": {
+      "id": "task_1784818437319_rn8zcr",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "FAILED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T14:53:57.319Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:55:05.931Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T14:55:05.931Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T14:53:57.320Z",
+      "updatedAt": "2026-07-23T14:55:05.931Z",
+      "errorCode": "CONTRACT_VALIDATION_FAILED",
+      "errorMessage": "CONTRACT_VALIDATION_FAILED: ",
+      "failureStage": "contract-validation",
+      "failedAt": "2026-07-23T14:55:05.930Z"
     }
   }
 }
