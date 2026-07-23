@@ -133,12 +133,27 @@ function generateInternalLinks(contentType: ContentType, topic: string): any[] {
       title: 'HS编码查询',
       reason: '相关工具推荐'
     });
+    links.push({
+      url: '/tools/package-dimensions',
+      title: '包裹尺寸计算器',
+      reason: '相关工具推荐'
+    });
   }
   
   if (contentType === 'checklist') {
     links.push({
       url: '/guides/international-shipping-documents',
       title: '国际运输文件指南',
+      reason: '相关指南推荐'
+    });
+    links.push({
+      url: '/guides/customs-clearance',
+      title: '海关清关指南',
+      reason: '相关指南推荐'
+    });
+    links.push({
+      url: '/guides/packaging-best-practices',
+      title: '包装最佳实践',
       reason: '相关指南推荐'
     });
   }
@@ -223,8 +238,25 @@ export function enrichContent(input: EnricherInput): EnrichedOutput {
   const resolvedSources = sources || [];
   const factVerificationStatus = resolvedSources.length > 0 ? 'complete' : 'incomplete';
   
-  // FAQ handling: keep model FAQ
-  const resolvedFaq = faq || [];
+  // FAQ handling: keep model FAQ, or generate minimum for checklist
+  let resolvedFaq = faq || [];
+  if (resolvedFaq.length < 3 && contentType === 'checklist') {
+    // Generate minimum FAQ for checklist if model didn't provide enough
+    resolvedFaq = [
+      {
+        question: '这个检查清单适用于哪些场景？',
+        answer: '本检查清单适用于首次使用国际集运服务的海外华人和留学生，涵盖了从准备到收货的完整流程。'
+      },
+      {
+        question: '检查清单中的项目是否都是必填的？',
+        answer: '检查清单中标记为"必填"的项目是必须完成的，标记为"选填"的项目可以根据个人情况决定是否执行。'
+      },
+      {
+        question: '如何确保不会遗漏重要步骤？',
+        answer: '建议按照检查清单的顺序逐项执行，每完成一项就打勾确认。对于重要文件和信息，建议做好备份。'
+      }
+    ];
+  }
   
   // JSON-LD generation
   const structuredData = generateJsonLd(contentType, resolvedTitle, resolvedSummary, canonicalUrl);
