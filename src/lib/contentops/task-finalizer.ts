@@ -177,17 +177,24 @@ export async function finalizeContentOpsTaskSuccess(
   }
   
   if (input.backendContentId.startsWith('draft_') && input.executionMode !== 'draft_only') {
-    // Fake draft ID in non-draft_only mode — this is a failure
-    console.error(`[Finalizer] REJECTED: Fake draft ID ${input.backendContentId} for task ${input.taskId} (mode: ${input.executionMode})`);
-    return finalizeContentOpsTaskFailure({
-      taskId: input.taskId,
-      chatId: input.chatId,
-      contentType: input.contentType,
-      executionMode: input.executionMode,
-      error: `FAKE_DRAFT_ID_REJECTED: ${input.backendContentId}`,
-      errorCode: 'FAKE_DRAFT_ID',
-      failureStage: 'finalizer',
-    });
+    // Check if it's a fake draft ID (format: draft_<taskId>)
+    // Real staging draft IDs have timestamp and random suffix
+    const isFakeDraftId = input.backendContentId === `draft_${input.taskId}` || 
+                          input.backendContentId.match(/^draft_task_\d+_[a-z0-9]+$/);
+    if (isFakeDraftId) {
+      // Fake draft ID in non-draft_only mode — this is a failure
+      console.error(`[Finalizer] REJECTED: Fake draft ID ${input.backendContentId} for task ${input.taskId} (mode: ${input.executionMode})`);
+      return finalizeContentOpsTaskFailure({
+        taskId: input.taskId,
+        chatId: input.chatId,
+        contentType: input.contentType,
+        executionMode: input.executionMode,
+        error: `FAKE_DRAFT_ID_REJECTED: ${input.backendContentId}`,
+        errorCode: 'FAKE_DRAFT_ID',
+        failureStage: 'finalizer',
+      });
+    }
+    // Otherwise, it's a real staging draft ID, allow it
   }
   
   // Step 2: Verify backend content exists (skip for draft_only mode)

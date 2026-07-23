@@ -805,6 +805,40 @@
       "failedAt": "2026-07-23T15:08:52.986Z",
       "archivedTest": true,
       "smokeTestCompletedAt": "2026-07-23T15:08:55.090Z"
+    },
+    "task_1784819364415_w5qufe": {
+      "id": "task_1784819364415_w5qufe",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "FAILED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T15:09:24.415Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:09:31.534Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T15:09:31.534Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T15:09:24.416Z",
+      "updatedAt": "2026-07-23T15:09:31.534Z",
+      "errorCode": "FAKE_DRAFT_ID",
+      "errorMessage": "FAKE_DRAFT_ID_REJECTED: draft_1784819375288_gd3fai",
+      "failureStage": "finalizer",
+      "failedAt": "2026-07-23T15:09:31.533Z"
     }
   }
 }
