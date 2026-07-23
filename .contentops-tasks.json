@@ -383,6 +383,94 @@
       "maxRetries": 3,
       "createdAt": "2026-07-23T02:09:58.439Z",
       "updatedAt": "2026-07-23T02:09:58.445Z"
+    },
+    "task_1784778332153_m7tjzq": {
+      "id": "task_1784778332153_m7tjzq",
+      "rawInput": "测试自动唤醒：写一篇关于国际集运的简短指南",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "测试自动唤醒：写一篇关于国际集运的简短指南",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T03:45:32.153Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T03:45:32.154Z",
+      "updatedAt": "2026-07-23T03:45:32.160Z"
+    },
+    "task_1784778610771_98638o": {
+      "id": "task_1784778610771_98638o",
+      "rawInput": "创建一个国际集运前的准备清单，包括文件准备、包装要求、禁运物品等",
+      "contentType": "checklist",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "创建一个国际集运前的准备清单，包括文件准备、包装要求、禁运物品等",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T03:50:10.771Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T03:50:10.772Z",
+      "updatedAt": "2026-07-23T03:50:10.779Z"
+    },
+    "task_1784778753102_qltizo": {
+      "id": "task_1784778753102_qltizo",
+      "rawInput": "创建一个关于国际集运的完整主题页面，包含工具、指南、清单和官方资源",
+      "contentType": "topic",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "创建一个关于国际集运的完整主题页面，包含工具、指南、清单和官方资源",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T03:52:33.102Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T03:52:33.103Z",
+      "updatedAt": "2026-07-23T03:52:33.108Z"
+    },
+    "task_1784779790971_677v4v": {
+      "id": "task_1784779790971_677v4v",
+      "rawInput": "创建一个关于国际集运的完整主题页面，包含工具推荐、操作指南、检查清单和官方资源",
+      "contentType": "topic",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "创建一个关于国际集运的完整主题页面，包含工具推荐、操作指南、检查清单和官方资源",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T04:09:50.971Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T04:09:50.971Z",
+      "updatedAt": "2026-07-23T04:09:50.977Z"
     }
   }
 }

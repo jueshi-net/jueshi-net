@@ -300,17 +300,43 @@ function parseTaskIntent(text: string): ParsedTask {
     contentType = 'guide';
   }
 
-  // Detect execution mode
+  // Detect execution mode with priority-based logic
+  // Priority: 1) Negated publish > 2) Review required > 3) Scheduled > 4) Publish when validated > 5) Publish now > 6) Default
   let executionMode: ParsedTask['executionMode'] = 'review_required';
-  // "检查通过后直接发布" or "验证通过后发布" → publish_when_validated
-  if (lower.includes('检查通过后') || lower.includes('验证通过后') || lower.includes('质量通过后') || lower.includes('检查通过后发布')) {
-    executionMode = 'publish_when_validated';
-  } else if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
-    // Only true "publish now" if NOT qualified by "检查通过后"
-    if (!lower.includes('检查通过后') && !lower.includes('验证通过后')) {
-      executionMode = 'publish_now';
+  
+  // Priority 1: Negated publish intent (HIGHEST PRIORITY)
+  // These expressions MUST override any positive publish intent
+  const negatedPublishPatterns = [
+    /不要.*发布/,
+    /不用.*发布/,
+    /暂不.*发布/,
+    /别发布/,
+    /先别.*发布/,
+    /不要.*立即发布/,
+    /不要.*自动发布/,
+    /不要.*直接发布/,
+    /仅保存草稿/,
+    /保存.*等我审核/,
+    /先给我审核/,
+    /审核后.*发布/,
+    /审核通过.*发布/,
+    /等我审核/,
+    /等待审核/,
+    /放后台/,
+  ];
+  
+  const hasNegatedPublish = negatedPublishPatterns.some(pattern => pattern.test(lower));
+  
+  if (hasNegatedPublish) {
+    // Negated publish intent detected - check if draft_only or review_required
+    if (lower.includes('只要草稿') || lower.includes('仅保存草稿')) {
+      executionMode = 'draft_only';
+    } else {
+      executionMode = 'review_required';
     }
-  } else if (
+  }
+  // Priority 2: Scheduled publish
+  else if (
     lower.includes('定时发布') || 
     lower.includes('安排发布') || 
     lower.includes('schedule') ||
@@ -320,13 +346,27 @@ function parseTaskIntent(text: string): ParsedTask {
     /\d+\s*分钟后.*发布/.test(lower)
   ) {
     executionMode = 'schedule_when_validated';
-  } else if (lower.includes('自动发布') || lower.includes('检查通过后发布')) {
-    executionMode = 'publish_when_validated';
-  } else if (lower.includes('等我审核') || lower.includes('等待审核') || lower.includes('放后台')) {
-    executionMode = 'review_required';
-  } else if (lower.includes('只要草稿') || lower.includes('不发布')) {
-    executionMode = 'draft_only';
   }
+  // Priority 3: Publish when validated (after quality check)
+  else if (lower.includes('检查通过后') || lower.includes('验证通过后') || lower.includes('质量通过后') || lower.includes('检查通过后发布') || lower.includes('自动发布')) {
+    executionMode = 'publish_when_validated';
+  }
+  // Priority 4: Publish now (only if explicitly positive, no negation)
+  else if (lower.includes('直接发布') || lower.includes('立即发布') || lower.includes('publish now')) {
+    // Only set to publish_now if there's NO negation nearby
+    // Check for negation words within 10 characters before "发布"
+    const publishIndex = lower.indexOf('发布');
+    if (publishIndex !== -1) {
+      const contextStart = Math.max(0, publishIndex - 10);
+      const context = lower.substring(contextStart, publishIndex);
+      const hasNegationNearby = /不|别|暂|不用/.test(context);
+      
+      if (!hasNegationNearby) {
+        executionMode = 'publish_now';
+      }
+    }
+  }
+  // Priority 5: Default is review_required (already set above)
 
   // Detect target environment
   let targetEnvironment: 'staging' | 'production' = 'staging';
@@ -1557,9 +1597,10 @@ Production: 🔒 DISABLED`;
       
       const ackMsg = await bot.sendMessage(chatId, ackMessage.substring(0, 4000));
 
-      // Create task via Bridge API
-      const taskResponse = await fetchBridgeApi({
-        action: 'create_task',
+      // Create task LOCALLY on Mac (not via staging Bridge API)
+      // This ensures the job is created in Mac's local queue and processed by Mac Worker
+      const { canonicalTaskService } = await import('../../src/lib/contentops/canonical-task-service');
+      const result = await canonicalTaskService.createAndEnqueueContentOpsTask({
         chatId: String(chatId),
         messageId: msg.message_id,
         rawInput: text,
@@ -1578,50 +1619,23 @@ Production: 🔒 DISABLED`;
         publishInstruction: parsed.publishInstruction,
       });
 
-      // Check HTTP status first
-      if (!taskResponse.ok) {
-        const errorData = await taskResponse.json().catch(() => ({ error: 'Unknown error', code: 'TASK_CREATE_FAILED' }));
-        // Map internal errors to user-safe messages
+      // Check result
+      if (!result.ok) {
         let userMessage = '❌ 任务创建失败\n\n';
-        if (taskResponse.status === 401 || errorData.code === 'INVALID_SIGNATURE') {
-          userMessage += '错误编号：CONTENTOPS-BRIDGE-AUTH\n系统内部通信验证失败，任务尚未创建，请稍后重试。';
-        } else if (taskResponse.status === 404) {
-          userMessage += '错误编号：CONTENTOPS-BRIDGE-NOT-FOUND\n系统服务暂时不可用，请稍后重试。';
-        } else if (taskResponse.status >= 500) {
-          userMessage += '错误编号：CONTENTOPS-BRIDGE-ERROR\n系统内部错误，任务尚未创建，请稍后重试。';
+        if (result.error?.code === 'CONTENTOPS_TASK_CREATE_FAILED') {
+          userMessage += '错误编号：CONTENTOPS-TASK-CREATE-FAILED\n任务创建失败，请稍后重试。';
+        } else if (result.error?.code === 'CONTENTOPS_JOB_ENQUEUE_FAILED') {
+          userMessage += '错误编号：CONTENTOPS-JOB-ENQUEUE-FAILED\n任务已创建但未进入执行队列，请稍后重试。';
         } else {
-          userMessage += `错误编号：${errorData.code || 'TASK_CREATE_FAILED'}\n任务创建失败，请稍后重试。`;
+          userMessage += `错误编号：${result.error?.code || 'TASK_CREATE_FAILED'}\n任务创建失败，请稍后重试。`;
         }
         await sendContentOpsPlainText(bot, chatId, userMessage);
-        console.error('[ContentOps Bot] Task creation failed:', { status: taskResponse.status, code: errorData.code, error: errorData.error });
+        console.error('[ContentOps Bot] Task creation failed:', result.error);
         return;
       }
 
-      // Parse JSON response
-      const taskResult = await taskResponse.json();
-
-      // Validate response schema: { ok: true, data: { task: { id, contentType, status }, job: { id, status } } }
-      if (!taskResult.ok || !taskResult.data || !taskResult.data.task || !taskResult.data.task.id) {
-        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
-
-错误编号：CONTENTOPS-TASK-RESPONSE-INVALID
-任务未进入执行队列，请稍后重试。`);
-        console.error('[ContentOps Bot] Task response invalid:', taskResult);
-        return;
-      }
-
-      // Validate job was enqueued
-      if (!taskResult.data.job || !taskResult.data.job.id) {
-        await sendContentOpsPlainText(bot, chatId, `❌ 任务创建失败
-
-错误编号：CONTENTOPS-JOB-ENQUEUE-FAILED
-任务已创建但未进入执行队列，请稍后重试。`);
-        console.error('[ContentOps Bot] Job enqueue failed:', taskResult);
-        return;
-      }
-
-      const taskId = taskResult.data.task.id;
-      const jobId = taskResult.data.job.id;
+      const taskId = result.taskId!;
+      const jobId = taskId; // Job ID is same as task ID
       const updateMessage = `✅ 任务创建成功
 
 任务 ID：${taskId}
