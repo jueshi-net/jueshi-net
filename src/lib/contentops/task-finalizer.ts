@@ -44,6 +44,8 @@ export interface FinalizerSuccessInput {
   latencyMs?: number;
   normalizerFixedCount?: number;
   normalizerRemainingBlockingIssues?: number;
+  transport?: 'telegram' | 'internal_test';  // Explicit transport routing
+  source?: string;  // Task source for internal smoke detection
 }
 
 export interface FinalizerFailureInput {
@@ -55,6 +57,8 @@ export interface FinalizerFailureInput {
   errorCode?: string;
   failureStage?: string;
   quarantinedContentId?: string;  // If content was created but is invalid
+  transport?: 'telegram' | 'internal_test';  // Explicit transport routing
+  source?: string;  // Task source for internal smoke detection
 }
 
 export interface FinalizerResult {
@@ -234,11 +238,19 @@ export async function finalizeContentOpsTaskSuccess(
   try {
     const adminUrl = buildContentOpsContentAdminUrl(input.contentType, input.backendContentId);
     
+    // Determine transport: internal smoke tests use internal_test, others use telegram
+    const transport = input.transport || 
+                      (input.source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram');
+    
+    // Internal smoke tests MUST use internal_test transport and null chatId
+    const chatId = transport === 'internal_test' ? null : input.chatId;
+    
     const outboxPayload = {
       schemaVersion: 2,
       createdAt: new Date().toISOString(),
       notificationId,
-      chatId: input.chatId,
+      transport,  // Explicit transport routing
+      chatId,     // null for internal_test
       terminalStatus: 'COMPLETED',
       contentType: input.contentType,
       title: input.title,
@@ -342,11 +354,19 @@ export async function finalizeContentOpsTaskFailure(
   
   // Step 4: Write failure terminal notification to outbox (v2 schema)
   try {
+    // Determine transport: internal smoke tests use internal_test, others use telegram
+    const transport = input.transport || 
+                      (input.source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram');
+    
+    // Internal smoke tests MUST use internal_test transport and null chatId
+    const chatId = transport === 'internal_test' ? null : input.chatId;
+    
     const outboxPayload = {
       schemaVersion: 2,
       createdAt: new Date().toISOString(),
       notificationId,
-      chatId: input.chatId,
+      transport,  // Explicit transport routing
+      chatId,     // null for internal_test
       terminalStatus: 'FAILED',
       contentType: input.contentType,
       title: null,

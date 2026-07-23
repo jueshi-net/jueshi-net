@@ -1189,6 +1189,49 @@
       "completedAt": "2026-07-23T16:00:05.714Z",
       "archivedTest": true,
       "smokeTestCompletedAt": "2026-07-23T16:00:07.757Z"
+    },
+    "task_1784822583420_q7ls6t": {
+      "id": "task_1784822583420_q7ls6t",
+      "chatId": "internal-test-sink",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "source": "internal_runtime_smoke",
+      "provider": "deterministic_fixture",
+      "internalAuthorized": true,
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T16:03:03.420Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T16:03:09.128Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T16:03:09.128Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T16:03:11.465Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T16:03:11.465Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T16:03:03.420Z",
+      "updatedAt": "2026-07-23T16:03:11.465Z",
+      "contentId": "draft_1784822592559_tcroqjf",
+      "completedAt": "2026-07-23T16:03:09.128Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T16:03:11.465Z"
     }
   }
 }

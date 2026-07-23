@@ -182,10 +182,23 @@ function moveToFailed(jobPath: string, error: string, job?: any) {
     log('error', 'Job moved to failed', { jobId, error });
     
     // Use Finalizer for failure terminal notification (replaces emitFailureNotification)
+    // Extract source and transport from job data
+    const source = jobData.source || jobData.task?.source;
+    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    
+    // For internal smoke tests, chatId can be null; for telegram, chatId is required
+    const chatId = transport === 'internal_test' ? null : (jobData.chatId || jobData.task?.chatId);
+    
+    // Fail closed: if chatId is missing for telegram transport, log error and skip notification
+    if (transport === 'telegram' && !chatId) {
+      log('error', 'MISSING_TARGET_CHAT_ID: Cannot send telegram notification without chatId', { jobId });
+      return;
+    }
+    
     finalizeContentOpsTask({
       success: false,
       taskId: jobId,
-      chatId: jobData.chatId || jobData.task?.chatId || '8602323654',
+      chatId: chatId || '',  // Empty string if null (will be converted to null by Finalizer)
       contentType: jobData.contentType || jobData.task?.contentType || 'unknown',
       executionMode: jobData.executionMode || jobData.task?.executionMode || 'review_required',
       error: error,
@@ -201,6 +214,8 @@ function moveToFailed(jobPath: string, error: string, job?: any) {
                     error.startsWith('FAKE_DRAFT_') ? 'finalizer' :
                     error.startsWith('FINALIZER_') ? 'finalizer' :
                     'worker',
+      transport,
+      source,
     }).catch(e => {
       log('error', 'Finalizer failure notification failed', { jobId, error: e.message });
     });
@@ -212,7 +227,20 @@ function moveToFailed(jobPath: string, error: string, job?: any) {
 function emitFailureNotification(job: any, error: string) {
   try {
     const taskId = job.jobId || job.id || job.task?.id || 'unknown';
-    const chatId = job.chatId || job.task?.chatId || '8602323654';
+    
+    // Extract source and determine transport
+    const source = job.source || job.task?.source;
+    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    
+    // For internal smoke tests, chatId is null; for telegram, chatId is required
+    const chatId = transport === 'internal_test' ? null : (job.chatId || job.task?.chatId);
+    
+    // Fail closed: if chatId is missing for telegram transport, log error and skip notification
+    if (transport === 'telegram' && !chatId) {
+      log('error', 'MISSING_TARGET_CHAT_ID: Cannot send telegram notification without chatId', { taskId });
+      return;
+    }
+    
     const contentType = job.contentType || job.task?.contentType || 'unknown';
     const notificationId = `terminal:${taskId}`;
     
@@ -222,7 +250,8 @@ function emitFailureNotification(job: any, error: string) {
       createdAt: new Date().toISOString(),
       // Notification dispatcher fields
       notificationId,
-      chatId,
+      transport,  // Explicit transport routing
+      chatId,     // null for internal_test
       backendContentId: null,
       content: JSON.stringify({
         contentType,
@@ -243,7 +272,7 @@ function emitFailureNotification(job: any, error: string) {
     
     const resultFile = path.join(OUTBOX_DIR, `${taskId}.json`);
     fs.writeFileSync(resultFile, JSON.stringify(outboxPayload, null, 2));
-    log('info', 'Failure notification written to outbox', { taskId, notificationId });
+    log('info', 'Failure notification written to outbox', { taskId, notificationId, transport });
   } catch (e: any) {
     log('error', 'Failed to emit failure notification', { error: e.message });
   }
@@ -425,10 +454,22 @@ async function processJob(jobPath: string): Promise<boolean> {
       // Otherwise, it's a real staging draft ID, allow it
     }
     
+    // Extract source and determine transport
+    const source = job.source || job.task?.source;
+    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    
+    // For internal smoke tests, chatId can be null; for telegram, chatId is required
+    const chatId = transport === 'internal_test' ? null : (job.task?.chatId || job.chatId);
+    
+    // Fail closed: if chatId is missing for telegram transport, fail the task
+    if (transport === 'telegram' && !chatId) {
+      throw new Error('MISSING_TARGET_CHAT_ID: Cannot complete task without chatId');
+    }
+    
     const finalizerResult = await finalizeContentOpsTask({
       success: true,
       taskId: job.jobId,
-      chatId: job.task?.chatId || job.chatId || '8602323654',
+      chatId: chatId || '',  // Empty string if null (will be converted to null by Finalizer)
       contentType: result.contentType,
       executionMode: task.executionMode,
       backendContentId: publishResult.draftId,
@@ -437,6 +478,8 @@ async function processJob(jobPath: string): Promise<boolean> {
       latencyMs: result.latencyMs,
       normalizerFixedCount: result.normalizerFixedCount,
       normalizerRemainingBlockingIssues: result.normalizerRemainingBlockingIssues,
+      transport,
+      source,
     });
     
     if (!finalizerResult.ok) {

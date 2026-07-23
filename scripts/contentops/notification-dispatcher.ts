@@ -262,21 +262,48 @@ async function processOutbox(token: string, notified: Record<string, any>): Prom
         continue;
       }
       
-      // Step 4: Build message
-      const chatId = outboxData.chatId || '8602323654';
+      // Step 4: Build message and determine transport
+      const transport = outboxData.transport || 'telegram';  // Default to telegram for backward compatibility
+      let chatId = outboxData.chatId;
+      
+      // Internal smoke tests MUST use internal_test transport
+      // Block any internal smoke test that tries to use telegram transport
+      const isInternalSmoke = outboxData.source === 'internal_runtime_smoke' || 
+                               transport === 'internal_test';
+      
+      if (isInternalSmoke && transport === 'telegram') {
+        console.error(`[Notification] BLOCKED: Internal smoke test cannot use telegram transport: ${file}`);
+        moveToFailedQueue(claimingPath, 'INTERNAL_SMOKE_TELEGRAM_BLOCKED');
+        continue;
+      }
+      
+      // Internal smoke tests MUST have null chatId
+      if (isInternalSmoke && chatId) {
+        console.error(`[Notification] BLOCKED: Internal smoke test must have null chatId, got: ${chatId}: ${file}`);
+        moveToFailedQueue(claimingPath, 'INTERNAL_SMOKE_WITH_CHAT_ID_BLOCKED');
+        continue;
+      }
+      
+      // Telegram transport requires valid chatId
+      if (transport === 'telegram' && !chatId) {
+        console.error(`[Notification] BLOCKED: Telegram transport requires chatId: ${file}`);
+        moveToFailedQueue(claimingPath, 'MISSING_TARGET_CHAT_ID');
+        continue;
+      }
+      
       const message = buildTerminalMessage(outboxData);
       
-      // Step 5: Send to Telegram or Test Sink
+      // Step 5: Send to Telegram or Test Sink based on transport field
       let sendResult: any;
-      if (chatId === 'internal-test-sink' || chatId === 'INTERNAL_TEST_SINK') {
+      if (transport === 'internal_test') {
         // Internal test sink - do not send to real Telegram
         const { sendToTestSink } = await import('./internal-test-transport');
         sendResult = await sendToTestSink(outboxData);
         console.log(`[Notification] Sent to test sink for task: ${taskId}`);
       } else {
         // Real Telegram send
-        sendResult = await sendTelegramMessage(token, chatId, message);
-        console.log(`[Notification] Sent ${outboxData.terminalStatus} for task: ${taskId}`);
+        sendResult = await sendTelegramMessage(token, chatId!, message);
+        console.log(`[Notification] Sent ${outboxData.terminalStatus} for task: ${taskId} to chatId: ${chatId}`);
       }
       
       // Step 6: Telegram success → write to notified.json

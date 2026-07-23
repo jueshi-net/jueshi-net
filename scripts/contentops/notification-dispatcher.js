@@ -187,8 +187,47 @@ async function processOutbox(token, notified) {
         continue;
       }
       
-      // Extract chatId
-      const chatId = outboxData.chatId || '8602323654';
+      // Extract transport and chatId
+      const transport = outboxData.transport || 'telegram';  // Default to telegram for backward compatibility
+      let chatId = outboxData.chatId;
+      
+      // Internal smoke tests MUST use internal_test transport
+      // Block any internal smoke test that tries to use telegram transport
+      const isInternalSmoke = outboxData.source === 'internal_runtime_smoke' || 
+                               transport === 'internal_test';
+      
+      if (isInternalSmoke && transport === 'telegram') {
+        console.error(`[Notification] BLOCKED: Internal smoke test cannot use telegram transport: ${file}`);
+        const failedDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/failed-notifications');
+        if (!fs.existsSync(failedDir)) {
+          fs.mkdirSync(failedDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(failedDir, `${file}.blocked`));
+        continue;
+      }
+      
+      // Internal smoke tests MUST have null chatId
+      if (isInternalSmoke && chatId) {
+        console.error(`[Notification] BLOCKED: Internal smoke test must have null chatId, got: ${chatId}: ${file}`);
+        const failedDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/failed-notifications');
+        if (!fs.existsSync(failedDir)) {
+          fs.mkdirSync(failedDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(failedDir, `${file}.blocked`));
+        continue;
+      }
+      
+      // Telegram transport requires valid chatId
+      if (transport === 'telegram' && !chatId) {
+        console.error(`[Notification] BLOCKED: Telegram transport requires chatId: ${file}`);
+        const failedDir = path.join(HOME_DIR, '.jueshi-contentops/jobs/failed-notifications');
+        if (!fs.existsSync(failedDir)) {
+          fs.mkdirSync(failedDir, { recursive: true });
+        }
+        fs.renameSync(filePath, path.join(failedDir, `${file}.missing-chatid`));
+        continue;
+      }
+      
       const executionMode = outboxData.executionMode || content.executionMode || 'review_required';
       
       // Determine status text based on executionMode and success
@@ -252,8 +291,30 @@ async function processOutbox(token, notified) {
 后台入口：https://i.jueshi.net/admin/contentops`;
       }
 
-      // Send notification
-      await sendTelegramMessage(token, chatId, message);
+      // Send notification based on transport
+      if (transport === 'internal_test') {
+        // Write to test sink audit log
+        const testSinkDir = path.join(HOME_DIR, '.jueshi-contentops/test-sink');
+        if (!fs.existsSync(testSinkDir)) {
+          fs.mkdirSync(testSinkDir, { recursive: true });
+        }
+        const auditFile = path.join(testSinkDir, 'audit.log');
+        const auditEntry = {
+          timestamp: new Date().toISOString(),
+          notificationId,
+          chatId: null,
+          terminalStatus: outboxData.terminalStatus,
+          backendContentId: backendContentId,
+          contentType: content.contentType,
+          title: content.title,
+        };
+        fs.appendFileSync(auditFile, JSON.stringify(auditEntry) + '\n');
+        console.log(`[Notification] Written to test sink: ${notificationId} for task: ${taskId}`);
+      } else {
+        // Send to Telegram
+        await sendTelegramMessage(token, chatId, message);
+        console.log(`[Notification] Sent to Telegram: ${notificationId} for task: ${taskId} to chatId: ${chatId}`);
+      }
       
       // Mark as notified using notificationId for idempotency
       notified[notificationId] = {
@@ -261,6 +322,7 @@ async function processOutbox(token, notified) {
         taskId: taskId,
         backendContentId: backendContentId,
         executionMode: executionMode,
+        transport: transport,
       };
       
       console.log(`[Notification] Sent: ${notificationId} for task: ${taskId}`);
