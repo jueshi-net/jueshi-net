@@ -20,6 +20,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 import * as https from 'https';
+import { buildContentOpsAdminUrl } from '../../src/lib/contentops/admin-url-builder';
 
 const HOME_DIR = require('os').homedir();
 const OUTBOX_DIR = path.join(HOME_DIR, '.jueshi-contentops/jobs/outbox');
@@ -176,7 +177,7 @@ function buildTerminalMessage(data: any): string {
     const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
     const title = data.title || content?.title || 'Untitled';
     const contentType = data.contentType || content?.contentType || 'unknown';
-    const adminUrl = data.adminUrl || 'https://i.jueshi.net/admin/contentops';
+    const adminUrl = data.adminUrl || buildContentOpsAdminUrl('staging');
     
     return [
       '✅ <b>任务处理完成</b>',
@@ -192,7 +193,7 @@ function buildTerminalMessage(data: any): string {
     const content = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
     const error = data.error || content?.error || '未知错误';
     const contentType = data.contentType || content?.contentType || 'unknown';
-    const adminUrl = data.adminUrl || 'https://i.jueshi.net/admin/contentops';
+    const adminUrl = data.adminUrl || buildContentOpsAdminUrl('staging');
     
     return [
       '❌ <b>任务处理失败</b>',
