@@ -192,7 +192,7 @@ function emitFailureNotification(job: any, error: string) {
     const taskId = job.jobId || job.id || job.task?.id || 'unknown';
     const chatId = job.chatId || job.task?.chatId || '8602323654';
     const contentType = job.contentType || job.task?.contentType || 'unknown';
-    const notificationId = `terminal:${taskId}:failed`;
+    const notificationId = `terminal:${taskId}`;
     
     const outboxPayload = {
       notificationId,
@@ -314,7 +314,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     });
     
     // Write result to outbox with notification-compatible schema
-    const notificationId = `terminal:${job.jobId}:completed`;
+    const notificationId = `terminal:${job.jobId}`;
     const resultFile = path.join(OUTBOX_DIR, `${job.jobId}.json`);
     const outboxPayload = {
       // Notification dispatcher fields

@@ -124,7 +124,7 @@ async function recoverTask() {
       console.log('Task ID:', taskId);
       console.log('Draft ID:', data.draftId || draftId);
       console.log('Status: AWAITING_REVIEW');
-      console.log('Admin URL: https://i.jueshi.net/admin/content-ops');
+      console.log('Admin URL: https://i.jueshi.net/admin/contentops');
       
     } else {
       const error = response.error || response.body || 'Unknown error';

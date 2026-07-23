@@ -103,8 +103,16 @@ async function processOutbox(token, notified) {
     try {
       const outboxData = JSON.parse(fs.readFileSync(path.join(OUTBOX_DIR, file), 'utf-8'));
       
-      // Use notificationId for idempotency (new schema) or fall back to taskId (old schema)
-      const notificationId = outboxData.notificationId || `terminal:${fileTaskId}:completed`;
+      // Use task-based idempotency key for terminal notifications
+      // Strip status suffix (:completed/:failed) to prevent duplicate sends
+      // when recovery overwrites a failure notification
+      let notificationId = outboxData.notificationId || `terminal:${fileTaskId}:completed`;
+      if (notificationId.startsWith('terminal:')) {
+        const parts = notificationId.split(':');
+        if (parts.length >= 3) {
+          notificationId = `terminal:${parts[1]}`; // Use task-based key only
+        }
+      }
       const taskId = outboxData.jobId || fileTaskId;
       
       // Skip if already notified (idempotent)
@@ -176,7 +184,7 @@ async function processOutbox(token, notified) {
 失败阶段：Worker 运行处理
 错误信息：${errorInfo.substring(0, 100)}
 当前状态：未保存、未发布
-后台入口：https://i.jueshi.net/admin/content-ops`;
+后台入口：https://i.jueshi.net/admin/contentops`;
       } else {
         // Success notification
         message = `${statusEmoji} 任务处理完成
@@ -187,7 +195,7 @@ async function processOutbox(token, notified) {
 后台内容 ID：${backendContentId}
 当前状态：${statusText}
 公开状态：${executionMode === 'publish_now' ? '已发布' : '未发布'}
-后台入口：https://i.jueshi.net/admin/content-ops`;
+后台入口：https://i.jueshi.net/admin/contentops`;
       }
 
       // Send notification
