@@ -24,7 +24,7 @@ export interface PublishResult {
 }
 
 export interface ContentPublishAdapter {
-  publish(result: StructuredContentResult, taskId: string): Promise<PublishResult>;
+  publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult>;
 }
 
 // ============================================================================
@@ -90,8 +90,17 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
 // ============================================================================
 
 export class GuidePublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string): Promise<PublishResult> {
+  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
     try {
+      // For draft_only mode, skip staging helper and just save locally
+      if (executionMode === 'draft_only') {
+        return {
+          success: true,
+          draftId: `draft_${taskId}`,
+          publishedUrl: null,
+        };
+      }
+      
       const payload = {
         idempotencyKey: taskId,
         taskId,
@@ -134,8 +143,17 @@ export class GuidePublishAdapter implements ContentPublishAdapter {
 // ============================================================================
 
 export class ChecklistPublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string): Promise<PublishResult> {
+  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
     try {
+      // For draft_only mode, skip staging helper and just save locally
+      if (executionMode === 'draft_only') {
+        return {
+          success: true,
+          draftId: `draft_${taskId}`,
+          publishedUrl: null,
+        };
+      }
+      
       const payload = {
         idempotencyKey: taskId,
         taskId,
@@ -175,8 +193,17 @@ export class ChecklistPublishAdapter implements ContentPublishAdapter {
 // ============================================================================
 
 export class TopicPublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string): Promise<PublishResult> {
+  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
     try {
+      // For draft_only mode, skip staging helper and just save locally
+      if (executionMode === 'draft_only') {
+        return {
+          success: true,
+          draftId: `draft_${taskId}`,
+          publishedUrl: null,
+        };
+      }
+      
       const payload = {
         idempotencyKey: taskId,
         taskId,

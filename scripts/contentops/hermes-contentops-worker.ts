@@ -262,7 +262,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     
     // Call appropriate adapter based on content type
     const adapter = getContentPublishAdapter(result.contentType);
-    const publishResult = await adapter.publish(result, task.id);
+    const publishResult = await adapter.publish(result, task.id, task.executionMode);
     
     if (!publishResult.success) {
       throw new Error(publishResult.error || 'ADAPTER_PUBLISH_FAILED');
