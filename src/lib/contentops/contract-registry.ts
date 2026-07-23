@@ -183,7 +183,11 @@ export const GuideContract: ContentContract = {
     // Body length
     const charCount = countChineseChars(content.body || '');
     if (charCount < this.minLength) {
-      errors.push(`Body too short: ${charCount} chars (min ${this.minLength})`);
+      if (isDraftMode) {
+        warnings.push(`Body short (draft mode): ${charCount} chars (min ${this.minLength})`);
+      } else {
+        errors.push(`Body too short: ${charCount} chars (min ${this.minLength})`);
+      }
     }
     if (charCount > this.maxLength) {
       warnings.push(`Body too long: ${charCount} chars (max ${this.maxLength})`);

@@ -1,0 +1,28 @@
+{
+  "tasks": {
+    "task_1784769542051_p59j9k": {
+      "id": "task_1784769542051_p59j9k",
+      "chatId": 8602323654,
+      "messageId": 1784769542051,
+      "rawInput": "测试自动唤醒：国际集运新手指南",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T01:19:02.052Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T01:19:02.052Z",
+      "updatedAt": "2026-07-23T01:19:02.055Z"
+    }
+  }
+}
