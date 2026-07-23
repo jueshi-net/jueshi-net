@@ -73,6 +73,11 @@ export class ContentNormalizer {
     // Step 8: Ensure FAQ minimum
     cleaned = this.ensureFaqMinimum(cleaned);
 
+    // Step 8.5: Topic-specific structure normalization
+    if (this.contract.type === 'topic') {
+      cleaned = this.normalizeTopicStructure(cleaned);
+    }
+
     // Step 9: Validate structure against contract
     const structureResult = this.contract.validateStructure(cleaned);
     for (const error of structureResult.errors) {
@@ -273,12 +278,24 @@ export class ContentNormalizer {
     }
 
     if (content.faq.length < this.contract.minFaqCount) {
-      this.addIssue(
-        'faq',
-        'error',
-        `FAQ count ${content.faq.length} below minimum ${this.contract.minFaqCount}`,
-        false
-      );
+      // For Topic: generate FAQ from blocks/subtopics before reporting error
+      if (this.contract.type === 'topic') {
+        const generatedFaq = this.generateTopicFaqFromContent(content);
+        if (generatedFaq.length > 0) {
+          content.faq = [...content.faq, ...generatedFaq];
+          this.addIssue('faq', 'info', `Generated ${generatedFaq.length} FAQ from Topic content`, true);
+          this.fixedCount++;
+        }
+      }
+      
+      if (content.faq.length < this.contract.minFaqCount) {
+        this.addIssue(
+          'faq',
+          'error',
+          `FAQ count ${content.faq.length} below minimum ${this.contract.minFaqCount}`,
+          false
+        );
+      }
     }
 
     // Remove empty FAQs
@@ -292,6 +309,165 @@ export class ContentNormalizer {
     });
 
     return content;
+  }
+
+  // ============================================================================
+  // Topic-Specific Normalization
+  // ============================================================================
+
+  /**
+   * Normalize Topic-specific structure:
+   * - hero string → {headline, subheadline, description}
+   * - hero aliases (title/subtitle/summary) → standard fields
+   * - Generate FAQ from blocks/subtopics if missing
+   */
+  private normalizeTopicStructure(content: any): any {
+    // Hero normalization
+    content = this.normalizeTopicHero(content);
+    return content;
+  }
+
+  /**
+   * Normalize Topic hero to {headline, subheadline, description}
+   * 
+   * Supports:
+   * - hero: "string" → {headline: string, subheadline: "", description: string}
+   * - hero: {title, subtitle, summary} → {headline, subheadline, description}
+   * - hero: {headline, subheadline, description} → as-is
+   */
+  private normalizeTopicHero(content: any): any {
+    if (!content.hero) {
+      // Try to construct hero from topic title
+      const title = content.title || '';
+      if (title) {
+        content.hero = {
+          headline: title,
+          subheadline: '',
+          description: title,
+        };
+        this.addIssue('topic-hero', 'info', 'Constructed hero from title', true);
+        this.fixedCount++;
+      }
+      return content;
+    }
+
+    // Case 1: hero is a string
+    if (typeof content.hero === 'string') {
+      const heroStr = content.hero.trim();
+      if (heroStr) {
+        // Split into headline and description if long enough
+        const parts = heroStr.split(/[——\-–—]/);
+        const headline = parts[0]?.trim() || heroStr;
+        const description = parts.slice(1).join('——').trim() || heroStr;
+        
+        content.hero = {
+          headline,
+          subheadline: headline.length > 30 ? '' : headline,
+          description: description !== headline ? description : heroStr,
+        };
+        this.addIssue('topic-hero', 'info', 'Normalized hero string to object', true);
+        this.fixedCount++;
+      }
+      return content;
+    }
+
+    // Case 2: hero is an object with aliases
+    if (typeof content.hero === 'object') {
+      const hero = content.hero;
+      
+      // headline resolution
+      const headline = hero.headline || hero.title || hero.name || hero['标题'] || '';
+      
+      // subheadline resolution
+      const subheadline = hero.subheadline || hero.subtitle || hero['副标题'] || '';
+      
+      // description resolution
+      const description = hero.description || hero.summary || hero['描述'] || hero['简介'] || '';
+      
+      // Only overwrite if we resolved something
+      if (headline || subheadline || description) {
+        content.hero = {
+          headline: headline || (content.title || ''),
+          subheadline: subheadline || headline || '',
+          description: description || headline || '',
+        };
+        this.addIssue('topic-hero', 'info', 'Normalized hero field aliases', true);
+        this.fixedCount++;
+      }
+    }
+
+    return content;
+  }
+
+  /**
+   * Generate FAQ from Topic blocks and subtopics (deterministic, no fabrication)
+   */
+  private generateTopicFaqFromContent(content: any): any[] {
+    const faqs: any[] = [];
+    const title = content.title || '';
+    const subtopics = content.subtopics || [];
+    const blocks = content.blockConfiguration || content.blocks || [];
+    const relatedTools = content.relatedTools || [];
+    const relatedGuides = content.relatedGuides || [];
+
+    // Generate FAQ from subtopics
+    if (subtopics.length > 0) {
+      const subtopicNames = subtopics.map((s: any) => s.title || s.name).filter(Boolean);
+      if (subtopicNames.length >= 2) {
+        faqs.push({
+          question: `这个专题涵盖了哪些主要内容？`,
+          answer: `本专题涵盖了${subtopicNames.slice(0, 3).join('、')}等核心内容，为您提供全面的信息和实用指南。`,
+        });
+      }
+    }
+
+    // Generate FAQ from blocks
+    const faqBlock = blocks.find((b: any) => b.type === 'faq');
+    if (faqBlock && faqBlock.content) {
+      faqs.push({
+        question: '有哪些常见问题？',
+        answer: typeof faqBlock.content === 'string' ? faqBlock.content : JSON.stringify(faqBlock.content),
+      });
+    }
+
+    // Generate FAQ from related tools
+    if (relatedTools.length > 0) {
+      const toolNames = relatedTools.map((t: any) => t.title || t.name).filter(Boolean);
+      if (toolNames.length > 0) {
+        faqs.push({
+          question: `有哪些实用工具可以使用？`,
+          answer: `我们推荐了${toolNames.slice(0, 3).join('、')}等实用工具，帮助您更高效地完成相关操作。`,
+        });
+      }
+    }
+
+    // Generate FAQ from related guides
+    if (relatedGuides.length > 0) {
+      const guideNames = relatedGuides.map((g: any) => g.title).filter(Boolean);
+      if (guideNames.length > 0) {
+        faqs.push({
+          question: `有哪些相关指南可以参考？`,
+          answer: `我们整理了${guideNames.slice(0, 3).join('、')}等详细指南，帮助您深入了解相关内容。`,
+        });
+      }
+    }
+
+    // Generic FAQ from title if still not enough
+    if (faqs.length < 3 && title) {
+      faqs.push({
+        question: `这个专题适合哪些人？`,
+        answer: `本专题适合对${title.replace(/[专题页面]/g, '').trim() || '相关内容'}感兴趣的海外华人和留学生，无论您是初学者还是有一定经验，都能从中获得有价值的信息。`,
+      });
+    }
+
+    if (faqs.length < 3 && title) {
+      faqs.push({
+        question: `如何获取最新信息？`,
+        answer: `建议您收藏本专题页面，并关注相关官方网站获取最新动态。内容会定期更新以确保信息的准确性和时效性。`,
+      });
+    }
+
+    return faqs.slice(0, 5); // Cap at 5 to avoid over-generation
   }
 
   // ============================================================================

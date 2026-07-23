@@ -117,6 +117,16 @@ export function normalizeFieldAliases(raw: any): any {
     normalized.blockConfiguration = normalized.blocks;
   }
   
+  // Topic relatedTools name → title
+  if (normalized.relatedTools && Array.isArray(normalized.relatedTools)) {
+    normalized.relatedTools = normalized.relatedTools.map((item: any) => {
+      if (item.name && !item.title) {
+        return { ...item, title: item.name };
+      }
+      return item;
+    });
+  }
+  
   return normalized;
 }
 
@@ -221,9 +231,24 @@ export function hasMinimalViability(raw: any, contentType?: string): { viable: b
   // Guide (default): needs body/content/article/markdown
   const hasBody = raw.body || raw.content || raw.article || raw.markdown || raw['正文'] || raw['内容'];
   
-  if (!hasBody) {
-    return { viable: false, reason: 'Guide requires body, content, article, or markdown' };
+  if (hasBody) {
+    return { viable: true };
   }
   
-  return { viable: true };
+  // If no body but has structural elements (groups, blocks, etc.), consider viable
+  // This handles cases where contentType is not specified but structure is present
+  const hasStructure = 
+    raw.groups || 
+    raw.items || 
+    raw.blocks || 
+    raw.blockConfiguration ||
+    raw.sections ||
+    raw.checklist ||
+    raw.subtopics;
+  
+  if (hasStructure) {
+    return { viable: true };
+  }
+  
+  return { viable: false, reason: 'Guide requires body, content, article, or markdown' };
 }
