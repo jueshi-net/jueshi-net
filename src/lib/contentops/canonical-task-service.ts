@@ -268,27 +268,38 @@ export class CanonicalTaskService {
 
   /**
    * Auto-wakeup Worker
-   * Uses launchctl kickstart or direct node execution
+   * Uses launchctl kickstart or direct spawn with detached mode
    */
   private async wakeupWorker(): Promise<void> {
-    const { execSync } = await import('child_process');
+    const { spawn } = await import('child_process');
     const cwd = process.cwd() || path.join(os.homedir(), 'xixiong-saas');
     const workerScript = path.join(cwd, 'scripts/contentops/hermes-contentops-worker.ts');
+    const tsxBin = path.join(cwd, 'node_modules/.bin/tsx');
 
     try {
       const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
-      execSync(`launchctl kickstart -k gui/${uid}/ai.hermes.contentops-worker 2>/dev/null || node ${workerScript} &`, {
+      const { execSync } = await import('child_process');
+      execSync(`launchctl kickstart -k gui/${uid}/ai.hermes.contentops-worker 2>/dev/null`, {
         stdio: 'ignore',
         timeout: 5000,
       });
-      console.log('[CanonicalTaskService] Worker kickstarted');
+      console.log('[CanonicalTaskService] Worker kickstarted via launchctl');
     } catch (kickstartError) {
-      // If launchctl fails, run worker directly in background
+      // If launchctl fails, spawn worker directly with detached mode
       try {
-        execSync(`node ${workerScript} > /dev/null 2>&1 &`, { stdio: 'ignore' });
-        console.log('[CanonicalTaskService] Worker started in background');
-      } catch (backgroundError) {
-        console.error('[CanonicalTaskService] Failed to start worker:', backgroundError);
+        const child = spawn(tsxBin, [workerScript], {
+          detached: true,
+          stdio: 'ignore',
+          cwd: cwd,
+          env: {
+            ...process.env,
+            HERMES_JOBS_DIR: path.join(os.homedir(), '.jueshi-contentops/jobs'),
+          },
+        });
+        child.unref();
+        console.log('[CanonicalTaskService] Worker spawned in background, PID:', child.pid);
+      } catch (spawnError) {
+        console.error('[CanonicalTaskService] Failed to spawn worker:', spawnError);
       }
     }
   }

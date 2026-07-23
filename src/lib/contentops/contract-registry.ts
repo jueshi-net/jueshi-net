@@ -165,10 +165,18 @@ export const GuideContract: ContentContract = {
     const errors: string[] = [];
     const warnings: string[] = [];
     
-    // Required fields
+    // Required fields (relaxed for draft_only with factVerificationStatus)
+    const isDraftMode = (content as any).executionMode === 'draft_only';
+    const isIncomplete = (content as any).factVerificationStatus === 'incomplete';
+    
     for (const field of this.requiredFields) {
       if (!(field in content)) {
-        errors.push(`Missing required field: ${field}`);
+        // For draft mode, FAQ and sources can be missing with warning
+        if (isDraftMode && isIncomplete && (field === 'faq' || field === 'sources')) {
+          warnings.push(`Optional field missing (draft mode): ${field}`);
+        } else {
+          errors.push(`Missing required field: ${field}`);
+        }
       }
     }
     
@@ -181,9 +189,13 @@ export const GuideContract: ContentContract = {
       warnings.push(`Body too long: ${charCount} chars (max ${this.maxLength})`);
     }
     
-    // FAQ count
+    // FAQ count (relaxed for draft mode)
     if (!content.faq || content.faq.length < this.minFaqCount) {
-      errors.push(`FAQ count too low: ${content.faq?.length || 0} (min ${this.minFaqCount})`);
+      if (isDraftMode && isIncomplete) {
+        warnings.push(`FAQ count low (draft mode): ${content.faq?.length || 0} (min ${this.minFaqCount})`);
+      } else {
+        errors.push(`FAQ count too low: ${content.faq?.length || 0} (min ${this.minFaqCount})`);
+      }
     }
     
     // Internal links
@@ -200,7 +212,11 @@ export const GuideContract: ContentContract = {
         warnings.push(`SEO description too short: ${content.seo.description.length} chars`);
       }
       if (!content.seo.keywords || content.seo.keywords.length < this.minKeywords) {
-        errors.push(`Keywords too few: ${content.seo.keywords?.length || 0} (min ${this.minKeywords})`);
+        if (isDraftMode && isIncomplete) {
+          warnings.push(`Keywords low (draft mode): ${content.seo.keywords?.length || 0} (min ${this.minKeywords})`);
+        } else {
+          errors.push(`Keywords too few: ${content.seo.keywords?.length || 0} (min ${this.minKeywords})`);
+        }
       }
     }
     

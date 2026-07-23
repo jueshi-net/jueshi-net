@@ -199,10 +199,26 @@ export class HermesContentExecutor implements ContentExecutor {
       const normalizer = new ContentNormalizer(contentType);
       const cleaningResult = normalizer.clean(normalized);
       
+      // Enrich with deterministic system-generated metadata
+      const { enrichContent, mergeEnrichedContent } = await import('./content-enricher');
+      const enriched = enrichContent({
+        contentType,
+        ...cleaningResult.content,
+        taskId: task.id,
+        topic: task.topic,
+        targetAudience: (task as any).targetAudience,
+        targetEnvironment: (task as any).targetEnvironment || 'staging',
+      });
+      
+      // Merge enriched metadata with cleaned content
+      const finalContent = mergeEnrichedContent(cleaningResult.content, enriched, {
+        executionMode: (task as any).executionMode || 'draft_only',
+      });
+      
       // Validate against contract
       const contract = getContract(contentType);
-      const structureValidation = contract.validateStructure(cleaningResult.content);
-      const qualityValidation = contract.validateQuality(cleaningResult.content);
+      const structureValidation = contract.validateStructure(finalContent);
+      const qualityValidation = contract.validateQuality(finalContent);
       
       const contractErrors = [...structureValidation.errors, ...qualityValidation.errors];
       const contractWarnings = [...structureValidation.warnings, ...qualityValidation.warnings];
@@ -212,16 +228,16 @@ export class HermesContentExecutor implements ContentExecutor {
       const result: StructuredContentResult = {
         success: true,
         contentType,
-        title: cleaningResult.content.title || task.topic || '',
-        slug: cleaningResult.content.slug || this.generateSlug(task.topic || ''),
-        summary: cleaningResult.content.summary || '',
-        content: cleaningResult.content,
-        seo: cleaningResult.content.seo || {},
-        geo: cleaningResult.content.geo || {},
-        sources: cleaningResult.content.sources || [],
-        faq: cleaningResult.content.faq || [],
-        internalLinks: cleaningResult.content.internalLinks || [],
-        structuredData: cleaningResult.content.structuredData,
+        title: finalContent.title,
+        slug: finalContent.slug,
+        summary: finalContent.summary,
+        content: finalContent,
+        seo: finalContent.seo,
+        geo: finalContent.geo,
+        sources: finalContent.sources,
+        faq: finalContent.faq,
+        internalLinks: finalContent.internalLinks,
+        structuredData: finalContent.structuredData,
         
         hermesRunId,
         provider: 'hermes-cli',
