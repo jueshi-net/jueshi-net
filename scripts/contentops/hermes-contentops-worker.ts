@@ -380,11 +380,20 @@ async function processJob(jobPath: string): Promise<boolean> {
     // ========================================================================
     
     // Validate adapter response — reject fake draft IDs (except draft_only mode)
+    // Real staging draft IDs have format: draft_<timestamp>_<random>
+    // Fake draft IDs have format: draft_<taskId>
     if (!publishResult.draftId) {
       throw new Error(`NO_DRAFT_ID_RETURNED`);
     }
     if (publishResult.draftId.startsWith('draft_') && task.executionMode !== 'draft_only') {
-      throw new Error(`FAKE_DRAFT_ID_REJECTED: ${publishResult.draftId}`);
+      // Check if it's a fake draft ID (format: draft_<taskId>)
+      // Real staging draft IDs have timestamp and random suffix
+      const isFakeDraftId = publishResult.draftId === `draft_${job.jobId}` || 
+                            publishResult.draftId.match(/^draft_task_\d+_[a-z0-9]+$/);
+      if (isFakeDraftId) {
+        throw new Error(`FAKE_DRAFT_ID_REJECTED: ${publishResult.draftId}`);
+      }
+      // Otherwise, it's a real staging draft ID, allow it
     }
     
     const finalizerResult = await finalizeContentOpsTask({

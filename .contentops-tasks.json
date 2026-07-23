@@ -763,6 +763,48 @@
       "failedAt": "2026-07-23T15:06:21.378Z",
       "archivedTest": true,
       "smokeTestCompletedAt": "2026-07-23T15:06:23.679Z"
+    },
+    "task_1784819328049_h812oj": {
+      "id": "task_1784819328049_h812oj",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T15:08:48.049Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:08:52.987Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T15:08:52.987Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:08:55.090Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T15:08:55.090Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T15:08:48.049Z",
+      "updatedAt": "2026-07-23T15:08:55.090Z",
+      "errorCode": "FAKE_DRAFT_ID",
+      "errorMessage": "FAKE_DRAFT_ID_REJECTED: draft_1784819336798_ik0r8un",
+      "failureStage": "finalizer",
+      "failedAt": "2026-07-23T15:08:52.986Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T15:08:55.090Z"
     }
   }
 }
