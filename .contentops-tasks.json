@@ -1232,6 +1232,76 @@
       "completedAt": "2026-07-23T16:03:09.128Z",
       "archivedTest": true,
       "smokeTestCompletedAt": "2026-07-23T16:03:11.465Z"
+    },
+    "task_1784826816386_lbtswk": {
+      "id": "task_1784826816386_lbtswk",
+      "chatId": "internal-test-sink",
+      "rawInput": "Internal runtime smoke test for wake verification",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal runtime smoke test for wake verification",
+      "source": "internal_runtime_smoke",
+      "provider": "deterministic_fixture",
+      "internalAuthorized": true,
+      "status": "COMPLETED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T17:13:36.386Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T17:13:42.553Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T17:13:42.553Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T17:13:36.387Z",
+      "updatedAt": "2026-07-23T17:13:42.553Z",
+      "contentId": "draft_1784826825090_typxyd",
+      "completedAt": "2026-07-23T17:13:42.553Z"
+    },
+    "task_1784827923161_y2sdy4": {
+      "id": "task_1784827923161_y2sdy4",
+      "chatId": "internal-test-sink",
+      "rawInput": "Internal runtime smoke test for wake verification",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal runtime smoke test for wake verification",
+      "source": "internal_runtime_smoke",
+      "provider": "deterministic_fixture",
+      "internalAuthorized": true,
+      "status": "FAILED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T17:32:03.161Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T17:32:12.326Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T17:32:12.326Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T17:32:03.161Z",
+      "updatedAt": "2026-07-23T17:32:12.326Z",
+      "errorCode": "CONTENT_NOT_FOUND",
+      "errorMessage": "BACKEND_CONTENT_NOT_FOUND: cmrxsgtj10000ut5p10hdsdmk",
+      "failureStage": "finalizer",
+      "failedAt": "2026-07-23T17:32:12.325Z"
     }
   }
 }

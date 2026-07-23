@@ -90,7 +90,7 @@ async function verifyBackendContentExists(
     // Use the internal drafts API with id query parameter
     const apiPath = `/api/internal/contentops/drafts?id=${encodeURIComponent(backendContentId)}`;
     
-    const checkCmd = `ssh ${stagingHost} "curl -s -o /dev/null -w '%{http_code}' http://localhost:3000${apiPath}"`;
+    const checkCmd = `ssh ${stagingHost} "curl -s -o /dev/null -w '%{http_code}' http://localhost:3001${apiPath}"`;
     const httpCode = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 }).trim();
     
     if (httpCode === '200') {
