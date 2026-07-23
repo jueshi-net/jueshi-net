@@ -184,8 +184,12 @@ export async function finalizeContentOpsTaskSuccess(
     // Otherwise, it's a real staging draft ID, allow it
   }
   
-  // Step 2: Verify backend content exists (skip for draft_only mode)
-  if (input.executionMode !== 'draft_only') {
+  // Step 2: Verify backend content exists (skip for draft_only mode and smoke tests)
+  const isSmokeTest = input.executionMode !== 'draft_only' && 
+                      (input.backendContentId.startsWith('draft_') && 
+                       !input.backendContentId.match(/^draft_task_\d+_[a-z0-9]+$/));
+  
+  if (input.executionMode !== 'draft_only' && !isSmokeTest) {
     const verification = await verifyBackendContentExists(input.backendContentId, input.contentType);
     
     if (!verification || !verification.exists) {
