@@ -83,26 +83,33 @@ async function verifyBackendContentExists(
   contentType: string
 ): Promise<{ exists: boolean; status?: string; adminUrl?: string } | null> {
   try {
-    // Use SSH to check if content exists via staging API
+    // Use staging helper to query content (handles HMAC signing automatically)
     const { execSync } = require('child_process');
     const stagingHost = process.env.STAGING_SSH_HOST || 'deploy@192.129.155.149';
+    const helperPath = process.env.STAGING_HELPER_PATH || '/home/deploy/xixiong-saas-staging/scripts/contentops/bridge-local-helper.ts';
     
-    // Use the internal drafts API with id query parameter
-    const apiPath = `/api/internal/contentops/drafts?id=${encodeURIComponent(backendContentId)}`;
+    // Query content using audit_contentops_task action with contentId
+    const queryInput = JSON.stringify({
+      action: 'audit_contentops_task',
+      contentId: backendContentId
+    });
     
-    const checkCmd = `ssh ${stagingHost} "curl -s -o /dev/null -w '%{http_code}' http://localhost:3001${apiPath}"`;
-    const httpCode = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 }).trim();
+    const checkCmd = `ssh ${stagingHost} "echo '${queryInput}' | npx tsx ${helperPath}"`;
+    const result = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 });
     
-    if (httpCode === '200') {
-      const adminUrl = buildContentOpsContentAdminUrl(contentType, backendContentId);
-      return { exists: true, status: 'DRAFT', adminUrl };
-    } else if (httpCode === '404') {
-      return { exists: false };
-    } else {
-      // Non-200/404 — treat as unverifiable, fail safe
-      console.error(`[Finalizer] Backend verification returned HTTP ${httpCode} for ${backendContentId}`);
-      return null;
+    const parsed = JSON.parse(result);
+    
+    // Check if content exists in the response
+    if (parsed.ok && parsed.data) {
+      const hasContent = parsed.data.task || parsed.data.content || parsed.data.drafts?.activeCount > 0;
+      if (hasContent) {
+        const adminUrl = buildContentOpsContentAdminUrl(contentType, backendContentId);
+        return { exists: true, status: 'DRAFT', adminUrl };
+      }
     }
+    
+    // Content not found
+    return { exists: false };
   } catch (error: any) {
     console.error(`[Finalizer] Backend verification failed for ${backendContentId}:`, error.message);
     return null;
