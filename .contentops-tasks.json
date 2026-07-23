@@ -263,6 +263,126 @@
       "maxRetries": 3,
       "createdAt": "2026-07-23T01:50:41.939Z",
       "updatedAt": "2026-07-23T01:50:41.944Z"
+    },
+    "task_1784771812549_b6n5wt": {
+      "id": "task_1784771812549_b6n5wt",
+      "chatId": 8602323654,
+      "messageId": 1784771812549,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T01:56:52.549Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T01:56:52.550Z",
+      "updatedAt": "2026-07-23T01:56:52.555Z"
+    },
+    "task_1784772060650_cfjh6": {
+      "id": "task_1784772060650_cfjh6",
+      "chatId": 8602323654,
+      "messageId": 1784772060650,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T02:01:00.650Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T02:01:00.650Z",
+      "updatedAt": "2026-07-23T02:01:00.657Z"
+    },
+    "task_1784772214466_ytvahl": {
+      "id": "task_1784772214466_ytvahl",
+      "chatId": 8602323654,
+      "messageId": 1784772214466,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T02:03:34.466Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T02:03:34.467Z",
+      "updatedAt": "2026-07-23T02:03:34.472Z"
+    },
+    "task_1784772403112_hcfqd": {
+      "id": "task_1784772403112_hcfqd",
+      "chatId": 8602323654,
+      "messageId": 1784772403112,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T02:06:43.112Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T02:06:43.113Z",
+      "updatedAt": "2026-07-23T02:06:43.117Z"
+    },
+    "task_1784772598439_50ymyl": {
+      "id": "task_1784772598439_50ymyl",
+      "chatId": 8602323654,
+      "messageId": 1784772598439,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T02:09:58.439Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T02:09:58.439Z",
+      "updatedAt": "2026-07-23T02:09:58.445Z"
     }
   }
 }

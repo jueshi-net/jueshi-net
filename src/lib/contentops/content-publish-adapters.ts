@@ -36,11 +36,12 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
     const stagingHost = process.env.STAGING_SSH_HOST || 'deploy@192.129.155.149';
     const helperPath = process.env.STAGING_HELPER_PATH || '/home/deploy/xixiong-saas-staging/scripts/contentops/bridge-local-helper.ts';
     
+    // Prepare JSON input with action
+    const jsonInput = JSON.stringify({ action, ...payload });
+    
     const child = spawn('ssh', [
       stagingHost,
-      `cd /home/deploy/xixiong-saas-staging && npx tsx ${helperPath}`,
-      action,
-      JSON.stringify(payload)
+      `cd /home/deploy/xixiong-saas-staging && echo '${jsonInput.replace(/'/g, "'\\''")}' | npx tsx ${helperPath}`
     ], {
       stdio: ['ignore', 'pipe', 'pipe']
     });
