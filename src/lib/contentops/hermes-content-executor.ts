@@ -201,6 +201,7 @@ export class HermesContentExecutor implements ContentExecutor {
       
       // Enrich with deterministic system-generated metadata
       const { enrichContent, mergeEnrichedContent } = await import('./content-enricher');
+      console.log('[HermesExecutor] Task executionMode:', (task as any).executionMode);
       const enriched = enrichContent({
         contentType,
         ...cleaningResult.content,
@@ -214,6 +215,7 @@ export class HermesContentExecutor implements ContentExecutor {
       const finalContent = mergeEnrichedContent(cleaningResult.content, enriched, {
         executionMode: (task as any).executionMode || 'draft_only',
       });
+      console.log('[HermesExecutor] Final content executionMode:', finalContent.executionMode);
       
       // Validate against contract
       const contract = getContract(contentType);
