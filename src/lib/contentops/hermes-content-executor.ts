@@ -189,8 +189,8 @@ export class HermesContentExecutor implements ContentExecutor {
       // Normalize field aliases
       const normalized = normalizeFieldAliases(parsed);
       
-      // Check minimal viability
-      const viability = hasMinimalViability(normalized);
+      // Check minimal viability with content type from task
+      const viability = hasMinimalViability(normalized, contentType);
       if (!viability.viable) {
         throw new Error(`RAW_MODEL_NOT_VIABLE: ${viability.reason}`);
       }

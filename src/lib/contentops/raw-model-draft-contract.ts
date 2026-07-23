@@ -169,18 +169,60 @@ export function validateRawModelDraft(raw: any): { success: boolean; errors: str
 // 最小合法性检查
 // ============================================================================
 
-export function hasMinimalViability(raw: any): { viable: boolean; reason?: string } {
-  // 必须有 contentType 或可推断
-  if (!raw.contentType && !raw.title && !raw.body && !raw.content) {
-    return { viable: false, reason: 'No contentType, title, or body found' };
+export function hasMinimalViability(raw: any, contentType?: string): { viable: boolean; reason?: string } {
+  // Type-aware viability check based on content type
+  const type = contentType || raw.contentType;
+  
+  // Checklist: needs groups, items, sections, or checklist structure
+  if (type === 'checklist') {
+    const hasChecklistStructure = 
+      raw.groups || 
+      raw.items || 
+      raw.sections || 
+      raw.checklist ||
+      raw.checklistItems ||
+      raw.data?.content?.groups ||
+      raw.data?.groups;
+    
+    if (!hasChecklistStructure) {
+      return { viable: false, reason: 'Checklist requires groups, items, sections, or checklist structure' };
+    }
+    
+    // Validate at least one group or item exists
+    const groups = raw.groups || raw.data?.content?.groups || raw.data?.groups || [];
+    const items = raw.items || raw.checklistItems || [];
+    const sections = raw.sections || [];
+    
+    if (groups.length === 0 && items.length === 0 && sections.length === 0) {
+      return { viable: false, reason: 'Checklist has empty groups, items, and sections' };
+    }
+    
+    return { viable: true };
   }
   
-  // 必须有实质内容（正文或结构化内容）
-  const hasBody = raw.body || raw.content || raw.article || raw.markdown || raw['正文'] || raw['内容'];
-  const hasStructure = raw.groups || raw.blockConfiguration || raw.blocks;
+  // Topic: needs blocks, blockConfiguration, sections, or modules
+  if (type === 'topic') {
+    const hasTopicStructure = 
+      raw.blocks || 
+      raw.blockConfiguration || 
+      raw.sections ||
+      raw.modules ||
+      raw.resources ||
+      raw.contentBlocks ||
+      raw.data?.content?.blocks;
+    
+    if (!hasTopicStructure) {
+      return { viable: false, reason: 'Topic requires blocks, blockConfiguration, sections, or modules' };
+    }
+    
+    return { viable: true };
+  }
   
-  if (!hasBody && !hasStructure) {
-    return { viable: false, reason: 'No substantive content found' };
+  // Guide (default): needs body/content/article/markdown
+  const hasBody = raw.body || raw.content || raw.article || raw.markdown || raw['正文'] || raw['内容'];
+  
+  if (!hasBody) {
+    return { viable: false, reason: 'Guide requires body, content, article, or markdown' };
   }
   
   return { viable: true };
