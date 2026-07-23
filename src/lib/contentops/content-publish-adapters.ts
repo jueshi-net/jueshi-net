@@ -34,7 +34,7 @@ export interface ContentPublishAdapter {
 async function callStagingHelper(action: string, payload: any): Promise<any> {
   return new Promise((resolve, reject) => {
     const stagingHost = process.env.STAGING_SSH_HOST || 'deploy@192.129.155.149';
-    const helperPath = process.env.STAGING_HELPER_PATH || '/home/deploy/xixiong-saas-staging/scripts/contentops/contentops-bridge-local.ts';
+    const helperPath = process.env.STAGING_HELPER_PATH || '/home/deploy/xixiong-saas-staging/scripts/contentops/bridge-local-helper.ts';
     
     const child = spawn('ssh', [
       stagingHost,
