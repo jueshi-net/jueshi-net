@@ -376,8 +376,11 @@ async function processJob(jobPath: string): Promise<boolean> {
     // Use Finalizer for atomic terminal state (replaces direct outbox write)
     // ========================================================================
     
-    // Validate adapter response — reject fake draft IDs
-    if (!publishResult.draftId || publishResult.draftId.startsWith('draft_')) {
+    // Validate adapter response — reject fake draft IDs (except draft_only mode)
+    if (!publishResult.draftId) {
+      throw new Error(`NO_DRAFT_ID_RETURNED`);
+    }
+    if (publishResult.draftId.startsWith('draft_') && task.executionMode !== 'draft_only') {
       throw new Error(`FAKE_DRAFT_ID_REJECTED: ${publishResult.draftId}`);
     }
     

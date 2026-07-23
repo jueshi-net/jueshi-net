@@ -161,10 +161,24 @@ export async function finalizeContentOpsTaskSuccess(
   
   console.log(`[Finalizer] Processing success for task ${input.taskId}, contentId=${input.backendContentId}`);
   
-  // Step 1: Validate input — backendContentId MUST be real
-  if (!input.backendContentId || input.backendContentId.startsWith('draft_')) {
-    // Fake draft ID — this is a failure, not success
-    console.error(`[Finalizer] REJECTED: Fake draft ID ${input.backendContentId} for task ${input.taskId}`);
+  // Step 1: Validate input — backendContentId MUST be real (except draft_only mode)
+  if (!input.backendContentId) {
+    // No content ID at all — this is a failure
+    console.error(`[Finalizer] REJECTED: No backendContentId for task ${input.taskId}`);
+    return finalizeContentOpsTaskFailure({
+      taskId: input.taskId,
+      chatId: input.chatId,
+      contentType: input.contentType,
+      executionMode: input.executionMode,
+      error: `NO_BACKEND_CONTENT_ID`,
+      errorCode: 'NO_CONTENT_ID',
+      failureStage: 'finalizer',
+    });
+  }
+  
+  if (input.backendContentId.startsWith('draft_') && input.executionMode !== 'draft_only') {
+    // Fake draft ID in non-draft_only mode — this is a failure
+    console.error(`[Finalizer] REJECTED: Fake draft ID ${input.backendContentId} for task ${input.taskId} (mode: ${input.executionMode})`);
     return finalizeContentOpsTaskFailure({
       taskId: input.taskId,
       chatId: input.chatId,

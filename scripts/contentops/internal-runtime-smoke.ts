@@ -88,14 +88,18 @@ async function runSmokeTest() {
   console.log(`[Smoke] Job contentType: ${jobData.contentType}`);
   console.log(`[Smoke] Job executionMode: ${jobData.executionMode || jobData.task?.executionMode}`);
   
-  // Step 3: Trigger Worker (manual start for smoke test)
-  console.log('\n[Smoke] Step 3: Starting Worker...');
+  // Step 3: Trigger Worker (with smoke test mode for deterministic fixture)
+  console.log('\n[Smoke] Step 3: Starting Worker (smoke test mode)...');
   
   const { spawn } = await import('child_process');
   const workerProcess = spawn('npx', ['tsx', 'scripts/contentops/hermes-contentops-worker.ts'], {
     cwd: '/Users/chq/xixiong-saas',
     stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, HERMES_JOBS_DIR: JOBS_DIR },
+    env: { 
+      ...process.env, 
+      HERMES_JOBS_DIR: JOBS_DIR,
+      CONTENTOPS_SMOKE_TEST_MODE: 'true', // Use deterministic fixture
+    },
   });
   
   const workerPid = workerProcess.pid;
