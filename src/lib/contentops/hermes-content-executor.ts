@@ -84,7 +84,7 @@ async function callHermesCLI(prompt: string): Promise<{ content: string; latency
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     
-    const args = ['chat', '-q', prompt, '-Q', '--max-turns', HERMES_MAX_TURNS.toString()];
+    const args = ['chat', '-q', prompt, '-Q', '--safe-mode', '--ignore-rules', '--max-turns', '1'];
     
     const child = spawn(HERMES_CLI_PATH, args, {
       cwd: HERMES_WORKING_DIR,
@@ -301,9 +301,14 @@ Generate ${contentType} content based on the following user input.
 User input:
 ${task.rawInput}
 
-You must respond with valid JSON only, no markdown, no explanation.
+CRITICAL INSTRUCTIONS:
+1. You MUST respond with ONLY valid JSON - no markdown, no explanation, no code, no scripts
+2. DO NOT use any tools - just generate the JSON content directly
+3. DO NOT write Python scripts or any other code
+4. Your ENTIRE response must be a single valid JSON object
+5. No text before or after the JSON
 
-CRITICAL: You must include ALL of the following fields at the TOP LEVEL of your JSON response:
+You must include ALL of the following fields at the TOP LEVEL of your JSON response:
 {
   "title": "SEO-friendly title in Chinese, max 24 chars",
   "slug": "url-friendly-slug-in-english",
