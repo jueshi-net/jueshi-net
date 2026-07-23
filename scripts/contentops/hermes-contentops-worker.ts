@@ -291,8 +291,41 @@ async function processJob(jobPath: string): Promise<boolean> {
     };
     
     // Call HermesContentExecutor with full Runtime Pipeline
-    const executor = new HermesContentExecutor();
-    const result = await executor.execute(task);
+    // SMOKE TEST MODE: Use deterministic fixture instead of calling Hermes
+    let result: any;
+    
+    if (process.env.CONTENTOPS_SMOKE_TEST_MODE === 'true') {
+      log('info', 'SMOKE TEST MODE: Using deterministic fixture', { jobId: job.jobId });
+      result = {
+        success: true,
+        contentType: task.contentType,
+        title: `Smoke Test: ${task.topic || 'Internal Runtime Test'}`,
+        slug: `smoke-test-${task.id}`,
+        summary: 'Deterministic fixture for smoke testing the ContentOps runtime path.',
+        content: {
+          hero: 'Smoke Test Content',
+          subtopics: ['Topic 1', 'Topic 2'],
+          relatedTools: [],
+          relatedGuides: [],
+          relatedChecklists: [],
+          relatedResources: [],
+          cta: 'Test CTA',
+          blockConfiguration: [],
+        },
+        faq: [],
+        seo: { title: 'Smoke Test', description: 'Smoke test', keywords: [] },
+        geo: { country: 'Test', city: 'Test' },
+        structuredData: {},
+        hermesRunId: 'smoke-test-fixture',
+        latencyMs: 50,
+        contractValidationPassed: true,
+        normalizerFixedCount: 0,
+        normalizerRemainingBlockingIssues: 0,
+      };
+    } else {
+      const executor = new HermesContentExecutor();
+      result = await executor.execute(task);
+    }
     
     if (!result.success) {
       throw new Error(result.error || 'HERMES_EXECUTOR_FAILED');

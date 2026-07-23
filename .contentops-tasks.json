@@ -497,6 +497,30 @@
       "maxRetries": 3,
       "createdAt": "2026-07-23T09:05:53.631Z",
       "updatedAt": "2026-07-23T09:05:53.639Z"
+    },
+    "task_1784816544220_nfwu3g": {
+      "id": "task_1784816544220_nfwu3g",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T14:22:24.220Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T14:22:24.220Z",
+      "updatedAt": "2026-07-23T14:22:24.227Z"
     }
   }
 }
