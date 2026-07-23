@@ -72,7 +72,21 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
       
       try {
         const result = JSON.parse(stdout);
-        resolve(result);
+        // Unwrap the bridge-local-helper response format
+        // It returns { ok, status, data, error }
+        // We need to extract data and map id to draftId
+        if (result.ok && result.data) {
+          resolve({
+            draftId: result.data.id,
+            publishedUrl: undefined, // Bridge API doesn't return publishedUrl for drafts
+            ...result.data,
+          });
+        } else if (result.error) {
+          reject(new Error(`STAGING_HELPER_ERROR: ${result.error.message || JSON.stringify(result.error)}`));
+        } else {
+          // Fallback: return as-is for backward compatibility
+          resolve(result);
+        }
       } catch (e) {
         reject(new Error('STAGING_HELPER_INVALID_JSON: ' + stdout.substring(0, 500)));
       }

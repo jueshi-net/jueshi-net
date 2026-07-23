@@ -637,6 +637,132 @@
       "errorMessage": "CONTRACT_VALIDATION_FAILED: ",
       "failureStage": "contract-validation",
       "failedAt": "2026-07-23T14:55:05.930Z"
+    },
+    "task_1784818621323_rny64i": {
+      "id": "task_1784818621323_rny64i",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T14:57:01.323Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:57:07.605Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T14:57:07.605Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:57:09.871Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T14:57:09.871Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T14:57:01.324Z",
+      "updatedAt": "2026-07-23T14:57:09.871Z",
+      "errorCode": "UNKNOWN_ERROR",
+      "errorMessage": "STAGING_HELPER_EXIT_2: Error: CONTENTOPS_BRIDGE_SECRET not configured\n",
+      "failureStage": "worker",
+      "failedAt": "2026-07-23T14:57:07.604Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T14:57:09.870Z"
+    },
+    "task_1784818793609_kklfvt": {
+      "id": "task_1784818793609_kklfvt",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T14:59:53.609Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T14:59:58.756Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T14:59:58.756Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:00:01.155Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T15:00:01.155Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T14:59:53.609Z",
+      "updatedAt": "2026-07-23T15:00:01.155Z",
+      "errorCode": "UNKNOWN_ERROR",
+      "errorMessage": "STAGING_HELPER_EXIT_4: Error: Action \"create_topic\" not allowed\nAllowed actions: create_task, resume_task, list_tasks, get_task, update_task, cancel_task, list_schedules, create_schedule, get_schedule, cancel_schedule, process_due_schedules, create_backend_draft, publish_staging, quality_check, submit_for_review, approve, reject, publish, generate, generation_jobs, generation_job_status, audit_contentops_task, update_content_status, update_task_metadata, auto_revise_checklist\n",
+      "failureStage": "worker",
+      "failedAt": "2026-07-23T14:59:58.755Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T15:00:01.155Z"
+    },
+    "task_1784819175631_seuewc": {
+      "id": "task_1784819175631_seuewc",
+      "chatId": "9999999999",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "status": "ARCHIVED_TEST",
+      "currentStep": "SMOKE_TEST_COMPLETED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T15:06:15.631Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:06:21.379Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T15:06:21.379Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:06:23.680Z"
+        },
+        {
+          "step": "SMOKE_TEST_COMPLETED",
+          "startedAt": "2026-07-23T15:06:23.680Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T15:06:15.632Z",
+      "updatedAt": "2026-07-23T15:06:23.680Z",
+      "errorCode": "UNKNOWN_ERROR",
+      "errorMessage": "NO_DRAFT_ID_RETURNED",
+      "failureStage": "worker",
+      "failedAt": "2026-07-23T15:06:21.378Z",
+      "archivedTest": true,
+      "smokeTestCompletedAt": "2026-07-23T15:06:23.679Z"
     }
   }
 }
