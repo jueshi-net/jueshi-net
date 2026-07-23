@@ -280,6 +280,10 @@ async function processJob(jobPath: string): Promise<boolean> {
       targetEnvironment: job.targetEnvironment || (job as any).task?.targetEnvironment || 'staging',
       rawInput: job.rawUserInput || job.userInstruction || (job as any).task?.rawInput || '',
       topic: job.topic || (job as any).task?.topic || '',
+      // Trusted metadata for internal smoke test detection
+      source: (job as any).task?.source,
+      provider: (job as any).task?.provider,
+      internalAuthorized: (job as any).task?.internalAuthorized,
       status: TASK_STATUS.RUNNING,
       currentStep: 'hermes-execution',
       stepHistory: [],

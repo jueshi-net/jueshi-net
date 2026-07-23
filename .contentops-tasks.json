@@ -1074,6 +1074,43 @@
       "errorMessage": "CONTRACT_VALIDATION_FAILED: ",
       "failureStage": "contract-validation",
       "failedAt": "2026-07-23T15:53:45.840Z"
+    },
+    "task_1784822088170_lwkysl": {
+      "id": "task_1784822088170_lwkysl",
+      "chatId": "internal-test-sink",
+      "messageId": 999999,
+      "rawInput": "Internal Runtime Smoke Test - Archival Only",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "Internal Runtime Smoke Test - Archival Only",
+      "source": "internal_runtime_smoke",
+      "provider": "deterministic_fixture",
+      "internalAuthorized": true,
+      "status": "FAILED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T15:54:48.170Z",
+          "status": "completed",
+          "completedAt": "2026-07-23T15:55:50.604Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-23T15:55:50.604Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T15:54:48.170Z",
+      "updatedAt": "2026-07-23T15:55:50.604Z",
+      "errorCode": "CONTRACT_VALIDATION_FAILED",
+      "errorMessage": "CONTRACT_VALIDATION_FAILED: ",
+      "failureStage": "contract-validation",
+      "failedAt": "2026-07-23T15:55:50.602Z"
     }
   }
 }
