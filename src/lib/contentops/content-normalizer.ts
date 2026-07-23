@@ -356,13 +356,16 @@ export class ContentNormalizer {
       const heroStr = content.hero.trim();
       if (heroStr) {
         // Split into headline and description if long enough
-        const parts = heroStr.split(/[——\-–—]/);
+        const parts = heroStr.split(/[——\\-–—]/);
         const headline = parts[0]?.trim() || heroStr;
         const description = parts.slice(1).join('——').trim() || heroStr;
         
+        // Ensure subheadline is never empty - use first 20 chars of headline or a default
+        const subheadline = headline.length > 30 ? headline.substring(0, 20) + '...' : headline;
+        
         content.hero = {
           headline,
-          subheadline: headline.length > 30 ? '' : headline,
+          subheadline,
           description: description !== headline ? description : heroStr,
         };
         this.addIssue('topic-hero', 'info', 'Normalized hero string to object', true);
