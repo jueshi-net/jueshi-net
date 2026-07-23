@@ -71,6 +71,30 @@
       "maxRetries": 3,
       "createdAt": "2026-07-23T01:26:41.974Z",
       "updatedAt": "2026-07-23T01:26:41.978Z"
+    },
+    "task_1784770338466_4nxqy": {
+      "id": "task_1784770338466_4nxqy",
+      "chatId": 8602323654,
+      "messageId": 1784770338466,
+      "rawInput": "国际集运完整指南：从选仓到签收的全流程详解",
+      "contentType": "guide",
+      "executionMode": "draft_only",
+      "targetEnvironment": "staging",
+      "topic": "国际集运",
+      "status": "QUEUED",
+      "currentStep": "PARSING_TASK",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-23T01:32:18.466Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-23T01:32:18.466Z",
+      "updatedAt": "2026-07-23T01:32:18.471Z"
     }
   }
 }

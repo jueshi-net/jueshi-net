@@ -169,6 +169,9 @@ export const GuideContract: ContentContract = {
     const isDraftMode = (content as any).executionMode === 'draft_only';
     const isIncomplete = (content as any).factVerificationStatus === 'incomplete';
     
+    console.log('[ContractValidation] isDraftMode:', isDraftMode, 'executionMode:', (content as any).executionMode);
+    console.log('[ContractValidation] isIncomplete:', isIncomplete, 'factVerificationStatus:', (content as any).factVerificationStatus);
+    
     for (const field of this.requiredFields) {
       if (!(field in content)) {
         // For draft mode, FAQ and sources can be missing with warning
