@@ -428,7 +428,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     const finalizerResult = await finalizeContentOpsTask({
       success: true,
       taskId: job.jobId,
-      chatId: job.chatId || '8602323654',
+      chatId: job.task?.chatId || job.chatId || '8602323654',
       contentType: result.contentType,
       executionMode: task.executionMode,
       backendContentId: publishResult.draftId,
