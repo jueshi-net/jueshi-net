@@ -38,6 +38,7 @@ export interface EnrichedOutput {
   title: string;
   slug: string;
   summary: string;
+  audience: string;
   seo: {
     title: string;
     description: string;
@@ -208,6 +209,9 @@ export function enrichContent(input: EnricherInput): EnrichedOutput {
   // Slug generation: system-generated from title
   const slug = generateSlug(resolvedTitle);
   
+  // Audience resolution: prefer model audience, fallback to task targetAudience
+  const resolvedAudience = audience || targetAudience || '海外华人和留学生';
+  
   // Summary generation: prefer model summary, fallback to body extraction
   const resolvedSummary = summary || (body ? generateSummary(body) : '');
   
@@ -265,6 +269,7 @@ export function enrichContent(input: EnricherInput): EnrichedOutput {
     title: resolvedTitle,
     slug,
     summary: resolvedSummary,
+    audience: resolvedAudience,
     seo: resolvedSeo,
     geo: resolvedGeo,
     canonicalUrl,
@@ -285,6 +290,7 @@ export function mergeEnrichedContent(modelOutput: any, enriched: EnrichedOutput,
     title: enriched.title,
     slug: enriched.slug,
     summary: enriched.summary,
+    audience: enriched.audience,
     seo: enriched.seo,
     geo: enriched.geo,
     canonicalUrl: enriched.canonicalUrl,
