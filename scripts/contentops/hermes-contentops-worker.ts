@@ -13,6 +13,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { HermesContentExecutor } from '../../src/lib/contentops/hermes-content-executor';
 import { getContentPublishAdapter } from '../../src/lib/contentops/content-publish-adapters';
+import { finalizeContentOpsTask } from '../../src/lib/contentops/task-finalizer';
 import type { ContentOpsTask } from '../../src/lib/contentops/contracts/task-contract';
 import { TASK_STATUS, isValidTaskStatus } from '../../src/lib/contentops/contracts/task-contract';
 import { JOB_STATUS, isValidJobStatus } from '../../src/lib/contentops/contracts/job-contract';
@@ -180,8 +181,29 @@ function moveToFailed(jobPath: string, error: string, job?: any) {
     fs.unlinkSync(jobPath);
     log('error', 'Job moved to failed', { jobId, error });
     
-    // Emit failure terminal notification to outbox
-    emitFailureNotification(jobData, error);
+    // Use Finalizer for failure terminal notification (replaces emitFailureNotification)
+    finalizeContentOpsTask({
+      success: false,
+      taskId: jobId,
+      chatId: jobData.chatId || jobData.task?.chatId || '8602323654',
+      contentType: jobData.contentType || jobData.task?.contentType || 'unknown',
+      executionMode: jobData.executionMode || jobData.task?.executionMode || 'review_required',
+      error: error,
+      errorCode: error.startsWith('CONTRACT_') ? 'CONTRACT_VALIDATION_FAILED' :
+                 error.startsWith('NORMALIZER_') ? 'NORMALIZER_BLOCKING' :
+                 error.startsWith('ADAPTER_') ? 'ADAPTER_PUBLISH_FAILED' :
+                 error.startsWith('FAKE_DRAFT_') ? 'FAKE_DRAFT_ID' :
+                 error.startsWith('FINALIZER_') ? 'FINALIZER_FAILED' :
+                 'UNKNOWN_ERROR',
+      failureStage: error.startsWith('CONTRACT_') ? 'contract-validation' :
+                    error.startsWith('NORMALIZER_') ? 'normalizer' :
+                    error.startsWith('ADAPTER_') ? 'adapter' :
+                    error.startsWith('FAKE_DRAFT_') ? 'finalizer' :
+                    error.startsWith('FINALIZER_') ? 'finalizer' :
+                    'worker',
+    }).catch(e => {
+      log('error', 'Finalizer failure notification failed', { jobId, error: e.message });
+    });
   } catch (e: any) {
     log('error', 'Failed to move job to failed', { jobId, error: e.message });
   }
@@ -317,41 +339,34 @@ async function processJob(jobPath: string): Promise<boolean> {
       publishedUrl: publishResult.publishedUrl,
     });
     
-    // Write result to outbox with notification-compatible schema
-    const notificationId = `terminal:${job.jobId}`;
-    const resultFile = path.join(OUTBOX_DIR, `${job.jobId}.json`);
-    const outboxPayload = {
-      // Schema version for startup protection
-      schemaVersion: 2,
-      createdAt: new Date().toISOString(),
-      // Notification dispatcher fields
-      notificationId,
-      chatId: job.chatId || task.chatId || '8602323654',
-      backendContentId: publishResult.draftId || `draft_${job.jobId}`,
-      // Content summary for notification message
-      content: JSON.stringify({
-        contentType: result.contentType,
-        title: result.title || result.normalizedOutput?.title || job.topic || 'Untitled',
-        executionMode: task.executionMode,
-        status: task.executionMode === 'publish_now' ? 'PUBLISHED' : 'AWAITING_REVIEW',
-      }),
-      // Worker metadata
-      jobId: job.jobId,
+    // ========================================================================
+    // Use Finalizer for atomic terminal state (replaces direct outbox write)
+    // ========================================================================
+    
+    // Validate adapter response — reject fake draft IDs
+    if (!publishResult.draftId || publishResult.draftId.startsWith('draft_')) {
+      throw new Error(`FAKE_DRAFT_ID_REJECTED: ${publishResult.draftId}`);
+    }
+    
+    const finalizerResult = await finalizeContentOpsTask({
       success: true,
+      taskId: job.jobId,
+      chatId: job.chatId || '8602323654',
       contentType: result.contentType,
-      draftId: publishResult.draftId,
-      publishedUrl: publishResult.publishedUrl,
+      executionMode: task.executionMode,
+      backendContentId: publishResult.draftId,
+      title: result.title || job.topic || 'Untitled',
       hermesRunId: result.hermesRunId,
       latencyMs: result.latencyMs,
       normalizerFixedCount: result.normalizerFixedCount,
       normalizerRemainingBlockingIssues: result.normalizerRemainingBlockingIssues,
-      contractValidationPassed: result.contractValidationPassed,
-      executionMode: task.executionMode,
-      completedAt: new Date().toISOString(),
-    };
-    fs.writeFileSync(resultFile, JSON.stringify(outboxPayload, null, 2));
+    });
     
-    log('info', 'Result written to outbox with notification', { jobId: job.jobId, notificationId });
+    if (!finalizerResult.ok) {
+      throw new Error(`FINALIZER_FAILED: ${finalizerResult.error}`);
+    }
+    
+    log('info', 'Finalizer completed successfully', { jobId: job.jobId, taskStatus: finalizerResult.taskStatus });
     
     // Clean up processing file
     try {
