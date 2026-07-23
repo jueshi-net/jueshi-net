@@ -262,8 +262,18 @@ async function processOutbox(token: string, notified: Record<string, any>): Prom
       const chatId = outboxData.chatId || '8602323654';
       const message = buildTerminalMessage(outboxData);
       
-      // Step 5: Send to Telegram
-      const sendResult = await sendTelegramMessage(token, chatId, message);
+      // Step 5: Send to Telegram or Test Sink
+      let sendResult: any;
+      if (chatId === 'internal-test-sink' || chatId === 'INTERNAL_TEST_SINK') {
+        // Internal test sink - do not send to real Telegram
+        const { sendToTestSink } = await import('./internal-test-transport');
+        sendResult = await sendToTestSink(outboxData);
+        console.log(`[Notification] Sent to test sink for task: ${taskId}`);
+      } else {
+        // Real Telegram send
+        sendResult = await sendTelegramMessage(token, chatId, message);
+        console.log(`[Notification] Sent ${outboxData.terminalStatus} for task: ${taskId}`);
+      }
       
       // Step 6: Telegram success → write to notified.json
       notified[notificationId] = {

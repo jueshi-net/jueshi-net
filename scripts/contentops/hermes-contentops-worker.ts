@@ -292,13 +292,20 @@ async function processJob(jobPath: string): Promise<boolean> {
     
     // Call HermesContentExecutor with full Runtime Pipeline
     // SMOKE TEST MODE: Use deterministic fixture instead of calling Hermes
-    // Check both environment variable and task rawInput for smoke test detection
+    // Only enable via trusted metadata - NOT via rawInput text (security risk)
     let result: any;
     const isSmokeTest = process.env.CONTENTOPS_SMOKE_TEST_MODE === 'true' || 
-                        task.rawInput?.includes('Internal Runtime Smoke Test');
+                        (task.source === 'internal_runtime_smoke' && 
+                         task.provider === 'deterministic_fixture' && 
+                         task.internalAuthorized === true);
     
     if (isSmokeTest) {
-      log('info', 'SMOKE TEST MODE: Using deterministic fixture', { jobId: job.jobId, rawInput: task.rawInput?.substring(0, 50) });
+      log('info', 'SMOKE TEST MODE: Using deterministic fixture', { 
+        jobId: job.jobId, 
+        source: task.source,
+        provider: task.provider,
+        internalAuthorized: task.internalAuthorized
+      });
       result = {
         success: true,
         contentType: task.contentType,

@@ -58,6 +58,11 @@ export interface ContentOpsTask {
   
   metadata?: any;
   
+  // Trusted metadata for internal smoke test detection
+  source?: string;
+  provider?: string;
+  internalAuthorized?: boolean;
+  
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +92,11 @@ export interface CreateTaskInput {
   sourceRequirement?: string;
   idempotencyKey?: string;
   archivedTest?: boolean;
+  
+  // Trusted metadata for internal smoke test detection
+  source?: string;
+  provider?: string;
+  internalAuthorized?: boolean;
 }
 
 /**

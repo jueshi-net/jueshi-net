@@ -69,6 +69,10 @@ export class TaskManager {
       scheduledAt: input.scheduledAt,
       publishInstruction: input.publishInstruction,
       sourceRequirement: input.sourceRequirement,
+      // Trusted metadata for internal smoke test detection
+      source: input.source,
+      provider: input.provider,
+      internalAuthorized: input.internalAuthorized,
       status: 'RECEIVED',
       currentStep: 'PARSING_TASK',
       stepHistory: [{

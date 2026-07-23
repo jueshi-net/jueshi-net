@@ -22,7 +22,7 @@ const OUTBOX_DIR = path.join(JOBS_DIR, 'outbox');
 const FAILED_DIR = path.join(JOBS_DIR, 'failed');
 
 // Test configuration
-const TEST_CHAT_ID = '9999999999'; // Internal test chat ID (not real user)
+const TEST_CHAT_ID = 'internal-test-sink'; // Internal test sink (not real user Telegram)
 const TEST_MESSAGE_ID = 999999;
 const TEST_TOPIC = 'Internal Runtime Smoke Test - Archival Only';
 
@@ -54,7 +54,10 @@ async function runSmokeTest() {
     executionMode: 'review_required', // Use review_required for real staging backend
     targetEnvironment: 'staging',
     topic: TEST_TOPIC,
-    source: 'internal_runtime_smoke', // Mark as smoke test for deterministic fixture
+    // Trusted metadata for smoke test detection (NOT via rawInput)
+    source: 'internal_runtime_smoke',
+    provider: 'deterministic_fixture',
+    internalAuthorized: true,
   });
   
   if (!taskResult.ok) {
