@@ -95,7 +95,11 @@ function validateV2Schema(data: any): { valid: boolean; error?: string } {
     if (!data.backendContentId) {
       return { valid: false, error: 'SUCCESS_WITHOUT_CONTENT_ID' };
     }
-    if (data.backendContentId.startsWith('draft_')) {
+    // Check for fake draft ID format: draft_<taskId> or draft_task_<timestamp>_<random>
+    // Real staging draft IDs: draft_<timestamp>_<random> (no "task_" prefix)
+    const isFakeDraftId = data.backendContentId.startsWith('draft_task_') ||
+                          data.backendContentId === `draft_${data.taskId}`;
+    if (isFakeDraftId) {
       return { valid: false, error: `FAKE_DRAFT_ID_IN_SUCCESS: ${data.backendContentId}` };
     }
   }
