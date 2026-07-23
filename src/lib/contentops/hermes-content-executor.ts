@@ -84,7 +84,7 @@ async function callHermesCLI(prompt: string): Promise<{ content: string; latency
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     
-    const args = ['chat', '-q', prompt, '-Q', '--safe-mode', '--ignore-rules', '--max-turns', '1'];
+    const args = ['chat', '-q', prompt, '-Q', '-m', 'qwen3.7-plus', '-t', 'none', '--max-turns', '1'];
     
     const child = spawn(HERMES_CLI_PATH, args, {
       cwd: HERMES_WORKING_DIR,
