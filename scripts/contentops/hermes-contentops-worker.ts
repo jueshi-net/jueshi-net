@@ -189,7 +189,7 @@ function moveToFailed(jobPath: string, error: string, job?: any) {
     // Use Finalizer for failure terminal notification (replaces emitFailureNotification)
     // Extract source and transport from job data
     const source = jobData.source || jobData.task?.source;
-    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    const transport = (source === 'internal_runtime_smoke' || source === 'internal_runtime_acceptance') ? 'internal_test' : 'telegram';
     
     // For internal smoke tests, chatId can be null; for telegram, chatId is required
     const chatId = transport === 'internal_test' ? null : (jobData.chatId || jobData.task?.chatId);

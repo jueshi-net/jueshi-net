@@ -134,7 +134,7 @@ export class GuidePublishAdapter implements ContentPublishAdapter {
         structuredData: result.structuredData,
       };
       
-      const response = await callStagingHelper('create_guide', payload);
+      const response = await callStagingHelper('create_backend_draft', payload);
       
       return {
         success: true,
@@ -184,7 +184,7 @@ export class ChecklistPublishAdapter implements ContentPublishAdapter {
         structuredData: result.structuredData,
       };
       
-      const response = await callStagingHelper('create_checklist', payload);
+      const response = await callStagingHelper('create_backend_draft', payload);
       
       return {
         success: true,
@@ -239,7 +239,7 @@ export class TopicPublishAdapter implements ContentPublishAdapter {
         structuredData: result.structuredData,
       };
       
-      const response = await callStagingHelper('create_topic', payload);
+      const response = await callStagingHelper('create_backend_draft', payload);
       
       return {
         success: true,
