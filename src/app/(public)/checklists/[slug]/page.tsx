@@ -57,7 +57,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (previewMode) {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-      return { title: "未找到清单" };
+      notFound();
     }
   }
 
@@ -121,7 +121,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   // Fallback to LandingPage
   const page = await getChecklist(slug);
-  if (!page) return { title: "未找到清单" };
+  if (!page) notFound();
 
   return {
     title: page.seoTitle || page.title,

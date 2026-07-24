@@ -74,13 +74,13 @@ export async function generateMetadata({
   if (previewMode) {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-      return { title: "专题不存在" };
+      notFound();
     }
   }
   const topic = await getTopicBySlug(slug);
 
   if (!topic || (!previewMode && topic.status !== "published")) {
-    return { title: "专题不存在" };
+    notFound();
   }
 
   const title = topic.seoTitle || topic.title;
