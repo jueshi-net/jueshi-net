@@ -1553,19 +1553,87 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Handle create_backend_draft action — save directly to content model
+    // Handle create_backend_draft action - save directly to content model
+    // V2-IDEMPOTENCY: Database-level atomic content creation with claim check
     if (data.action === 'create_backend_draft') {
       const { prisma } = await import('@/lib/prisma');
       const { Prisma } = await import('@prisma/client');
+      const { computeRequestHash } = await import('@/lib/contentops/idempotency-key');
       
       const contentType = data.contentType || 'guide';
       const title = data.title;
+      const keyHash = data.idempotencyKeyHash;
+      const keyVersion = data.idempotencyKeyVersion || 1;
+      const idempotencySource = data.idempotencySource || 'telegram';
+      const taskId = data.taskId;
+      const jobId = data.jobId;
       
       if (!title) {
         return NextResponse.json(
           { error: 'Title is required', code: 'MISSING_TITLE' },
           { status: 400 }
         );
+      }
+      
+      // === IDEMPOTENCY: Compute request hash ===
+      const requestPayload = {
+        title: data.title,
+        contentType,
+        taskId,
+        idempotencyKeyHash: keyHash,
+      };
+      const requestHash = computeRequestHash(requestPayload);
+      
+      // === IDEMPOTENCY: Check existing claim ===
+      // Try to find an existing claim by keyHash
+      let existingClaim: any = null;
+      try {
+        existingClaim = await prisma.contentOpsIdempotencyClaim.findUnique({
+          where: { keyHash: keyHash || '__nonexistent__' },
+        });
+      } catch {
+        // Table might not exist yet (migration not run) - skip claim check
+        // This is acceptable: the local file-system claim still provides
+        // first-layer idempotency, and the backend will just create content
+        console.log('[ContentOps Bridge] Idempotency claim table not available, skipping DB claim check');
+      }
+      
+      if (existingClaim) {
+        // Check request hash conflict
+        if (existingClaim.requestHash && existingClaim.requestHash !== requestHash) {
+          return NextResponse.json({
+            ok: false,
+            error: {
+              code: 'IDEMPOTENCY_KEY_REUSE_CONFLICT',
+              message: 'Same idempotency key used with different request body',
+            },
+          }, { status: 409 });
+        }
+        
+        // Claim exists with same request hash
+        if (existingClaim.status === 'CREATED' || existingClaim.status === 'COMPLETED') {
+          // Content already created - return existing
+          return NextResponse.json({
+            id: existingClaim.backendContentId,
+            title: title,
+            contentType,
+            state: 'DRAFT',
+            isReplay: true,
+            createdAt: existingClaim.createdAt.toISOString(),
+          }, { status: 200 });
+        }
+        
+        if (existingClaim.status === 'PROCESSING') {
+          // Another request is processing - return retryable
+          return NextResponse.json({
+            ok: false,
+            error: {
+              code: 'IDEMPOTENCY_IN_PROGRESS',
+              message: 'Content creation in progress for this key',
+            },
+            retryable: true,
+          }, { status: 409 });
+        }
       }
       
       // Generate slug from title
@@ -1575,6 +1643,57 @@ export async function POST(request: NextRequest) {
         .replace(/^-+|-+$/g, '')
         + '-' + Date.now().toString(36);
       
+      // === IDEMPOTENCY: Create claim in transaction ===
+      const claimResult = await prisma.$transaction(async (tx: any) => {
+          // Try to create the claim (atomic - fails if keyHash already exists)
+          const claim = await tx.contentOpsIdempotencyClaim.create({
+            data: {
+              keyHash: keyHash || `fallback_${taskId}`,
+              keyVersion,
+              requestHash,
+              taskId: taskId || '',
+              jobId: jobId || null,
+              contentType,
+              status: 'PROCESSING',
+            },
+          }).catch((err: any) => {
+            // If unique constraint violation, another request won
+            if (err.code === 'P2002') {
+              return null;
+            }
+            throw err;
+          });
+          
+          if (!claim) {
+            // Lost the race - read the existing claim
+            const winner = await tx.contentOpsIdempotencyClaim.findUnique({
+              where: { keyHash: keyHash || `fallback_${taskId}` },
+            });
+            if (winner && (winner.status === 'CREATED' || winner.status === 'COMPLETED')) {
+              return { replay: true, contentId: winner.backendContentId };
+            }
+            throw new Error('IDEMPOTENCY_RACE_LOST_AND_WINNER_NOT_READY');
+          }
+          
+          // Won the claim - create the content
+          // (Content creation code continues below based on contentType)
+          return { claim, replay: false };
+        });
+        
+        if (claimResult.replay) {
+          // Content already existed - return it
+          return NextResponse.json({
+            id: claimResult.contentId,
+            title,
+            contentType,
+            state: 'DRAFT',
+            isReplay: true,
+          }, { status: 200 });
+        }
+        
+        // Now create the actual content (outside transaction for complex creates)
+        // Claim is already in PROCESSING state from the transaction above
+
       if (contentType === 'checklist') {
         // Map checklist content to Checklist model
         const content = data.content || {};
@@ -1627,6 +1746,7 @@ export async function POST(request: NextRequest) {
           groupCount: groups.length,
           itemCount: steps.length,
           createdAt: checklist.createdAt.toISOString(),
+          isReplay: false,
         }, { status: 201 });
       }
       
@@ -1789,7 +1909,20 @@ export async function POST(request: NextRequest) {
           contentType: 'guide',
           state: 'DRAFT',
           createdAt: guide.createdAt.toISOString(),
+          isReplay: false,
         }, { status: 201 });
+      }
+      
+      // Update claim to CREATED after successful content creation
+      if (keyHash) {
+        try {
+          await prisma.contentOpsIdempotencyClaim.update({
+            where: { keyHash },
+            data: { status: 'CREATED' },
+          });
+        } catch {
+          // Non-critical: claim table may not exist yet
+        }
       }
       
       return NextResponse.json(

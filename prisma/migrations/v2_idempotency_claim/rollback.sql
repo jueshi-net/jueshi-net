@@ -1,0 +1,5 @@
+-- ContentOps Idempotency Claim Rollback
+-- V2-IDEMPOTENCY: v1.20.42.18.6.24.1
+--
+-- THIS ROLLBACK IS NOT YET EXECUTED.
+-- DATABASE_MIGRATION_AUTHORIZED=*** TABLE IF EXISTS `contentops_idempotency_claims`;

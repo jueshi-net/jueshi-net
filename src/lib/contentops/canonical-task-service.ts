@@ -19,6 +19,19 @@ import * as path from 'path';
 import * as os from 'os';
 import { taskManager } from './task-manager';
 import type { CreateTaskInput, ContentOpsTask } from './task-types';
+import {
+  generateIdempotencyKey,
+} from './idempotency-key';
+import {
+  atomicClaim,
+  readClaim,
+  handleReplay,
+  markEnqueued,
+  markProcessing,
+  markContentCreated,
+  markCompleted,
+  markFailed,
+} from './idempotency-claim';
 
 // ============================================================================
 // Configuration
@@ -38,6 +51,12 @@ export interface CanonicalTaskResult {
   task?: ContentOpsTask;
   enqueueStatus?: 'QUEUED' | 'FAILED_ENQUEUE';
   recoverable?: boolean;
+  /** Whether this was a replay (existing task returned, no new task created) */
+  isReplay?: boolean;
+  /** Existing contentId if the replay found one */
+  existingContentId?: string;
+  /** Idempotency key hash */
+  keyHash?: string;
   error?: {
     code: string;
     message: string;
@@ -55,6 +74,10 @@ export interface JobPayload {
   source?: string;
   provider?: string;
   internalAuthorized?: boolean;
+  // === IDEMPOTENCY FIELDS (propagated to Worker -> Adapter -> Backend) ===
+  idempotencyKeyHash: string;
+  idempotencyKeyVersion: number;
+  idempotencySource: 'telegram' | 'internal';
 }
 
 // ============================================================================
@@ -63,19 +86,155 @@ export interface JobPayload {
 
 export class CanonicalTaskService {
   /**
-   * Create task and enqueue job atomically
-   * This is the ONLY way to create a ContentOps task
+   * Create task and enqueue job atomically.
+   * This is the ONLY way to create a ContentOps task.
+   *
+   * Idempotency flow:
+   * 1. Generate or receive idempotency key hash
+   * 2. Atomically claim the key (file-system exclusive create)
+   * 3. If new claim: create task, enqueue job
+   * 4. If existing claim:
+   *    a. COMPLETED/CONTENT_CREATED: return existing taskId and contentId
+   *    b. PROCESSING/CLAIMED/ENQUEUED: return existing taskId (in-progress)
+   *    c. FAILED: reuse same taskId, increment attemptCount, re-enqueue
    */
   async createAndEnqueueContentOpsTask(input: CreateTaskInput): Promise<CanonicalTaskResult> {
     console.log('[CanonicalTaskService] Creating task and enqueueing job');
 
-    // Step 1: Create task record
+    // === STEP 0: Generate idempotency key if not provided ===
+    let keyHash = input.idempotencyKeyHash;
+    let keyVersion = input.idempotencyKeyVersion || 1;
+    let keySource = input.idempotencySource || 'telegram';
+
+    if (!keyHash) {
+      // Auto-generate based on source
+      try {
+        if (input.internalAuthorized || input.source?.startsWith('internal_')) {
+          // Internal acceptance/smoke test
+          const caseId = input.internalCaseId || input.source || 'internal';
+          const keyResult = generateIdempotencyKey({
+            source: 'internal',
+            internalSource: input.source || 'internal',
+            caseId,
+          });
+          keyHash = keyResult.keyHash;
+          keyVersion = keyResult.keyVersion;
+          keySource = 'internal';
+        } else {
+          // Telegram message
+          const keyResult = generateIdempotencyKey({
+            source: 'telegram',
+            chatId: input.chatId,
+            messageId: input.messageId,
+          });
+          keyHash = keyResult.keyHash;
+          keyVersion = keyResult.keyVersion;
+          keySource = 'telegram';
+        }
+      } catch (keyError) {
+        return {
+          ok: false,
+          error: {
+            code: 'IDEMPOTENCY_KEY_GENERATION_FAILED',
+            message: keyError instanceof Error ? keyError.message : 'Unknown error',
+          },
+        };
+      }
+    }
+
+    // Enrich input with idempotency fields
+    const enrichedInput: CreateTaskInput = {
+      ...input,
+      idempotencyKeyHash: keyHash,
+      idempotencyKeyVersion: keyVersion,
+      idempotencySource: keySource,
+    };
+
+    // === STEP 1: Atomic claim ===
+    let taskId: string;
+    let isReplay = false;
+
+    // Try to claim with a provisional taskId
+    const provisionalTaskId = `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const claimResult = atomicClaim(
+      keyHash,
+      keyVersion,
+      provisionalTaskId,
+      provisionalTaskId, // jobId = taskId
+      input.contentType || 'guide'
+    );
+
+    if (claimResult.isNew) {
+      // New claim - proceed to create task
+      taskId = provisionalTaskId;
+      console.log('[CanonicalTaskService] New idempotency claim:', keyHash);
+    } else {
+      // Existing claim - check status
+      const existingClaim = claimResult.claim;
+      isReplay = true;
+
+      if (existingClaim.status === 'COMPLETED' || existingClaim.status === 'CONTENT_CREATED') {
+        // Already done - return existing result
+        console.log('[CanonicalTaskService] Replay: task already completed:', existingClaim.taskId);
+        const existingTask = await taskManager.getTask(existingClaim.taskId);
+        return {
+          ok: true,
+          taskId: existingClaim.taskId,
+          task: existingTask || undefined,
+          enqueueStatus: 'QUEUED',
+          isReplay: true,
+          existingContentId: existingClaim.contentId,
+          keyHash,
+        };
+      }
+
+      if (existingClaim.status === 'PROCESSING' || existingClaim.status === 'CLAIMED' || existingClaim.status === 'ENQUEUED') {
+        // In progress - return existing task
+        console.log('[CanonicalTaskService] Replay: task in progress:', existingClaim.taskId);
+        const existingTask = await taskManager.getTask(existingClaim.taskId);
+        return {
+          ok: true,
+          taskId: existingClaim.taskId,
+          task: existingTask || undefined,
+          enqueueStatus: 'QUEUED',
+          isReplay: true,
+          keyHash,
+        };
+      }
+
+      if (existingClaim.status === 'FAILED') {
+        // Retry - reuse same taskId, increment attempt
+        console.log('[CanonicalTaskService] Replay: retrying failed task:', existingClaim.taskId);
+        handleReplay(keyHash); // Increments attemptCount, resets to CLAIMED
+        taskId = existingClaim.taskId;
+        // Load existing task to get retryCount
+        const failedTask = await taskManager.getTask(taskId);
+        await taskManager.updateTaskStatus(taskId, 'QUEUED', undefined, {
+          retryCount: (failedTask?.retryCount || 0) + 1,
+        });
+      } else {
+        // Unknown status - treat as new
+        taskId = provisionalTaskId;
+      }
+    }
+
+    // === STEP 2: Create or reuse task ===
     let task: ContentOpsTask;
     try {
-      task = await taskManager.createTask(input);
-      console.log('[CanonicalTaskService] Task created:', task.id);
+      if (isReplay) {
+        // Reuse existing task for retry
+        task = (await taskManager.getTask(taskId)) as ContentOpsTask;
+        if (!task) {
+          // Task was lost but claim exists - create new with same ID
+          task = await taskManager.createTask(enrichedInput);
+          task.id = taskId; // Restore original ID for consistency
+        }
+      } else {
+        task = await taskManager.createTask(enrichedInput);
+      }
+      console.log('[CanonicalTaskService] Task ready:', task.id);
     } catch (error) {
-      console.error('[CanonicalTaskService] Failed to create task:', error);
+      markFailed(keyHash, error instanceof Error ? error.message : 'Task creation failed');
       return {
         ok: false,
         error: {
@@ -85,7 +244,7 @@ export class CanonicalTaskService {
       };
     }
 
-    // Step 2: Generate job payload
+    // === STEP 3: Generate job payload with idempotency fields ===
     const jobPayload: JobPayload = {
       jobId: task.id,
       jobType: 'contentops_generate',
@@ -93,18 +252,20 @@ export class CanonicalTaskService {
       rawUserInput: task.rawInput,
       task,
       createdAt: new Date().toISOString(),
-      // Pass trusted metadata from input to job
       source: input.source,
       provider: input.provider,
       internalAuthorized: input.internalAuthorized,
+      // Propagate idempotency fields
+      idempotencyKeyHash: task.idempotencyKeyHash,
+      idempotencyKeyVersion: task.idempotencyKeyVersion,
+      idempotencySource: task.idempotencySource,
     };
 
-    // Step 3: Atomic write to inbox
+    // === STEP 4: Atomic write to inbox ===
     const enqueueResult = await this.atomicEnqueueJob(jobPayload);
 
     if (!enqueueResult.success) {
-      // Task created but job enqueue failed - mark as FAILED_ENQUEUE
-      console.error('[CanonicalTaskService] Job enqueue failed, marking task as FAILED_ENQUEUE');
+      markFailed(keyHash, enqueueResult.error || 'Enqueue failed');
       await taskManager.updateTaskStatus(task.id, 'FAILED_ENQUEUE', undefined, {
         errorCode: 'CONTENTOPS_JOB_ENQUEUE_FAILED',
         errorMessage: enqueueResult.error || 'Unknown enqueue error',
@@ -116,6 +277,7 @@ export class CanonicalTaskService {
         task,
         enqueueStatus: 'FAILED_ENQUEUE',
         recoverable: true,
+        keyHash,
         error: {
           code: 'CONTENTOPS_JOB_ENQUEUE_FAILED',
           message: enqueueResult.error || 'Failed to enqueue job',
@@ -123,11 +285,12 @@ export class CanonicalTaskService {
       };
     }
 
-    // Step 4: Mark task as QUEUED
+    // === STEP 5: Mark task as QUEUED and update claim ===
     await taskManager.updateTaskStatus(task.id, 'QUEUED');
+    markEnqueued(keyHash);
     console.log('[CanonicalTaskService] Task queued successfully:', task.id);
 
-    // Step 5: Auto-wakeup Worker
+    // === STEP 6: Auto-wakeup Worker ===
     await this.wakeupWorker();
 
     return {
@@ -135,6 +298,7 @@ export class CanonicalTaskService {
       taskId: task.id,
       task,
       enqueueStatus: 'QUEUED',
+      keyHash,
     };
   }
 
@@ -169,7 +333,7 @@ export class CanonicalTaskService {
       };
     }
 
-    // Step 3: Generate job payload
+    // Step 3: Generate job payload with idempotency fields
     const jobPayload: JobPayload = {
       jobId: task.id,
       jobType: 'contentops_generate',
@@ -177,6 +341,10 @@ export class CanonicalTaskService {
       rawUserInput: task.rawInput,
       task,
       createdAt: new Date().toISOString(),
+      // Propagate idempotency fields from existing task
+      idempotencyKeyHash: task.idempotencyKeyHash || '',
+      idempotencyKeyVersion: task.idempotencyKeyVersion || 1,
+      idempotencySource: task.idempotencySource || 'telegram',
     };
 
     // Step 4: Atomic write to inbox

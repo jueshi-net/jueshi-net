@@ -19,11 +19,17 @@ import * as os from 'os';
 import { HermesContentExecutor } from '../../src/lib/contentops/hermes-content-executor';
 import { getContentPublishAdapter } from '../../src/lib/contentops/content-publish-adapters';
 import { finalizeContentOpsTask } from '../../src/lib/contentops/task-finalizer';
-import type { ContentOpsTask } from '../../src/lib/contentops/contracts/task-contract';
-import { TASK_STATUS, isValidTaskStatus } from '../../src/lib/contentops/contracts/task-contract';
-import { JOB_STATUS, isValidJobStatus } from '../../src/lib/contentops/contracts/job-contract';
+import type { ContentOpsTask } from '../../src/lib/contentops/task-types';
 import { isValidContentType } from '../../src/lib/contentops/contracts/content-types';
 import { isValidExecutionMode } from '../../src/lib/contentops/contracts/execution-modes';
+import {
+  markProcessing,
+  markContentCreated,
+  markCompleted,
+  markFailed,
+  readClaim,
+} from '../../src/lib/contentops/idempotency-claim';
+import type { PublishOptions } from '../../src/lib/contentops/content-publish-adapters';
 
 // ============================================================================
 // Configuration — Mac mini paths
@@ -319,7 +325,7 @@ async function processJob(jobPath: string): Promise<boolean> {
       source: job.source || (job as any).task?.source,
       provider: job.provider || (job as any).task?.provider,
       internalAuthorized: job.internalAuthorized || (job as any).task?.internalAuthorized,
-      status: TASK_STATUS.RUNNING,
+      status: 'PARSING',
       currentStep: 'hermes-execution',
       stepHistory: [],
       executor: 'hermes-agent',
@@ -327,6 +333,12 @@ async function processJob(jobPath: string): Promise<boolean> {
       maxRetries: 3,
       createdAt: job.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Idempotency fields (V2-IDEMPOTENCY)
+      idempotencyKeyHash: job.idempotencyKeyHash || (job as any).task?.idempotencyKeyHash || '',
+      idempotencyKeyVersion: job.idempotencyKeyVersion || (job as any).task?.idempotencyKeyVersion || 1,
+      idempotencySource: job.idempotencySource || (job as any).task?.idempotencySource || 'telegram',
+      attemptCount: (job as any).task?.attemptCount || 1,
+      originalTaskId: job.jobId,
     };
     
     // Call HermesContentExecutor with full Runtime Pipeline
@@ -372,7 +384,7 @@ async function processJob(jobPath: string): Promise<boolean> {
           success: false,
           error: 'FORCED_FAILURE: Deterministic fixture explicitly triggered failure for acceptance testing',
           contentType: task.contentType,
-          title: `Forced Failure Test: ${task.normalizedTitle || 'Acceptance Test'}`,
+          title: `Forced Failure Test: ${task.topic || 'Acceptance Test'}`,
           slug: `forced-failure-${task.id}`,
           summary: 'Deterministic fixture for forced failure acceptance testing.',
           content: null,
@@ -424,7 +436,7 @@ async function processJob(jobPath: string): Promise<boolean> {
         result = {
           success: true,
           contentType,
-          title: `Acceptance Test: ${contentType} - ${task.normalizedTitle || 'Internal Runtime Test'}`,
+          title: `Acceptance Test: ${contentType} - ${task.topic || 'Internal Runtime Test'}`,
           slug: `acceptance-${contentType}-${task.id}`,
           summary: 'Deterministic fixture for acceptance testing the ContentOps runtime path.',
           content,
@@ -475,9 +487,22 @@ async function processJob(jobPath: string): Promise<boolean> {
       throw new Error('NORMALIZER_BLOCKING_ISSUES: ' + result.normalizerRemainingBlockingIssues);
     }
     
+    // Mark claim as PROCESSING
+    if (task.idempotencyKeyHash) {
+      markProcessing(task.idempotencyKeyHash);
+    }
+    
     // Call appropriate adapter based on content type
     const adapter = getContentPublishAdapter(result.contentType);
-    const publishResult = await adapter.publish(result, task.id, task.executionMode);
+    const publishOptions: PublishOptions = {
+      idempotencyKeyHash: task.idempotencyKeyHash || '',
+      idempotencyKeyVersion: task.idempotencyKeyVersion || 1,
+      idempotencySource: task.idempotencySource || 'telegram',
+      taskId: task.id,
+      jobId: job.jobId,
+      executionMode: task.executionMode,
+    };
+    const publishResult = await adapter.publish(result, task.id, task.executionMode, publishOptions);
     
     if (!publishResult.success) {
       throw new Error(publishResult.error || 'ADAPTER_PUBLISH_FAILED');
@@ -487,7 +512,13 @@ async function processJob(jobPath: string): Promise<boolean> {
       jobId: job.jobId,
       draftId: publishResult.draftId,
       publishedUrl: publishResult.publishedUrl,
+      isReplay: publishResult.isReplay,
     });
+    
+    // Mark claim as CONTENT_CREATED
+    if (task.idempotencyKeyHash && publishResult.draftId) {
+      markContentCreated(task.idempotencyKeyHash, publishResult.draftId);
+    }
     
     // ========================================================================
     // Use Finalizer for atomic terminal state (replaces direct outbox write)
@@ -542,6 +573,11 @@ async function processJob(jobPath: string): Promise<boolean> {
       throw new Error(`FINALIZER_FAILED: ${finalizerResult.error}`);
     }
     
+    // Mark claim as COMPLETED
+    if (task.idempotencyKeyHash) {
+      markCompleted(task.idempotencyKeyHash);
+    }
+    
     log('info', 'Finalizer completed successfully', { jobId: job.jobId, taskStatus: finalizerResult.taskStatus });
     
     // Clean up processing file
@@ -553,6 +589,10 @@ async function processJob(jobPath: string): Promise<boolean> {
     
     return true;
   } catch (error: any) {
+    // Mark claim as FAILED
+    if (task?.idempotencyKeyHash) {
+      markFailed(task.idempotencyKeyHash, error.message);
+    }
     moveToFailed(processingPath, error.message);
     return false;
   }

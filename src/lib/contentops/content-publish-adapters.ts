@@ -1,15 +1,19 @@
 /**
  * ContentOps Content Publish Adapters
- * 
+ *
  * Separate adapters for each content type.
  * Each adapter calls staging-local helper via SSH.
- * 
- * V2-MVP: v1.20.42.18.6.21.12.1
+ *
+ * V2-IDEMPOTENCY: v1.20.42.18.6.24.1
+ * - publish() now receives idempotencyKeyHash (not taskId) for backend dedup
+ * - Adapter passes keyHash + requestHash to backend create_backend_draft
+ * - Backend uses ContentOpsIdempotencyClaim for atomic content creation
  */
 
 import { spawn } from 'child_process';
 import type { ContentType } from './task-types';
 import type { StructuredContentResult } from './hermes-content-executor';
+import { computeRequestHash } from './idempotency-key';
 
 // ============================================================================
 // Types
@@ -21,10 +25,32 @@ export interface PublishResult {
   publishedUrl?: string;
   error?: string;
   errorCode?: string;
+  /** Whether this was an idempotent replay (content already existed) */
+  isReplay?: boolean;
+}
+
+export interface PublishOptions {
+  /** Idempotency key hash - used by backend for atomic content claim */
+  idempotencyKeyHash: string;
+  /** Key version */
+  idempotencyKeyVersion: number;
+  /** Idempotency source */
+  idempotencySource: 'telegram' | 'internal';
+  /** Task ID for metadata */
+  taskId: string;
+  /** Job ID for metadata */
+  jobId?: string;
+  /** Execution mode */
+  executionMode?: string;
 }
 
 export interface ContentPublishAdapter {
-  publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult>;
+  publish(
+    result: StructuredContentResult,
+    taskId: string,
+    executionMode?: string,
+    options?: PublishOptions
+  ): Promise<PublishResult>;
 }
 
 // ============================================================================
@@ -71,7 +97,7 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
       }
       
       try {
-        // Extract JSON from stdout — dotenv banner may precede the actual JSON
+        // Extract JSON from stdout - dotenv banner may precede the actual JSON
         const lines = stdout.trim().split('\n');
         const jsonLine = lines.findLast(line => line.trim().startsWith('{')) || stdout;
         const result = JSON.parse(jsonLine);
@@ -107,20 +133,29 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
 // ============================================================================
 
 export class GuidePublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
+  async publish(
+    result: StructuredContentResult,
+    taskId: string,
+    executionMode?: string,
+    options?: PublishOptions
+  ): Promise<PublishResult> {
     try {
       // For draft_only mode, skip staging helper and just save locally
       if (executionMode === 'draft_only') {
         return {
           success: true,
           draftId: `draft_${taskId}`,
-          publishedUrl: null,
+          publishedUrl: undefined,
         };
       }
       
       const payload = {
-        idempotencyKey: taskId,
+        idempotencyKey: options?.idempotencyKeyHash || taskId, // Use keyHash if available, fallback to taskId
+        idempotencyKeyHash: options?.idempotencyKeyHash,
+        idempotencyKeyVersion: options?.idempotencyKeyVersion,
+        idempotencySource: options?.idempotencySource,
         taskId,
+        jobId: options?.jobId,
         contentType: 'guide',
         title: result.title,
         slug: result.slug,
@@ -143,6 +178,7 @@ export class GuidePublishAdapter implements ContentPublishAdapter {
         success: true,
         draftId: response.draftId,
         publishedUrl: response.publishedUrl,
+        isReplay: response.isReplay,
       };
       
     } catch (error: any) {
@@ -160,20 +196,29 @@ export class GuidePublishAdapter implements ContentPublishAdapter {
 // ============================================================================
 
 export class ChecklistPublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
+  async publish(
+    result: StructuredContentResult,
+    taskId: string,
+    executionMode?: string,
+    options?: PublishOptions
+  ): Promise<PublishResult> {
     try {
       // For draft_only mode, skip staging helper and just save locally
       if (executionMode === 'draft_only') {
         return {
           success: true,
           draftId: `draft_${taskId}`,
-          publishedUrl: null,
+          publishedUrl: undefined,
         };
       }
       
       const payload = {
-        idempotencyKey: taskId,
+        idempotencyKey: options?.idempotencyKeyHash || taskId,
+        idempotencyKeyHash: options?.idempotencyKeyHash,
+        idempotencyKeyVersion: options?.idempotencyKeyVersion,
+        idempotencySource: options?.idempotencySource,
         taskId,
+        jobId: options?.jobId,
         contentType: 'checklist',
         title: result.title,
         slug: result.slug,
@@ -193,6 +238,7 @@ export class ChecklistPublishAdapter implements ContentPublishAdapter {
         success: true,
         draftId: response.draftId,
         publishedUrl: response.publishedUrl,
+        isReplay: response.isReplay,
       };
       
     } catch (error: any) {
@@ -210,20 +256,29 @@ export class ChecklistPublishAdapter implements ContentPublishAdapter {
 // ============================================================================
 
 export class TopicPublishAdapter implements ContentPublishAdapter {
-  async publish(result: StructuredContentResult, taskId: string, executionMode?: string): Promise<PublishResult> {
+  async publish(
+    result: StructuredContentResult,
+    taskId: string,
+    executionMode?: string,
+    options?: PublishOptions
+  ): Promise<PublishResult> {
     try {
       // For draft_only mode, skip staging helper and just save locally
       if (executionMode === 'draft_only') {
         return {
           success: true,
           draftId: `draft_${taskId}`,
-          publishedUrl: null,
+          publishedUrl: undefined,
         };
       }
       
       const payload = {
-        idempotencyKey: taskId,
+        idempotencyKey: options?.idempotencyKeyHash || taskId,
+        idempotencyKeyHash: options?.idempotencyKeyHash,
+        idempotencyKeyVersion: options?.idempotencyKeyVersion,
+        idempotencySource: options?.idempotencySource,
         taskId,
+        jobId: options?.jobId,
         contentType: 'topic',
         title: result.title,
         slug: result.slug,
@@ -248,6 +303,7 @@ export class TopicPublishAdapter implements ContentPublishAdapter {
         success: true,
         draftId: response.draftId,
         publishedUrl: response.publishedUrl,
+        isReplay: response.isReplay,
       };
       
     } catch (error: any) {

@@ -54,6 +54,9 @@ function saveTasks(store: TaskStore): void {
 export class TaskManager {
   /**
    * Create a new task
+   * If input has idempotencyKeyHash, it is persisted in the task record.
+   * The caller (CanonicalTaskService) is responsible for atomic claim checking
+   * before calling this method.
    */
   async createTask(input: CreateTaskInput): Promise<ContentOpsTask> {
     const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -93,14 +96,31 @@ export class TaskManager {
       maxRetries: 3,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      // Idempotency fields (V2-IDEMPOTENCY)
+      idempotencyKeyHash: input.idempotencyKeyHash || '',
+      idempotencyKeyVersion: input.idempotencyKeyVersion || 1,
+      idempotencySource: input.idempotencySource || 'telegram',
+      internalCaseId: input.internalCaseId,
+      attemptCount: 1,
+      originalTaskId: taskId,
     };
 
     const store = loadTasks();
     store.tasks[taskId] = task;
     saveTasks(store);
 
-    console.log(`[TaskManager] Created task: ${taskId} (${task.contentType}: ${task.topic})`);
+    console.log(`[TaskManager] Created task: ${taskId} (${task.contentType}: ${task.topic}) idempotencyKeyHash=${task.idempotencyKeyHash ? '[present]' : '[empty]'}`);
     return task;
+  }
+
+  /**
+   * Find a task by idempotency key hash.
+   * Returns null if no task with this key exists.
+   */
+  async findByKeyHash(keyHash: string): Promise<ContentOpsTask | null> {
+    const store = loadTasks();
+    const tasks = Object.values(store.tasks);
+    return tasks.find(t => t.idempotencyKeyHash === keyHash) || null;
   }
 
   /**

@@ -2191,3 +2191,30 @@ model DomainEventOutbox {
   @@index([status, availableAt])
   @@map("domain_event_outbox")
 }
+
+// ============================================================================
+// V2-IDEMPOTENCY: ContentOps Idempotency Claim
+// Provides database-level atomic content creation deduplication.
+// keyHash is @unique - the database constraint is the atomic claim primitive.
+// ============================================================================
+
+model ContentOpsIdempotencyClaim {
+  id              String   @id @default(cuid())
+  keyHash         String   @unique @map("key_hash")
+  keyVersion      Int      @default(1) @map("key_version")
+  requestHash     String?  @map("request_hash")
+  taskId          String   @map("task_id")
+  jobId           String?  @map("job_id")
+  contentType     String   @map("content_type")
+  status          String   @default("CLAIMED") // CLAIMED / PROCESSING / CREATED / COMPLETED / FAILED
+  backendContentId String? @map("backend_content_id")
+  attemptCount    Int      @default(1) @map("attempt_count")
+  lastError       String?  @map("last_error") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([taskId])
+  @@index([contentType])
+  @@map("contentops_idempotency_claims")
+}

@@ -1,128 +1,72 @@
 /**
- * ContentOps Task Contract
- * 
- * 统一的 Task 数据结构
- * Bot、API、Worker 都必须使用这个 Contract
+ * ContentOps Task Contract - RE-EXPORT from canonical task-types.ts
+ *
+ * This file now re-exports from the single source of truth (task-types.ts).
+ * No duplicate type definitions are allowed.
+ *
+ * V2-IDEMPOTENCY: v1.20.42.18.6.24.1
+ * Unified to single canonical definition with idempotency fields.
  */
 
-import { ContentType } from './content-types';
-import { ExecutionMode } from './execution-modes';
+// Re-export everything from the canonical source
+export type {
+  TaskStatus,
+  ContentType,
+  ExecutionMode,
+  TargetEnvironment,
+  IdempotencySource,
+  ContentOpsTask,
+  CreateTaskInput,
+  TaskStep,
+  TaskEvent,
+} from '../task-types';
 
-/**
- * Task status enum
- */
-export const TASK_STATUS = {
-  RECEIVED: 'RECEIVED',
-  QUEUED: 'QUEUED',
-  RUNNING: 'RUNNING',
-  NORMALIZING: 'NORMALIZING',
-  QUALITY_CHECK: 'QUALITY_CHECK',
-  AWAITING_REVIEW: 'AWAITING_REVIEW',
-  SCHEDULED: 'SCHEDULED',
-  PUBLISHED: 'PUBLISHED',
-  CHANGES_REQUESTED: 'CHANGES_REQUESTED',
-  FAILED: 'FAILED',
-  CANCELLED: 'CANCELLED',
-  ARCHIVED_TEST: 'ARCHIVED_TEST',
-  FAILED_ENQUEUE: 'FAILED_ENQUEUE',
-  MISCLASSIFIED_REQUEST: 'MISCLASSIFIED_REQUEST',
+export { TASK_STEPS } from '../task-types';
+
+// Legacy compatibility: keep TASK_STATUS const for existing code that references it
+const TASK_STATUS = {
+  RECEIVED: 'RECEIVED' as const,
+  QUEUED: 'QUEUED' as const,
+  RUNNING: 'PARSING' as const, // Map legacy RUNNING to PARSING
+  NORMALIZING: 'CLEANING_CONTENT' as const, // Map legacy NORMALIZING
+  QUALITY_CHECK: 'QUALITY_CHECKING' as const, // Map legacy QUALITY_CHECK
+  AWAITING_REVIEW: 'AWAITING_REVIEW' as const,
+  SCHEDULED: 'SCHEDULED' as const,
+  PUBLISHED: 'PUBLISHED' as const,
+  CHANGES_REQUESTED: 'AWAITING_REVIEW' as const, // Map legacy
+  FAILED: 'FAILED' as const,
+  CANCELLED: 'CANCELLED' as const,
+  ARCHIVED_TEST: 'CANCELLED' as const, // Map legacy
+  FAILED_ENQUEUE: 'FAILED_ENQUEUE' as const,
+  MISCLASSIFIED_REQUEST: 'FAILED' as const, // Map legacy
 } as const;
 
-export type TaskStatus = typeof TASK_STATUS[keyof typeof TASK_STATUS];
+export { TASK_STATUS };
+
+export type LegacyTaskStatus = typeof TASK_STATUS[keyof typeof TASK_STATUS];
 
 /**
- * Task data structure
+ * Validate task status (legacy compat)
  */
-export interface ContentOpsTask {
-  id: string;
-  taskId: string;
-  contentType: ContentType;
-  executionMode: ExecutionMode;
-  targetEnvironment: 'staging' | 'production';
-  rawInput: string;
-  normalizedTitle?: string;
-  status: TaskStatus;
-  
-  idempotencyKey?: string;
-  archivedTest?: boolean;
-  
-  contentId?: string;
-  contentSlug?: string;
-  
-  qualityScore?: number;
-  qualityIssues?: any;
-  
-  failureStage?: string;
-  failureReason?: string;
-  recoverable?: boolean;
-  
-  metadata?: any;
-  
-  // Trusted metadata for internal smoke test detection
-  source?: string;
-  provider?: string;
-  internalAuthorized?: boolean;
-  
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Create task input
- */
-export interface CreateTaskInput {
-  chatId: number;
-  messageId: number;
-  rawInput: string;
-  contentType: ContentType;
-  executionMode: ExecutionMode;
-  targetEnvironment: 'staging' | 'production';
-  
-  // Optional fields
-  topic?: string;
-  audience?: string;
-  country?: string;
-  city?: string;
-  industry?: string;
-  tone?: string;
-  requiredSections?: string[];
-  specialRequirements?: string;
-  scheduledAt?: string;
-  publishInstruction?: string;
-  sourceRequirement?: string;
-  idempotencyKey?: string;
-  archivedTest?: boolean;
-  
-  // Trusted metadata for internal smoke test detection
-  source?: string;
-  provider?: string;
-  internalAuthorized?: boolean;
-}
-
-/**
- * Validate task status
- */
-export function isValidTaskStatus(value: string): value is TaskStatus {
-  return Object.values(TASK_STATUS).includes(value as TaskStatus);
+export function isValidTaskStatus(value: string): value is LegacyTaskStatus {
+  return Object.values(TASK_STATUS).includes(value as LegacyTaskStatus);
 }
 
 /**
  * Check if task is in terminal state
  */
-export function isTaskTerminal(status: TaskStatus): boolean {
+export function isTaskTerminal(status: string): boolean {
   return (
-    status === TASK_STATUS.PUBLISHED ||
-    status === TASK_STATUS.FAILED ||
-    status === TASK_STATUS.CANCELLED ||
-    status === TASK_STATUS.ARCHIVED_TEST ||
-    status === TASK_STATUS.FAILED_ENQUEUE ||
-    status === TASK_STATUS.MISCLASSIFIED_REQUEST
+    status === 'PUBLISHED' ||
+    status === 'FAILED' ||
+    status === 'CANCELLED' ||
+    status === 'FAILED_ENQUEUE'
   );
 }
 
 /**
- * Check if task can be retried
+ * Check if task can be retried (legacy compat)
  */
-export function canTaskRetry(status: TaskStatus): boolean {
-  return status === TASK_STATUS.FAILED && !isTaskTerminal(status);
+export function canTaskRetry(status: string): boolean {
+  return status === 'FAILED';
 }

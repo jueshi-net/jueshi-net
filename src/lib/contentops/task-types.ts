@@ -1,9 +1,15 @@
 /**
- * ContentOps Autonomous Task Types
- * 
- * Task-based content production system.
- * Users send natural language tasks, agent orchestrates full pipeline.
+ * ContentOps Canonical Task Types - SINGLE SOURCE OF TRUTH
+ *
+ * This is the ONLY place where ContentOpsTask and CreateTaskInput are defined.
+ * contracts/task-contract.ts re-exports from here.
+ *
+ * V2-IDEMPOTENCY: v1.20.42.18.6.24.1
+ * Added idempotency fields for reliable duplicate prevention.
  */
+
+import type { ContentType } from './contracts/content-types';
+import type { ExecutionMode } from './contracts/execution-modes';
 
 // ============================================================================
 // Task State Machine
@@ -36,34 +42,34 @@ export type TaskStatus =
   | 'FAILED_ENQUEUE'     // Task created but job enqueue failed (recoverable)
   | 'CANCELLED';         // Cancelled by user
 
-export type ContentType = 'guide' | 'checklist' | 'topic';
-
-export type ExecutionMode =
-  | 'draft_only'              // Just create draft, no publish
-  | 'review_required'         // Create draft, wait for review (default)
-  | 'publish_when_validated'  // Auto-publish staging after quality pass
-  | 'schedule_when_validated' // Auto-publish at scheduled time
-  | 'publish_now';            // Publish immediately (staging only without prod auth)
+// Re-export ContentType and ExecutionMode from contracts for convenience
+export type { ContentType, ExecutionMode } from './contracts/content-types';
 
 export type TargetEnvironment = 'staging' | 'production';
 
 // ============================================================================
-// Task Definition
+// Idempotency Fields
+// ============================================================================
+
+export type IdempotencySource = 'telegram' | 'internal';
+
+// ============================================================================
+// Task Definition (CANONICAL)
 // ============================================================================
 
 export interface ContentOpsTask {
   id: string;
   chatId: string;
   messageId: number;
-  
+
   // Original task
   rawInput: string;
-  
+
   // Parsed intent
   contentType: ContentType;
   executionMode: ExecutionMode;
   targetEnvironment: TargetEnvironment;
-  
+
   // Extracted parameters
   topic: string;
   audience?: string;
@@ -76,7 +82,7 @@ export interface ContentOpsTask {
   scheduledAt?: string; // ISO timestamp
   publishInstruction?: string;
   sourceRequirement?: string;
-  
+
   // Execution state
   status: TaskStatus;
   currentStep: string;
@@ -87,7 +93,7 @@ export interface ContentOpsTask {
     status: 'running' | 'completed' | 'failed' | 'skipped';
     error?: string;
   }>;
-  
+
   // Generated content
   brief?: any;
   outline?: any;
@@ -98,12 +104,12 @@ export interface ContentOpsTask {
   internalLinks?: any[];
   sources?: any[];
   qualityReport?: any;
-  
+
   // Backend references
   draftId?: string;
   version?: number;
   publishedUrl?: string;
-  
+
   // Execution metadata
   executor: 'hermes-agent' | 'external-api';
   provider?: string;
@@ -111,26 +117,52 @@ export interface ContentOpsTask {
   retryCount: number;
   maxRetries: number;
   resumeAt?: string; // ISO timestamp for rate limit recovery
-  
+
   // Timestamps
   createdAt: string;
   updatedAt: string;
   completedAt?: string;
-  
+
   // Error tracking
   errorCode?: string;
   errorMessage?: string;
+
+  // === IDEMPOTENCY FIELDS (V2-IDEMPOTENCY) ===
+
+  /** SHA-256 hash of the canonical idempotency key. Safe to persist. */
+  idempotencyKeyHash: string;
+
+  /** Version of the idempotency key format */
+  idempotencyKeyVersion: number;
+
+  /** Which source generated this key: 'telegram' or 'internal' */
+  idempotencySource: IdempotencySource;
+
+  /** For internal sources, the case identifier (not the raw chatId) */
+  internalCaseId?: string;
+
+  /** How many attempts have been made (including the first) */
+  attemptCount: number;
+
+  /** If this is a retry, the original task ID (same as id for first attempt) */
+  originalTaskId?: string;
+
+  // === TRUSTED METADATA ===
+
+  source?: string;
+  provider?: string;
+  internalAuthorized?: boolean;
 }
 
 // ============================================================================
-// Task Creation Input
+// Task Creation Input (CANONICAL)
 // ============================================================================
 
 export interface CreateTaskInput {
   chatId: string;
   messageId: number;
   rawInput: string;
-  
+
   // Parsed fields (from NLP or manual)
   contentType?: ContentType;
   executionMode?: ExecutionMode;
@@ -146,11 +178,19 @@ export interface CreateTaskInput {
   scheduledAt?: string;
   publishInstruction?: string;
   sourceRequirement?: string;
-  
+
   // Trusted metadata for internal smoke test detection
   source?: string;
   provider?: string;
   internalAuthorized?: boolean;
+
+  // === IDEMPOTENCY FIELDS (V2-IDEMPOTENCY) ===
+
+  /** Pre-computed idempotency key hash. If not provided, service will generate. */
+  idempotencyKeyHash?: string;
+  idempotencyKeyVersion?: number;
+  idempotencySource?: IdempotencySource;
+  internalCaseId?: string;
 }
 
 // ============================================================================
