@@ -195,15 +195,10 @@ export async function finalizeContentOpsTaskSuccess(
     // Otherwise, it's a real staging draft ID, allow it
   }
   
-  // Step 2: Verify backend content exists (skip for draft_only mode and smoke tests)
+  // Step 2: Verify backend content exists (skip for draft_only mode only)
   console.log(`[Finalizer] Checking backend verification: source=${input.source}, executionMode=${input.executionMode}, backendContentId=${input.backendContentId}`);
-  const isSmokeTest = input.source === 'internal_runtime_smoke' ||
-                      (input.executionMode !== 'draft_only' && 
-                       input.backendContentId.startsWith('draft_') && 
-                       !input.backendContentId.match(/^draft_task_\\d+_[a-z0-9]+$/));
-  console.log(`[Finalizer] isSmokeTest=${isSmokeTest}`);
   
-  if (input.executionMode !== 'draft_only' && !isSmokeTest) {
+  if (input.executionMode !== 'draft_only') {
     const verification = await verifyBackendContentExists(input.backendContentId, input.contentType);
     
     if (!verification || !verification.exists) {
@@ -216,8 +211,11 @@ export async function finalizeContentOpsTaskSuccess(
         error: `BACKEND_CONTENT_NOT_FOUND: ${input.backendContentId}`,
         errorCode: 'CONTENT_NOT_FOUND',
         failureStage: 'finalizer',
+        transport: input.transport,
+        source: input.source,
       });
     }
+    console.log(`[Finalizer] Backend verification passed for ${input.backendContentId}`);
   }
   
   // Step 3: Determine content status
@@ -449,6 +447,9 @@ export interface FinalizerInput {
   errorCode?: string;
   failureStage?: string;
   quarantinedContentId?: string;
+  // Runtime context for transport routing
+  transport?: 'telegram' | 'internal_test';
+  source?: string;
 }
 
 /**
@@ -480,6 +481,8 @@ export async function finalizeContentOpsTask(input: FinalizerInput): Promise<Fin
       latencyMs: input.latencyMs,
       normalizerFixedCount: input.normalizerFixedCount,
       normalizerRemainingBlockingIssues: input.normalizerRemainingBlockingIssues,
+      transport: input.transport,
+      source: input.source,
     });
   } else {
     if (!input.error) {
@@ -500,6 +503,8 @@ export async function finalizeContentOpsTask(input: FinalizerInput): Promise<Fin
       errorCode: input.errorCode,
       failureStage: input.failureStage,
       quarantinedContentId: input.quarantinedContentId,
+      transport: input.transport,
+      source: input.source,
     });
   }
 }
