@@ -146,6 +146,11 @@ export interface CreateTaskInput {
   scheduledAt?: string;
   publishInstruction?: string;
   sourceRequirement?: string;
+  
+  // Trusted metadata for internal smoke test detection
+  source?: string;
+  provider?: string;
+  internalAuthorized?: boolean;
 }
 
 // ============================================================================

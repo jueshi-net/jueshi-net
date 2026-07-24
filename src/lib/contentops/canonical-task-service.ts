@@ -51,6 +51,10 @@ export interface JobPayload {
   rawUserInput: string;
   task: ContentOpsTask;
   createdAt: string;
+  // Trusted metadata for internal smoke test detection
+  source?: string;
+  provider?: string;
+  internalAuthorized?: boolean;
 }
 
 // ============================================================================
@@ -89,6 +93,10 @@ export class CanonicalTaskService {
       rawUserInput: task.rawInput,
       task,
       createdAt: new Date().toISOString(),
+      // Pass trusted metadata from input to job
+      source: input.source,
+      provider: input.provider,
+      internalAuthorized: input.internalAuthorized,
     };
 
     // Step 3: Atomic write to inbox
