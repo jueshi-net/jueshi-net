@@ -94,7 +94,8 @@ async function verifyBackendContentExists(
       contentId: backendContentId
     });
     
-    const checkCmd = `ssh ${stagingHost} "echo '${queryInput}' | npx tsx ${helperPath}"`;
+    const stagingWorkDir = process.env.STAGING_WORK_DIR || '/home/deploy/xixiong-saas-staging';
+    const checkCmd = `ssh ${stagingHost} "cd ${stagingWorkDir} && echo '${queryInput}' | npx tsx ${helperPath}"`;
     const result = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 });
     
     const parsed = JSON.parse(result);

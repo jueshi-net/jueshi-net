@@ -1446,6 +1446,43 @@
       "errorMessage": "BACKEND_CONTENT_NOT_FOUND: cmrxst3690004ut5pusjdogxl",
       "failureStage": "finalizer",
       "failedAt": "2026-07-23T17:41:46.405Z"
+    },
+    "task_1784855385257_l5b395": {
+      "id": "task_1784855385257_l5b395",
+      "chatId": "internal-test-sink",
+      "messageId": 0,
+      "rawInput": "ContentOps Finalizer Metadata Smoke 1784855385256",
+      "contentType": "topic",
+      "executionMode": "review_required",
+      "targetEnvironment": "staging",
+      "topic": "ContentOps Finalizer Metadata Smoke 1784855385256",
+      "source": "internal_runtime_smoke",
+      "provider": "deterministic_fixture",
+      "internalAuthorized": true,
+      "status": "FAILED",
+      "currentStep": "FINALIZED",
+      "stepHistory": [
+        {
+          "step": "PARSING_TASK",
+          "startedAt": "2026-07-24T01:09:45.257Z",
+          "status": "completed",
+          "completedAt": "2026-07-24T01:10:01.490Z"
+        },
+        {
+          "step": "FINALIZED",
+          "startedAt": "2026-07-24T01:10:01.490Z",
+          "status": "running"
+        }
+      ],
+      "executor": "hermes-agent",
+      "retryCount": 0,
+      "maxRetries": 3,
+      "createdAt": "2026-07-24T01:09:45.258Z",
+      "updatedAt": "2026-07-24T01:10:01.490Z",
+      "errorCode": "CONTENT_NOT_FOUND",
+      "errorMessage": "BACKEND_CONTENT_NOT_FOUND: cmry8thl20005ut5pvtvm0q08",
+      "failureStage": "finalizer",
+      "failedAt": "2026-07-24T01:10:01.487Z"
     }
   }
 }
