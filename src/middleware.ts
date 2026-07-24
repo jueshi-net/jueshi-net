@@ -45,8 +45,37 @@ function notFoundResponse(): NextResponse {
   });
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Check content status for topics/guides/checklists to return proper HTTP 404
+  const contentMatch = pathname.match(/^\/(topics|guides|checklists)\/([^/]+)$/);
+  if (contentMatch) {
+    const [, type, slug] = contentMatch;
+    // Skip preview mode
+    if (!request.nextUrl.searchParams.has('preview')) {
+      try {
+        const apiUrl = new URL('/api/internal/check-content-status', request.url);
+        apiUrl.searchParams.set('type', type.replace(/s$/, '')); // topics -> topic
+        apiUrl.searchParams.set('slug', slug);
+        
+        const response = await fetch(apiUrl, { 
+          headers: { 'x-internal': 'true' },
+          next: { revalidate: 60 } // Cache for 60 seconds
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.should404) {
+            return notFoundResponse();
+          }
+        }
+      } catch (error) {
+        // If API call fails, let the page handle it
+        console.error('[middleware] Content check failed:', error);
+      }
+    }
+  }
 
   // /tools/quote -> /tools/documents/quotation (permanent)
   if (pathname === "/tools/quote") {
@@ -108,6 +137,9 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/topics/:path*",
+    "/guides/:path*",
+    "/checklists/:path*",
     "/tools/quote",
     "/tools/quote-sheet",
     "/community",
