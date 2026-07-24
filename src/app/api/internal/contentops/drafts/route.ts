@@ -1129,7 +1129,6 @@ export async function POST(request: NextRequest) {
                 publishedAt: true,
                 seoTitle: true,
                 seoDescription: true,
-                canonicalUrl: true,
                 metadataJson: true,
               }
             });
@@ -1147,7 +1146,7 @@ export async function POST(request: NextRequest) {
                 subtopicCount: metadata.subtopicCount || 0,
                 faqCount: contentOps.faq?.length || 0,
                 seoPresent: !!(topic.seoTitle || topic.seoDescription),
-                canonicalPresent: !!topic.canonicalUrl,
+                canonicalPresent: false, // Topic model doesn't have canonicalUrl
                 jsonLdPresent: !!contentOps.structuredData,
                 internalLinkCount: contentOps.internalLinks?.length || 0,
                 sourceFactCount: contentOps.sourceFacts?.length || 0,
