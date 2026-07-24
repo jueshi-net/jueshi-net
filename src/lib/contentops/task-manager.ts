@@ -7,13 +7,21 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import type { ContentOpsTask, CreateTaskInput, TaskStatus } from './task-types';
 
 // ============================================================================
 // File-based Storage
 // ============================================================================
 
-const TASKS_FILE = path.join(process.cwd(), '.contentops-tasks.json');
+// Runtime state directory outside Git worktree
+const CONTENTOPS_STATE_DIR = process.env.CONTENTOPS_STATE_DIR || path.join(os.homedir(), '.jueshi-contentops');
+const TASKS_FILE = path.join(CONTENTOPS_STATE_DIR, 'tasks.json');
+
+// Ensure state directory exists
+if (!fs.existsSync(CONTENTOPS_STATE_DIR)) {
+  fs.mkdirSync(CONTENTOPS_STATE_DIR, { recursive: true });
+}
 
 interface TaskStore {
   tasks: Record<string, ContentOpsTask>;
