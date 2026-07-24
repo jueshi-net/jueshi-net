@@ -55,13 +55,12 @@ export async function middleware(request: NextRequest) {
     // Skip preview mode
     if (!request.nextUrl.searchParams.has('preview')) {
       try {
-        const apiUrl = new URL('/api/internal/check-content-status', request.url);
-        apiUrl.searchParams.set('type', type.replace(/s$/, '')); // topics -> topic
-        apiUrl.searchParams.set('slug', slug);
+        // Use localhost to avoid going through Cloudflare
+        const port = process.env.PORT || '3000';
+        const apiUrl = `http://localhost:${port}/api/internal/check-content-status?type=${type.replace(/s$/, '')}&slug=${encodeURIComponent(slug)}`;
         
         const response = await fetch(apiUrl, { 
           headers: { 'x-internal': 'true' },
-          next: { revalidate: 60 } // Cache for 60 seconds
         });
         
         if (response.ok) {
