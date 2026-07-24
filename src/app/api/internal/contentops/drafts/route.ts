@@ -1754,6 +1754,44 @@ export async function POST(request: NextRequest) {
       }
       
       // For other content types, fall through to generic draft
+      if (contentType === 'guide') {
+        const content = data.content || {};
+        const body = content.body || content.body || data.body || `# ${title}\n\n${data.excerpt || data.summary || ''}`;
+        
+        const guide = await prisma.guide.create({
+          data: {
+            title,
+            slug,
+            summary: data.excerpt || data.summary || '',
+            body: body,
+            category: content.category || 'general',
+            tags: content.seo?.keywords || data.tags || [],
+            relatedTools: content.relatedTools || [],
+            relatedTopics: content.relatedTopics || [],
+            relatedChecklists: content.relatedChecklists || [],
+            relatedGuides: content.relatedGuides || [],
+            status: 'draft',
+            seoTitle: content.seo?.title || data.seoTitle || title,
+            seoDescription: content.seo?.description || data.seoDescription || '',
+            metadataJson: {
+              taskId: data.taskId,
+              contentType: 'guide',
+              source: 'contentops-bridge',
+              originalContent: content,
+            },
+          },
+        });
+        
+        return NextResponse.json({
+          id: guide.id,
+          title: guide.title,
+          slug: guide.slug,
+          contentType: 'guide',
+          state: 'DRAFT',
+          createdAt: guide.createdAt.toISOString(),
+        }, { status: 201 });
+      }
+      
       return NextResponse.json(
         { error: `Content type "${contentType}" not yet supported for backend draft`, code: 'UNSUPPORTED_CONTENT_TYPE' },
         { status: 400 }

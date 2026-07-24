@@ -71,7 +71,10 @@ async function callStagingHelper(action: string, payload: any): Promise<any> {
       }
       
       try {
-        const result = JSON.parse(stdout);
+        // Extract JSON from stdout — dotenv banner may precede the actual JSON
+        const lines = stdout.trim().split('\n');
+        const jsonLine = lines.findLast(line => line.trim().startsWith('{')) || stdout;
+        const result = JSON.parse(jsonLine);
         // Unwrap the bridge-local-helper response format
         // It returns { ok, status, data, error }
         // We need to extract data and map id to draftId

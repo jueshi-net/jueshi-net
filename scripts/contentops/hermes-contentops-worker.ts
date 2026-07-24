@@ -388,14 +388,28 @@ async function processJob(jobPath: string): Promise<boolean> {
           normalizerRemainingBlockingIssues: 1,
         };
       } else {
-        // Normal smoke test - return success
-        result = {
-          success: true,
-          contentType: task.contentType,
-          title: `Smoke Test: ${task.normalizedTitle || 'Internal Runtime Test'}`,
-          slug: `smoke-test-${task.id}`,
-          summary: 'Deterministic fixture for smoke testing the ContentOps runtime path.',
-          content: {
+        // Normal smoke test - return success with type-appropriate content
+        const contentType = task.contentType || 'guide';
+        let content: any;
+        
+        if (contentType === 'guide') {
+          content = {
+            body: `# Acceptance Test Guide\n\nThis is a deterministic fixture for acceptance testing.\n\n## Section 1\n\nTest content for guide body.\n\n## Section 2\n\nMore test content.`,
+            audience: 'test-users',
+            steps: [{ title: 'Step 1', description: 'Test step' }],
+            pitfalls: [{ title: 'Pitfall 1', description: 'Test pitfall' }],
+          };
+        } else if (contentType === 'checklist') {
+          content = {
+            groups: [{
+              name: 'Test Group',
+              items: [{ title: 'Item 1', description: 'Test item', required: true }],
+            }],
+            pitfalls: [{ title: 'Pitfall 1', description: 'Test pitfall' }],
+          };
+        } else {
+          // topic
+          content = {
             hero: 'Smoke Test Content',
             subtopics: ['Topic 1', 'Topic 2'],
             relatedTools: [],
@@ -404,12 +418,21 @@ async function processJob(jobPath: string): Promise<boolean> {
             relatedResources: [],
             cta: 'Test CTA',
             blockConfiguration: [],
-          },
+          };
+        }
+        
+        result = {
+          success: true,
+          contentType,
+          title: `Acceptance Test: ${contentType} - ${task.normalizedTitle || 'Internal Runtime Test'}`,
+          slug: `acceptance-${contentType}-${task.id}`,
+          summary: 'Deterministic fixture for acceptance testing the ContentOps runtime path.',
+          content,
           faq: [],
-          seo: { title: 'Smoke Test', description: 'Smoke test', keywords: [] },
+          seo: { title: `Acceptance Test ${contentType}`, description: 'Acceptance test', keywords: [] },
           geo: { country: 'Test', city: 'Test' },
           structuredData: {},
-          hermesRunId: 'smoke-test-fixture',
+          hermesRunId: 'acceptance-test-fixture',
           latencyMs: 50,
           contractValidationPassed: true,
           normalizerFixedCount: 0,
