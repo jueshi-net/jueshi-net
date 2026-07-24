@@ -65,7 +65,7 @@ async function createAcceptanceBatch() {
       contentType: task.contentType,
       rawInput: task.topic,
       topic: task.topic,
-      executionMode: 'draft_only',
+      executionMode: 'review_required',
       targetEnvironment: 'staging',
       source: 'internal_runtime_acceptance',
       provider: 'deterministic_fixture',
