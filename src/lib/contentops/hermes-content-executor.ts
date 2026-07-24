@@ -84,7 +84,7 @@ async function callHermesCLI(prompt: string): Promise<{ content: string; latency
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     
-    const args = ['chat', '-q', prompt, '-Q', '-m', 'qwen3.7-plus', '-t', 'none', '--max-turns', '1'];
+    const args = ['chat', '-q', prompt, '-Q', '-m', 'glm-5.2', '-t', 'none', '--max-turns', '1'];
     
     const child = spawn(HERMES_CLI_PATH, args, {
       cwd: HERMES_WORKING_DIR,
@@ -112,7 +112,9 @@ async function callHermesCLI(prompt: string): Promise<{ content: string; latency
       clearTimeout(timeout);
       
       if (code !== 0) {
-        reject(new Error(`HERMES_CLI_EXIT_${code}: ${stderr.substring(0, 500)}`));
+        const errOut = stdout.substring(0, 500);
+        const errErr = stderr.substring(0, 500);
+        reject(new Error(`HERMES_CLI_EXIT_${code}: stdout=${errOut} stderr=${errErr}`));
         return;
       }
       
