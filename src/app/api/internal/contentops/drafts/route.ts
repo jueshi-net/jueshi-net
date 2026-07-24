@@ -1117,6 +1117,42 @@ export async function POST(request: NextRequest) {
               internalLinkCount: contentOps.internalLinks?.length || 0,
               sourceFactCount: contentOps.sourceFacts?.length || 0,
             };
+          } else {
+            // Try Topic
+            const topic = await prisma.topic.findUnique({
+              where: { id: contentId },
+              select: {
+                id: true,
+                slug: true,
+                title: true,
+                status: true,
+                publishedAt: true,
+                seoTitle: true,
+                seoDescription: true,
+                canonicalUrl: true,
+                metadataJson: true,
+              }
+            });
+            
+            if (topic) {
+              const metadata = topic.metadataJson as any || {};
+              const contentOps = metadata.contentOps || {};
+              
+              content = {
+                id: topic.id,
+                type: 'topic',
+                status: topic.status,
+                publishedAt: topic.publishedAt?.toISOString() || null,
+                slug: topic.slug,
+                subtopicCount: metadata.subtopicCount || 0,
+                faqCount: contentOps.faq?.length || 0,
+                seoPresent: !!(topic.seoTitle || topic.seoDescription),
+                canonicalPresent: !!topic.canonicalUrl,
+                jsonLdPresent: !!contentOps.structuredData,
+                internalLinkCount: contentOps.internalLinks?.length || 0,
+                sourceFactCount: contentOps.sourceFacts?.length || 0,
+              };
+            }
           }
         }
       }
