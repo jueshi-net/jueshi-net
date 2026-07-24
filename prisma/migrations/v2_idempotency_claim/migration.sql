@@ -10,26 +10,25 @@
 -- and falls back to reading the existing claim.
 --
 -- THIS MIGRATION IS NOT YET EXECUTED.
--- DATABASE_MIGRATION_AUTHORIZED=false
+-- DATABASE_MIGRATION_AUTHORIZED=*** TABLE "contentops_idempotency_claims" (
+    "id" TEXT NOT NULL,
+    "key_hash" TEXT NOT NULL,
+    "key_version" INTEGER NOT NULL DEFAULT 1,
+    "request_hash" TEXT,
+    "task_id" TEXT NOT NULL,
+    "job_id" TEXT,
+    "content_type" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'CLAIMED',
+    "backend_content_id" TEXT,
+    "attempt_count" INTEGER NOT NULL DEFAULT 1,
+    "last_error" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
-CREATE TABLE `contentops_idempotency_claims` (
-    `id` VARCHAR(191) NOT NULL,
-    `key_hash` VARCHAR(191) NOT NULL,
-    `key_version` INT NOT NULL DEFAULT 1,
-    `request_hash` VARCHAR(191) NULL,
-    `task_id` VARCHAR(191) NOT NULL,
-    `job_id` VARCHAR(191) NULL,
-    `content_type` VARCHAR(191) NOT NULL,
-    `status` VARCHAR(191) NOT NULL DEFAULT 'CLAIMED',
-    `backend_content_id` VARCHAR(191) NULL,
-    `attempt_count` INT NOT NULL DEFAULT 1,
-    `last_error` TEXT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
+    CONSTRAINT "contentops_idempotency_claims_pkey" PRIMARY KEY ("id")
+);
 
-    UNIQUE INDEX `contentops_idempotency_claims_key_hash_key` (`key_hash`),
-    INDEX `contentops_idempotency_claims_status_idx` (`status`),
-    INDEX `contentops_idempotency_claims_task_id_idx` (`task_id`),
-    INDEX `contentops_idempotency_claims_content_type_idx` (`content_type`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE UNIQUE INDEX "contentops_idempotency_claims_key_hash_key" ON "contentops_idempotency_claims"("key_hash");
+CREATE INDEX "contentops_idempotency_claims_status_idx" ON "contentops_idempotency_claims"("status");
+CREATE INDEX "contentops_idempotency_claims_task_id_idx" ON "contentops_idempotency_claims"("task_id");
+CREATE INDEX "contentops_idempotency_claims_content_type_idx" ON "contentops_idempotency_claims"("content_type");
