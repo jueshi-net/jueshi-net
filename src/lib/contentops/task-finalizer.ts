@@ -94,8 +94,11 @@ async function verifyBackendContentExists(
       contentId: backendContentId
     });
     
+    // Base64 encode to avoid shell escaping issues
+    const base64Input = Buffer.from(queryInput).toString('base64');
+    
     const stagingWorkDir = process.env.STAGING_WORK_DIR || '/home/deploy/xixiong-saas-staging';
-    const checkCmd = `ssh ${stagingHost} "cd ${stagingWorkDir} && echo '${queryInput}' | npx tsx ${helperPath}"`;
+    const checkCmd = `ssh ${stagingHost} "cd ${stagingWorkDir} && echo '${base64Input}' | base64 -d | npx tsx ${helperPath}"`;
     const result = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 });
     
     // Extract JSON from output — dotenv banner may precede the actual JSON
