@@ -98,7 +98,10 @@ async function verifyBackendContentExists(
     const checkCmd = `ssh ${stagingHost} "cd ${stagingWorkDir} && echo '${queryInput}' | npx tsx ${helperPath}"`;
     const result = execSync(checkCmd, { encoding: 'utf-8', timeout: 15000 });
     
-    const parsed = JSON.parse(result);
+    // Extract JSON from output — dotenv banner may precede the actual JSON
+    const lines = result.trim().split('\n');
+    const jsonLine = lines.findLast((line: string) => line.trim().startsWith('{')) || result;
+    const parsed = JSON.parse(jsonLine);
     
     // Check if content exists in the response
     if (parsed.ok && parsed.data) {
