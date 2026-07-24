@@ -9,8 +9,9 @@
 -- only one succeeds; the other gets a unique constraint violation (P2002)
 -- and falls back to reading the existing claim.
 --
--- THIS MIGRATION IS NOT YET EXECUTED.
--- DATABASE_MIGRATION_AUTHORIZED=*** TABLE "contentops_idempotency_claims" (
+-- Migration not yet executed. Database migration authorization pending.
+
+CREATE TABLE "contentops_idempotency_claims" (
     "id" TEXT NOT NULL,
     "key_hash" TEXT NOT NULL,
     "key_version" INTEGER NOT NULL DEFAULT 1,
