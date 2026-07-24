@@ -487,7 +487,8 @@ async function processJob(jobPath: string): Promise<boolean> {
     }
     
     // Check if normalizer has remaining blocking issues (skip for draft_only mode)
-    if (result.normalizerRemainingBlockingIssues > 0 && task.executionMode !== 'draft_only') {
+    // Also skip when contract validation already passed (post-enrichment errors are 0)
+    if (result.normalizerRemainingBlockingIssues > 0 && !result.contractValidationPassed && task.executionMode !== 'draft_only') {
       throw new Error('NORMALIZER_BLOCKING_ISSUES: ' + result.normalizerRemainingBlockingIssues);
     }
     

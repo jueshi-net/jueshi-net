@@ -226,9 +226,9 @@ export class HermesContentExecutor implements ContentExecutor {
       
       const contractErrors = [...structureValidation.errors, ...qualityValidation.errors];
       const contractWarnings = [...structureValidation.warnings, ...qualityValidation.warnings];
-      // For draft mode, only check contract errors, not normalizer remaining issues
-      const isDraftMode = finalContent.executionMode === 'draft_only';
-      const contractValidationPassed = contractErrors.length === 0 && (isDraftMode || cleaningResult.remainingCount === 0);
+      // Contract validation: use post-enrichment errors only (pre-enrichment remainingCount
+      // includes system-owned fields the enricher hasn't added yet - false positives)
+      const contractValidationPassed = contractErrors.length === 0;
       
       // Build result
       const result: StructuredContentResult = {
