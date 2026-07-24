@@ -57,7 +57,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (previewMode) {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-      notFound();
+      // Return empty metadata - page component will call notFound()
+      return {};
     }
   }
 
@@ -121,7 +122,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   // Fallback to LandingPage
   const page = await getChecklist(slug);
-  if (!page) notFound();
+  if (!page) {
+    // Return empty metadata - page component will call notFound()
+    return {};
+  }
 
   return {
     title: page.seoTitle || page.title,

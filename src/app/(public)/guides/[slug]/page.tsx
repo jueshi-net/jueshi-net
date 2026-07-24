@@ -85,7 +85,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (previewMode) {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-      notFound();
+      // Return empty metadata - page component will call notFound()
+      return {};
     }
   }
 
@@ -115,7 +116,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   // 2. Fallback to Article model
   const article = await prisma.article.findUnique({ where: { slug } });
-  if (!article || article.status !== "published") notFound();
+  if (!article || article.status !== "published") {
+    // Return empty metadata - page component will call notFound()
+    return {};
+  }
 
   const desc = article.seoDescription || article.excerpt || article.content.replace(/<[^>]*>/g, "").slice(0, 150);
 

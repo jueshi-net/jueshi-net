@@ -74,13 +74,15 @@ export async function generateMetadata({
   if (previewMode) {
     const isAdminUser = await isAdmin();
     if (!isAdminUser) {
-      notFound();
+      // Return empty metadata - page component will call notFound()
+      return {};
     }
   }
   const topic = await getTopicBySlug(slug);
 
   if (!topic || (!previewMode && topic.status !== "published")) {
-    notFound();
+    // Return empty metadata - page component will call notFound()
+    return {};
   }
 
   const title = topic.seoTitle || topic.title;
