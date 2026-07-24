@@ -235,7 +235,7 @@ function emitFailureNotification(job: any, error: string) {
     
     // Extract source and determine transport
     const source = job.source || job.task?.source;
-    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    const transport = (source === 'internal_runtime_smoke' || source === 'internal_runtime_acceptance') ? 'internal_test' : 'telegram';
     
     // For internal smoke tests, chatId is null; for telegram, chatId is required
     const chatId = transport === 'internal_test' ? null : (job.chatId || job.task?.chatId);
@@ -489,7 +489,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     
     // Extract source and determine transport
     const source = job.source || job.task?.source;
-    const transport = source === 'internal_runtime_smoke' ? 'internal_test' : 'telegram';
+    const transport = (source === 'internal_runtime_smoke' || source === 'internal_runtime_acceptance') ? 'internal_test' : 'telegram';
     
     // For internal smoke tests, chatId can be null; for telegram, chatId is required
     const chatId = transport === 'internal_test' ? null : (job.task?.chatId || job.chatId);
