@@ -1575,26 +1575,34 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      // === IDEMPOTENCY: Compute request hash ===
+      // === IDEMPOTENCY: Compute request hash from full business payload ===
+      // Includes all fields that affect the final draft.
+      // Volatile fields (taskId, jobId, slug, timestamps, keyHash) are
+      // automatically excluded by computeRequestHash's stripVolatileFields.
       const requestPayload = {
-        title: data.title,
         contentType,
-        taskId,
-        idempotencyKeyHash: keyHash,
+        title: data.title,
+        executionMode: data.executionMode,
+        targetEnvironment: data.targetEnvironment,
+        source: data.source,
+        provider: data.provider,
+        content: data.content,
+        excerpt: data.excerpt,
+        summary: data.summary,
+        body: data.body,
+        tags: data.tags,
+        seoTitle: data.seoTitle,
+        seoDescription: data.seoDescription,
       };
       const requestHash = computeRequestHash(requestPayload);
       
-      // === IDEMPOTENCY: Check existing claim ===
-      // Try to find an existing claim by keyHash
+      // === IDEMPOTENCY: Check existing claim (outside transaction) ===
       let existingClaim: any = null;
       try {
         existingClaim = await prisma.contentOpsIdempotencyClaim.findUnique({
           where: { keyHash: keyHash || '__nonexistent__' },
         });
       } catch {
-        // Table might not exist yet (migration not run) - skip claim check
-        // This is acceptable: the local file-system claim still provides
-        // first-layer idempotency, and the backend will just create content
         console.log('[ContentOps Bridge] Idempotency claim table not available, skipping DB claim check');
       }
       
@@ -1610,9 +1618,19 @@ export async function POST(request: NextRequest) {
           }, { status: 409 });
         }
         
-        // Claim exists with same request hash
+        // Check contentType conflict
+        if (existingClaim.contentType !== contentType) {
+          return NextResponse.json({
+            ok: false,
+            error: {
+              code: 'IDEMPOTENCY_KEY_REUSE_CONFLICT',
+              message: 'Same idempotency key used with different content type',
+            },
+          }, { status: 409 });
+        }
+        
+        // Claim exists with same request hash and content type
         if (existingClaim.status === 'CREATED' || existingClaim.status === 'COMPLETED') {
-          // Content already created - return existing
           return NextResponse.json({
             id: existingClaim.backendContentId,
             title: title,
@@ -1624,7 +1642,6 @@ export async function POST(request: NextRequest) {
         }
         
         if (existingClaim.status === 'PROCESSING') {
-          // Another request is processing - return retryable
           return NextResponse.json({
             ok: false,
             error: {
@@ -1643,10 +1660,14 @@ export async function POST(request: NextRequest) {
         .replace(/^-+|-+$/g, '')
         + '-' + Date.now().toString(36);
       
-      // === IDEMPOTENCY: Create claim in transaction ===
-      const claimResult = await prisma.$transaction(async (tx: any) => {
-          // Try to create the claim (atomic - fails if keyHash already exists)
-          const claim = await tx.contentOpsIdempotencyClaim.create({
+      // === IDEMPOTENCY: Create claim + content in SAME transaction ===
+      // Scheme A: If content creation fails, transaction rolls back
+      // (no DB claim remains). Local file claim marks FAILED for retry.
+      // P2002 is caught outside the transaction to read the winner.
+      try {
+        const result = await prisma.$transaction(async (tx: any) => {
+          // 1. Create claim with status PROCESSING (atomic - P2002 if exists)
+          await tx.contentOpsIdempotencyClaim.create({
             data: {
               keyHash: keyHash || `fallback_${taskId}`,
               keyVersion,
@@ -1656,279 +1677,230 @@ export async function POST(request: NextRequest) {
               contentType,
               status: 'PROCESSING',
             },
-          }).catch((err: any) => {
-            // If unique constraint violation, another request won
-            if (err.code === 'P2002') {
-              return null;
-            }
-            throw err;
           });
-          
-          if (!claim) {
-            // Lost the race - read the existing claim
-            const winner = await tx.contentOpsIdempotencyClaim.findUnique({
+
+          // 2. Create content based on type (inside same transaction)
+          let contentId: string;
+          let responseData: Record<string, unknown> = {};
+
+          if (contentType === 'checklist') {
+            const content = data.content || {};
+            const groups = content.groups || [];
+            const steps = groups.flatMap((group: any, groupIndex: number) => {
+              const items = group.items || [];
+              return items.map((item: any, itemIndex: number) => ({
+                title: item.title || '',
+                description: item.description || '',
+                completed: false,
+                optional: !item.required,
+                metadata: {
+                  group: group.name || group.title || `Group ${groupIndex + 1}`,
+                  groupDescription: group.description || '',
+                  completionCondition: item.completionCondition || '',
+                  riskNote: item.riskNote || '',
+                  sortOrder: item.sortOrder ?? (groupIndex * 100 + itemIndex),
+                }
+              }));
+            });
+
+            const checklist = await tx.checklist.create({
+              data: {
+                title,
+                slug,
+                summary: content.summary || content.description || '',
+                steps: steps as Prisma.InputJsonValue,
+                status: 'draft',
+                seoTitle: content.seoTitle || title,
+                seoDescription: content.seoDescription || '',
+                metadataJson: {
+                  taskId: data.taskId,
+                  contentType: 'checklist',
+                  source: 'contentops-bridge',
+                  originalContent: content,
+                  groupCount: groups.length,
+                  itemCount: steps.length,
+                },
+              },
+            });
+            contentId = checklist.id;
+            responseData = { groupCount: groups.length, itemCount: steps.length };
+
+          } else if (contentType === 'topic') {
+            const content = data.content || {};
+            const topicItems: any[] = [];
+            const subtopics = content.subtopics || [];
+            for (let i = 0; i < subtopics.length; i++) {
+              const sub = subtopics[i];
+              topicItems.push({
+                name: sub.title || '',
+                description: sub.description || '',
+                category: sub.type || 'resource',
+                officialUrl: sub.url || '',
+                sortOrder: i,
+              });
+            }
+            const topicSections: any[] = [];
+            let sectionOrder = 0;
+            if (content.hero) {
+              topicSections.push({
+                type: 'intro', title: content.hero.headline || title,
+                content: content.hero.description || content.summary || '',
+                sortOrder: sectionOrder++,
+              });
+            }
+            if (content.faq && content.faq.length > 0) {
+              topicSections.push({
+                type: 'faq', title: '常见问题',
+                content: JSON.stringify(content.faq), sortOrder: sectionOrder++,
+              });
+            }
+            if (content.cta) {
+              topicSections.push({
+                type: 'cta', title: content.cta.text || '了解更多',
+                content: content.cta.url || '', sortOrder: sectionOrder++,
+              });
+            }
+            const metadataJson = {
+              taskId: data.taskId, contentType: 'topic', source: 'contentops-bridge',
+              originalContent: content, subtopicCount: subtopics.length,
+              faqCount: content.faq?.length || 0, sourceFactCount: content.sources?.length || 0,
+              internalLinkCount: content.internalLinks?.length || 0,
+              blockConfiguration: content.blockConfiguration || {
+                hero: !!content.hero,
+                tools: (content.relatedTools || []).length > 0,
+                guides: (content.relatedGuides || []).length > 0,
+                checklists: (content.relatedChecklists || []).length > 0,
+                officialResources: (content.relatedResources || []).length > 0,
+                faq: (content.faq || []).length > 0,
+                internalLinks: (content.internalLinks || []).length > 0,
+              },
+            };
+
+            const topic = await tx.topic.create({
+              data: {
+                title, slug, subtitle: content.hero?.subheadline || '',
+                summary: content.summary || '', status: 'draft',
+                templateType: 'rating_list', heroBadges: content.heroBadges || [],
+                suitableFor: content.audience ? [content.audience] : [],
+                tags: content.seo?.keywords || [],
+                seoTitle: content.seo?.title || content.seoTitle || title,
+                seoDescription: content.seo?.description || content.seoDescription || '',
+                metadataJson: metadataJson as Prisma.InputJsonValue,
+                items: { create: topicItems.map(item => ({
+                  name: item.name, description: item.description,
+                  category: item.category, officialUrl: item.officialUrl,
+                  sortOrder: item.sortOrder,
+                })) },
+                sections: { create: topicSections.map(section => ({
+                  type: section.type, title: section.title,
+                  content: section.content, sortOrder: section.sortOrder,
+                })) },
+              },
+              include: { items: true, sections: true },
+            });
+            contentId = topic.id;
+            responseData = {
+              subtopicCount: topic.items.length, sectionCount: topic.sections.length,
+              faqCount: content.faq?.length || 0, sourceFactCount: content.sources?.length || 0,
+              internalLinkCount: content.internalLinks?.length || 0,
+            };
+
+          } else if (contentType === 'guide') {
+            const content = data.content || {};
+            const body = content.body || data.body || `# ${title}\n\n${data.excerpt || data.summary || ''}`;
+
+            const guide = await tx.guide.create({
+              data: {
+                title, slug,
+                summary: data.excerpt || data.summary || '',
+                body: body, category: content.category || 'general',
+                tags: content.seo?.keywords || data.tags || [],
+                relatedTools: content.relatedTools || [],
+                relatedTopics: content.relatedTopics || [],
+                relatedChecklists: content.relatedChecklists || [],
+                relatedGuides: content.relatedGuides || [],
+                status: 'draft',
+                seoTitle: content.seo?.title || data.seoTitle || title,
+                seoDescription: content.seo?.description || data.seoDescription || '',
+                metadataJson: {
+                  taskId: data.taskId, contentType: 'guide',
+                  source: 'contentops-bridge', originalContent: content,
+                },
+              },
+            });
+            contentId = guide.id;
+
+          } else {
+            throw new Error(`UNSUPPORTED_CONTENT_TYPE: ${contentType}`);
+          }
+
+          // 3. Update claim to CREATED with real backendContentId
+          // This happens BEFORE any return - inside the transaction
+          await tx.contentOpsIdempotencyClaim.update({
+            where: { keyHash: keyHash || `fallback_${taskId}` },
+            data: {
+              status: 'CREATED',
+              backendContentId: contentId,
+            },
+          });
+
+          // 4. Return response data (transaction will commit)
+          return { contentId, ...responseData };
+        });
+
+        // Transaction committed successfully - return 201
+        return NextResponse.json({
+          id: result.contentId,
+          title,
+          slug,
+          contentType,
+          state: 'DRAFT',
+          isReplay: false,
+          createdAt: new Date().toISOString(),
+          ...result,
+        }, { status: 201 });
+
+      } catch (error: any) {
+        // === P2002: Another request won the race ===
+        // Transaction rolled back. Read winner OUTSIDE the failed transaction.
+        if (error?.code === 'P2002') {
+          let winner: any = null;
+          try {
+            winner = await prisma.contentOpsIdempotencyClaim.findUnique({
               where: { keyHash: keyHash || `fallback_${taskId}` },
             });
-            if (winner && (winner.status === 'CREATED' || winner.status === 'COMPLETED')) {
-              return { replay: true, contentId: winner.backendContentId };
-            }
-            throw new Error('IDEMPOTENCY_RACE_LOST_AND_WINNER_NOT_READY');
-          }
-          
-          // Won the claim - create the content
-          // (Content creation code continues below based on contentType)
-          return { claim, replay: false };
-        });
-        
-        if (claimResult.replay) {
-          // Content already existed - return it
-          return NextResponse.json({
-            id: claimResult.contentId,
-            title,
-            contentType,
-            state: 'DRAFT',
-            isReplay: true,
-          }, { status: 200 });
-        }
-        
-        // Now create the actual content (outside transaction for complex creates)
-        // Claim is already in PROCESSING state from the transaction above
+          } catch {}
 
-      if (contentType === 'checklist') {
-        // Map checklist content to Checklist model
-        const content = data.content || {};
-        const groups = content.groups || [];
-        
-        // Convert groups/items to steps format
-        const steps = groups.flatMap((group: any, groupIndex: number) => {
-          const items = group.items || [];
-          return items.map((item: any, itemIndex: number) => ({
-            title: item.title || '',
-            description: item.description || '',
-            completed: false,
-            optional: !item.required,
-            metadata: {
-              group: group.name || group.title || `Group ${groupIndex + 1}`,
-              groupDescription: group.description || '',
-              completionCondition: item.completionCondition || '',
-              riskNote: item.riskNote || '',
-              sortOrder: item.sortOrder ?? (groupIndex * 100 + itemIndex),
-            }
-          }));
-        });
-        
-        const checklist = await prisma.checklist.create({
-          data: {
-            title,
-            slug,
-            summary: content.summary || content.description || '',
-            steps: steps as Prisma.InputJsonValue,
-            status: 'draft',
-            seoTitle: content.seoTitle || title,
-            seoDescription: content.seoDescription || '',
-            metadataJson: {
-              taskId: data.taskId,
-              contentType: 'checklist',
-              source: 'contentops-bridge',
-              originalContent: content,
-              groupCount: groups.length,
-              itemCount: steps.length,
+          if (winner && (winner.status === 'CREATED' || winner.status === 'COMPLETED')) {
+            return NextResponse.json({
+              id: winner.backendContentId,
+              title, contentType,
+              state: 'DRAFT',
+              isReplay: true,
+              createdAt: winner.createdAt.toISOString(),
+            }, { status: 200 });
+          }
+
+          // Winner still PROCESSING - return retryable
+          return NextResponse.json({
+            ok: false,
+            error: {
+              code: 'IDEMPOTENCY_IN_PROGRESS',
+              message: 'Content creation in progress for this key',
             },
-          },
-        });
-        
-        return NextResponse.json({
-          id: checklist.id,
-          title: checklist.title,
-          slug: checklist.slug,
-          contentType: 'checklist',
-          state: 'DRAFT',
-          groupCount: groups.length,
-          itemCount: steps.length,
-          createdAt: checklist.createdAt.toISOString(),
-          isReplay: false,
-        }, { status: 201 });
+            retryable: true,
+          }, { status: 409 });
+        }
+
+        // === Other error: content creation failed ===
+        // Scheme A: Transaction rolled back, no DB claim remains.
+        // Local file claim is marked FAILED by the worker's catch block.
+        console.error('[ContentOps Bridge] Content creation failed:', error);
+        return NextResponse.json(
+          { error: 'Content creation failed', code: 'CREATE_BACKEND_DRAFT_FAILED' },
+          { status: 500 }
+        );
       }
-      
-      if (contentType === 'topic') {
-        // Map topic content to Topic model
-        const content = data.content || {};
-        
-        // Build items from subtopics/related content
-        const topicItems = [];
-        const subtopics = content.subtopics || [];
-        for (let i = 0; i < subtopics.length; i++) {
-          const sub = subtopics[i];
-          topicItems.push({
-            name: sub.title || '',
-            description: sub.description || '',
-            category: sub.type || 'resource',
-            officialUrl: sub.url || '',
-            sortOrder: i,
-          });
-        }
-        
-        // Build sections from hero, FAQ, CTA
-        const topicSections = [];
-        let sectionOrder = 0;
-        
-        if (content.hero) {
-          topicSections.push({
-            type: 'intro',
-            title: content.hero.headline || title,
-            content: content.hero.description || content.summary || '',
-            sortOrder: sectionOrder++,
-          });
-        }
-        
-        if (content.faq && content.faq.length > 0) {
-          topicSections.push({
-            type: 'faq',
-            title: '常见问题',
-            content: JSON.stringify(content.faq),
-            sortOrder: sectionOrder++,
-          });
-        }
-        
-        if (content.cta) {
-          topicSections.push({
-            type: 'cta',
-            title: content.cta.text || '了解更多',
-            content: content.cta.url || '',
-            sortOrder: sectionOrder++,
-          });
-        }
-        
-        // Build metadata
-        const metadataJson = {
-          taskId: data.taskId,
-          contentType: 'topic',
-          source: 'contentops-bridge',
-          originalContent: content,
-          subtopicCount: subtopics.length,
-          faqCount: content.faq?.length || 0,
-          sourceFactCount: content.sources?.length || 0,
-          internalLinkCount: content.internalLinks?.length || 0,
-          blockConfiguration: content.blockConfiguration || {
-            hero: !!content.hero,
-            tools: (content.relatedTools || []).length > 0,
-            guides: (content.relatedGuides || []).length > 0,
-            checklists: (content.relatedChecklists || []).length > 0,
-            officialResources: (content.relatedResources || []).length > 0,
-            faq: (content.faq || []).length > 0,
-            internalLinks: (content.internalLinks || []).length > 0,
-          },
-        };
-        
-        const topic = await prisma.topic.create({
-          data: {
-            title,
-            slug,
-            subtitle: content.hero?.subheadline || '',
-            summary: content.summary || '',
-            status: 'draft',
-            templateType: 'rating_list',
-            heroBadges: content.heroBadges || [],
-            suitableFor: content.audience ? [content.audience] : [],
-            tags: content.seo?.keywords || [],
-            seoTitle: content.seo?.title || content.seoTitle || title,
-            seoDescription: content.seo?.description || content.seoDescription || '',
-            metadataJson: metadataJson as Prisma.InputJsonValue,
-            items: {
-              create: topicItems.map(item => ({
-                name: item.name,
-                description: item.description,
-                category: item.category,
-                officialUrl: item.officialUrl,
-                sortOrder: item.sortOrder,
-              })),
-            },
-            sections: {
-              create: topicSections.map(section => ({
-                type: section.type,
-                title: section.title,
-                content: section.content,
-                sortOrder: section.sortOrder,
-              })),
-            },
-          },
-          include: {
-            items: true,
-            sections: true,
-          },
-        });
-        
-        return NextResponse.json({
-          id: topic.id,
-          title: topic.title,
-          slug: topic.slug,
-          contentType: 'topic',
-          state: 'DRAFT',
-          subtopicCount: topic.items.length,
-          sectionCount: topic.sections.length,
-          faqCount: content.faq?.length || 0,
-          sourceFactCount: content.sources?.length || 0,
-          internalLinkCount: content.internalLinks?.length || 0,
-          createdAt: topic.createdAt.toISOString(),
-        }, { status: 201 });
-      }
-      
-      // For other content types, fall through to generic draft
-      if (contentType === 'guide') {
-        const content = data.content || {};
-        const body = content.body || content.body || data.body || `# ${title}\n\n${data.excerpt || data.summary || ''}`;
-        
-        const guide = await prisma.guide.create({
-          data: {
-            title,
-            slug,
-            summary: data.excerpt || data.summary || '',
-            body: body,
-            category: content.category || 'general',
-            tags: content.seo?.keywords || data.tags || [],
-            relatedTools: content.relatedTools || [],
-            relatedTopics: content.relatedTopics || [],
-            relatedChecklists: content.relatedChecklists || [],
-            relatedGuides: content.relatedGuides || [],
-            status: 'draft',
-            seoTitle: content.seo?.title || data.seoTitle || title,
-            seoDescription: content.seo?.description || data.seoDescription || '',
-            metadataJson: {
-              taskId: data.taskId,
-              contentType: 'guide',
-              source: 'contentops-bridge',
-              originalContent: content,
-            },
-          },
-        });
-        
-        return NextResponse.json({
-          id: guide.id,
-          title: guide.title,
-          slug: guide.slug,
-          contentType: 'guide',
-          state: 'DRAFT',
-          createdAt: guide.createdAt.toISOString(),
-          isReplay: false,
-        }, { status: 201 });
-      }
-      
-      // Update claim to CREATED after successful content creation
-      if (keyHash) {
-        try {
-          await prisma.contentOpsIdempotencyClaim.update({
-            where: { keyHash },
-            data: { status: 'CREATED' },
-          });
-        } catch {
-          // Non-critical: claim table may not exist yet
-        }
-      }
-      
-      return NextResponse.json(
-        { error: `Content type "${contentType}" not yet supported for backend draft`, code: 'UNSUPPORTED_CONTENT_TYPE' },
-        { status: 400 }
-      );
     }
 
     // Default: create new draft

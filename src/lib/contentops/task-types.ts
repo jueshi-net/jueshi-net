@@ -42,8 +42,9 @@ export type TaskStatus =
   | 'FAILED_ENQUEUE'     // Task created but job enqueue failed (recoverable)
   | 'CANCELLED';         // Cancelled by user
 
-// Re-export ContentType and ExecutionMode from contracts for convenience
-export type { ContentType, ExecutionMode } from './contracts/content-types';
+// Re-export ContentType and ExecutionMode from their respective contract modules
+export type { ContentType } from './contracts/content-types';
+export type { ExecutionMode } from './contracts/execution-modes';
 
 export type TargetEnvironment = 'staging' | 'production';
 
@@ -112,7 +113,6 @@ export interface ContentOpsTask {
 
   // Execution metadata
   executor: 'hermes-agent' | 'external-api';
-  provider?: string;
   model?: string;
   retryCount: number;
   maxRetries: number;

@@ -132,18 +132,111 @@ function hashKey(canonicalValue: string): string {
 }
 
 /**
+ * Recursively serialize a value with stable key ordering.
+ *
+ * - Object keys are sorted at every nesting level.
+ * - Array order is preserved (business order matters).
+ * - undefined values are removed from objects.
+ * - Date values are converted to ISO strings.
+ * - Booleans, numbers, strings, null are passed through.
+ *
+ * This replaces the previous JSON.stringify(payload, Object.keys(payload).sort())
+ * which only sorted top-level keys and could miss nested field changes.
+ */
+function stableSerialize(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(stableSerialize);
+  }
+
+  if (typeof value === 'object') {
+    const sortedKeys = Object.keys(value as Record<string, unknown>).sort();
+    const result: Record<string, unknown> = {};
+    for (const key of sortedKeys) {
+      const childValue = (value as Record<string, unknown>)[key];
+      if (childValue !== undefined) {
+        result[key] = stableSerialize(childValue);
+      }
+    }
+    return result;
+  }
+
+  return value;
+}
+
+/**
+ * Volatile field names that must NEVER be included in requestHash.
+ * These fields change between retries and do not affect the business result.
+ */
+const VOLATILE_FIELDS = new Set([
+  'taskId',
+  'jobId',
+  'idempotencyKeyHash',
+  'idempotencyKey',
+  'idempotencyKeyVersion',
+  'idempotencySource',
+  'slug',
+  'createdAt',
+  'updatedAt',
+  'timestamp',
+  'requestHash',
+]);
+
+/**
+ * Remove volatile fields from a payload object at all nesting levels.
+ * This ensures that retry metadata, timestamps, and generated slugs
+ * do not affect the request hash.
+ */
+function stripVolatileFields(value: unknown): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(stripVolatileFields);
+  }
+
+  if (typeof value === 'object') {
+    const result: Record<string, unknown> = {};
+    for (const [key, childValue] of Object.entries(value as Record<string, unknown>)) {
+      if (!VOLATILE_FIELDS.has(key) && childValue !== undefined) {
+        result[key] = stripVolatileFields(childValue);
+      }
+    }
+    return result;
+  }
+
+  return value;
+}
+
+/**
  * Compute a request hash from the full request payload.
  * This is used to detect key-reuse conflicts (same key, different request body).
  *
  * The request hash is separate from the idempotency key hash:
  * - keyHash identifies the logical operation (same messageId = same key)
  * - requestHash identifies the exact request body (detects accidental key reuse)
+ *
+ * Uses recursive stable serialization:
+ * - All object keys are sorted at every nesting level
+ * - Volatile fields (taskId, jobId, slug, timestamps, etc.) are excluded
+ * - Array order is preserved (business order)
+ * - undefined values are removed
+ * - Dates are converted to ISO strings
  */
 export function computeRequestHash(payload: Record<string, unknown>): string {
-  // Sort keys for deterministic hashing
-  const sortedJson = JSON.stringify(payload, Object.keys(payload).sort());
+  const cleaned = stripVolatileFields(payload);
+  const serialized = stableSerialize(cleaned);
+  const json = JSON.stringify(serialized);
   return crypto
     .createHash('sha256')
-    .update(sortedJson, 'utf-8')
+    .update(json, 'utf-8')
     .digest('hex');
 }
