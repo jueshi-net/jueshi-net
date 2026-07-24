@@ -22,7 +22,7 @@ import * as path from 'path';
 // Load environment variables from .env.local
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env.local') });
 
-const BRIDGE_SECRET=proces...RET;
+const BRIDGE_SECRET = process.env.CONTENTOPS_BRIDGE_SECRET || '';
 const BRIDGE_URL = 'http://127.0.0.1:3001';
 const ENDPOINT = '/api/internal/contentops/drafts';
 
