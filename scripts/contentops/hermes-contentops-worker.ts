@@ -8,8 +8,13 @@
  * V2-MVP: v1.20.42.18.6.21.12.2
  */
 
-import * as fs from 'fs';
+import * as dotenv from 'dotenv';
 import * as path from 'path';
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env.local') });
+
+import * as fs from 'fs';
 import * as os from 'os';
 import { HermesContentExecutor } from '../../src/lib/contentops/hermes-content-executor';
 import { getContentPublishAdapter } from '../../src/lib/contentops/content-publish-adapters';
@@ -339,7 +344,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     });
     
     const isSmokeTest = process.env.CONTENTOPS_SMOKE_TEST_MODE === 'true' || 
-                        (task.source === 'internal_runtime_smoke' && 
+                        ((task.source === 'internal_runtime_smoke' || task.source === 'internal_runtime_acceptance') && 
                          task.provider === 'deterministic_fixture' && 
                          task.internalAuthorized === true);
     
@@ -356,34 +361,61 @@ async function processJob(jobPath: string): Promise<boolean> {
         jobId: job.jobId, 
         source: task.source,
         provider: task.provider,
-        internalAuthorized: task.internalAuthorized
+        internalAuthorized: task.internalAuthorized,
+        forceFailure: job.forceFailure
       });
-      result = {
-        success: true,
-        contentType: task.contentType,
-        title: `Smoke Test: ${task.normalizedTitle || 'Internal Runtime Test'}`,
-        slug: `smoke-test-${task.id}`,
-        summary: 'Deterministic fixture for smoke testing the ContentOps runtime path.',
-        content: {
-          hero: 'Smoke Test Content',
-          subtopics: ['Topic 1', 'Topic 2'],
-          relatedTools: [],
-          relatedGuides: [],
-          relatedChecklists: [],
-          relatedResources: [],
-          cta: 'Test CTA',
-          blockConfiguration: [],
-        },
-        faq: [],
-        seo: { title: 'Smoke Test', description: 'Smoke test', keywords: [] },
-        geo: { country: 'Test', city: 'Test' },
-        structuredData: {},
-        hermesRunId: 'smoke-test-fixture',
-        latencyMs: 50,
-        contractValidationPassed: true,
-        normalizerFixedCount: 0,
-        normalizerRemainingBlockingIssues: 0,
-      };
+      
+      // Check for forced failure trigger
+      if (job.forceFailure === true) {
+        log('info', 'FORCED FAILURE: Deterministic fixture triggered failure', { jobId: job.jobId });
+        result = {
+          success: false,
+          error: 'FORCED_FAILURE: Deterministic fixture explicitly triggered failure for acceptance testing',
+          contentType: task.contentType,
+          title: `Forced Failure Test: ${task.normalizedTitle || 'Acceptance Test'}`,
+          slug: `forced-failure-${task.id}`,
+          summary: 'Deterministic fixture for forced failure acceptance testing.',
+          content: null,
+          faq: [],
+          seo: { title: 'Forced Failure', description: 'Forced failure test', keywords: [] },
+          geo: { country: 'Test', city: 'Test' },
+          structuredData: {},
+          hermesRunId: 'forced-failure-fixture',
+          latencyMs: 50,
+          contractValidationPassed: false,
+          contractErrors: ['FORCED_FAILURE_TRIGGER'],
+          normalizerFixedCount: 0,
+          normalizerRemainingBlockingIssues: 1,
+        };
+      } else {
+        // Normal smoke test - return success
+        result = {
+          success: true,
+          contentType: task.contentType,
+          title: `Smoke Test: ${task.normalizedTitle || 'Internal Runtime Test'}`,
+          slug: `smoke-test-${task.id}`,
+          summary: 'Deterministic fixture for smoke testing the ContentOps runtime path.',
+          content: {
+            hero: 'Smoke Test Content',
+            subtopics: ['Topic 1', 'Topic 2'],
+            relatedTools: [],
+            relatedGuides: [],
+            relatedChecklists: [],
+            relatedResources: [],
+            cta: 'Test CTA',
+            blockConfiguration: [],
+          },
+          faq: [],
+          seo: { title: 'Smoke Test', description: 'Smoke test', keywords: [] },
+          geo: { country: 'Test', city: 'Test' },
+          structuredData: {},
+          hermesRunId: 'smoke-test-fixture',
+          latencyMs: 50,
+          contractValidationPassed: true,
+          normalizerFixedCount: 0,
+          normalizerRemainingBlockingIssues: 0,
+        };
+      }
     } else {
       const executor = new HermesContentExecutor();
       result = await executor.execute(task);
