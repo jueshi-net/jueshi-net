@@ -226,11 +226,11 @@ export class CanonicalTaskService {
         task = (await taskManager.getTask(taskId)) as ContentOpsTask;
         if (!task) {
           // Task was lost but claim exists - create new with same ID
-          task = await taskManager.createTask(enrichedInput);
-          task.id = taskId; // Restore original ID for consistency
+          task = await taskManager.createTask(enrichedInput, taskId);
         }
       } else {
-        task = await taskManager.createTask(enrichedInput);
+        // Pass pre-generated taskId to ensure claim.taskId === task.id === job.jobId
+        task = await taskManager.createTask(enrichedInput, taskId);
       }
       console.log('[CanonicalTaskService] Task ready:', task.id);
     } catch (error) {

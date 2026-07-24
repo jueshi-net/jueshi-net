@@ -303,6 +303,10 @@ async function processJob(jobPath: string): Promise<boolean> {
     return false;
   }
   
+  // Stable reference available across try/catch/finally
+  // Prevents ReferenceError in catch block (V2-IDEMPOTENCY regression fix)
+  let task: ContentOpsTask | null = null;
+  
   try {
     log('info', 'Processing job', { 
       jobId: job.jobId, 
@@ -311,7 +315,7 @@ async function processJob(jobPath: string): Promise<boolean> {
     });
     
     // Convert job to ContentOpsTask
-    const task: ContentOpsTask = {
+    task = {
       id: job.jobId,
       chatId: job.chatId || 'worker',
       messageId: job.messageId || 0,
@@ -589,11 +593,53 @@ async function processJob(jobPath: string): Promise<boolean> {
     
     return true;
   } catch (error: any) {
-    // Mark claim as FAILED
-    if (task?.idempotencyKeyHash) {
-      markFailed(task.idempotencyKeyHash, error.message);
+    // === CRASH-PROOF FAILURE CLEANUP ===
+    // Each step is independently protected so that failure in one
+    // step does not prevent the others from executing.
+    // Primary error is preserved and never overwritten.
+    
+    const primaryErrorMessage = error instanceof Error ? error.message : String(error);
+    const primaryErrorStack = error instanceof Error ? error.stack : undefined;
+    
+    log('error', 'Worker crashed', {
+      error: primaryErrorMessage,
+      stack: primaryErrorStack,
+      jobId: job?.jobId,
+    });
+    
+    // Step 1: Mark local idempotency claim as FAILED
+    try {
+      if (task?.idempotencyKeyHash) {
+        markFailed(task.idempotencyKeyHash, primaryErrorMessage);
+      }
+    } catch (cleanupError: any) {
+      log('error', 'Claim markFailed cleanup failed', {
+        error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+        primaryError: primaryErrorMessage,
+      });
     }
-    moveToFailed(processingPath, error.message);
+    
+    // Step 2: Move job from processing to failed
+    try {
+      moveToFailed(processingPath, primaryErrorMessage);
+    } catch (cleanupError: any) {
+      log('error', 'moveToFailed cleanup failed', {
+        error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+        primaryError: primaryErrorMessage,
+      });
+    }
+    
+    // Step 3: Emit failure terminal notification
+    try {
+      emitFailureNotification(job, primaryErrorMessage);
+    } catch (cleanupError: any) {
+      log('error', 'emitFailureNotification cleanup failed', {
+        error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+        primaryError: primaryErrorMessage,
+      });
+    }
+    
+    // Primary error is preserved - never overwritten by cleanup errors
     return false;
   }
 }

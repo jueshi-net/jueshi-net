@@ -58,8 +58,10 @@ export class TaskManager {
    * The caller (CanonicalTaskService) is responsible for atomic claim checking
    * before calling this method.
    */
-  async createTask(input: CreateTaskInput): Promise<ContentOpsTask> {
-    const taskId = `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+  async createTask(input: CreateTaskInput, preGeneratedTaskId?: string): Promise<ContentOpsTask> {
+    // Use pre-generated taskId if provided (from CanonicalTaskService idempotency claim)
+    // This ensures claim.taskId === task.id === job.jobId
+    const taskId = preGeneratedTaskId || `task_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     
     const task: ContentOpsTask = {
       id: taskId,
