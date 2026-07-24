@@ -134,7 +134,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   };
 }
 
-export const dynamic = "force-dynamic";
+// Removed force-dynamic to allow proper HTTP 404 status code setting
+export const revalidate = 0;
 
 export default async function ChecklistPage({ params, searchParams }: Props) {
   const { slug } = await params;

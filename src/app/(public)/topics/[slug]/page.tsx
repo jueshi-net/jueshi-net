@@ -38,7 +38,8 @@ const RATING_ORDER = ["S", "A", "B", "C", "D"] as const;
 // v1.20.42.18.6.16.6.84.3.21: Removed generateStaticParams to fix
 // "Page changed from static to dynamic at runtime" error caused by
 // await searchParams (preview mode). All topic pages are now dynamic.
-export const dynamic = "force-dynamic";
+// Removed force-dynamic to allow proper HTTP 404 status code setting.
+export const revalidate = 0;
 
 // ===== Data fetching =====
 

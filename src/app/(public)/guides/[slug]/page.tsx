@@ -587,4 +587,5 @@ export default async function ArticlePage({ params, searchParams }: Props) {
   );
 }
 
-export const dynamic = 'force-dynamic';
+// Removed force-dynamic to allow proper HTTP 404 status code setting
+export const revalidate = 0;
